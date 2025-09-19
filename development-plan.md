@@ -87,10 +87,11 @@
 - **Historical Data**: False positive penalty based on similar past findings
 
 **Machine Learning Components**:
-- **Feature Engineering**: Code complexity metrics, function signatures, control flow
-- **Model Training**: Regular retraining on customer feedback data
-- **Inference Pipeline**: Real-time scoring during analysis runs
-- **Model Versioning**: MLflow for experiment tracking and model deployment
+- **Training Data Collection**: Customer feedback on false positives (Phase 1)
+- **Feature Engineering**: Code complexity metrics, function signatures, control flow (Phase 2)
+- **Model Training**: Supervised learning on 6+ months of customer data (Phase 2)
+- **Inference Pipeline**: Real-time scoring during analysis runs (Phase 2)
+- **Model Versioning**: MLflow for experiment tracking and model deployment (Phase 2)
 
 #### 3. Analysis Orchestration Service
 **Purpose**: Manage analysis workflows, resource allocation, job scheduling
@@ -538,51 +539,61 @@
 - Dashboard shows findings from all tools with complexity correlation
 - Code metrics enhance vulnerability risk assessment
 
-#### Sprint 6: Basic Intelligence Engine (Weeks 11-12)
-**Technical Milestone**: Cross-tool deduplication and risk scoring
+#### Sprint 6: Intelligence Engine & Smart Rules (Weeks 11-12)
+**Technical Milestone**: Rule-based deduplication and intelligent risk scoring
 
 **Development Checklist**:
 - [ ] Implement syntactic deduplication (exact file/line matching)
 - [ ] Create fuzzy matching algorithm using Levenshtein distance
-- [ ] Implement base risk scoring with severity weights
+- [ ] Implement rule-based risk scoring with severity weights
 - [ ] Add confidence multipliers for risk calculations
 - [ ] Create cross-tool validation bonus scoring
+- [ ] Integrate code complexity metrics into risk assessment
+- [ ] Implement intelligent severity adjustment based on business context
+- [ ] Create rule-based false positive detection using pattern matching
 - [ ] Implement finding status management (open/acknowledged/fixed)
 - [ ] Add bulk finding status updates
-- [ ] Create finding detail modal with remediation suggestions
+- [ ] Create finding detail modal with template-based remediation suggestions
 - [ ] Implement finding export functionality (PDF/CSV)
 - [ ] Add basic analytics dashboard with metrics
 
 **Acceptance Criteria**:
-- Duplicate findings merge automatically across tools
-- Risk scores calculate consistently using defined algorithm
+- Duplicate findings merge automatically across tools with 70% accuracy
+- Risk scores calculate consistently using rule-based algorithm
+- Code complexity integration improves risk assessment by 25%
+- Rule-based false positive detection achieves 35% reduction
 - Finding statuses persist and update across sessions
+- Template-based remediation provides relevant suggestions
 - Export generates properly formatted reports
 - Analytics display meaningful security metrics
 
 ### Phase 2: Enterprise Features (Months 4-6)
 
-#### Sprint 7: Advanced Intelligence & ML (Weeks 13-14)
-**Technical Milestone**: Machine learning-based false positive detection
+#### Sprint 7: Advanced Rule-Based Intelligence (Weeks 13-14)
+**Technical Milestone**: Sophisticated rule engines and pattern recognition
 
 **Development Checklist**:
-- [ ] Implement feature engineering pipeline for code complexity metrics
-- [ ] Set up MLflow for experiment tracking and model versioning
-- [ ] Create training data collection from customer feedback
-- [ ] Implement supervised learning model for duplicate classification
-- [ ] Add semantic similarity matching using spaCy
-- [ ] Create model inference pipeline for real-time scoring
-- [ ] Implement A/B testing framework for model improvements
-- [ ] Add model performance monitoring and drift detection
-- [ ] Create automated model retraining on new feedback data
-- [ ] Implement confidence intervals for ML predictions
+- [ ] Implement advanced rule engine for vulnerability pattern detection
+- [ ] Create statistical analysis algorithms for anomaly detection
+- [ ] Set up decision tree implementations for smart categorization
+- [ ] Implement AST-based code similarity analysis
+- [ ] Add business context rules for risk adjustment
+- [ ] Create template-based remediation suggestion engine
+- [ ] Implement statistical correlation between complexity and vulnerabilities
+- [ ] Add rule-based severity adjustment using multiple factors
+- [ ] Create intelligent finding categorization using NLP libraries
+- [ ] Implement pattern matching for known vulnerability signatures
+- [ ] Add customer feedback collection for future ML training data
+- [ ] Create A/B testing framework for rule improvements
 
 **Acceptance Criteria**:
-- ML model achieves >85% accuracy on duplicate detection
-- False positive rate reduces below 10% with ML integration
-- Model retrains automatically on new feedback data
-- Inference latency stays below 100ms per finding
-- Model performance metrics track and alert on degradation
+- Rule engine achieves 75% accuracy on vulnerability classification
+- False positive rate reduces below 15% with advanced rules
+- Statistical analysis identifies meaningful patterns in data
+- AST similarity detection improves deduplication accuracy
+- Template remediation provides relevant, actionable suggestions
+- Customer feedback collection system captures ML training data
+- A/B testing validates rule improvements
 
 #### Sprint 8: Team Collaboration & Workflow (Weeks 15-16)
 **Technical Milestone**: Multi-user collaboration with commenting and assignments
@@ -741,27 +752,30 @@
 - Policy violations trigger automatic remediation workflows
 - Auditor portal provides secure access to compliance evidence
 
-#### Sprint 15: AI-Powered Analysis & Remediation (Weeks 29-30)
-**Technical Milestone**: LLM integration for intelligent code analysis
+#### Sprint 15: Machine Learning Integration (Weeks 29-30)
+**Technical Milestone**: ML-powered analysis enhancement (after sufficient training data)
 
 **Development Checklist**:
-- [ ] Integrate large language model API for code understanding
-- [ ] Implement automated remediation suggestion generation
-- [ ] Add natural language query interface for security findings
-- [ ] Create smart categorization using semantic analysis
-- [ ] Implement context-aware vulnerability explanations
-- [ ] Add automated code fix generation with validation
-- [ ] Create intelligent severity assessment based on business context
-- [ ] Implement false positive prediction using code analysis
-- [ ] Add automated security documentation generation
-- [ ] Create chatbot interface for security guidance
+- [ ] Implement feature engineering pipeline using collected training data
+- [ ] Set up MLflow for experiment tracking and model versioning
+- [ ] Create supervised learning model for false positive prediction
+- [ ] Implement semantic similarity matching using embeddings
+- [ ] Add ML-based vulnerability severity prediction
+- [ ] Create model inference pipeline for real-time scoring
+- [ ] Implement automated model retraining pipeline
+- [ ] Add model performance monitoring and drift detection
+- [ ] Create ML-powered remediation suggestion ranking
+- [ ] Implement confidence scoring for ML predictions
+- [ ] Add A/B testing for ML vs rule-based approaches
+- [ ] Create ML model explainability features for enterprise customers
 
 **Acceptance Criteria**:
-- LLM generates accurate remediation suggestions >80% of time
-- Natural language queries return relevant security findings
-- Automated fixes pass validation and don't break functionality
-- Severity assessments align with security expert judgment
-- Chatbot provides helpful security guidance to developers
+- ML model achieves >85% accuracy using 6+ months of training data
+- False positive rate improves additional 10-15% beyond rule-based system
+- Model inference latency stays below 100ms per finding
+- Automated retraining maintains model performance over time
+- A/B testing shows statistically significant improvement over rules
+- Enterprise customers can understand ML decision rationale
 
 #### Sprint 16: Advanced Enterprise Integration (Weeks 31-32)
 **Technical Milestone**: Deep enterprise system integration
