@@ -55,17 +55,17 @@
 - [ ] **Test ArgoCD rollback functionality for local data service**
 - [ ] **Validate Vault secret rotation for database credentials**
 
-**Local Development Configuration with Vault:**
+**Cloud Development Configuration with Vault:**
 ```yaml
 API Service Vault Secrets:
-  secret/api-service/jwt-secret: "local-development-jwt-signing-key"
+  secret/api-service/jwt-secret: "cloud-development-jwt-signing-key"
   secret/api-service/oauth-google: "Google OAuth client credentials"
   secret/api-service/oauth-github: "GitHub OAuth client credentials"
-  secret/api-service/cors-origins: "https://app.solidity-platform.local"
+  secret/api-service/cors-origins: "https://app.dev.soliditysecops.com"
 
 Data Service Vault Secrets:
-  secret/data-service/database-url: "postgresql://user:pass@postgres.solidity-platform.local:5432/platform"
-  secret/data-service/redis-url: "redis://redis.solidity-platform.local:6379"
+  secret/data-service/database-url: "RDS PostgreSQL connection string"
+  secret/data-service/redis-url: "ElastiCache Redis connection string"
   secret/data-service/encryption-key: "AES-256 encryption key for sensitive data"
   secret/data-service/audit-signing-key: "Key for audit log integrity"
 
@@ -75,14 +75,14 @@ Vault Policies:
 ```
 
 **Deliverables Day 6:**
-- [ ] Functional API service with authentication running locally
-- [ ] Local database schema deployed with test data
-- [ ] Data service with local caching operational
-- [ ] Basic user and project management working with local storage
-- [ ] **Local SSL-secured API endpoints accessible via https://api.solidity-platform.local**
-- [ ] **Rate limiting protecting local API services**
-- [ ] **API and data services deployed and managed via local ArgoCD**
-- [ ] **ArgoCD showing healthy status for both services in local environment**
+- [ ] Functional API service with authentication running in EKS
+- [ ] RDS database schema deployed with test data
+- [ ] Data service with ElastiCache caching operational
+- [ ] Basic user and project management working with cloud storage
+- [ ] **Cloud SSL-secured API endpoints accessible via https://api.dev.soliditysecops.com**
+- [ ] **Rate limiting protecting cloud API services**
+- [ ] **API and data services deployed and managed via cloud ArgoCD**
+- [ ] **ArgoCD showing healthy status for both services in cloud environment**
 - [ ] **All sensitive configuration stored and retrieved from Vault**
 - [ ] **External Secrets Operator successfully injecting Vault secrets**
 
@@ -163,14 +163,14 @@ Vault Policies:
 ```
 
 **Deliverables Day 7:**
-- [ ] All 4 security tools integrated and functional in local environment
-- [ ] Local job orchestration system processing analyses
-- [ ] Tool adapters normalizing results to common format locally
-- [ ] Parallel execution of multiple tools working in local cluster
-- [ ] **Local SSL-secured tool services accessible via https://tools.solidity-platform.local**
-- [ ] **Local orchestration endpoints protected with proper authentication**
-- [ ] **Tool integration and orchestration services managed via local ArgoCD**
-- [ ] **ArgoCD showing healthy deployment status for all local tool services**
+- [ ] All 4 security tools integrated and functional in EKS environment
+- [ ] Cloud job orchestration system processing analyses
+- [ ] Tool adapters normalizing results to common format in cloud
+- [ ] Parallel execution of multiple tools working in EKS cluster
+- [ ] **Cloud SSL-secured tool services accessible via https://tools.dev.soliditysecops.com**
+- [ ] **Cloud orchestration endpoints protected with proper authentication**
+- [ ] **Tool integration and orchestration services managed via cloud ArgoCD**
+- [ ] **ArgoCD showing healthy deployment status for all cloud tool services**
 - [ ] **All tool credentials and sensitive configuration managed by Vault**
 - [ ] **External Secrets Operator successfully injecting tool secrets**
 
@@ -230,7 +230,7 @@ Vault Policies:
 - [ ] **Test ArgoCD progressive delivery for local frontend changes**
 - [ ] **Validate frontend secret injection from Vault**
 
-**Local Frontend Configuration with Vault:**
+**Cloud Frontend Configuration with Vault:**
 ```yaml
 Intelligence Engine Vault Secrets:
   secret/intelligence-engine/ml-api-keys: "Machine learning service API keys"
@@ -240,8 +240,8 @@ Intelligence Engine Vault Secrets:
 
 Frontend Vault Secrets:
   secret/frontend/oauth-client-id: "OAuth client ID for authentication"
-  secret/frontend/api-base-url: "https://api.solidity-platform.local"
-  secret/frontend/websocket-url: "wss://api.solidity-platform.local/ws"
+  secret/frontend/api-base-url: "https://api.dev.soliditysecops.com"
+  secret/frontend/websocket-url: "wss://api.dev.soliditysecops.com/ws"
   secret/frontend/feature-flags: "Dynamic feature flag configuration"
   secret/frontend/analytics-key: "Analytics service API key"
 
@@ -251,14 +251,14 @@ Vault Policies:
 ```
 
 **Deliverables Day 8:**
-- [ ] Intelligence engine processing and scoring findings locally
-- [ ] React frontend with authentication working against local APIs
-- [ ] Real-time communication between frontend and backend via local WebSockets
-- [ ] Basic dashboard structure in place for local testing
-- [ ] **Frontend accessible via https://app.solidity-platform.local with self-signed SSL**
-- [ ] **Local security headers configured for frontend protection**
-- [ ] **Intelligence engine and frontend services deployed via local ArgoCD**
-- [ ] **ArgoCD managing local frontend deployment lifecycle**
+- [ ] Intelligence engine processing and scoring findings in cloud
+- [ ] React frontend with authentication working against cloud APIs
+- [ ] Real-time communication between frontend and backend via cloud WebSockets
+- [ ] Basic dashboard structure in place for cloud testing
+- [ ] **Frontend accessible via https://app.dev.soliditysecops.com with Let's Encrypt SSL**
+- [ ] **Cloud security headers configured for frontend protection**
+- [ ] **Intelligence engine and frontend services deployed via cloud ArgoCD**
+- [ ] **ArgoCD managing cloud frontend deployment lifecycle**
 - [ ] **All frontend and intelligence engine secrets managed by Vault**
 - [ ] **External Secrets Operator injecting secrets into frontend and intelligence services**
 
@@ -305,16 +305,16 @@ Vault Policies:
 - [ ] **Test ArgoCD health checks for local WebSocket connections**
 - [ ] **Test Vault secret rotation for notification service credentials**
 
-**Local Notification Configuration with Vault:**
+**Cloud Notification Configuration with Vault:**
 ```yaml
 Notification Service Vault Secrets:
-  secret/notification/websocket-url: "wss://notifications.solidity-platform.local"
-  secret/notification/smtp-server: "mailhog.solidity-platform.local:1025"
-  secret/notification/smtp-username: "Local MailHog username"
-  secret/notification/smtp-password: "Local MailHog password"
-  secret/notification/slack-webhook: "https://hooks.slack.com/services/LOCAL/DEV/WEBHOOK"
-  secret/notification/email-from: "noreply@solidity-platform.local"
-  secret/notification/base-url: "https://app.solidity-platform.local"
+  secret/notification/websocket-url: "wss://notifications.dev.soliditysecops.com"
+  secret/notification/ses-access-key: "AWS SES access key"
+  secret/notification/ses-secret-key: "AWS SES secret key"
+  secret/notification/ses-region: "us-east-1"
+  secret/notification/slack-webhook: "https://hooks.slack.com/services/TEAM/CHANNEL/TOKEN"
+  secret/notification/email-from: "noreply@soliditysecops.com"
+  secret/notification/base-url: "https://app.dev.soliditysecops.com"
 
 Email Template Vault Secrets:
   secret/notification/templates/critical-finding: "Critical vulnerability email template"
@@ -326,14 +326,14 @@ Vault Policies:
 ```
 
 **Deliverables Day 9:**
-- [ ] Functional dashboard displaying security findings from local analysis
-- [ ] Real-time notifications working across all channels in local environment
-- [ ] **Local email integration operational (MailHog for testing)**
-- [ ] **Local Slack integration functional (test webhook)**
-- [ ] User interface responsive and accessible for local development
-- [ ] **All services accessible via local SSL-secured ingress**
-- [ ] **Local WebSocket connections working through nginx ingress proxy**
-- [ ] **All services deployed and managed via local ArgoCD**
+- [ ] Functional dashboard displaying security findings from cloud analysis
+- [ ] Real-time notifications working across all channels in cloud environment
+- [ ] **Cloud email integration operational (AWS SES for testing)**
+- [ ] **Cloud Slack integration functional (production webhook)**
+- [ ] User interface responsive and accessible for cloud development
+- [ ] **All services accessible via cloud SSL-secured ingress**
+- [ ] **Cloud WebSocket connections working through ALB ingress proxy**
+- [ ] **All services deployed and managed via cloud ArgoCD**
 - [ ] **All notification credentials and templates managed by Vault**
 - [ ] **External Secrets Operator successfully injecting notification secrets**
 
