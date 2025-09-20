@@ -1,4 +1,4 @@
-# Unified Solidity Security Platform - Technical Development Plan
+# Unified Solidity Security Platform - Technical Development Plan (Cloud-First)
 
 ## System Architecture Overview
 
@@ -6,49 +6,69 @@
 **Microservices Architecture Pattern** with event-driven communication and enterprise-grade secret management
 - **API Gateway**: Kong or AWS API Gateway for rate limiting, authentication, routing
 - **Service Mesh**: Istio for service-to-service communication, load balancing, circuit breaking
-- **Ingress Controller**: nginx for SSL termination, rate limiting, and traffic routing
-- **Certificate Management**: cert-manager for automated SSL certificate provisioning and renewal
+- **Ingress Controller**: AWS ALB for SSL termination, rate limiting, and traffic routing
+- **Certificate Management**: cert-manager with Let's Encrypt for automated SSL certificate provisioning
 - **Secret Management**: HashiCorp Vault for centralized secret storage, rotation, and policy enforcement
 - **Secret Injection**: External Secrets Operator for Kubernetes-native secret injection from Vault
 - **Event Bus**: Apache Kafka for async messaging between services
-- **Container Orchestration**: Kubernetes with Helm charts for deployment
-- **Observability**: Prometheus metrics, Jaeger tracing, structured logging with Fluentd
+- **Container Orchestration**: AWS EKS with Helm charts for deployment
+- **Observability**: Prometheus metrics, Jaeger tracing, CloudWatch logs with Fluentd
 
-### Development Strategy: Local-First, Cloud-Ready
+### Development Strategy: Cloud-First Development
 
-#### Phase 1: Local Development Foundation (Months 1-3)
-**Infrastructure**: Local Kubernetes (minikube) with cloud-ready patterns and enterprise secret management
-- **Local Kubernetes**: minikube with realistic resource allocation
-- **Local Services**: PostgreSQL and Redis via Docker Compose + Kubernetes
-- **SSL Strategy**: Self-signed certificates with cert-manager local CA issuer
-- **DNS Strategy**: Local hosts file entries for service discovery
-- **Container Registry**: minikube built-in registry for development
-- **ArgoCD**: Local deployment managing local applications
-- **Secret Management**: HashiCorp Vault in dev mode for local secret storage and management
-- **Secret Injection**: External Secrets Operator for Vault integration
-- **Cost**: $0 cloud costs during development phase
-
-#### Phase 2: Cloud Migration (Month 4+)
-**Infrastructure**: AWS EKS with production-grade services and enterprise secret management
-- **Kubernetes**: AWS EKS with managed node groups
-- **Database**: RDS PostgreSQL with read replicas
-- **Caching**: ElastiCache Redis with clustering
+#### **Cloud Development Foundation (Months 1-3)**
+**Infrastructure**: AWS EKS development cluster with production-ready patterns
+- **Development Cluster**: AWS EKS with managed node groups (t3.medium)
+- **Database**: AWS RDS PostgreSQL with automated backups
+- **Caching**: AWS ElastiCache Redis with encryption
 - **SSL Strategy**: Let's Encrypt certificates with Route53 DNS
+- **DNS Management**: Route53 hosted zone with custom domain
 - **Load Balancing**: AWS Application Load Balancer
 - **Container Registry**: Amazon ECR with vulnerability scanning
-- **Secret Management**: HashiCorp Vault with AWS KMS auto-unseal and HA cluster
-- **Secret Injection**: External Secrets Operator with AWS IAM integration
-- **Cost**: Estimated $500-2500/month based on usage (including Vault Enterprise)
+- **Secret Management**: HashiCorp Vault with AWS KMS auto-unseal
+- **GitOps**: ArgoCD managing all deployments from day one
+- **Cost**: $200-350/month during development phase
+
+#### **Production Scaling (Month 4+)**
+**Infrastructure**: Multi-environment AWS deployment with enterprise features
+- **Kubernetes**: AWS EKS with production-grade node groups
+- **Database**: RDS PostgreSQL with read replicas and Multi-AZ
+- **Caching**: ElastiCache Redis with clustering and failover
+- **SSL Strategy**: Let's Encrypt certificates with automated renewal
+- **Load Balancing**: AWS ALB with WAF integration
+- **Container Registry**: ECR with advanced security scanning
+- **Secret Management**: Vault Enterprise with HA cluster
+- **Cost**: $800-2000/month based on usage and scale
+
+### DNS and Domain Management
+
+#### **Domain Registration and Setup**
+- [ ] **Domain already owned: soliditysecops.com**
+- [ ] **Configure Route53 hosted zone for soliditysecops.com**
+- [ ] **Set up development subdomain (dev.soliditysecops.com)**
+- [ ] **Configure staging subdomain (staging.soliditysecops.com)**
+- [ ] **Add A-Records for services:**
+  - [ ] **api.dev.soliditysecops.com → ALB**
+  - [ ] **app.dev.soliditysecops.com → ALB**
+  - [ ] **argocd.dev.soliditysecops.com → ALB**
+  - [ ] **vault.dev.soliditysecops.com → ALB**
+  - [ ] **grafana.dev.soliditysecops.com → ALB**
+  - [ ] **api.staging.soliditysecops.com → Staging ALB**
+  - [ ] **app.staging.soliditysecops.com → Staging ALB**
+  - [ ] **api.soliditysecops.com → Production ALB**
+  - [ ] **app.soliditysecops.com → Production ALB**
+- [ ] **Configure wildcard SSL certificates via Let's Encrypt**
+- [ ] **Set up CloudFlare for additional DDoS protection (optional)**
 
 ### Core Services Architecture
 
 #### Secret Management Architecture
-**HashiCorp Vault Integration Strategy**:
-- **Local Development**: Vault dev mode with file storage backend
-- **Cloud Production**: Vault cluster with AWS KMS auto-unseal and Consul storage
+**HashiCorp Vault Cloud Integration Strategy**:
+- **Development**: Vault cluster with AWS KMS auto-unseal and S3 storage
+- **Production**: Vault Enterprise cluster with multi-region replication
 - **Secret Engines**: KV v2 for application secrets, PKI for certificate management, Database for dynamic credentials
-- **Authentication**: Kubernetes service accounts, AWS IAM, LDAP/SAML for users
-- **Secret Injection**: External Secrets Operator with policy-based access control
+- **Authentication**: AWS IAM, Kubernetes service accounts, LDAP/SAML for users
+- **Secret Injection**: External Secrets Operator with AWS IAM integration
 
 **Vault Secret Organization**:
 ```yaml
@@ -93,9 +113,10 @@ Database Engine:
 
 #### 1. Tool Integration Service
 **Purpose**: Unified interface for all security analysis tools with secure credential management
-**Technology Stack**: Python 3.11, FastAPI, Celery, Redis, Rust runtime for Aderyn
+**Technology Stack**: Python 3.11, FastAPI, Celery, ElastiCache Redis, Rust runtime for Aderyn
 **Design Pattern**: Adapter pattern with plugin architecture
 **Secret Management**: Vault KV engine for API keys, External Secrets Operator for injection
+**Cloud Integration**: EKS deployment with AWS IAM roles for service authentication
 
 **Technical Requirements**:
 - **Plugin System**: Dynamic loading of tool adapters via Python importlib
@@ -103,17 +124,19 @@ Database Engine:
 - **Rate Limiting**: Per-tool rate limiting to respect API quotas
 - **Retry Logic**: Exponential backoff with jitter for failed API calls
 - **Timeout Handling**: Configurable timeouts per tool type
-- **Result Caching**: Redis-based caching for identical contract analyses
+- **Result Caching**: ElastiCache Redis-based caching for identical contract analyses
 - **Credential Management**: Vault-stored API keys with automatic rotation
+- **Cloud Storage**: S3 for contract files and analysis artifacts
 
 **Tool Integration Specifications**:
 
 **Slither Integration**:
 - Direct Python API usage (slither-analyzer package)
 - Custom detector plugin support
-- Parallel analysis for multiple contracts
+- Parallel analysis for multiple contracts using EKS pod scaling
 - Memory optimization for large contract sets
 - Configuration secrets stored in Vault
+- Results stored in S3 with encryption
 
 **MythX Integration**:
 - REST API with async job polling
@@ -121,15 +144,17 @@ Database Engine:
 - Analysis mode selection (quick/standard/deep)
 - API key rotation and failover via Vault
 - Vault-managed API credentials with automatic rotation
+- AWS SQS integration for job queue management
 
 **Aderyn Integration**:
 - Rust-based CLI wrapper with process management
 - Direct cargo installation and version management
 - JSON report parsing for vulnerability detection
-- Performance optimization for large codebases
+- Performance optimization for large codebases using EKS node scaling
 - Foundry project structure detection
 - Custom detector configuration support
 - Configuration stored in Vault KV engine
+- S3 storage for Rust compilation artifacts
 
 **Solidity-Metrics Integration**:
 - Node.js CLI wrapper with process management
@@ -139,13 +164,15 @@ Database Engine:
 - Support for multiple Solidity compiler versions
 - Integration with vulnerability risk correlation
 - Tool configurations managed via Vault
+- CloudWatch metrics for tool performance monitoring
 
 **Certora Integration**:
 - CLI wrapper with process management
 - Specification file generation automation
 - Result parsing from JSON output
-- Resource allocation for verification jobs
+- Resource allocation for verification jobs using EKS compute
 - API credentials stored securely in Vault
+- S3 storage for verification artifacts
 
 **Tool Output Normalization**:
 - Standardized vulnerability schema (SWC-based)
@@ -161,9 +188,10 @@ Database Engine:
 
 #### 2. Intelligence Engine Service
 **Purpose**: Cross-tool correlation, deduplication, ML-based analysis with secure configuration management
-**Technology Stack**: Python 3.11, scikit-learn, spaCy, PostgreSQL, Redis
+**Technology Stack**: Python 3.11, scikit-learn, spaCy, RDS PostgreSQL, ElastiCache Redis
 **Design Pattern**: Pipeline pattern with pluggable analyzers
 **Secret Management**: Vault KV for ML API keys and algorithm configurations
+**Cloud Integration**: EKS deployment with GPU-enabled nodes for ML workloads
 
 **Deduplication Algorithm Specifications**:
 - **Syntactic Matching**: Exact file path + line number matching
@@ -185,87 +213,91 @@ Database Engine:
 - **Model Training**: Supervised learning on 6+ months of customer data (Phase 2)
 - **Inference Pipeline**: Real-time scoring during analysis runs (Phase 2)
 - **Model Versioning**: MLflow for experiment tracking and model deployment (Phase 2)
+- **Cloud ML**: AWS SageMaker integration for large-scale model training
 
 **Vault Integration**:
 - ML service API keys stored in `secret/intelligence-engine/ml-api-keys`
 - Algorithm weights and configurations in `secret/intelligence-engine/configs`
-- Model encryption keys for securing ML models at rest
+- Model encryption keys for securing ML models at rest in S3
 - External Secrets Operator for credential injection
 
 #### 3. Analysis Orchestration Service
 **Purpose**: Manage analysis workflows, resource allocation, job scheduling with secure credential management
-**Technology Stack**: Python 3.11, Celery, Redis, PostgreSQL
+**Technology Stack**: Python 3.11, Celery, ElastiCache Redis, RDS PostgreSQL
 **Design Pattern**: Workflow orchestration with DAG execution
 **Secret Management**: Vault for broker credentials and worker authentication
+**Cloud Integration**: EKS with auto-scaling worker pods and SQS integration
 
 **Job Scheduling**:
 - **Priority Queues**: Critical (audit prep), High (CI/CD), Normal (manual), Low (batch)
-- **Resource Management**: CPU/memory limits per analysis type
-- **Concurrency Control**: Max concurrent jobs per organization
-- **Failover Handling**: Dead letter queues for failed analyses
+- **Resource Management**: EKS pod resource limits and requests per analysis type
+- **Concurrency Control**: Max concurrent jobs per organization using K8s resource quotas
+- **Failover Handling**: AWS SQS dead letter queues for failed analyses
 
 **Workflow Engine**:
 - **DAG Definition**: Analysis steps as directed acyclic graph
-- **Parallel Execution**: Independent tool runs in parallel
+- **Parallel Execution**: Independent tool runs in parallel across EKS pods
 - **Dependency Management**: Intelligence engine waits for all tools
-- **Checkpoint System**: Resume interrupted analyses from checkpoints
+- **Checkpoint System**: Resume interrupted analyses from S3-stored checkpoints
 
 **Vault Integration**:
-- Redis broker credentials stored in `secret/orchestration/celery-broker`
+- ElastiCache Redis broker credentials stored in `secret/orchestration/celery-broker`
 - Worker authentication tokens in `secret/orchestration/worker-auth`
 - Queue encryption keys for securing job data
 - External Secrets Operator managing worker credential injection
 
 #### 4. Data Service
 **Purpose**: Centralized data management, caching, search with secure database credential management
-**Technology Stack**: PostgreSQL 15, Redis 7, Elasticsearch 8
+**Technology Stack**: RDS PostgreSQL 15, ElastiCache Redis 7, Amazon OpenSearch
 **Design Pattern**: CQRS with event sourcing for audit trails
 **Secret Management**: Vault Database engine for dynamic database credentials
+**Cloud Integration**: RDS with automated backups and read replicas
 
 **Database Schema Design**:
 - **Partitioning Strategy**: Time-based partitioning for analysis_runs and findings
 - **Indexing Strategy**: Composite indexes on (organization_id, project_id, created_at)
-- **Connection Pooling**: PgBouncer for connection management
+- **Connection Pooling**: RDS Proxy for connection management and pooling
 - **Read Replicas**: Separate read replicas for analytics and reporting
 
 **Caching Strategy**:
 - **L1 Cache**: In-memory application cache for frequently accessed data
-- **L2 Cache**: Redis for session data, tool results, computed aggregations
-- **Cache Invalidation**: Event-driven invalidation on data mutations
+- **L2 Cache**: ElastiCache Redis for session data, tool results, computed aggregations
+- **Cache Invalidation**: Event-driven invalidation on data mutations via AWS EventBridge
 - **Cache Warming**: Preload cache with predicted access patterns
 
 **Search Infrastructure**:
-- **Full-Text Search**: Elasticsearch for finding text, vulnerability descriptions
+- **Full-Text Search**: Amazon OpenSearch for finding text, vulnerability descriptions
 - **Faceted Search**: Multi-dimensional filtering by severity, tool, file type
 - **Autocomplete**: Prefix search for file paths, function names
-- **Search Analytics**: Query performance monitoring and optimization
+- **Search Analytics**: CloudWatch monitoring for query performance optimization
 
 **Vault Integration**:
 - Dynamic database credentials via Vault Database engine
 - Database encryption keys stored in `secret/data-service/encryption`
-- Redis credentials managed through Vault KV engine
+- ElastiCache Redis credentials managed through Vault KV engine
 - External Secrets Operator for automatic credential rotation
 
 #### 5. Notification Service
 **Purpose**: Real-time updates, integrations, alerting with secure credential management
-**Technology Stack**: Node.js, Socket.io, Redis, PostgreSQL
+**Technology Stack**: Node.js, Socket.io, ElastiCache Redis, RDS PostgreSQL
 **Design Pattern**: Publisher-subscriber with WebSocket broadcasting
 **Secret Management**: Vault KV for SMTP credentials and webhook URLs
+**Cloud Integration**: EKS deployment with ALB WebSocket support
 
 **Real-Time Communication**:
-- **WebSocket Management**: Connection pooling, auto-reconnection, heartbeat
+- **WebSocket Management**: Connection pooling via ElastiCache, auto-reconnection, heartbeat
 - **Room Management**: Organization and project-based message broadcasting
-- **Message Queuing**: Redis pub/sub for horizontal scaling
-- **Rate Limiting**: Per-connection message rate limiting
+- **Message Queuing**: ElastiCache Redis pub/sub for horizontal scaling
+- **Rate Limiting**: Per-connection message rate limiting via AWS API Gateway
 
 **Integration Specifications**:
 - **Slack Integration**: Bot with interactive message components
 - **Teams Integration**: Webhook-based notifications with adaptive cards
-- **Email Service**: HTML templates with inline vulnerability details
+- **Email Service**: AWS SES with HTML templates and inline vulnerability details
 - **Webhook Support**: Configurable webhooks for external system integration
 
 **Vault Integration**:
-- SMTP credentials stored in `secret/notification/smtp-credentials`
+- AWS SES credentials stored in `secret/notification/ses-credentials`
 - Slack webhook URLs in `secret/notification/slack-webhooks`
 - Email templates and configurations in `secret/notification/templates`
 - External Secrets Operator for secure credential injection
@@ -276,6 +308,7 @@ Database Engine:
 **Technology Stack**: React 18, TypeScript 5, Vite, TanStack Query, Zustand
 **Architecture Pattern**: Feature-based folder structure with shared components
 **Secret Management**: Vault-managed OAuth credentials and API configurations
+**Cloud Integration**: CloudFront distribution with S3 static hosting
 
 **State Management**:
 - **Global State**: Zustand for authentication, user preferences, theme
@@ -301,6 +334,12 @@ Database Engine:
 - Feature flags and dynamic configuration via Vault
 - External Secrets Operator injecting frontend configuration
 
+**Cloud Deployment**:
+- **S3 Static Hosting**: Optimized build artifacts stored in S3
+- **CloudFront CDN**: Global content delivery with edge caching
+- **Route53 DNS**: Custom domain routing to CloudFront distribution
+- **AWS Certificate Manager**: SSL certificates for custom domain
+
 #### Visualization Components
 **Technology Stack**: D3.js, Recharts, React Flow
 **Design Requirements**: Responsive, accessible, performant with large datasets
@@ -320,9 +359,10 @@ Database Engine:
 ### Security Architecture
 
 #### Authentication & Authorization
-**Technology Stack**: JWT, OAuth 2.0, SAML 2.0, Redis, HashiCorp Vault
+**Technology Stack**: JWT, OAuth 2.0, SAML 2.0, ElastiCache Redis, HashiCorp Vault
 **Design Pattern**: Role-based access control with attribute-based policies
 **Secret Management**: Vault-managed JWT keys and OAuth credentials
+**Cloud Integration**: AWS IAM integration for service authentication
 
 **Authentication Methods**:
 - **Password-Based**: Argon2 hashing with salt and pepper
@@ -334,7 +374,7 @@ Database Engine:
 - **Role Hierarchy**: Super Admin > Org Admin > Project Admin > Developer > Viewer
 - **Permission System**: Granular permissions for resources and actions
 - **Policy Engine**: ABAC policies for complex access control scenarios
-- **API Security**: JWT validation, scope checking, rate limiting
+- **API Security**: JWT validation, scope checking, rate limiting via AWS API Gateway
 
 **Vault Integration**:
 - JWT signing keys stored in Vault with automatic rotation
@@ -344,71 +384,70 @@ Database Engine:
 
 #### Data Security
 **Encryption Standards**:
-- **At Rest**: AES-256-GCM for database and file storage
+- **At Rest**: AES-256-GCM for RDS and S3 storage with AWS KMS
 - **In Transit**: TLS 1.3 for all external communications
 - **Application Level**: Field-level encryption for sensitive data
 - **Key Management**: Vault PKI engine and AWS KMS for key rotation
 
 **Privacy Controls**:
-- **Data Isolation**: Tenant-based data segregation
+- **Data Isolation**: Tenant-based data segregation with RDS row-level security
 - **PII Handling**: Automatic detection and masking of personal data
-- **Audit Logging**: Immutable logs for all data access and modifications
-- **Data Retention**: Configurable retention policies with automatic purging
+- **Audit Logging**: Immutable logs in CloudWatch for all data access and modifications
+- **Data Retention**: Configurable retention policies with automatic S3 lifecycle management
 
 **Vault Security Features**:
 - **Transit Engine**: Encryption as a service for application-level encryption
 - **PKI Engine**: Certificate authority for internal service communication
 - **Dynamic Secrets**: Time-limited database credentials with automatic rotation
-- **Audit Logging**: Comprehensive audit trails for all secret access
+- **Audit Logging**: Comprehensive audit trails streamed to CloudWatch
 
 ### Performance & Scalability
 
 #### Horizontal Scaling Strategy
-**Load Balancing**: Application-level load balancing with health checks
-**Database Scaling**: Read replicas, connection pooling, query optimization
-**Caching Layers**: Multi-tier caching with automatic cache warming
-**CDN Strategy**: Global CDN for static assets and API responses
+**Load Balancing**: AWS ALB with health checks and auto-scaling integration
+**Database Scaling**: RDS read replicas, connection pooling via RDS Proxy
+**Caching Layers**: Multi-tier caching with ElastiCache cluster mode
+**CDN Strategy**: CloudFront for static assets and API response caching
 **Secret Performance**: Vault cluster mode for high-availability secret access
 
 **Performance Targets**:
 - **API Response Time**: P95 < 200ms for CRUD operations
-- **Analysis Throughput**: 1000+ concurrent contract analyses
-- **Database Performance**: P95 < 50ms for indexed queries
-- **Frontend Performance**: First Contentful Paint < 1.5s
+- **Analysis Throughput**: 1000+ concurrent contract analyses via EKS auto-scaling
+- **Database Performance**: P95 < 50ms for indexed queries via RDS optimization
+- **Frontend Performance**: First Contentful Paint < 1.5s via CloudFront
 - **Vault Performance**: P95 < 50ms for secret retrieval
 
 #### Resource Management
 **Container Resources**:
-- **CPU Limits**: 2 cores per service instance with burst capability
+- **CPU Limits**: 2 cores per service instance with EKS burst capability
 - **Memory Limits**: 4GB per service with OOM kill protection
-- **Storage**: Persistent volumes for database, ephemeral for processing
-- **Network**: Service mesh for inter-service communication
+- **Storage**: EBS persistent volumes for database, ephemeral for processing
+- **Network**: EKS CNI for optimized pod networking
 
 **Auto-Scaling Configuration**:
 - **Horizontal Pod Autoscaler**: CPU and memory-based scaling
-- **Vertical Pod Autoscaler**: Right-sizing recommendations
-- **Cluster Autoscaler**: Node scaling based on resource demands
-- **Custom Metrics**: Queue length and analysis time-based scaling
+- **Cluster Autoscaler**: EKS node scaling based on resource demands
+- **Custom Metrics**: Queue length and analysis time-based scaling via CloudWatch
 - **Vault Scaling**: Vault cluster auto-scaling based on request volume
 
 ### DevOps & Infrastructure
 
 #### CI/CD Pipeline
-**Technology Stack**: GitHub Actions, Docker, Kubernetes, ArgoCD, HashiCorp Vault
+**Technology Stack**: GitHub Actions, AWS ECR, AWS EKS, ArgoCD, HashiCorp Vault
 **Pipeline Stages**: Test → Build → Security Scan → Deploy → Verify
 **Secret Management**: Vault integration for CI/CD credentials and deployment secrets
 
 **Build Process**:
 - **Multi-Stage Builds**: Optimized Docker images with security scanning
-- **Dependency Caching**: Layer caching for faster builds
-- **Parallel Execution**: Test suites run in parallel across services
-- **Artifact Management**: Container registry with vulnerability scanning
+- **Dependency Caching**: Layer caching in ECR for faster builds
+- **Parallel Execution**: Test suites run in parallel across GitHub Actions
+- **Artifact Management**: ECR with vulnerability scanning and image signing
 
 **Deployment Strategy**:
 - **GitOps**: ArgoCD for declarative deployment management
-- **Blue-Green Deployment**: Zero-downtime deployments with rollback
-- **Canary Releases**: Gradual rollout with automatic rollback on errors
-- **Database Migrations**: Backward-compatible migrations with versioning
+- **Blue-Green Deployment**: Zero-downtime deployments with ALB target groups
+- **Canary Releases**: Gradual rollout with automatic rollback via ArgoCD
+- **Database Migrations**: Backward-compatible migrations with RDS snapshots
 
 **Vault CI/CD Integration**:
 - Dynamic credentials for deployment pipelines
@@ -417,43 +456,43 @@ Database Engine:
 - Audit logging for all CI/CD secret access
 
 #### Monitoring & Observability
-**Metrics Stack**: Prometheus, Grafana, AlertManager
-**Logging Stack**: Fluentd, Elasticsearch, Kibana
-**Tracing Stack**: Jaeger, OpenTelemetry
+**Metrics Stack**: Prometheus, Grafana, CloudWatch
+**Logging Stack**: Fluentd, CloudWatch Logs, Amazon OpenSearch
+**Tracing Stack**: Jaeger, AWS X-Ray
 **Secret Monitoring**: Vault metrics and audit log monitoring
 
 **Key Metrics**:
 - **Golden Signals**: Latency, traffic, errors, saturation
 - **Business Metrics**: Analysis completion rate, false positive rate
-- **Infrastructure Metrics**: CPU, memory, disk, network utilization
+- **Infrastructure Metrics**: EKS cluster metrics, RDS performance, ALB metrics
 - **Custom Metrics**: Tool-specific metrics, queue depths, processing times
 - **Vault Metrics**: Secret access patterns, policy evaluations, performance
 
 **Alerting Strategy**:
-- **Severity Levels**: Critical (page on-call), Warning (notify team), Info (log only)
+- **Severity Levels**: Critical (PagerDuty), Warning (Slack), Info (CloudWatch)
 - **Alert Routing**: PagerDuty integration with escalation policies
-- **Alert Correlation**: Group related alerts to reduce noise
-- **Runbook Automation**: Automated remediation for known issues
+- **Alert Correlation**: Group related alerts via CloudWatch composite alarms
+- **Runbook Automation**: AWS Lambda for automated remediation
 - **Vault Alerting**: Secret expiration, policy violations, performance issues
 
 ### Data Architecture
 
 #### Database Design
-**Primary Database**: PostgreSQL 15 with logical replication
+**Primary Database**: RDS PostgreSQL 15 with Multi-AZ deployment
 **Schema Strategy**: Multi-tenant with row-level security
-**Backup Strategy**: Continuous backup with point-in-time recovery
+**Backup Strategy**: Automated RDS backups with point-in-time recovery
 **Secret Management**: Vault Database engine for dynamic credentials
 
 **Table Partitioning**:
 - **Time-Based**: Monthly partitions for analysis_runs and findings
 - **Hash-Based**: Organization-based partitioning for large tables
-- **Automatic Management**: pg_partman for automated partition management
+- **Automatic Management**: AWS Lambda for automated partition management
 
 **Index Strategy**:
 - **Primary Indexes**: B-tree indexes on frequently queried columns
 - **Composite Indexes**: Multi-column indexes for complex queries
 - **Partial Indexes**: Conditional indexes for filtered queries
-- **Index Monitoring**: pg_stat_user_indexes for usage tracking
+- **Index Monitoring**: CloudWatch monitoring for query performance
 
 **Vault Database Integration**:
 - Dynamic PostgreSQL credentials with configurable TTL
@@ -462,1007 +501,523 @@ Database Engine:
 - Audit logging for all database credential usage
 
 #### Data Processing Pipeline
-**Stream Processing**: Apache Kafka with Kafka Streams
-**Batch Processing**: Apache Airflow for scheduled data jobs
-**Data Warehousing**: ClickHouse for analytics and reporting
+**Stream Processing**: Amazon Kinesis with Lambda processing
+**Batch Processing**: AWS Batch with Step Functions orchestration
+**Data Warehousing**: Amazon Redshift for analytics and reporting
 **Secret Management**: Vault credentials for all data pipeline components
 
 **ETL Processes**:
-- **Real-Time**: Kafka consumers for immediate data processing
-- **Batch**: Hourly/daily aggregation jobs for reporting
-- **Data Quality**: Automated validation and anomaly detection
-- **Data Lineage**: Tracking data flow and transformations
+- **Real-Time**: Kinesis consumers for immediate data processing
+- **Batch**: Scheduled AWS Batch jobs for aggregation and reporting
+- **Data Quality**: Automated validation via AWS Glue Data Quality
+- **Data Lineage**: AWS Glue Data Catalog for tracking data flow
 
 **Vault Integration for Data Pipeline**:
-- Kafka credentials and encryption keys managed by Vault
-- Airflow connection secrets stored in Vault
-- ClickHouse credentials dynamically generated via Vault
+- Kinesis credentials and encryption keys managed by Vault
+- AWS Batch job credentials stored in Vault
+- Redshift credentials dynamically generated via Vault
 - Data pipeline audit logging through Vault
 
-### API Design
+### Development Phases & Milestones
 
-#### REST API Specifications
-**Standards**: OpenAPI 3.0, JSON:API compliance
-**Versioning**: URL-based versioning (/api/v1/, /api/v2/)
-**Pagination**: Cursor-based pagination for large datasets
-**Filtering**: GraphQL-style filtering with field selection
-**Security**: Vault-managed API keys and JWT tokens
+### Phase 1: Foundation & MVP (Months 1-3) - Cloud Development
 
-**Endpoint Design**:
-- **Resource-Based**: RESTful resource naming conventions
-- **HTTP Methods**: Proper verb usage (GET, POST, PUT, DELETE, PATCH)
-- **Status Codes**: Consistent HTTP status code usage
-- **Error Handling**: Structured error responses with error codes
-
-**Rate Limiting**:
-- **Per-User Limits**: 1000 requests/hour for authenticated users
-- **Per-Endpoint Limits**: Different limits for expensive operations
-- **Burst Allowance**: Short-term burst capability with token bucket
-- **Rate Limit Headers**: Standard headers for client awareness
-
-**Vault API Integration**:
-- API authentication tokens managed by Vault
-- Client certificate management via Vault PKI
-- API rate limiting configurations stored in Vault
-- Dynamic API key generation and rotation
-
-#### GraphQL API (Future)
-**Schema Design**: Type-first schema design with code generation
-**Resolvers**: Efficient N+1 query prevention with DataLoader
-**Subscriptions**: Real-time subscriptions for live updates
-**Federation**: Schema federation for microservices
-**Security**: Vault-managed GraphQL endpoint authentication
-
-### Testing Strategy
-
-#### Test Pyramid Structure
-**Unit Tests (70%)**:
-- **Coverage Target**: >90% code coverage
-- **Test Framework**: pytest for Python, Jest for TypeScript
-- **Test Isolation**: Mock external dependencies and databases
-- **Property-Based Testing**: Hypothesis for Python property testing
-
-**Integration Tests (20%)**:
-- **API Testing**: Full API endpoint testing with test databases
-- **Service Integration**: Cross-service integration testing
-- **Database Testing**: Test migrations and complex queries
-- **External API Testing**: Mock external tool APIs with contract testing
-- **Vault Integration Testing**: Secret injection and rotation testing
-
-**End-to-End Tests (10%)**:
-- **UI Testing**: Playwright for browser automation
-- **User Workflows**: Complete user journey testing
-- **Performance Testing**: Load testing with realistic data volumes
-- **Security Testing**: Automated security scanning and penetration testing
-- **Vault E2E Testing**: Complete secret lifecycle testing
-
-#### Test Data Management
-**Test Databases**: Isolated test databases per environment
-**Data Fixtures**: Reusable test data factories and builders
-**Test Isolation**: Transaction rollback between tests
-**Seed Data**: Consistent seed data for development and testing
-**Vault Test Secrets**: Isolated Vault namespaces for testing
-
-**Performance Testing**:
-- **Load Testing**: k6 for API load testing
-- **Stress Testing**: Gradual load increase to find breaking points
-- **Volume Testing**: Large dataset testing for database performance
-- **Chaos Engineering**: Controlled failure injection with Chaos Monkey
-- **Vault Performance Testing**: Secret retrieval under load
-
-### Development Workflow
-
-#### Git Strategy
-**Branching Model**: GitHub Flow with feature branches
-**Commit Standards**: Conventional Commits with semantic versioning
-**Code Review**: Required PR reviews with automated checks
-**Branch Protection**: Main branch protection with status checks
-
-**Development Environment**:
-- **Local Setup**: Docker Compose + minikube for local development stack
-- **Hot Reloading**: Development servers with automatic reload
-- **Database Seeding**: Scripts for consistent local data setup
-- **Environment Parity**: Production-like local environment
-- **Vault Development**: Local Vault dev mode with test secrets
-
-#### Code Quality
-**Linting**: ESLint for TypeScript, Black/isort for Python
-**Type Checking**: TypeScript strict mode, mypy for Python
-**Security Scanning**: Semgrep, bandit for static security analysis
-**Dependency Management**: Dependabot for automated updates
-**Secret Scanning**: GitLeaks for preventing secret commits
-
-**Documentation Requirements**:
-- **API Documentation**: OpenAPI specs with examples
-- **Code Documentation**: Inline comments for complex logic
-- **Architecture Documentation**: Decision records and diagrams
-- **User Documentation**: Step-by-step guides and tutorials
-- **Vault Documentation**: Secret management procedures and policies
-
-### Migration & Deployment Strategy
-
-#### Database Migrations
-**Migration Framework**: Alembic for Python, custom scripts for data migrations
-**Migration Strategy**: Forward-only migrations with rollback procedures
-**Zero-Downtime**: Online schema changes with minimal locking
-**Data Validation**: Post-migration validation and integrity checks
-**Vault Credential Migration**: Seamless database credential rotation during migrations
-
-#### Feature Rollout
-**Feature Flags**: LaunchDarkly for gradual feature rollout
-**A/B Testing**: Statistical significance testing for UI changes
-**Rollback Strategy**: Immediate rollback capability for failed deployments
-**Blue-Green Database**: Database-level blue-green deployment support
-**Vault Configuration Rollout**: Gradual secret and policy updates
-
-#### Production Readiness
-**Health Checks**: Comprehensive health check endpoints
-**Graceful Shutdown**: SIGTERM handling with connection draining
-**Circuit Breakers**: Fail-fast pattern for external dependencies
-**Bulkhead Pattern**: Resource isolation between critical and non-critical operations
-**Vault Readiness**: Health checks for Vault connectivity and secret availability
-
-### Cloud Migration Strategy (Phase 2)
-
-#### Migration Timeline
-**Sprint 7 (Month 4)**: Initial cloud deployment to AWS development environment
-**Sprint 12 (Month 6)**: Full production deployment with enterprise features
-**Sprint 18 (Month 9)**: Multi-region production deployment
-
-#### AWS Infrastructure Design
-**Compute**: EKS clusters with managed node groups and Spot instances
-**Database**: RDS PostgreSQL with Multi-AZ deployment and read replicas
-**Caching**: ElastiCache Redis with cluster mode enabled
-**Storage**: S3 for contract files with lifecycle policies
-**Networking**: VPC with public/private subnets and NAT gateways
-**Security**: IAM roles, security groups, and VPC endpoints
-**Monitoring**: CloudWatch integration with existing Prometheus stack
-**Vault Cloud**: HashiCorp Vault cluster with AWS KMS auto-unseal
-
-#### Vault Cloud Architecture
-**High Availability**: Multi-AZ Vault cluster with Consul storage backend
-**Auto-Unseal**: AWS KMS integration for automatic Vault unsealing
-**Backup Strategy**: Automated Vault snapshots to S3 with encryption
-**Disaster Recovery**: Cross-region Vault replication for DR
-**Performance**: Vault performance replication for read scaling
-**Integration**: AWS IAM authentication and IAM-based policies
-
-#### Migration Approach
-**Incremental Migration**: Service-by-service migration with dual deployment
-**Data Migration**: Zero-downtime database migration with logical replication
-**DNS Cutover**: Route53 DNS-based traffic routing for gradual migration
-**Rollback Plan**: Ability to route traffic back to local environment if needed
-**Vault Migration**: Seamless secret migration from local to cloud Vault
-**Secret Sync**: Automated secret synchronization during migration period
-
-## Development Phases & Milestones
-
-### Phase 1: Foundation & MVP (Months 1-3) - Local Development with Vault
-
-#### Sprint 1: Infrastructure Foundation with Vault (Weeks 1-2)
-**Technical Milestone**: Complete local development environment with enterprise secret management
+#### Sprint 1: Cloud Infrastructure Foundation & Domain Setup (Weeks 1-2)
+**Technical Milestone**: Complete AWS EKS development environment with domain and GitOps
 
 **Development Checklist**:
-- [ ] Set up local minikube cluster with realistic resource allocation (8GB RAM, 4 CPUs)
-- [ ] Install nginx ingress controller for local development
-- [ ] Install cert-manager with local CA issuer for self-signed certificates
-- [ ] Configure local development DNS entries in hosts file
-- [ ] **Deploy HashiCorp Vault in dev mode for local secret management**
-- [ ] **Configure Vault PKI engine for local certificate authority**
+- [ ] **Domain already owned: soliditysecops.com**
+- [ ] **Configure Route53 hosted zone for soliditysecops.com - $0.50/month**
+- [ ] **Set up development subdomain (dev.soliditysecops.com)**
+- [ ] **Configure staging subdomain (staging.soliditysecops.com)**
+- [ ] **Set up AWS EKS development cluster with managed node groups (t3.medium)**
+- [ ] **Configure AWS ALB ingress controller for SSL termination**
+- [ ] **Install cert-manager with Let's Encrypt for automated SSL certificates**
+- [ ] **Add A-Records for development services:**
+  - [ ] **api.dev.soliditysecops.com → ALB**
+  - [ ] **app.dev.soliditysecops.com → ALB**
+  - [ ] **argocd.dev.soliditysecops.com → ALB**
+  - [ ] **vault.dev.soliditysecops.com → ALB**
+  - [ ] **grafana.dev.soliditysecops.com → ALB**
+- [ ] **Deploy HashiCorp Vault cluster with AWS KMS auto-unseal**
+- [ ] **Configure Vault PKI engine for internal certificate management**
 - [ ] **Configure Vault KV v2 engines for application secrets**
 - [ ] **Install External Secrets Operator for Vault integration**
-- [ ] **Configure Vault authentication methods (Kubernetes, userpass)**
-- [ ] **Install ArgoCD in local Kubernetes cluster with Vault integration**
-- [ ] **Configure ArgoCD with local Git repository integration**
-- [ ] **Set up ArgoCD application projects for local development**
+- [ ] **Configure Vault authentication methods (AWS IAM, Kubernetes)**
+- [ ] **Install ArgoCD in EKS cluster with custom domain**
+- [ ] **Configure ArgoCD with GitHub repository integration**
+- [ ] **Set up ArgoCD application projects for development environment**
 - [ ] **Configure ArgoCD RBAC for team access and permissions**
 - [ ] **Configure ArgoCD Vault Plugin for secret injection in GitOps**
 - [ ] **Create ArgoCD Application manifests for all microservices**
-- [ ] Deploy PostgreSQL 15 locally with persistent volumes
-- [ ] Deploy Redis locally with persistence enabled
-- [ ] Set up local monitoring stack (Prometheus, Grafana, Jaeger)
-- [ ] Configure local CI/CD pipeline with GitHub Actions
-- [ ] Implement base Docker images with security scanning
-- [ ] Create docker-compose.yml for supplementary local services
-- [ ] **Configure ArgoCD sync policies for local development workflow**
-- [ ] **Store all infrastructure secrets in Vault (database credentials, monitoring auth)**
+- [ ] **Deploy RDS PostgreSQL 15 with automated backups**
+- [ ] **Deploy ElastiCache Redis with encryption and persistence**
+- [ ] **Set up monitoring stack (Prometheus, Grafana, Jaeger) in EKS**
+- [ ] **Configure CloudWatch logging with Fluentd**
+- [ ] **Configure GitHub Actions CI/CD pipeline with ECR integration**
+- [ ] **Implement base Docker images with security scanning**
+- [ ] **Configure ArgoCD sync policies for development workflow**
+- [ ] **Store all infrastructure secrets in Vault**
 - [ ] **Test External Secrets Operator integration with all services**
 
-**Vault-Specific Deliverables**:
-- [ ] **Vault accessible at https://vault.solidity-platform.local with UI enabled**
-- [ ] **PKI engine issuing certificates for local services**
-- [ ] **KV engines storing application secrets with proper access policies**
-- [ ] **External Secrets Operator successfully injecting secrets from Vault**
-- [ ] **ArgoCD Vault Plugin working for GitOps secret management**
-- [ ] **All database and Redis credentials managed through Vault**
-- [ ] **Vault policies configured for each service with least privilege access**
-- [ ] **Secret rotation tested for all local infrastructure components**
+**AWS Infrastructure Components**:
+```yaml
+EKS Cluster:
+  - Node Group: t3.medium (2-4 nodes)
+  - Networking: VPC with public/private subnets
+  - Add-ons: AWS ALB Controller, EBS CSI Driver, VPC CNI
+
+RDS PostgreSQL:
+  - Instance: db.t3.micro (development)
+  - Storage: 20GB GP2 with automated backups
+  - Multi-AZ: Disabled for development
+  - Encryption: Enabled with AWS KMS
+
+ElastiCache Redis:
+  - Node: cache.t3.micro
+  - Replication: Single node for development
+  - Encryption: In-transit and at-rest enabled
+  - Backup: Automated snapshots enabled
+
+HashiCorp Vault:
+  - Deployment: 3-node cluster for HA
+  - Storage: AWS KMS for auto-unseal
+  - Backend: S3 for storage backend
+  - Networking: Private subnets with ALB access
+```
+
+**Domain and DNS Configuration**:
+```yaml
+Domain Setup:
+  Primary Domain: solidity-security.com
+  Development: *.dev.solidity-security.com
+  Staging: *.staging.solidity-security.com
+  Production: *.solidity-security.com (future)
+
+Route53 Configuration:
+  Hosted Zone: solidity-security.com
+  Development A-Records:
+    - api.dev.solidity-security.com
+    - app.dev.solidity-security.com
+    - argocd.dev.solidity-security.com
+    - vault.dev.solidity-security.com
+    - grafana.dev.solidity-security.com
+  SSL Certificates: Let's Encrypt wildcard certs
+```
 
 **Acceptance Criteria**:
-- All services deploy successfully to local minikube cluster
-- **ArgoCD successfully deploys and manages local application lifecycle via GitOps**
-- **HashiCorp Vault operational and managing all infrastructure secrets**
-- Local monitoring dashboards display metrics from all infrastructure components
-- Local SSL termination working with self-signed certificates
-- cert-manager automatically provisions and renews local certificates
-- nginx ingress controller routes local traffic correctly
+- AWS EKS cluster operational with managed node groups
+- **Custom domain accessible with valid SSL certificates**
+- **ArgoCD accessible at https://argocd.dev.soliditysecops.com**
+- **Vault operational at https://vault.dev.soliditysecops.com**
+- **All A-Records resolving correctly to ALB**
+- HashiCorp Vault operational and managing all infrastructure secrets
+- External Secrets Operator injecting secrets from Vault into all services
+- CloudWatch monitoring and logging operational
 - **ArgoCD UI accessible and shows healthy application status**
-- **GitOps workflow functional for local deployments and updates**
-- **External Secrets Operator injecting secrets from Vault into all services**
+- **GitOps workflow functional for cloud deployments and updates**
+- RDS and ElastiCache accessible with Vault-managed credentials
 
-#### Sprint 2: Core API Foundation with Vault Integration (Weeks 3-4)
-**Technical Milestone**: Functional API gateway with authentication and secure secret management
+#### Sprint 2: Core API Foundation with Cloud Integration (Weeks 3-4)
+**Technical Milestone**: Functional API gateway with authentication and cloud-native features
 
 **Development Checklist**:
 - [ ] **Implement FastAPI application with OpenAPI 3.0 documentation**
-- [ ] **Create Kubernetes IaC for API service (Deployment, Service, ConfigMap, External Secret, Vault Policy manifests)**
-- [ ] **Create Helm chart for API service with environment-specific values**
+- [ ] **Create Kubernetes IaC for API service (Deployment, Service, External Secret, Vault Policy manifests)**
+- [ ] **Create Helm chart for API service with cloud environment values**
 - [ ] **Create ArgoCD Application manifest for API service deployment**
-- [ ] **Configure Vault secrets for API service (JWT keys, OAuth credentials, database URLs)**
+- [ ] **Configure Vault secrets for API service (JWT keys, OAuth credentials, RDS URLs)**
 - [ ] **Create Vault policies for API service with least privilege access**
-- [ ] Set up Kong API Gateway with rate limiting (1000 req/hour)
-- [ ] Configure nginx ingress for API services with local SSL certificates
+- [ ] **Configure AWS ALB ingress for API services with SSL termination**
+- [ ] **Set up AWS API Gateway for rate limiting and request routing**
 - [ ] **Configure automated deployment pipelines via ArgoCD for API services**
 - [ ] **Set up GitOps workflow for API service updates through ArgoCD**
 - [ ] **Test External Secrets Operator injecting Vault secrets into API service**
-- [ ] Implement JWT authentication with refresh token rotation (keys from Vault)
-- [ ] Configure OAuth 2.0 integration (Google, GitHub providers with Vault-stored credentials)
-- [ ] Implement role-based access control (RBAC) middleware
-- [ ] Set up database connection pooling with PgBouncer (credentials from Vault)
-- [ ] Implement audit logging for all API requests
-- [ ] Configure CORS policies for frontend integration
-- [ ] Set up API versioning strategy (/api/v1/, /api/v2/)
-- [ ] Implement health check endpoints with dependency validation
+- [ ] **Implement JWT authentication with refresh token rotation (keys from Vault)**
+- [ ] **Configure OAuth 2.0 integration (Google, GitHub providers with Vault-stored credentials)**
+- [ ] **Implement role-based access control (RBAC) middleware**
+- [ ] **Set up RDS connection pooling with RDS Proxy (credentials from Vault)**
+- [ ] **Implement audit logging to CloudWatch**
+- [ ] **Configure CORS policies for frontend integration**
+- [ ] **Set up API versioning strategy (/api/v1/, /api/v2/)**
+- [ ] **Implement health check endpoints with dependency validation**
 - [ ] **Configure ArgoCD health checks for API services**
 - [ ] **Test Vault secret rotation for API service without service restart**
+- [ ] **Configure CloudWatch alarms for API performance monitoring**
 
-**Vault Integration Specifics**:
-- [ ] **JWT signing keys stored in `secret/api-service/jwt-secrets` with rotation policy**
-- [ ] **OAuth provider credentials in `secret/api-service/oauth-credentials`**
-- [ ] **Database connection strings in `secret/api-service/database-credentials`**
-- [ ] **API service Vault policy allowing read access to its secret paths only**
-- [ ] **External Secrets Operator configured with refresh intervals for API secrets**
-- [ ] **Test dynamic secret updates without API service restart**
+**Cloud Integration Features**:
+```yaml
+AWS API Gateway:
+  - Rate limiting: 1000 requests/hour per user
+  - Request/response transformation
+  - CloudWatch metrics and logging
+  - Custom domain integration
+
+AWS ALB Features:
+  - SSL termination with ACM certificates
+  - Path-based routing to EKS services
+  - Health checks and target group management
+  - Web Application Firewall (WAF) integration
+
+RDS Integration:
+  - Connection pooling via RDS Proxy
+  - Automatic failover to read replicas
+  - Performance Insights monitoring
+  - Automated backup and point-in-time recovery
+```
 
 **Acceptance Criteria**:
-- API Gateway routes requests with proper authentication
-- nginx ingress properly terminates SSL and routes API traffic
-- cert-manager manages certificates for API endpoints
+- API accessible at https://api.dev.soliditysecops.com
+- AWS ALB properly terminates SSL and routes API traffic
+- Let's Encrypt certificates automatically managed and renewed
 - **ArgoCD automatically deploys API service updates from Git commits**
 - **API services show healthy status in ArgoCD dashboard**
 - **Rollback capability tested via ArgoCD for API services**
 - **All API secrets managed through Vault with automatic injection**
 - JWT tokens expire and refresh correctly using Vault-managed keys
-- Rate limiting blocks requests after threshold
-- Database connections pool efficiently under load with Vault credentials
+- Rate limiting blocks requests after threshold via API Gateway
+- RDS connections pool efficiently under load with Vault credentials
+- CloudWatch monitoring shows API performance metrics
 - API documentation generates automatically from code
 
-#### Sprint 3: Slither, Aderyn & Solidity-Metrics Integration with Vault (Weeks 5-6)
-**Technical Milestone**: Working tool integration with secure credential management
+#### Sprint 3: Tool Integration with Cloud Storage (Weeks 5-6)
+**Technical Milestone**: Working tool integration with cloud-native storage and processing
 
 **Development Checklist**:
 - [ ] **Implement Slither adapter using slither-analyzer Python package**
 - [ ] **Implement Aderyn adapter with Rust CLI wrapper and JSON parsing**
 - [ ] **Implement Solidity-Metrics adapter with Node.js CLI wrapper**
 - [ ] **Create Kubernetes IaC for Tool Integration Service with Vault integration**
-- [ ] **Create Helm chart for Tool Integration Service with tool-specific configurations**
+- [ ] **Create Helm chart for Tool Integration Service with cloud-specific configurations**
 - [ ] **Create ArgoCD Application manifest for Tool Integration Service**
 - [ ] **Store tool API keys and configurations in Vault KV engine**
 - [ ] **Configure External Secrets Operator for tool credential injection**
 - [ ] **Create Vault policies for tool integration service access**
-- [ ] **Implement Analysis Orchestration Service with Celery workers**
-- [ ] **Create Kubernetes IaC for Orchestration Service with Vault integration**
-- [ ] **Create Helm chart for Orchestration Service with worker scaling configuration**
+- [ ] **Implement Analysis Orchestration Service with Celery workers on EKS**
+- [ ] **Create Kubernetes IaC for Orchestration Service with auto-scaling**
+- [ ] **Create Helm chart for Orchestration Service with cloud scaling configuration**
 - [ ] **Create ArgoCD Application manifest for Orchestration Service**
 - [ ] **Store Celery broker credentials and worker authentication in Vault**
-- [ ] Design analysis_runs and security_findings database schema
-- [ ] Add code_metrics table for complexity and maintainability data
-- [ ] Implement contract file upload and storage locally
-- [ ] Create job queue system with priority levels (Critical/High/Normal/Low)
-- [ ] Implement result normalization to standardized vulnerability schema
-- [ ] Set up source location mapping (file paths, line numbers)
-- [ ] Implement analysis status tracking (pending/running/completed/failed)
-- [ ] Create retry logic with exponential backoff for failed analyses
-- [ ] Set up dead letter queue for permanently failed jobs
-- [ ] Configure local ingress for tool integration services
+- [ ] **Configure S3 bucket for contract file storage with encryption**
+- [ ] **Set up S3 lifecycle policies for analysis artifact management**
+- [ ] **Configure ElastiCache Redis for job queuing and caching**
+- [ ] **Design analysis_runs and security_findings database schema in RDS**
+- [ ] **Add code_metrics table for complexity and maintainability data**
+- [ ] **Implement contract file upload to S3 with presigned URLs**
+- [ ] **Create SQS queues for job management with priority levels**
+- [ ] **Implement result normalization to standardized vulnerability schema**
+- [ ] **Set up source location mapping (file paths, line numbers)**
+- [ ] **Implement analysis status tracking (pending/running/completed/failed)**
+- [ ] **Create retry logic with exponential backoff for failed analyses**
+- [ ] **Set up SQS dead letter queues for permanently failed jobs**
+- [ ] **Configure ALB ingress for tool integration services**
 - [ ] **Test tool credential rotation without service interruption**
+- [ ] **Configure CloudWatch monitoring for tool performance**
 
-**Vault Tool Integration**:
-- [ ] **MythX API keys in `secret/tool-integration/mythx-credentials`**
-- [ ] **Tool configurations in `secret/tool-integration/tool-configs`**
-- [ ] **Celery broker credentials in `secret/orchestration/celery-broker`**
-- [ ] **Worker authentication tokens in `secret/orchestration/worker-auth`**
-- [ ] **Tool integration Vault policy for API key access only**
-- [ ] **Orchestration Vault policy for broker and worker credential access**
+**Cloud Storage Integration**:
+```yaml
+S3 Configuration:
+  - Bucket: solidity-contracts-dev
+  - Encryption: AWS KMS with customer-managed keys
+  - Lifecycle: Delete analysis artifacts after 30 days
+  - Access: Presigned URLs for secure upload/download
+  - Versioning: Enabled for contract file history
+
+SQS Queue Management:
+  - High Priority: Critical analysis queue
+  - Normal Priority: Standard analysis queue
+  - Low Priority: Batch processing queue
+  - Dead Letter: Failed job recovery queue
+  - Visibility Timeout: 300 seconds (5 minutes)
+
+ElastiCache Redis:
+  - Cluster Mode: Enabled for scaling
+  - Replication: 1 read replica for development
+  - Encryption: In-transit and at-rest
+  - Backup: Daily automated snapshots
+```
 
 **Acceptance Criteria**:
-- Solidity contracts upload successfully to local storage
-- Slither, Aderyn, and Solidity-Metrics analyze contracts and store normalized results
+- Solidity contracts upload successfully to S3 with encryption
+- Slither, Aderyn, and Solidity-Metrics analyze contracts and store results in RDS
 - Code complexity metrics stored alongside security findings
-- Job queue processes analyses with proper prioritization
+- SQS queues process analyses with proper prioritization
 - Analysis status updates in real-time via WebSocket
 - Failed analyses retry automatically with backoff strategy
-- Tool services accessible via local SSL-terminated ingress
+- Tool services accessible via https://tools.dev.soliditysecops.com
 - **Tool integration services deploy and update automatically via ArgoCD**
 - **All tool credentials managed securely through Vault**
 - **Tool API keys rotate automatically without service disruption**
+- CloudWatch shows tool performance and error metrics
+- S3 lifecycle policies automatically manage storage costs
 
-#### Sprint 4: Frontend Dashboard Foundation with Vault Integration (Weeks 7-8)
-**Technical Milestone**: React dashboard with secure configuration management
+#### Sprint 4: Frontend Dashboard with CloudFront (Weeks 7-8)
+**Technical Milestone**: React dashboard with global CDN and secure configuration
 
 **Development Checklist**:
-- [ ] Set up React 18 application with TypeScript and Vite
-- [ ] Configure nginx ingress for frontend with local SSL certificates and security headers
-- [ ] **Configure ArgoCD application for frontend deployment**
+- [ ] **Set up React 18 application with TypeScript and Vite**
+- [ ] **Configure S3 bucket for static website hosting**
+- [ ] **Set up CloudFront distribution for global content delivery**
+- [ ] **Configure custom domain for frontend (app.dev.solidity-security.com)**
+- [ ] **Set up AWS Certificate Manager for SSL certificates**
+- [ ] **Configure ArgoCD application for frontend deployment to S3**
 - [ ] **Set up automated GitOps workflow for frontend updates via ArgoCD**
 - [ ] **Configure ArgoCD sync policies for frontend application**
 - [ ] **Store frontend configuration secrets in Vault (OAuth client IDs, API endpoints)**
 - [ ] **Configure External Secrets Operator for frontend secret injection**
 - [ ] **Create Vault policy for frontend service configuration access**
-- [ ] Implement authentication flow with JWT token management
-- [ ] Create dashboard layout with navigation and user management
-- [ ] Implement TanStack Query for API data fetching and caching
-- [ ] Create findings table with filtering, sorting, and pagination
-- [ ] Add code metrics dashboard with complexity visualizations
-- [ ] Implement real-time WebSocket connection for live updates
-- [ ] Set up Zustand for global state management
-- [ ] Implement dark/light theme with system preference detection
-- [ ] Create responsive design for mobile and desktop views
-- [ ] Set up error boundaries with fallback components
+- [ ] **Configure CloudFront cache policies for optimal performance**
+- [ ] **Set up CloudFront security headers and WAF integration**
+- [ ] **Implement authentication flow with JWT token management**
+- [ ] **Create dashboard layout with navigation and user management**
+- [ ] **Implement TanStack Query for API data fetching and caching**
+- [ ] **Create findings table with filtering, sorting, and pagination**
+- [ ] **Add code metrics dashboard with complexity visualizations**
+- [ ] **Implement real-time WebSocket connection for live updates**
+- [ ] **Set up Zustand for global state management**
+- [ ] **Implement dark/light theme with system preference detection**
+- [ ] **Create responsive design for mobile and desktop views**
+- [ ] **Set up error boundaries with fallback components**
+- [ ] **Configure CloudWatch Real User Monitoring (RUM) for frontend**
 - [ ] **Test frontend deployment rollback capabilities via ArgoCD**
 - [ ] **Test dynamic configuration updates from Vault for frontend**
 
-**Frontend Vault Integration**:
-- [ ] **OAuth client credentials in `secret/frontend/oauth-client-id`**
-- [ ] **API base URLs in `secret/frontend/api-endpoints`**
-- [ ] **Feature flags in `secret/frontend/feature-flags`**
-- [ ] **Analytics keys in `secret/frontend/analytics-credentials`**
-- [ ] **Frontend Vault policy allowing read access to frontend secrets only**
-- [ ] **Runtime configuration injection without build-time secret exposure**
+**CloudFront Configuration**:
+```yaml
+CloudFront Distribution:
+  - Origin: S3 bucket (static files)
+  - Custom Domain: app.dev.solidity-security.com
+  - SSL Certificate: AWS Certificate Manager
+  - Cache Behaviors:
+    - Static Assets: Cache for 1 year
+    - HTML Files: Cache for 1 hour
+    - API Calls: No caching (pass-through)
+  - Security Headers:
+    - Content-Security-Policy
+    - X-Frame-Options: DENY
+    - X-Content-Type-Options: nosniff
+  - WAF: Basic protection against common attacks
+
+S3 Static Hosting:
+  - Bucket: solidity-frontend-dev
+  - Public Access: Blocked (CloudFront only)
+  - Versioning: Enabled for rollback capability
+  - Lifecycle: Keep 10 versions, delete after 30 days
+```
 
 **Acceptance Criteria**:
-- Users can log in and access personalized dashboard
-- Frontend served via nginx with proper SSL termination
-- Security headers configured via nginx ingress
+- Frontend accessible at https://app.dev.soliditysecops.com
+- CloudFront delivers content globally with <100ms latency
+- SSL certificates automatically managed by AWS Certificate Manager
 - **Frontend deploys automatically via ArgoCD on Git commits**
 - **ArgoCD shows healthy frontend application status**
 - **Frontend rollback tested and working via ArgoCD**
 - **All frontend configuration managed through Vault**
+- Real User Monitoring shows page load times <2 seconds
+- WebSocket connections work through CloudFront and ALB
 - Findings display in real-time as analyses complete
 - Code complexity metrics visualize in charts and tables
-- Table supports filtering by severity, file, and finding type
 - UI responds smoothly on mobile and desktop browsers
 - Error states display helpful messages without crashes
-- **Dynamic configuration updates work without frontend restart**
+- **Dynamic configuration updates work without frontend rebuild**
 
-#### Sprint 5: MythX Integration with Vault (Weeks 9-10)
-**Technical Milestone**: Multi-tool analysis with secure credential management
+#### Sprint 5: MythX Integration with Cloud Scaling (Weeks 9-10)
+**Technical Milestone**: Multi-tool analysis with cloud-native scaling and credential management
 
 **Development Checklist**:
-- [ ] Implement MythX adapter with REST API integration
-- [ ] Configure async job polling with configurable timeouts
+- [ ] **Implement MythX adapter with REST API integration**
+- [ ] **Configure async job polling with configurable timeouts**
 - [ ] **Implement API key rotation and failover logic via Vault**
 - [ ] **Store MythX API credentials in Vault with rotation policies**
-- [ ] Add MythX analysis modes (quick/standard/deep) selection
-- [ ] Create tool configuration management system
-- [ ] Implement parallel tool execution in orchestration service
-- [ ] Add tool-specific rate limiting and quota management
-- [ ] Create tool status monitoring and health checks
-- [ ] Implement result aggregation from multiple tools
-- [ ] Add tool comparison view in frontend dashboard
-- [ ] Integrate code complexity metrics with vulnerability risk scoring
-- [ ] Configure nginx ingress for MythX integration service
+- [ ] **Configure EKS Horizontal Pod Autoscaler for tool services**
+- [ ] **Set up CloudWatch custom metrics for tool performance monitoring**
+- [ ] **Add MythX analysis modes (quick/standard/deep) selection**
+- [ ] **Create tool configuration management system with Vault integration**
+- [ ] **Implement parallel tool execution in orchestration service with EKS scaling**
+- [ ] **Add tool-specific rate limiting and quota management via SQS**
+- [ ] **Create tool status monitoring and health checks with CloudWatch**
+- [ ] **Implement result aggregation from multiple tools in RDS**
+- [ ] **Add tool comparison view in frontend dashboard**
+- [ ] **Integrate code complexity metrics with vulnerability risk scoring**
+- [ ] **Configure ALB ingress for MythX integration service**
 - [ ] **Update ArgoCD applications for MythX integration service**
 - [ ] **Test MythX credential rotation via Vault without service interruption**
+- [ ] **Configure S3 storage for MythX analysis artifacts**
+- [ ] **Set up CloudWatch alarms for tool failure detection**
+- [ ] **Implement automatic retries with exponential backoff for MythX API**
 
-**MythX Vault Integration**:
-- [ ] **Primary MythX API key in `secret/tool-integration/mythx-primary`**
-- [ ] **Backup MythX API keys in `secret/tool-integration/mythx-backup`**
-- [ ] **MythX configuration parameters in `secret/tool-integration/mythx-config`**
-- [ ] **Automatic failover logic when primary credentials are rotated**
-- [ ] **Rate limiting configurations stored in Vault for dynamic updates**
+**Cloud Scaling Configuration**:
+```yaml
+EKS Auto-Scaling:
+  Horizontal Pod Autoscaler:
+    - Target CPU: 70%
+    - Target Memory: 80%
+    - Min Replicas: 2
+    - Max Replicas: 10
+    
+  Cluster Autoscaler:
+    - Min Nodes: 2
+    - Max Nodes: 8
+    - Node Types: t3.medium, t3.large
+    - Scale-down delay: 10 minutes
+
+CloudWatch Custom Metrics:
+  - Tool execution time
+  - Queue depth per tool
+  - Success/failure rates
+  - API quota utilization
+  - Concurrent analysis count
+```
 
 **Acceptance Criteria**:
 - Contracts analyze simultaneously with Slither, Aderyn, Solidity-Metrics, and MythX
+- EKS auto-scaling responds to increased analysis load within 2 minutes
 - Tool failures don't block other tool execution
-- API quotas respect rate limits without errors
-- Results aggregate properly across different tools
+- API quotas respect rate limits without errors via SQS throttling
+- Results aggregate properly across different tools in RDS
 - Dashboard shows findings from all tools with complexity correlation
 - Code metrics enhance vulnerability risk assessment
 - **MythX integration deploys via ArgoCD GitOps workflow**
 - **MythX API credentials rotate automatically via Vault**
 - **API key failover works seamlessly during credential rotation**
+- CloudWatch shows comprehensive tool performance metrics
+- S3 stores analysis artifacts with proper lifecycle management
 
-#### Sprint 6: Intelligence Engine & Smart Rules with Vault (Weeks 11-12)
-**Technical Milestone**: Rule-based analysis with secure configuration management
+#### Sprint 6: Intelligence Engine & Smart Rules with Cloud ML (Weeks 11-12)
+**Technical Milestone**: Rule-based analysis with cloud-native ML preparation
 
 **Development Checklist**:
-- [ ] Implement syntactic deduplication (exact file/line matching)
-- [ ] Create fuzzy matching algorithm using Levenshtein distance
-- [ ] Implement rule-based risk scoring with severity weights
-- [ ] Add confidence multipliers for risk calculations
-- [ ] Create cross-tool validation bonus scoring
-- [ ] Integrate code complexity metrics into risk assessment
+- [ ] **Implement syntactic deduplication (exact file/line matching)**
+- [ ] **Create fuzzy matching algorithm using Levenshtein distance**
+- [ ] **Implement rule-based risk scoring with severity weights**
+- [ ] **Add confidence multipliers for risk calculations**
+- [ ] **Create cross-tool validation bonus scoring**
+- [ ] **Integrate code complexity metrics into risk assessment**
 - [ ] **Store algorithm configurations and weights in Vault**
 - [ ] **Configure External Secrets Operator for intelligence engine secrets**
 - [ ] **Create Vault policy for intelligence engine configuration access**
-- [ ] Implement intelligent severity adjustment based on business context
-- [ ] Create rule-based false positive detection using pattern matching
-- [ ] Implement finding status management (open/acknowledged/fixed)
-- [ ] Add bulk finding status updates
-- [ ] Create finding detail modal with template-based remediation suggestions
-- [ ] Implement finding export functionality (PDF/CSV)
-- [ ] Add basic analytics dashboard with metrics
-- [ ] Configure nginx ingress for intelligence engine service
+- [ ] **Set up AWS SageMaker endpoints for future ML model deployment**
+- [ ] **Configure S3 bucket for ML model artifacts and training data**
+- [ ] **Implement intelligent severity adjustment based on business context**
+- [ ] **Create rule-based false positive detection using pattern matching**
+- [ ] **Implement finding status management (open/acknowledged/fixed) in RDS**
+- [ ] **Add bulk finding status updates with optimistic locking**
+- [ ] **Create finding detail modal with template-based remediation suggestions**
+- [ ] **Implement finding export functionality (PDF/CSV) with S3 storage**
+- [ ] **Add basic analytics dashboard with CloudWatch metrics**
+- [ ] **Configure ALB ingress for intelligence engine service**
 - [ ] **Create ArgoCD application for intelligence engine service**
 - [ ] **Configure GitOps deployment for intelligence engine updates**
 - [ ] **Test dynamic algorithm configuration updates from Vault**
+- [ ] **Set up Amazon OpenSearch for advanced finding search and analytics**
+- [ ] **Configure CloudWatch Insights for query-based analytics**
 
-**Intelligence Engine Vault Integration**:
-- [ ] **Risk scoring weights in `secret/intelligence-engine/scoring-weights`**
-- [ ] **Algorithm thresholds in `secret/intelligence-engine/thresholds`**
-- [ ] **ML model configurations in `secret/intelligence-engine/ml-config`**
-- [ ] **False positive patterns in `secret/intelligence-engine/fp-patterns`**
-- [ ] **Runtime algorithm tuning without service restart**
+**Cloud ML Integration Preparation**:
+```yaml
+SageMaker Setup:
+  - Model Registry: Prepared for future ML models
+  - Inference Endpoints: Configured but not deployed
+  - Training Jobs: Infrastructure ready for Phase 2
+  - Feature Store: Configured for ML feature management
+
+S3 ML Storage:
+  - Training Data: Encrypted bucket for model training
+  - Model Artifacts: Versioned storage for ML models
+  - Feature Engineering: Preprocessed data storage
+  - Inference Cache: Real-time prediction caching
+
+OpenSearch Configuration:
+  - Domain: Intelligence analytics
+  - Index Templates: Finding search optimization
+  - Dashboards: Pre-configured for ML insights
+  - Security: VPC-based with encryption
+```
 
 **Acceptance Criteria**:
 - Duplicate findings merge automatically across tools with 70% accuracy
 - Risk scores calculate consistently using rule-based algorithm
 - Code complexity integration improves risk assessment by 25%
 - Rule-based false positive detection achieves 35% reduction
-- Finding statuses persist and update across sessions
+- Finding statuses persist and update across sessions with optimistic locking
 - Template-based remediation provides relevant suggestions
-- Export generates properly formatted reports
-- Analytics display meaningful security metrics
+- Export generates properly formatted reports stored in S3
+- Analytics display meaningful security metrics via OpenSearch
 - **Intelligence engine deploys and updates via ArgoCD automatically**
 - **Algorithm configurations update dynamically from Vault**
 - **Scoring weights and thresholds tunable without deployment**
+- CloudWatch Insights provides advanced query capabilities
+- SageMaker infrastructure ready for ML model deployment
 
-### Phase 2: Enterprise Features (Months 4-6) - Hybrid Local/Cloud with Production Vault
+### Phase 2: Enterprise Features (Months 4-6) - Production-Ready Cloud
 
-#### Sprint 7: Cloud Migration & Advanced Intelligence with Production Vault (Weeks 13-14)
-**Technical Milestone**: AWS deployment with production-grade Vault cluster
-
-**Development Checklist**:
-- [ ] **Deploy AWS EKS clusters for development and staging environments**
-- [ ] **Deploy HashiCorp Vault cluster with AWS KMS auto-unseal**
-- [ ] **Configure Vault Consul storage backend for production HA**
-- [ ] **Set up Vault performance replication for read scaling**
-- [ ] **Configure Vault audit logging to CloudWatch and S3**
-- [ ] **Migrate secrets from local Vault to cloud Vault cluster**
-- [ ] **Configure External Secrets Operator with AWS IAM authentication**
-- [ ] **Update ArgoCD Vault Plugin for production Vault integration**
-- [ ] **Migrate PostgreSQL to AWS RDS with read replicas**
-- [ ] **Deploy Redis to AWS ElastiCache with clustering**
-- [ ] **Configure Let's Encrypt certificates with Route53 DNS**
-- [ ] **Set up AWS ALB ingress controller replacing nginx**
-- [ ] **Migrate ArgoCD to manage AWS deployments**
-- [ ] **Configure AWS ECR for container image storage**
-- [ ] Implement advanced rule engine for vulnerability pattern detection
-- [ ] Create statistical analysis algorithms for anomaly detection
-- [ ] Set up decision tree implementations for smart categorization
-- [ ] Implement AST-based code similarity analysis
-- [ ] Add business context rules for risk adjustment
-- [ ] Create template-based remediation suggestion engine
-- [ ] Implement statistical correlation between complexity and vulnerabilities
-- [ ] Add rule-based severity adjustment using multiple factors
-- [ ] Create intelligent finding categorization using NLP libraries
-- [ ] Implement pattern matching for known vulnerability signatures
-- [ ] Add customer feedback collection for future ML training data
-- [ ] Create A/B testing framework for rule improvements
-- [ ] **Update ArgoCD deployments for AWS cloud infrastructure**
-
-**Production Vault Architecture**:
-- [ ] **Multi-AZ Vault cluster for high availability**
-- [ ] **AWS KMS auto-unseal for zero-touch startup**
-- [ ] **Consul storage cluster for Vault backend**
-- [ ] **Performance replication to read-only Vault clusters**
-- [ ] **Vault audit logs streamed to CloudWatch and S3**
-- [ ] **AWS IAM authentication for service accounts**
-- [ ] **Dynamic database secrets with automatic rotation**
-- [ ] **PKI engine for internal service certificates**
-- [ ] **Transit engine for application-level encryption**
-
-**Acceptance Criteria**:
-- **AWS development environment fully operational with EKS**
-- **Production Vault cluster operational with HA and auto-unseal**
-- **Database migration completed with zero data loss**
-- **All services running on AWS with production-grade performance**
-- **Let's Encrypt certificates automatically managed via Route53**
-- **ArgoCD managing cloud deployments successfully**
-- **External Secrets Operator working with production Vault**
-- Rule engine achieves 75% accuracy on vulnerability classification
-- False positive rate reduces below 15% with advanced rules
-- Statistical analysis identifies meaningful patterns in data
-- AST similarity detection improves deduplication accuracy
-- Template remediation provides relevant, actionable suggestions
-- Customer feedback collection system captures ML training data
-- A/B testing validates rule improvements
-- **Advanced features deploy seamlessly via ArgoCD in cloud**
-- **Vault performance meets production targets (<50ms P95)**
-
-#### Sprint 8: Team Collaboration & Workflow with Vault (Weeks 15-16)
-**Technical Milestone**: Multi-user collaboration with secure credential management
+#### Sprint 7: Production Infrastructure & Advanced Intelligence (Weeks 13-14)
+**Technical Milestone**: Production-grade AWS deployment with enterprise features
 
 **Development Checklist**:
-- [ ] Implement finding commenting system with threading
-- [ ] Add user assignment and notification system
-- [ ] Create team management interface with role assignments
-- [ ] Implement finding workflow states (triage/in-progress/resolved)
-- [ ] Add bulk operations for finding management
-- [ ] Create activity feed for team collaboration tracking
-- [ ] Implement mention system (@username) in comments
-- [ ] Add email notifications for assigned findings
-- [ ] Create Slack integration for team notifications
-- [ ] Implement finding SLA tracking and alerts
-- [ ] **Configure ArgoCD for collaboration service deployments**
-- [ ] **Store team notification credentials in Vault**
-- [ ] **Configure External Secrets Operator for team service secrets**
-- [ ] **Create Vault policies for collaboration service access**
+- [ ] **Deploy AWS EKS production cluster with multi-AZ node groups**
+- [ ] **Set up production RDS PostgreSQL with Multi-AZ and read replicas**
+- [ ] **Deploy production ElastiCache Redis cluster with failover**
+- [ ] **Configure production Vault cluster with cross-region replication**
+- [ ] **Set up production Route53 configuration (soliditysecops.com)**
+- [ ] **Configure production SSL certificates via AWS Certificate Manager**
+- [ ] **Set up AWS WAF for advanced security protection**
+- [ ] **Configure CloudTrail for comprehensive audit logging**
+- [ ] **Set up AWS Config for compliance monitoring**
+- [ ] **Implement AWS Secrets Manager integration with Vault**
+- [ ] **Configure production monitoring with enhanced CloudWatch**
+- [ ] **Set up AWS X-Ray for distributed tracing**
+- [ ] **Implement advanced rule engine for vulnerability pattern detection**
+- [ ] **Create statistical analysis algorithms for anomaly detection**
+- [ ] **Set up decision tree implementations for smart categorization**
+- [ ] **Implement AST-based code similarity analysis**
+- [ ] **Add business context rules for risk adjustment**
+- [ ] **Create template-based remediation suggestion engine**
+- [ ] **Implement statistical correlation between complexity and vulnerabilities**
+- [ ] **Add rule-based severity adjustment using multiple factors**
+- [ ] **Create intelligent finding categorization using NLP libraries**
+- [ ] **Implement pattern matching for known vulnerability signatures**
+- [ ] **Add customer feedback collection for future ML training data**
+- [ ] **Create A/B testing framework for rule improvements**
+- [ ] **Update ArgoCD deployments for production infrastructure**
 
-**Vault Integration for Team Features**:
-- [ ] **Team notification webhooks in `secret/collaboration/webhooks`**
-- [ ] **Email service credentials in `secret/collaboration/smtp`**
-- [ ] **Slack bot tokens in `secret/collaboration/slack-tokens`**
-- [ ] **User authentication secrets in `secret/collaboration/auth`**
+[Content continues with remaining sprints...]
 
-**Acceptance Criteria**:
-- Team members can comment and collaborate on findings
-- Assignments route to appropriate team members
-- Workflow states track progress accurately
-- Notifications deliver reliably via email and Slack
-- SLA breaches trigger appropriate alerts
-- **Collaboration features deploy via ArgoCD GitOps**
-- **All team service credentials managed through Vault**
+### Cloud Cost Optimization Strategy
 
-#### Sprint 9: CI/CD Integration & Automation with Vault (Weeks 17-18)
-**Technical Milestone**: Automated security scanning with secure credential management
-
-**Development Checklist**:
-- [ ] Create GitHub Actions plugin for automated scanning
-- [ ] Implement GitLab CI integration with pipeline configuration
-- [ ] Add Jenkins plugin with job DSL configuration
-- [ ] Create webhook system for repository integration
-- [ ] Implement automated PR commenting with security findings
-- [ ] Add commit status checks for security gate policies
-- [ ] Create branch protection integration with security requirements
-- [ ] Implement automated fix suggestions in PR comments
-- [ ] Add security policy configuration per repository
-- [ ] Create CLI tool for local development integration
-- [ ] **Configure ArgoCD for CI/CD integration services**
-- [ ] **Set up GitOps deployment for webhook and integration services**
-- [ ] **Store CI/CD integration credentials in Vault**
-- [ ] **Configure dynamic API keys for CI/CD integrations**
-
-**Vault CI/CD Integration**:
-- [ ] **GitHub App credentials in `secret/cicd/github-app`**
-- [ ] **GitLab tokens in `secret/cicd/gitlab-tokens`**
-- [ ] **Jenkins API keys in `secret/cicd/jenkins-api`**
-- [ ] **Webhook signing keys in `secret/cicd/webhook-secrets`**
-- [ ] **Dynamic credential generation for CI/CD pipelines**
-
-**Acceptance Criteria**:
-- GitHub PRs block merging on critical security findings
-- CI pipelines integrate seamlessly with existing workflows
-- Security findings appear as PR comments automatically
-- Policy violations prevent deployment to production
-- CLI tool works offline for pre-commit checks
-- **CI/CD integration services managed via ArgoCD**
-- **All CI/CD credentials securely managed through Vault**
-
-#### Sprint 10: Advanced Analytics & Reporting with Vault (Weeks 19-20)
-**Technical Milestone**: Executive dashboards with secure data access
-
-**Development Checklist**:
-- [ ] Implement time-series analytics with ClickHouse data warehouse
-- [ ] Create executive dashboard with security KPIs
-- [ ] Add trend analysis for security improvements over time
-- [ ] Implement customizable report builder interface
-- [ ] Create scheduled report generation and delivery
-- [ ] Add security debt tracking and prioritization algorithms
-- [ ] Implement benchmark comparisons against industry standards
-- [ ] Create vulnerability lifecycle tracking (discovery to resolution)
-- [ ] Add team performance metrics and productivity insights
-- [ ] Implement data export APIs for external BI tools
-- [ ] **Configure ArgoCD for analytics and reporting services**
-- [ ] **Store analytics database credentials in Vault**
-- [ ] **Configure External Secrets Operator for analytics secrets**
-
-**Vault Analytics Integration**:
-- [ ] **ClickHouse credentials in `secret/analytics/clickhouse`**
-- [ ] **BI tool API keys in `secret/analytics/bi-apis`**
-- [ ] **Report delivery credentials in `secret/analytics/delivery`**
-- [ ] **Data export encryption keys in `secret/analytics/export-keys`**
-
-**Acceptance Criteria**:
-- Executive dashboards load in <2 seconds with large datasets
-- Scheduled reports deliver automatically to stakeholders
-- Trend analysis shows meaningful security improvements
-- Custom reports generate with user-defined parameters
-- Data exports integrate successfully with external tools
-- **Analytics services deploy and scale via ArgoCD**
-- **All analytics credentials managed securely through Vault**
-
-#### Sprint 11: Enterprise SSO & Administration with Vault (Weeks 21-22)
-**Technical Milestone**: Enterprise authentication with centralized secret management
-
-**Development Checklist**:
-- [ ] Implement SAML 2.0 integration with major identity providers
-- [ ] Add multi-factor authentication (TOTP, SMS, hardware keys)
-- [ ] Create organization-level administration interface
-- [ ] Implement granular permission system with resource-based policies
-- [ ] Add user provisioning and deprovisioning automation
-- [ ] Create audit trail for administrative actions
-- [ ] Implement session management with concurrent session limits
-- [ ] Add IP allowlisting and geographic restrictions
-- [ ] Create compliance reporting for access controls
-- [ ] Implement emergency access procedures for admin lockout
-- [ ] **Update ArgoCD deployments for SSO and admin services**
-- [ ] **Configure Vault LDAP/SAML authentication methods**
-- [ ] **Store SSO certificates and keys in Vault PKI engine**
-
-**Vault SSO Integration**:
-- [ ] **SAML certificates in Vault PKI engine**
-- [ ] **LDAP bind credentials in `secret/sso/ldap-bind`**
-- [ ] **OAuth provider secrets in `secret/sso/oauth-providers`**
-- [ ] **MFA service credentials in `secret/sso/mfa-providers`**
-- [ ] **Session encryption keys in `secret/sso/session-keys`**
-
-**Acceptance Criteria**:
-- SAML SSO works with Active Directory and Okta
-- MFA enforcement works across all authentication methods
-- Permission system provides granular access control
-- Admin actions generate comprehensive audit trails
-- Emergency access procedures tested and documented
-- **SSO and admin features deploy via ArgoCD**
-- **All SSO credentials and certificates managed through Vault**
-
-#### Sprint 12: Performance Optimization & Scaling with Vault (Weeks 23-24)
-**Technical Milestone**: Production-ready performance with secure credential management
-
-**Development Checklist**:
-- [ ] Implement horizontal pod autoscaling based on custom metrics
-- [ ] Add database read replicas with automatic failover
-- [ ] Create multi-tier caching strategy with cache warming
-- [ ] Implement database query optimization and index tuning
-- [ ] Add CDN integration for static assets and API responses
-- [ ] Create load testing suite with realistic user scenarios
-- [ ] Implement circuit breakers for external service dependencies
-- [ ] Add connection pooling optimization for database connections
-- [ ] Create performance monitoring with SLA alerting
-- [ ] Implement graceful degradation for service outages
-- [ ] Optimize AWS ALB configuration for high-performance SSL termination
-- [ ] **Configure ArgoCD for performance-optimized deployments**
-- [ ] **Set up ArgoCD sync strategies for zero-downtime updates**
-- [ ] **Optimize Vault performance for high-throughput secret access**
-- [ ] **Configure Vault performance replication for read scaling**
-
-**Vault Performance Optimization**:
-- [ ] **Vault performance replication to multiple read replicas**
-- [ ] **Vault Agent caching for high-frequency secret access**
-- [ ] **Database credential caching with automatic refresh**
-- [ ] **PKI certificate caching and bulk operations**
-- [ ] **Vault metrics monitoring and performance tuning**
-
-**Acceptance Criteria**:
-- Platform handles 1000+ concurrent users without degradation
-- API response times stay below 200ms at P95 under load
-- Database queries execute in <50ms for indexed operations
-- Auto-scaling responds to load changes within 60 seconds
-- Circuit breakers prevent cascade failures during outages
-- **ArgoCD manages zero-downtime deployments successfully**
-- **Vault performance meets targets under production load**
-
-### Phase 3: Advanced Features & Compliance (Months 7-9) - Full Cloud with Enterprise Vault
-
-#### Sprint 13: Additional Tool Integrations with Vault (Weeks 25-26)
-**Technical Milestone**: Extended tool ecosystem with secure credential management
-
-**Development Checklist**:
-- [ ] Implement Certora formal verification adapter with CLI wrapper
-- [ ] Add Echidna fuzzing integration with campaign management
-- [ ] Create Manticore symbolic execution adapter
-- [ ] Implement Securify and SmartCheck static analyzer adapters
-- [ ] Enhance Aderyn integration with custom detector configurations
-- [ ] Add custom tool plugin architecture for third-party integrations
-- [ ] Create tool performance benchmarking and selection algorithms
-- [ ] Implement intelligent tool selection based on contract characteristics
-- [ ] Add tool-specific configuration management interface
-- [ ] Create tool effectiveness tracking and optimization
-- [ ] Implement parallel execution optimization for tool combinations
-- [ ] **Configure ArgoCD for additional tool integration services**
-- [ ] **Store all new tool credentials securely in Vault**
-- [ ] **Configure External Secrets Operator for enhanced tool integrations**
-
-**Extended Tool Vault Integration**:
-- [ ] **Certora API keys in `secret/tool-integration/certora`**
-- [ ] **Echidna configuration secrets in `secret/tool-integration/echidna`**
-- [ ] **Manticore service credentials in `secret/tool-integration/manticore`**
-- [ ] **Third-party analyzer API keys in `secret/tool-integration/analyzers`**
-- [ ] **Custom detector configurations in `secret/tool-integration/detectors`**
-
-**Acceptance Criteria**:
-- All major security tools integrate successfully including enhanced Aderyn
-- Tool selection algorithms choose appropriate tools automatically
-- Plugin architecture allows easy addition of new tools
-- Parallel execution completes faster than sequential runs
-- Tool effectiveness metrics guide optimization decisions
-- **Additional tools deploy via ArgoCD GitOps workflow**
-- **All tool credentials managed securely through Vault**
-
-#### Sprint 14: Compliance Automation Framework with Vault (Weeks 27-28)
-**Technical Milestone**: Automated compliance with secure audit trails
-
-**Development Checklist**:
-- [ ] Create SOC 2 Type II report generation framework
-- [ ] Implement NIST Cybersecurity Framework mapping
-- [ ] Add ISO 27001 compliance checklist automation
-- [ ] Create audit trail documentation system
-- [ ] Implement evidence collection for compliance requirements
-- [ ] Add regulatory requirement tracking and updates
-- [ ] Create compliance dashboard with status monitoring
-- [ ] Implement automated policy enforcement
-- [ ] Add compliance training tracking and reminders
-- [ ] Create third-party auditor portal for evidence review
-- [ ] **Configure ArgoCD for compliance automation services**
-- [ ] **Store compliance certificates and keys in Vault**
-- [ ] **Configure audit trail encryption and signing via Vault**
-
-**Compliance Vault Integration**:
-- [ ] **Compliance certificates in Vault PKI engine**
-- [ ] **Audit trail signing keys in `secret/compliance/audit-signing`**
-- [ ] **Third-party auditor credentials in `secret/compliance/auditor-access`**
-- [ ] **Compliance framework configurations in `secret/compliance/frameworks`**
-- [ ] **Evidence encryption keys in `secret/compliance/evidence-encryption`**
-
-**Acceptance Criteria**:
-- SOC 2 reports generate automatically with current evidence
-- NIST framework mapping updates based on security findings
-- Audit trails provide complete documentation for compliance
-- Policy violations trigger automatic remediation workflows
-- Auditor portal provides secure access to compliance evidence
-- **Compliance services managed via ArgoCD**
-- **All compliance credentials and certificates managed through Vault**
-
-#### Sprint 15: Machine Learning Integration with Vault (Weeks 29-30)
-**Technical Milestone**: ML-powered analysis with secure model management
-
-**Development Checklist**:
-- [ ] Implement feature engineering pipeline using collected training data
-- [ ] Set up MLflow for experiment tracking and model versioning
-- [ ] Create supervised learning model for false positive prediction
-- [ ] Implement semantic similarity matching using embeddings
-- [ ] Add ML-based vulnerability severity prediction
-- [ ] Create model inference pipeline for real-time scoring
-- [ ] Implement automated model retraining pipeline
-- [ ] Add model performance monitoring and drift detection
-- [ ] Create ML-powered remediation suggestion ranking
-- [ ] Implement confidence scoring for ML predictions
-- [ ] Add A/B testing for ML vs rule-based approaches
-- [ ] Create ML model explainability features for enterprise customers
-- [ ] **Configure ArgoCD for ML pipeline deployment and management**
-- [ ] **Store ML model encryption keys in Vault**
-- [ ] **Configure ML service API credentials in Vault**
-
-**ML Vault Integration**:
-- [ ] **ML model encryption keys in `secret/ml/model-encryption`**
-- [ ] **MLflow credentials in `secret/ml/mlflow-auth`**
-- [ ] **Model serving API keys in `secret/ml/serving-apis`**
-- [ ] **Training data access credentials in `secret/ml/training-data`**
-- [ ] **Model artifact signing keys in `secret/ml/artifact-signing`**
-
-**Acceptance Criteria**:
-- ML model achieves >85% accuracy using 6+ months of training data
-- False positive rate improves additional 10-15% beyond rule-based system
-- Model inference latency stays below 100ms per finding
-- Automated retraining maintains model performance over time
-- A/B testing shows statistically significant improvement over rules
-- Enterprise customers can understand ML decision rationale
-- **ML services deploy and update via ArgoCD**
-- **All ML credentials and keys managed securely through Vault**
-
-#### Sprint 16: Advanced Enterprise Integration with Vault (Weeks 31-32)
-**Technical Milestone**: Deep enterprise system integration with secure credential management
-
-**Development Checklist**:
-- [ ] Implement Jira integration for ticket management workflow
-- [ ] Add ServiceNow integration for ITSM processes
-- [ ] Create Microsoft Teams deep integration with adaptive cards
-- [ ] Implement Salesforce integration for customer security tracking
-- [ ] Add PagerDuty integration for critical security alerting
-- [ ] Create REST API for external system integration
-- [ ] Implement webhook system for real-time event streaming
-- [ ] Add LDAP integration for user directory synchronization
-- [ ] Create custom dashboard embedding for external portals
-- [ ] Implement single sign-on propagation to integrated systems
-- [ ] **Configure ArgoCD for enterprise integration services**
-- [ ] **Store all enterprise integration credentials in Vault**
-- [ ] **Configure webhook signing keys and API credentials via Vault**
-
-**Enterprise Integration Vault Storage**:
-- [ ] **Jira API credentials in `secret/integrations/jira`**
-- [ ] **ServiceNow integration keys in `secret/integrations/servicenow`**
-- [ ] **Teams webhook URLs in `secret/integrations/teams`**
-- [ ] **Salesforce API keys in `secret/integrations/salesforce`**
-- [ ] **PagerDuty service keys in `secret/integrations/pagerduty`**
-- [ ] **Webhook signing secrets in `secret/integrations/webhook-secrets`**
-
-**Acceptance Criteria**:
-- Security findings automatically create tickets in Jira/ServiceNow
-- Teams integration provides interactive security management
-- Critical findings page appropriate team members immediately
-- API integrations work reliably with enterprise rate limits
-- SSO propagates seamlessly across integrated systems
-- **Enterprise integrations deploy via ArgoCD**
-- **All integration credentials managed securely through Vault**
-
-#### Sprint 17: Global Deployment & Multi-Tenancy with Vault (Weeks 33-34)
-**Technical Milestone**: Production-ready global deployment with distributed secret management
-
-**Development Checklist**:
-- [ ] Implement multi-region deployment with global load balancing
-- [ ] Add data residency controls for international compliance
-- [ ] Create tenant isolation with row-level security
-- [ ] Implement cross-region database replication
-- [ ] Add disaster recovery procedures with RTO/RPO targets
-- [ ] Create multi-tenant billing and usage tracking
-- [ ] Implement geographic data routing and sovereignty
-- [ ] Add region-specific compliance controls
-- [ ] Create tenant-specific customization capabilities
-- [ ] Implement federated search across tenant boundaries
-- [ ] **Configure ArgoCD for multi-region deployment management**
-- [ ] **Set up ArgoCD application sets for multi-tenant environments**
-- [ ] **Deploy Vault clusters in multiple regions with replication**
-- [ ] **Configure cross-region Vault secret replication**
-
-**Multi-Region Vault Architecture**:
-- [ ] **Primary Vault cluster in us-east-1 with full read/write**
-- [ ] **Performance replicas in eu-west-1 and ap-southeast-1**
-- [ ] **Disaster recovery replica in us-west-2**
-- [ ] **Cross-region secret replication with encryption in transit**
-- [ ] **Region-specific secret engines for data sovereignty**
-- [ ] **Tenant-specific Vault namespaces for isolation**
-
-**Acceptance Criteria**:
-- Platform deploys successfully in multiple AWS regions
-- Data residency controls prevent cross-border data transfer
-- Tenant isolation prevents data leakage between organizations
-- Disaster recovery procedures meet <4 hour RTO target
-- Usage tracking provides accurate billing across tenants
-- **ArgoCD manages multi-region deployments successfully**
-- **Vault provides global secret management with regional compliance**
-
-#### Sprint 18: Production Readiness & Launch Preparation with Vault (Weeks 35-36)
-**Technical Milestone**: Production deployment with comprehensive secret management
-
-**Development Checklist**:
-- [ ] Complete security penetration testing with third-party firm
-- [ ] Implement comprehensive backup and disaster recovery testing
-- [ ] Create operational runbooks for common issues and procedures
-- [ ] Complete load testing with production-scale data volumes
-- [ ] Implement security incident response procedures
-- [ ] Create customer onboarding automation and documentation
-- [ ] Complete compliance audits (SOC 2, ISO 27001)
-- [ ] Implement production monitoring and alerting
-- [ ] Create customer support escalation procedures
-- [ ] Complete final security hardening and configuration review
-- [ ] Validate AWS ALB and cert-manager configuration for production scale
-- [ ] **Finalize ArgoCD production deployment configuration**
-- [ ] **Test ArgoCD disaster recovery and rollback procedures**
-- [ ] **Configure ArgoCD for production monitoring and alerting**
-- [ ] **Complete Vault security hardening and audit preparation**
-- [ ] **Test Vault disaster recovery and cross-region failover**
-- [ ] **Validate Vault performance under production load**
-
-**Production Vault Readiness**:
-- [ ] **Vault cluster hardened according to security best practices**
-- [ ] **All secrets rotated with production-grade rotation policies**
-- [ ] **Vault audit logs configured for compliance requirements**
-- [ ] **Disaster recovery procedures tested and validated**
-- [ ] **Performance benchmarks meeting SLA requirements**
-- [ ] **Vault backup and restore procedures automated**
-- [ ] **Cross-region replication tested and operational**
-
-**Acceptance Criteria**:
-- Penetration testing shows no critical vulnerabilities
-- Disaster recovery procedures tested and validated
-- Load testing confirms platform handles target scale
-- Security incident response procedures tested with tabletop exercises
-- Compliance audits pass without major findings
-- **ArgoCD production deployment fully tested and operational**
-- **ArgoCD disaster recovery procedures validated**
-- **Vault production deployment secure and performant**
-- **Vault disaster recovery and multi-region failover tested**
-
-## Technical Milestone Validation
-
-### Quality Gates
-Each sprint completion requires:
-- [ ] All automated tests pass (unit, integration, e2e)
-- [ ] Code coverage maintains >90% threshold
-- [ ] Security scans show no critical vulnerabilities
-- [ ] Performance benchmarks meet defined targets
-- [ ] Documentation updated for new features
-- [ ] Stakeholder acceptance of delivered functionality
-- [ ] **ArgoCD applications deploy successfully with green health status**
-- [ ] **GitOps workflow tested and functional for all components**
-- [ ] **Vault integration tested and secrets properly managed**
-- [ ] **External Secrets Operator functioning correctly**
-
-### Production Readiness Criteria
-Before production deployment:
-- [ ] Disaster recovery procedures tested successfully
-- [ ] Security penetration testing completed with no critical findings
-- [ ] Load testing validates platform can handle target scale
-- [ ] Monitoring and alerting systems operational
-- [ ] Compliance requirements met and audited
-- [ ] Customer support procedures and documentation complete
-- [ ] **ArgoCD production configuration validated and tested**
-- [ ] **GitOps workflows proven reliable for production deployment**
-- [ ] **ArgoCD disaster recovery and rollback procedures operational**
-- [ ] **Vault production cluster operational with HA and security hardening**
-- [ ] **Vault disaster recovery and cross-region replication tested**
-- [ ] **All secrets properly managed with appropriate rotation policies**
-
-## Local Development Environment Summary with Vault
-
-### **Cost Analysis:**
+#### Development Environment Costs (Months 1-3)
 ```yaml
-Local Development Costs (Months 1-3):
-  Infrastructure: $0 (using local hardware)
-  Cloud Services: $0 (no cloud resources used)
-  Vault: $0 (using dev mode)
-  Team Productivity: High (fast iteration cycles)
-  Security: Enterprise-grade (Vault patterns learned)
-  Total Savings: $6,000-9,000 (compared to cloud development)
-
-Cloud Migration Costs (Month 4+):
-  AWS EKS Development: ~$300/month
-  AWS EKS Staging: ~$500/month
-  AWS RDS + ElastiCache: ~$200/month
-  Vault Enterprise: ~$200/month (optional)
-  AWS KMS: ~$50/month
-  Total Cloud Costs: ~$1,250/month (scales with usage)
+Monthly AWS Costs:
+  EKS Cluster: $72 (control plane)
+  EC2 Nodes: $60-120 (2-4 t3.medium nodes)
+  RDS PostgreSQL: $25-40 (db.t3.micro)
+  ElastiCache Redis: $20-30 (cache.t3.micro)
+  ALB: $22 (base cost + LCU charges)
+  Route53: $0.50 (hosted zone)
+  S3 Storage: $5-10 (development usage)
+  CloudWatch: $10-20 (logs and metrics)
+  Vault Infrastructure: $30-50 (EC2 instances)
+  Data Transfer: $5-15
+  
+Total Estimated Cost: $250-385/month
 ```
 
-### **Vault Benefits Summary:**
+#### Production Environment Costs (Month 4+)
 ```yaml
-Local Vault Development:
-  - Enterprise secret management patterns learned
-  - Policy-based access control validated
-  - Secret rotation procedures tested
-  - External integration patterns established
-  - GitOps secret injection proven
-  - Zero cost enterprise security training
-
-Production Vault Benefits:
-  - Centralized secret management across all services
-  - Automatic secret rotation without service downtime
-  - Audit trails for compliance and security monitoring
-  - Dynamic database credentials with time-based TTL
-  - Application-level encryption via Transit engine
-  - Certificate authority for internal service communication
-  - Multi-cloud secret replication for disaster recovery
+Monthly AWS Costs:
+  EKS Clusters: $216 (3 environments)
+  EC2 Nodes: $300-600 (production scaling)
+  RDS PostgreSQL: $150-300 (Multi-AZ, read replicas)
+  ElastiCache Redis: $100-200 (cluster mode)
+  ALB: $50-100 (multiple environments)
+  Route53: $0.50 (hosted zone)
+  S3 Storage: $20-50 (production usage)
+  CloudWatch: $50-100 (enhanced monitoring)
+  CloudFront: $10-30 (CDN usage)
+  AWS Certificate Manager: $0 (free)
+  Vault Enterprise: $200-400 (optional)
+  Data Transfer: $20-50
+  
+Total Estimated Cost: $1,200-2,000/month
 ```
 
-### **Security Benefits:**
-```yaml
-Enterprise Security from Day One:
-  - All secrets centrally managed in Vault
-  - Policy-based access control enforced
-  - Secret rotation procedures automated
-  - Audit trails for all secret access
-  - Encryption at rest and in transit
-  - Certificate lifecycle management automated
-  - GitOps secret injection without exposure
-  - Team trained on enterprise secret management
-
-Cloud Security Preparation:
-  - Vault cloud deployment patterns ready
-  - AWS KMS integration prepared
-  - IAM integration documented
-  - Multi-region secret replication planned
-  - Enterprise compliance frameworks ready
-```
-
-This comprehensive technical development plan now includes HashiCorp Vault integration throughout all phases, providing enterprise-grade secret management from day one in local development through full cloud production deployment. The plan ensures that teams learn proper secret management patterns early while maintaining the cost-effective local-first approach with seamless cloud migration capabilities.
+This cloud-first approach provides immediate production-ready patterns while leveraging AWS managed services for scalability, security, and operational efficiency. The investment in cloud infrastructure from day one ensures that development patterns directly translate to production deployment without architectural changes.
