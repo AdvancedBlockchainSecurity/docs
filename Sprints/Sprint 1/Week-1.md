@@ -58,21 +58,123 @@
 
 ### **Day 2: Cloud-Ready Service IaC & Local Data Services**
 
-#### Morning: Cloud-Ready Service IaC Framework (3-4 hours)
-- [ ] Create Kubernetes deployment templates for all 6 microservices with environment-specific configs
-- [ ] Set up Helm chart templates with local and cloud environment values
-- [ ] **Create local ingress definitions with self-signed SSL certificates**
-- [ ] **Create cloud-ready ingress definitions for future AWS ALB integration**
-- [ ] Configure cert-manager Certificate resources for local development
+#### **Morning: Infrastructure IaC Framework + Microservice Template Creation (3-4 hours)**
+
+##### **Infrastructure Services IaC (1 hour)**
+- [ ] **Create Kubernetes IaC templates for infrastructure services:**
+  - [ ] **PostgreSQL: Deployment, Service, PersistentVolumeClaim, ConfigMap manifests**
+  - [ ] **Redis: Deployment, Service, ConfigMap manifests**
+  - [ ] **Monitoring: Prometheus, Grafana, Jaeger Deployment manifests**
+- [ ] **Create Helm chart templates for infrastructure services with local and cloud values**
+- [ ] **Create local ingress definitions with self-signed SSL certificates for infrastructure**
+- [ ] **Design cloud-ready ingress templates for future AWS ALB integration (commented/unused)**
+- [ ] **Configure cert-manager Certificate resources for local development**
 - [ ] **Design cloud-ready cert-manager configs for Let's Encrypt (commented/unused)**
-- [ ] Set up nginx ingress rules with local routing and rate limiting
-- [ ] Configure service discovery and mesh networking for local development
-- [ ] Create Docker build templates optimized for both local and cloud deployment
-- [ ] Set up environment-specific configuration management (local/dev/staging/prod)
+- [ ] **Set up nginx ingress rules for infrastructure services with local routing**
+
+##### **Microservice Template Framework Creation (2-3 hours)**
+
+###### **1. API Service Templates**
+- [ ] **Create `api-service/` directory structure:**
+  - [ ] **`k8s/base/deployment.yaml`** - FastAPI application deployment template
+  - [ ] **`k8s/base/service.yaml`** - ClusterIP service for internal communication
+  - [ ] **`k8s/base/configmap.yaml`** - Environment variables and app configuration
+  - [ ] **`k8s/base/secret.yaml`** - JWT secrets and OAuth credentials template
+  - [ ] **`k8s/base/ingress.yaml`** - External API access routing
+  - [ ] **`k8s/base/hpa.yaml`** - Horizontal Pod Autoscaler configuration
+- [ ] **Create Helm chart for API service:**
+  - [ ] **`helm/api-service/Chart.yaml`** - Chart metadata and dependencies
+  - [ ] **`helm/api-service/values.yaml`** - Default values for all environments
+  - [ ] **`helm/api-service/values-local.yaml`** - Local development overrides
+  - [ ] **`helm/api-service/values-cloud.yaml`** - AWS cloud configuration
+  - [ ] **`helm/api-service/templates/`** - Templated Kubernetes manifests
+- [ ] **Create ArgoCD Application template:** `argocd/api-service-application.yaml`
+
+###### **2. Tool Integration Service Templates** 
+- [ ] **Create `tool-integration-service/` directory structure:**
+  - [ ] **`k8s/base/deployment.yaml`** - Multi-container pod with tool runtimes (Python, Rust, Node.js)
+  - [ ] **`k8s/base/service.yaml`** - Service for tool execution requests
+  - [ ] **`k8s/base/configmap.yaml`** - Tool configurations and API endpoints
+  - [ ] **`k8s/base/secret.yaml`** - MythX API keys and tool credentials
+  - [ ] **`k8s/base/pvc.yaml`** - Persistent storage for contract files and tool outputs
+  - [ ] **`k8s/base/ingress.yaml`** - Tool service API access
+- [ ] **Create Helm chart for Tool Integration service:**
+  - [ ] **`helm/tool-integration/Chart.yaml`** - Chart with tool dependencies
+  - [ ] **`helm/tool-integration/values.yaml`** - Tool configurations and resource limits
+  - [ ] **`helm/tool-integration/values-local.yaml`** - Local tool paths and settings
+  - [ ] **`helm/tool-integration/values-cloud.yaml`** - Cloud storage and scaling configs
+- [ ] **Create ArgoCD Application template:** `argocd/tool-integration-application.yaml`
+
+###### **3. Analysis Orchestration Service Templates**
+- [ ] **Create `orchestration-service/` directory structure:**
+  - [ ] **`k8s/base/deployment.yaml`** - Celery worker deployment template
+  - [ ] **`k8s/base/service.yaml`** - Worker communication service
+  - [ ] **`k8s/base/configmap.yaml`** - Celery broker settings and queue configurations
+  - [ ] **`k8s/base/secret.yaml`** - Redis connection credentials
+  - [ ] **`k8s/base/hpa.yaml`** - Worker auto-scaling based on queue length
+  - [ ] **`k8s/base/pdb.yaml`** - Pod disruption budget for rolling updates
+- [ ] **Create Helm chart for Orchestration service:**
+  - [ ] **`helm/orchestration/Chart.yaml`** - Chart with Celery dependencies
+  - [ ] **`helm/orchestration/values.yaml`** - Worker concurrency and scaling settings
+  - [ ] **`helm/orchestration/values-local.yaml`** - Single worker for local development
+  - [ ] **`helm/orchestration/values-cloud.yaml`** - Multi-worker cloud configuration
+- [ ] **Create ArgoCD Application template:** `argocd/orchestration-application.yaml`
+
+###### **4. Intelligence Engine Service Templates**
+- [ ] **Create `intelligence-engine-service/` directory structure:**
+  - [ ] **`k8s/base/deployment.yaml`** - ML processing deployment with GPU support template
+  - [ ] **`k8s/base/service.yaml`** - Intelligence API service
+  - [ ] **`k8s/base/configmap.yaml`** - ML model configurations and scoring algorithms
+  - [ ] **`k8s/base/secret.yaml`** - ML service credentials and API keys
+  - [ ] **`k8s/base/pvc.yaml`** - Persistent storage for ML models and training data
+  - [ ] **`k8s/base/ingress.yaml`** - Intelligence service API access
+- [ ] **Create Helm chart for Intelligence Engine:**
+  - [ ] **`helm/intelligence-engine/Chart.yaml`** - Chart with ML dependencies
+  - [ ] **`helm/intelligence-engine/values.yaml`** - Model configurations and resource limits
+  - [ ] **`helm/intelligence-engine/values-local.yaml`** - Local ML processing settings
+  - [ ] **`helm/intelligence-engine/values-cloud.yaml`** - Cloud ML and GPU configurations
+- [ ] **Create ArgoCD Application template:** `argocd/intelligence-engine-application.yaml`
+
+###### **5. Data Service Templates**
+- [ ] **Create `data-service/` directory structure:**
+  - [ ] **`k8s/base/deployment.yaml`** - Database API service deployment
+  - [ ] **`k8s/base/service.yaml`** - Database access service
+  - [ ] **`k8s/base/configmap.yaml`** - Database connection pools and caching settings
+  - [ ] **`k8s/base/secret.yaml`** - Database credentials and connection strings
+  - [ ] **`k8s/base/ingress.yaml`** - Data service API access (admin only)
+- [ ] **Create Helm chart for Data service:**
+  - [ ] **`helm/data-service/Chart.yaml`** - Chart with database dependencies
+  - [ ] **`helm/data-service/values.yaml`** - Connection pool and caching configurations
+  - [ ] **`helm/data-service/values-local.yaml`** - Local database connection settings
+  - [ ] **`helm/data-service/values-cloud.yaml`** - RDS and ElastiCache configurations
+- [ ] **Create ArgoCD Application template:** `argocd/data-service-application.yaml`
+
+###### **6. Notification Service Templates**
+- [ ] **Create `notification-service/` directory structure:**
+  - [ ] **`k8s/base/deployment.yaml`** - WebSocket and notification service deployment
+  - [ ] **`k8s/base/service.yaml`** - WebSocket and API service
+  - [ ] **`k8s/base/configmap.yaml`** - Email templates and notification configurations
+  - [ ] **`k8s/base/secret.yaml`** - SMTP credentials and webhook URLs
+  - [ ] **`k8s/base/ingress.yaml`** - WebSocket and notification API access
+- [ ] **Create Helm chart for Notification service:**
+  - [ ] **`helm/notification/Chart.yaml`** - Chart with messaging dependencies
+  - [ ] **`helm/notification/values.yaml`** - Email and WebSocket configurations
+  - [ ] **`helm/notification/values-local.yaml`** - Local SMTP (MailHog) settings
+  - [ ] **`helm/notification/values-cloud.yaml`** - AWS SES and SNS configurations
+- [ ] **Create ArgoCD Application template:** `argocd/notification-application.yaml`
+
+##### **Service Discovery & Configuration (30 minutes)**
+- [ ] **Configure service discovery and Istio mesh networking for local development**
+- [ ] **Create Docker build templates optimized for both local and cloud deployment**
+- [ ] **Set up environment-specific configuration management (local/dev/staging/prod)**
 - [ ] **Create ArgoCD Application manifests for each microservice**
 - [ ] **Configure ArgoCD sync policies for local development workflow**
 
-#### Afternoon: Local Data Services + Infrastructure ArgoCD Applications (3-4 hours)
+---
+
+#### **Afternoon: Local Data Services + Infrastructure ArgoCD Applications (3-4 hours)**
+
+##### **Data Infrastructure Deployment (2 hours)**
 - [ ] **Deploy PostgreSQL 15 locally via Kubernetes using infrastructure IaC templates**
 - [ ] **Configure PgBouncer connection pooling for local development**
 - [ ] **Deploy Redis locally via Kubernetes using infrastructure IaC templates**
@@ -80,33 +182,98 @@
 - [ ] **Design cloud-ready Redis HA configuration templates (for future use)**
 - [ ] **Test local database connectivity and performance**
 - [ ] **Configure local data backup and restore procedures**
-- [ ] **Create ArgoCD Applications for local PostgreSQL and Redis using infrastructure IaC**
+
+##### **ArgoCD Infrastructure Management (1-2 hours)**
+- [ ] **Create ArgoCD Applications for local PostgreSQL using infrastructure IaC**
+- [ ] **Create ArgoCD Applications for local Redis using infrastructure IaC**
+- [ ] **Create ArgoCD Applications for monitoring stack using infrastructure IaC**
 - [ ] **Test ArgoCD automatic sync for infrastructure service configuration changes**
 - [ ] **Configure ArgoCD health checks for local data services**
+- [ ] **Configure ArgoCD health checks for monitoring services**
 
-**Environment Strategy:**
+---
+
+### **Environment Strategy:**
+
+#### **Local Development:**
 ```yaml
-Local Development:
-  - Self-signed certificates via local CA
-  - Single-node PostgreSQL and Redis
-  - Local DNS resolution
-  - minikube tunnel for load balancer simulation
-
-Cloud Ready (Future):
-  - Let's Encrypt certificates via Route53 DNS
-  - RDS PostgreSQL with read replicas
-  - ElastiCache Redis cluster
-  - AWS ALB with SSL termination
+SSL Strategy: Self-signed certificates via local CA
+Database: Single-node PostgreSQL with local storage
+Cache: Single Redis instance
+DNS: Local hosts file resolution (/etc/hosts)
+Load Balancer: minikube tunnel simulation
+Container Registry: minikube built-in registry
 ```
 
-**Deliverables Day 2:**
-- [ ] Complete Kubernetes IaC templates for all 6 microservices
-- [ ] Helm charts with local development values and cloud-ready structure
-- [ ] Local PostgreSQL and Redis deployed and accessible
-- [ ] **ArgoCD Applications created for all microservices and data services**
+#### **Cloud Ready (Future):**
+```yaml
+SSL Strategy: Let's Encrypt certificates via Route53 DNS
+Database: RDS PostgreSQL with read replicas and automated backups
+Cache: ElastiCache Redis cluster with failover
+DNS: Route53 with health checks
+Load Balancer: AWS ALB with SSL termination
+Container Registry: Amazon ECR with vulnerability scanning
+```
+
+---
+
+### **Deliverables Day 2:**
+
+#### **Microservice Template Framework:**
+- [ ] **Complete Kubernetes IaC templates for all 6 microservices:**
+  - [ ] API Service template structure ready
+  - [ ] Tool Integration Service template structure ready
+  - [ ] Analysis Orchestration Service template structure ready
+  - [ ] Intelligence Engine Service template structure ready
+  - [ ] Data Service template structure ready
+  - [ ] Notification Service template structure ready
+
+#### **Infrastructure & GitOps:**
+- [ ] **Helm charts with local development values and cloud-ready structure**
+- [ ] **Local PostgreSQL and Redis deployed and accessible**
+- [ ] **Monitoring stack (Prometheus, Grafana, Jaeger) deployed and accessible**
+- [ ] **ArgoCD Applications created for all infrastructure services**
+- [ ] **ArgoCD Applications templates created for all 6 microservices (ready for service implementation)**
 - [ ] **GitOps workflow functional for local infrastructure deployments**
 - [ ] **Cloud-ready IaC templates prepared for future AWS deployment**
-- [ ] Local SSL certificates automatically generated and renewed
+- [ ] **Local SSL certificates automatically generated and renewed**
+
+#### **Directory Structure Created:**
+```
+solidity-security-platform/
+├── services/
+│   ├── api-service/
+│   │   ├── k8s/base/ (6 manifests)
+│   │   ├── helm/ (5 files)
+│   │   └── argocd/ (1 application)
+│   ├── tool-integration-service/
+│   │   ├── k8s/base/ (6 manifests)
+│   │   ├── helm/ (5 files)
+│   │   └── argocd/ (1 application)
+│   ├── orchestration-service/
+│   │   ├── k8s/base/ (6 manifests)
+│   │   ├── helm/ (5 files)
+│   │   └── argocd/ (1 application)
+│   ├── intelligence-engine-service/
+│   │   ├── k8s/base/ (6 manifests)
+│   │   ├── helm/ (5 files)
+│   │   └── argocd/ (1 application)
+│   ├── data-service/
+│   │   ├── k8s/base/ (5 manifests)
+│   │   ├── helm/ (5 files)
+│   │   └── argocd/ (1 application)
+│   └── notification-service/
+│       ├── k8s/base/ (5 manifests)
+│       ├── helm/ (5 files)
+│       └── argocd/ (1 application)
+└── infrastructure/
+    ├── postgresql/ (IaC deployed)
+    ├── redis/ (IaC deployed)
+    ├── monitoring/ (IaC deployed)
+    └── argocd-apps/ (infrastructure applications)
+```
+
+**Total Templates Created:** 6 microservices × ~11 files each = 66 template files ready for service implementation in Week 2.
 
 ---
 
