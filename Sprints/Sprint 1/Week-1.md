@@ -1,1016 +1,387 @@
-# Unified Solidity Security Platform - Technical Development Plan
-
-## System Architecture Overview
-
-### High-Level Architecture
-**Microservices Architecture Pattern** with event-driven communication
-- **API Gateway**: Kong or AWS API Gateway for rate limiting, authentication, routing
-- **Service Mesh**: Istio for service-to-service communication, load balancing, circuit breaking
-- **Ingress Controller**: nginx for SSL termination, rate limiting, and traffic routing
-- **Certificate Management**: cert-manager for automated SSL certificate provisioning and renewal
-- **Event Bus**: Apache Kafka for async messaging between services
-- **Container Orchestration**: Kubernetes with Helm charts for deployment
-- **Observability**: Prometheus metrics, Jaeger tracing, structured logging with Fluentd
-
-### Development Strategy: Local-First, Cloud-Ready
-
-#### Phase 1: Local Development Foundation (Months 1-3)
-**Infrastructure**: Local Kubernetes (minikube) with cloud-ready patterns
-- **Local Kubernetes**: minikube with realistic resource allocation
-- **Local Services**: PostgreSQL and Redis via Docker Compose + Kubernetes
-- **SSL Strategy**: Self-signed certificates with cert-manager local CA issuer
-- **DNS Strategy**: Local hosts file entries for service discovery
-- **Container Registry**: minikube built-in registry for development
-- **ArgoCD**: Local deployment managing local applications
-- **Cost**: $0 cloud costs during development phase
-
-#### Phase 2: Cloud Migration (Month 4+)
-**Infrastructure**: AWS EKS with production-grade services
-- **Kubernetes**: AWS EKS with managed node groups
-- **Database**: RDS PostgreSQL with read replicas
-- **Caching**: ElastiCache Redis with clustering
-- **SSL Strategy**: Let's Encrypt certificates with Route53 DNS
-- **Load Balancing**: AWS Application Load Balancer
-- **Container Registry**: Amazon ECR with vulnerability scanning
-- **Cost**: Estimated $500-2000/month based on usage
-
-### Core Services Architecture
-
-#### 1. Tool Integration Service
-**Purpose**: Unified interface for all security analysis tools
-**Technology Stack**: Python 3.11, FastAPI, Celery, Redis, Rust runtime for Aderyn
-**Design Pattern**: Adapter pattern with plugin architecture
-
-**Technical Requirements**:
-- **Plugin System**: Dynamic loading of tool adapters via Python importlib
-- **Multi-Language Support**: Python for Slither/MythX, Rust runtime for Aderyn
-- **Rate Limiting**: Per-tool rate limiting to respect API quotas
-- **Retry Logic**: Exponential backoff with jitter for failed API calls
-- **Timeout Handling**: Configurable timeouts per tool type
-- **Result Caching**: Redis-based caching for identical contract analyses
-
-**Tool Integration Specifications**:
-
-**Slither Integration**:
-- Direct Python API usage (slither-analyzer package)
-- Custom detector plugin support
-- Parallel analysis for multiple contracts
-- Memory optimization for large contract sets
-
-**MythX Integration**:
-- REST API with async job polling
-- WebSocket support for real-time updates
-- Analysis mode selection (quick/standard/deep)
-- API key rotation and failover
-
-**Aderyn Integration**:
-- Rust-based CLI wrapper with process management
-- Direct cargo installation and version management
-- JSON report parsing for vulnerability detection
-- Performance optimization for large codebases
-- Foundry project structure detection
-- Custom detector configuration support
-
-**Solidity-Metrics Integration**:
-- Node.js CLI wrapper with process management
-- npm package installation and version management
-- Comprehensive code complexity metrics extraction
-- AST-based analysis for maintainability scores
-- Support for multiple Solidity compiler versions
-- Integration with vulnerability risk correlation
-
-**Certora Integration**:
-- CLI wrapper with process management
-- Specification file generation automation
-- Result parsing from JSON output
-- Resource allocation for verification jobs
-
-**Tool Output Normalization**:
-- Standardized vulnerability schema (SWC-based)
-- Source location mapping (file paths, line numbers)
-- Severity level harmonization across tools
-- Confidence score normalization (0.0-1.0 scale)
-
-#### 2. Intelligence Engine Service
-**Purpose**: Cross-tool correlation, deduplication, ML-based analysis
-**Technology Stack**: Python 3.11, scikit-learn, spaCy, PostgreSQL, Redis
-**Design Pattern**: Pipeline pattern with pluggable analyzers
-
-**Deduplication Algorithm Specifications**:
-- **Syntactic Matching**: Exact file path + line number matching
-- **Semantic Matching**: AST-based similarity using tree-edit distance
-- **Fuzzy Matching**: Levenshtein distance on vulnerability descriptions
-- **ML Classification**: Supervised learning model for duplicate detection
-
-**Risk Scoring Engine**:
-- **Base Severity Weights**: Critical(10), High(7), Medium(4), Low(2), Info(1)
-- **Confidence Multipliers**: High confidence × 1.0, Medium × 0.8, Low × 0.6
-- **Cross-Tool Validation**: +20% boost for findings confirmed by multiple tools
-- **Code Complexity Integration**: Higher complexity scores increase vulnerability risk by 10-30%
-- **Business Context**: Function criticality weighting based on gas usage patterns
-- **Historical Data**: False positive penalty based on similar past findings
-
-**Machine Learning Components**:
-- **Training Data Collection**: Customer feedback on false positives (Phase 1)
-- **Feature Engineering**: Code complexity metrics, function signatures, control flow (Phase 2)
-- **Model Training**: Supervised learning on 6+ months of customer data (Phase 2)
-- **Inference Pipeline**: Real-time scoring during analysis runs (Phase 2)
-- **Model Versioning**: MLflow for experiment tracking and model deployment (Phase 2)
-
-#### 3. Analysis Orchestration Service
-**Purpose**: Manage analysis workflows, resource allocation, job scheduling
-**Technology Stack**: Python 3.11, Celery, Redis, PostgreSQL
-**Design Pattern**: Workflow orchestration with DAG execution
-
-**Job Scheduling**:
-- **Priority Queues**: Critical (audit prep), High (CI/CD), Normal (manual), Low (batch)
-- **Resource Management**: CPU/memory limits per analysis type
-- **Concurrency Control**: Max concurrent jobs per organization
-- **Failover Handling**: Dead letter queues for failed analyses
-
-**Workflow Engine**:
-- **DAG Definition**: Analysis steps as directed acyclic graph
-- **Parallel Execution**: Independent tool runs in parallel
-- **Dependency Management**: Intelligence engine waits for all tools
-- **Checkpoint System**: Resume interrupted analyses from checkpoints
-
-#### 4. Data Service
-**Purpose**: Centralized data management, caching, search
-**Technology Stack**: PostgreSQL 15, Redis 7, Elasticsearch 8
-**Design Pattern**: CQRS with event sourcing for audit trails
-
-**Database Schema Design**:
-- **Partitioning Strategy**: Time-based partitioning for analysis_runs and findings
-- **Indexing Strategy**: Composite indexes on (organization_id, project_id, created_at)
-- **Connection Pooling**: PgBouncer for connection management
-- **Read Replicas**: Separate read replicas for analytics and reporting
-
-**Caching Strategy**:
-- **L1 Cache**: In-memory application cache for frequently accessed data
-- **L2 Cache**: Redis for session data, tool results, computed aggregations
-- **Cache Invalidation**: Event-driven invalidation on data mutations
-- **Cache Warming**: Preload cache with predicted access patterns
-
-**Search Infrastructure**:
-- **Full-Text Search**: Elasticsearch for finding text, vulnerability descriptions
-- **Faceted Search**: Multi-dimensional filtering by severity, tool, file type
-- **Autocomplete**: Prefix search for file paths, function names
-- **Search Analytics**: Query performance monitoring and optimization
-
-#### 5. Notification Service
-**Purpose**: Real-time updates, integrations, alerting
-**Technology Stack**: Node.js, Socket.io, Redis, PostgreSQL
-**Design Pattern**: Publisher-subscriber with WebSocket broadcasting
-
-**Real-Time Communication**:
-- **WebSocket Management**: Connection pooling, auto-reconnection, heartbeat
-- **Room Management**: Organization and project-based message broadcasting
-- **Message Queuing**: Redis pub/sub for horizontal scaling
-- **Rate Limiting**: Per-connection message rate limiting
-
-**Integration Specifications**:
-- **Slack Integration**: Bot with interactive message components
-- **Teams Integration**: Webhook-based notifications with adaptive cards
-- **Email Service**: HTML templates with inline vulnerability details
-- **Webhook Support**: Configurable webhooks for external system integration
-
-### Frontend Architecture
-
-#### React Application Structure
-**Technology Stack**: React 18, TypeScript 5, Vite, TanStack Query, Zustand
-**Architecture Pattern**: Feature-based folder structure with shared components
-
-**State Management**:
-- **Global State**: Zustand for authentication, user preferences, theme
-- **Server State**: TanStack Query for API data fetching and caching
-- **Local State**: React useState/useReducer for component-specific state
-- **Form State**: React Hook Form with Zod validation
-
-**Component Architecture**:
-- **Design System**: Custom component library with Storybook documentation
-- **Lazy Loading**: React.lazy for code splitting by route and feature
-- **Error Boundaries**: Granular error handling with fallback components
-- **Performance**: React.memo, useMemo, useCallback for optimization
-
-**Real-Time Features**:
-- **WebSocket Client**: Custom hook for connection management
-- **Optimistic Updates**: Immediate UI updates with rollback on failure
-- **Offline Support**: Service worker for basic offline functionality
-- **Push Notifications**: Browser notifications for critical findings
-
-#### Visualization Components
-**Technology Stack**: D3.js, Recharts, React Flow
-**Design Requirements**: Responsive, accessible, performant with large datasets
-
-**Dashboard Visualizations**:
-- **Risk Trend Charts**: Time-series visualization of security metrics
-- **Finding Distribution**: Donut charts showing severity distribution
-- **Heat Maps**: Code coverage and vulnerability density visualization
-- **Network Graphs**: Contract dependency and interaction visualization
-
-**Real-Time Updates**:
-- **Streaming Data**: WebSocket-based real-time chart updates
-- **Animation**: Smooth transitions for data changes
-- **Performance**: Canvas rendering for high-frequency updates
-- **Accessibility**: Screen reader support, keyboard navigation
-
-### Security Architecture
-
-#### Authentication & Authorization
-**Technology Stack**: JWT, OAuth 2.0, SAML 2.0, Redis
-**Design Pattern**: Role-based access control with attribute-based policies
-
-**Authentication Methods**:
-- **Password-Based**: Argon2 hashing with salt and pepper
-- **OAuth Providers**: Google, GitHub, Microsoft SSO integration
-- **SAML SSO**: Enterprise identity provider integration
-- **Multi-Factor**: TOTP, SMS, hardware key support
-
-**Authorization Model**:
-- **Role Hierarchy**: Super Admin > Org Admin > Project Admin > Developer > Viewer
-- **Permission System**: Granular permissions for resources and actions
-- **Policy Engine**: ABAC policies for complex access control scenarios
-- **API Security**: JWT validation, scope checking, rate limiting
-
-#### Data Security
-**Encryption Standards**:
-- **At Rest**: AES-256-GCM for database and file storage
-- **In Transit**: TLS 1.3 for all external communications
-- **Application Level**: Field-level encryption for sensitive data
-- **Key Management**: AWS KMS or HashiCorp Vault for key rotation
-
-**Privacy Controls**:
-- **Data Isolation**: Tenant-based data segregation
-- **PII Handling**: Automatic detection and masking of personal data
-- **Audit Logging**: Immutable logs for all data access and modifications
-- **Data Retention**: Configurable retention policies with automatic purging
-
-### Performance & Scalability
-
-#### Horizontal Scaling Strategy
-**Load Balancing**: Application-level load balancing with health checks
-**Database Scaling**: Read replicas, connection pooling, query optimization
-**Caching Layers**: Multi-tier caching with automatic cache warming
-**CDN Strategy**: Global CDN for static assets and API responses
-
-**Performance Targets**:
-- **API Response Time**: P95 < 200ms for CRUD operations
-- **Analysis Throughput**: 1000+ concurrent contract analyses
-- **Database Performance**: P95 < 50ms for indexed queries
-- **Frontend Performance**: First Contentful Paint < 1.5s
-
-#### Resource Management
-**Container Resources**:
-- **CPU Limits**: 2 cores per service instance with burst capability
-- **Memory Limits**: 4GB per service with OOM kill protection
-- **Storage**: Persistent volumes for database, ephemeral for processing
-- **Network**: Service mesh for inter-service communication
-
-**Auto-Scaling Configuration**:
-- **Horizontal Pod Autoscaler**: CPU and memory-based scaling
-- **Vertical Pod Autoscaler**: Right-sizing recommendations
-- **Cluster Autoscaler**: Node scaling based on resource demands
-- **Custom Metrics**: Queue length and analysis time-based scaling
-
-### DevOps & Infrastructure
-
-#### CI/CD Pipeline
-**Technology Stack**: GitHub Actions, Docker, Kubernetes, ArgoCD
-**Pipeline Stages**: Test → Build → Security Scan → Deploy → Verify
-
-**Build Process**:
-- **Multi-Stage Builds**: Optimized Docker images with security scanning
-- **Dependency Caching**: Layer caching for faster builds
-- **Parallel Execution**: Test suites run in parallel across services
-- **Artifact Management**: Container registry with vulnerability scanning
-
-**Deployment Strategy**:
-- **GitOps**: ArgoCD for declarative deployment management
-- **Blue-Green Deployment**: Zero-downtime deployments with rollback
-- **Canary Releases**: Gradual rollout with automatic rollback on errors
-- **Database Migrations**: Backward-compatible migrations with versioning
-
-#### Monitoring & Observability
-**Metrics Stack**: Prometheus, Grafana, AlertManager
-**Logging Stack**: Fluentd, Elasticsearch, Kibana
-**Tracing Stack**: Jaeger, OpenTelemetry
-
-**Key Metrics**:
-- **Golden Signals**: Latency, traffic, errors, saturation
-- **Business Metrics**: Analysis completion rate, false positive rate
-- **Infrastructure Metrics**: CPU, memory, disk, network utilization
-- **Custom Metrics**: Tool-specific metrics, queue depths, processing times
-
-**Alerting Strategy**:
-- **Severity Levels**: Critical (page on-call), Warning (notify team), Info (log only)
-- **Alert Routing**: PagerDuty integration with escalation policies
-- **Alert Correlation**: Group related alerts to reduce noise
-- **Runbook Automation**: Automated remediation for known issues
-
-### Data Architecture
-
-#### Database Design
-**Primary Database**: PostgreSQL 15 with logical replication
-**Schema Strategy**: Multi-tenant with row-level security
-**Backup Strategy**: Continuous backup with point-in-time recovery
-
-**Table Partitioning**:
-- **Time-Based**: Monthly partitions for analysis_runs and findings
-- **Hash-Based**: Organization-based partitioning for large tables
-- **Automatic Management**: pg_partman for automated partition management
-
-**Index Strategy**:
-- **Primary Indexes**: B-tree indexes on frequently queried columns
-- **Composite Indexes**: Multi-column indexes for complex queries
-- **Partial Indexes**: Conditional indexes for filtered queries
-- **Index Monitoring**: pg_stat_user_indexes for usage tracking
-
-#### Data Processing Pipeline
-**Stream Processing**: Apache Kafka with Kafka Streams
-**Batch Processing**: Apache Airflow for scheduled data jobs
-**Data Warehousing**: ClickHouse for analytics and reporting
-
-**ETL Processes**:
-- **Real-Time**: Kafka consumers for immediate data processing
-- **Batch**: Hourly/daily aggregation jobs for reporting
-- **Data Quality**: Automated validation and anomaly detection
-- **Data Lineage**: Tracking data flow and transformations
-
-### API Design
-
-#### REST API Specifications
-**Standards**: OpenAPI 3.0, JSON:API compliance
-**Versioning**: URL-based versioning (/api/v1/, /api/v2/)
-**Pagination**: Cursor-based pagination for large datasets
-**Filtering**: GraphQL-style filtering with field selection
-
-**Endpoint Design**:
-- **Resource-Based**: RESTful resource naming conventions
-- **HTTP Methods**: Proper verb usage (GET, POST, PUT, DELETE, PATCH)
-- **Status Codes**: Consistent HTTP status code usage
-- **Error Handling**: Structured error responses with error codes
-
-**Rate Limiting**:
-- **Per-User Limits**: 1000 requests/hour for authenticated users
-- **Per-Endpoint Limits**: Different limits for expensive operations
-- **Burst Allowance**: Short-term burst capability with token bucket
-- **Rate Limit Headers**: Standard headers for client awareness
-
-#### GraphQL API (Future)
-**Schema Design**: Type-first schema design with code generation
-**Resolvers**: Efficient N+1 query prevention with DataLoader
-**Subscriptions**: Real-time subscriptions for live updates
-**Federation**: Schema federation for microservices
-
-### Testing Strategy
-
-#### Test Pyramid Structure
-**Unit Tests (70%)**:
-- **Coverage Target**: >90% code coverage
-- **Test Framework**: pytest for Python, Jest for TypeScript
-- **Test Isolation**: Mock external dependencies and databases
-- **Property-Based Testing**: Hypothesis for Python property testing
-
-**Integration Tests (20%)**:
-- **API Testing**: Full API endpoint testing with test databases
-- **Service Integration**: Cross-service integration testing
-- **Database Testing**: Test migrations and complex queries
-- **External API Testing**: Mock external tool APIs with contract testing
-
-**End-to-End Tests (10%)**:
-- **UI Testing**: Playwright for browser automation
-- **User Workflows**: Complete user journey testing
-- **Performance Testing**: Load testing with realistic data volumes
-- **Security Testing**: Automated security scanning and penetration testing
-
-#### Test Data Management
-**Test Databases**: Isolated test databases per environment
-**Data Fixtures**: Reusable test data factories and builders
-**Test Isolation**: Transaction rollback between tests
-**Seed Data**: Consistent seed data for development and testing
-
-**Performance Testing**:
-- **Load Testing**: k6 for API load testing
-- **Stress Testing**: Gradual load increase to find breaking points
-- **Volume Testing**: Large dataset testing for database performance
-- **Chaos Engineering**: Controlled failure injection with Chaos Monkey
-
-### Development Workflow
-
-#### Git Strategy
-**Branching Model**: GitHub Flow with feature branches
-**Commit Standards**: Conventional Commits with semantic versioning
-**Code Review**: Required PR reviews with automated checks
-**Branch Protection**: Main branch protection with status checks
-
-**Development Environment**:
-- **Local Setup**: Docker Compose + minikube for local development stack
-- **Hot Reloading**: Development servers with automatic reload
-- **Database Seeding**: Scripts for consistent local data setup
-- **Environment Parity**: Production-like local environment
-
-#### Code Quality
-**Linting**: ESLint for TypeScript, Black/isort for Python
-**Type Checking**: TypeScript strict mode, mypy for Python
-**Security Scanning**: Semgrep, bandit for static security analysis
-**Dependency Management**: Dependabot for automated updates
-
-**Documentation Requirements**:
-- **API Documentation**: OpenAPI specs with examples
-- **Code Documentation**: Inline comments for complex logic
-- **Architecture Documentation**: Decision records and diagrams
-- **User Documentation**: Step-by-step guides and tutorials
-
-### Migration & Deployment Strategy
-
-#### Database Migrations
-**Migration Framework**: Alembic for Python, custom scripts for data migrations
-**Migration Strategy**: Forward-only migrations with rollback procedures
-**Zero-Downtime**: Online schema changes with minimal locking
-**Data Validation**: Post-migration validation and integrity checks
-
-#### Feature Rollout
-**Feature Flags**: LaunchDarkly for gradual feature rollout
-**A/B Testing**: Statistical significance testing for UI changes
-**Rollback Strategy**: Immediate rollback capability for failed deployments
-**Blue-Green Database**: Database-level blue-green deployment support
-
-#### Production Readiness
-**Health Checks**: Comprehensive health check endpoints
-**Graceful Shutdown**: SIGTERM handling with connection draining
-**Circuit Breakers**: Fail-fast pattern for external dependencies
-**Bulkhead Pattern**: Resource isolation between critical and non-critical operations
-
-### Cloud Migration Strategy (Phase 2)
-
-#### Migration Timeline
-**Sprint 7 (Month 4)**: Initial cloud deployment to AWS development environment
-**Sprint 12 (Month 6)**: Full production deployment with enterprise features
-**Sprint 18 (Month 9)**: Multi-region production deployment
-
-#### AWS Infrastructure Design
-**Compute**: EKS clusters with managed node groups and Spot instances
-**Database**: RDS PostgreSQL with Multi-AZ deployment and read replicas
-**Caching**: ElastiCache Redis with cluster mode enabled
-**Storage**: S3 for contract files with lifecycle policies
-**Networking**: VPC with public/private subnets and NAT gateways
-**Security**: IAM roles, security groups, and VPC endpoints
-**Monitoring**: CloudWatch integration with existing Prometheus stack
-
-#### Migration Approach
-**Incremental Migration**: Service-by-service migration with dual deployment
-**Data Migration**: Zero-downtime database migration with logical replication
-**DNS Cutover**: Route53 DNS-based traffic routing for gradual migration
-**Rollback Plan**: Ability to route traffic back to local environment if needed
-
-## Development Phases & Milestones
-
-### Phase 1: Foundation & MVP (Months 1-3) - Local Development
-
-#### Sprint 1: Infrastructure Foundation (Weeks 1-2)
-**Technical Milestone**: Complete local development environment and core infrastructure setup
-
-**Development Checklist**:
+# Sprint 1: Infrastructure Foundation & Repository Setup (Weeks 1-2)
+
+**Objective:** Establish complete local development environment, repository structure, and cloud-ready Infrastructure as Code foundation for all services with GitOps deployment automation.
+
+## Week 1: Local Infrastructure Foundation & Cloud-Ready IaC
+
+### **Day 1: Repository Foundation & Local Kubernetes Setup**
+
+#### Morning: Repository Setup (2 hours)
+- [x] Create 6 repositories on GitHub with branch protection
+  - [x] solidity-security-platform
+  - [x] solidity-security-infrastructure
+  - [x] solidity-security-tools
+  - [x] solidity-security-docs
+  - [x] solidity-security-monitoring
+  - [x] solidity-security-vulnerabilities
+- [x] Set up team permissions and access controls
+- [x] Clone all repositories and create initial folder structures
+- [x] Configure repository templates and README files
+
+#### Afternoon: Local Kubernetes + ArgoCD + Local SSL (5-6 hours)
 - [ ] Set up local minikube cluster with realistic resource allocation (8GB RAM, 4 CPUs)
+- [ ] Enable minikube addons (ingress, registry, metrics-server)
+- [ ] Install and configure Istio service mesh in local cluster
 - [ ] Install nginx ingress controller for local development
-- [ ] Install cert-manager with local CA issuer for self-signed certificates
-- [ ] Configure local development DNS entries in hosts file
+- [ ] Install cert-manager for automated local certificate management
+- [ ] **Configure cert-manager with local CA issuer (not Let's Encrypt)**
+- [ ] **Create local root CA and configure self-signed certificate generation**
+- [ ] **Set up local development DNS entries in hosts file**
 - [ ] **Install ArgoCD in local Kubernetes cluster**
 - [ ] **Configure ArgoCD with local Git repository integration**
 - [ ] **Set up ArgoCD application projects for local development**
 - [ ] **Configure ArgoCD RBAC for team access and permissions**
-- [ ] **Create ArgoCD Application manifests for all microservices**
-- [ ] Deploy PostgreSQL 15 locally with persistent volumes
-- [ ] Deploy Redis locally with persistence enabled
-- [ ] Set up local monitoring stack (Prometheus, Grafana, Jaeger)
-- [ ] Configure local CI/CD pipeline with GitHub Actions
-- [ ] Implement base Docker images with security scanning
 - [ ] Create docker-compose.yml for supplementary local services
+- [ ] Write setup scripts for automated local environment reproduction
+
+**Local DNS Configuration:**
+```bash
+# Add to /etc/hosts or equivalent
+127.0.0.1 api.solidity-platform.local
+127.0.0.1 app.solidity-platform.local
+127.0.0.1 argocd.solidity-platform.local
+127.0.0.1 grafana.solidity-platform.local
+127.0.0.1 prometheus.solidity-platform.local
+```
+
+**Deliverables Day 1:**
+- [ ] All 6 repositories created with basic structure
+- [ ] Local minikube cluster operational with realistic resource limits
+- [ ] nginx ingress controller routing traffic locally
+- [ ] **Local CA issuer generating self-signed certificates automatically**
+- [ ] **ArgoCD successfully deployed and accessible via https://argocd.solidity-platform.local**
+- [ ] **ArgoCD UI accessible with local SSL certificates**
+- [ ] **Local development environment fully scripted and reproducible**
+- [ ] Infrastructure repository with complete local setup automation
+
+---
+
+### **Day 2: Cloud-Ready Service IaC & Local Data Services**
+
+#### Morning: Cloud-Ready Service IaC Framework (3-4 hours)
+- [ ] Create Kubernetes deployment templates for all 6 microservices with environment-specific configs
+- [ ] Set up Helm chart templates with local and cloud environment values
+- [ ] **Create local ingress definitions with self-signed SSL certificates**
+- [ ] **Create cloud-ready ingress definitions for future AWS ALB integration**
+- [ ] Configure cert-manager Certificate resources for local development
+- [ ] **Design cloud-ready cert-manager configs for Let's Encrypt (commented/unused)**
+- [ ] Set up nginx ingress rules with local routing and rate limiting
+- [ ] Configure service discovery and mesh networking for local development
+- [ ] Create Docker build templates optimized for both local and cloud deployment
+- [ ] Set up environment-specific configuration management (local/dev/staging/prod)
+- [ ] **Create ArgoCD Application manifests for each microservice**
 - [ ] **Configure ArgoCD sync policies for local development workflow**
 
-**Acceptance Criteria**:
-- All services deploy successfully to local minikube cluster
-- **ArgoCD successfully deploys and manages local application lifecycle via GitOps**
-- Local monitoring dashboards display metrics from all infrastructure components
-- Local SSL termination working with self-signed certificates
-- cert-manager automatically provisions and renews local certificates
-- nginx ingress controller routes local traffic correctly
-- **ArgoCD UI accessible and shows healthy application status**
-- **GitOps workflow functional for local deployments and updates**
+#### Afternoon: Local Data Services + Infrastructure ArgoCD Applications (3-4 hours)
+- [ ] **Deploy PostgreSQL 15 locally via Kubernetes using infrastructure IaC templates**
+- [ ] **Configure PgBouncer connection pooling for local development**
+- [ ] **Deploy Redis locally via Kubernetes using infrastructure IaC templates**
+- [ ] **Create local Redis configuration (single instance for development)**
+- [ ] **Design cloud-ready Redis HA configuration templates (for future use)**
+- [ ] **Test local database connectivity and performance**
+- [ ] **Configure local data backup and restore procedures**
+- [ ] **Create ArgoCD Applications for local PostgreSQL and Redis using infrastructure IaC**
+- [ ] **Test ArgoCD automatic sync for infrastructure service configuration changes**
+- [ ] **Configure ArgoCD health checks for local data services**
 
-#### Sprint 2: Core API Foundation (Weeks 3-4)
-**Technical Milestone**: Functional API gateway with authentication
+**Environment Strategy:**
+```yaml
+Local Development:
+  - Self-signed certificates via local CA
+  - Single-node PostgreSQL and Redis
+  - Local DNS resolution
+  - minikube tunnel for load balancer simulation
 
-**Development Checklist**:
-- [ ] **Implement FastAPI application with OpenAPI 3.0 documentation**
-- [ ] **Create Kubernetes IaC for API service (Deployment, Service, ConfigMap, Ingress manifests)**
-- [ ] **Create Helm chart for API service with environment-specific values**
-- [ ] **Create ArgoCD Application manifest for API service deployment**
-- [ ] Set up Kong API Gateway with rate limiting (1000 req/hour)
-- [ ] Configure nginx ingress for API services with local SSL certificates
-- [ ] **Configure automated deployment pipelines via ArgoCD for API services**
-- [ ] **Set up GitOps workflow for API service updates through ArgoCD**
-- [ ] Implement JWT authentication with refresh token rotation
-- [ ] Configure OAuth 2.0 integration (Google, GitHub providers)
-- [ ] Implement role-based access control (RBAC) middleware
-- [ ] Set up database connection pooling with PgBouncer
-- [ ] Implement audit logging for all API requests
-- [ ] Configure CORS policies for frontend integration
-- [ ] Set up API versioning strategy (/api/v1/, /api/v2/)
-- [ ] Implement health check endpoints with dependency validation
-- [ ] **Configure ArgoCD health checks for API services**
+Cloud Ready (Future):
+  - Let's Encrypt certificates via Route53 DNS
+  - RDS PostgreSQL with read replicas
+  - ElastiCache Redis cluster
+  - AWS ALB with SSL termination
+```
 
-**Acceptance Criteria**:
-- API Gateway routes requests with proper authentication
-- nginx ingress properly terminates SSL and routes API traffic
-- cert-manager manages certificates for API endpoints
-- **ArgoCD automatically deploys API service updates from Git commits**
-- **API services show healthy status in ArgoCD dashboard**
-- **Rollback capability tested via ArgoCD for API services**
-- JWT tokens expire and refresh correctly
-- Rate limiting blocks requests after threshold
-- Database connections pool efficiently under load
-- API documentation generates automatically from code
+**Deliverables Day 2:**
+- [ ] Complete Kubernetes IaC templates for all 6 microservices
+- [ ] Helm charts with local development values and cloud-ready structure
+- [ ] Local PostgreSQL and Redis deployed and accessible
+- [ ] **ArgoCD Applications created for all microservices and data services**
+- [ ] **GitOps workflow functional for local infrastructure deployments**
+- [ ] **Cloud-ready IaC templates prepared for future AWS deployment**
+- [ ] Local SSL certificates automatically generated and renewed
 
-#### Sprint 3: Slither, Aderyn & Solidity-Metrics Integration (Weeks 5-6)
-**Technical Milestone**: Working Slither, Aderyn, and Solidity-Metrics integration with result storage
+---
 
-**Development Checklist**:
-- [ ] **Implement Slither adapter using slither-analyzer Python package**
-- [ ] **Implement Aderyn adapter with Rust CLI wrapper and JSON parsing**
-- [ ] **Implement Solidity-Metrics adapter with Node.js CLI wrapper**
-- [ ] **Create Kubernetes IaC for Tool Integration Service (Deployment, Service, ConfigMap manifests)**
-- [ ] **Create Helm chart for Tool Integration Service with tool-specific configurations**
-- [ ] **Create ArgoCD Application manifest for Tool Integration Service**
-- [ ] **Implement Analysis Orchestration Service with Celery workers**
-- [ ] **Create Kubernetes IaC for Orchestration Service (Deployment, Service, ConfigMap, HPA manifests)**
-- [ ] **Create Helm chart for Orchestration Service with worker scaling configuration**
-- [ ] **Create ArgoCD Application manifest for Orchestration Service**
-- [ ] Design analysis_runs and security_findings database schema
-- [ ] Add code_metrics table for complexity and maintainability data
-- [ ] Implement contract file upload and storage locally
-- [ ] Create job queue system with priority levels (Critical/High/Normal/Low)
-- [ ] Implement result normalization to standardized vulnerability schema
-- [ ] Set up source location mapping (file paths, line numbers)
-- [ ] Implement analysis status tracking (pending/running/completed/failed)
-- [ ] Create retry logic with exponential backoff for failed analyses
-- [ ] Set up dead letter queue for permanently failed jobs
-- [ ] Configure local ingress for tool integration services
+### **Day 3: Local Monitoring Stack & Platform Repository**
 
-**Acceptance Criteria**:
-- Solidity contracts upload successfully to local storage
-- Slither, Aderyn, and Solidity-Metrics analyze contracts and store normalized results
-- Code complexity metrics stored alongside security findings
-- Job queue processes analyses with proper prioritization
-- Analysis status updates in real-time via WebSocket
-- Failed analyses retry automatically with backoff strategy
-- Tool services accessible via local SSL-terminated ingress
-- **Tool integration services deploy and update automatically via ArgoCD**
+#### Morning: Local Monitoring Infrastructure + Monitoring IaC (3-4 hours)
+- [ ] **Deploy Prometheus for metrics collection using monitoring infrastructure IaC**
+- [ ] **Configure Grafana with basic infrastructure dashboards using monitoring infrastructure IaC**
+- [ ] **Install Jaeger for distributed tracing using monitoring infrastructure IaC**
+- [ ] **Set up monitoring service discovery for all local infrastructure services**
+- [ ] **Configure local alerting rules (email disabled, console output only)**
+- [ ] **Set up local monitoring ingress with self-signed SSL certificates**
+- [ ] **Configure nginx ingress for local Grafana and Prometheus access**
+- [ ] **Create ArgoCD Applications for local monitoring stack using monitoring IaC**
+- [ ] **Configure ArgoCD to manage local Prometheus and Grafana deployments**
+- [ ] **Set up monitoring for ArgoCD itself using local Prometheus**
 
-#### Sprint 4: Frontend Dashboard Foundation (Weeks 7-8)
-**Technical Milestone**: React dashboard displaying Slither, Aderyn, and Solidity-Metrics analysis results
+#### Afternoon: Platform Repository Structure + GitOps Patterns (3 hours)
+- [ ] Create platform monorepo structure for all microservices
+- [ ] Set up backend service directory templates with local development configs
+- [ ] Create React frontend application structure with local API endpoints
+- [ ] Configure shared libraries and utilities for cross-service communication
+- [ ] Set up basic service communication patterns for local development
+- [ ] **Configure local frontend ingress with self-signed SSL termination**
+- [ ] **Implement ArgoCD App-of-Apps pattern for local application management**
+- [ ] **Configure ArgoCD ApplicationSets for local environment automation**
+- [ ] **Set up local Git webhook integration for automatic ArgoCD sync**
 
-**Development Checklist**:
-- [ ] Set up React 18 application with TypeScript and Vite
-- [ ] Configure nginx ingress for frontend with local SSL certificates and security headers
-- [ ] **Configure ArgoCD application for frontend deployment**
-- [ ] **Set up automated GitOps workflow for frontend updates via ArgoCD**
-- [ ] **Configure ArgoCD sync policies for frontend application**
-- [ ] Implement authentication flow with JWT token management
-- [ ] Create dashboard layout with navigation and user management
-- [ ] Implement TanStack Query for API data fetching and caching
-- [ ] Create findings table with filtering, sorting, and pagination
-- [ ] Add code metrics dashboard with complexity visualizations
-- [ ] Implement real-time WebSocket connection for live updates
-- [ ] Set up Zustand for global state management
-- [ ] Implement dark/light theme with system preference detection
-- [ ] Create responsive design for mobile and desktop views
-- [ ] Set up error boundaries with fallback components
-- [ ] **Test frontend deployment rollback capabilities via ArgoCD**
+**Local Monitoring Configuration:**
+```yaml
+Prometheus:
+  - Scrape local Kubernetes metrics
+  - Service discovery for minikube services
+  - Local storage with 7-day retention
 
-**Acceptance Criteria**:
-- Users can log in and access personalized dashboard
-- Frontend served via nginx with proper SSL termination
-- Security headers configured via nginx ingress
-- **Frontend deploys automatically via ArgoCD on Git commits**
-- **ArgoCD shows healthy frontend application status**
-- **Frontend rollback tested and working via ArgoCD**
-- Findings display in real-time as analyses complete
-- Code complexity metrics visualize in charts and tables
-- Table supports filtering by severity, file, and finding type
-- UI responds smoothly on mobile and desktop browsers
-- Error states display helpful messages without crashes
+Grafana:
+  - Pre-configured dashboards for local development
+  - Local data source configuration
+  - No external alerting (development mode)
 
-#### Sprint 5: MythX Integration (Weeks 9-10)
-**Technical Milestone**: Multi-tool analysis with MythX, Slither, Aderyn, and Solidity-Metrics
+Jaeger:
+  - In-memory storage for local tracing
+  - All-in-one deployment for simplicity
+```
 
-**Development Checklist**:
-- [ ] Implement MythX adapter with REST API integration
-- [ ] Configure async job polling with configurable timeouts
-- [ ] Implement API key rotation and failover logic
-- [ ] Add MythX analysis modes (quick/standard/deep) selection
-- [ ] Create tool configuration management system
-- [ ] Implement parallel tool execution in orchestration service
-- [ ] Add tool-specific rate limiting and quota management
-- [ ] Create tool status monitoring and health checks
-- [ ] Implement result aggregation from multiple tools
-- [ ] Add tool comparison view in frontend dashboard
-- [ ] Integrate code complexity metrics with vulnerability risk scoring
-- [ ] Configure nginx ingress for MythX integration service
-- [ ] **Update ArgoCD applications for MythX integration service**
+**Deliverables Day 3:**
+- [ ] Complete local monitoring stack (Prometheus, Grafana, Jaeger) deployed
+- [ ] **Local monitoring dashboards accessible via https://grafana.solidity-platform.local**
+- [ ] Platform repository with microservice structure and local configs
+- [ ] Basic service templates optimized for local development
+- [ ] **ArgoCD managing all local monitoring components via GitOps**
+- [ ] **ArgoCD App-of-Apps pattern implemented for scalable local management**
 
-**Acceptance Criteria**:
-- Contracts analyze simultaneously with Slither, Aderyn, Solidity-Metrics, and MythX
-- Tool failures don't block other tool execution
-- API quotas respect rate limits without errors
-- Results aggregate properly across different tools
-- Dashboard shows findings from all tools with complexity correlation
-- Code metrics enhance vulnerability risk assessment
-- **MythX integration deploys via ArgoCD GitOps workflow**
+---
 
-#### Sprint 6: Intelligence Engine & Smart Rules (Weeks 11-12)
-**Technical Milestone**: Rule-based deduplication and intelligent risk scoring
+### **Day 4: Local CI/CD & Tools Repository**
 
-**Development Checklist**:
-- [ ] Implement syntactic deduplication (exact file/line matching)
-- [ ] Create fuzzy matching algorithm using Levenshtein distance
-- [ ] Implement rule-based risk scoring with severity weights
-- [ ] Add confidence multipliers for risk calculations
-- [ ] Create cross-tool validation bonus scoring
-- [ ] Integrate code complexity metrics into risk assessment
-- [ ] Implement intelligent severity adjustment based on business context
-- [ ] Create rule-based false positive detection using pattern matching
-- [ ] Implement finding status management (open/acknowledged/fixed)
-- [ ] Add bulk finding status updates
-- [ ] Create finding detail modal with template-based remediation suggestions
-- [ ] Implement finding export functionality (PDF/CSV)
-- [ ] Add basic analytics dashboard with metrics
-- [ ] Configure nginx ingress for intelligence engine service
-- [ ] **Create ArgoCD application for intelligence engine service**
-- [ ] **Configure GitOps deployment for intelligence engine updates**
+#### Morning: Local CI/CD Pipeline + ArgoCD Integration (3-4 hours)
+- [ ] Create GitHub Actions workflows for local infrastructure validation
+- [ ] Set up automated testing for Kubernetes manifests and Helm charts
+- [ ] Configure Docker image building with security scanning
+- [ ] **Implement local deployment automation using minikube registry**
+- [ ] Set up dependency scanning and vulnerability alerts
+- [ ] **Configure local ingress validation and SSL certificate checks**
+- [ ] **Implement local cert-manager certificate lifecycle testing**
+- [ ] **Integrate GitHub Actions with local ArgoCD for GitOps workflows**
+- [ ] **Configure ArgoCD Image Updater for local development (disabled by default)**
+- [ ] **Set up ArgoCD notifications for local deployment status**
 
-**Acceptance Criteria**:
-- Duplicate findings merge automatically across tools with 70% accuracy
-- Risk scores calculate consistently using rule-based algorithm
-- Code complexity integration improves risk assessment by 25%
-- Rule-based false positive detection achieves 35% reduction
-- Finding statuses persist and update across sessions
-- Template-based remediation provides relevant suggestions
-- Export generates properly formatted reports
-- Analytics display meaningful security metrics
-- **Intelligence engine deploys and updates via ArgoCD automatically**
+#### Afternoon: Tools Repository Structure + Local Testing (3 hours)
+- [ ] Create tools repository with adapter structure for local development
+- [ ] Set up adapter templates for Slither, Aderyn, MythX, Solidity-Metrics
+- [ ] Configure tool installation and management scripts for local environment
+- [ ] Create common schemas for vulnerability normalization
+- [ ] Set up integration testing framework for tools in local environment
+- [ ] **Configure local tools service ingress with self-signed SSL**
+- [ ] **Create ArgoCD Application for local tools service deployment**
+- [ ] **Configure ArgoCD to manage local tool configurations and updates**
+- [ ] **Test ArgoCD rollback functionality for local tools service**
 
-### Phase 2: Enterprise Features (Months 4-6) - Hybrid Local/Cloud
+**Local CI/CD Strategy:**
+```yaml
+Development Workflow:
+  1. Commit to feature branch
+  2. GitHub Actions runs tests and builds images
+  3. Push images to minikube registry
+  4. ArgoCD automatically syncs local deployment
+  5. Test changes in local environment
+  6. Merge to main triggers production-ready build
+```
 
-#### Sprint 7: Cloud Migration & Advanced Intelligence (Weeks 13-14)
-**Technical Milestone**: AWS deployment + sophisticated rule engines and pattern recognition
+**Deliverables Day 4:**
+- [ ] Complete local CI/CD pipeline for infrastructure validation
+- [ ] Automated testing and building for all services with local registry
+- [ ] Tools repository with adapter structure optimized for local development
+- [ ] **GitHub Actions integrated with ArgoCD for local GitOps workflow**
+- [ ] **Local development workflow documented and tested**
+- [ ] **ArgoCD deployment notifications working for local environment**
 
-**Development Checklist**:
-- [ ] **Deploy AWS EKS clusters for development and staging environments**
-- [ ] **Migrate PostgreSQL to AWS RDS with read replicas**
-- [ ] **Deploy Redis to AWS ElastiCache with clustering**
-- [ ] **Configure Let's Encrypt certificates with Route53 DNS**
-- [ ] **Set up AWS ALB ingress controller replacing nginx**
-- [ ] **Migrate ArgoCD to manage AWS deployments**
-- [ ] **Configure AWS ECR for container image storage**
-- [ ] Implement advanced rule engine for vulnerability pattern detection
-- [ ] Create statistical analysis algorithms for anomaly detection
-- [ ] Set up decision tree implementations for smart categorization
-- [ ] Implement AST-based code similarity analysis
-- [ ] Add business context rules for risk adjustment
-- [ ] Create template-based remediation suggestion engine
-- [ ] Implement statistical correlation between complexity and vulnerabilities
-- [ ] Add rule-based severity adjustment using multiple factors
-- [ ] Create intelligent finding categorization using NLP libraries
-- [ ] Implement pattern matching for known vulnerability signatures
-- [ ] Add customer feedback collection for future ML training data
-- [ ] Create A/B testing framework for rule improvements
-- [ ] **Update ArgoCD deployments for AWS cloud infrastructure**
+---
 
-**Acceptance Criteria**:
-- **AWS development environment fully operational with EKS**
-- **Database migration completed with zero data loss**
-- **All services running on AWS with production-grade performance**
-- **Let's Encrypt certificates automatically managed via Route53**
-- **ArgoCD managing cloud deployments successfully**
-- Rule engine achieves 75% accuracy on vulnerability classification
-- False positive rate reduces below 15% with advanced rules
-- Statistical analysis identifies meaningful patterns in data
-- AST similarity detection improves deduplication accuracy
-- Template remediation provides relevant, actionable suggestions
-- Customer feedback collection system captures ML training data
-- A/B testing validates rule improvements
-- **Advanced features deploy seamlessly via ArgoCD in cloud**
+### **Day 5: Integration Testing & Local Development Documentation**
 
-#### Sprint 8: Team Collaboration & Workflow (Weeks 15-16)
-**Technical Milestone**: Multi-user collaboration with commenting and assignments
+#### Morning: End-to-End Local Integration Testing (3-4 hours)
+- [ ] Create comprehensive local integration testing scripts
+- [ ] Test complete local infrastructure stack functionality
+- [ ] Validate service-to-service communication in local environment
+- [ ] Test local monitoring and alerting end-to-end
+- [ ] Verify local CI/CD pipeline functionality
+- [ ] **Test local SSL certificate renewal and validation**
+- [ ] **Validate local ingress routing and rate limiting**
+- [ ] **Test ArgoCD deployment, sync, and rollback functionality in local environment**
+- [ ] **Validate ArgoCD RBAC and local environment access**
+- [ ] **Test local ArgoCD disaster recovery and backup procedures**
 
-**Development Checklist**:
-- [ ] Implement finding commenting system with threading
-- [ ] Add user assignment and notification system
-- [ ] Create team management interface with role assignments
-- [ ] Implement finding workflow states (triage/in-progress/resolved)
-- [ ] Add bulk operations for finding management
-- [ ] Create activity feed for team collaboration tracking
-- [ ] Implement mention system (@username) in comments
-- [ ] Add email notifications for assigned findings
-- [ ] Create Slack integration for team notifications
-- [ ] Implement finding SLA tracking and alerts
-- [ ] **Configure ArgoCD for collaboration service deployments**
+#### Afternoon: Local Development Documentation & Cloud Migration Prep (3-4 hours)
+- [ ] Create comprehensive local development setup documentation
+- [ ] Document local architecture and service interactions
+- [ ] Write local troubleshooting and maintenance guides
+- [ ] Create team onboarding documentation for local environment
+- [ ] **Document local SSL certificate management procedures**
+- [ ] **Create local nginx configuration and troubleshooting guide**
+- [ ] **Create ArgoCD local operational runbooks and troubleshooting guides**
+- [ ] **Document local GitOps workflow and best practices**
+- [ ] **Prepare cloud migration strategy documentation for Sprint 7**
+- [ ] **Create comparison guide: local vs cloud configurations**
+- [ ] Run final validation of all Sprint 1 acceptance criteria
 
-**Acceptance Criteria**:
-- Team members can comment and collaborate on findings
-- Assignments route to appropriate team members
-- Workflow states track progress accurately
-- Notifications deliver reliably via email and Slack
-- SLA breaches trigger appropriate alerts
-- **Collaboration features deploy via ArgoCD GitOps**
+**Local Environment Documentation:**
+```yaml
+Required Documentation:
+  - Local setup automation scripts
+  - minikube configuration and resource requirements
+  - Local DNS and SSL certificate setup
+  - ArgoCD local deployment and management
+  - Troubleshooting common local development issues
+  - Cloud migration preparation checklist
+```
 
-#### Sprint 9: CI/CD Integration & Automation (Weeks 17-18)
-**Technical Milestone**: Automated security scanning in development workflows
+**Deliverables Day 5:**
+- [ ] End-to-end local integration testing complete
+- [ ] Complete documentation for local setup and operations
+- [ ] **Local SSL certificate management documentation**
+- [ ] Team onboarding guide ready for local development
+- [ ] **ArgoCD local operational documentation complete**
+- [ ] **Local GitOps workflow documented and tested**
+- [ ] **Cloud migration strategy documented for future reference**
+- [ ] All Sprint 1 acceptance criteria validated
 
-**Development Checklist**:
-- [ ] Create GitHub Actions plugin for automated scanning
-- [ ] Implement GitLab CI integration with pipeline configuration
-- [ ] Add Jenkins plugin with job DSL configuration
-- [ ] Create webhook system for repository integration
-- [ ] Implement automated PR commenting with security findings
-- [ ] Add commit status checks for security gate policies
-- [ ] Create branch protection integration with security requirements
-- [ ] Implement automated fix suggestions in PR comments
-- [ ] Add security policy configuration per repository
-- [ ] Create CLI tool for local development integration
-- [ ] **Configure ArgoCD for CI/CD integration services**
-- [ ] **Set up GitOps deployment for webhook and integration services**
+## Week 2: Service Implementation & Testing
 
-**Acceptance Criteria**:
-- GitHub PRs block merging on critical security findings
-- CI pipelines integrate seamlessly with existing workflows
-- Security findings appear as PR comments automatically
-- Policy violations prevent deployment to production
-- CLI tool works offline for pre-commit checks
-- **CI/CD integration services managed via ArgoCD**
+### **Day 6-7: Core Services Implementation + Local ArgoCD Deployment**
+- [ ] Implement basic FastAPI application for API service with local configs
+- [ ] Create tool integration service with adapter framework for local testing
+- [ ] Set up data service with local database connections
+- [ ] Implement basic orchestration service for local job management
+- [ ] **Configure all services with local ingress and self-signed SSL**
+- [ ] **Deploy all services via ArgoCD GitOps workflow locally**
+- [ ] **Test ArgoCD automatic sync for local service updates**
 
-#### Sprint 10: Advanced Analytics & Reporting (Weeks 19-20)
-**Technical Milestone**: Executive dashboards and advanced reporting
+### **Day 8-9: Frontend & Advanced Services + Local GitOps**
+- [ ] Create React frontend with authentication flow pointing to local APIs
+- [ ] Implement intelligence engine service for local risk scoring
+- [ ] Set up notification service with local WebSocket support
+- [ ] Integrate all services with local monitoring and logging
+- [ ] **Configure frontend SSL termination and security headers for local development**
+- [ ] **Deploy frontend and advanced services via local ArgoCD**
+- [ ] **Configure ArgoCD progressive delivery for local frontend updates**
 
-**Development Checklist**:
-- [ ] Implement time-series analytics with ClickHouse data warehouse
-- [ ] Create executive dashboard with security KPIs
-- [ ] Add trend analysis for security improvements over time
-- [ ] Implement customizable report builder interface
-- [ ] Create scheduled report generation and delivery
-- [ ] Add security debt tracking and prioritization algorithms
-- [ ] Implement benchmark comparisons against industry standards
-- [ ] Create vulnerability lifecycle tracking (discovery to resolution)
-- [ ] Add team performance metrics and productivity insights
-- [ ] Implement data export APIs for external BI tools
-- [ ] **Configure ArgoCD for analytics and reporting services**
+### **Day 10: End-to-End Testing & Sprint Completion + Local GitOps Validation**
+- [ ] Run complete end-to-end analysis workflow in local environment
+- [ ] Test all service integrations and communication locally
+- [ ] Validate local monitoring and alerting functionality
+- [ ] **Test local SSL certificate rotation and renewal**
+- [ ] **Test complete local GitOps workflow via ArgoCD**
+- [ ] **Validate ArgoCD local rollback and disaster recovery procedures**
+- [ ] Complete Sprint 1 acceptance criteria validation
 
-**Acceptance Criteria**:
-- Executive dashboards load in <2 seconds with large datasets
-- Scheduled reports deliver automatically to stakeholders
-- Trend analysis shows meaningful security improvements
-- Custom reports generate with user-defined parameters
-- Data exports integrate successfully with external tools
-- **Analytics services deploy and scale via ArgoCD**
+## Sprint 1 Final Acceptance Criteria
 
-#### Sprint 11: Enterprise SSO & Administration (Weeks 21-22)
-**Technical Milestone**: Enterprise authentication and administration features
+### **Local Infrastructure Requirements:**
+- [ ] All services deploy successfully to local minikube cluster
+- [ ] Local monitoring dashboards display metrics from all infrastructure components
+- [ ] Local CI/CD pipeline successfully builds and deploys to local environment
+- [ ] Local database connections and Redis functional
+- [ ] **Local SSL termination working with self-signed certificates**
+- [ ] **cert-manager automatically provisions and renews local certificates**
+- [ ] **nginx ingress controller routes local traffic correctly with rate limiting**
+- [ ] **ArgoCD successfully deploys and manages local application lifecycle via GitOps**
 
-**Development Checklist**:
-- [ ] Implement SAML 2.0 integration with major identity providers
-- [ ] Add multi-factor authentication (TOTP, SMS, hardware keys)
-- [ ] Create organization-level administration interface
-- [ ] Implement granular permission system with resource-based policies
-- [ ] Add user provisioning and deprovisioning automation
-- [ ] Create audit trail for administrative actions
-- [ ] Implement session management with concurrent session limits
-- [ ] Add IP allowlisting and geographic restrictions
-- [ ] Create compliance reporting for access controls
-- [ ] Implement emergency access procedures for admin lockout
-- [ ] **Update ArgoCD deployments for SSO and admin services**
+### **Local GitOps & ArgoCD Requirements:**
+- [ ] **ArgoCD Applications deployed for all local microservices and infrastructure**
+- [ ] **GitOps workflow functional for all local deployments and updates**
+- [ ] **ArgoCD sync policies configured for local development environment**
+- [ ] **ArgoCD RBAC working with proper local team access controls**
+- [ ] **ArgoCD rollback capability tested in local environment**
+- [ ] **ArgoCD health checks validate local application deployment status**
+- [ ] **GitHub Actions integrated with ArgoCD for local automated GitOps**
 
-**Acceptance Criteria**:
-- SAML SSO works with Active Directory and Okta
-- MFA enforcement works across all authentication methods
-- Permission system provides granular access control
-- Admin actions generate comprehensive audit trails
-- Emergency access procedures tested and documented
-- **SSO and admin features deploy via ArgoCD**
+### **Repository & IaC Requirements:**
+- [ ] All 6 repositories created with proper structure and local development documentation
+- [ ] **IaC templates work for both local development and future cloud deployment**
+- [ ] Infrastructure as Code validates and deploys successfully to local environment
+- [ ] **Team members can reproduce local environment setup in <30 minutes**
+- [ ] Security scanning integrated into local build process
+- [ ] **Local SSL certificate management automated and documented**
+- [ ] **Cloud-ready IaC templates prepared for future AWS deployment**
 
-#### Sprint 12: Performance Optimization & Scaling (Weeks 23-24)
-**Technical Milestone**: Production-ready performance and scalability
+### **Local Operational Requirements:**
+- [ ] Health checks and monitoring for all local services operational
+- [ ] **Local automated testing and validation pipelines working**
+- [ ] **Local development documentation complete and accessible**
+- [ ] **Local development environment fully reproducible across team**
+- [ ] **Team onboarding process documented and tested for local setup**
+- [ ] **Local SSL certificates rotate automatically without service interruption**
+- [ ] **ArgoCD local operational runbooks and troubleshooting documentation complete**
 
-**Development Checklist**:
-- [ ] Implement horizontal pod autoscaling based on custom metrics
-- [ ] Add database read replicas with automatic failover
-- [ ] Create multi-tier caching strategy with cache warming
-- [ ] Implement database query optimization and index tuning
-- [ ] Add CDN integration for static assets and API responses
-- [ ] Create load testing suite with realistic user scenarios
-- [ ] Implement circuit breakers for external service dependencies
-- [ ] Add connection pooling optimization for database connections
-- [ ] Create performance monitoring with SLA alerting
-- [ ] Implement graceful degradation for service outages
-- [ ] Optimize AWS ALB configuration for high-performance SSL termination
-- [ ] **Configure ArgoCD for performance-optimized deployments**
-- [ ] **Set up ArgoCD sync strategies for zero-downtime updates**
+### **Performance Requirements:**
+- [ ] **Local platform handles basic load without degradation**
+- [ ] **Local API response times meet targets (<200ms P95)**
+- [ ] **Local database queries execute efficiently**
+- [ ] **Local monitoring system responsive and reliable**
+- [ ] **Local ingress layer handles traffic routing efficiently**
+- [ ] **Local certificate provisioning completes within 2 minutes**
+- [ ] **ArgoCD local sync operations complete within 1 minute**
 
-**Acceptance Criteria**:
-- Platform handles 1000+ concurrent users without degradation
-- API response times stay below 200ms at P95 under load
-- Database queries execute in <50ms for indexed operations
-- Auto-scaling responds to load changes within 60 seconds
-- Circuit breakers prevent cascade failures during outages
-- **ArgoCD manages zero-downtime deployments successfully**
+### **Development Workflow Requirements:**
+- [ ] **Local development workflow supports hot-reload and fast iteration**
+- [ ] **Local debugging and testing procedures documented**
+- [ ] **Local environment isolated from cloud resources (zero cloud costs)**
+- [ ] **Local GitOps workflow prepares team for cloud deployment patterns**
+- [ ] **Cloud migration strategy documented and ready for Sprint 7**
 
-### Phase 3: Advanced Features & Compliance (Months 7-9) - Full Cloud
+## Local Development Strategy Summary
 
-#### Sprint 13: Additional Tool Integrations (Weeks 25-26)
-**Technical Milestone**: Extended tool ecosystem with Certora, Echidna, Manticore
+### **Cost Savings:**
+- **Zero cloud costs** during Sprints 1-6 (estimated $6,000-9,000 saved)
+- **Local resource utilization** instead of cloud compute charges
+- **No cloud networking or storage costs** during development
 
-**Development Checklist**:
-- [ ] Implement Certora formal verification adapter with CLI wrapper
-- [ ] Add Echidna fuzzing integration with campaign management
-- [ ] Create Manticore symbolic execution adapter
-- [ ] Implement Securify and SmartCheck static analyzer adapters
-- [ ] Enhance Aderyn integration with custom detector configurations
-- [ ] Add custom tool plugin architecture for third-party integrations
-- [ ] Create tool performance benchmarking and selection algorithms
-- [ ] Implement intelligent tool selection based on contract characteristics
-- [ ] Add tool-specific configuration management interface
-- [ ] Create tool effectiveness tracking and optimization
-- [ ] Implement parallel execution optimization for tool combinations
-- [ ] **Configure ArgoCD for additional tool integration services**
+### **Development Benefits:**
+- **Faster iteration cycles** with local testing and debugging
+- **Offline development capability** for improved productivity
+- **Consistent team environments** via scripted setup
+- **Full GitOps pattern learning** with local ArgoCD deployment
 
-**Acceptance Criteria**:
-- All major security tools integrate successfully including enhanced Aderyn
-- Tool selection algorithms choose appropriate tools automatically
-- Plugin architecture allows easy addition of new tools
-- Parallel execution completes faster than sequential runs
-- Tool effectiveness metrics guide optimization decisions
-- **Additional tools deploy via ArgoCD GitOps workflow**
+### **Cloud Migration Preparation:**
+- **Cloud-ready IaC templates** developed from day one
+- **Environment-specific configurations** prepared for AWS deployment
+- **GitOps workflow patterns** proven locally before cloud deployment
+- **Migration strategy** documented for seamless Sprint 7 transition
 
-#### Sprint 14: Compliance Automation Framework (Weeks 27-28)
-**Technical Milestone**: Automated compliance documentation and reporting
+## IaC Storage Strategy Summary
 
-**Development Checklist**:
-- [ ] Create SOC 2 Type II report generation framework
-- [ ] Implement NIST Cybersecurity Framework mapping
-- [ ] Add ISO 27001 compliance checklist automation
-- [ ] Create audit trail documentation system
-- [ ] Implement evidence collection for compliance requirements
-- [ ] Add regulatory requirement tracking and updates
-- [ ] Create compliance dashboard with status monitoring
-- [ ] Implement automated policy enforcement
-- [ ] Add compliance training tracking and reminders
-- [ ] Create third-party auditor portal for evidence review
-- [ ] **Configure ArgoCD for compliance automation services**
-
-**Acceptance Criteria**:
-- SOC 2 reports generate automatically with current evidence
-- NIST framework mapping updates based on security findings
-- Audit trails provide complete documentation for compliance
-- Policy violations trigger automatic remediation workflows
-- Auditor portal provides secure access to compliance evidence
-- **Compliance services managed via ArgoCD**
-
-#### Sprint 15: Machine Learning Integration (Weeks 29-30)
-**Technical Milestone**: ML-powered analysis enhancement (after sufficient training data)
-
-**Development Checklist**:
-- [ ] Implement feature engineering pipeline using collected training data
-- [ ] Set up MLflow for experiment tracking and model versioning
-- [ ] Create supervised learning model for false positive prediction
-- [ ] Implement semantic similarity matching using embeddings
-- [ ] Add ML-based vulnerability severity prediction
-- [ ] Create model inference pipeline for real-time scoring
-- [ ] Implement automated model retraining pipeline
-- [ ] Add model performance monitoring and drift detection
-- [ ] Create ML-powered remediation suggestion ranking
-- [ ] Implement confidence scoring for ML predictions
-- [ ] Add A/B testing for ML vs rule-based approaches
-- [ ] Create ML model explainability features for enterprise customers
-- [ ] **Configure ArgoCD for ML pipeline deployment and management**
-
-**Acceptance Criteria**:
-- ML model achieves >85% accuracy using 6+ months of training data
-- False positive rate improves additional 10-15% beyond rule-based system
-- Model inference latency stays below 100ms per finding
-- Automated retraining maintains model performance over time
-- A/B testing shows statistically significant improvement over rules
-- Enterprise customers can understand ML decision rationale
-- **ML services deploy and update via ArgoCD**
-
-#### Sprint 16: Advanced Enterprise Integration (Weeks 31-32)
-**Technical Milestone**: Deep enterprise system integration
-
-**Development Checklist**:
-- [ ] Implement Jira integration for ticket management workflow
-- [ ] Add ServiceNow integration for ITSM processes
-- [ ] Create Microsoft Teams deep integration with adaptive cards
-- [ ] Implement Salesforce integration for customer security tracking
-- [ ] Add PagerDuty integration for critical security alerting
-- [ ] Create REST API for external system integration
-- [ ] Implement webhook system for real-time event streaming
-- [ ] Add LDAP integration for user directory synchronization
-- [ ] Create custom dashboard embedding for external portals
-- [ ] Implement single sign-on propagation to integrated systems
-- [ ] **Configure ArgoCD for enterprise integration services**
-
-**Acceptance Criteria**:
-- Security findings automatically create tickets in Jira/ServiceNow
-- Teams integration provides interactive security management
-- Critical findings page appropriate team members immediately
-- API integrations work reliably with enterprise rate limits
-- SSO propagates seamlessly across integrated systems
-- **Enterprise integrations deploy via ArgoCD**
-
-#### Sprint 17: Global Deployment & Multi-Tenancy (Weeks 33-34)
-**Technical Milestone**: Production-ready global deployment architecture
-
-**Development Checklist**:
-- [ ] Implement multi-region deployment with global load balancing
-- [ ] Add data residency controls for international compliance
-- [ ] Create tenant isolation with row-level security
-- [ ] Implement cross-region database replication
-- [ ] Add disaster recovery procedures with RTO/RPO targets
-- [ ] Create multi-tenant billing and usage tracking
-- [ ] Implement geographic data routing and sovereignty
-- [ ] Add region-specific compliance controls
-- [ ] Create tenant-specific customization capabilities
-- [ ] Implement federated search across tenant boundaries
-- [ ] **Configure ArgoCD for multi-region deployment management**
-- [ ] **Set up ArgoCD application sets for multi-tenant environments**
-
-**Acceptance Criteria**:
-- Platform deploys successfully in multiple AWS regions
-- Data residency controls prevent cross-border data transfer
-- Tenant isolation prevents data leakage between organizations
-- Disaster recovery procedures meet <4 hour RTO target
-- Usage tracking provides accurate billing across tenants
-- **ArgoCD manages multi-region deployments successfully**
-
-#### Sprint 18: Production Readiness & Launch Preparation (Weeks 35-36)
-**Technical Milestone**: Production deployment with full operational procedures
-
-**Development Checklist**:
-- [ ] Complete security penetration testing with third-party firm
-- [ ] Implement comprehensive backup and disaster recovery testing
-- [ ] Create operational runbooks for common issues and procedures
-- [ ] Complete load testing with production-scale data volumes
-- [ ] Implement security incident response procedures
-- [ ] Create customer onboarding automation and documentation
-- [ ] Complete compliance audits (SOC 2, ISO 27001)
-- [ ] Implement production monitoring and alerting
-- [ ] Create customer support escalation procedures
-- [ ] Complete final security hardening and configuration review
-- [ ] Validate AWS ALB and cert-manager configuration for production scale
-- [ ] **Finalize ArgoCD production deployment configuration**
-- [ ] **Test ArgoCD disaster recovery and rollback procedures**
-- [ ] **Configure ArgoCD for production monitoring and alerting**
-
-**Acceptance Criteria**:
-- Penetration testing shows no critical vulnerabilities
-- Disaster recovery procedures tested and validated
-- Load testing confirms platform handles target scale
-- Security incident response procedures tested with tabletop exercises
-- Compliance audits pass without major findings
-- **ArgoCD production deployment fully tested and operational**
-- **ArgoCD disaster recovery procedures validated**
-
-## Technical Milestone Validation
-
-### Quality Gates
-Each sprint completion requires:
-- [ ] All automated tests pass (unit, integration, e2e)
-- [ ] Code coverage maintains >90% threshold
-- [ ] Security scans show no critical vulnerabilities
-- [ ] Performance benchmarks meet defined targets
-- [ ] Documentation updated for new features
-- [ ] Stakeholder acceptance of delivered functionality
-- [ ] **ArgoCD applications deploy successfully with green health status**
-- [ ] **GitOps workflow tested and functional for all components**
-
-### Production Readiness Criteria
-Before production deployment:
-- [ ] Disaster recovery procedures tested successfully
-- [ ] Security penetration testing completed with no critical findings
-- [ ] Load testing validates platform can handle target scale
-- [ ] Monitoring and alerting systems operational
-- [ ] Compliance requirements met and audited
-- [ ] Customer support procedures and documentation complete
-- [ ] **ArgoCD production configuration validated and tested**
-- [ ] **GitOps workflows proven reliable for production deployment**
-- [ ] **ArgoCD disaster recovery and rollback procedures operational**
-
-### Local Development Benefits Summary
-- **Zero cloud costs** during development phase (estimated $6,000-9,000 saved)
-- **Faster development cycles** with local testing and debugging
-- **Full GitOps pattern validation** with local ArgoCD
-- **Cloud-ready architecture** from day one
-- **Smooth migration path** to production cloud infrastructure
-- **Team productivity** with consistent local environments
-
-This technical development plan provides comprehensive implementation details with clear phases, milestones, and validation criteria for building a production-ready, enterprise-scale unified Solidity security platform with full GitOps deployment automation via ArgoCD, optimized for local development with seamless cloud migration capability.
+- **Infrastructure IaC** → `solidity-security-infrastructure` repository
+  - Local minikube configurations
+  - Cloud-ready AWS templates (unused until Sprint 7)
+  - ArgoCD Applications for both local and cloud
+- **Application IaC** → Embedded in service directories within platform repository
+  - Local development Helm values
+  - Cloud-ready Helm values (prepared for future use)
+- **Monitoring IaC** → `solidity-security-monitoring` repository
+  - Local monitoring stack configurations
+  - Cloud-ready monitoring configurations
+- **CI/CD IaC** → `.github/workflows` in respective repositories
+  - Local development workflows
+  - Cloud deployment workflows (prepared for Sprint 7)
+- **Documentation** → `solidity-security-docs` repository
+  - Local development setup guides
+  - Cloud migration procedures
+- **Tool Configurations** → `solidity-security-tools` repository
+  - Local tool adapter configurations
+- **ArgoCD Applications** → `solidity-security-infrastructure/argocd/`
+  - Local development applications
+  - Cloud-ready applications (prepared for future)
+- **GitOps Configurations** → `solidity-security-infrastructure/gitops/`
+  - Local GitOps patterns and workflows
+  - Cloud GitOps templates
