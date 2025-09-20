@@ -6,6 +6,8 @@
 **Microservices Architecture Pattern** with event-driven communication
 - **API Gateway**: Kong or AWS API Gateway for rate limiting, authentication, routing
 - **Service Mesh**: Istio for service-to-service communication, load balancing, circuit breaking
+- **Ingress Controller**: nginx for SSL termination, rate limiting, and traffic routing
+- **Certificate Management**: cert-manager for automated SSL certificate provisioning and renewal
 - **Event Bus**: Apache Kafka for async messaging between services
 - **Container Orchestration**: Kubernetes with Helm charts for deployment
 - **Observability**: Prometheus metrics, Jaeger tracing, structured logging with Fluentd
@@ -426,6 +428,9 @@
 
 **Development Checklist**:
 - [ ] Set up Kubernetes cluster with Istio service mesh
+- [ ] Install nginx ingress controller for SSL termination and traffic routing
+- [ ] Install cert-manager for automated SSL certificate management
+- [ ] Configure Let's Encrypt integration with staging and production issuers
 - [ ] Configure PostgreSQL 15 with logical replication setup
 - [ ] Implement Redis cluster for caching and session management
 - [ ] Set up monitoring stack (Prometheus, Grafana, Jaeger)
@@ -438,6 +443,8 @@
 
 **Acceptance Criteria**:
 - All services can be deployed to local Kubernetes cluster
+- nginx ingress controller routes traffic with SSL termination
+- cert-manager automatically provisions and renews certificates
 - Monitoring dashboards display basic infrastructure metrics
 - CI/CD pipeline successfully builds and deploys to staging
 - Database connections and Redis clustering functional
@@ -449,6 +456,7 @@
 **Development Checklist**:
 - [ ] Implement FastAPI application with OpenAPI 3.0 documentation
 - [ ] Set up Kong API Gateway with rate limiting (1000 req/hour)
+- [ ] Configure nginx ingress for API services with SSL certificates
 - [ ] Implement JWT authentication with refresh token rotation
 - [ ] Configure OAuth 2.0 integration (Google, GitHub providers)
 - [ ] Implement role-based access control (RBAC) middleware
@@ -460,6 +468,8 @@
 
 **Acceptance Criteria**:
 - API Gateway routes requests with proper authentication
+- nginx ingress properly terminates SSL and routes API traffic
+- cert-manager manages certificates for API endpoints
 - JWT tokens expire and refresh correctly
 - Rate limiting blocks requests after threshold
 - Database connections pool efficiently under load
@@ -482,6 +492,7 @@
 - [ ] Implement analysis status tracking (pending/running/completed/failed)
 - [ ] Create retry logic with exponential backoff for failed analyses
 - [ ] Set up dead letter queue for permanently failed jobs
+- [ ] Configure SSL ingress for tool integration services
 
 **Acceptance Criteria**:
 - Solidity contracts upload successfully to secure storage
@@ -490,12 +501,14 @@
 - Job queue processes analyses with proper prioritization
 - Analysis status updates in real-time via WebSocket
 - Failed analyses retry automatically with backoff strategy
+- Tool services accessible via SSL-terminated ingress
 
 #### Sprint 4: Frontend Dashboard Foundation (Weeks 7-8)
 **Technical Milestone**: React dashboard displaying Slither, Aderyn, and Solidity-Metrics analysis results
 
 **Development Checklist**:
 - [ ] Set up React 18 application with TypeScript and Vite
+- [ ] Configure nginx ingress for frontend with SSL certificates and security headers
 - [ ] Implement authentication flow with JWT token management
 - [ ] Create dashboard layout with navigation and user management
 - [ ] Implement TanStack Query for API data fetching and caching
@@ -509,6 +522,8 @@
 
 **Acceptance Criteria**:
 - Users can log in and access personalized dashboard
+- Frontend served via nginx with proper SSL termination
+- Security headers configured via nginx ingress
 - Findings display in real-time as analyses complete
 - Code complexity metrics visualize in charts and tables
 - Table supports filtering by severity, file, and finding type
@@ -530,6 +545,7 @@
 - [ ] Implement result aggregation from multiple tools
 - [ ] Add tool comparison view in frontend dashboard
 - [ ] Integrate code complexity metrics with vulnerability risk scoring
+- [ ] Configure nginx ingress for MythX integration service
 
 **Acceptance Criteria**:
 - Contracts analyze simultaneously with Slither, Aderyn, Solidity-Metrics, and MythX
@@ -556,6 +572,7 @@
 - [ ] Create finding detail modal with template-based remediation suggestions
 - [ ] Implement finding export functionality (PDF/CSV)
 - [ ] Add basic analytics dashboard with metrics
+- [ ] Configure nginx ingress for intelligence engine service
 
 **Acceptance Criteria**:
 - Duplicate findings merge automatically across tools with 70% accuracy
@@ -697,6 +714,7 @@
 - [ ] Add connection pooling optimization for database connections
 - [ ] Create performance monitoring with SLA alerting
 - [ ] Implement graceful degradation for service outages
+- [ ] Optimize nginx configuration for high-performance SSL termination
 
 **Acceptance Criteria**:
 - Platform handles 1000+ concurrent users without degradation
@@ -835,6 +853,7 @@
 - [ ] Implement production monitoring and alerting
 - [ ] Create customer support escalation procedures
 - [ ] Complete final security hardening and configuration review
+- [ ] Validate nginx and cert-manager configuration for production scale
 
 **Acceptance Criteria**:
 - Penetration testing shows no critical vulnerabilities
