@@ -18,19 +18,29 @@
 - [x] Clone all repositories and create initial folder structures
 - [x] Configure repository templates and README files
 
-#### Afternoon: Local Kubernetes + ArgoCD + Local SSL (5-6 hours)
+#### Afternoon: Local Kubernetes Setup + Infrastructure Manifest Creation (5-6 hours)
 - [ ] Set up local minikube cluster with realistic resource allocation (8GB RAM, 4 CPUs)
 - [ ] Enable minikube addons (ingress, registry, metrics-server)
-- [ ] Install and configure Istio service mesh in local cluster
-- [ ] Install nginx ingress controller for local development
-- [ ] Install cert-manager for automated local certificate management
-- [ ] **Configure cert-manager with local CA issuer (not Let's Encrypt)**
-- [ ] **Create local root CA and configure self-signed certificate generation**
-- [ ] **Set up local development DNS entries in hosts file**
-- [ ] **Install ArgoCD in local Kubernetes cluster**
-- [ ] **Configure ArgoCD with local Git repository integration**
-- [ ] **Set up ArgoCD application projects for local development**
-- [ ] **Configure ArgoCD RBAC for team access and permissions**
+- [ ] **Create Infrastructure Manifests FIRST:**
+  - [ ] **Create Istio service mesh installation manifests**
+  - [ ] **Create nginx ingress controller deployment manifests**
+  - [ ] **Create cert-manager installation and configuration manifests**
+  - [ ] **Create local CA issuer manifests (not Let's Encrypt)**
+  - [ ] **Create ArgoCD installation manifests**
+  - [ ] **Create ArgoCD RBAC configuration manifests**
+  - [ ] **Create ArgoCD application project manifests for local development**
+- [ ] **Create Local Development Configuration:**
+  - [ ] **Create local root CA certificate generation scripts**
+  - [ ] **Create local development DNS configuration scripts**
+  - [ ] **Create ArgoCD Git repository integration configuration**
+- [ ] **Deploy Infrastructure Using Created Manifests:**
+  - [ ] **Install and configure Istio service mesh using manifests**
+  - [ ] **Install nginx ingress controller using manifests**
+  - [ ] **Install cert-manager using manifests**
+  - [ ] **Configure cert-manager with local CA issuer using manifests**
+  - [ ] **Install ArgoCD using manifests**
+  - [ ] **Configure ArgoCD with local Git repository integration using manifests**
+  - [ ] **Configure ArgoCD RBAC for team access and permissions using manifests**
 - [ ] Create docker-compose.yml for supplementary local services
 - [ ] Write setup scripts for automated local environment reproduction
 
@@ -58,21 +68,26 @@
 
 ### **Day 2: Cloud-Ready Service IaC & Local Data Services**
 
-#### **Morning: Infrastructure IaC Framework + Microservice Template Creation (3-4 hours)**
-
-##### **Infrastructure Services IaC (1 hour)**
+#### Morning: Cloud-Ready Service IaC Framework (3-4 hours)
 - [ ] **Create Kubernetes IaC templates for infrastructure services:**
   - [ ] **PostgreSQL: Deployment, Service, PersistentVolumeClaim, ConfigMap manifests**
   - [ ] **Redis: Deployment, Service, ConfigMap manifests**
   - [ ] **Monitoring: Prometheus, Grafana, Jaeger Deployment manifests**
 - [ ] **Create Helm chart templates for infrastructure services with local and cloud values**
-- [ ] **Create local ingress definitions with self-signed SSL certificates for infrastructure**
-- [ ] **Design cloud-ready ingress templates for future AWS ALB integration (commented/unused)**
-- [ ] **Configure cert-manager Certificate resources for local development**
+- [ ] Create Kubernetes deployment templates for all 6 microservices with environment-specific configs
+- [ ] Set up Helm chart templates with local and cloud environment values
+- [ ] **Create local ingress definitions with self-signed SSL certificates**
+- [ ] **Create cloud-ready ingress definitions for future AWS ALB integration**
+- [ ] Configure cert-manager Certificate resources for local development
 - [ ] **Design cloud-ready cert-manager configs for Let's Encrypt (commented/unused)**
-- [ ] **Set up nginx ingress rules for infrastructure services with local routing**
+- [ ] Set up nginx ingress rules with local routing and rate limiting
+- [ ] Configure service discovery and mesh networking for local development
+- [ ] Create Docker build templates optimized for both local and cloud deployment
+- [ ] Set up environment-specific configuration management (local/dev/staging/prod)
+- [ ] **Create ArgoCD Application manifests for each microservice**
+- [ ] **Configure ArgoCD sync policies for local development workflow**
 
-##### **Microservice Template Framework Creation (2-3 hours)**
+##### **DETAILED BREAKDOWN: Microservice Template Creation**
 
 ###### **1. API Service Templates**
 - [ ] **Create `api-service/` directory structure:**
@@ -163,18 +178,7 @@
   - [ ] **`helm/notification/values-cloud.yaml`** - AWS SES and SNS configurations
 - [ ] **Create ArgoCD Application template:** `argocd/notification-application.yaml`
 
-##### **Service Discovery & Configuration (30 minutes)**
-- [ ] **Configure service discovery and Istio mesh networking for local development**
-- [ ] **Create Docker build templates optimized for both local and cloud deployment**
-- [ ] **Set up environment-specific configuration management (local/dev/staging/prod)**
-- [ ] **Create ArgoCD Application manifests for each microservice**
-- [ ] **Configure ArgoCD sync policies for local development workflow**
-
----
-
-#### **Afternoon: Local Data Services + Infrastructure ArgoCD Applications (3-4 hours)**
-
-##### **Data Infrastructure Deployment (2 hours)**
+#### Afternoon: Local Data Services + Infrastructure ArgoCD Applications (3-4 hours)
 - [ ] **Deploy PostgreSQL 15 locally via Kubernetes using infrastructure IaC templates**
 - [ ] **Configure PgBouncer connection pooling for local development**
 - [ ] **Deploy Redis locally via Kubernetes using infrastructure IaC templates**
@@ -182,8 +186,6 @@
 - [ ] **Design cloud-ready Redis HA configuration templates (for future use)**
 - [ ] **Test local database connectivity and performance**
 - [ ] **Configure local data backup and restore procedures**
-
-##### **ArgoCD Infrastructure Management (1-2 hours)**
 - [ ] **Create ArgoCD Applications for local PostgreSQL using infrastructure IaC**
 - [ ] **Create ArgoCD Applications for local Redis using infrastructure IaC**
 - [ ] **Create ArgoCD Applications for monitoring stack using infrastructure IaC**
@@ -191,54 +193,31 @@
 - [ ] **Configure ArgoCD health checks for local data services**
 - [ ] **Configure ArgoCD health checks for monitoring services**
 
----
-
-### **Environment Strategy:**
-
-#### **Local Development:**
+**Environment Strategy:**
 ```yaml
-SSL Strategy: Self-signed certificates via local CA
-Database: Single-node PostgreSQL with local storage
-Cache: Single Redis instance
-DNS: Local hosts file resolution (/etc/hosts)
-Load Balancer: minikube tunnel simulation
-Container Registry: minikube built-in registry
+Local Development:
+  - Self-signed certificates via local CA
+  - Single-node PostgreSQL and Redis
+  - Local DNS resolution
+  - minikube tunnel for load balancer simulation
+
+Cloud Ready (Future):
+  - Let's Encrypt certificates via Route53 DNS
+  - RDS PostgreSQL with read replicas
+  - ElastiCache Redis cluster
+  - AWS ALB with SSL termination
 ```
 
-#### **Cloud Ready (Future):**
-```yaml
-SSL Strategy: Let's Encrypt certificates via Route53 DNS
-Database: RDS PostgreSQL with read replicas and automated backups
-Cache: ElastiCache Redis cluster with failover
-DNS: Route53 with health checks
-Load Balancer: AWS ALB with SSL termination
-Container Registry: Amazon ECR with vulnerability scanning
-```
-
----
-
-### **Deliverables Day 2:**
-
-#### **Microservice Template Framework:**
-- [ ] **Complete Kubernetes IaC templates for all 6 microservices:**
-  - [ ] API Service template structure ready
-  - [ ] Tool Integration Service template structure ready
-  - [ ] Analysis Orchestration Service template structure ready
-  - [ ] Intelligence Engine Service template structure ready
-  - [ ] Data Service template structure ready
-  - [ ] Notification Service template structure ready
-
-#### **Infrastructure & GitOps:**
-- [ ] **Helm charts with local development values and cloud-ready structure**
-- [ ] **Local PostgreSQL and Redis deployed and accessible**
-- [ ] **Monitoring stack (Prometheus, Grafana, Jaeger) deployed and accessible**
-- [ ] **ArgoCD Applications created for all infrastructure services**
-- [ ] **ArgoCD Applications templates created for all 6 microservices (ready for service implementation)**
+**Deliverables Day 2:**
+- [ ] Complete Kubernetes IaC templates for all 6 microservices
+- [ ] Helm charts with local development values and cloud-ready structure
+- [ ] Local PostgreSQL and Redis deployed and accessible
+- [ ] **ArgoCD Applications created for all microservices and data services**
 - [ ] **GitOps workflow functional for local infrastructure deployments**
 - [ ] **Cloud-ready IaC templates prepared for future AWS deployment**
-- [ ] **Local SSL certificates automatically generated and renewed**
+- [ ] Local SSL certificates automatically generated and renewed
 
-#### **Directory Structure Created:**
+**Directory Structure Created:**
 ```
 solidity-security-platform/
 ├── services/
