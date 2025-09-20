@@ -18,63 +18,69 @@
 - [x] Clone all repositories and create initial folder structures
 - [x] Configure repository templates and README files
 
-#### Afternoon: Local Kubernetes Setup + Infrastructure Manifest Creation (5-6 hours)
-- [ ] Set up local minikube cluster with realistic resource allocation (8GB RAM, 4 CPUs)
-- [ ] Enable minikube addons (ingress, registry, metrics-server)
-- [ ] **Create Infrastructure Manifests FIRST:**
-  - [ ] **Create Istio service mesh installation manifests**
-  - [ ] **Create nginx ingress controller deployment manifests**
-  - [ ] **Create cert-manager installation and configuration manifests**
-  - [ ] **Create local CA issuer manifests (not Let's Encrypt)**
-  - [ ] **Create HashiCorp Vault installation manifests for local secret management**
-  - [ ] **Create Vault configuration manifests (dev mode for local development)**
-  - [ ] **Create Vault PKI secret engine manifests for local certificate management**
+#### Afternoon: AWS EKS Setup + Infrastructure Manifest Creation (5-6 hours)
+- [ ] **Domain already owned: soliditysecops.com**
+- [ ] **Configure Route53 hosted zone for soliditysecops.com - $0.50/month**
+- [ ] **Set up development subdomain (dev.soliditysecops.com)**
+- [ ] **Configure staging subdomain (staging.soliditysecops.com)**
+- [ ] Set up AWS EKS development cluster with realistic resource allocation (t3.medium nodes)
+- [ ] Configure EKS add-ons (AWS ALB Controller, EBS CSI Driver, VPC CNI)
+- [ ] **Create Infrastructure Manifests:**
+  - [ ] **Create AWS ALB ingress controller deployment manifests**
+  - [ ] **Create cert-manager installation and Let's Encrypt issuer manifests**
+  - [ ] **Create HashiCorp Vault installation manifests for AWS KMS auto-unseal**
+  - [ ] **Create Vault configuration manifests with S3 backend storage**
+  - [ ] **Create Vault PKI secret engine manifests for internal certificate management**
   - [ ] **Create Vault KV secret engine manifests for application secrets**
   - [ ] **Create ArgoCD installation manifests**
   - [ ] **Create ArgoCD RBAC configuration manifests**
-  - [ ] **Create ArgoCD application project manifests for local development**
+  - [ ] **Create ArgoCD application project manifests for cloud development**
   - [ ] **Create ArgoCD Vault integration manifests for GitOps secret management**
-- [ ] **Create Local Development Configuration:**
-  - [ ] **Create local root CA certificate generation scripts**
-  - [ ] **Create Vault initialization and unsealing scripts for local development**
-  - [ ] **Create Vault secret provisioning scripts for local services**
-  - [ ] **Create local development DNS configuration scripts**
+- [ ] **Create Cloud Development Configuration:**
+  - [ ] **Create Let's Encrypt certificate generation for soliditysecops.com**
+  - [ ] **Create Vault initialization and unsealing scripts for cloud development**
+  - [ ] **Create Vault secret provisioning scripts for cloud services**
+  - [ ] **Create Route53 DNS configuration scripts**
   - [ ] **Create ArgoCD Git repository integration configuration**
   - [ ] **Create ArgoCD Vault Plugin configuration for secret injection**
 - [ ] **Deploy Infrastructure Using Created Manifests:**
-  - [ ] **Install and configure Istio service mesh using manifests**
-  - [ ] **Install nginx ingress controller using manifests**
-  - [ ] **Install cert-manager using manifests**
-  - [ ] **Configure cert-manager with local CA issuer using manifests**
-  - [ ] **Install HashiCorp Vault using manifests in dev mode for local development**
-  - [ ] **Configure Vault PKI engine for local certificate authority**
+  - [ ] **Install and configure AWS ALB ingress controller**
+  - [ ] **Install cert-manager with Let's Encrypt ClusterIssuer**
+  - [ ] **Deploy HashiCorp Vault cluster with AWS KMS auto-unseal**
+  - [ ] **Configure Vault PKI engine for internal certificate authority**
   - [ ] **Configure Vault KV engines for application secrets**
-  - [ ] **Install ArgoCD using manifests**
-  - [ ] **Configure ArgoCD with local Git repository integration using manifests**
-  - [ ] **Configure ArgoCD RBAC for team access and permissions using manifests**
+  - [ ] **Install ArgoCD in EKS cluster**
+  - [ ] **Configure ArgoCD with GitHub repository integration**
+  - [ ] **Configure ArgoCD RBAC for team access and permissions**
   - [ ] **Configure ArgoCD Vault Plugin for automatic secret injection**
-- [ ] Create docker-compose.yml for supplementary local services
-- [ ] Write setup scripts for automated local environment reproduction
+- [ ] **Add A-Records for development services:**
+  - [ ] **api.dev.soliditysecops.com → ALB**
+  - [ ] **app.dev.soliditysecops.com → ALB**
+  - [ ] **argocd.dev.soliditysecops.com → ALB**
+  - [ ] **vault.dev.soliditysecops.com → ALB**
+  - [ ] **grafana.dev.soliditysecops.com → ALB**
+- [ ] Write setup scripts for automated cloud environment reproduction
 
-**Local DNS Configuration:**
+**Cloud DNS Configuration:**
 ```bash
-# Add to /etc/hosts or equivalent
-127.0.0.1 api.solidity-platform.local
-127.0.0.1 app.solidity-platform.local
-127.0.0.1 argocd.solidity-platform.local
-127.0.0.1 vault.solidity-platform.local
-127.0.0.1 grafana.solidity-platform.local
-127.0.0.1 prometheus.solidity-platform.local
+# Route53 A-Records for soliditysecops.com
+api.dev.soliditysecops.com → ALB-DNS-NAME
+app.dev.soliditysecops.com → ALB-DNS-NAME
+argocd.dev.soliditysecops.com → ALB-DNS-NAME
+vault.dev.soliditysecops.com → ALB-DNS-NAME
+grafana.dev.soliditysecops.com → ALB-DNS-NAME
+prometheus.dev.soliditysecops.com → ALB-DNS-NAME
 ```
 
-**Vault Local Development Configuration:**
+**Vault Cloud Development Configuration:**
 ```yaml
-Vault Development Setup:
-  mode: "dev"
+Vault Production Setup:
+  mode: "production"
   ui: true
-  storage: "file"
-  seal_type: "auto"
-  local_address: "https://vault.solidity-platform.local:8200"
+  storage: "s3"
+  seal_type: "awskms"
+  cluster_address: "https://vault.dev.soliditysecops.com:8201"
+  api_address: "https://vault.dev.soliditysecops.com:8200"
   
 Secret Engines:
   kv_v2:
@@ -82,31 +88,35 @@ Secret Engines:
     description: "Application secrets and configurations"
   pki:
     path: "pki/"
-    description: "Local certificate authority"
-    max_ttl: "8760h"  # 1 year for local development
+    description: "Internal certificate authority"
+    max_ttl: "8760h"  # 1 year
+  database:
+    path: "database/"
+    description: "Dynamic database credentials"
   
 Auth Methods:
+  aws:
+    path: "auth/aws/"
+    description: "AWS IAM authentication"
   kubernetes:
     path: "auth/kubernetes/"
     description: "Kubernetes service account authentication"
-  userpass:
-    path: "auth/userpass/"
-    description: "Local development user authentication"
 ```
 
 **Deliverables Day 1:**
 - [ ] All 6 repositories created with basic structure
-- [ ] Local minikube cluster operational with realistic resource limits
-- [ ] nginx ingress controller routing traffic locally
-- [ ] **Local CA issuer generating self-signed certificates automatically**
-- [ ] **HashiCorp Vault deployed and operational at https://vault.solidity-platform.local**
-- [ ] **Vault PKI engine configured for local certificate management**
+- [ ] **Domain soliditysecops.com configured in Route53**
+- [ ] **AWS EKS cluster operational with managed node groups**
+- [ ] **AWS ALB ingress controller routing traffic**
+- [ ] **Let's Encrypt ClusterIssuer provisioning SSL certificates automatically**
+- [ ] **HashiCorp Vault deployed and operational at https://vault.dev.soliditysecops.com**
+- [ ] **Vault PKI engine configured for internal certificate management**
 - [ ] **Vault KV engines ready for application secret storage**
-- [ ] **ArgoCD successfully deployed and accessible via https://argocd.solidity-platform.local**
-- [ ] **ArgoCD UI accessible with local SSL certificates**
+- [ ] **ArgoCD successfully deployed and accessible via https://argocd.dev.soliditysecops.com**
+- [ ] **ArgoCD UI accessible with Let's Encrypt SSL certificates**
 - [ ] **ArgoCD Vault Plugin configured for secret injection**
-- [ ] **Local development environment fully scripted and reproducible**
-- [ ] Infrastructure repository with complete local setup automation including Vault
+- [ ] **Cloud development environment fully scripted and reproducible**
+- [ ] Infrastructure repository with complete cloud setup automation including Vault
 
 ---
 
@@ -244,24 +254,23 @@ Auth Methods:
 - [ ] **Create ArgoCD Application template:** `argocd/notification-application.yaml`
 - [ ] **Create Vault secret templates:** `vault/notification-secrets.yaml`
 
-#### Afternoon: Local Data Services + Infrastructure ArgoCD Applications (3-4 hours)
-- [ ] **Deploy PostgreSQL 15 locally via Kubernetes using infrastructure IaC templates**
-- [ ] **Configure PostgreSQL credentials in Vault KV engine**
-- [ ] **Configure PgBouncer connection pooling for local development**
-- [ ] **Deploy Redis locally via Kubernetes using infrastructure IaC templates**
-- [ ] **Store Redis connection credentials in Vault**
-- [ ] **Create local Redis configuration (single instance for development)**
-- [ ] **Design cloud-ready Redis HA configuration templates (for future use)**
-- [ ] **Test local database connectivity using Vault-managed credentials**
-- [ ] **Configure local data backup and restore procedures**
-- [ ] **Create ArgoCD Applications for local PostgreSQL using infrastructure IaC**
-- [ ] **Create ArgoCD Applications for local Redis using infrastructure IaC**
-- [ ] **Create ArgoCD Applications for monitoring stack using infrastructure IaC**
+#### Afternoon: AWS RDS & ElastiCache Setup + Infrastructure ArgoCD Applications (3-4 hours)
+- [ ] **Deploy AWS RDS PostgreSQL 15 with automated backups and encryption**
+- [ ] **Configure RDS parameter group for optimal performance**
+- [ ] **Store RDS connection credentials in Vault KV engine**
+- [ ] **Set up RDS Proxy for connection pooling (optional for development)**
+- [ ] **Deploy AWS ElastiCache Redis with encryption in-transit and at-rest**
+- [ ] **Configure ElastiCache subnet group and security groups**
+- [ ] **Store ElastiCache connection credentials in Vault**
+- [ ] **Test cloud database connectivity using Vault-managed credentials**
+- [ ] **Configure RDS automated backup and point-in-time recovery**
+- [ ] **Set up CloudWatch monitoring for RDS and ElastiCache**
+- [ ] **Create ArgoCD Applications for cloud infrastructure monitoring**
 - [ ] **Test ArgoCD automatic sync for infrastructure service configuration changes**
-- [ ] **Configure ArgoCD health checks for local data services**
-- [ ] **Configure ArgoCD health checks for monitoring services**
+- [ ] **Configure ArgoCD health checks for cloud data services**
 - [ ] **Test Vault integration with ArgoCD for automatic secret injection**
-- [ ] **Validate External Secrets Operator functionality with local Vault**
+- [ ] **Validate External Secrets Operator functionality with cloud Vault**
+- [ ] **Configure CloudWatch alarms for database performance monitoring**
 
 **Environment Strategy:**
 ```yaml
@@ -298,16 +307,19 @@ Secret Paths:
 ```
 
 **Deliverables Day 2:**
-- [ ] Complete Kubernetes IaC templates for all 6 microservices with Vault integration
-- [ ] Helm charts with local development values and cloud-ready structure
-- [ ] Local PostgreSQL and Redis deployed and accessible via Vault-managed credentials
-- [ ] **ArgoCD Applications created for all microservices and data services**
-- [ ] **GitOps workflow functional for local infrastructure deployments**
-- [ ] **Vault secret management operational for all local services**
+- [ ] Complete DNS A-Records configured and resolving to ALB
+- [ ] SSL certificates automatically provisioned for all subdomains
+- [ ] Complete Kubernetes IaC templates for all 6 microservices with AWS integration
+- [ ] Helm charts with development values and production-ready structure
+- [ ] AWS RDS PostgreSQL deployed and accessible via Vault-managed credentials
+- [ ] AWS ElastiCache Redis deployed and operational
+- [ ] **ArgoCD Applications created for all microservices and cloud infrastructure**
+- [ ] **GitOps workflow functional for cloud infrastructure deployments**
+- [ ] **Vault secret management operational for all cloud services**
 - [ ] **External Secrets Operator successfully injecting secrets from Vault**
 - [ ] **ArgoCD Vault Plugin working for GitOps secret management**
-- [ ] **Cloud-ready IaC templates prepared for future AWS deployment with Vault**
-- [ ] Local SSL certificates automatically generated and renewed
+- [ ] **Cloud-ready IaC templates prepared for production deployment**
+- [ ] SSL certificates automatically managed and renewed via Let's Encrypt
 
 **Directory Structure Created:**
 ```
@@ -343,6 +355,12 @@ solidity-security-platform/
 │       ├── helm/ (5 files)
 │       ├── argocd/ (1 application)
 │       └── vault/ (secret templates)
+└── infrastructure/
+    ├── vault/ (Vault configuration and policies)
+    ├── postgresql/ (IaC deployed)
+    ├── redis/ (IaC deployed)
+    ├── monitoring/ (IaC deployed)
+    └── argocd-apps/ (infrastructure applications)
 ```
 
 **Total Templates Created:** 6 microservices × ~13 files each (including Vault) = 78 template files ready for service implementation in Week 2.
@@ -351,21 +369,25 @@ solidity-security-platform/
 
 ### **Day 3: Local Monitoring Stack & Platform Repository**
 
-#### Morning: Local Monitoring Infrastructure + Monitoring IaC (3-4 hours)
-- [ ] **Deploy Prometheus for metrics collection using monitoring infrastructure IaC**
-- [ ] **Configure Grafana with basic infrastructure dashboards using monitoring infrastructure IaC**
-- [ ] **Install Jaeger for distributed tracing using monitoring infrastructure IaC**
+#### Morning: Cloud Monitoring Infrastructure + S3 Configuration (3-4 hours)
+- [ ] **Deploy Prometheus for metrics collection in EKS cluster**
+- [ ] **Configure Grafana with cloud infrastructure dashboards**
+- [ ] **Install Jaeger for distributed tracing in EKS**
+- [ ] **Set up AWS CloudWatch integration with Prometheus**
+- [ ] **Configure CloudWatch Container Insights for EKS monitoring**
+- [ ] **Set up AWS X-Ray for distributed tracing (preparation)**
 - [ ] **Configure Vault integration for monitoring stack credentials**
 - [ ] **Store Grafana admin credentials in Vault KV engine**
-- [ ] **Configure Prometheus OAuth integration with Vault-managed secrets**
-- [ ] **Set up monitoring service discovery for all local infrastructure services**
-- [ ] **Configure local alerting rules (email disabled, console output only)**
-- [ ] **Set up local monitoring ingress with self-signed SSL certificates**
-- [ ] **Configure nginx ingress for local Grafana and Prometheus access**
-- [ ] **Create ArgoCD Applications for local monitoring stack using monitoring IaC**
-- [ ] **Configure ArgoCD to manage local Prometheus and Grafana deployments**
-- [ ] **Set up monitoring for ArgoCD itself using local Prometheus**
-- [ ] **Configure Vault metrics collection and monitoring**
+- [ ] **Configure monitoring service discovery for EKS services**
+- [ ] **Set up CloudWatch alarms for critical infrastructure metrics**
+- [ ] **Configure ALB ingress for monitoring services with custom domains**
+- [ ] **Create S3 bucket for contract file storage with encryption**
+- [ ] **Configure S3 bucket lifecycle policies for cost optimization**
+- [ ] **Set up S3 IAM roles and policies for service access**
+- [ ] **Create ArgoCD Applications for cloud monitoring stack**
+- [ ] **Configure ArgoCD to manage Prometheus and Grafana deployments**
+- [ ] **Set up monitoring for ArgoCD itself using CloudWatch**
+- [ ] **Configure Vault metrics collection and CloudWatch integration**
 - [ ] **Test External Secrets Operator integration with monitoring credentials**
 
 #### Afternoon: Platform Repository Structure + GitOps Patterns (3 hours)
@@ -381,42 +403,51 @@ solidity-security-platform/
 - [ ] **Configure Vault secret rotation policies for local development**
 - [ ] **Test Vault PKI engine for automatic certificate generation**
 
-**Local Monitoring Configuration with Vault:**
+**Cloud Monitoring Configuration with AWS Integration:**
 ```yaml
-Prometheus:
-  - Scrape local Kubernetes metrics
-  - Service discovery for minikube services
-  - Local storage with 7-day retention
-  - OAuth credentials stored in Vault
+Prometheus in EKS:
+  - Scrape EKS cluster metrics via ServiceMonitor
+  - CloudWatch integration for AWS service metrics
+  - Persistent storage using EBS volumes
+  - High availability with multiple replicas
 
-Grafana:
-  - Pre-configured dashboards for local development
-  - Local data source configuration
-  - No external alerting (development mode)
-  - Admin credentials managed by Vault
+Grafana in EKS:
+  - Pre-configured dashboards for AWS services
+  - CloudWatch data source configuration
   - OAuth integration with Vault-managed secrets
+  - Admin credentials managed by Vault
+  - Custom domain: grafana.dev.soliditysecops.com
 
-Jaeger:
-  - In-memory storage for local tracing
-  - All-in-one deployment for simplicity
-  - Authentication credentials in Vault
+Jaeger in EKS:
+  - Elasticsearch backend for trace storage
+  - Integration with AWS X-Ray (future)
+  - Custom domain access for team collaboration
 
-Vault Metrics:
-  - Vault server metrics collection
-  - Secret engine usage monitoring
-  - Authentication method tracking
-  - Policy evaluation metrics
+CloudWatch Integration:
+  - Container Insights for EKS monitoring
+  - Application logs via Fluentd
+  - Custom metrics from application services
+  - Automated alerting for critical issues
+
+S3 Storage Configuration:
+  - Bucket: soliditysecops-contracts-dev
+  - Encryption: AWS KMS with customer-managed keys
+  - Lifecycle: Transition to IA after 30 days, delete after 90 days
+  - Versioning: Enabled for contract file history
+  - Access: IAM roles for service access, no public access
 ```
 
 **Deliverables Day 3:**
-- [ ] Complete local monitoring stack (Prometheus, Grafana, Jaeger) deployed
-- [ ] **Local monitoring dashboards accessible via https://grafana.solidity-platform.local**
-- [ ] **Vault operational at https://vault.solidity-platform.local with monitoring**
-- [ ] Platform repository with microservice structure and local configs
-- [ ] Basic service templates optimized for local development
-- [ ] **ArgoCD managing all local monitoring components via GitOps**
-- [ ] **ArgoCD App-of-Apps pattern implemented for scalable local management**
+- [ ] Complete cloud monitoring stack (Prometheus, Grafana, Jaeger) deployed in EKS
+- [ ] **Cloud monitoring dashboards accessible via https://grafana.dev.soliditysecops.com**
+- [ ] **Vault operational at https://vault.dev.soliditysecops.com with CloudWatch monitoring**
+- [ ] **S3 bucket configured for contract storage with proper encryption and lifecycle**
+- [ ] Platform repository with microservice structure and cloud configs
+- [ ] Basic service templates optimized for cloud development
+- [ ] **ArgoCD managing all cloud monitoring components via GitOps**
+- [ ] **ArgoCD App-of-Apps pattern implemented for scalable cloud management**
 - [ ] **Vault secret management integrated with all monitoring components**
+- [ ] **CloudWatch providing comprehensive infrastructure and application monitoring**
 
 ---
 
