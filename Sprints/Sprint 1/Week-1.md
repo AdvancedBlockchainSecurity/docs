@@ -343,12 +343,6 @@ solidity-security-platform/
 │       ├── helm/ (5 files)
 │       ├── argocd/ (1 application)
 │       └── vault/ (secret templates)
-└── infrastructure/
-    ├── vault/ (Vault configuration and policies)
-    ├── postgresql/ (IaC deployed)
-    ├── redis/ (IaC deployed)
-    ├── monitoring/ (IaC deployed)
-    └── argocd-apps/ (infrastructure applications)
 ```
 
 **Total Templates Created:** 6 microservices × ~13 files each (including Vault) = 78 template files ready for service implementation in Week 2.
