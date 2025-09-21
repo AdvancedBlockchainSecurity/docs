@@ -18,62 +18,70 @@
 - [x] Set up team permissions and access controls
 - [x] Clone all repositories and create initial folder structures
 - [x] Configure repository templates and README files
-- [ ] **Purchase production domain** (e.g., solidity-platform.com) via Route53 or registrar
-- [ ] **Configure Route53 hosted zone** for DNS management (if not using Route53 registrar)
+- [ ] **Configure Cloudflare DNS for existing domain** for DNS management
 - [ ] **Set up development subdomain** (dev.solidity-platform.com) with A records
 - [ ] **Configure staging subdomain** (staging.solidity-platform.com) with A records
 - [ ] **Set up production subdomain** (app.solidity-platform.com) with A records
 
 #### Afternoon: AWS Infrastructure Provisioning & Kubernetes Services Setup (5-6 hours)
 
-##### **AWS Infrastructure IaC Creation (5-7 hours)**
+##### **AWS Infrastructure IaC Creation (2-3 hours)**
 - [ ] **Create Terraform modules in `solidity-security-aws-infrastructure` repository:**
   - [ ] **VPC module with public/private subnets, NAT gateways, Internet gateway**
-  - [ ] **EKS cluster module with managed node groups and OIDC provider**
-  - [ ] **RDS PostgreSQL module with Multi-AZ deployment and parameter groups**
+  - [ ] **EKS cluster module with managed node groups, OIDC provider, and private API endpoint**
+  - [ ] **RDS PostgreSQL module with Multi-AZ deployment, parameter groups, and KMS encryption**
   - [ ] **ElastiCache Redis module with cluster mode and parameter groups**
-  - [ ] **Route53 module for hosted zone and health checks**
+  - [ ] **Route53 module for health checks (optional)**
   - [ ] **IAM module for EKS service roles and policies**
   - [ ] **Secrets Manager module for application secrets**
-  - [ ] **Security Groups module for network access control**
+  - [ ] **Security Groups module for network access control and optimization**
   - [ ] **ECR repositories module with vulnerability scanning**
   - [ ] **VPC Endpoints module for ECR, S3, Secrets Manager**
+  - [ ] **WAF module for ALB DDoS and injection protection**
+  - [ ] **KMS module for customer-managed encryption keys**
 
 ##### **AWS Infrastructure Deployment (2-3 hours)**
 - [ ] **Deploy AWS cloud infrastructure using Terraform:**
   - [ ] **Create VPC with public/private subnets across 3 AZs**
-  - [ ] **Deploy EKS cluster with managed node groups (t3.medium, 3 nodes)**
-  - [ ] **Provision RDS PostgreSQL 15 Multi-AZ with automated backups**
+  - [ ] **Deploy EKS cluster with managed node groups (t3.medium, 3 nodes) and private API endpoint**
+  - [ ] **Provision RDS PostgreSQL 15 Multi-AZ with automated backups and KMS encryption**
   - [ ] **Deploy ElastiCache Redis cluster with encryption**
-  - [ ] **Configure Route53 hosted zone with development DNS records**
+  - [ ] **Configure Cloudflare DNS with development DNS records pointing to ALB**
   - [ ] **Create IAM roles for EKS services and AWS integrations**
   - [ ] **Set up AWS Secrets Manager for application secrets**
-  - [ ] **Configure security groups for proper network access**
+  - [ ] **Configure security groups for proper network access and optimization**
   - [ ] **Create ECR repositories with vulnerability scanning**
   - [ ] **Deploy VPC Endpoints for ECR, S3, Secrets Manager**
+  - [ ] **Configure WAF for ALB with DDoS and injection protection**
+  - [ ] **Set up customer-managed KMS keys for RDS and EBS encryption**
+  - [ ] **Configure RDS with force SSL connections and security parameter groups**
   - [ ] **Update kubeconfig for EKS cluster access**
 
 ##### **Kubernetes Services IaC Creation & Deployment (2 hours)**
 - [ ] **Create Kubernetes service manifests in `solidity-security-infrastructure` repository:**
   - [ ] **AWS Load Balancer Controller installation and IAM service account**
-  - [ ] **cert-manager installation with Let's Encrypt ClusterIssuer and Route53 solver**
+  - [ ] **cert-manager installation with Let's Encrypt ClusterIssuer and HTTP-01 challenge**
   - [ ] **External Secrets Operator with AWS IAM authentication for Secrets Manager**
   - [ ] **AWS Secrets Manager CSI Driver for direct secret mounting**
   - [ ] **ArgoCD installation with AWS Secrets Manager integration and RBAC**
   - [ ] **Resource Quotas for namespace resource limits**
   - [ ] **Network Policies for pod communication security**
+  - [ ] **Pod Security Standards for enhanced container security**
+  - [ ] **RBAC policies beyond basic ArgoCD for granular access control**
 - [ ] **Deploy Kubernetes services to EKS cluster:**
   - [ ] **Install AWS Load Balancer Controller using manifests**
-  - [ ] **Install cert-manager with Let's Encrypt issuer using manifests**
+  - [ ] **Install cert-manager with Let's Encrypt issuer using HTTP-01 challenge**
   - [ ] **Install External Secrets Operator with AWS IAM authentication**
   - [ ] **Deploy AWS Secrets Manager CSI Driver**
   - [ ] **Deploy ArgoCD with GitHub integration and AWS Secrets Manager Plugin**
   - [ ] **Configure Resource Quotas for development namespace**
   - [ ] **Deploy Network Policies for service mesh security**
+  - [ ] **Configure Pod Security Standards enforcement**
+  - [ ] **Set up enhanced RBAC policies for granular access control**
 
-**Enhanced Cloud DNS Configuration:**
+**Cloudflare DNS Configuration:**
 ```bash
-# Route53 DNS Configuration
+# Cloudflare DNS Configuration
 dev.solidity-platform.com → AWS ALB (to be created)
 api.dev.solidity-platform.com → AWS ALB (API Gateway)
 app.dev.solidity-platform.com → AWS ALB (Frontend)
@@ -231,8 +239,8 @@ Backup Automation:
 
 **Deliverables Day 1:**
 - [ ] All 7 repositories created with basic structure (including new AWS infrastructure repo)
-- [ ] **Production domain purchased and Route53 hosted zone configured**
-- [ ] **Development, staging, and production subdomains configured with DNS records**
+- [ ] **Existing domain configured in Cloudflare with proper DNS records**
+- [ ] **Development, staging, and production subdomains configured with A records in Cloudflare**
 - [ ] **AWS infrastructure deployed via Terraform (VPC, EKS, RDS, ElastiCache)**
 - [ ] **Enhanced security deployed (Security Groups, VPC Endpoints, Network Policies)**
 - [ ] **ECR repositories created with vulnerability scanning and lifecycle policies**
@@ -241,7 +249,7 @@ Backup Automation:
 - [ ] **EKS cluster operational with managed node groups and security hardening**
 - [ ] **RDS PostgreSQL and ElastiCache Redis deployed with encryption and monitoring**
 - [ ] AWS Load Balancer Controller routing traffic to services
-- [ ] **Let's Encrypt issuer generating SSL certificates automatically via Route53**
+- [ ] **Let's Encrypt issuer generating SSL certificates automatically via HTTP-01 challenge**
 - [ ] **AWS Secrets Manager configured for application secret storage with enhanced security**
 - [ ] **External Secrets Operator configured with AWS IAM authentication**
 - [ ] **ArgoCD successfully deployed and accessible via https://argocd.dev.solidity-platform.com**
@@ -269,8 +277,8 @@ Backup Automation:
 - [ ] Create Kubernetes deployment templates for all 6 microservices with AWS-specific configs and security
 - [ ] Set up Helm chart templates with development and production environment values
 - [ ] **Create ALB ingress definitions with Let's Encrypt SSL certificates and WAF integration**
-- [ ] **Create Route53 DNS management configurations for service discovery**
-- [ ] Configure cert-manager Certificate resources for automatic Let's Encrypt renewal
+- [ ] **Create Cloudflare DNS management configurations for service discovery**
+- [ ] Configure cert-manager Certificate resources for automatic Let's Encrypt renewal with HTTP-01 challenge
 - [ ] Set up AWS ALB ingress rules with SSL termination, rate limiting, and security headers
 - [ ] Configure service discovery and mesh networking for EKS development with Network Policies
 - [ ] Create Docker build templates optimized for ECR with security scanning integration
@@ -521,8 +529,11 @@ Compliance & Monitoring:
 - [ ] Complete enhanced Kubernetes IaC templates for all 6 microservices with security hardening
 - [ ] Helm charts with development values and production-ready security structure
 - [ ] RDS PostgreSQL and ElastiCache deployed with encryption and monitoring
-- [ ] **Enhanced security deployed (Network Policies, VPC Endpoints)**
+- [ ] **Enhanced security deployed (Network Policies, VPC Endpoints, WAF protection)**
 - [ ] **ECR repositories created with vulnerability scanning**
+- [ ] **EKS cluster hardened with private API endpoint and Pod Security Standards**
+- [ ] **RDS PostgreSQL hardened with KMS encryption and force SSL**
+- [ ] **ALB hardened with WAF integration and security headers**
 - [ ] **ArgoCD Applications created for all microservices and data services with security policies**
 - [ ] **GitOps workflow functional for cloud infrastructure deployments with compliance validation**
 - [ ] **AWS Secrets Manager enhanced secret management operational with encryption and rotation**
@@ -569,20 +580,6 @@ solidity-security-platform/
 
 **Total Enhanced Templates Created:** 6 microservices × ~15 files each (including security) = 90 template files ready for secure service implementation in Week 2.
 
-**Breakdown of Additional Security Templates Added (per microservice):**
-
-- **aws-secrets/**: Enhanced secrets management templates, including:
-  - `secrets.yaml`: Secure storage of service credentials with AWS Secrets Manager integration.
-  - `encryption-config.yaml`: Configuration for encryption of sensitive data at rest and in transit.
-  - `rotation-policy.yaml`: Automated secrets rotation policy for improved security.
-- **helm/**: Additional Helm chart files for security, including:
-  - `network-policy.yaml`: Kubernetes network policies to restrict traffic between pods.
-  - `rbac.yaml`: Role-based access control templates for least-privilege service accounts.
-- **k8s/base/**: Security-focused Kubernetes manifests, including:
-  - `pod-security.yaml`: Pod security standards enforcement.
-  - `audit-policy.yaml`: Kubernetes audit logging configuration for compliance.
-
-*These new templates account for the increase from ~13 to ~15 files per microservice, ensuring each service is production-ready with robust security controls.*
 ---
 
 ### **Day 3: Enhanced Cloud Monitoring Stack & Platform Repository**
@@ -829,19 +826,20 @@ Required Documentation:
 ## Enhanced Sprint 1 Final Acceptance Criteria
 
 ### **Enhanced Cloud Infrastructure Requirements:**
-- [ ] All services deploy successfully to AWS EKS development cluster with security hardening
-- [ ] **Domain purchased and Route53 DNS properly configured with A records and monitoring**
+- [ ] All services deploy successfully to AWS EKS development cluster with hardening
+- [ ] **Domain configured in Cloudflare and DNS properly configured with A records**
 - [ ] **Development, staging, and production subdomains configured with security validation**
-- [ ] **Enhanced container security implemented (scanning, signing, runtime protection)**
+- [ ] **Enhanced container security implemented (scanning, Pod Security Standards)**
 - [ ] **Network security deployed (VPC Endpoints, Network Policies, Security Groups)**
+- [ ] **EKS cluster hardened (private API endpoint, RBAC, Pod Security Standards)**
+- [ ] **RDS hardened (KMS encryption, force SSL, security parameter groups)**
+- [ ] **ALB hardened (WAF integration, security headers, SSL/TLS policy enforcement)**
 - [ ] **ECR repositories operational with vulnerability scanning and lifecycle policies**
-- [ ] **CloudWatch Log Groups and Container Insights providing comprehensive monitoring**
-- [ ] **AWS Config and GuardDuty operational for compliance and threat detection**
 - [ ] Enhanced CloudWatch monitoring dashboards display metrics from all infrastructure components
 - [ ] Enhanced cloud CI/CD pipeline successfully builds and deploys to EKS environment with security
 - [ ] RDS and ElastiCache connections functional with proper authentication and encryption
 - [ ] **Enhanced Let's Encrypt SSL termination working with automatic certificate renewal and monitoring**
-- [ ] **cert-manager automatically provisions and renews certificates via Route53 with validation**
+- [ ] **cert-manager automatically provisions and renews certificates via HTTP-01 challenge with validation**
 - [ ] **Enhanced AWS ALB routes traffic correctly with SSL termination, security headers, and rate limiting**
 - [ ] **Enhanced ArgoCD successfully deploys and manages cloud application lifecycle via GitOps**
 - [ ] **Enhanced AWS Secrets Manager operational and managing all application secrets with security**
@@ -872,7 +870,7 @@ Required Documentation:
 - [ ] Enhanced Infrastructure as Code validates and deploys successfully to AWS EKS
 - [ ] **Team members can reproduce enhanced cloud environment setup in <60 minutes**
 - [ ] **Enhanced security scanning integrated into cloud build process with ECR and SBOM generation**
-- [ ] **Enhanced Let's Encrypt certificate management automated and documented with monitoring**
+- [ ] **Enhanced Let's Encrypt certificate management automated and documented with HTTP-01 challenge**
 - [ ] **Enhanced production-ready IaC templates configured for AWS scaling with security**
 - [ ] **Enhanced AWS Secrets Manager configuration templates ready for production deployment**
 
@@ -906,28 +904,10 @@ Required Documentation:
 
 ## Enhanced Cloud Development Strategy Summary
 
-### **Enhanced Cost Management:**
-- **Enhanced development costs** approximately $400-500/month during Sprints 1-6
-- **Enhanced production scaling** planned for $1,500+/month with full enterprise security features
-
-**Itemized Enhanced Security Component Cost Breakdown (Production):**
-- **AWS Secrets Manager (Enterprise usage):** ~$200/month  
-  Secure storage and rotation of secrets, keys, and credentials.
-- **Container Security (Scanning, Signing, Runtime Protection):** ~$150/month  
-  Automated vulnerability scanning, image signing, and runtime threat detection.
-- **Network Security (Micro-segmentation, Zero-Trust):** ~$100/month  
-  VPC segmentation, security groups, and zero-trust network policies.
-- **Advanced Monitoring & Logging (CloudWatch, GuardDuty, Security Hub):** ~$120/month  
-  Real-time security monitoring, alerting, and compliance reporting.
-- **SSL/TLS Certificate Management (Let's Encrypt, ACM):** ~$30/month  
-  Automated certificate provisioning and renewal for all domains.
-- **IAM & Access Controls (Role-based, SSO, Audit):** ~$50/month  
-  Fine-grained access management, SSO integration, and audit logging.
-- **Production EKS Cluster (Hardened, Multi-AZ):** ~$850/month  
-  High-availability, multi-AZ, and security-hardened Kubernetes infrastructure.
-- **Other Security Enhancements & Contingency:** ~$100/month  
-  Miscellaneous security tools, updates, and contingency buffer.
-- **Cost optimization** through spot instances, scheduled scaling, resource tagging, and monitoring
+### **Cost Management:**
+- **Enhanced development costs** approximately $320-400/month during Sprints 1-6 (Route53 costs removed)
+- **Enhanced production scaling** planned for $1,400+/month with full enterprise security features
+- **Cost optimization** through Cloudflare DNS (free), spot instances, scheduled scaling, resource tagging, and monitoring
 
 ### **Enhanced Development Benefits:**
 - **No local resource constraints** - perfect for MacBook Air development
