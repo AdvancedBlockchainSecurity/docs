@@ -1,25 +1,25 @@
 # Week 2: Service Implementation & Testing (Sprint 1 Continuation)
 
-**Objective:** Implement core microservices, integrate tools, build frontend dashboard, and achieve end-to-end functionality with cloud SSL-terminated access, complete cloud GitOps deployment automation, and secure Vault-based secret management.
+**Objective:** Implement core microservices, integrate tools, build frontend dashboard, and achieve end-to-end functionality with cloud SSL-terminated access, complete cloud GitOps deployment automation, and secure AWS Secrets Manager-based secret management.
 
 ## Day 6: Core API Services Implementation + Cloud ArgoCD Deployment
 
 ### **Morning: API Service Foundation + Cloud GitOps Deployment (3-4 hours)**
 - [ ] **Create FastAPI application structure with proper project layout**
 - [ ] **Create Kubernetes IaC for API Service:**
-  - [ ] **Deployment.yaml with environment variables, resource limits, and Vault secret injection**
+  - [ ] **Deployment.yaml with environment variables, resource limits, and AWS secret injection**
   - [ ] **Service.yaml for internal cluster communication**
   - [ ] **ConfigMap.yaml for application configuration (non-sensitive data)**
-  - [ ] **External Secret.yaml for Vault secret injection (JWT keys, OAuth credentials)**
-  - [ ] **Vault Policy.yaml for API service secret access permissions**
-  - [ ] **Service Account.yaml for Vault Kubernetes authentication and AWS IAM**
+  - [ ] **External Secret.yaml for AWS Secrets Manager secret injection (JWT keys, OAuth credentials)**
+  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
+  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
   - [ ] **Ingress.yaml for ALB external access with Let's Encrypt SSL**
 - [ ] **Create Helm chart for API Service with cloud development values**
 - [ ] **Create ArgoCD Application manifest for API service**
-- [ ] **Configure Vault secrets for API service:**
-  - [ ] **JWT signing keys in Vault KV engine**
-  - [ ] **OAuth provider credentials in Vault**
-  - [ ] **RDS connection secrets in Vault**
+- [ ] **Configure AWS Secrets Manager secrets for API service:**
+  - [ ] **JWT signing keys in AWS Secrets Manager**
+  - [ ] **OAuth provider credentials in AWS Secrets Manager**
+  - [ ] **RDS connection secrets in AWS Secrets Manager**
 - [ ] Implement JWT authentication and authorization middleware for cloud testing
 - [ ] Set up RDS connection pooling via RDS Proxy and ORM configuration
 - [ ] Create user management endpoints (register, login, profile) with RDS database
@@ -28,23 +28,23 @@
 - [ ] Set up health check and readiness probe endpoints for CloudWatch monitoring
 - [ ] **Configure cloud GitOps deployment for API service via ArgoCD**
 - [ ] **Test ArgoCD automatic sync for cloud API service updates**
-- [ ] **Validate External Secrets Operator injecting Vault secrets into API service**
+- [ ] **Validate External Secrets Operator injecting AWS Secrets Manager secrets into API service**
 
 ### **Afternoon: Data Service Implementation + Cloud ArgoCD Management (3-4 hours)**
 - [ ] **Implement database models for all core entities with RDS PostgreSQL**
 - [ ] **Create Kubernetes IaC for Data Service:**
-  - [ ] **Deployment.yaml with RDS connection configuration and Vault integration**
+  - [ ] **Deployment.yaml with RDS connection configuration and AWS Secrets Manager integration**
   - [ ] **Service.yaml for inter-service communication**
   - [ ] **ConfigMap.yaml for RDS and ElastiCache connection settings (non-sensitive)**
-  - [ ] **External Secret.yaml for RDS and ElastiCache credentials from Vault**
-  - [ ] **Vault Policy.yaml for data service secret access**
-  - [ ] **Service Account.yaml for Vault authentication and AWS IAM**
+  - [ ] **External Secret.yaml for RDS and ElastiCache credentials from AWS Secrets Manager**
+  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
+  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
 - [ ] **Create Helm chart for Data Service with cloud development values**
 - [ ] **Create ArgoCD Application manifest for data service deployment**
-- [ ] **Configure Vault secrets for Data Service:**
-  - [ ] **RDS PostgreSQL connection strings in Vault**
-  - [ ] **ElastiCache Redis connection credentials in Vault**
-  - [ ] **Database encryption keys in Vault**
+- [ ] **Configure AWS Secrets Manager secrets for Data Service:**
+  - [ ] **RDS PostgreSQL connection strings in AWS Secrets Manager with auto-rotation**
+  - [ ] **ElastiCache Redis connection credentials in AWS Secrets Manager**
+  - [ ] **Database encryption keys in AWS Secrets Manager**
 - [ ] Create Alembic migration scripts for RDS database schema
 - [ ] Set up ElastiCache Redis connection and caching layer
 - [ ] Implement data access layer with repository pattern for cloud development
@@ -53,25 +53,25 @@
 - [ ] Implement audit logging for cloud data operations with CloudWatch
 - [ ] **Configure ArgoCD health checks for cloud data service**
 - [ ] **Test ArgoCD rollback functionality for cloud data service**
-- [ ] **Validate Vault secret rotation for RDS credentials**
+- [ ] **Validate AWS Secrets Manager secret rotation for RDS credentials**
 
-**Cloud Development Configuration with Vault:**
+**Cloud Development Configuration with AWS Secrets Manager:**
 ```yaml
-API Service Vault Secrets:
-  secret/api-service/jwt-secret: "cloud-development-jwt-signing-key"
-  secret/api-service/oauth-google: "Google OAuth client credentials"
-  secret/api-service/oauth-github: "GitHub OAuth client credentials"
-  secret/api-service/cors-origins: "https://app.dev.solidity-platform.com"
+API Service AWS Secrets Manager Secrets:
+  dev/api-service/jwt-secret: "cloud-development-jwt-signing-key"
+  dev/api-service/oauth-google: "Google OAuth client credentials"
+  dev/api-service/oauth-github: "GitHub OAuth client credentials"
+  dev/api-service/cors-origins: "https://app.dev.solidity-platform.com"
 
-Data Service Vault Secrets:
-  secret/data-service/rds-url: "RDS PostgreSQL connection string with RDS Proxy"
-  secret/data-service/elasticache-url: "ElastiCache Redis cluster endpoint"
-  secret/data-service/encryption-key: "AES-256 encryption key for sensitive data"
-  secret/data-service/audit-signing-key: "Key for audit log integrity"
+Data Service AWS Secrets Manager Secrets:
+  dev/data-service/rds-url: "RDS PostgreSQL connection string with RDS Proxy"
+  dev/data-service/elasticache-url: "ElastiCache Redis cluster endpoint"
+  dev/data-service/encryption-key: "AES-256 encryption key for sensitive data"
+  dev/data-service/audit-signing-key: "Key for audit log integrity"
 
-Vault Policies:
-  api-service-policy: "Read access to secret/api-service/*"
-  data-service-policy: "Read access to secret/data-service/*"
+IAM Policies:
+  api-service-policy: "Access to dev/api-service/* secrets"
+  data-service-policy: "Access to dev/data-service/* secrets"
 ```
 
 **Deliverables Day 6:**
@@ -83,8 +83,8 @@ Vault Policies:
 - [ ] **ALB rate limiting protecting cloud API services**
 - [ ] **API and data services deployed and managed via cloud ArgoCD**
 - [ ] **ArgoCD showing healthy status for both services in cloud environment**
-- [ ] **All sensitive configuration stored and retrieved from Vault**
-- [ ] **External Secrets Operator successfully injecting Vault secrets**
+- [ ] **All sensitive configuration stored and retrieved from AWS Secrets Manager**
+- [ ] **External Secrets Operator successfully injecting AWS Secrets Manager secrets**
 
 ---
 
@@ -96,43 +96,43 @@ Vault Policies:
 - [ ] **Implement MythX adapter with async API client (production API keys)**
 - [ ] **Create Solidity-Metrics adapter with Node.js wrapper for cloud analysis**
 - [ ] **Create Kubernetes IaC for Tool Integration Service:**
-  - [ ] **Deployment.yaml with tool binaries, runtime dependencies, and Vault secret injection**
+  - [ ] **Deployment.yaml with tool binaries, runtime dependencies, and AWS secret injection**
   - [ ] **Service.yaml for tool service communication**
   - [ ] **ConfigMap.yaml for tool configurations and API endpoints (non-sensitive)**
-  - [ ] **External Secret.yaml for tool API keys and credentials from Vault**
-  - [ ] **Vault Policy.yaml for tool integration service permissions**
-  - [ ] **Service Account.yaml for Vault authentication and AWS IAM**
+  - [ ] **External Secret.yaml for tool API keys and credentials from AWS Secrets Manager**
+  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
+  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
   - [ ] **PersistentVolumeClaim.yaml for EBS storage for tool data**
 - [ ] **Create Helm chart for Tool Integration Service with tool-specific values**
 - [ ] **Create ArgoCD Application manifest for tool integration service**
-- [ ] **Configure Vault secrets for Tool Integration Service:**
-  - [ ] **MythX API keys and credentials in Vault**
-  - [ ] **Tool-specific configuration secrets in Vault**
-  - [ ] **Third-party service credentials in Vault**
+- [ ] **Configure AWS Secrets Manager secrets for Tool Integration Service:**
+  - [ ] **MythX API keys and credentials in AWS Secrets Manager**
+  - [ ] **Tool-specific configuration secrets in AWS Secrets Manager**
+  - [ ] **Third-party service credentials in AWS Secrets Manager**
 - [ ] Set up tool result normalization to common schema for cloud testing
 - [ ] Implement tool health checking and status monitoring for cloud tools
 - [ ] Configure tool-specific rate limiting and retry logic for cloud development
 - [ ] **Configure ArgoCD sync policies for cloud tool service deployments**
 - [ ] **Test ArgoCD automatic deployment for cloud tool configuration changes**
-- [ ] **Validate Vault secret injection for tool credentials**
+- [ ] **Validate AWS Secrets Manager secret injection for tool credentials**
 
 ### **Afternoon: Orchestration Service + Cloud ArgoCD Management (3-4 hours)**
 - [ ] **Set up Celery with ElastiCache Redis broker for job queue**
 - [ ] **Implement analysis workflow orchestration for cloud development**
 - [ ] **Create Kubernetes IaC for Orchestration Service:**
-  - [ ] **Deployment.yaml for Celery workers with scaling configuration and Vault secrets**
+  - [ ] **Deployment.yaml for Celery workers with scaling configuration and AWS secrets**
   - [ ] **Service.yaml for worker communication**
   - [ ] **ConfigMap.yaml for Celery and ElastiCache broker settings (non-sensitive)**
-  - [ ] **External Secret.yaml for ElastiCache broker credentials from Vault**
-  - [ ] **Vault Policy.yaml for orchestration service permissions**
-  - [ ] **Service Account.yaml for Vault authentication and AWS IAM**
+  - [ ] **External Secret.yaml for ElastiCache broker credentials from AWS Secrets Manager**
+  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
+  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
   - [ ] **HorizontalPodAutoscaler.yaml for automatic worker scaling**
 - [ ] **Create Helm chart for Orchestration Service with worker configurations**
 - [ ] **Create ArgoCD Application manifest for orchestration service**
-- [ ] **Configure Vault secrets for Orchestration Service:**
-  - [ ] **ElastiCache Redis broker connection credentials in Vault**
-  - [ ] **Celery result backend credentials in Vault**
-  - [ ] **Worker authentication tokens in Vault**
+- [ ] **Configure AWS Secrets Manager secrets for Orchestration Service:**
+  - [ ] **ElastiCache Redis broker connection credentials in AWS Secrets Manager**
+  - [ ] **Celery result backend credentials in AWS Secrets Manager**
+  - [ ] **Worker authentication tokens in AWS Secrets Manager**
 - [ ] Create job priority and scheduling system with cloud worker processes
 - [ ] Set up parallel tool execution with dependency management in cloud
 - [ ] Implement job status tracking and progress updates for CloudWatch monitoring
@@ -140,26 +140,26 @@ Vault Policies:
 - [ ] Set up automatic worker scaling based on queue length
 - [ ] **Configure ArgoCD to manage cloud Celery worker deployments**
 - [ ] **Test ArgoCD scaling and rolling updates for cloud workers**
-- [ ] **Test Vault secret rotation for orchestration service credentials**
+- [ ] **Test AWS Secrets Manager secret rotation for orchestration service credentials**
 
-**Cloud Tool Integration Configuration with Vault:**
+**Cloud Tool Integration Configuration with AWS Secrets Manager:**
 ```yaml
-Tool Integration Vault Secrets:
-  secret/tool-integration/slither-config: "Slither configuration and paths"
-  secret/tool-integration/aderyn-config: "Aderyn Rust CLI configuration"
-  secret/tool-integration/mythx-api-key: "MythX production API credentials"
-  secret/tool-integration/mythx-api-url: "https://api.mythx.io/v1"
-  secret/tool-integration/solidity-metrics-config: "Solidity-Metrics Node.js configuration"
+Tool Integration AWS Secrets Manager Secrets:
+  dev/tool-integration/slither-config: "Slither configuration and paths"
+  dev/tool-integration/aderyn-config: "Aderyn Rust CLI configuration"
+  dev/tool-integration/mythx-api-key: "MythX production API credentials"
+  dev/tool-integration/mythx-api-url: "https://api.mythx.io/v1"
+  dev/tool-integration/solidity-metrics-config: "Solidity-Metrics Node.js configuration"
 
-Orchestration Vault Secrets:
-  secret/orchestration/elasticache-broker: "ElastiCache Redis cluster endpoint"
-  secret/orchestration/celery-backend: "ElastiCache Redis backend configuration"
-  secret/orchestration/worker-auth-token: "Worker authentication token"
-  secret/orchestration/admin-credentials: "Admin interface credentials"
+Orchestration AWS Secrets Manager Secrets:
+  dev/orchestration/elasticache-broker: "ElastiCache Redis cluster endpoint"
+  dev/orchestration/celery-backend: "ElastiCache Redis backend configuration"
+  dev/orchestration/worker-auth-token: "Worker authentication token"
+  dev/orchestration/admin-credentials: "Admin interface credentials"
 
-Vault Policies:
-  tool-integration-policy: "Read access to secret/tool-integration/*"
-  orchestration-policy: "Read access to secret/orchestration/*"
+IAM Policies:
+  tool-integration-policy: "Access to dev/tool-integration/* secrets"
+  orchestration-policy: "Access to dev/orchestration/* secrets"
 ```
 
 **Deliverables Day 7:**
@@ -171,7 +171,7 @@ Vault Policies:
 - [ ] **Cloud orchestration endpoints protected with proper authentication**
 - [ ] **Tool integration and orchestration services managed via cloud ArgoCD**
 - [ ] **ArgoCD showing healthy deployment status for all cloud tool services**
-- [ ] **All tool credentials and sensitive configuration managed by Vault**
+- [ ] **All tool credentials and sensitive configuration managed by AWS Secrets Manager**
 - [ ] **External Secrets Operator successfully injecting tool secrets**
 
 ---
@@ -182,19 +182,19 @@ Vault Policies:
 - [ ] **Implement rule-based deduplication algorithms for cloud testing**
 - [ ] **Create risk scoring engine with severity weights for cloud development**
 - [ ] **Create Kubernetes IaC for Intelligence Engine Service:**
-  - [ ] **Deployment.yaml with ML dependencies, processing configuration, and Vault secrets**
+  - [ ] **Deployment.yaml with ML dependencies, processing configuration, and AWS secrets**
   - [ ] **Service.yaml for intelligence service communication**
   - [ ] **ConfigMap.yaml for scoring algorithms and rule configurations (non-sensitive)**
-  - [ ] **External Secret.yaml for ML service credentials from Vault**
-  - [ ] **Vault Policy.yaml for intelligence engine permissions**
-  - [ ] **Service Account.yaml for Vault authentication and AWS IAM**
+  - [ ] **External Secret.yaml for ML service credentials from AWS Secrets Manager**
+  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
+  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
   - [ ] **PersistentVolumeClaim.yaml for EBS storage for ML model storage**
 - [ ] **Create Helm chart for Intelligence Engine Service with algorithm configurations**
 - [ ] **Create ArgoCD Application manifest for intelligence engine service**
-- [ ] **Configure Vault secrets for Intelligence Engine:**
-  - [ ] **ML service API keys in Vault**
-  - [ ] **Algorithm configuration secrets in Vault**
-  - [ ] **Model encryption keys in Vault**
+- [ ] **Configure AWS Secrets Manager secrets for Intelligence Engine:**
+  - [ ] **ML service API keys in AWS Secrets Manager**
+  - [ ] **Algorithm configuration secrets in AWS Secrets Manager**
+  - [ ] **Model encryption keys in AWS Secrets Manager**
 - [ ] Set up cross-tool correlation and validation with cloud data
 - [ ] Implement false positive detection using pattern matching in cloud
 - [ ] Create finding status management (open/acknowledged/fixed) with cloud storage
@@ -202,24 +202,24 @@ Vault Policies:
 - [ ] Configure intelligent severity adjustment based on cloud context
 - [ ] **Configure ArgoCD health checks for cloud intelligence engine**
 - [ ] **Test ArgoCD deployment and sync for cloud intelligence service**
-- [ ] **Validate Vault secret injection for intelligence engine credentials**
+- [ ] **Validate AWS Secrets Manager secret injection for intelligence engine credentials**
 
 ### **Afternoon: Frontend Foundation + Cloud ArgoCD Deployment (3-4 hours)**
 - [ ] **Create React application with TypeScript and Vite for cloud development**
 - [ ] **Create Kubernetes IaC for Frontend Application:**
-  - [ ] **Deployment.yaml with nginx serving React build and Vault integration**
+  - [ ] **Deployment.yaml with nginx serving React build and AWS Secrets Manager integration**
   - [ ] **Service.yaml for frontend service access**
   - [ ] **ConfigMap.yaml for nginx configuration and API endpoints (non-sensitive)**
-  - [ ] **External Secret.yaml for frontend secrets from Vault (API keys, OAuth)**
-  - [ ] **Vault Policy.yaml for frontend service permissions**
-  - [ ] **Service Account.yaml for Vault authentication and AWS IAM**
+  - [ ] **External Secret.yaml for frontend secrets from AWS Secrets Manager (API keys, OAuth)**
+  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
+  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
   - [ ] **Ingress.yaml for ALB frontend routing with Let's Encrypt SSL**
 - [ ] **Create Helm chart for Frontend with environment-specific API URLs**
 - [ ] **Create ArgoCD Application manifest for frontend deployment**
-- [ ] **Configure Vault secrets for Frontend:**
-  - [ ] **OAuth client credentials in Vault**
-  - [ ] **API endpoint configurations in Vault**
-  - [ ] **Feature flags and configuration in Vault**
+- [ ] **Configure AWS Secrets Manager secrets for Frontend:**
+  - [ ] **OAuth client credentials in AWS Secrets Manager**
+  - [ ] **API endpoint configurations in AWS Secrets Manager**
+  - [ ] **Feature flags and configuration in AWS Secrets Manager**
 - [ ] Set up authentication flow with JWT token management for cloud APIs
 - [ ] Implement TanStack Query for cloud API data fetching and caching
 - [ ] Create basic dashboard layout and navigation for cloud testing
@@ -228,26 +228,26 @@ Vault Policies:
 - [ ] Implement dark/light theme with system preference for cloud development
 - [ ] **Configure ArgoCD sync policies for cloud frontend updates**
 - [ ] **Test ArgoCD progressive delivery for cloud frontend changes**
-- [ ] **Validate frontend secret injection from Vault**
+- [ ] **Validate frontend secret injection from AWS Secrets Manager**
 
-**Cloud Frontend Configuration with Vault:**
+**Cloud Frontend Configuration with AWS Secrets Manager:**
 ```yaml
-Intelligence Engine Vault Secrets:
-  secret/intelligence-engine/ml-api-keys: "Machine learning service API keys"
-  secret/intelligence-engine/algorithm-weights: "Risk scoring algorithm weights"
-  secret/intelligence-engine/model-encryption-key: "Encryption key for ML models"
-  secret/intelligence-engine/deduplication-threshold: "Configurable deduplication threshold"
+Intelligence Engine AWS Secrets Manager Secrets:
+  dev/intelligence-engine/ml-api-keys: "Machine learning service API keys"
+  dev/intelligence-engine/algorithm-weights: "Risk scoring algorithm weights"
+  dev/intelligence-engine/model-encryption-key: "Encryption key for ML models"
+  dev/intelligence-engine/deduplication-threshold: "Configurable deduplication threshold"
 
-Frontend Vault Secrets:
-  secret/frontend/oauth-client-id: "OAuth client ID for authentication"
-  secret/frontend/api-base-url: "https://api.dev.solidity-platform.com"
-  secret/frontend/websocket-url: "wss://api.dev.solidity-platform.com/ws"
-  secret/frontend/feature-flags: "Dynamic feature flag configuration"
-  secret/frontend/analytics-key: "Analytics service API key"
+Frontend AWS Secrets Manager Secrets:
+  dev/frontend/oauth-client-id: "OAuth client ID for authentication"
+  dev/frontend/api-base-url: "https://api.dev.solidity-platform.com"
+  dev/frontend/websocket-url: "wss://api.dev.solidity-platform.com/ws"
+  dev/frontend/feature-flags: "Dynamic feature flag configuration"
+  dev/frontend/analytics-key: "Analytics service API key"
 
-Vault Policies:
-  intelligence-engine-policy: "Read access to secret/intelligence-engine/*"
-  frontend-policy: "Read access to secret/frontend/*"
+IAM Policies:
+  intelligence-engine-policy: "Access to dev/intelligence-engine/* secrets"
+  frontend-policy: "Access to dev/frontend/* secrets"
 ```
 
 **Deliverables Day 8:**
@@ -259,7 +259,7 @@ Vault Policies:
 - [ ] **Cloud security headers configured for frontend protection via ALB**
 - [ ] **Intelligence engine and frontend services deployed via cloud ArgoCD**
 - [ ] **ArgoCD managing cloud frontend deployment lifecycle**
-- [ ] **All frontend and intelligence engine secrets managed by Vault**
+- [ ] **All frontend and intelligence engine secrets managed by AWS Secrets Manager**
 - [ ] **External Secrets Operator injecting secrets into frontend and intelligence services**
 
 ---
@@ -278,23 +278,23 @@ Vault Policies:
 - [ ] **Test ArgoCD automatic sync for cloud frontend feature updates**
 - [ ] **Configure ArgoCD blue-green deployment for cloud frontend**
 - [ ] **Validate ArgoCD rollback for cloud frontend UI changes**
-- [ ] **Test dynamic configuration updates from Vault for frontend features**
+- [ ] **Test dynamic configuration updates from AWS Secrets Manager for frontend features**
 
 ### **Afternoon: Notification Service + Cloud ArgoCD Application (3-4 hours)**
 - [ ] **Implement WebSocket server for real-time notifications in cloud environment**
 - [ ] **Create Kubernetes IaC for Notification Service:**
-  - [ ] **Deployment.yaml with WebSocket and email service configuration plus Vault integration**
+  - [ ] **Deployment.yaml with WebSocket and email service configuration plus AWS Secrets Manager integration**
   - [ ] **Service.yaml for notification service communication**
   - [ ] **ConfigMap.yaml for email templates and notification settings (non-sensitive)**
-  - [ ] **External Secret.yaml for SMTP and webhook credentials from Vault**
-  - [ ] **Vault Policy.yaml for notification service permissions**
-  - [ ] **Service Account.yaml for Vault authentication and AWS IAM**
+  - [ ] **External Secret.yaml for SMTP and webhook credentials from AWS Secrets Manager**
+  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
+  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
 - [ ] **Create Helm chart for Notification Service with cloud SMTP configurations**
 - [ ] **Create ArgoCD Application manifest for notification service**
-- [ ] **Configure Vault secrets for Notification Service:**
-  - [ ] **AWS SES SMTP server credentials in Vault**
-  - [ ] **Slack webhook URLs in Vault**
-  - [ ] **Third-party notification service API keys in Vault**
+- [ ] **Configure AWS Secrets Manager secrets for Notification Service:**
+  - [ ] **AWS SES SMTP server credentials in AWS Secrets Manager**
+  - [ ] **Slack webhook URLs in AWS Secrets Manager**
+  - [ ] **Third-party notification service API keys in AWS Secrets Manager**
 - [ ] Set up connection pooling and room management for cloud development
 - [ ] Create email notification system with AWS SES
 - [ ] Implement Slack integration for team notifications (production webhook URL)
@@ -303,26 +303,26 @@ Vault Policies:
 - [ ] Implement rate limiting for notifications in cloud development
 - [ ] **Configure ArgoCD to manage cloud notification service deployments**
 - [ ] **Test ArgoCD health checks for cloud WebSocket connections**
-- [ ] **Test Vault secret rotation for notification service credentials**
+- [ ] **Test AWS Secrets Manager secret rotation for notification service credentials**
 
-**Cloud Notification Configuration with Vault:**
+**Cloud Notification Configuration with AWS Secrets Manager:**
 ```yaml
-Notification Service Vault Secrets:
-  secret/notification/websocket-url: "wss://notifications.dev.solidity-platform.com"
-  secret/notification/ses-smtp-server: "AWS SES SMTP endpoint"
-  secret/notification/ses-username: "AWS SES SMTP username"
-  secret/notification/ses-password: "AWS SES SMTP password"
-  secret/notification/slack-webhook: "https://hooks.slack.com/services/PROD/WEBHOOK/URL"
-  secret/notification/email-from: "noreply@solidity-platform.com"
-  secret/notification/base-url: "https://app.dev.solidity-platform.com"
+Notification Service AWS Secrets Manager Secrets:
+  dev/notification/websocket-url: "wss://notifications.dev.solidity-platform.com"
+  dev/notification/ses-smtp-server: "AWS SES SMTP endpoint"
+  dev/notification/ses-username: "AWS SES SMTP username"
+  dev/notification/ses-password: "AWS SES SMTP password"
+  dev/notification/slack-webhook: "https://hooks.slack.com/services/PROD/WEBHOOK/URL"
+  dev/notification/email-from: "noreply@solidity-platform.com"
+  dev/notification/base-url: "https://app.dev.solidity-platform.com"
 
-Email Template Vault Secrets:
-  secret/notification/templates/critical-finding: "Critical vulnerability email template"
-  secret/notification/templates/analysis-complete: "Analysis completion email template"
-  secret/notification/templates/weekly-report: "Weekly security report template"
+Email Template AWS Secrets Manager Secrets:
+  dev/notification/templates/critical-finding: "Critical vulnerability email template"
+  dev/notification/templates/analysis-complete: "Analysis completion email template"
+  dev/notification/templates/weekly-report: "Weekly security report template"
 
-Vault Policies:
-  notification-policy: "Read access to secret/notification/*"
+IAM Policies:
+  notification-policy: "Access to dev/notification/* secrets"
 ```
 
 **Deliverables Day 9:**
@@ -334,7 +334,7 @@ Vault Policies:
 - [ ] **All services accessible via cloud SSL-secured ALB ingress**
 - [ ] **Cloud WebSocket connections working through ALB proxy**
 - [ ] **All services deployed and managed via cloud ArgoCD**
-- [ ] **All notification credentials and templates managed by Vault**
+- [ ] **All notification credentials and templates managed by AWS Secrets Manager**
 - [ ] **External Secrets Operator successfully injecting notification secrets**
 
 ---
@@ -354,9 +354,8 @@ Vault Policies:
 - [ ] **Test complete cloud GitOps workflow via ArgoCD for all services**
 - [ ] **Validate ArgoCD sync, rollback, and disaster recovery procedures in cloud**
 - [ ] **Test ArgoCD multi-application deployment capabilities in cloud**
-- [ ] **Test Vault secret injection across entire cloud application stack**
-- [ ] **Validate Vault secret rotation without service disruption**
-- [ ] **Test Vault PKI engine certificate lifecycle management**
+- [ ] **Test AWS Secrets Manager secret injection across entire cloud application stack**
+- [ ] **Validate AWS Secrets Manager secret rotation without service disruption**
 - [ ] **Validate External Secrets Operator failure scenarios and recovery**
 
 ### **Afternoon: Performance Testing & Final Validation + Cloud Operations (3-4 hours)**
@@ -370,43 +369,43 @@ Vault Policies:
 - [ ] **Test ArgoCD performance under multiple concurrent cloud deployments**
 - [ ] **Validate ArgoCD backup and restore procedures**
 - [ ] **Test ArgoCD RBAC and multi-user access scenarios in cloud**
-- [ ] **Test Vault performance under high secret retrieval load**
-- [ ] **Validate Vault backup and disaster recovery procedures**
-- [ ] **Test Vault cluster health and monitoring**
+- [ ] **Test AWS Secrets Manager performance under high secret retrieval load**
+- [ ] **Validate AWS Secrets Manager backup and disaster recovery procedures**
+- [ ] **Test AWS Secrets Manager cross-region replication**
 - [ ] Complete Sprint 1 acceptance criteria validation
 - [ ] **Document any known issues and technical debt for cloud environment**
 - [ ] **Prepare production scaling checklist for future sprints**
 
-**Cloud Performance Testing with Vault:**
+**Cloud Performance Testing with AWS Secrets Manager:**
 ```yaml
 Load Testing Targets:
   - API endpoints: 100 concurrent requests
   - RDS database: 50 concurrent connections
   - WebSocket: 25 concurrent connections
   - Analysis workflow: 5 concurrent contract analyses
-  - Vault secret retrieval: 200 concurrent requests
+  - AWS Secrets Manager secret retrieval: 200 concurrent requests
 
 Expected Cloud Performance:
   - API response times: <200ms P95 (cloud network)
   - RDS queries: <50ms for indexed operations with RDS Proxy
   - WebSocket latency: <100ms
   - Analysis completion: <5 minutes for medium contracts
-  - Vault secret retrieval: <100ms P95
+  - AWS Secrets Manager secret retrieval: <100ms P95
   - Secret rotation: <30 seconds without service disruption
 ```
 
-**Vault Operational Testing:**
+**AWS Secrets Manager Operational Testing:**
 ```yaml
-Vault Testing Scenarios:
+AWS Secrets Manager Testing Scenarios:
   - Secret injection across all cloud services
-  - Dynamic secret rotation for RDS credentials
-  - PKI certificate lifecycle (issue, renew, revoke)
+  - Automatic secret rotation for RDS credentials
+  - Cross-service secret access with IAM policies
   - Policy changes and access control validation
-  - Backup and restore procedures with AWS S3
-  - High availability simulation with AWS KMS
+  - Backup and restore procedures with cross-region replication
+  - High availability simulation with AWS multi-AZ
   - Performance under load with CloudWatch monitoring
   - Integration with External Secrets Operator
-  - ArgoCD Vault Plugin functionality
+  - ArgoCD AWS Secrets Manager Plugin functionality
 ```
 
 **Deliverables Day 10:**
@@ -416,7 +415,7 @@ Vault Testing Scenarios:
 - [ ] **Let's Encrypt SSL infrastructure tested and operational**
 - [ ] **ArgoCD cloud operations validated and documented**
 - [ ] **Cloud GitOps workflow proven reliable for all services**
-- [ ] **Vault secret management operational and tested end-to-end**
+- [ ] **AWS Secrets Manager secret management operational and tested end-to-end**
 - [ ] **External Secrets Operator integration validated and documented**
 - [ ] **Production scaling strategy documented and ready for implementation**
 - [ ] Technical debt and optimization opportunities documented
@@ -433,7 +432,7 @@ Vault Testing Scenarios:
 - [ ] **cert-manager managing Let's Encrypt certificates automatically**
 - [ ] **All backend services deployed via cloud ArgoCD GitOps**
 - [ ] **ArgoCD managing service dependencies and deployment order in cloud**
-- [ ] **Vault managing all sensitive configuration and credentials**
+- [ ] **AWS Secrets Manager managing all sensitive configuration and credentials**
 - [ ] **External Secrets Operator injecting secrets into all services**
 
 ### **Day 8-9: Frontend-Backend Integration + Cloud ArgoCD Deployment**
@@ -445,18 +444,18 @@ Vault Testing Scenarios:
 - [ ] **Cloud security headers protecting frontend communications via ALB**
 - [ ] **Frontend-backend integration deployed via cloud ArgoCD**
 - [ ] **ArgoCD managing cloud frontend deployment with zero downtime**
-- [ ] **All frontend secrets managed through Vault**
-- [ ] **Dynamic configuration updates from Vault without frontend restart**
+- [ ] **All frontend secrets managed through AWS Secrets Manager**
+- [ ] **Dynamic configuration updates from AWS Secrets Manager without frontend restart**
 
 ### **Day 10: Full Stack Integration + Cloud ArgoCD Operations**
 - [ ] **Complete user workflow from upload to results via cloud SSL**
 - [ ] All services monitored and alerting properly in CloudWatch
 - [ ] **Cloud CI/CD pipeline building and deploying successfully to EKS**
 - [ ] **Let's Encrypt certificates rotating automatically**
-- [ ] **Documentation updated with current cloud state including SSL and Vault setup**
+- [ ] **Documentation updated with current cloud state including SSL and AWS Secrets Manager setup**
 - [ ] **Complete cloud GitOps workflow operational via ArgoCD**
 - [ ] **ArgoCD managing entire cloud application lifecycle**
-- [ ] **Vault secret management integrated across entire stack**
+- [ ] **AWS Secrets Manager secret management integrated across entire stack**
 - [ ] **External Secrets Operator operational for all services**
 
 ## Sprint 1 Final Acceptance Criteria
@@ -470,8 +469,8 @@ Vault Testing Scenarios:
 - [ ] **Notifications sent via AWS SES email and Slack for critical findings**
 - [ ] **All communication encrypted with automatically managed Let's Encrypt certificates**
 - [ ] **Complete workflow managed via cloud ArgoCD GitOps deployment**
-- [ ] **All sensitive data and credentials managed through HashiCorp Vault**
-- [ ] **External Secrets Operator automatically injecting secrets from Vault**
+- [ ] **All sensitive data and credentials managed through AWS Secrets Manager**
+- [ ] **External Secrets Operator automatically injecting secrets from AWS Secrets Manager**
 
 ### **Cloud Infrastructure Validation:**
 - [ ] **All services deployed and running in AWS EKS development cluster**
@@ -483,8 +482,8 @@ Vault Testing Scenarios:
 - [ ] **cert-manager automatically provisioning and renewing Let's Encrypt certificates**
 - [ ] **Let's Encrypt SSL termination working for all services**
 - [ ] **ArgoCD successfully deploys and manages cloud application lifecycle via GitOps**
-- [ ] **HashiCorp Vault operational and managing all application secrets with AWS KMS**
-- [ ] **External Secrets Operator successfully injecting secrets from Vault**
+- [ ] **AWS Secrets Manager operational and managing all application secrets**
+- [ ] **External Secrets Operator successfully injecting secrets from AWS Secrets Manager**
 
 ### **Cloud GitOps & ArgoCD Validation:**
 - [ ] **ArgoCD Applications deployed for all cloud microservices and infrastructure**
@@ -495,19 +494,18 @@ Vault Testing Scenarios:
 - [ ] **ArgoCD health checks validate cloud application deployment status**
 - [ ] **GitHub Actions integrated with ArgoCD for cloud automated GitOps**
 - [ ] **ArgoCD cloud disaster recovery procedures tested and validated**
-- [ ] **ArgoCD Vault Plugin working for secret management in GitOps workflows**
+- [ ] **ArgoCD AWS Secrets Manager Plugin working for secret management in GitOps workflows**
 
-### **Vault & Secret Management Validation:**
-- [ ] **Vault cluster deployed and operational with AWS KMS auto-unseal**
-- [ ] **Vault PKI engine configured for certificate management**
-- [ ] **Vault KV engines storing all application secrets securely**
+### **AWS Secrets Manager & Secret Management Validation:**
+- [ ] **AWS Secrets Manager configured and operational for application secrets**
+- [ ] **AWS Secrets Manager automatic rotation working for database credentials**
 - [ ] **External Secrets Operator injecting secrets into all microservices**
-- [ ] **Vault policies configured for each microservice with least privilege access**
+- [ ] **IAM policies configured for each microservice with least privilege access**
 - [ ] **Secret rotation tested and functional for all services without disruption**
-- [ ] **ArgoCD Vault integration working for GitOps secret management**
-- [ ] **CI/CD pipelines using Vault for secure secret management**
-- [ ] **Vault performance meeting targets (<100ms P95 for secret retrieval)**
-- [ ] **Vault backup and disaster recovery procedures tested**
+- [ ] **ArgoCD AWS Secrets Manager integration working for GitOps secret management**
+- [ ] **CI/CD pipelines using AWS Secrets Manager for secure secret management**
+- [ ] **AWS Secrets Manager performance meeting targets (<100ms P95 for secret retrieval)**
+- [ ] **AWS Secrets Manager backup and disaster recovery procedures tested**
 
 ### **Quality & Security:**
 - [ ] **Automated tests passing for all services (>90% coverage) in cloud environment**
@@ -518,7 +516,7 @@ Vault Testing Scenarios:
 - [ ] **Let's Encrypt certificates valid and automatically renewed**
 - [ ] **Security headers properly configured via ALB ingress**
 - [ ] **ArgoCD cloud security configurations validated and hardened**
-- [ ] **Vault security policies enforced and audited**
+- [ ] **AWS Secrets Manager security policies enforced and audited**
 - [ ] **Secret access logged and monitored for security compliance**
 
 ### **Operational Readiness:**
@@ -530,7 +528,7 @@ Vault Testing Scenarios:
 - [ ] **Let's Encrypt certificate management automated and documented**
 - [ ] **ALB ingress configuration properly managed in IaC**
 - [ ] **ArgoCD cloud operational runbooks and troubleshooting documentation complete**
-- [ ] **Vault operational procedures documented and validated**
+- [ ] **AWS Secrets Manager operational procedures documented and validated**
 - [ ] **External Secrets Operator troubleshooting guide complete**
 
 ### **Business Validation:**
@@ -548,10 +546,10 @@ Vault Testing Scenarios:
 ### **Development Workflow Validation:**
 - [ ] **Cloud development supports rapid iteration and testing cycles**
 - [ ] **Cloud debugging procedures documented and tested**
-- [ ] **Cloud costs managed within development budget ($300-400/month)**
+- [ ] **Cloud costs managed within development budget ($250-350/month)**
 - [ ] **Cloud GitOps workflow prepares team for production scaling**
 - [ ] **Team productivity optimized with cloud development environment**
-- [ ] **Vault secret management prepares team for enterprise secret workflows**
+- [ ] **AWS Secrets Manager secret management prepares team for enterprise secret workflows**
 
 ## Technical Debt & Known Issues Documentation
 
@@ -565,8 +563,8 @@ Vault Testing Scenarios:
 - [ ] **Document cert-manager edge cases and troubleshooting**
 - [ ] **Document ArgoCD cloud optimization opportunities**
 - [ ] **Review cloud GitOps workflow for potential improvements**
-- [ ] **Document Vault performance tuning opportunities**
-- [ ] **Review Vault policy optimization and least privilege improvements**
+- [ ] **Document AWS Secrets Manager performance tuning opportunities**
+- [ ] **Review AWS Secrets Manager IAM policy optimization and least privilege improvements**
 - [ ] **Document External Secrets Operator edge cases and failure scenarios**
 - [ ] **Prepare production scaling requirements and dependencies**
 
@@ -580,9 +578,9 @@ Vault Testing Scenarios:
 - [ ] **Advanced ALB and CloudFront optimization**
 - [ ] **ArgoCD ApplicationSets for advanced deployment patterns**
 - [ ] **Multi-region ArgoCD deployment strategies**
-- [ ] **Vault Enterprise features for advanced secret management**
-- [ ] **Advanced Vault secret engines (database dynamic secrets, PKI automation)**
-- [ ] **Vault performance replication for global deployments**
+- [ ] **AWS Secrets Manager cross-region replication for global deployments**
+- [ ] **Advanced AWS Secrets Manager secret engines (database dynamic secrets)**
+- [ ] **AWS Systems Manager Parameter Store integration as alternative**
 
 ### **Production Scaling Preparation:**
 - [ ] **Multi-environment EKS cluster provisioning documented**
@@ -595,10 +593,10 @@ Vault Testing Scenarios:
 - [ ] **AWS IAM and security configurations for production prepared**
 - [ ] **CloudWatch monitoring production integration documented**
 - [ ] **ArgoCD production deployment configurations ready**
-- [ ] **Vault production deployment with HA and performance replication documented**
+- [ ] **AWS Secrets Manager production deployment with HA and cross-region replication documented**
 - [ ] **External Secrets Operator production configuration prepared**
-- [ ] **Vault Enterprise cluster mode deployment for production HA**
-- [ ] **AWS Secrets Manager integration as Vault alternative documented**
+- [ ] **AWS Secrets Manager enterprise features deployment for production HA**
+- [ ] **Multi-region AWS Secrets Manager integration documented**
 
 ## Cloud Development Environment Summary
 
@@ -609,20 +607,20 @@ Cloud Development Costs (Week 1-2):
   RDS PostgreSQL (Multi-AZ): ~$50/month
   ElastiCache Redis: ~$30/month
   Route53 + Domain: ~$20/month
-  Vault Cluster: ~$50/month
+  AWS Secrets Manager: ~$10/month
   ALB + Data Transfer: ~$30/month
   CloudWatch + Monitoring: ~$20/month
-  Total Development Costs: ~$400/month
+  Total Development Costs: ~$360/month
 
 Production Scaling Costs (Sprint 7+):
   AWS EKS Production: ~$500/month
   AWS EKS Staging: ~$300/month
   RDS PostgreSQL + Replicas: ~$200/month
   ElastiCache + Clustering: ~$100/month
-  Vault Enterprise: ~$200/month (optional)
+  AWS Secrets Manager + Cross-Region: ~$50/month
   AWS KMS + Other Services: ~$100/month
   CloudFront CDN: ~$50/month
-  Total Production Costs: ~$1,450/month (scales with usage)
+  Total Production Costs: ~$1,300/month (scales with usage)
 ```
 
 ### **Development Velocity Benefits:**
@@ -645,13 +643,13 @@ GitOps Learning Benefits:
   - Deployment automation proven with actual AWS services
   - Rollback and disaster recovery procedures tested in cloud
   - Multi-application management patterns established
-  - Secret management via GitOps workflows proven with Vault
+  - Secret management via GitOps workflows proven with AWS Secrets Manager
 
-Vault Learning Benefits:
+AWS Secrets Manager Learning Benefits:
   - Enterprise secret management patterns established in cloud
-  - Policy-based access control tested with AWS IAM integration
+  - IAM-based access control tested with AWS services integration
   - Secret rotation procedures proven with cloud services
-  - AWS KMS integration patterns established
+  - AWS native integration patterns established
   - Production scaling preparation for enterprise secret management
 ```
 
@@ -669,7 +667,7 @@ New Team Member Setup:
     2. Configure AWS credentials (10 minutes)
     3. Run cloud setup scripts (20 minutes)
     4. Wait for ArgoCD deployment (15 minutes)
-    5. Vault initialization (automated in scripts)
+    5. AWS Secrets Manager initialization (automated in scripts)
     6. Access cloud applications (10 minutes)
   
   Cloud Benefits:
@@ -691,7 +689,7 @@ Cloud Testing Coverage:
   - Security scanning integrated with ECR
   - Performance benchmarks established with cloud services
   - Team collaboration workflows tested
-  - Vault secret management end-to-end tested in cloud
+  - AWS Secrets Manager secret management end-to-end tested in cloud
   - External Secrets Operator integration validated
 
 Production Readiness:
@@ -701,28 +699,28 @@ Production Readiness:
   - Performance baselines established with cloud services
   - Security configurations validated with AWS services
   - Enterprise secret management patterns proven in cloud
-  - Vault production deployment configurations ready
+  - AWS Secrets Manager production deployment configurations ready
 ```
 
 ### **Security Benefits:**
 ```yaml
 Enterprise Security from Day One:
-  - All secrets centrally managed in cloud Vault
+  - All secrets centrally managed in cloud AWS Secrets Manager
   - AWS IAM integration for enhanced access control
   - Policy-based access control enforced in cloud
   - Secret rotation procedures automated with cloud services
-  - Audit trails for all secret access in CloudWatch
+  - Audit trails for all secret access in CloudTrail
   - Encryption at rest and in transit with AWS services
   - Certificate lifecycle management automated with Let's Encrypt
   - GitOps secret injection without exposure tested in cloud
   - Team trained on enterprise secret management with cloud integration
 
 Production Security Preparation:
-  - Vault production deployment patterns ready
+  - AWS Secrets Manager production deployment patterns ready
   - AWS KMS integration operational
   - IAM integration documented and tested
   - Multi-region secret replication planned
   - Enterprise compliance frameworks ready for cloud deployment
 ```
 
-This completes Sprint 1 with a fully functional MVP platform running entirely in cloud development environment, featuring enterprise-grade secret management with HashiCorp Vault, ready for team collaboration and rapid feature development in Sprint 2, with seamless production scaling capability planned for future sprints. The cloud-first approach provides immediate team collaboration, eliminates local resource constraints, and ensures production readiness from day one.
+This completes Sprint 1 with a fully functional MVP platform running entirely in cloud development environment, featuring enterprise-grade secret management with AWS Secrets Manager, ready for team collaboration and rapid feature development in Sprint 2, with seamless production scaling capability planned for future sprints. The cloud-first approach provides immediate team collaboration, eliminates local resource constraints, and ensures production readiness from day one.

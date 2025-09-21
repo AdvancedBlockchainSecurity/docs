@@ -8,8 +8,8 @@
 - **Service Mesh**: Istio for service-to-service communication, load balancing, circuit breaking
 - **Ingress Controller**: AWS Application Load Balancer (ALB) with SSL termination and traffic routing
 - **Certificate Management**: cert-manager with Let's Encrypt for automated SSL certificate provisioning
-- **Secret Management**: HashiCorp Vault for centralized secret storage, rotation, and policy enforcement
-- **Secret Injection**: External Secrets Operator for Kubernetes-native secret injection from Vault
+- **Secret Management**: AWS Secrets Manager for centralized secret storage, rotation, and policy enforcement
+- **Secret Injection**: External Secrets Operator for Kubernetes-native secret injection from AWS Secrets Manager
 - **Event Bus**: Apache Kafka for async messaging between services
 - **Container Orchestration**: AWS EKS with Helm charts for deployment
 - **Observability**: Prometheus metrics, Jaeger tracing, structured logging with Fluentd
@@ -25,19 +25,19 @@
 - **Load Balancing**: AWS Application Load Balancer with SSL termination
 - **Container Registry**: Amazon ECR with vulnerability scanning
 - **ArgoCD**: Cloud deployment managing development applications
-- **Secret Management**: HashiCorp Vault cluster with AWS KMS auto-unseal
+- **Secret Management**: AWS Secrets Manager with automatic rotation and cross-region replication
 - **Secret Injection**: External Secrets Operator with AWS IAM integration
-- **Cost**: $200-300/month for development environment
+- **Cost**: $250-350/month for development environment
 
 #### Phase 2: Production Scaling (Month 4+)
-**Infrastructure**: Multi-environment AWS deployment with enterprise Vault
+**Infrastructure**: Multi-environment AWS deployment with enterprise AWS Secrets Manager
 - **Multi-Environment**: Separate EKS clusters for dev/staging/production
 - **Database**: RDS PostgreSQL with read replicas and automated backups
 - **Caching**: ElastiCache Redis with clustering and failover
 - **Global Distribution**: CloudFront CDN and multi-region deployment
 - **Monitoring**: CloudWatch integration with Prometheus and Grafana
-- **Secret Management**: HashiCorp Vault Enterprise with HA cluster
-- **Disaster Recovery**: Cross-region Vault replication and backup
+- **Secret Management**: AWS Secrets Manager with cross-region replication and enterprise features
+- **Disaster Recovery**: Multi-region AWS Secrets Manager replication and backup
 - **Cost**: $500-2500/month based on usage and scale
 
 ### Domain and DNS Setup
@@ -65,7 +65,6 @@ A Records (managed by AWS ALB):
   
 Subdomains:
   api.dev.solidity-platform.com → API Gateway
-  vault.dev.solidity-platform.com → Vault UI
   argocd.dev.solidity-platform.com → ArgoCD Dashboard
   grafana.dev.solidity-platform.com → Monitoring
 ```
@@ -73,17 +72,18 @@ Subdomains:
 ### Core Services Architecture
 
 #### Secret Management Architecture
-**HashiCorp Vault Integration Strategy**:
-- **Development**: Vault cluster with AWS KMS auto-unseal and Consul storage
-- **Production**: Vault Enterprise cluster with HA, performance replication, and DR
-- **Secret Engines**: KV v2 for application secrets, PKI for certificate management, Database for dynamic credentials
-- **Authentication**: AWS IAM, Kubernetes service accounts, LDAP/SAML for users
+**AWS Secrets Manager Integration Strategy**:
+- **Development**: AWS Secrets Manager with automatic rotation and CloudTrail logging
+- **Production**: AWS Secrets Manager with cross-region replication and enterprise features
+- **Secret Categories**: Application secrets, database credentials, API keys, certificates
+- **Authentication**: AWS IAM roles, IRSA (IAM Roles for Service Accounts), cross-account access
 - **Secret Injection**: External Secrets Operator with IAM-based access control
 
-**Vault Secret Organization**:
+**AWS Secrets Manager Secret Organization**:
 ```yaml
 Secret Paths Structure:
-  secret/
+  Environment-based organization:
+  dev/
   ├── api-service/
   │   ├── jwt-secrets
   │   ├── oauth-credentials
@@ -109,23 +109,19 @@ Secret Paths Structure:
       ├── webhook-urls
       └── template-configs
 
-PKI Engine:
-  pki/
-  ├── root-ca/
-  ├── intermediate-ca/
-  └── certificates/
+staging/ and prod/ environments follow same structure
 
-Database Engine:
-  database/
-  ├── postgresql-dynamic/
-  └── redis-dynamic/
+Cross-Region Replication:
+  Primary Region: us-east-1
+  DR Region: us-west-2
+  Automatic failover and sync
 ```
 
 #### 1. Tool Integration Service
 **Purpose**: Unified interface for all security analysis tools with secure credential management
 **Technology Stack**: Python 3.11, FastAPI, Celery, Redis, Rust runtime for Aderyn
 **Design Pattern**: Adapter pattern with plugin architecture
-**Secret Management**: Vault KV engine for API keys, External Secrets Operator for injection
+**Secret Management**: AWS Secrets Manager for API keys, External Secrets Operator for injection
 
 **Technical Requirements**:
 - **Plugin System**: Dynamic loading of tool adapters via Python importlib
@@ -134,7 +130,7 @@ Database Engine:
 - **Retry Logic**: Exponential backoff with jitter for failed API calls
 - **Timeout Handling**: Configurable timeouts per tool type
 - **Result Caching**: Redis-based caching for identical contract analyses
-- **Credential Management**: Vault-stored API keys with automatic rotation
+- **Credential Management**: AWS Secrets Manager-stored API keys with automatic rotation
 
 **Tool Integration Specifications**:
 
@@ -143,7 +139,7 @@ Database Engine:
 - Custom detector plugin support
 - Parallel analysis for multiple contracts
 - Memory optimization for large contract sets
-- Configuration secrets stored in Vault
+- Configuration secrets stored in AWS Secrets Manager
 - Built-in detector configuration and custom rule support
 - JSON output parsing for standardized vulnerability reporting
 - Integration with Foundry and Hardhat project structures
@@ -153,8 +149,8 @@ Database Engine:
 - REST API with async job polling
 - WebSocket support for real-time updates
 - Analysis mode selection (quick/standard/deep)
-- API key rotation and failover via Vault
-- Vault-managed API credentials with automatic rotation
+- API key rotation and failover via AWS Secrets Manager
+- AWS Secrets Manager-managed API credentials with automatic rotation
 - Support for all MythX analysis types (static, dynamic, symbolic)
 - Rate limiting and quota management
 - Result correlation with other tool findings
@@ -167,7 +163,7 @@ Database Engine:
 - Performance optimization for large codebases
 - Foundry project structure detection
 - Custom detector configuration support
-- Configuration stored in Vault KV engine
+- Configuration stored in AWS Secrets Manager
 - Support for custom Rust-based detectors
 - Integration with Solidity compilation artifacts
 - Advanced pattern matching for smart contract vulnerabilities
@@ -179,7 +175,7 @@ Database Engine:
 - AST-based analysis for maintainability scores
 - Support for multiple Solidity compiler versions
 - Integration with vulnerability risk correlation
-- Tool configurations managed via Vault
+- Tool configurations managed via AWS Secrets Manager
 - Cyclomatic complexity calculation
 - Function length and parameter count analysis
 - Contract inheritance depth measurement
@@ -190,7 +186,7 @@ Database Engine:
 - Specification file generation automation
 - Result parsing from JSON output
 - Resource allocation for verification jobs
-- API credentials stored securely in Vault
+- API credentials stored securely in AWS Secrets Manager
 - Formal verification result integration
 - Specification template management
 - Verification report generation
@@ -214,17 +210,17 @@ Database Engine:
 - Severity level harmonization across tools
 - Confidence score normalization (0.0-1.0 scale)
 
-**Vault Integration**:
-- Tool API keys stored in `secret/tool-integration/`
+**AWS Secrets Manager Integration**:
+- Tool API keys stored in environment-specific paths
 - External Secrets Operator injecting credentials as Kubernetes secrets
-- Vault policies for least-privilege access to tool credentials
+- IAM policies for least-privilege access to specific secrets
 - Automatic secret rotation for supported APIs
 
 #### 2. Intelligence Engine Service
 **Purpose**: Cross-tool correlation, deduplication, rule-based analysis with secure configuration management
 **Technology Stack**: Python 3.11, NLP libraries, PostgreSQL, Redis
 **Design Pattern**: Pipeline pattern with pluggable analyzers
-**Secret Management**: Vault KV for algorithm configurations
+**Secret Management**: AWS Secrets Manager for algorithm configurations
 
 **Deduplication Algorithm Specifications**:
 - **Syntactic Matching**: Exact file path + line number matching
@@ -247,17 +243,17 @@ Database Engine:
 - **Remediation Suggestions**: Template-based fix recommendations
 - **Statistical Analysis**: Trend analysis and anomaly detection
 
-**Vault Integration**:
-- Algorithm configurations stored in `secret/intelligence-engine/algorithm-configs`
-- Rule weights and thresholds in `secret/intelligence-engine/rule-weights`
-- Pattern configurations in `secret/intelligence-engine/pattern-configs`
+**AWS Secrets Manager Integration**:
+- Algorithm configurations stored in environment-specific paths
+- Rule weights and thresholds in AWS Secrets Manager
+- Pattern configurations with automatic updates
 - External Secrets Operator for credential injection
 
 #### 3. Analysis Orchestration Service
 **Purpose**: Manage analysis workflows, resource allocation, job scheduling with secure credential management
 **Technology Stack**: Python 3.11, Celery, Redis, PostgreSQL
 **Design Pattern**: Workflow orchestration with DAG execution
-**Secret Management**: Vault for broker credentials and worker authentication
+**Secret Management**: AWS Secrets Manager for broker credentials and worker authentication
 
 **Job Scheduling**:
 - **Priority Queues**: Critical (audit prep), High (CI/CD), Normal (manual), Low (batch)
@@ -271,9 +267,9 @@ Database Engine:
 - **Dependency Management**: Intelligence engine waits for all tools
 - **Checkpoint System**: Resume interrupted analyses from checkpoints
 
-**Vault Integration**:
-- Redis broker credentials stored in `secret/orchestration/celery-broker`
-- Worker authentication tokens in `secret/orchestration/worker-auth`
+**AWS Secrets Manager Integration**:
+- Redis broker credentials stored in AWS Secrets Manager
+- Worker authentication tokens with automatic rotation
 - Queue encryption keys for securing job data
 - External Secrets Operator managing worker credential injection
 
@@ -281,7 +277,7 @@ Database Engine:
 **Purpose**: Centralized data management, caching, search with secure database credential management
 **Technology Stack**: RDS PostgreSQL 15, ElastiCache Redis 7, Elasticsearch 8
 **Design Pattern**: CQRS with event sourcing for audit trails
-**Secret Management**: Vault Database engine for dynamic database credentials
+**Secret Management**: AWS Secrets Manager with automatic rotation for database credentials
 
 **Database Schema Design**:
 - **Partitioning Strategy**: Time-based partitioning for analysis_runs and findings
@@ -301,17 +297,53 @@ Database Engine:
 - **Autocomplete**: Prefix search for file paths, function names
 - **Search Analytics**: Query performance monitoring and optimization
 
-**Vault Integration**:
-- Dynamic database credentials via Vault Database engine
-- Database encryption keys stored in `secret/data-service/encryption`
-- Redis credentials managed through Vault KV engine
+**Table Partitioning**:
+- **Time-Based**: Monthly partitions for analysis_runs and findings
+- **Hash-Based**: Organization-based partitioning for large tables
+- **Automatic Management**: pg_partman for automated partition management
+
+**Index Strategy**:
+- **Primary Indexes**: B-tree indexes on frequently queried columns
+- **Composite Indexes**: Multi-column indexes for complex queries
+- **Partial Indexes**: Conditional indexes for filtered queries
+- **Index Monitoring**: pg_stat_user_indexes for usage tracking
+
+**AWS Secrets Manager Integration**:
+- Automatic database credential rotation via AWS Secrets Manager
+- Database encryption keys stored in AWS Secrets Manager
+- Redis credentials managed through AWS Secrets Manager
 - External Secrets Operator for automatic credential rotation
+
+**AWS Secrets Manager Database Integration**:
+- Automatic PostgreSQL credential rotation with configurable TTL
+- Automatic credential rotation without service interruption
+- IAM-based database access via AWS Secrets Manager
+- Audit logging for all database credential usage
+
+### Data Architecture
+
+#### Database Design
+**Primary Database**: RDS PostgreSQL 15 with Multi-AZ deployment
+**Schema Strategy**: Multi-tenant with row-level security
+**Backup Strategy**: Automated RDS backups with point-in-time recovery
+**Secret Management**: AWS Secrets Manager with automatic rotation for database credentials
+
+**Table Partitioning**:
+- **Time-Based**: Monthly partitions for analysis_runs and findings
+- **Hash-Based**: Organization-based partitioning for large tables
+- **Automatic Management**: pg_partman for automated partition management
+
+**Index Strategy**:
+- **Primary Indexes**: B-tree indexes on frequently queried columns
+- **Composite Indexes**: Multi-column indexes for complex queries
+- **Partial Indexes**: Conditional indexes for filtered queries
+- **Index Monitoring**: pg_stat_user_indexes for usage tracking
 
 #### 5. Notification Service
 **Purpose**: Real-time updates, integrations, alerting with secure credential management
 **Technology Stack**: Node.js, Socket.io, Redis, PostgreSQL
 **Design Pattern**: Publisher-subscriber with WebSocket broadcasting
-**Secret Management**: Vault KV for SMTP credentials and webhook URLs
+**Secret Management**: AWS Secrets Manager for SMTP credentials and webhook URLs
 
 **Real-Time Communication**:
 - **WebSocket Management**: Connection pooling, auto-reconnection, heartbeat
@@ -325,10 +357,10 @@ Database Engine:
 - **Email Service**: HTML templates with inline vulnerability details
 - **Webhook Support**: Configurable webhooks for external system integration
 
-**Vault Integration**:
-- SMTP credentials stored in `secret/notification/smtp-credentials`
-- Slack webhook URLs in `secret/notification/slack-webhooks`
-- Email templates and configurations in `secret/notification/templates`
+**AWS Secrets Manager Integration**:
+- SMTP credentials stored in AWS Secrets Manager
+- Slack webhook URLs in AWS Secrets Manager
+- Email templates and configurations in AWS Secrets Manager
 - External Secrets Operator for secure credential injection
 
 ### Frontend Architecture
@@ -336,7 +368,7 @@ Database Engine:
 #### React Application Structure
 **Technology Stack**: React 18, TypeScript 5, Vite, TanStack Query, Zustand
 **Architecture Pattern**: Feature-based folder structure with shared components
-**Secret Management**: Vault-managed OAuth credentials and API configurations
+**Secret Management**: AWS Secrets Manager-managed OAuth credentials and API configurations
 
 **State Management**:
 - **Global State**: Zustand for authentication, user preferences, theme
@@ -356,10 +388,10 @@ Database Engine:
 - **Offline Support**: Service worker for basic offline functionality
 - **Push Notifications**: Browser notifications for critical findings
 
-**Vault Integration**:
-- OAuth client credentials managed via Vault
-- API endpoint configurations stored in Vault
-- Feature flags and dynamic configuration via Vault
+**AWS Secrets Manager Integration**:
+- OAuth client credentials managed via AWS Secrets Manager
+- API endpoint configurations stored in AWS Secrets Manager
+- Feature flags and dynamic configuration via AWS Secrets Manager
 - External Secrets Operator injecting frontend configuration
 
 #### Visualization Components
@@ -381,9 +413,9 @@ Database Engine:
 ### Security Architecture
 
 #### Authentication & Authorization
-**Technology Stack**: JWT, OAuth 2.0, SAML 2.0, Redis, HashiCorp Vault
+**Technology Stack**: JWT, OAuth 2.0, SAML 2.0, Redis, AWS Secrets Manager
 **Design Pattern**: Role-based access control with attribute-based policies
-**Secret Management**: Vault-managed JWT keys and OAuth credentials
+**Secret Management**: AWS Secrets Manager-managed JWT keys and OAuth credentials
 
 **Authentication Methods**:
 - **Password-Based**: Argon2 hashing with salt and pepper
@@ -397,18 +429,18 @@ Database Engine:
 - **Policy Engine**: ABAC policies for complex access control scenarios
 - **API Security**: JWT validation, scope checking, rate limiting
 
-**Vault Integration**:
-- JWT signing keys stored in Vault with automatic rotation
+**AWS Secrets Manager Integration**:
+- JWT signing keys stored in AWS Secrets Manager with automatic rotation
 - OAuth provider credentials managed centrally
 - Session encryption keys for secure state management
-- Vault policies for authentication service access
+- IAM policies for authentication service access
 
 #### Data Security
 **Encryption Standards**:
 - **At Rest**: AES-256-GCM for database and file storage
 - **In Transit**: TLS 1.3 for all external communications
 - **Application Level**: Field-level encryption for sensitive data
-- **Key Management**: Vault PKI engine and AWS KMS for key rotation
+- **Key Management**: AWS Secrets Manager and AWS KMS for key rotation
 
 **Privacy Controls**:
 - **Data Isolation**: Tenant-based data segregation
@@ -416,11 +448,11 @@ Database Engine:
 - **Audit Logging**: Immutable logs for all data access and modifications
 - **Data Retention**: Configurable retention policies with automatic purging
 
-**Vault Security Features**:
-- **Transit Engine**: Encryption as a service for application-level encryption
-- **PKI Engine**: Certificate authority for internal service communication
-- **Dynamic Secrets**: Time-limited database credentials with automatic rotation
-- **Audit Logging**: Comprehensive audit trails for all secret access
+**AWS Secrets Manager Security Features**:
+- **Encryption**: Encryption in transit and at rest with AWS KMS
+- **Access Control**: IAM-based access control with least privilege
+- **Audit Logging**: Comprehensive audit trails via CloudTrail
+- **Cross-Region Replication**: Disaster recovery and global access
 
 ### Performance & Scalability
 
@@ -429,14 +461,14 @@ Database Engine:
 **Database Scaling**: RDS read replicas, connection pooling, query optimization
 **Caching Layers**: Multi-tier caching with CloudFront CDN
 **Auto-Scaling**: EKS cluster autoscaler and horizontal pod autoscaling
-**Secret Performance**: Vault cluster mode for high-availability secret access
+**Secret Performance**: AWS Secrets Manager with optimized retrieval patterns
 
 **Performance Targets**:
 - **API Response Time**: P95 < 200ms for CRUD operations
 - **Analysis Throughput**: 1000+ concurrent contract analyses
 - **Database Performance**: P95 < 50ms for indexed queries
 - **Frontend Performance**: First Contentful Paint < 1.5s
-- **Vault Performance**: P95 < 50ms for secret retrieval
+- **AWS Secrets Manager Performance**: P95 < 50ms for secret retrieval
 
 #### Resource Management
 **Container Resources**:
@@ -450,14 +482,14 @@ Database Engine:
 - **Vertical Pod Autoscaler**: Right-sizing recommendations
 - **Cluster Autoscaler**: Node scaling based on resource demands
 - **Custom Metrics**: Queue length and analysis time-based scaling
-- **Vault Scaling**: Vault cluster auto-scaling based on request volume
+- **AWS Secrets Manager Scaling**: Optimized retrieval patterns for high-throughput
 
 ### DevOps & Infrastructure
 
 #### CI/CD Pipeline
-**Technology Stack**: GitHub Actions, Docker, AWS EKS, ArgoCD, HashiCorp Vault
+**Technology Stack**: GitHub Actions, Docker, AWS EKS, ArgoCD, AWS Secrets Manager
 **Pipeline Stages**: Test → Build → Security Scan → Deploy → Verify
-**Secret Management**: Vault integration for CI/CD credentials and deployment secrets
+**Secret Management**: AWS Secrets Manager integration for CI/CD credentials and deployment secrets
 
 **Build Process**:
 - **Multi-Stage Builds**: Optimized Docker images with security scanning
@@ -471,74 +503,31 @@ Database Engine:
 - **Canary Releases**: Gradual rollout with automatic rollback on errors
 - **Database Migrations**: Backward-compatible migrations with versioning
 
-**Vault CI/CD Integration**:
+**AWS Secrets Manager CI/CD Integration**:
 - Dynamic credentials for deployment pipelines
 - Secret injection during build and deployment processes
-- Policy-based access control for pipeline operations
+- IAM-based access control for pipeline operations
 - Audit logging for all CI/CD secret access
 
 #### Monitoring & Observability
 **Metrics Stack**: Prometheus, Grafana, AlertManager, CloudWatch
 **Logging Stack**: Fluentd, CloudWatch Logs, Elasticsearch, Kibana
 **Tracing Stack**: Jaeger, OpenTelemetry, AWS X-Ray
-**Secret Monitoring**: Vault metrics and audit log monitoring
+**Secret Monitoring**: AWS Secrets Manager metrics and audit log monitoring
 
 **Key Metrics**:
 - **Golden Signals**: Latency, traffic, errors, saturation
 - **Business Metrics**: Analysis completion rate, false positive rate
 - **Infrastructure Metrics**: CPU, memory, disk, network utilization
 - **Custom Metrics**: Tool-specific metrics, queue depths, processing times
-- **Vault Metrics**: Secret access patterns, policy evaluations, performance
+- **AWS Secrets Manager Metrics**: Secret access patterns, rotation success, performance
 
 **Alerting Strategy**:
 - **Severity Levels**: Critical (page on-call), Warning (notify team), Info (log only)
 - **Alert Routing**: PagerDuty integration with escalation policies
 - **Alert Correlation**: Group related alerts to reduce noise
 - **Runbook Automation**: Automated remediation for known issues
-- **Vault Alerting**: Secret expiration, policy violations, performance issues
-
-### Data Architecture
-
-#### Database Design
-**Primary Database**: RDS PostgreSQL 15 with Multi-AZ deployment
-**Schema Strategy**: Multi-tenant with row-level security
-**Backup Strategy**: Automated RDS backups with point-in-time recovery
-**Secret Management**: Vault Database engine for dynamic credentials
-
-**Table Partitioning**:
-- **Time-Based**: Monthly partitions for analysis_runs and findings
-- **Hash-Based**: Organization-based partitioning for large tables
-- **Automatic Management**: pg_partman for automated partition management
-
-**Index Strategy**:
-- **Primary Indexes**: B-tree indexes on frequently queried columns
-- **Composite Indexes**: Multi-column indexes for complex queries
-- **Partial Indexes**: Conditional indexes for filtered queries
-- **Index Monitoring**: pg_stat_user_indexes for usage tracking
-
-**Vault Database Integration**:
-- Dynamic PostgreSQL credentials with configurable TTL
-- Automatic credential rotation without service interruption
-- Role-based database access via Vault policies
-- Audit logging for all database credential usage
-
-#### Data Processing Pipeline
-**Stream Processing**: Amazon Kinesis with Kafka compatibility
-**Batch Processing**: Apache Airflow on EKS for scheduled data jobs
-**Data Warehousing**: Amazon Redshift for analytics and reporting
-**Secret Management**: Vault credentials for all data pipeline components
-
-**ETL Processes**:
-- **Real-Time**: Kinesis consumers for immediate data processing
-- **Batch**: Hourly/daily aggregation jobs for reporting
-- **Data Quality**: Automated validation and anomaly detection
-- **Data Lineage**: Tracking data flow and transformations
-
-**Vault Integration for Data Pipeline**:
-- Kinesis credentials and encryption keys managed by Vault
-- Airflow connection secrets stored in Vault
-- Redshift credentials dynamically generated via Vault
-- Data pipeline audit logging through Vault
+- **AWS Secrets Manager Alerting**: Secret expiration, rotation failures, access anomalies
 
 ### API Design
 
@@ -547,7 +536,7 @@ Database Engine:
 **Versioning**: URL-based versioning (/api/v1/, /api/v2/)
 **Pagination**: Cursor-based pagination for large datasets
 **Filtering**: GraphQL-style filtering with field selection
-**Security**: Vault-managed API keys and JWT tokens
+**Security**: AWS Secrets Manager-managed API keys and JWT tokens
 
 **Endpoint Design**:
 - **Resource-Based**: RESTful resource naming conventions
@@ -561,18 +550,18 @@ Database Engine:
 - **Burst Allowance**: Short-term burst capability with token bucket
 - **Rate Limit Headers**: Standard headers for client awareness
 
-**Vault API Integration**:
-- API authentication tokens managed by Vault
-- Client certificate management via Vault PKI
-- API rate limiting configurations stored in Vault
+**AWS Secrets Manager API Integration**:
+- API authentication tokens managed by AWS Secrets Manager
 - Dynamic API key generation and rotation
+- Client certificate management via AWS Certificate Manager
+- API rate limiting configurations stored in AWS Secrets Manager
 
 #### GraphQL API (Future)
 **Schema Design**: Type-first schema design with code generation
 **Resolvers**: Efficient N+1 query prevention with DataLoader
 **Subscriptions**: Real-time subscriptions for live updates
 **Federation**: Schema federation for microservices
-**Security**: Vault-managed GraphQL endpoint authentication
+**Security**: AWS Secrets Manager-managed GraphQL endpoint authentication
 
 ### Testing Strategy
 
@@ -588,28 +577,28 @@ Database Engine:
 - **Service Integration**: Cross-service integration testing
 - **Database Testing**: Test migrations and complex queries with RDS
 - **External API Testing**: Mock external tool APIs with contract testing
-- **Vault Integration Testing**: Secret injection and rotation testing
+- **AWS Secrets Manager Integration Testing**: Secret injection and rotation testing
 
 **End-to-End Tests (10%)**:
 - **UI Testing**: Playwright for browser automation
 - **User Workflows**: Complete user journey testing
 - **Performance Testing**: Load testing with realistic data volumes
 - **Security Testing**: Automated security scanning and penetration testing
-- **Vault E2E Testing**: Complete secret lifecycle testing
+- **AWS Secrets Manager E2E Testing**: Complete secret lifecycle testing
 
 #### Test Data Management
 **Test Databases**: Isolated RDS instances per environment
 **Data Fixtures**: Reusable test data factories and builders
 **Test Isolation**: Transaction rollback between tests
 **Seed Data**: Consistent seed data for development and testing
-**Vault Test Secrets**: Isolated Vault namespaces for testing
+**AWS Secrets Manager Test Secrets**: Isolated namespaces for testing
 
 **Performance Testing**:
 - **Load Testing**: k6 for API load testing
 - **Stress Testing**: Gradual load increase to find breaking points
 - **Volume Testing**: Large dataset testing for database performance
 - **Chaos Engineering**: Controlled failure injection with Chaos Monkey
-- **Vault Performance Testing**: Secret retrieval under load
+- **AWS Secrets Manager Performance Testing**: Secret retrieval under load
 
 ### Development Workflow
 
@@ -624,7 +613,7 @@ Database Engine:
 - **Hot Reloading**: Development servers with automatic reload
 - **Database Seeding**: Scripts for consistent cloud data setup
 - **Environment Parity**: Production-like development environment
-- **Vault Development**: Cloud Vault cluster with development namespaces
+- **AWS Secrets Manager Development**: Cloud-based secret management with development namespaces
 
 #### Code Quality
 **Linting**: ESLint for TypeScript, Black/isort for Python
@@ -638,7 +627,7 @@ Database Engine:
 - **Code Documentation**: Inline comments for complex logic
 - **Architecture Documentation**: Decision records and diagrams
 - **User Documentation**: Step-by-step guides and tutorials
-- **Vault Documentation**: Secret management procedures and policies
+- **AWS Secrets Manager Documentation**: Secret management procedures and policies
 
 ### Migration & Deployment Strategy
 
@@ -647,21 +636,21 @@ Database Engine:
 **Migration Strategy**: Forward-only migrations with rollback procedures
 **Zero-Downtime**: Online schema changes with minimal locking
 **Data Validation**: Post-migration validation and integrity checks
-**Vault Credential Migration**: Seamless database credential rotation during migrations
+**AWS Secrets Manager Credential Migration**: Seamless database credential rotation during migrations
 
 #### Feature Rollout
 **Feature Flags**: LaunchDarkly for gradual feature rollout
 **A/B Testing**: Statistical significance testing for UI changes
 **Rollback Strategy**: Immediate rollback capability for failed deployments
 **Blue-Green Database**: Database-level blue-green deployment support
-**Vault Configuration Rollout**: Gradual secret and policy updates
+**AWS Secrets Manager Configuration Rollout**: Gradual secret and configuration updates
 
 #### Production Readiness
 **Health Checks**: Comprehensive health check endpoints
 **Graceful Shutdown**: SIGTERM handling with connection draining
 **Circuit Breakers**: Fail-fast pattern for external dependencies
 **Bulkhead Pattern**: Resource isolation between critical and non-critical operations
-**Vault Readiness**: Health checks for Vault connectivity and secret availability
+**AWS Secrets Manager Readiness**: Health checks for AWS Secrets Manager connectivity and secret availability
 
 ### Cloud Infrastructure Design
 
@@ -673,15 +662,15 @@ Database Engine:
 **Networking**: VPC with public/private subnets and NAT gateways
 **Security**: IAM roles, security groups, and VPC endpoints
 **Monitoring**: CloudWatch integration with existing Prometheus stack
-**Vault Cloud**: HashiCorp Vault cluster with AWS KMS auto-unseal
+**Secret Management**: AWS Secrets Manager with cross-region replication
 
-#### Vault Cloud Architecture
-**High Availability**: Multi-AZ Vault cluster with Consul storage backend
-**Auto-Unseal**: AWS KMS integration for automatic Vault unsealing
-**Backup Strategy**: Automated Vault snapshots to S3 with encryption
-**Disaster Recovery**: Cross-region Vault replication for DR
-**Performance**: Vault performance replication for read scaling
-**Integration**: AWS IAM authentication and IAM-based policies
+#### AWS Secrets Manager Cloud Architecture
+**High Availability**: Multi-AZ AWS Secrets Manager with cross-region replication
+**Automatic Rotation**: AWS Lambda-based rotation for database credentials
+**Backup Strategy**: Automated cross-region secret replication
+**Disaster Recovery**: Cross-region AWS Secrets Manager replication for DR
+**Performance**: Optimized retrieval patterns for high-throughput applications
+**Integration**: AWS IAM authentication and policy-based access control
 
 #### Multi-Environment Strategy
 **Development Environment**: Single EKS cluster with reduced resources
@@ -689,7 +678,7 @@ Database Engine:
 **Production Environment**: Multi-AZ, high-availability configuration
 **Cost Optimization**: Spot instances, scheduled scaling, resource tagging
 
-## Cloud Development Environment Summary with Vault
+## Cloud Development Environment Summary with AWS Secrets Manager
 
 ### **Cost Analysis:**
 ```yaml
@@ -698,33 +687,33 @@ Cloud Development Costs (Months 1-3):
   RDS PostgreSQL (Multi-AZ): ~$50/month
   ElastiCache Redis: ~$30/month
   Route53 + Domain: ~$20/month
-  Vault Cluster: ~$50/month
-  Total Development Costs: ~$350/month
+  AWS Secrets Manager: ~$10/month
+  Total Development Costs: ~$310/month
 
 Production Scaling Costs (Month 4+):
   AWS EKS Production: ~$500/month
   AWS EKS Staging: ~$300/month
   RDS PostgreSQL + Replicas: ~$200/month
   ElastiCache + Clustering: ~$100/month
-  Vault Enterprise: ~$200/month (optional)
+  AWS Secrets Manager + Cross-Region: ~$50/month
   AWS KMS + Other Services: ~$100/month
-  Total Production Costs: ~$1,400/month (scales with usage)
+  Total Production Costs: ~$1,250/month (scales with usage)
 ```
 
-### **Vault Benefits Summary:**
+### **AWS Secrets Manager Benefits Summary:**
 ```yaml
-Cloud Vault Development:
-  - Enterprise secret management from day one
+Cloud AWS Secrets Manager Development:
+  - Native AWS integration from day one
   - Production-grade policies and procedures
   - Automatic secret rotation and lifecycle management
   - Multi-environment secret isolation
   - AWS IAM integration for access control
   - Real production patterns and workflows
 
-Production Vault Benefits:
+Production AWS Secrets Manager Benefits:
   - High availability and disaster recovery
   - Automatic backup and cross-region replication
-  - Performance replication for global scale
+  - Cross-region replication for global scale
   - Enterprise compliance and audit logging
   - AWS KMS integration for enhanced security
   - Multi-cloud secret management capabilities
@@ -743,4 +732,4 @@ Cloud-First Advantages:
   - Global accessibility for distributed teams
 ```
 
-This comprehensive technical development plan provides enterprise-grade secret management with HashiCorp Vault from day one in cloud development, ensuring production readiness while maintaining rapid development velocity without local resource constraints.
+This comprehensive technical development plan provides enterprise-grade secret management with AWS Secrets Manager from day one in cloud development, ensuring production readiness while maintaining rapid development velocity without local resource constraints.
