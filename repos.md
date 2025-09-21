@@ -619,7 +619,6 @@ solidity-security-vulnerabilities/
 graph TB
     A[solidity-security-platform] --> B[solidity-security-tools]
     A --> F[solidity-security-vulnerabilities]
-    G[solidity-security-aws-infrastructure] --> C[solidity-security-infrastructure]
     C --> A
     C --> D[solidity-security-monitoring]
     E[solidity-security-docs] --> A
