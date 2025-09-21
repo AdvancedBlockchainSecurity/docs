@@ -209,7 +209,7 @@ Each sprint must meet:
 ### Operational Requirements
 - [ ] Cloud development supports rapid iteration and testing cycles
 - [ ] Team can reproduce cloud environment in <60 minutes
-- [ ] Cloud costs managed within development budget ($340/month in Phase 1)
+- [ ] Cloud costs managed within development budget ($400-500/month in Phase 1)
 - [ ] All services accessible via SSL-secured endpoints
 - [ ] Complete documentation for operations and troubleshooting
 
