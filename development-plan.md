@@ -564,7 +564,7 @@ metadata:
 spec:
   source:
     repoURL: https://github.com/your-org/solidity-security-platform
-    path: services/api-service/k8s/base
+    path: backend/api-service/k8s/base
     targetRevision: main
   destination:
     server: https://kubernetes.default.svc
