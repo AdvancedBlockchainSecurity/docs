@@ -297,11 +297,46 @@ Cross-Region Replication:
 - **Autocomplete**: Prefix search for file paths, function names
 - **Search Analytics**: Query performance monitoring and optimization
 
+**Table Partitioning**:
+- **Time-Based**: Monthly partitions for analysis_runs and findings
+- **Hash-Based**: Organization-based partitioning for large tables
+- **Automatic Management**: pg_partman for automated partition management
+
+**Index Strategy**:
+- **Primary Indexes**: B-tree indexes on frequently queried columns
+- **Composite Indexes**: Multi-column indexes for complex queries
+- **Partial Indexes**: Conditional indexes for filtered queries
+- **Index Monitoring**: pg_stat_user_indexes for usage tracking
+
 **AWS Secrets Manager Integration**:
 - Automatic database credential rotation via AWS Secrets Manager
 - Database encryption keys stored in AWS Secrets Manager
 - Redis credentials managed through AWS Secrets Manager
 - External Secrets Operator for automatic credential rotation
+
+**AWS Secrets Manager Database Integration**:
+- Automatic PostgreSQL credential rotation with configurable TTL
+- Automatic credential rotation without service interruption
+- IAM-based database access via AWS Secrets Manager
+- Audit logging for all database credential usage
+
+#### Data Processing Pipeline
+**Stream Processing**: Amazon Kinesis with Kafka compatibility
+**Batch Processing**: Apache Airflow on EKS for scheduled data jobs
+**Data Warehousing**: Amazon Redshift for analytics and reporting
+**Secret Management**: AWS Secrets Manager credentials for all data pipeline components
+
+**ETL Processes**:
+- **Real-Time**: Kinesis consumers for immediate data processing
+- **Batch**: Hourly/daily aggregation jobs for reporting
+- **Data Quality**: Automated validation and anomaly detection
+- **Data Lineage**: Tracking data flow and transformations
+
+**AWS Secrets Manager Integration for Data Pipeline**:
+- Kinesis credentials and encryption keys managed by AWS Secrets Manager
+- Airflow connection secrets stored in AWS Secrets Manager
+- Redshift credentials automatically rotated via AWS Secrets Manager
+- Data pipeline audit logging through CloudTrail
 
 #### 5. Notification Service
 **Purpose**: Real-time updates, integrations, alerting with secure credential management
@@ -493,43 +528,6 @@ Cross-Region Replication:
 - **Runbook Automation**: Automated remediation for known issues
 - **AWS Secrets Manager Alerting**: Secret expiration, rotation failures, access anomalies
 
-### Data Architecture
-
-#### Database Design
-**Primary Database**: RDS PostgreSQL 15 with Multi-AZ deployment
-**Schema Strategy**: Multi-tenant with row-level security
-**Backup Strategy**: Automated RDS backups with point-in-time recovery
-**Secret Management**: AWS Secrets Manager with automatic credential rotation
-
-**Table Partitioning**:
-- **Time-Based**: Monthly partitions for analysis_runs and findings
-- **Hash-Based**: Organization-based partitioning for large tables
-- **Automatic Management**: pg_partman for automated partition management
-
-**Index Strategy**:
-- **Primary Indexes**: B-tree indexes on frequently queried columns
-- **Composite Indexes**: Multi-column indexes for complex queries
-- **Partial Indexes**: Conditional indexes for filtered queries
-- **Index Monitoring**: pg_stat_user_indexes for usage tracking
-
-**AWS Secrets Manager Database Integration**:
-- Automatic PostgreSQL credential rotation with configurable TTL
-- Automatic credential rotation without service interruption
-- IAM-based database access via AWS Secrets Manager
-- Audit logging for all database credential usage
-
-#### Data Processing Pipeline
-**Stream Processing**: Amazon Kinesis with Kafka compatibility
-**Batch Processing**: Apache Airflow on EKS for scheduled data jobs
-**Data Warehousing**: Amazon Redshift for analytics and reporting
-**Secret Management**: AWS Secrets Manager credentials for all data pipeline components
-
-**AWS Secrets Manager Integration for Data Pipeline**:
-- Kinesis credentials and encryption keys managed by AWS Secrets Manager
-- Airflow connection secrets stored in AWS Secrets Manager
-- Redshift credentials automatically rotated via AWS Secrets Manager
-- Data pipeline audit logging through CloudTrail
-
 ### API Design
 
 #### REST API Specifications
@@ -645,6 +643,13 @@ Cross-Region Replication:
 **Rollback Strategy**: Immediate rollback capability for failed deployments
 **Blue-Green Database**: Database-level blue-green deployment support
 **AWS Secrets Manager Configuration Rollout**: Gradual secret and configuration updates
+
+#### Production Readiness
+**Health Checks**: Comprehensive health check endpoints
+**Graceful Shutdown**: SIGTERM handling with connection draining
+**Circuit Breakers**: Fail-fast pattern for external dependencies
+**Bulkhead Pattern**: Resource isolation between critical and non-critical operations
+**AWS Secrets Manager Readiness**: Health checks for AWS Secrets Manager connectivity and secret availability
 
 ### Cloud Infrastructure Design
 
