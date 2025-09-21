@@ -909,6 +909,24 @@ Required Documentation:
 ### **Enhanced Cost Management:**
 - **Enhanced development costs** approximately $400-500/month during Sprints 1-6
 - **Enhanced production scaling** planned for $1,500+/month with full enterprise security features
+
+**Itemized Enhanced Security Component Cost Breakdown (Production):**
+- **AWS Secrets Manager (Enterprise usage):** ~$200/month  
+  Secure storage and rotation of secrets, keys, and credentials.
+- **Container Security (Scanning, Signing, Runtime Protection):** ~$150/month  
+  Automated vulnerability scanning, image signing, and runtime threat detection.
+- **Network Security (Micro-segmentation, Zero-Trust):** ~$100/month  
+  VPC segmentation, security groups, and zero-trust network policies.
+- **Advanced Monitoring & Logging (CloudWatch, GuardDuty, Security Hub):** ~$120/month  
+  Real-time security monitoring, alerting, and compliance reporting.
+- **SSL/TLS Certificate Management (Let's Encrypt, ACM):** ~$30/month  
+  Automated certificate provisioning and renewal for all domains.
+- **IAM & Access Controls (Role-based, SSO, Audit):** ~$50/month  
+  Fine-grained access management, SSO integration, and audit logging.
+- **Production EKS Cluster (Hardened, Multi-AZ):** ~$850/month  
+  High-availability, multi-AZ, and security-hardened Kubernetes infrastructure.
+- **Other Security Enhancements & Contingency:** ~$100/month  
+  Miscellaneous security tools, updates, and contingency buffer.
 - **Cost optimization** through spot instances, scheduled scaling, resource tagging, and monitoring
 
 ### **Enhanced Development Benefits:**
