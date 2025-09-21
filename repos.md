@@ -17,7 +17,7 @@ Contains: API services, frontend, shared libraries
 ```
 Purpose: AWS cloud resource provisioning and management
 Tech Stack: Terraform, AWS CLI, CloudFormation
-Contains: VPC, EKS, RDS, ElastiCache, Route53, IAM, Secrets Manager configurations
+Contains: VPC, EKS, RDS, ElastiCache, IAM, Secrets Manager configurations
 ```
 
 ### 3. **`solidity-security-infrastructure`**
@@ -87,11 +87,6 @@ solidity-security-platform/
 solidity-security-aws-infrastructure/
 ├── terraform/
 │   ├── environments/
-│   │   ├── dev/
-│   │   │   ├── main.tf
-│   │   │   ├── variables.tf
-│   │   │   ├── terraform.tfvars
-│   │   │   └── outputs.tf
 │   │   ├── staging/
 │   │   │   ├── main.tf
 │   │   │   ├── variables.tf
@@ -119,11 +114,6 @@ solidity-security-aws-infrastructure/
 │   │   │   ├── outputs.tf
 │   │   │   └── README.md
 │   │   ├── elasticache/
-│   │   │   ├── main.tf
-│   │   │   ├── variables.tf
-│   │   │   ├── outputs.tf
-│   │   │   └── README.md
-│   │   ├── route53/
 │   │   │   ├── main.tf
 │   │   │   ├── variables.tf
 │   │   │   ├── outputs.tf
@@ -198,7 +188,6 @@ solidity-security-infrastructure/
 ├── cert-manager/
 │   ├── install.yaml
 │   ├── cluster-issuer-letsencrypt.yaml
-│   └── route53-credentials.yaml
 ├── aws-load-balancer-controller/
 │   ├── install.yaml
 │   ├── service-account.yaml
@@ -460,7 +449,7 @@ solidity-security-vulnerabilities/
 - [ ] Configure repository templates and README files
 - [ ] Add team members with appropriate permissions
 - [ ] **Purchase production domain** (e.g., solidity-platform.com)
-- [ ] **Configure Route53 hosted zone**
+- [ ] **Configure Cloudflare hosted zone**
 
 ### Day 2: AWS Infrastructure Repository Setup
 - [ ] **Create Terraform modules for AWS infrastructure**
@@ -508,7 +497,6 @@ solidity-security-vulnerabilities/
 - `TERRAFORM_CLOUD_TOKEN` (if using Terraform Cloud)
 - `DOCKER_REGISTRY_TOKEN` (for ECR)
 - `SLACK_WEBHOOK_URL`
-- `ROUTE53_ACCESS_KEY` (for DNS management)
 
 ## Repository Dependencies
 
@@ -539,7 +527,7 @@ graph TB
 ## Infrastructure Deployment Order
 
 1. **AWS Infrastructure** (`solidity-security-aws-infrastructure`)
-   - Deploy VPC, EKS, RDS, ElastiCache, Route53
+   - Deploy VPC, EKS, RDS, ElastiCache
    - Configure IAM roles and AWS Secrets Manager
    - Set up domain and DNS
 
