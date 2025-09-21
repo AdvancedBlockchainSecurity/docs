@@ -547,7 +547,7 @@ solidity-security-infrastructure/
 #### ArgoCD Integration Strategy
 **Repository Structure**: ArgoCD Applications in infrastructure repo pointing to platform repo services
 **GitOps Workflow**: 
-1. Developer commits code to `solidity-security-platform/services/{service-name}/`
+1. Developer commits code to `solidity-security-platform/backend/{service-name}/`
 2. ArgoCD detects changes via webhook or polling
 3. ArgoCD syncs Kubernetes manifests from platform repo to cluster
 4. External Secrets Operator injects secrets from AWS Secrets Manager
