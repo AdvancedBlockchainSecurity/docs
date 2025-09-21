@@ -239,8 +239,8 @@ Backup Automation:
 
 **Deliverables Day 1:**
 - [ ] All 7 repositories created with basic structure (including new AWS infrastructure repo)
-- [ ] **Existing domain configured in Cloudflare with proper DNS records**
-- [ ] **Development, staging, and production subdomains configured with A records in Cloudflare**
+- [ ] **solidity-platform.com domain configured in Cloudflare with proper DNS records**
+- [ ] **Development (dev.solidity-platform.com), staging (staging.solidity-platform.com), and production (solidity-platform.com) subdomains configured with A records in Cloudflare**
 - [ ] **AWS infrastructure deployed via Terraform (VPC, EKS, RDS, ElastiCache)**
 - [ ] **Enhanced security deployed (Security Groups, VPC Endpoints, Network Policies)**
 - [ ] **ECR repositories created with vulnerability scanning and lifecycle policies**
