@@ -655,32 +655,18 @@ AWS Secrets Manager Testing Scenarios:
 **Final Structure Created in `solidity-security-platform`:**
 ```
 solidity-security-platform/
-├── services/
+├── backend/
 │   ├── api-service/
-│   │   ├── src/ (FastAPI application code)
-│   │   ├── tests/ (Service-specific tests)
-│   │   ├── Dockerfile (Container build)
-│   │   ├── k8s/ (Kubernetes manifests with security policies)
-│   │   │   ├── base/ (11 manifests including external secrets)
-│   │   │   └── overlays/ (dev/staging/production)
-│   │   ├── helm/ (Complete Helm chart with values files)
-│   │   └── aws-secrets/ (AWS Secrets Manager templates)
-│   ├── tool-integration-service/ (Same structure)
-│   ├── orchestration-service/ (Same structure)
-│   ├── intelligence-engine-service/ (Same structure)
-│   ├── data-service/ (Same structure)
-│   └── notification-service/ (Same structure)
+│   ├── tool-integration-service/
+│   ├── orchestration-service/
+│   ├── intelligence-engine-service/
+│   ├── data-service/
+│   └── notification-service/
 ├── frontend/
-│   ├── src/ (React application code)
-│   ├── public/ (Static assets)
-│   ├── Dockerfile (Frontend container)
-│   ├── k8s/ (Frontend K8s manifests)
-│   ├── helm/ (Frontend Helm chart)
-│   └── aws-secrets/ (Frontend secret templates)
-├── shared/ (Shared libraries and utilities)
-├── scripts/ (Development and deployment scripts)
-├── tests/ (Integration and E2E tests)
-└── docs/ (Basic setup guides)
+├── shared/
+├── scripts/
+├── tests/
+└── docs/
 ```
 
 **ArgoCD Applications in `solidity-security-infrastructure`:**
