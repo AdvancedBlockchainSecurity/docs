@@ -264,7 +264,7 @@ Backup Automation:
 ### **Day 2: Cloud-Ready Service IaC & Enhanced Data Services**
 
 #### Morning: Cloud-Ready Service IaC Framework with Enhanced Security (3-4 hours)
-- [ ] **Create enhanced Kubernetes IaC templates for all 6 microservices with security hardening:**
+- [ ] **Create enhanced Kubernetes IaC templates for platform infrastructure components with security hardening:**
   - [ ] **RDS PostgreSQL: IAM service account, External Secret, ConfigMap manifests with encryption**
   - [ ] **ElastiCache Redis: IAM service account, External Secret, ConfigMap manifests with TLS**
   - [ ] **Enhanced Monitoring: Prometheus, Grafana, Jaeger with CloudWatch integration**
@@ -274,7 +274,13 @@ Backup Automation:
   - [ ] **Pod Security Standards for all application deployments**
   - [ ] **Resource Quotas for namespace-level resource management**
 - [ ] **Create enhanced Helm chart templates for infrastructure services with cloud and development values**
-- [ ] Create Kubernetes deployment templates for all 6 microservices with AWS-specific configs and security
+- [ ] **Create Kubernetes deployment templates for all 6 microservices with AWS-specific configs and security:**
+  - [ ] **API Service** (FastAPI with authentication and RDS integration)
+  - [ ] **Tool Integration Service** (Slither, Aderyn, MythX, Solidity-Metrics adapters)
+  - [ ] **Orchestration Service** (Celery workers with ElastiCache Redis)
+  - [ ] **Intelligence Engine Service** (ML processing and risk scoring)
+  - [ ] **Data Service** (Database access layer with connection pooling)
+  - [ ] **Notification Service** (WebSocket and external integrations)
 - [ ] Set up Helm chart templates with development and production environment values
 - [ ] **Create ALB ingress definitions with Let's Encrypt SSL certificates and WAF integration**
 - [ ] **Create Cloudflare DNS management configurations for service discovery**
