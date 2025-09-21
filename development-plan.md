@@ -204,6 +204,12 @@ Cross-Region Replication:
 - Vulnerability detection through symbolic analysis
 - Integration with other static analysis results
 
+**Tool Output Normalization**:
+- Standardized vulnerability schema (SWC-based)
+- Source location mapping (file paths, line numbers)
+- Severity level harmonization across tools
+- Confidence score normalization (0.0-1.0 scale)
+
 **AWS Secrets Manager Integration**:
 - Tool API keys stored in environment-specific paths
 - External Secrets Operator injecting credentials as Kubernetes secrets
@@ -340,11 +346,33 @@ Cross-Region Replication:
 - **Error Boundaries**: Granular error handling with fallback components
 - **Performance**: React.memo, useMemo, useCallback for optimization
 
+**Real-Time Features**:
+- **WebSocket Client**: Custom hook for connection management
+- **Optimistic Updates**: Immediate UI updates with rollback on failure
+- **Offline Support**: Service worker for basic offline functionality
+- **Push Notifications**: Browser notifications for critical findings
+
 **AWS Secrets Manager Integration**:
 - OAuth client credentials managed via AWS Secrets Manager
 - API endpoint configurations stored in AWS Secrets Manager
 - Feature flags and dynamic configuration via AWS Secrets Manager
 - External Secrets Operator injecting frontend configuration
+
+#### Visualization Components
+**Technology Stack**: D3.js, Recharts, React Flow
+**Design Requirements**: Responsive, accessible, performant with large datasets
+
+**Dashboard Visualizations**:
+- **Risk Trend Charts**: Time-series visualization of security metrics
+- **Finding Distribution**: Donut charts showing severity distribution
+- **Heat Maps**: Code coverage and vulnerability density visualization
+- **Network Graphs**: Contract dependency and interaction visualization
+
+**Real-Time Updates**:
+- **Streaming Data**: WebSocket-based real-time chart updates
+- **Animation**: Smooth transitions for data changes
+- **Performance**: Canvas rendering for high-frequency updates
+- **Accessibility**: Screen reader support, keyboard navigation
 
 ### Security Architecture
 
@@ -510,6 +538,18 @@ Cross-Region Replication:
 **Pagination**: Cursor-based pagination for large datasets
 **Filtering**: GraphQL-style filtering with field selection
 **Security**: AWS Secrets Manager-managed API keys and JWT tokens
+
+**Endpoint Design**:
+- **Resource-Based**: RESTful resource naming conventions
+- **HTTP Methods**: Proper verb usage (GET, POST, PUT, DELETE, PATCH)
+- **Status Codes**: Consistent HTTP status code usage
+- **Error Handling**: Structured error responses with error codes
+
+**Rate Limiting**:
+- **Per-User Limits**: 1000 requests/hour for authenticated users
+- **Per-Endpoint Limits**: Different limits for expensive operations
+- **Burst Allowance**: Short-term burst capability with token bucket
+- **Rate Limit Headers**: Standard headers for client awareness
 
 **AWS Secrets Manager API Integration**:
 - API authentication tokens managed by AWS Secrets Manager
