@@ -6,10 +6,11 @@
 
 ### **Day 1: Repository Foundation & AWS EKS Setup**
 
-#### Morning: Repository Setup (2 hours)
-- [x] Create 6 repositories on GitHub with branch protection
+#### Morning: Repository Setup & Domain Purchase (2 hours)
+- [x] Create 7 repositories on GitHub with branch protection
   - [x] solidity-security-platform
   - [x] solidity-security-infrastructure
+  - [x] **solidity-security-aws-infrastructure** (NEW - for Terraform/AWS IaC)
   - [x] solidity-security-tools
   - [x] solidity-security-docs
   - [x] solidity-security-monitoring
@@ -17,55 +18,48 @@
 - [x] Set up team permissions and access controls
 - [x] Clone all repositories and create initial folder structures
 - [x] Configure repository templates and README files
+- [ ] **Purchase production domain** (e.g., solidity-platform.com) via Route53 or registrar
+- [ ] **Configure Route53 hosted zone** for DNS management (if not using Route53 registrar)
 
-#### Afternoon: Domain Setup & AWS EKS Infrastructure (5-6 hours)
+#### Afternoon: AWS Infrastructure Provisioning & Kubernetes Services Setup (5-6 hours)
 
-##### **Domain and DNS Configuration (1-2 hours)**
-- [ ] **Purchase production domain** (e.g., solidity-platform.com) via Route53 or domain registrar
-- [ ] **Configure Route53 hosted zone** for DNS management
-- [ ] **Set up development subdomain** (dev.solidity-platform.com)
-- [ ] **Configure staging subdomain** (staging.solidity-platform.com)
-- [ ] **Set up production subdomain** (app.solidity-platform.com)
-- [ ] **Create A record placeholders** for future ALB assignment
+##### **AWS Infrastructure IaC Creation (1-2 hours)**
+- [ ] **Create Terraform modules in `solidity-security-aws-infrastructure` repository:**
+  - [ ] **VPC module with public/private subnets, NAT gateways, Internet gateway**
+  - [ ] **EKS cluster module with managed node groups and OIDC provider**
+  - [ ] **RDS PostgreSQL module with Multi-AZ deployment and parameter groups**
+  - [ ] **ElastiCache Redis module with cluster mode and parameter groups**
+  - [ ] **Route53 module for hosted zone and health checks**
+  - [ ] **IAM module for EKS service roles and policies**
+  - [ ] **KMS module for Vault auto-unseal key**
+  - [ ] **Security Groups module for network access control**
 
-##### **AWS EKS Cluster Setup (3-4 hours)**
-- [ ] Set up AWS EKS development cluster with managed node groups (t3.medium, 3 nodes)
-- [ ] Configure AWS VPC with public/private subnets and NAT gateways
-- [ ] Enable EKS cluster logging and monitoring integration with CloudWatch
-- [ ] **Create Infrastructure Manifests for AWS:**
-  - [ ] **Create AWS Load Balancer Controller installation manifests**
-  - [ ] **Create cert-manager installation manifests with Let's Encrypt**
-  - [ ] **Create Route53 DNS validation configuration for cert-manager**
-  - [ ] **Create HashiCorp Vault cluster manifests with AWS KMS auto-unseal**
-  - [ ] **Create Vault Consul storage backend manifests**
-  - [ ] **Create Vault PKI secret engine manifests for certificate management**
-  - [ ] **Create Vault KV secret engine manifests for application secrets**
-  - [ ] **Create ArgoCD installation manifests with Vault integration**
-  - [ ] **Create ArgoCD RBAC configuration manifests**
-  - [ ] **Create ArgoCD application project manifests for development**
-  - [ ] **Create ArgoCD Vault integration manifests for GitOps secret management**
-  - [ ] **Create External Secrets Operator manifests for Vault integration**
-- [ ] **Create Cloud Development Configuration:**
-  - [ ] **Create Vault cluster initialization and auto-unseal scripts**
-  - [ ] **Create Vault secret provisioning scripts for cloud services**
-  - [ ] **Create Route53 DNS configuration scripts for subdomains**
-  - [ ] **Create ArgoCD Git repository integration configuration**
-  - [ ] **Create ArgoCD Vault Plugin configuration for secret injection**
-  - [ ] **Create Let's Encrypt certificate automation scripts**
-- [ ] **Deploy Infrastructure Using Created Manifests:**
+##### **AWS Infrastructure Deployment (2-3 hours)**
+- [ ] **Deploy AWS cloud infrastructure using Terraform:**
+  - [ ] **Create VPC with public/private subnets across 3 AZs**
+  - [ ] **Deploy EKS cluster with managed node groups (t3.medium, 3 nodes)**
+  - [ ] **Provision RDS PostgreSQL 15 Multi-AZ with automated backups**
+  - [ ] **Deploy ElastiCache Redis cluster with encryption**
+  - [ ] **Configure Route53 hosted zone with development DNS records**
+  - [ ] **Create IAM roles for EKS services and AWS integrations**
+  - [ ] **Provision KMS key for Vault auto-unseal**
+  - [ ] **Configure security groups for proper network access**
+  - [ ] **Update kubeconfig for EKS cluster access**
+
+##### **Kubernetes Services IaC Creation & Deployment (2 hours)**
+- [ ] **Create Kubernetes service manifests in `solidity-security-infrastructure` repository:**
+  - [ ] **AWS Load Balancer Controller installation and IAM service account**
+  - [ ] **cert-manager installation with Let's Encrypt ClusterIssuer and Route53 solver**
+  - [ ] **HashiCorp Vault cluster with Consul storage and AWS KMS auto-unseal**
+  - [ ] **External Secrets Operator with AWS IAM authentication**
+  - [ ] **ArgoCD installation with Vault integration and RBAC**
+- [ ] **Deploy Kubernetes services to EKS cluster:**
   - [ ] **Install AWS Load Balancer Controller using manifests**
   - [ ] **Install cert-manager with Let's Encrypt issuer using manifests**
-  - [ ] **Configure cert-manager with Route53 DNS validation using manifests**
-  - [ ] **Install HashiCorp Vault cluster using manifests with AWS KMS auto-unseal**
-  - [ ] **Configure Vault PKI engine for certificate authority**
-  - [ ] **Configure Vault KV engines for application secrets**
-  - [ ] **Install ArgoCD using manifests with AWS integration**
-  - [ ] **Configure ArgoCD with GitHub repository integration using manifests**
-  - [ ] **Configure ArgoCD RBAC for team access and permissions using manifests**
-  - [ ] **Configure ArgoCD Vault Plugin for automatic secret injection**
+  - [ ] **Deploy HashiCorp Vault cluster with AWS KMS auto-unseal**
+  - [ ] **Configure Vault PKI and KV engines**
   - [ ] **Install External Secrets Operator with AWS IAM authentication**
-- [ ] Create ECR repositories for container image storage
-- [ ] Write setup scripts for automated cloud environment reproduction
+  - [ ] **Deploy ArgoCD with GitHub integration and Vault Plugin**
 
 **Cloud DNS Configuration:**
 ```bash
@@ -110,10 +104,11 @@ Auth Methods:
 ```
 
 **Deliverables Day 1:**
-- [ ] All 6 repositories created with basic structure
+- [ ] All 7 repositories created with basic structure (including new AWS infrastructure repo)
 - [ ] **Production domain purchased and Route53 hosted zone configured**
-- [ ] **DNS subdomains configured for dev, staging, and production**
-- [ ] AWS EKS development cluster operational with managed node groups
+- [ ] **AWS infrastructure deployed via Terraform (VPC, EKS, RDS, ElastiCache)**
+- [ ] **EKS cluster operational with managed node groups**
+- [ ] **RDS PostgreSQL and ElastiCache Redis deployed and accessible**
 - [ ] AWS Load Balancer Controller routing traffic to services
 - [ ] **Let's Encrypt issuer generating SSL certificates automatically via Route53**
 - [ ] **HashiCorp Vault cluster deployed and operational at https://vault.dev.solidity-platform.com**
@@ -123,7 +118,7 @@ Auth Methods:
 - [ ] **ArgoCD UI accessible with Let's Encrypt SSL certificates**
 - [ ] **ArgoCD Vault Plugin configured for secret injection**
 - [ ] **External Secrets Operator configured with AWS IAM authentication**
-- [ ] Infrastructure repository with complete cloud setup automation including Vault
+- [ ] Both infrastructure repositories with complete cloud setup automation including Vault [ ] Infrastructure repository with complete cloud setup automation including Vault
 
 ---
 

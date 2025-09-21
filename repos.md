@@ -1,8 +1,8 @@
 # Sprint 1 (Week 1) Repository Structure
 
-Based on your infrastructure foundation requirements, here are the repositories you need to create:
+Based on your cloud-first infrastructure foundation requirements, here are the repositories you need to create:
 
-## Core Repositories (6 repos)
+## Core Repositories (7 repos)
 
 ### 1. **`solidity-security-platform`** 
 **Main monorepo for the entire platform**
@@ -12,15 +12,23 @@ Tech Stack: Python, FastAPI, React, TypeScript
 Contains: API services, frontend, shared libraries
 ```
 
-### 2. **`solidity-security-infrastructure`**
-**Infrastructure as Code repository**
+### 2. **`solidity-security-aws-infrastructure`** (NEW)
+**AWS Infrastructure as Code repository**
 ```
-Purpose: All infrastructure definitions and deployment scripts
-Tech Stack: Terraform, Helm, Docker Compose, GitHub Actions
-Contains: K8s manifests, cloud infrastructure, CI/CD pipelines
+Purpose: AWS cloud resource provisioning and management
+Tech Stack: Terraform, AWS CLI, CloudFormation
+Contains: VPC, EKS, RDS, ElastiCache, Route53, IAM, KMS configurations
 ```
 
-### 3. **`solidity-security-tools`**
+### 3. **`solidity-security-infrastructure`**
+**Kubernetes Infrastructure as Code repository**
+```
+Purpose: Kubernetes service definitions and deployment scripts
+Tech Stack: Helm, Kubernetes manifests, ArgoCD, GitHub Actions
+Contains: K8s manifests, ArgoCD applications, CI/CD pipelines
+```
+
+### 4. **`solidity-security-tools`**
 **Security tool integrations and adapters**
 ```
 Purpose: Tool adapters, wrappers, and integration logic
@@ -28,7 +36,7 @@ Tech Stack: Python, Rust, Node.js (for different tool requirements)
 Contains: Slither, Aderyn, MythX, Solidity-Metrics adapters
 ```
 
-### 4. **`solidity-security-docs`**
+### 5. **`solidity-security-docs`**
 **Documentation and knowledge base**
 ```
 Purpose: Technical documentation, API docs, user guides
@@ -36,7 +44,7 @@ Tech Stack: Markdown, Docusaurus/GitBook
 Contains: Architecture docs, setup guides, API documentation
 ```
 
-### 5. **`solidity-security-monitoring`**
+### 6. **`solidity-security-monitoring`**
 **Observability and monitoring configurations**
 ```
 Purpose: Monitoring, alerting, and observability setup
@@ -44,7 +52,7 @@ Tech Stack: Prometheus, Grafana, custom dashboards
 Contains: Grafana dashboards, Prometheus rules, alerting configs
 ```
 
-### 6. **`solidity-security-vulnerabilities`**
+### 7. **`solidity-security-vulnerabilities`**
 **Vulnerability database and intelligence**
 ```
 Purpose: Vulnerability data, patterns, and intelligence
@@ -74,31 +82,192 @@ solidity-security-platform/
 └── docs/                         # Basic README and setup guides
 ```
 
+### ☁️ **solidity-security-aws-infrastructure** (NEW)
+```
+solidity-security-aws-infrastructure/
+├── terraform/
+│   ├── environments/
+│   │   ├── dev/
+│   │   │   ├── main.tf
+│   │   │   ├── variables.tf
+│   │   │   ├── terraform.tfvars
+│   │   │   └── outputs.tf
+│   │   ├── staging/
+│   │   │   ├── main.tf
+│   │   │   ├── variables.tf
+│   │   │   ├── terraform.tfvars
+│   │   │   └── outputs.tf
+│   │   └── production/
+│   │       ├── main.tf
+│   │       ├── variables.tf
+│   │       ├── terraform.tfvars
+│   │       └── outputs.tf
+│   ├── modules/
+│   │   ├── vpc/
+│   │   │   ├── main.tf
+│   │   │   ├── variables.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── README.md
+│   │   ├── eks/
+│   │   │   ├── main.tf
+│   │   │   ├── variables.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── README.md
+│   │   ├── rds/
+│   │   │   ├── main.tf
+│   │   │   ├── variables.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── README.md
+│   │   ├── elasticache/
+│   │   │   ├── main.tf
+│   │   │   ├── variables.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── README.md
+│   │   ├── route53/
+│   │   │   ├── main.tf
+│   │   │   ├── variables.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── README.md
+│   │   ├── iam/
+│   │   │   ├── main.tf
+│   │   │   ├── variables.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── README.md
+│   │   └── kms/
+│   │       ├── main.tf
+│   │       ├── variables.tf
+│   │       ├── outputs.tf
+│   │       └── README.md
+│   └── shared/
+│       ├── backend.tf            # S3 + DynamoDB backend config
+│       ├── providers.tf          # AWS provider configuration
+│       └── versions.tf           # Terraform version constraints
+├── scripts/
+│   ├── setup-domain.sh           # Domain purchase and Route53 setup
+│   ├── create-dev-env.sh         # Development environment creation
+│   ├── create-staging-env.sh     # Staging environment creation
+│   ├── create-prod-env.sh        # Production environment creation
+│   ├── destroy-env.sh            # Environment cleanup
+│   └── update-kubeconfig.sh      # EKS kubeconfig update
+├── docs/
+│   ├── aws-setup-guide.md        # AWS account setup instructions
+│   ├── domain-configuration.md   # Domain and DNS setup guide
+│   ├── terraform-guide.md        # Terraform usage guide
+│   ├── cost-optimization.md      # AWS cost optimization strategies
+│   └── security-hardening.md     # AWS security best practices
+├── .github/
+│   └── workflows/
+│       ├── terraform-plan.yml    # Terraform plan workflow
+│       ├── terraform-apply.yml   # Terraform apply workflow
+│       └── destroy-env.yml       # Environment destruction workflow
+├── .gitignore                    # Terraform and AWS-specific ignores
+└── README.md                     # Repository overview and usage
+```
+
 ### 🏗️ **solidity-security-infrastructure**
 ```
 solidity-security-infrastructure/
-├── local/
-│   ├── docker-compose.yml        # Local development stack
-│   ├── k8s/                      # Local Kubernetes manifests
-│   └── scripts/                  # Local setup scripts
-├── terraform/
-│   ├── modules/                  # Reusable Terraform modules
-│   │   ├── eks-cluster/
-│   │   ├── networking/
-│   │   ├── databases/
-│   │   └── monitoring/
-│   └── environments/
+├── argocd/
+│   ├── installation/
+│   │   ├── argocd-install.yaml
+│   │   ├── argocd-rbac.yaml
+│   │   └── argocd-ingress.yaml
+│   ├── applications/
+│   │   ├── app-of-apps.yaml
+│   │   ├── vault-application.yaml
+│   │   ├── monitoring-application.yaml
+│   │   ├── api-service-application.yaml
+│   │   ├── frontend-application.yaml
+│   │   ├── tool-integration-application.yaml
+│   │   ├── orchestration-application.yaml
+│   │   ├── intelligence-engine-application.yaml
+│   │   ├── data-service-application.yaml
+│   │   └── notification-application.yaml
+│   └── projects/
+│       ├── dev-project.yaml
+│       ├── staging-project.yaml
+│       └── prod-project.yaml
+├── vault/
+│   ├── deployment/
+│   │   ├── vault-cluster.yaml
+│   │   ├── consul-storage.yaml
+│   │   ├── vault-injector.yaml
+│   │   └── vault-ui-ingress.yaml
+│   ├── policies/
+│   │   ├── api-service-policy.hcl
+│   │   ├── data-service-policy.hcl
+│   │   ├── tool-integration-policy.hcl
+│   │   ├── orchestration-policy.hcl
+│   │   ├── intelligence-engine-policy.hcl
+│   │   ├── notification-policy.hcl
+│   │   ├── frontend-policy.hcl
+│   │   └── base-policies.hcl
+│   ├── auth-methods/
+│   │   ├── kubernetes-auth.yaml
+│   │   └── aws-iam-auth.yaml
+│   └── secret-engines/
+│       ├── kv-engine.yaml
+│       ├── pki-engine.yaml
+│       └── database-engine.yaml
+├── external-secrets/
+│   ├── operator-install.yaml
+│   ├── cluster-secret-store.yaml
+│   └── secret-templates/
+│       ├── api-service-external-secret.yaml
+│       ├── data-service-external-secret.yaml
+│       ├── tool-integration-external-secret.yaml
+│       ├── orchestration-external-secret.yaml
+│       ├── intelligence-engine-external-secret.yaml
+│       ├── notification-external-secret.yaml
+│       └── frontend-external-secret.yaml
+├── cert-manager/
+│   ├── install.yaml
+│   ├── cluster-issuer-letsencrypt.yaml
+│   └── route53-credentials.yaml
+├── aws-load-balancer-controller/
+│   ├── install.yaml
+│   ├── service-account.yaml
+│   └── iam-policy.yaml
+├── monitoring/
+│   ├── prometheus/
+│   │   ├── prometheus-install.yaml
+│   │   ├── prometheus-config.yaml
+│   │   └── service-monitor.yaml
+│   ├── grafana/
+│   │   ├── grafana-install.yaml
+│   │   ├── grafana-config.yaml
+│   │   └── grafana-ingress.yaml
+│   ├── jaeger/
+│   │   ├── jaeger-install.yaml
+│   │   └── jaeger-config.yaml
+│   └── alertmanager/
+│       ├── alertmanager-install.yaml
+│       └── alertmanager-config.yaml
+├── helm/
+│   ├── charts/                   # Custom Helm charts
+│   │   ├── api-service/
+│   │   ├── frontend/
+│   │   ├── tool-integration/
+│   │   ├── orchestration/
+│   │   ├── intelligence-engine/
+│   │   ├── data-service/
+│   │   └── notification/
+│   └── values/                   # Environment-specific values
+│       ├── dev/
 │       ├── staging/
 │       └── production/
-├── helm/
-│   ├── charts/                   # Helm charts for applications
-│   └── values/                   # Environment-specific values
-├── github-actions/
-│   └── workflows/                # CI/CD pipeline definitions
-└── scripts/
-    ├── setup-local.sh
-    ├── deploy-staging.sh
-    └── deploy-production.sh
+├── scripts/
+│   ├── setup-cluster-services.sh # Install cluster-level services
+│   ├── vault-init.sh             # Initialize and configure Vault
+│   ├── monitoring-setup.sh       # Set up monitoring stack
+│   ├── deploy-applications.sh    # Deploy all applications via ArgoCD
+│   └── update-certificates.sh    # Update SSL certificates
+└── .github/
+    └── workflows/
+        ├── deploy-dev.yml         # Deploy to development
+        ├── deploy-staging.yml     # Deploy to staging
+        ├── deploy-prod.yml        # Deploy to production
+        └── validate-manifests.yml # Validate Kubernetes manifests
 ```
 
 ### 🔧 **solidity-security-tools**
@@ -106,20 +275,76 @@ solidity-security-infrastructure/
 solidity-security-tools/
 ├── adapters/
 │   ├── slither/                  # Slither integration
+│   │   ├── adapter.py
+│   │   ├── config.py
+│   │   ├── normalizer.py
+│   │   └── tests/
 │   ├── aderyn/                   # Aderyn integration
+│   │   ├── adapter.py
+│   │   ├── rust_wrapper.py
+│   │   ├── config.py
+│   │   ├── normalizer.py
+│   │   └── tests/
 │   ├── mythx/                    # MythX integration
+│   │   ├── adapter.py
+│   │   ├── async_client.py
+│   │   ├── config.py
+│   │   ├── normalizer.py
+│   │   └── tests/
 │   ├── solidity-metrics/         # Solidity-Metrics integration
+│   │   ├── adapter.py
+│   │   ├── nodejs_wrapper.py
+│   │   ├── config.py
+│   │   ├── normalizer.py
+│   │   └── tests/
 │   └── certora/                  # Future Certora integration
+│       ├── adapter.py
+│       ├── config.py
+│       ├── normalizer.py
+│       └── tests/
 ├── common/
 │   ├── schemas/                  # Common vulnerability schemas
+│   │   ├── vulnerability.json
+│   │   ├── finding.json
+│   │   └── tool_result.json
 │   ├── normalizers/              # Result normalization
+│   │   ├── base_normalizer.py
+│   │   ├── swc_mapper.py
+│   │   └── severity_mapper.py
 │   └── utils/                    # Shared utilities
+│       ├── file_utils.py
+│       ├── crypto_utils.py
+│       └── validation.py
 ├── tests/
 │   ├── fixtures/                 # Test contracts
+│   │   ├── vulnerable_contracts/
+│   │   ├── safe_contracts/
+│   │   └── complex_contracts/
 │   └── integration/              # Tool integration tests
-└── scripts/
-    ├── install-tools.sh
-    └── test-integrations.sh
+│       ├── test_slither.py
+│       ├── test_aderyn.py
+│       ├── test_mythx.py
+│       └── test_solidity_metrics.py
+├── k8s/                          # Kubernetes manifests for tools
+│   ├── base/
+│   │   ├── deployment.yaml
+│   │   ├── service.yaml
+│   │   ├── configmap.yaml
+│   │   ├── external-secret.yaml
+│   │   ├── vault-policy.yaml
+│   │   ├── service-account.yaml
+│   │   ├── pvc.yaml
+│   │   └── ingress.yaml
+│   └── overlays/
+│       ├── dev/
+│       ├── staging/
+│       └── production/
+├── scripts/
+│   ├── install-tools.sh          # Install all security tools
+│   ├── test-integrations.sh      # Test tool integrations
+│   ├── setup-vault-secrets.sh    # Configure Vault secrets for tools
+│   └── performance-test.sh       # Performance testing
+└── README.md
 ```
 
 ### 📚 **solidity-security-docs**
@@ -128,22 +353,44 @@ solidity-security-docs/
 ├── architecture/
 │   ├── system-overview.md
 │   ├── microservices.md
-│   └── data-flow.md
+│   ├── aws-infrastructure.md     # NEW: AWS architecture documentation
+│   ├── kubernetes-services.md    # NEW: K8s services documentation
+│   ├── vault-integration.md      # NEW: Vault secret management
+│   ├── data-flow.md
+│   └── security-model.md
 ├── development/
 │   ├── getting-started.md
-│   ├── local-setup.md
-│   └── contributing.md
+│   ├── cloud-setup.md            # Updated: Cloud development setup
+│   ├── aws-prerequisites.md      # NEW: AWS account and domain setup
+│   ├── contributing.md
+│   └── troubleshooting.md
 ├── deployment/
-│   ├── infrastructure.md
+│   ├── aws-infrastructure.md     # NEW: AWS infrastructure deployment
 │   ├── kubernetes.md
-│   └── monitoring.md
+│   ├── argocd-setup.md           # NEW: ArgoCD configuration
+│   ├── vault-setup.md            # NEW: Vault deployment and config
+│   ├── monitoring.md
+│   └── ssl-certificates.md       # NEW: Let's Encrypt and cert-manager
 ├── api/
 │   ├── openapi-specs/
-│   └── integration-guides/
+│   ├── integration-guides/
+│   └── webhook-documentation.md
+├── operations/
+│   ├── runbooks/                 # NEW: Operational procedures
+│   │   ├── vault-operations.md
+│   │   ├── argocd-operations.md
+│   │   ├── aws-operations.md
+│   │   └── incident-response.md
+│   ├── monitoring/
+│   │   ├── alerts.md
+│   │   ├── dashboards.md
+│   │   └── troubleshooting.md
+│   └── backup-recovery.md
 └── user-guides/
     ├── dashboard-usage.md
     ├── tool-configuration.md
-    └── compliance-reports.md
+    ├── compliance-reports.md
+    └── team-collaboration.md
 ```
 
 ### 📊 **solidity-security-monitoring**
@@ -151,20 +398,69 @@ solidity-security-docs/
 solidity-security-monitoring/
 ├── prometheus/
 │   ├── rules/                    # Alerting rules
+│   │   ├── infrastructure.yml
+│   │   ├── applications.yml
+│   │   ├── vault.yml             # NEW: Vault monitoring rules
+│   │   └── aws.yml               # NEW: AWS service monitoring
 │   ├── config/                   # Prometheus configuration
+│   │   ├── prometheus.yml
+│   │   ├── scrape-configs.yml
+│   │   └── remote-write.yml
 │   └── targets/                  # Service discovery configs
+│       ├── kubernetes-sd.yml
+│       ├── aws-sd.yml            # NEW: AWS service discovery
+│       └── vault-sd.yml          # NEW: Vault service discovery
 ├── grafana/
 │   ├── dashboards/               # Dashboard JSON files
+│   │   ├── infrastructure.json
+│   │   ├── applications.json
+│   │   ├── vault.json            # NEW: Vault monitoring dashboard
+│   │   ├── aws-services.json     # NEW: AWS services dashboard
+│   │   ├── argocd.json           # NEW: ArgoCD dashboard
+│   │   └── security-metrics.json
 │   ├── datasources/              # Data source configurations
+│   │   ├── prometheus.yml
+│   │   ├── cloudwatch.yml        # NEW: CloudWatch integration
+│   │   └── vault-metrics.yml     # NEW: Vault metrics
 │   └── provisioning/             # Automated provisioning
+│       ├── dashboards.yml
+│       ├── datasources.yml
+│       └── notifiers.yml
 ├── alertmanager/
 │   ├── config/                   # Alert routing configuration
+│   │   ├── alertmanager.yml
+│   │   ├── routes.yml
+│   │   └── receivers.yml
 │   └── templates/                # Notification templates
+│       ├── slack.tmpl
+│       ├── email.tmpl
+│       └── pagerduty.tmpl
 ├── jaeger/
-│   └── config/                   # Distributed tracing setup
+│   ├── config/                   # Distributed tracing setup
+│   │   ├── jaeger.yml
+│   │   └── storage.yml
+│   └── collectors/
+│       ├── kubernetes.yml
+│       └── aws.yml               # NEW: AWS X-Ray integration
+├── cloudwatch/                   # NEW: CloudWatch configuration
+│   ├── dashboards/
+│   │   ├── eks-cluster.json
+│   │   ├── rds-monitoring.json
+│   │   ├── elasticache.json
+│   │   └── alb-monitoring.json
+│   ├── alarms/
+│   │   ├── infrastructure.yml
+│   │   ├── applications.yml
+│   │   └── cost-alerts.yml
+│   └── log-groups/
+│       ├── application-logs.yml
+│       ├── infrastructure-logs.yml
+│       └── audit-logs.yml
 └── scripts/
     ├── import-dashboards.sh
-    └── setup-monitoring.sh
+    ├── setup-monitoring.sh
+    ├── configure-cloudwatch.sh    # NEW: CloudWatch setup
+    └── vault-monitoring.sh        # NEW: Vault monitoring setup
 ```
 
 ### 🛡️ **solidity-security-vulnerabilities**
@@ -192,35 +488,40 @@ solidity-security-vulnerabilities/
 
 ## Week 1 Repository Setup Checklist
 
-### Day 1: Repository Creation
-- [ ] Create all 6 repositories on GitHub
+### Day 1: Repository Creation & Domain Setup
+- [ ] Create all 7 repositories on GitHub
 - [ ] Set up branch protection rules (main branch)
 - [ ] Configure repository templates and README files
 - [ ] Add team members with appropriate permissions
+- [ ] **Purchase production domain** (e.g., solidity-platform.com)
+- [ ] **Configure Route53 hosted zone**
 
-### Day 2: Infrastructure Repository Setup
-- [ ] Create `docker-compose.yml` for local development
-- [ ] Set up basic Kubernetes manifests
-- [ ] Configure GitHub Actions workflows
-- [ ] Add setup scripts for local environment
+### Day 2: AWS Infrastructure Repository Setup
+- [ ] **Create Terraform modules for AWS infrastructure**
+- [ ] **Set up environment-specific configurations (dev/staging/prod)**
+- [ ] **Configure GitHub Actions for Terraform workflows**
+- [ ] **Add domain and DNS configuration scripts**
+- [ ] **Document AWS setup prerequisites**
 
-### Day 3: Platform Repository Foundation
+### Day 3: Kubernetes Infrastructure Repository Setup
+- [ ] **Create ArgoCD installation manifests**
+- [ ] **Set up Vault deployment configurations**
+- [ ] **Configure AWS Load Balancer Controller manifests**
+- [ ] **Create External Secrets Operator configurations**
+- [ ] **Set up cert-manager with Let's Encrypt**
+
+### Day 4: Platform Repository Foundation
 - [ ] Set up monorepo structure with service directories
 - [ ] Create basic FastAPI application skeleton
 - [ ] Set up React application with TypeScript
-- [ ] Configure Docker build files
+- [ ] Configure Docker build files for AWS ECR
 
-### Day 4: Tools Repository Setup
+### Day 5: Tools & Documentation
 - [ ] Create adapter structure for each security tool
 - [ ] Set up tool installation scripts
 - [ ] Configure test fixtures with sample contracts
-- [ ] Document tool integration patterns
-
-### Day 5: Documentation & Monitoring
-- [ ] Set up documentation site structure
-- [ ] Create basic architecture documentation
-- [ ] Configure Prometheus and Grafana setups
-- [ ] Set up vulnerability database schema
+- [ ] Set up documentation site structure with AWS and cloud information
+- [ ] Configure monitoring dashboards for AWS services
 
 ## Repository Permissions & Settings
 
@@ -237,9 +538,11 @@ solidity-security-vulnerabilities/
 
 ### **GitHub Actions Secrets:**
 - `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`
-- `DOCKER_REGISTRY_TOKEN`
+- `TERRAFORM_CLOUD_TOKEN` (if using Terraform Cloud)
+- `DOCKER_REGISTRY_TOKEN` (for ECR)
 - `SLACK_WEBHOOK_URL`
-- `DATABASE_PASSWORD`
+- `ROUTE53_ACCESS_KEY` (for DNS management)
+- `VAULT_TOKEN` (for Vault management)
 
 ## Repository Dependencies
 
@@ -248,16 +551,40 @@ graph TB
     A[solidity-security-platform] --> B[solidity-security-tools]
     A --> C[solidity-security-infrastructure]
     A --> F[solidity-security-vulnerabilities]
+    G[solidity-security-aws-infrastructure] --> C
     C --> D[solidity-security-monitoring]
     E[solidity-security-docs] --> A
     E --> C
     E --> B
+    E --> G
+    
+    style G fill:#ff9999
+    style C fill:#99ccff
 ```
 
 **Key Dependencies:**
-- Platform depends on tools and infrastructure
+- **AWS Infrastructure** provides the foundation for all cloud resources
+- **Kubernetes Infrastructure** depends on AWS Infrastructure being deployed first
+- Platform depends on tools and Kubernetes infrastructure
 - Infrastructure includes monitoring configurations
 - Documentation references all other repos
 - Vulnerabilities database is consumed by platform
 
-This repository structure supports your microservices architecture while maintaining clear separation of concerns and enabling independent development workflows.
+## Infrastructure Deployment Order
+
+1. **AWS Infrastructure** (`solidity-security-aws-infrastructure`)
+   - Deploy VPC, EKS, RDS, ElastiCache, Route53
+   - Configure IAM roles and KMS keys
+   - Set up domain and DNS
+
+2. **Kubernetes Services** (`solidity-security-infrastructure`)
+   - Install ArgoCD, Vault, AWS Load Balancer Controller
+   - Configure cert-manager and External Secrets Operator
+   - Set up monitoring stack
+
+3. **Platform Applications** (`solidity-security-platform`)
+   - Deploy microservices via ArgoCD
+   - Configure applications with Vault secrets
+   - Test end-to-end functionality
+
+This repository structure supports your cloud-first microservices architecture while maintaining clear separation between AWS infrastructure provisioning and Kubernetes service deployment, enabling independent development workflows and proper infrastructure management.
