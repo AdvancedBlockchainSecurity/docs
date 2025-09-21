@@ -252,7 +252,6 @@ Each sprint must meet:
 AWS EKS Development: ~$200/month
 RDS PostgreSQL (Multi-AZ): ~$50/month
 ElastiCache Redis: ~$30/month
-Route53 + Domain: ~$20/month
 AWS Secrets Manager: ~$10/month
 ALB + Data Transfer: ~$30/month
 Total: ~$340/month
