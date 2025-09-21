@@ -91,7 +91,8 @@ solidity-security-aws-infrastructure/
 │   │   │   ├── main.tf
 │   │   │   ├── variables.tf
 │   │   │   ├── terraform.tfvars
-│   │   │   └── outputs.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── README.md
 │   │   ├── staging/
 │   │   │   ├── main.tf
 │   │   │   ├── variables.tf
