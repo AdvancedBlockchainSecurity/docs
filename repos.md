@@ -243,12 +243,6 @@ solidity-security-infrastructure/
 │       ├── dev/
 │       ├── staging/
 │       └── production/
-├── scripts/
-│   ├── setup-cluster-services.sh # Install cluster-level services
-│   ├── vault-init.sh             # Initialize and configure Vault
-│   ├── monitoring-setup.sh       # Set up monitoring stack
-│   ├── deploy-applications.sh    # Deploy all applications via ArgoCD
-│   └── update-certificates.sh    # Update SSL certificates
 └── .github/
     └── workflows/
         ├── deploy-dev.yml         # Deploy to development
@@ -443,11 +437,6 @@ solidity-security-monitoring/
 │       ├── application-logs.yml
 │       ├── infrastructure-logs.yml
 │       └── audit-logs.yml
-└── scripts/
-    ├── import-dashboards.sh
-    ├── setup-monitoring.sh
-    ├── configure-cloudwatch.sh    # NEW: CloudWatch setup
-    └── vault-monitoring.sh        # NEW: Vault monitoring setup
 ```
 
 ### 🛡️ **solidity-security-vulnerabilities**
