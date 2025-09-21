@@ -646,24 +646,6 @@ Production Environment:
   Enterprise Features: Enhanced monitoring and compliance
 ```
 
-### **Migration from Local Development:**
-```yaml
-Phase 1: Cloud Development Setup
-  - Replace local .env files with AWS Secrets Manager
-  - Implement External Secrets Operator
-  - Test secret injection and rotation
-  
-Phase 2: Production Scaling
-  - Add cross-region replication
-  - Implement enterprise monitoring
-  - Enable advanced compliance features
-  
-Phase 3: Multi-Environment Management
-  - Separate secret namespaces per environment
-  - Implement environment-specific rotation policies
-  - Add cross-account secret sharing
-```
-
 ### **Troubleshooting and Operations:**
 ```yaml
 Common Issues and Solutions:
