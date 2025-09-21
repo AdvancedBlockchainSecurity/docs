@@ -142,19 +142,6 @@ solidity-security-aws-infrastructure/
 │       ├── backend.tf            # S3 + DynamoDB backend config
 │       ├── providers.tf          # AWS provider configuration
 │       └── versions.tf           # Terraform version constraints
-├── scripts/
-│   ├── setup-domain.sh           # Domain purchase and Route53 setup
-│   ├── create-dev-env.sh         # Development environment creation
-│   ├── create-staging-env.sh     # Staging environment creation
-│   ├── create-prod-env.sh        # Production environment creation
-│   ├── destroy-env.sh            # Environment cleanup
-│   └── update-kubeconfig.sh      # EKS kubeconfig update
-├── docs/
-│   ├── aws-setup-guide.md        # AWS account setup instructions
-│   ├── domain-configuration.md   # Domain and DNS setup guide
-│   ├── terraform-guide.md        # Terraform usage guide
-│   ├── cost-optimization.md      # AWS cost optimization strategies
-│   └── security-hardening.md     # AWS security best practices
 ├── .github/
 │   └── workflows/
 │       ├── terraform-plan.yml    # Terraform plan workflow
