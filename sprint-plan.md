@@ -18,20 +18,21 @@
 - [ ] Install AWS Load Balancer Controller for ALB ingress management
 - [ ] Install cert-manager with Let's Encrypt and Route53 DNS validation
 - [ ] Configure development DNS entries with proper A records pointing to ALB
-- [ ] **Configure AWS Secrets Manager for application secret storage**
-- [ ] **Set up AWS IAM roles for Secrets Manager access**
-- [ ] **Configure cert-manager with Let's Encrypt for certificate management**
+- [ ] **Deploy AWS Secrets Manager for application secret storage**
+- [ ] **Configure AWS Secrets Manager with environment-based secret organization**
+- [ ] **Set up automatic secret rotation for database credentials**
 - [ ] **Install External Secrets Operator with AWS IAM authentication**
-- [ ] **Configure External Secrets Operator for AWS Secrets Manager integration**
+- [ ] **Configure AWS Secrets Store CSI Driver for direct secret mounting**
+- [ ] **Configure AWS IAM roles and policies for least-privilege secret access**
 - [ ] **Install ArgoCD in AWS EKS cluster**
 - [ ] **Configure ArgoCD with GitHub repository integration**
 - [ ] **Set up ArgoCD application projects for development**
 - [ ] **Configure ArgoCD RBAC for team access and permissions**
-- [ ] **Configure ArgoCD with External Secrets Operator for secret injection in GitOps**
+- [ ] **Configure ArgoCD External Secrets integration for secret injection in GitOps**
 - [ ] **Create ArgoCD Application manifests for all microservices**
 - [ ] Deploy RDS PostgreSQL 15 with Multi-AZ deployment and automated backups
 - [ ] Deploy ElastiCache Redis with cluster mode enabled
-- [ ] Set up CloudWatch monitoring with Prometheus and Grafana on EKS (Note: Grafana uses default password configuration)
+- [ ] Set up CloudWatch monitoring with Prometheus and Grafana on EKS
 - [ ] Configure ECR for container image storage with vulnerability scanning
 - [ ] Implement GitHub Actions CI/CD pipeline with AWS integration
 - [ ] Create production-ready Docker images with security scanning
@@ -41,11 +42,11 @@
 - [ ] **Test External Secrets Operator integration with all cloud services**
 
 **AWS Secrets Manager Tool Integration**:
-- [ ] **MythX API keys in `tool-integration/mythx-credentials` secret**
-- [ ] **Tool configurations in `tool-integration/tool-configs` secret**
-- [ ] **ElastiCache Redis credentials in `orchestration/celery-broker` secret**
-- [ ] **Worker authentication tokens in `orchestration/worker-auth` secret**
-- [ ] **Tool integration IAM policy for Secrets Manager API key access only**
+- [ ] **MythX API keys in `dev/tool-integration/mythx-credentials`**
+- [ ] **Tool configurations in `dev/tool-integration/tool-configs`**
+- [ ] **ElastiCache Redis credentials in `dev/orchestration/celery-broker`**
+- [ ] **Worker authentication tokens in `dev/orchestration/worker-auth`**
+- [ ] **Tool integration IAM policy for API key access only**
 - [ ] **Orchestration IAM policy for broker and worker credential access**
 
 **Acceptance Criteria**:
@@ -77,11 +78,11 @@
 
 **Development Checklist**:
 - [ ] **Implement FastAPI application with OpenAPI 3.0 documentation**
-- [ ] **Create Kubernetes IaC for API service (Deployment, Service, ConfigMap, External Secret, IAM Policy manifests)**
+- [ ] **Create Kubernetes IaC for API service (Deployment, Service, ConfigMap, External Secret, Secret Provider Class manifests)**
 - [ ] **Create Helm chart for API service with environment-specific values**
 - [ ] **Create ArgoCD Application manifest for API service deployment**
 - [ ] **Configure AWS Secrets Manager secrets for API service (JWT keys, OAuth credentials, RDS URLs)**
-- [ ] **Create IAM policies for API service with least privilege access to Secrets Manager**
+- [ ] **Create IAM policies for API service with least privilege access**
 - [ ] Set up AWS API Gateway with rate limiting (1000 req/hour) and CloudWatch logging
 - [ ] Configure AWS ALB ingress for API services with Let's Encrypt SSL certificates
 - [ ] **Configure automated deployment pipelines via ArgoCD for API services**
@@ -99,9 +100,9 @@
 - [ ] **Test AWS Secrets Manager secret rotation for API service without service restart**
 
 **MythX AWS Secrets Manager Integration**:
-- [ ] **Primary MythX API key in `tool-integration/mythx-primary` secret**
-- [ ] **Backup MythX API keys in `tool-integration/mythx-backup` secret**
-- [ ] **MythX configuration parameters in `tool-integration/mythx-config` secret**
+- [ ] **Primary MythX API key in `dev/tool-integration/mythx-primary`**
+- [ ] **Backup MythX API keys in `dev/tool-integration/mythx-backup`**
+- [ ] **MythX configuration parameters in `dev/tool-integration/mythx-config`**
 - [ ] **Automatic failover logic when primary credentials are rotated**
 - [ ] **Rate limiting configurations stored in AWS Secrets Manager for dynamic updates**
 
@@ -138,9 +139,9 @@
 - [ ] **Create Kubernetes IaC for Tool Integration Service**
 - [ ] **Create Helm chart for Tool Integration Service with tool-specific configurations**
 - [ ] **Create ArgoCD Application manifest for Tool Integration Service**
-- [ ] **Store tool API keys and configurations in AWS Secrets Manager KV engine**
+- [ ] **Store tool API keys and configurations in AWS Secrets Manager**
 - [ ] **Configure External Secrets Operator for tool credential injection**
-- [ ] **Create AWS Secrets Manager policies for tool integration service access**
+- [ ] **Create IAM policies for tool integration service access**
 - [ ] **Implement Analysis Orchestration Service with Celery workers on EKS**
 - [ ] **Create Kubernetes IaC for Orchestration Service**
 - [ ] **Create Helm chart for Orchestration Service with worker scaling configuration**
@@ -159,11 +160,11 @@
 - [ ] **Test tool credential rotation without service interruption**
 
 **Extended Tool AWS Secrets Manager Integration**:
-- [ ] **Certora API keys in `secrets-manager/tool-integration/certora`**
-- [ ] **Echidna configuration secrets in `secrets-manager/tool-integration/echidna`**
-- [ ] **Manticore service credentials in `secrets-manager/tool-integration/manticore`**
-- [ ] **Third-party analyzer API keys in `secrets-manager/tool-integration/analyzers`**
-- [ ] **Custom detector configurations in `secrets-manager/tool-integration/detectors`**
+- [ ] **Certora API keys in `dev/tool-integration/certora`**
+- [ ] **Echidna configuration secrets in `dev/tool-integration/echidna`**
+- [ ] **Manticore service credentials in `dev/tool-integration/manticore`**
+- [ ] **Third-party analyzer API keys in `dev/tool-integration/analyzers`**
+- [ ] **Custom detector configurations in `dev/tool-integration/detectors`**
 
 **Acceptance Criteria**:
 - All major security tools integrate successfully including enhanced Aderyn
@@ -196,7 +197,7 @@
 - [ ] **Configure ArgoCD sync policies for frontend application**
 - [ ] **Store frontend configuration secrets in AWS Secrets Manager (OAuth client IDs, API endpoints)**
 - [ ] **Configure External Secrets Operator for frontend secret injection**
-- [ ] **Create AWS Secrets Manager policy for frontend service configuration access**
+- [ ] **Create IAM policy for frontend service configuration access**
 - [ ] Implement authentication flow with JWT token management
 - [ ] Create dashboard layout with navigation and user management
 - [ ] Implement TanStack Query for API data fetching and caching
@@ -271,7 +272,7 @@
 - [ ] Integrate code complexity metrics into risk assessment
 - [ ] **Store algorithm configurations and weights in AWS Secrets Manager**
 - [ ] **Configure External Secrets Operator for intelligence engine secrets**
-- [ ] **Create AWS Secrets Manager policy for intelligence engine configuration access**
+- [ ] **Create IAM policy for intelligence engine configuration access**
 - [ ] Implement intelligent severity adjustment based on business context
 - [ ] Create rule-based false positive detection using pattern matching
 - [ ] Implement finding status management (open/acknowledged/fixed)
@@ -304,11 +305,10 @@
 
 **Development Checklist**:
 - [ ] **Deploy AWS EKS clusters for staging and production environments**
-- [ ] **Configure AWS Secrets Manager service with multi-AZ HA**
-- [ ] **Configure AWS Secrets Manager performance replication across regions**
-- [ ] **Set up AWS Secrets Manager disaster recovery replication**
-- [ ] **Configure AWS Secrets Manager audit logging to CloudWatch and S3**
+- [ ] **Deploy AWS Secrets Manager with cross-region replication**
+- [ ] **Configure AWS Secrets Manager enterprise features and compliance**
 - [ ] **Set up cross-region AWS Secrets Manager secret replication**
+- [ ] **Configure AWS Secrets Manager audit logging to CloudTrail and CloudWatch**
 - [ ] **Configure External Secrets Operator with production IAM roles**
 - [ ] **Update ArgoCD for multi-environment deployment management**
 - [ ] **Scale RDS PostgreSQL to production configuration with read replicas**
@@ -333,7 +333,7 @@
 
 **Acceptance Criteria**:
 - **AWS staging and production environments fully operational with EKS**
-- **Production AWS Secrets Manager service operational with HA and auto-unseal**
+- **Production AWS Secrets Manager configured with HA and cross-region replication**
 - **Database migration completed with zero data loss**
 - **All services running on production AWS with enterprise-grade performance**
 - **Let's Encrypt certificates automatically managed for all environments**
@@ -366,7 +366,7 @@
 - [ ] **Configure ArgoCD for collaboration service deployments**
 - [ ] **Store team notification credentials in AWS Secrets Manager**
 - [ ] **Configure External Secrets Operator for team service secrets**
-- [ ] **Create AWS Secrets Manager policies for collaboration service access**
+- [ ] **Create IAM policies for collaboration service access**
 
 **Acceptance Criteria**:
 - Team members can comment and collaborate on findings
@@ -447,8 +447,8 @@
 - [ ] Create compliance reporting for access controls
 - [ ] Implement emergency access procedures for admin lockout
 - [ ] **Update ArgoCD deployments for SSO and admin services**
-- [ ] **Configure AWS Secrets Manager LDAP/SAML authentication methods**
-- [ ] **Store SSO certificates and keys in AWS Secrets Manager PKI engine**
+- [ ] **Configure AWS Secrets Manager SAML certificate storage**
+- [ ] **Store SSO certificates and keys in AWS Secrets Manager**
 
 **Acceptance Criteria**:
 - SAML SSO works with Active Directory and Okta
@@ -477,7 +477,7 @@
 - [ ] **Configure ArgoCD for performance-optimized deployments**
 - [ ] **Set up ArgoCD sync strategies for zero-downtime updates**
 - [ ] **Optimize AWS Secrets Manager performance for high-throughput secret access**
-- [ ] **Configure AWS Secrets Manager performance replication for read scaling**
+- [ ] **Configure AWS Secrets Manager cross-region replication for performance**
 
 **Acceptance Criteria**:
 - Platform handles 1000+ concurrent users without degradation
@@ -588,7 +588,7 @@
 - [ ] Implement federated search across tenant boundaries
 - [ ] **Configure ArgoCD for multi-region deployment management**
 - [ ] **Set up ArgoCD application sets for multi-tenant environments**
-- [ ] **Configure AWS Secrets Manager services in multiple regions with replication**
+- [ ] **Deploy AWS Secrets Manager in multiple regions with replication**
 - [ ] **Configure cross-region AWS Secrets Manager secret replication**
 
 **Acceptance Criteria**:
@@ -659,7 +659,7 @@ Before production deployment:
 - [ ] **ArgoCD production configuration validated and tested**
 - [ ] **GitOps workflows proven reliable for production deployment**
 - [ ] **ArgoCD disaster recovery and rollback procedures operational**
-- [ ] **AWS Secrets Manager production cluster operational with HA and security hardening**
+- [ ] **AWS Secrets Manager production deployment operational with HA and security hardening**
 - [ ] **AWS Secrets Manager disaster recovery and cross-region replication tested**
 - [ ] **All secrets properly managed with appropriate rotation policies**
 
@@ -672,25 +672,25 @@ Cloud Development Costs (Months 1-3):
   RDS PostgreSQL (Multi-AZ): ~$50/month
   ElastiCache Redis: ~$30/month
   Route53 + Domain: ~$20/month
-  AWS Secrets Manager Cluster: ~$50/month
+  AWS Secrets Manager: ~$10/month
   ALB + Data Transfer: ~$30/month
-  Total Development Costs: ~$380/month
+  Total Development Costs: ~$340/month
 
 Production Scaling Costs (Month 4+):
   AWS EKS Production: ~$500/month
   AWS EKS Staging: ~$300/month
   RDS PostgreSQL + Replicas: ~$200/month
   ElastiCache + Clustering: ~$100/month
-  AWS Secrets Manager: ~$200/month (optional)
+  AWS Secrets Manager + Cross-Region: ~$50/month
   AWS KMS + Other Services: ~$100/month
   CloudFront CDN: ~$50/month
-  Total Production Costs: ~$1,450/month (scales with usage)
+  Total Production Costs: ~$1,300/month (scales with usage)
 ```
 
 ### **AWS Secrets Manager Benefits Summary:**
 ```yaml
 Cloud AWS Secrets Manager Development:
-  - Enterprise secret management from day one
+  - Native AWS integration from day one
   - Production-grade policies and procedures
   - Automatic secret rotation and lifecycle management
   - Multi-environment secret isolation
@@ -700,7 +700,7 @@ Cloud AWS Secrets Manager Development:
 Production AWS Secrets Manager Benefits:
   - High availability and disaster recovery
   - Automatic backup and cross-region replication
-  - Performance replication for global scale
+  - Cross-region replication for global scale
   - Enterprise compliance and audit logging
   - AWS KMS integration for enhanced security
   - Multi-cloud secret management capabilities

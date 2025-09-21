@@ -17,7 +17,7 @@ Contains: API services, frontend, shared libraries
 ```
 Purpose: AWS cloud resource provisioning and management
 Tech Stack: Terraform, AWS CLI, CloudFormation
-Contains: VPC, EKS, RDS, ElastiCache, Route53, IAM, KMS configurations
+Contains: VPC, EKS, RDS, ElastiCache, Route53, IAM, Secrets Manager configurations
 ```
 
 ### 3. **`solidity-security-infrastructure`**
@@ -133,7 +133,7 @@ solidity-security-aws-infrastructure/
 │   │   │   ├── variables.tf
 │   │   │   ├── outputs.tf
 │   │   │   └── README.md
-│   │   └── kms/
+│   │   └── secrets-manager/
 │   │       ├── main.tf
 │   │       ├── variables.tf
 │   │       ├── outputs.tf
@@ -161,7 +161,6 @@ solidity-security-infrastructure/
 │   │   └── argocd-ingress.yaml
 │   ├── applications/
 │   │   ├── app-of-apps.yaml
-│   │   ├── aws-secrets-application.yaml
 │   │   ├── monitoring-application.yaml
 │   │   ├── api-service-application.yaml
 │   │   ├── frontend-application.yaml
@@ -174,28 +173,6 @@ solidity-security-infrastructure/
 │       ├── dev-project.yaml
 │       ├── staging-project.yaml
 │       └── prod-project.yaml
-├── aws-secrets/
-│   ├── deployment/
-│   │   ├── aws-secrets-cluster.yaml
-│   │   ├── consul-storage.yaml
-│   │   ├── aws-secrets-injector.yaml
-│   │   └── aws-secrets-ui-ingress.yaml
-│   ├── policies/
-│   │   ├── api-service-policy.hcl
-│   │   ├── data-service-policy.hcl
-│   │   ├── tool-integration-policy.hcl
-│   │   ├── orchestration-policy.hcl
-│   │   ├── intelligence-engine-policy.hcl
-│   │   ├── notification-policy.hcl
-│   │   ├── frontend-policy.hcl
-│   │   └── base-policies.hcl
-│   ├── auth-methods/
-│   │   ├── kubernetes-auth.yaml
-│   │   └── aws-iam-auth.yaml
-│   └── secret-engines/
-│       ├── kv-engine.yaml
-│       ├── pki-engine.yaml
-│       └── database-engine.yaml
 ├── external-secrets/
 │   ├── operator-install.yaml
 │   ├── cluster-secret-store.yaml
@@ -207,6 +184,17 @@ solidity-security-infrastructure/
 │       ├── intelligence-engine-external-secret.yaml
 │       ├── notification-external-secret.yaml
 │       └── frontend-external-secret.yaml
+├── secrets-store-csi/
+│   ├── install.yaml
+│   ├── aws-provider.yaml
+│   └── secret-provider-classes/
+│       ├── api-service-spc.yaml
+│       ├── data-service-spc.yaml
+│       ├── tool-integration-spc.yaml
+│       ├── orchestration-spc.yaml
+│       ├── intelligence-engine-spc.yaml
+│       ├── notification-spc.yaml
+│       └── frontend-spc.yaml
 ├── cert-manager/
 │   ├── install.yaml
 │   ├── cluster-issuer-letsencrypt.yaml
@@ -222,7 +210,7 @@ solidity-security-infrastructure/
 │   │   └── service-monitor.yaml
 │   ├── grafana/
 │   │   ├── grafana-install.yaml
-│   │   ├── grafana-config.yaml (Note: Uses default password configuration)
+│   │   ├── grafana-config.yaml
 │   │   └── grafana-ingress.yaml
 │   ├── jaeger/
 │   │   ├── jaeger-install.yaml
@@ -312,7 +300,7 @@ solidity-security-tools/
 │   │   ├── service.yaml
 │   │   ├── configmap.yaml
 │   │   ├── external-secret.yaml
-│   │   ├── aws-secrets-policy.yaml
+│   │   ├── secret-provider-class.yaml
 │   │   ├── service-account.yaml
 │   │   ├── pvc.yaml
 │   │   └── ingress.yaml
@@ -323,7 +311,7 @@ solidity-security-tools/
 ├── scripts/
 │   ├── install-tools.sh          # Install all security tools
 │   ├── test-integrations.sh      # Test tool integrations
-│   ├── setup-aws-secrets-secrets.sh    # Configure AWS Secrets Manager secrets for tools
+│   ├── setup-aws-secrets.sh      # Configure AWS Secrets Manager secrets for tools
 │   └── performance-test.sh       # Performance testing
 └── README.md
 ```
@@ -336,7 +324,7 @@ solidity-security-docs/
 │   ├── microservices.md
 │   ├── aws-infrastructure.md     # NEW: AWS architecture documentation
 │   ├── kubernetes-services.md    # NEW: K8s services documentation
-│   ├── aws-secrets-integration.md      # NEW: AWS Secrets Manager secret management
+│   ├── secrets-manager-integration.md # NEW: AWS Secrets Manager integration
 │   ├── data-flow.md
 │   └── security-model.md
 ├── development/
@@ -349,7 +337,7 @@ solidity-security-docs/
 │   ├── aws-infrastructure.md     # NEW: AWS infrastructure deployment
 │   ├── kubernetes.md
 │   ├── argocd-setup.md           # NEW: ArgoCD configuration
-│   ├── aws-secrets-setup.md            # NEW: AWS Secrets Manager deployment and config
+│   ├── secrets-manager-setup.md  # NEW: AWS Secrets Manager deployment and config
 │   ├── monitoring.md
 │   └── ssl-certificates.md       # NEW: Let's Encrypt and cert-manager
 ├── api/
@@ -358,7 +346,7 @@ solidity-security-docs/
 │   └── webhook-documentation.md
 ├── operations/
 │   ├── runbooks/                 # NEW: Operational procedures
-│   │   ├── aws-secrets-operations.md
+│   │   ├── secrets-manager-operations.md
 │   │   ├── argocd-operations.md
 │   │   ├── aws-operations.md
 │   │   └── incident-response.md
@@ -381,7 +369,7 @@ solidity-security-monitoring/
 │   ├── rules/                    # Alerting rules
 │   │   ├── infrastructure.yml
 │   │   ├── applications.yml
-│   │   ├── aws-secrets.yml             # NEW: AWS Secrets Manager monitoring rules
+│   │   ├── secrets-manager.yml   # NEW: AWS Secrets Manager monitoring rules
 │   │   └── aws.yml               # NEW: AWS service monitoring
 │   ├── config/                   # Prometheus configuration
 │   │   ├── prometheus.yml
@@ -390,19 +378,19 @@ solidity-security-monitoring/
 │   └── targets/                  # Service discovery configs
 │       ├── kubernetes-sd.yml
 │       ├── aws-sd.yml            # NEW: AWS service discovery
-│       └── aws-secrets-sd.yml          # NEW: AWS Secrets Manager service discovery
+│       └── secrets-manager-sd.yml # NEW: AWS Secrets Manager service discovery
 ├── grafana/
 │   ├── dashboards/               # Dashboard JSON files
 │   │   ├── infrastructure.json
 │   │   ├── applications.json
-│   │   ├── aws-secrets.json            # NEW: AWS Secrets Manager monitoring dashboard
+│   │   ├── secrets-manager.json  # NEW: AWS Secrets Manager monitoring dashboard
 │   │   ├── aws-services.json     # NEW: AWS services dashboard
 │   │   ├── argocd.json           # NEW: ArgoCD dashboard
 │   │   └── security-metrics.json
 │   ├── datasources/              # Data source configurations
 │   │   ├── prometheus.yml
 │   │   ├── cloudwatch.yml        # NEW: CloudWatch integration
-│   │   └── aws-secrets-metrics.yml     # NEW: AWS Secrets Manager metrics
+│   │   └── secrets-manager-metrics.yml # NEW: AWS Secrets Manager metrics
 │   └── provisioning/             # Automated provisioning
 │       ├── dashboards.yml
 │       ├── datasources.yml
@@ -428,10 +416,12 @@ solidity-security-monitoring/
 │   │   ├── eks-cluster.json
 │   │   ├── rds-monitoring.json
 │   │   ├── elasticache.json
+│   │   ├── secrets-manager.json
 │   │   └── alb-monitoring.json
 │   ├── alarms/
 │   │   ├── infrastructure.yml
 │   │   ├── applications.yml
+│   │   ├── secrets-manager.yml
 │   │   └── cost-alerts.yml
 │   └── log-groups/
 │       ├── application-logs.yml
@@ -478,12 +468,13 @@ solidity-security-vulnerabilities/
 - [ ] **Configure GitHub Actions for Terraform workflows**
 - [ ] **Add domain and DNS configuration scripts**
 - [ ] **Document AWS setup prerequisites**
+- [ ] **Create AWS Secrets Manager Terraform module**
 
 ### Day 3: Kubernetes Infrastructure Repository Setup
 - [ ] **Create ArgoCD installation manifests**
-- [ ] **Set up AWS Secrets Manager deployment configurations**
+- [ ] **Set up External Secrets Operator deployment configurations**
 - [ ] **Configure AWS Load Balancer Controller manifests**
-- [ ] **Create External Secrets Operator configurations**
+- [ ] **Create AWS Secrets Store CSI Driver configurations**
 - [ ] **Set up cert-manager with Let's Encrypt**
 
 ### Day 4: Platform Repository Foundation
@@ -518,7 +509,6 @@ solidity-security-vulnerabilities/
 - `DOCKER_REGISTRY_TOKEN` (for ECR)
 - `SLACK_WEBHOOK_URL`
 - `ROUTE53_ACCESS_KEY` (for DNS management)
-- `VAULT_TOKEN` (for AWS Secrets Manager management)
 
 ## Repository Dependencies
 
@@ -550,12 +540,12 @@ graph TB
 
 1. **AWS Infrastructure** (`solidity-security-aws-infrastructure`)
    - Deploy VPC, EKS, RDS, ElastiCache, Route53
-   - Configure IAM roles and KMS keys
+   - Configure IAM roles and AWS Secrets Manager
    - Set up domain and DNS
 
 2. **Kubernetes Services** (`solidity-security-infrastructure`)
-   - Install ArgoCD, AWS Secrets Manager, AWS Load Balancer Controller
-   - Configure cert-manager and External Secrets Operator
+   - Install ArgoCD, External Secrets Operator, AWS Load Balancer Controller
+   - Configure cert-manager and AWS Secrets Store CSI Driver
    - Set up monitoring stack
 
 3. **Platform Applications** (`solidity-security-platform`)
@@ -563,4 +553,145 @@ graph TB
    - Configure applications with AWS Secrets Manager secrets
    - Test end-to-end functionality
 
-This repository structure supports your cloud-first microservices architecture while maintaining clear separation between AWS infrastructure provisioning and Kubernetes service deployment, enabling independent development workflows and proper infrastructure management.
+## AWS Secrets Manager Integration Strategy
+
+### **Secret Organization Structure:**
+```yaml
+Environment-based Secret Paths:
+  dev/
+  ├── api-service/
+  │   ├── jwt-secret
+  │   ├── oauth-credentials
+  │   └── database-credentials
+  ├── tool-integration/
+  │   ├── mythx-api-key
+  │   ├── slither-config
+  │   └── tool-credentials
+  ├── data-service/
+  │   ├── rds-credentials
+  │   ├── elasticache-credentials
+  │   └── encryption-keys
+  ├── orchestration/
+  │   ├── celery-broker
+  │   └── worker-auth
+  ├── intelligence-engine/
+  │   ├── ml-api-keys
+  │   └── algorithm-configs
+  └── notification/
+      ├── ses-credentials
+      ├── slack-webhook
+      └── email-templates
+
+staging/ and prod/ follow same structure
+```
+
+### **IAM Integration Strategy:**
+```yaml
+Service Account Annotations:
+  IRSA (IAM Roles for Service Accounts):
+    - Each microservice gets dedicated IAM role
+    - Least privilege access to specific secret paths
+    - Cross-account access for multi-environment setups
+    
+Secret Access Patterns:
+  External Secrets Operator:
+    - Pulls secrets from AWS Secrets Manager
+    - Creates Kubernetes secrets automatically
+    - Handles secret rotation and updates
+    
+  AWS Secrets Store CSI Driver:
+    - Direct secret mounting as files
+    - Real-time secret updates
+    - Reduced memory footprint
+```
+
+### **Rotation and Lifecycle Management:**
+```yaml
+Automatic Rotation:
+  Database Credentials:
+    - RDS PostgreSQL: 30-day rotation
+    - ElastiCache Redis: 90-day rotation
+    - Lambda-based rotation functions
+    
+  Application Secrets:
+    - JWT signing keys: 7-day rotation
+    - API keys: Manual rotation with notifications
+    - OAuth credentials: External provider dependent
+    
+Monitoring and Alerting:
+  CloudTrail Integration:
+    - All secret access logged
+    - Anomaly detection for unusual access patterns
+    - CloudWatch alarms for rotation failures
+    
+  Cost Management:
+    - Secret usage tracking
+    - Cleanup of unused secrets
+    - Cross-region replication optimization
+```
+
+### **Development vs Production Configuration:**
+```yaml
+Development Environment:
+  Secret Scope: dev/* namespace
+  Rotation Frequency: Extended intervals for stability
+  Cross-Region: Single region deployment
+  Cost Optimization: Minimal replication
+  
+Production Environment:
+  Secret Scope: prod/* namespace
+  Rotation Frequency: Security-optimized intervals
+  Cross-Region: Multi-region replication
+  High Availability: Automatic failover
+  Enterprise Features: Enhanced monitoring and compliance
+```
+
+### **Migration from Local Development:**
+```yaml
+Phase 1: Cloud Development Setup
+  - Replace local .env files with AWS Secrets Manager
+  - Implement External Secrets Operator
+  - Test secret injection and rotation
+  
+Phase 2: Production Scaling
+  - Add cross-region replication
+  - Implement enterprise monitoring
+  - Enable advanced compliance features
+  
+Phase 3: Multi-Environment Management
+  - Separate secret namespaces per environment
+  - Implement environment-specific rotation policies
+  - Add cross-account secret sharing
+```
+
+### **Troubleshooting and Operations:**
+```yaml
+Common Issues and Solutions:
+  Secret Injection Failures:
+    - Check IAM permissions and IRSA configuration
+    - Verify External Secrets Operator health
+    - Validate secret path and key names
+    
+  Rotation Problems:
+    - Monitor Lambda rotation function logs
+    - Check database connectivity from rotation function
+    - Verify rotation schedule configuration
+    
+  Performance Issues:
+    - Optimize secret retrieval patterns
+    - Implement local caching where appropriate
+    - Monitor API rate limits and quotas
+    
+Operational Procedures:
+  Emergency Secret Rotation:
+    - Manual rotation procedures
+    - Service restart orchestration
+    - Rollback procedures
+    
+  Disaster Recovery:
+    - Cross-region secret replication verification
+    - Secret backup and restore procedures
+    - Multi-region failover testing
+```
+
+This repository structure supports your cloud-first microservices architecture while maintaining clear separation between AWS infrastructure provisioning and Kubernetes service deployment, enabling independent development workflows and proper infrastructure management with enterprise-grade secret management through AWS Secrets Manager from day one.

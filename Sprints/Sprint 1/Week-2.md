@@ -7,17 +7,17 @@
 ### **Morning: API Service Foundation + Cloud GitOps Deployment (3-4 hours)**
 - [ ] **Create FastAPI application structure with proper project layout**
 - [ ] **Create Kubernetes IaC for API Service:**
-  - [ ] **Deployment.yaml with environment variables, resource limits, and AWS Secrets Manager secret injection**
+  - [ ] **Deployment.yaml with environment variables, resource limits, and AWS secret injection**
   - [ ] **Service.yaml for internal cluster communication**
   - [ ] **ConfigMap.yaml for application configuration (non-sensitive data)**
   - [ ] **External Secret.yaml for AWS Secrets Manager secret injection (JWT keys, OAuth credentials)**
-  - [ ] **AWS Secrets Manager Policy.yaml for API service secret access permissions**
-  - [ ] **Service Account.yaml for AWS Secrets Manager Kubernetes authentication and AWS IAM**
+  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
+  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
   - [ ] **Ingress.yaml for ALB external access with Let's Encrypt SSL**
 - [ ] **Create Helm chart for API Service with cloud development values**
 - [ ] **Create ArgoCD Application manifest for API service**
 - [ ] **Configure AWS Secrets Manager secrets for API service:**
-  - [ ] **JWT signing keys in AWS Secrets Manager KV engine**
+  - [ ] **JWT signing keys in AWS Secrets Manager**
   - [ ] **OAuth provider credentials in AWS Secrets Manager**
   - [ ] **RDS connection secrets in AWS Secrets Manager**
 - [ ] Implement JWT authentication and authorization middleware for cloud testing
@@ -37,12 +37,12 @@
   - [ ] **Service.yaml for inter-service communication**
   - [ ] **ConfigMap.yaml for RDS and ElastiCache connection settings (non-sensitive)**
   - [ ] **External Secret.yaml for RDS and ElastiCache credentials from AWS Secrets Manager**
-  - [ ] **AWS Secrets Manager Policy.yaml for data service secret access**
-  - [ ] **Service Account.yaml for AWS Secrets Manager authentication and AWS IAM**
+  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
+  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
 - [ ] **Create Helm chart for Data Service with cloud development values**
 - [ ] **Create ArgoCD Application manifest for data service deployment**
 - [ ] **Configure AWS Secrets Manager secrets for Data Service:**
-  - [ ] **RDS PostgreSQL connection strings in AWS Secrets Manager**
+  - [ ] **RDS PostgreSQL connection strings in AWS Secrets Manager with auto-rotation**
   - [ ] **ElastiCache Redis connection credentials in AWS Secrets Manager**
   - [ ] **Database encryption keys in AWS Secrets Manager**
 - [ ] Create Alembic migration scripts for RDS database schema
@@ -58,20 +58,20 @@
 **Cloud Development Configuration with AWS Secrets Manager:**
 ```yaml
 API Service AWS Secrets Manager Secrets:
-  secrets-manager/api-service/jwt-secret: "cloud-development-jwt-signing-key"
-  secrets-manager/api-service/oauth-google: "Google OAuth client credentials"
-  secrets-manager/api-service/oauth-github: "GitHub OAuth client credentials"
-  secrets-manager/api-service/cors-origins: "https://app.dev.solidity-platform.com"
+  dev/api-service/jwt-secret: "cloud-development-jwt-signing-key"
+  dev/api-service/oauth-google: "Google OAuth client credentials"
+  dev/api-service/oauth-github: "GitHub OAuth client credentials"
+  dev/api-service/cors-origins: "https://app.dev.solidity-platform.com"
 
 Data Service AWS Secrets Manager Secrets:
-  secrets-manager/data-service/rds-url: "RDS PostgreSQL connection string with RDS Proxy"
-  secrets-manager/data-service/elasticache-url: "ElastiCache Redis cluster endpoint"
-  secrets-manager/data-service/encryption-key: "AES-256 encryption key for sensitive data"
-  secrets-manager/data-service/audit-signing-key: "Key for audit log integrity"
+  dev/data-service/rds-url: "RDS PostgreSQL connection string with RDS Proxy"
+  dev/data-service/elasticache-url: "ElastiCache Redis cluster endpoint"
+  dev/data-service/encryption-key: "AES-256 encryption key for sensitive data"
+  dev/data-service/audit-signing-key: "Key for audit log integrity"
 
-AWS Secrets Manager Policies:
-  api-service-policy: "Read access to secrets-manager/api-service/*"
-  data-service-policy: "Read access to secrets-manager/data-service/*"
+IAM Policies:
+  api-service-policy: "Access to dev/api-service/* secrets"
+  data-service-policy: "Access to dev/data-service/* secrets"
 ```
 
 **Deliverables Day 6:**
@@ -96,12 +96,12 @@ AWS Secrets Manager Policies:
 - [ ] **Implement MythX adapter with async API client (production API keys)**
 - [ ] **Create Solidity-Metrics adapter with Node.js wrapper for cloud analysis**
 - [ ] **Create Kubernetes IaC for Tool Integration Service:**
-  - [ ] **Deployment.yaml with tool binaries, runtime dependencies, and AWS Secrets Manager secret injection**
+  - [ ] **Deployment.yaml with tool binaries, runtime dependencies, and AWS secret injection**
   - [ ] **Service.yaml for tool service communication**
   - [ ] **ConfigMap.yaml for tool configurations and API endpoints (non-sensitive)**
   - [ ] **External Secret.yaml for tool API keys and credentials from AWS Secrets Manager**
-  - [ ] **AWS Secrets Manager Policy.yaml for tool integration service permissions**
-  - [ ] **Service Account.yaml for AWS Secrets Manager authentication and AWS IAM**
+  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
+  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
   - [ ] **PersistentVolumeClaim.yaml for EBS storage for tool data**
 - [ ] **Create Helm chart for Tool Integration Service with tool-specific values**
 - [ ] **Create ArgoCD Application manifest for tool integration service**
@@ -120,12 +120,12 @@ AWS Secrets Manager Policies:
 - [ ] **Set up Celery with ElastiCache Redis broker for job queue**
 - [ ] **Implement analysis workflow orchestration for cloud development**
 - [ ] **Create Kubernetes IaC for Orchestration Service:**
-  - [ ] **Deployment.yaml for Celery workers with scaling configuration and AWS Secrets Manager secrets**
+  - [ ] **Deployment.yaml for Celery workers with scaling configuration and AWS secrets**
   - [ ] **Service.yaml for worker communication**
   - [ ] **ConfigMap.yaml for Celery and ElastiCache broker settings (non-sensitive)**
   - [ ] **External Secret.yaml for ElastiCache broker credentials from AWS Secrets Manager**
-  - [ ] **AWS Secrets Manager Policy.yaml for orchestration service permissions**
-  - [ ] **Service Account.yaml for AWS Secrets Manager authentication and AWS IAM**
+  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
+  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
   - [ ] **HorizontalPodAutoscaler.yaml for automatic worker scaling**
 - [ ] **Create Helm chart for Orchestration Service with worker configurations**
 - [ ] **Create ArgoCD Application manifest for orchestration service**
@@ -145,21 +145,21 @@ AWS Secrets Manager Policies:
 **Cloud Tool Integration Configuration with AWS Secrets Manager:**
 ```yaml
 Tool Integration AWS Secrets Manager Secrets:
-  secrets-manager/tool-integration/slither-config: "Slither configuration and paths"
-  secrets-manager/tool-integration/aderyn-config: "Aderyn Rust CLI configuration"
-  secrets-manager/tool-integration/mythx-api-key: "MythX production API credentials"
-  secrets-manager/tool-integration/mythx-api-url: "https://api.mythx.io/v1"
-  secrets-manager/tool-integration/solidity-metrics-config: "Solidity-Metrics Node.js configuration"
+  dev/tool-integration/slither-config: "Slither configuration and paths"
+  dev/tool-integration/aderyn-config: "Aderyn Rust CLI configuration"
+  dev/tool-integration/mythx-api-key: "MythX production API credentials"
+  dev/tool-integration/mythx-api-url: "https://api.mythx.io/v1"
+  dev/tool-integration/solidity-metrics-config: "Solidity-Metrics Node.js configuration"
 
 Orchestration AWS Secrets Manager Secrets:
-  secrets-manager/orchestration/elasticache-broker: "ElastiCache Redis cluster endpoint"
-  secrets-manager/orchestration/celery-backend: "ElastiCache Redis backend configuration"
-  secrets-manager/orchestration/worker-auth-token: "Worker authentication token"
-  secrets-manager/orchestration/admin-credentials: "Admin interface credentials"
+  dev/orchestration/elasticache-broker: "ElastiCache Redis cluster endpoint"
+  dev/orchestration/celery-backend: "ElastiCache Redis backend configuration"
+  dev/orchestration/worker-auth-token: "Worker authentication token"
+  dev/orchestration/admin-credentials: "Admin interface credentials"
 
-AWS Secrets Manager Policies:
-  tool-integration-policy: "Read access to secrets-manager/tool-integration/*"
-  orchestration-policy: "Read access to secrets-manager/orchestration/*"
+IAM Policies:
+  tool-integration-policy: "Access to dev/tool-integration/* secrets"
+  orchestration-policy: "Access to dev/orchestration/* secrets"
 ```
 
 **Deliverables Day 7:**
@@ -182,12 +182,12 @@ AWS Secrets Manager Policies:
 - [ ] **Implement rule-based deduplication algorithms for cloud testing**
 - [ ] **Create risk scoring engine with severity weights for cloud development**
 - [ ] **Create Kubernetes IaC for Intelligence Engine Service:**
-  - [ ] **Deployment.yaml with ML dependencies, processing configuration, and AWS Secrets Manager secrets**
+  - [ ] **Deployment.yaml with ML dependencies, processing configuration, and AWS secrets**
   - [ ] **Service.yaml for intelligence service communication**
   - [ ] **ConfigMap.yaml for scoring algorithms and rule configurations (non-sensitive)**
   - [ ] **External Secret.yaml for ML service credentials from AWS Secrets Manager**
-  - [ ] **AWS Secrets Manager Policy.yaml for intelligence engine permissions**
-  - [ ] **Service Account.yaml for AWS Secrets Manager authentication and AWS IAM**
+  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
+  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
   - [ ] **PersistentVolumeClaim.yaml for EBS storage for ML model storage**
 - [ ] **Create Helm chart for Intelligence Engine Service with algorithm configurations**
 - [ ] **Create ArgoCD Application manifest for intelligence engine service**
@@ -211,8 +211,8 @@ AWS Secrets Manager Policies:
   - [ ] **Service.yaml for frontend service access**
   - [ ] **ConfigMap.yaml for nginx configuration and API endpoints (non-sensitive)**
   - [ ] **External Secret.yaml for frontend secrets from AWS Secrets Manager (API keys, OAuth)**
-  - [ ] **AWS Secrets Manager Policy.yaml for frontend service permissions**
-  - [ ] **Service Account.yaml for AWS Secrets Manager authentication and AWS IAM**
+  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
+  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
   - [ ] **Ingress.yaml for ALB frontend routing with Let's Encrypt SSL**
 - [ ] **Create Helm chart for Frontend with environment-specific API URLs**
 - [ ] **Create ArgoCD Application manifest for frontend deployment**
@@ -233,21 +233,21 @@ AWS Secrets Manager Policies:
 **Cloud Frontend Configuration with AWS Secrets Manager:**
 ```yaml
 Intelligence Engine AWS Secrets Manager Secrets:
-  secrets-manager/intelligence-engine/ml-api-keys: "Machine learning service API keys"
-  secrets-manager/intelligence-engine/algorithm-weights: "Risk scoring algorithm weights"
-  secrets-manager/intelligence-engine/model-encryption-key: "Encryption key for ML models"
-  secrets-manager/intelligence-engine/deduplication-threshold: "Configurable deduplication threshold"
+  dev/intelligence-engine/ml-api-keys: "Machine learning service API keys"
+  dev/intelligence-engine/algorithm-weights: "Risk scoring algorithm weights"
+  dev/intelligence-engine/model-encryption-key: "Encryption key for ML models"
+  dev/intelligence-engine/deduplication-threshold: "Configurable deduplication threshold"
 
 Frontend AWS Secrets Manager Secrets:
-  secrets-manager/frontend/oauth-client-id: "OAuth client ID for authentication"
-  secrets-manager/frontend/api-base-url: "https://api.dev.solidity-platform.com"
-  secrets-manager/frontend/websocket-url: "wss://api.dev.solidity-platform.com/ws"
-  secrets-manager/frontend/feature-flags: "Dynamic feature flag configuration"
-  secrets-manager/frontend/analytics-key: "Analytics service API key"
+  dev/frontend/oauth-client-id: "OAuth client ID for authentication"
+  dev/frontend/api-base-url: "https://api.dev.solidity-platform.com"
+  dev/frontend/websocket-url: "wss://api.dev.solidity-platform.com/ws"
+  dev/frontend/feature-flags: "Dynamic feature flag configuration"
+  dev/frontend/analytics-key: "Analytics service API key"
 
-AWS Secrets Manager Policies:
-  intelligence-engine-policy: "Read access to secrets-manager/intelligence-engine/*"
-  frontend-policy: "Read access to secrets-manager/frontend/*"
+IAM Policies:
+  intelligence-engine-policy: "Access to dev/intelligence-engine/* secrets"
+  frontend-policy: "Access to dev/frontend/* secrets"
 ```
 
 **Deliverables Day 8:**
@@ -287,8 +287,8 @@ AWS Secrets Manager Policies:
   - [ ] **Service.yaml for notification service communication**
   - [ ] **ConfigMap.yaml for email templates and notification settings (non-sensitive)**
   - [ ] **External Secret.yaml for SMTP and webhook credentials from AWS Secrets Manager**
-  - [ ] **AWS Secrets Manager Policy.yaml for notification service permissions**
-  - [ ] **Service Account.yaml for AWS Secrets Manager authentication and AWS IAM**
+  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
+  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
 - [ ] **Create Helm chart for Notification Service with cloud SMTP configurations**
 - [ ] **Create ArgoCD Application manifest for notification service**
 - [ ] **Configure AWS Secrets Manager secrets for Notification Service:**
@@ -308,21 +308,21 @@ AWS Secrets Manager Policies:
 **Cloud Notification Configuration with AWS Secrets Manager:**
 ```yaml
 Notification Service AWS Secrets Manager Secrets:
-  secrets-manager/notification/websocket-url: "wss://notifications.dev.solidity-platform.com"
-  secrets-manager/notification/ses-smtp-server: "AWS SES SMTP endpoint"
-  secrets-manager/notification/ses-username: "AWS SES SMTP username"
-  secrets-manager/notification/ses-password: "AWS SES SMTP password"
-  secrets-manager/notification/slack-webhook: "https://hooks.slack.com/services/PROD/WEBHOOK/URL"
-  secrets-manager/notification/email-from: "noreply@solidity-platform.com"
-  secrets-manager/notification/base-url: "https://app.dev.solidity-platform.com"
+  dev/notification/websocket-url: "wss://notifications.dev.solidity-platform.com"
+  dev/notification/ses-smtp-server: "AWS SES SMTP endpoint"
+  dev/notification/ses-username: "AWS SES SMTP username"
+  dev/notification/ses-password: "AWS SES SMTP password"
+  dev/notification/slack-webhook: "https://hooks.slack.com/services/PROD/WEBHOOK/URL"
+  dev/notification/email-from: "noreply@solidity-platform.com"
+  dev/notification/base-url: "https://app.dev.solidity-platform.com"
 
 Email Template AWS Secrets Manager Secrets:
-  secrets-manager/notification/templates/critical-finding: "Critical vulnerability email template"
-  secrets-manager/notification/templates/analysis-complete: "Analysis completion email template"
-  secrets-manager/notification/templates/weekly-report: "Weekly security report template"
+  dev/notification/templates/critical-finding: "Critical vulnerability email template"
+  dev/notification/templates/analysis-complete: "Analysis completion email template"
+  dev/notification/templates/weekly-report: "Weekly security report template"
 
-AWS Secrets Manager Policies:
-  notification-policy: "Read access to secrets-manager/notification/*"
+IAM Policies:
+  notification-policy: "Access to dev/notification/* secrets"
 ```
 
 **Deliverables Day 9:**
@@ -356,7 +356,6 @@ AWS Secrets Manager Policies:
 - [ ] **Test ArgoCD multi-application deployment capabilities in cloud**
 - [ ] **Test AWS Secrets Manager secret injection across entire cloud application stack**
 - [ ] **Validate AWS Secrets Manager secret rotation without service disruption**
-- [ ] **Test AWS Secrets Manager PKI engine certificate lifecycle management**
 - [ ] **Validate External Secrets Operator failure scenarios and recovery**
 
 ### **Afternoon: Performance Testing & Final Validation + Cloud Operations (3-4 hours)**
@@ -372,7 +371,7 @@ AWS Secrets Manager Policies:
 - [ ] **Test ArgoCD RBAC and multi-user access scenarios in cloud**
 - [ ] **Test AWS Secrets Manager performance under high secret retrieval load**
 - [ ] **Validate AWS Secrets Manager backup and disaster recovery procedures**
-- [ ] **Test AWS Secrets Manager service health and monitoring**
+- [ ] **Test AWS Secrets Manager cross-region replication**
 - [ ] Complete Sprint 1 acceptance criteria validation
 - [ ] **Document any known issues and technical debt for cloud environment**
 - [ ] **Prepare production scaling checklist for future sprints**
@@ -399,11 +398,11 @@ Expected Cloud Performance:
 ```yaml
 AWS Secrets Manager Testing Scenarios:
   - Secret injection across all cloud services
-  - Dynamic secret rotation for RDS credentials
-  - PKI certificate lifecycle (issue, renew, revoke)
+  - Automatic secret rotation for RDS credentials
+  - Cross-service secret access with IAM policies
   - Policy changes and access control validation
-  - Backup and restore procedures with AWS S3
-  - High availability simulation with AWS KMS
+  - Backup and restore procedures with cross-region replication
+  - High availability simulation with AWS multi-AZ
   - Performance under load with CloudWatch monitoring
   - Integration with External Secrets Operator
   - ArgoCD AWS Secrets Manager Plugin functionality
@@ -483,7 +482,7 @@ AWS Secrets Manager Testing Scenarios:
 - [ ] **cert-manager automatically provisioning and renewing Let's Encrypt certificates**
 - [ ] **Let's Encrypt SSL termination working for all services**
 - [ ] **ArgoCD successfully deploys and manages cloud application lifecycle via GitOps**
-- [ ] **AWS Secrets Manager operational and managing all application secrets with AWS KMS**
+- [ ] **AWS Secrets Manager operational and managing all application secrets**
 - [ ] **External Secrets Operator successfully injecting secrets from AWS Secrets Manager**
 
 ### **Cloud GitOps & ArgoCD Validation:**
@@ -498,11 +497,10 @@ AWS Secrets Manager Testing Scenarios:
 - [ ] **ArgoCD AWS Secrets Manager Plugin working for secret management in GitOps workflows**
 
 ### **AWS Secrets Manager & Secret Management Validation:**
-- [ ] **AWS Secrets Manager service deployed and operational with AWS KMS auto-unseal**
-- [ ] **AWS Secrets Manager PKI engine configured for certificate management**
-- [ ] **AWS Secrets Manager KV engines storing all application secrets securely**
+- [ ] **AWS Secrets Manager configured and operational for application secrets**
+- [ ] **AWS Secrets Manager automatic rotation working for database credentials**
 - [ ] **External Secrets Operator injecting secrets into all microservices**
-- [ ] **AWS Secrets Manager policies configured for each microservice with least privilege access**
+- [ ] **IAM policies configured for each microservice with least privilege access**
 - [ ] **Secret rotation tested and functional for all services without disruption**
 - [ ] **ArgoCD AWS Secrets Manager integration working for GitOps secret management**
 - [ ] **CI/CD pipelines using AWS Secrets Manager for secure secret management**
@@ -548,7 +546,7 @@ AWS Secrets Manager Testing Scenarios:
 ### **Development Workflow Validation:**
 - [ ] **Cloud development supports rapid iteration and testing cycles**
 - [ ] **Cloud debugging procedures documented and tested**
-- [ ] **Cloud costs managed within development budget ($300-400/month)**
+- [ ] **Cloud costs managed within development budget ($250-350/month)**
 - [ ] **Cloud GitOps workflow prepares team for production scaling**
 - [ ] **Team productivity optimized with cloud development environment**
 - [ ] **AWS Secrets Manager secret management prepares team for enterprise secret workflows**
@@ -566,7 +564,7 @@ AWS Secrets Manager Testing Scenarios:
 - [ ] **Document ArgoCD cloud optimization opportunities**
 - [ ] **Review cloud GitOps workflow for potential improvements**
 - [ ] **Document AWS Secrets Manager performance tuning opportunities**
-- [ ] **Review AWS Secrets Manager policy optimization and least privilege improvements**
+- [ ] **Review AWS Secrets Manager IAM policy optimization and least privilege improvements**
 - [ ] **Document External Secrets Operator edge cases and failure scenarios**
 - [ ] **Prepare production scaling requirements and dependencies**
 
@@ -580,9 +578,9 @@ AWS Secrets Manager Testing Scenarios:
 - [ ] **Advanced ALB and CloudFront optimization**
 - [ ] **ArgoCD ApplicationSets for advanced deployment patterns**
 - [ ] **Multi-region ArgoCD deployment strategies**
-- [ ] **AWS Secrets Manager Enterprise features for advanced secret management**
-- [ ] **Advanced AWS Secrets Manager secret engines (database dynamic secrets, PKI automation)**
-- [ ] **AWS Secrets Manager performance replication for global deployments**
+- [ ] **AWS Secrets Manager cross-region replication for global deployments**
+- [ ] **Advanced AWS Secrets Manager secret engines (database dynamic secrets)**
+- [ ] **AWS Systems Manager Parameter Store integration as alternative**
 
 ### **Production Scaling Preparation:**
 - [ ] **Multi-environment EKS cluster provisioning documented**
@@ -595,10 +593,10 @@ AWS Secrets Manager Testing Scenarios:
 - [ ] **AWS IAM and security configurations for production prepared**
 - [ ] **CloudWatch monitoring production integration documented**
 - [ ] **ArgoCD production deployment configurations ready**
-- [ ] **AWS Secrets Manager production deployment with HA and performance replication documented**
+- [ ] **AWS Secrets Manager production deployment with HA and cross-region replication documented**
 - [ ] **External Secrets Operator production configuration prepared**
-- [ ] **AWS Secrets Manager Enterprise cluster mode deployment for production HA**
-- [ ] **AWS Secrets Manager integration as AWS Secrets Manager alternative documented**
+- [ ] **AWS Secrets Manager enterprise features deployment for production HA**
+- [ ] **Multi-region AWS Secrets Manager integration documented**
 
 ## Cloud Development Environment Summary
 
@@ -609,20 +607,20 @@ Cloud Development Costs (Week 1-2):
   RDS PostgreSQL (Multi-AZ): ~$50/month
   ElastiCache Redis: ~$30/month
   Route53 + Domain: ~$20/month
-  AWS Secrets Manager Cluster: ~$50/month
+  AWS Secrets Manager: ~$10/month
   ALB + Data Transfer: ~$30/month
   CloudWatch + Monitoring: ~$20/month
-  Total Development Costs: ~$400/month
+  Total Development Costs: ~$360/month
 
 Production Scaling Costs (Sprint 7+):
   AWS EKS Production: ~$500/month
   AWS EKS Staging: ~$300/month
   RDS PostgreSQL + Replicas: ~$200/month
   ElastiCache + Clustering: ~$100/month
-  AWS Secrets Manager Enterprise: ~$200/month (optional)
+  AWS Secrets Manager + Cross-Region: ~$50/month
   AWS KMS + Other Services: ~$100/month
   CloudFront CDN: ~$50/month
-  Total Production Costs: ~$1,450/month (scales with usage)
+  Total Production Costs: ~$1,300/month (scales with usage)
 ```
 
 ### **Development Velocity Benefits:**
@@ -649,9 +647,9 @@ GitOps Learning Benefits:
 
 AWS Secrets Manager Learning Benefits:
   - Enterprise secret management patterns established in cloud
-  - Policy-based access control tested with AWS IAM integration
+  - IAM-based access control tested with AWS services integration
   - Secret rotation procedures proven with cloud services
-  - AWS KMS integration patterns established
+  - AWS native integration patterns established
   - Production scaling preparation for enterprise secret management
 ```
 
@@ -711,7 +709,7 @@ Enterprise Security from Day One:
   - AWS IAM integration for enhanced access control
   - Policy-based access control enforced in cloud
   - Secret rotation procedures automated with cloud services
-  - Audit trails for all secret access in CloudWatch
+  - Audit trails for all secret access in CloudTrail
   - Encryption at rest and in transit with AWS services
   - Certificate lifecycle management automated with Let's Encrypt
   - GitOps secret injection without exposure tested in cloud
