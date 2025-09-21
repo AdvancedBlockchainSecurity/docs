@@ -320,6 +320,25 @@ Cross-Region Replication:
 - IAM-based database access via AWS Secrets Manager
 - Audit logging for all database credential usage
 
+### Data Architecture
+
+#### Database Design
+**Primary Database**: RDS PostgreSQL 15 with Multi-AZ deployment
+**Schema Strategy**: Multi-tenant with row-level security
+**Backup Strategy**: Automated RDS backups with point-in-time recovery
+**Secret Management**: AWS Secrets Manager with automatic rotation for database credentials
+
+**Table Partitioning**:
+- **Time-Based**: Monthly partitions for analysis_runs and findings
+- **Hash-Based**: Organization-based partitioning for large tables
+- **Automatic Management**: pg_partman for automated partition management
+
+**Index Strategy**:
+- **Primary Indexes**: B-tree indexes on frequently queried columns
+- **Composite Indexes**: Multi-column indexes for complex queries
+- **Partial Indexes**: Conditional indexes for filtered queries
+- **Index Monitoring**: pg_stat_user_indexes for usage tracking
+
 #### 5. Notification Service
 **Purpose**: Real-time updates, integrations, alerting with secure credential management
 **Technology Stack**: Node.js, Socket.io, Redis, PostgreSQL
