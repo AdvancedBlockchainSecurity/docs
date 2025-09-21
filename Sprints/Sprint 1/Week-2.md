@@ -5,17 +5,23 @@
 ## Day 6: Core API Services Implementation + Cloud ArgoCD Deployment
 
 ### **Morning: API Service Foundation + Cloud GitOps Deployment (3-4 hours)**
-- [ ] **Create FastAPI application structure with proper project layout**
-- [ ] **Create Kubernetes IaC for API Service:**
-  - [ ] **Deployment.yaml with environment variables, resource limits, and AWS secret injection**
-  - [ ] **Service.yaml for internal cluster communication**
-  - [ ] **ConfigMap.yaml for application configuration (non-sensitive data)**
-  - [ ] **External Secret.yaml for AWS Secrets Manager secret injection (JWT keys, OAuth credentials)**
-  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
-  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
-  - [ ] **Ingress.yaml for ALB external access with Let's Encrypt SSL**
-- [ ] **Create Helm chart for API Service with cloud development values**
-- [ ] **Create ArgoCD Application manifest for API service**
+- [ ] **Create FastAPI application structure in `solidity-security-platform/backend/api-service/`**
+  - [ ] **`main.py`** - FastAPI application entry point
+  - [ ] **`auth/`** - Authentication and authorization modules
+  - [ ] **`routes/`** - API route definitions
+  - [ ] **`models/`** - Data models and schemas
+  - [ ] **`middleware/`** - Custom middleware components
+  - [ ] **`utils/`** - Utility functions and helpers
+- [ ] **Verify Kubernetes IaC for API Service in `solidity-security-platform/backend/api-service/`:**
+  - [ ] **`deployment.yaml`** - Environment variables, resource limits, and AWS secret injection
+  - [ ] **`service.yaml`** - Internal cluster communication
+  - [ ] **`configmap.yaml`** - Application configuration (non-sensitive data)
+  - [ ] **`external-secret.yaml`** - AWS Secrets Manager secret injection (JWT keys, OAuth credentials)
+  - [ ] **`secret-provider-class.yaml`** - AWS Secrets Manager CSI driver configuration
+  - [ ] **`service-account.yaml`** - AWS IAM IRSA and Secrets Manager authentication
+  - [ ] **`ingress.yaml`** - ALB external access with Let's Encrypt SSL
+- [ ] **Verify Helm chart for API Service in `solidity-security-platform/backend/api-service/`**
+- [ ] **Verify ArgoCD Application manifest in `solidity-security-infrastructure/argocd/applications/api-service-application.yaml`**
 - [ ] **Configure AWS Secrets Manager secrets for API service:**
   - [ ] **JWT signing keys in AWS Secrets Manager**
   - [ ] **OAuth provider credentials in AWS Secrets Manager**
@@ -26,21 +32,26 @@
 - [ ] Implement organization and project management APIs for cloud development
 - [ ] Configure CORS policies for cloud frontend development
 - [ ] Set up health check and readiness probe endpoints for CloudWatch monitoring
-- [ ] **Configure cloud GitOps deployment for API service via ArgoCD**
+- [ ] **Deploy API service via ArgoCD by committing code to platform repository**
 - [ ] **Test ArgoCD automatic sync for cloud API service updates**
 - [ ] **Validate External Secrets Operator injecting AWS Secrets Manager secrets into API service**
 
 ### **Afternoon: Data Service Implementation + Cloud ArgoCD Management (3-4 hours)**
-- [ ] **Implement database models for all core entities with RDS PostgreSQL**
-- [ ] **Create Kubernetes IaC for Data Service:**
-  - [ ] **Deployment.yaml with RDS connection configuration and AWS Secrets Manager integration**
-  - [ ] **Service.yaml for inter-service communication**
-  - [ ] **ConfigMap.yaml for RDS and ElastiCache connection settings (non-sensitive)**
-  - [ ] **External Secret.yaml for RDS and ElastiCache credentials from AWS Secrets Manager**
-  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
-  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
-- [ ] **Create Helm chart for Data Service with cloud development values**
-- [ ] **Create ArgoCD Application manifest for data service deployment**
+- [ ] **Implement database models in `solidity-security-platform/backend/data-service/`**
+  - [ ] **`models/`** - SQLAlchemy models for all core entities
+  - [ ] **`schemas/`** - Pydantic schemas for data validation
+  - [ ] **`repositories/`** - Data access layer with repository pattern
+  - [ ] **`migrations/`** - Alembic migration scripts
+  - [ ] **`utils/`** - Database utilities and helpers
+- [ ] **Verify Kubernetes IaC for Data Service in `solidity-security-platform/backend/data-service/`:**
+  - [ ] **`deployment.yaml`** - RDS connection configuration and AWS Secrets Manager integration
+  - [ ] **`service.yaml`** - Inter-service communication
+  - [ ] **`configmap.yaml`** - RDS and ElastiCache connection settings (non-sensitive)
+  - [ ] **`external-secret.yaml`** - RDS and ElastiCache credentials from AWS Secrets Manager
+  - [ ] **`secret-provider-class.yaml`** - AWS Secrets Manager CSI driver configuration
+  - [ ] **`service-account.yaml`** - AWS IAM IRSA and Secrets Manager authentication
+- [ ] **Verify Helm chart for Data Service in `solidity-security-platform/backend/data-service/`**
+- [ ] **Verify ArgoCD Application manifest in `solidity-security-infrastructure/argocd/applications/data-service-application.yaml`**
 - [ ] **Configure AWS Secrets Manager secrets for Data Service:**
   - [ ] **RDS PostgreSQL connection strings in AWS Secrets Manager with auto-rotation**
   - [ ] **ElastiCache Redis connection credentials in AWS Secrets Manager**
@@ -51,6 +62,7 @@
 - [ ] Create database seeding scripts for cloud development data
 - [ ] Set up RDS Proxy connection pooling and query optimization
 - [ ] Implement audit logging for cloud data operations with CloudWatch
+- [ ] **Deploy data service via ArgoCD by committing code to platform repository**
 - [ ] **Configure ArgoCD health checks for cloud data service**
 - [ ] **Test ArgoCD rollback functionality for cloud data service**
 - [ ] **Validate AWS Secrets Manager secret rotation for RDS credentials**
@@ -81,7 +93,7 @@ IAM Policies:
 - [ ] Basic user and project management working with cloud storage
 - [ ] **Cloud SSL-secured API endpoints accessible via https://api.dev.advancedblockchainsecurity.com**
 - [ ] **ALB rate limiting protecting cloud API services**
-- [ ] **API and data services deployed and managed via cloud ArgoCD**
+- [ ] **API and data services deployed and managed via cloud ArgoCD (auto-sync from platform repo)**
 - [ ] **ArgoCD showing healthy status for both services in cloud environment**
 - [ ] **All sensitive configuration stored and retrieved from AWS Secrets Manager**
 - [ ] **External Secrets Operator successfully injecting AWS Secrets Manager secrets**
@@ -91,20 +103,23 @@ IAM Policies:
 ## Day 7: Tool Integration Service & Orchestration + Cloud ArgoCD Integration
 
 ### **Morning: Tool Integration Service + Cloud GitOps Deployment (3-4 hours)**
-- [ ] **Implement Slither adapter with Python API integration for cloud development**
-- [ ] **Create Aderyn adapter with Rust CLI wrapper for cloud execution**
-- [ ] **Implement MythX adapter with async API client (production API keys)**
-- [ ] **Create Solidity-Metrics adapter with Node.js wrapper for cloud analysis**
-- [ ] **Create Kubernetes IaC for Tool Integration Service:**
-  - [ ] **Deployment.yaml with tool binaries, runtime dependencies, and AWS secret injection**
-  - [ ] **Service.yaml for tool service communication**
-  - [ ] **ConfigMap.yaml for tool configurations and API endpoints (non-sensitive)**
-  - [ ] **External Secret.yaml for tool API keys and credentials from AWS Secrets Manager**
-  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
-  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
-  - [ ] **PersistentVolumeClaim.yaml for EBS storage for tool data**
-- [ ] **Create Helm chart for Tool Integration Service with tool-specific values**
-- [ ] **Create ArgoCD Application manifest for tool integration service**
+- [ ] **Implement tool adapters in `solidity-security-platform/backend/tool-integration-service/`:**
+  - [ ] **`adapters/slither/`** - Slither adapter with Python API integration
+  - [ ] **`adapters/aderyn/`** - Aderyn adapter with Rust CLI wrapper
+  - [ ] **`adapters/mythx/`** - MythX adapter with async API client
+  - [ ] **`adapters/solidity_metrics/`** - Solidity-Metrics adapter with Node.js wrapper
+  - [ ] **`common/`** - Shared adapter utilities and schemas
+  - [ ] **`normalizers/`** - Result normalization to common schema
+- [ ] **Verify Kubernetes IaC for Tool Integration Service in `solidity-security-platform/backend/tool-integration-service/`:**
+  - [ ] **`deployment.yaml`** - Tool binaries, runtime dependencies, and AWS secret injection
+  - [ ] **`service.yaml`** - Tool service communication
+  - [ ] **`configmap.yaml`** - Tool configurations and API endpoints (non-sensitive)
+  - [ ] **`external-secret.yaml`** - Tool API keys and credentials from AWS Secrets Manager
+  - [ ] **`secret-provider-class.yaml`** - AWS Secrets Manager CSI driver configuration
+  - [ ] **`service-account.yaml`** - AWS IAM IRSA and Secrets Manager authentication
+  - [ ] **`pvc.yaml`** - EBS storage for tool data
+- [ ] **Verify Helm chart for Tool Integration Service in `solidity-security-platform/backend/tool-integration-service/`**
+- [ ] **Verify ArgoCD Application manifest in `solidity-security-infrastructure/argocd/applications/tool-integration-application.yaml`**
 - [ ] **Configure AWS Secrets Manager secrets for Tool Integration Service:**
   - [ ] **MythX API keys and credentials in AWS Secrets Manager**
   - [ ] **Tool-specific configuration secrets in AWS Secrets Manager**
@@ -112,23 +127,30 @@ IAM Policies:
 - [ ] Set up tool result normalization to common schema for cloud testing
 - [ ] Implement tool health checking and status monitoring for cloud tools
 - [ ] Configure tool-specific rate limiting and retry logic for cloud development
+- [ ] **Deploy tool integration service via ArgoCD by committing code to platform repository**
 - [ ] **Configure ArgoCD sync policies for cloud tool service deployments**
 - [ ] **Test ArgoCD automatic deployment for cloud tool configuration changes**
 - [ ] **Validate AWS Secrets Manager secret injection for tool credentials**
 
 ### **Afternoon: Orchestration Service + Cloud ArgoCD Management (3-4 hours)**
+- [ ] **Implement orchestration logic in `solidity-security-platform/backend/orchestration-service/`:**
+  - [ ] **`celery_app.py`** - Celery application configuration
+  - [ ] **`tasks/`** - Celery task definitions for analysis workflows
+  - [ ] **`workers/`** - Worker process implementations
+  - [ ] **`orchestrator/`** - Analysis workflow orchestration logic
+  - [ ] **`queue_manager/`** - Job queue and priority management
 - [ ] **Set up Celery with ElastiCache Redis broker for job queue**
 - [ ] **Implement analysis workflow orchestration for cloud development**
-- [ ] **Create Kubernetes IaC for Orchestration Service:**
-  - [ ] **Deployment.yaml for Celery workers with scaling configuration and AWS secrets**
-  - [ ] **Service.yaml for worker communication**
-  - [ ] **ConfigMap.yaml for Celery and ElastiCache broker settings (non-sensitive)**
-  - [ ] **External Secret.yaml for ElastiCache broker credentials from AWS Secrets Manager**
-  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
-  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
-  - [ ] **HorizontalPodAutoscaler.yaml for automatic worker scaling**
-- [ ] **Create Helm chart for Orchestration Service with worker configurations**
-- [ ] **Create ArgoCD Application manifest for orchestration service**
+- [ ] **Verify Kubernetes IaC for Orchestration Service in `solidity-security-platform/backend/orchestration-service/`:**
+  - [ ] **`deployment.yaml`** - Celery workers with scaling configuration and AWS secrets
+  - [ ] **`service.yaml`** - Worker communication
+  - [ ] **`configmap.yaml`** - Celery and ElastiCache broker settings (non-sensitive)
+  - [ ] **`external-secret.yaml`** - ElastiCache broker credentials from AWS Secrets Manager
+  - [ ] **`secret-provider-class.yaml`** - AWS Secrets Manager CSI driver configuration
+  - [ ] **`service-account.yaml`** - AWS IAM IRSA and Secrets Manager authentication
+  - [ ] **`hpa.yaml`** - Horizontal Pod Autoscaler for automatic worker scaling
+- [ ] **Verify Helm chart for Orchestration Service in `solidity-security-platform/backend/orchestration-service/`**
+- [ ] **Verify ArgoCD Application manifest in `solidity-security-infrastructure/argocd/applications/orchestration-application.yaml`**
 - [ ] **Configure AWS Secrets Manager secrets for Orchestration Service:**
   - [ ] **ElastiCache Redis broker connection credentials in AWS Secrets Manager**
   - [ ] **Celery result backend credentials in AWS Secrets Manager**
@@ -138,6 +160,7 @@ IAM Policies:
 - [ ] Implement job status tracking and progress updates for CloudWatch monitoring
 - [ ] Configure dead letter queues for failed jobs in cloud environment
 - [ ] Set up automatic worker scaling based on queue length
+- [ ] **Deploy orchestration service via ArgoCD by committing code to platform repository**
 - [ ] **Configure ArgoCD to manage cloud Celery worker deployments**
 - [ ] **Test ArgoCD scaling and rolling updates for cloud workers**
 - [ ] **Test AWS Secrets Manager secret rotation for orchestration service credentials**
@@ -169,7 +192,7 @@ IAM Policies:
 - [ ] Parallel execution of multiple tools working in EKS cluster
 - [ ] **Cloud SSL-secured tool services accessible via https://tools.dev.advancedblockchainsecurity.com**
 - [ ] **Cloud orchestration endpoints protected with proper authentication**
-- [ ] **Tool integration and orchestration services managed via cloud ArgoCD**
+- [ ] **Tool integration and orchestration services managed via cloud ArgoCD (auto-sync from platform repo)**
 - [ ] **ArgoCD showing healthy deployment status for all cloud tool services**
 - [ ] **All tool credentials and sensitive configuration managed by AWS Secrets Manager**
 - [ ] **External Secrets Operator successfully injecting tool secrets**
@@ -179,18 +202,25 @@ IAM Policies:
 ## Day 8: Intelligence Engine & Frontend Foundation + Cloud ArgoCD Applications
 
 ### **Morning: Intelligence Engine Service + Cloud GitOps Integration (3-4 hours)**
+- [ ] **Implement intelligence engine in `solidity-security-platform/backend/intelligence-engine-service/`:**
+  - [ ] **`deduplication/`** - Rule-based deduplication algorithms
+  - [ ] **`risk_scoring/`** - Risk scoring engine with severity weights
+  - [ ] **`correlation/`** - Cross-tool correlation and validation
+  - [ ] **`false_positive/`** - False positive detection using pattern matching
+  - [ ] **`status_manager/`** - Finding status management
+  - [ ] **`analytics/`** - Basic analytics and metrics
 - [ ] **Implement rule-based deduplication algorithms for cloud testing**
 - [ ] **Create risk scoring engine with severity weights for cloud development**
-- [ ] **Create Kubernetes IaC for Intelligence Engine Service:**
-  - [ ] **Deployment.yaml with ML dependencies, processing configuration, and AWS secrets**
-  - [ ] **Service.yaml for intelligence service communication**
-  - [ ] **ConfigMap.yaml for scoring algorithms and rule configurations (non-sensitive)**
-  - [ ] **External Secret.yaml for ML service credentials from AWS Secrets Manager**
-  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
-  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
-  - [ ] **PersistentVolumeClaim.yaml for EBS storage for ML model storage**
-- [ ] **Create Helm chart for Intelligence Engine Service with algorithm configurations**
-- [ ] **Create ArgoCD Application manifest for intelligence engine service**
+- [ ] **Verify Kubernetes IaC for Intelligence Engine Service in `solidity-security-platform/backend/intelligence-engine-service/`:**
+  - [ ] **`deployment.yaml`** - ML dependencies, processing configuration, and AWS secrets
+  - [ ] **`service.yaml`** - Intelligence service communication
+  - [ ] **`configmap.yaml`** - Scoring algorithms and rule configurations (non-sensitive)
+  - [ ] **`external-secret.yaml`** - ML service credentials from AWS Secrets Manager
+  - [ ] **`secret-provider-class.yaml`** - AWS Secrets Manager CSI driver configuration
+  - [ ] **`service-account.yaml`** - AWS IAM IRSA and Secrets Manager authentication
+  - [ ] **`pvc.yaml`** - EBS storage for ML model storage
+- [ ] **Verify Helm chart for Intelligence Engine Service in `solidity-security-platform/backend/intelligence-engine-service/`**
+- [ ] **Verify ArgoCD Application manifest in `solidity-security-infrastructure/argocd/applications/intelligence-engine-application.yaml`**
 - [ ] **Configure AWS Secrets Manager secrets for Intelligence Engine:**
   - [ ] **ML service API keys in AWS Secrets Manager**
   - [ ] **Algorithm configuration secrets in AWS Secrets Manager**
@@ -200,22 +230,30 @@ IAM Policies:
 - [ ] Create finding status management (open/acknowledged/fixed) with cloud storage
 - [ ] Set up bulk operations for finding management in cloud environment
 - [ ] Configure intelligent severity adjustment based on cloud context
+- [ ] **Deploy intelligence engine service via ArgoCD by committing code to platform repository**
 - [ ] **Configure ArgoCD health checks for cloud intelligence engine**
 - [ ] **Test ArgoCD deployment and sync for cloud intelligence service**
 - [ ] **Validate AWS Secrets Manager secret injection for intelligence engine credentials**
 
 ### **Afternoon: Frontend Foundation + Cloud ArgoCD Deployment (3-4 hours)**
+- [ ] **Create React application in `solidity-security-platform/frontend/`:**
+  - [ ] **`components/`** - Reusable UI components
+  - [ ] **`pages/`** - Page-level components
+  - [ ] **`hooks/`** - Custom React hooks
+  - [ ] **`utils/`** - Utility functions
+  - [ ] **`store/`** - Zustand store configuration
+  - [ ] **`api/`** - API client and TanStack Query setup
 - [ ] **Create React application with TypeScript and Vite for cloud development**
-- [ ] **Create Kubernetes IaC for Frontend Application:**
-  - [ ] **Deployment.yaml with nginx serving React build and AWS Secrets Manager integration**
-  - [ ] **Service.yaml for frontend service access**
-  - [ ] **ConfigMap.yaml for nginx configuration and API endpoints (non-sensitive)**
-  - [ ] **External Secret.yaml for frontend secrets from AWS Secrets Manager (API keys, OAuth)**
-  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
-  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
-  - [ ] **Ingress.yaml for ALB frontend routing with Let's Encrypt SSL**
-- [ ] **Create Helm chart for Frontend with environment-specific API URLs**
-- [ ] **Create ArgoCD Application manifest for frontend deployment**
+- [ ] **Verify Kubernetes IaC for Frontend Application in `solidity-security-platform/frontend/`:**
+  - [ ] **`deployment.yaml`** - nginx serving React build and AWS Secrets Manager integration
+  - [ ] **`service.yaml`** - Frontend service access
+  - [ ] **`configmap.yaml`** - nginx configuration and API endpoints (non-sensitive)
+  - [ ] **`external-secret.yaml`** - Frontend secrets from AWS Secrets Manager (API keys, OAuth)
+  - [ ] **`secret-provider-class.yaml`** - AWS Secrets Manager CSI driver configuration
+  - [ ] **`service-account.yaml`** - AWS IAM IRSA and Secrets Manager authentication
+  - [ ] **`ingress.yaml`** - ALB frontend routing with Let's Encrypt SSL
+- [ ] **Verify Helm chart for Frontend in `solidity-security-platform/frontend/`**
+- [ ] **Verify ArgoCD Application manifest in `solidity-security-infrastructure/argocd/applications/frontend-application.yaml`**
 - [ ] **Configure AWS Secrets Manager secrets for Frontend:**
   - [ ] **OAuth client credentials in AWS Secrets Manager**
   - [ ] **API endpoint configurations in AWS Secrets Manager**
@@ -226,6 +264,7 @@ IAM Policies:
 - [ ] Set up Zustand for global state management in cloud environment
 - [ ] Configure WebSocket connection for real-time updates to cloud backend
 - [ ] Implement dark/light theme with system preference for cloud development
+- [ ] **Deploy frontend via ArgoCD by committing code to platform repository**
 - [ ] **Configure ArgoCD sync policies for cloud frontend updates**
 - [ ] **Test ArgoCD progressive delivery for cloud frontend changes**
 - [ ] **Validate frontend secret injection from AWS Secrets Manager**
@@ -257,7 +296,7 @@ IAM Policies:
 - [ ] Basic dashboard structure in place for cloud testing
 - [ ] **Frontend accessible via https://app.dev.advancedblockchainsecurity.com with Let's Encrypt SSL**
 - [ ] **Cloud security headers configured for frontend protection via ALB**
-- [ ] **Intelligence engine and frontend services deployed via cloud ArgoCD**
+- [ ] **Intelligence engine and frontend services deployed via cloud ArgoCD (auto-sync from platform repo)**
 - [ ] **ArgoCD managing cloud frontend deployment lifecycle**
 - [ ] **All frontend and intelligence engine secrets managed by AWS Secrets Manager**
 - [ ] **External Secrets Operator injecting secrets into frontend and intelligence services**
@@ -267,6 +306,11 @@ IAM Policies:
 ## Day 9: Frontend Dashboard & Notification Service + Cloud ArgoCD Management
 
 ### **Morning: Dashboard Implementation + Cloud ArgoCD Sync (3-4 hours)**
+- [ ] **Implement dashboard components in `solidity-security-platform/frontend/`:**
+  - [ ] **`components/dashboard/`** - Dashboard-specific components
+  - [ ] **`components/findings/`** - Finding-related components
+  - [ ] **`components/projects/`** - Project management components
+  - [ ] **`components/users/`** - User management components
 - [ ] Create findings table with filtering, sorting, and pagination for cloud data
 - [ ] Implement finding detail modal with remediation suggestions using cloud templates
 - [ ] Set up real-time updates for analysis progress via cloud WebSockets
@@ -281,16 +325,22 @@ IAM Policies:
 - [ ] **Test dynamic configuration updates from AWS Secrets Manager for frontend features**
 
 ### **Afternoon: Notification Service + Cloud ArgoCD Application (3-4 hours)**
+- [ ] **Implement notification service in `solidity-security-platform/backend/notification-service/`:**
+  - [ ] **`websocket/`** - WebSocket server for real-time notifications
+  - [ ] **`email/`** - Email notification system
+  - [ ] **`integrations/`** - Third-party integrations (Slack, Teams)
+  - [ ] **`templates/`** - Notification templates
+  - [ ] **`preferences/`** - Notification preferences and routing
 - [ ] **Implement WebSocket server for real-time notifications in cloud environment**
-- [ ] **Create Kubernetes IaC for Notification Service:**
-  - [ ] **Deployment.yaml with WebSocket and email service configuration plus AWS Secrets Manager integration**
-  - [ ] **Service.yaml for notification service communication**
-  - [ ] **ConfigMap.yaml for email templates and notification settings (non-sensitive)**
-  - [ ] **External Secret.yaml for SMTP and webhook credentials from AWS Secrets Manager**
-  - [ ] **Secret Provider Class.yaml for AWS Secrets Manager CSI driver configuration**
-  - [ ] **Service Account.yaml for AWS IAM IRSA and Secrets Manager authentication**
-- [ ] **Create Helm chart for Notification Service with cloud SMTP configurations**
-- [ ] **Create ArgoCD Application manifest for notification service**
+- [ ] **Verify Kubernetes IaC for Notification Service in `solidity-security-platform/backend/notification-service/`:**
+  - [ ] **`deployment.yaml`** - WebSocket and email service configuration plus AWS Secrets Manager integration
+  - [ ] **`service.yaml`** - Notification service communication
+  - [ ] **`configmap.yaml`** - Email templates and notification settings (non-sensitive)
+  - [ ] **`external-secret.yaml`** - SMTP and webhook credentials from AWS Secrets Manager
+  - [ ] **`secret-provider-class.yaml`** - AWS Secrets Manager CSI driver configuration
+  - [ ] **`service-account.yaml`** - AWS IAM IRSA and Secrets Manager authentication
+- [ ] **Verify Helm chart for Notification Service in `solidity-security-platform/backend/notification-service/`**
+- [ ] **Verify ArgoCD Application manifest in `solidity-security-infrastructure/argocd/applications/notification-application.yaml`**
 - [ ] **Configure AWS Secrets Manager secrets for Notification Service:**
   - [ ] **AWS SES SMTP server credentials in AWS Secrets Manager**
   - [ ] **Slack webhook URLs in AWS Secrets Manager**
@@ -301,6 +351,7 @@ IAM Policies:
 - [ ] Set up webhook system for external integrations in cloud environment
 - [ ] Configure notification preferences and routing with cloud storage
 - [ ] Implement rate limiting for notifications in cloud development
+- [ ] **Deploy notification service via ArgoCD by committing code to platform repository**
 - [ ] **Configure ArgoCD to manage cloud notification service deployments**
 - [ ] **Test ArgoCD health checks for cloud WebSocket connections**
 - [ ] **Test AWS Secrets Manager secret rotation for notification service credentials**
@@ -333,7 +384,7 @@ IAM Policies:
 - [ ] User interface responsive and accessible for cloud development
 - [ ] **All services accessible via cloud SSL-secured ALB ingress**
 - [ ] **Cloud WebSocket connections working through ALB proxy**
-- [ ] **All services deployed and managed via cloud ArgoCD**
+- [ ] **All services deployed and managed via cloud ArgoCD (auto-sync from platform repo)**
 - [ ] **All notification credentials and templates managed by AWS Secrets Manager**
 - [ ] **External Secrets Operator successfully injecting notification secrets**
 
@@ -430,7 +481,7 @@ AWS Secrets Manager Testing Scenarios:
 - [ ] Authentication working across all cloud services
 - [ ] **All services accessible via cloud SSL-secured ALB ingress**
 - [ ] **cert-manager managing Let's Encrypt certificates automatically**
-- [ ] **All backend services deployed via cloud ArgoCD GitOps**
+- [ ] **All backend services deployed via cloud ArgoCD GitOps (auto-sync from platform repo)**
 - [ ] **ArgoCD managing service dependencies and deployment order in cloud**
 - [ ] **AWS Secrets Manager managing all sensitive configuration and credentials**
 - [ ] **External Secrets Operator injecting secrets into all services**
@@ -442,7 +493,7 @@ AWS Secrets Manager Testing Scenarios:
 - [ ] Error handling and loading states implemented for cloud development
 - [ ] Data fetching and caching optimized for cloud APIs
 - [ ] **Cloud security headers protecting frontend communications via ALB**
-- [ ] **Frontend-backend integration deployed via cloud ArgoCD**
+- [ ] **Frontend-backend integration deployed via cloud ArgoCD (auto-sync from platform repo)**
 - [ ] **ArgoCD managing cloud frontend deployment with zero downtime**
 - [ ] **All frontend secrets managed through AWS Secrets Manager**
 - [ ] **Dynamic configuration updates from AWS Secrets Manager without frontend restart**
@@ -453,7 +504,7 @@ AWS Secrets Manager Testing Scenarios:
 - [ ] **Cloud CI/CD pipeline building and deploying successfully to EKS**
 - [ ] **Let's Encrypt certificates rotating automatically**
 - [ ] **Documentation updated with current cloud state including SSL and AWS Secrets Manager setup**
-- [ ] **Complete cloud GitOps workflow operational via ArgoCD**
+- [ ] **Complete cloud GitOps workflow operational via ArgoCD (platform repo as source)**
 - [ ] **ArgoCD managing entire cloud application lifecycle**
 - [ ] **AWS Secrets Manager secret management integrated across entire stack**
 - [ ] **External Secrets Operator operational for all services**
@@ -468,7 +519,7 @@ AWS Secrets Manager Testing Scenarios:
 - [ ] **Users can manage finding status and add comments with cloud persistence**
 - [ ] **Notifications sent via AWS SES email and Slack for critical findings**
 - [ ] **All communication encrypted with automatically managed Let's Encrypt certificates**
-- [ ] **Complete workflow managed via cloud ArgoCD GitOps deployment**
+- [ ] **Complete workflow managed via cloud ArgoCD GitOps deployment (platform repo)**
 - [ ] **All sensitive data and credentials managed through AWS Secrets Manager**
 - [ ] **External Secrets Operator automatically injecting secrets from AWS Secrets Manager**
 
@@ -486,7 +537,8 @@ AWS Secrets Manager Testing Scenarios:
 - [ ] **External Secrets Operator successfully injecting secrets from AWS Secrets Manager**
 
 ### **Cloud GitOps & ArgoCD Validation:**
-- [ ] **ArgoCD Applications deployed for all cloud microservices and infrastructure**
+- [ ] **ArgoCD Applications deployed for all cloud microservices in infrastructure repo**
+- [ ] **ArgoCD Applications pointing to platform repository service directories**
 - [ ] **GitOps workflow functional for all cloud deployments and updates**
 - [ ] **ArgoCD sync policies configured appropriately for cloud environment**
 - [ ] **ArgoCD RBAC working with proper cloud team access controls**
@@ -597,6 +649,58 @@ AWS Secrets Manager Testing Scenarios:
 - [ ] **External Secrets Operator production configuration prepared**
 - [ ] **AWS Secrets Manager enterprise features deployment for production HA**
 - [ ] **Multi-region AWS Secrets Manager integration documented**
+
+## Enhanced Platform Repository Structure Summary
+
+**Final Structure Created in `solidity-security-platform`:**
+```
+solidity-security-platform/
+├── services/
+│   ├── api-service/
+│   │   ├── src/ (FastAPI application code)
+│   │   ├── tests/ (Service-specific tests)
+│   │   ├── Dockerfile (Container build)
+│   │   ├── k8s/ (Kubernetes manifests with security policies)
+│   │   │   ├── base/ (11 manifests including external secrets)
+│   │   │   └── overlays/ (dev/staging/production)
+│   │   ├── helm/ (Complete Helm chart with values files)
+│   │   └── aws-secrets/ (AWS Secrets Manager templates)
+│   ├── tool-integration-service/ (Same structure)
+│   ├── orchestration-service/ (Same structure)
+│   ├── intelligence-engine-service/ (Same structure)
+│   ├── data-service/ (Same structure)
+│   └── notification-service/ (Same structure)
+├── frontend/
+│   ├── src/ (React application code)
+│   ├── public/ (Static assets)
+│   ├── Dockerfile (Frontend container)
+│   ├── k8s/ (Frontend K8s manifests)
+│   ├── helm/ (Frontend Helm chart)
+│   └── aws-secrets/ (Frontend secret templates)
+├── shared/ (Shared libraries and utilities)
+├── scripts/ (Development and deployment scripts)
+├── tests/ (Integration and E2E tests)
+└── docs/ (Basic setup guides)
+```
+
+**ArgoCD Applications in `solidity-security-infrastructure`:**
+```
+solidity-security-infrastructure/
+├── argocd/
+│   ├── applications/
+│   │   ├── api-service-application.yaml (→ platform/services/api-service/k8s/base)
+│   │   ├── tool-integration-application.yaml (→ platform/services/tool-integration-service/k8s/base)
+│   │   ├── orchestration-application.yaml (→ platform/services/orchestration-service/k8s/base)
+│   │   ├── intelligence-engine-application.yaml (→ platform/services/intelligence-engine-service/k8s/base)
+│   │   ├── data-service-application.yaml (→ platform/services/data-service/k8s/base)
+│   │   ├── notification-application.yaml (→ platform/services/notification-service/k8s/base)
+│   │   ├── frontend-application.yaml (→ platform/frontend/k8s/base)
+│   │   └── app-of-apps.yaml (Manages all applications)
+│   └── projects/ (ArgoCD project definitions)
+└── external-secrets/ (External Secrets Operator configs)
+```
+
+This completes Sprint 1 with a fully functional MVP platform running entirely in cloud development environment, featuring enterprise-grade secret management with AWS Secrets Manager, ready for team collaboration and rapid feature development in Sprint 2, with seamless production scaling capability planned for future sprints. The cloud-first approach provides immediate team collaboration, eliminates local resource constraints, and ensures production readiness from day one.
 
 ## Cloud Development Environment Summary
 
@@ -722,5 +826,3 @@ Production Security Preparation:
   - Multi-region secret replication planned
   - Enterprise compliance frameworks ready for cloud deployment
 ```
-
-This completes Sprint 1 with a fully functional MVP platform running entirely in cloud development environment, featuring enterprise-grade secret management with AWS Secrets Manager, ready for team collaboration and rapid feature development in Sprint 2, with seamless production scaling capability planned for future sprints. The cloud-first approach provides immediate team collaboration, eliminates local resource constraints, and ensures production readiness from day one.

@@ -117,11 +117,60 @@ Cross-Region Replication:
   Automatic failover and sync
 ```
 
+#### Repository Structure Integration
+
+### **Platform Repository (`solidity-security-platform`)**
+Contains all microservices with integrated deployment configurations:
+
+```
+solidity-security-platform/
+├── backend/
+│   ├── api-service/
+│   │   ├── src/                      # FastAPI application code
+│   │   ├── tests/                    # Service-specific tests
+│   │   ├── Dockerfile                # Container build
+│   │   └── k8s/                      # Kubernetes manifests
+│   ├── tool-integration-service/     # Same structure
+│   ├── orchestration-service/        # Same structure
+│   ├── intelligence-engine-service/  # Same structure
+│   ├── data-service/                 # Same structure
+│   └── notification-service/         # Same structure
+├── frontend/
+│   ├── src/                          # React application
+│   └── k8s/                          # Frontend K8s manifests
+├── shared/                           # Shared libraries
+├── scripts/                          # Development scripts
+└── tests/                            # Integration tests
+```
+
+### **Infrastructure Repository (`solidity-security-infrastructure`)**
+Contains ArgoCD applications pointing to platform repository services:
+
+```
+solidity-security-infrastructure/
+├── argocd/
+│   ├── applications/
+│   │   ├── api-service-application.yaml      # → platform/backend/api-service
+│   │   ├── tool-integration-application.yaml # → platform/backend/tool-integration-service
+│   │   ├── orchestration-application.yaml    # → platform/backend/orchestration-service
+│   │   ├── intelligence-engine-application.yaml # → platform/backend/intelligence-engine-service
+│   │   ├── data-service-application.yaml     # → platform/backend/data-service
+│   │   ├── notification-application.yaml     # → platform/backend/notification-service
+│   │   ├── frontend-application.yaml         # → platform/frontend
+│   │   └── app-of-apps.yaml                  # Manages all applications
+│   └── projects/                     # ArgoCD project definitions
+├── external-secrets/                 # External Secrets Operator configs
+├── cert-manager/                     # Certificate management
+├── aws-load-balancer-controller/     # ALB controller
+└── cluster-services/                 # Cluster-wide services
+```
+
 #### 1. Tool Integration Service
 **Purpose**: Unified interface for all security analysis tools with secure credential management
 **Technology Stack**: Python 3.11, FastAPI, Celery, Redis, Rust runtime for Aderyn
 **Design Pattern**: Adapter pattern with plugin architecture
 **Secret Management**: AWS Secrets Manager for API keys, External Secrets Operator for injection
+**Location**: `solidity-security-platform/backend/tool-integration-service/`
 
 **Technical Requirements**:
 - **Plugin System**: Dynamic loading of tool adapters via Python importlib
@@ -221,6 +270,7 @@ Cross-Region Replication:
 **Technology Stack**: Python 3.11, NLP libraries, PostgreSQL, Redis
 **Design Pattern**: Pipeline pattern with pluggable analyzers
 **Secret Management**: AWS Secrets Manager for algorithm configurations
+**Location**: `solidity-security-platform/backend/intelligence-engine-service/`
 
 **Deduplication Algorithm Specifications**:
 - **Syntactic Matching**: Exact file path + line number matching
@@ -254,6 +304,7 @@ Cross-Region Replication:
 **Technology Stack**: Python 3.11, Celery, Redis, PostgreSQL
 **Design Pattern**: Workflow orchestration with DAG execution
 **Secret Management**: AWS Secrets Manager for broker credentials and worker authentication
+**Location**: `solidity-security-platform/backend/orchestration-service/`
 
 **Job Scheduling**:
 - **Priority Queues**: Critical (audit prep), High (CI/CD), Normal (manual), Low (batch)
@@ -278,6 +329,7 @@ Cross-Region Replication:
 **Technology Stack**: RDS PostgreSQL 15, ElastiCache Redis 7, Elasticsearch 8
 **Design Pattern**: CQRS with event sourcing for audit trails
 **Secret Management**: AWS Secrets Manager with automatic rotation for database credentials
+**Location**: `solidity-security-platform/backend/data-service/`
 
 **Database Schema Design**:
 - **Partitioning Strategy**: Time-based partitioning for analysis_runs and findings
@@ -320,30 +372,12 @@ Cross-Region Replication:
 - IAM-based database access via AWS Secrets Manager
 - Audit logging for all database credential usage
 
-### Data Architecture
-
-#### Database Design
-**Primary Database**: RDS PostgreSQL 15 with Multi-AZ deployment
-**Schema Strategy**: Multi-tenant with row-level security
-**Backup Strategy**: Automated RDS backups with point-in-time recovery
-**Secret Management**: AWS Secrets Manager with automatic rotation for database credentials
-
-**Table Partitioning**:
-- **Time-Based**: Monthly partitions for analysis_runs and findings
-- **Hash-Based**: Organization-based partitioning for large tables
-- **Automatic Management**: pg_partman for automated partition management
-
-**Index Strategy**:
-- **Primary Indexes**: B-tree indexes on frequently queried columns
-- **Composite Indexes**: Multi-column indexes for complex queries
-- **Partial Indexes**: Conditional indexes for filtered queries
-- **Index Monitoring**: pg_stat_user_indexes for usage tracking
-
 #### 5. Notification Service
 **Purpose**: Real-time updates, integrations, alerting with secure credential management
 **Technology Stack**: Node.js, Socket.io, Redis, PostgreSQL
 **Design Pattern**: Publisher-subscriber with WebSocket broadcasting
 **Secret Management**: AWS Secrets Manager for SMTP credentials and webhook URLs
+**Location**: `solidity-security-platform/backend/notification-service/`
 
 **Real-Time Communication**:
 - **WebSocket Management**: Connection pooling, auto-reconnection, heartbeat
@@ -369,6 +403,7 @@ Cross-Region Replication:
 **Technology Stack**: React 18, TypeScript 5, Vite, TanStack Query, Zustand
 **Architecture Pattern**: Feature-based folder structure with shared components
 **Secret Management**: AWS Secrets Manager-managed OAuth credentials and API configurations
+**Location**: `solidity-security-platform/frontend/`
 
 **State Management**:
 - **Global State**: Zustand for authentication, user preferences, theme
@@ -508,6 +543,37 @@ Cross-Region Replication:
 - Secret injection during build and deployment processes
 - IAM-based access control for pipeline operations
 - Audit logging for all CI/CD secret access
+
+#### ArgoCD Integration Strategy
+**Repository Structure**: ArgoCD Applications in infrastructure repo pointing to platform repo services
+**GitOps Workflow**: 
+1. Developer commits code to `solidity-security-platform/services/{service-name}/`
+2. ArgoCD detects changes via webhook or polling
+3. ArgoCD syncs Kubernetes manifests from platform repo to cluster
+4. External Secrets Operator injects secrets from AWS Secrets Manager
+5. Service deploys with updated configuration
+
+**ArgoCD Application Example**:
+```yaml
+# solidity-security-infrastructure/argocd/applications/api-service-application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: api-service
+  namespace: argocd
+spec:
+  source:
+    repoURL: https://github.com/your-org/solidity-security-platform
+    path: services/api-service/k8s/base
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: solidity-platform
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+```
 
 #### Monitoring & Observability
 **Metrics Stack**: Prometheus, Grafana, AlertManager, CloudWatch
@@ -730,6 +796,8 @@ Cloud-First Advantages:
   - Enterprise-grade monitoring and alerting
   - Fast iteration with cloud-native CI/CD
   - Global accessibility for distributed teams
+  - Integrated deployment configurations in platform repo
+  - GitOps workflow with ArgoCD from day one
 ```
 
-This comprehensive technical development plan provides enterprise-grade secret management with AWS Secrets Manager from day one in cloud development, ensuring production readiness while maintaining rapid development velocity without local resource constraints.
+This comprehensive technical development plan provides enterprise-grade secret management with AWS Secrets Manager from day one in cloud development, ensuring production readiness while maintaining rapid development velocity without local resource constraints. The integrated repository structure with platform services containing both code and deployment configurations, managed by ArgoCD applications in the infrastructure repository, creates a streamlined development and deployment workflow.
