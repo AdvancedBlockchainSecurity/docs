@@ -569,6 +569,20 @@ solidity-security-platform/
 
 **Total Enhanced Templates Created:** 6 microservices × ~15 files each (including security) = 90 template files ready for secure service implementation in Week 2.
 
+**Breakdown of Additional Security Templates Added (per microservice):**
+
+- **aws-secrets/**: Enhanced secrets management templates, including:
+  - `secrets.yaml`: Secure storage of service credentials with AWS Secrets Manager integration.
+  - `encryption-config.yaml`: Configuration for encryption of sensitive data at rest and in transit.
+  - `rotation-policy.yaml`: Automated secrets rotation policy for improved security.
+- **helm/**: Additional Helm chart files for security, including:
+  - `network-policy.yaml`: Kubernetes network policies to restrict traffic between pods.
+  - `rbac.yaml`: Role-based access control templates for least-privilege service accounts.
+- **k8s/base/**: Security-focused Kubernetes manifests, including:
+  - `pod-security.yaml`: Pod security standards enforcement.
+  - `audit-policy.yaml`: Kubernetes audit logging configuration for compliance.
+
+*These new templates account for the increase from ~13 to ~15 files per microservice, ensuring each service is production-ready with robust security controls.*
 ---
 
 ### **Day 3: Enhanced Cloud Monitoring Stack & Platform Repository**
