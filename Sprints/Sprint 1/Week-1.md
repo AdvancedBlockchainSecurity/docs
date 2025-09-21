@@ -26,7 +26,7 @@
 
 #### Afternoon: AWS Infrastructure Provisioning & Kubernetes Services Setup (5-6 hours)
 
-##### **AWS Infrastructure IaC Creation (2-3 hours)**
+##### **AWS Infrastructure IaC Creation (5-7 hours)**
 - [ ] **Create Terraform modules in `solidity-security-aws-infrastructure` repository:**
   - [ ] **VPC module with public/private subnets, NAT gateways, Internet gateway**
   - [ ] **EKS cluster module with managed node groups and OIDC provider**
