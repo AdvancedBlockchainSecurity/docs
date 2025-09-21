@@ -8,11 +8,11 @@
 **Technical Milestone**: Complete cloud development environment with enterprise secret management
 
 **Development Checklist**:
-- [ ] **Purchase production domain** (e.g., solidity-platform.com) via Route53 or registrar
+- [ ] **Purchase production domain** (e.g., advancedblockchainsecurity.com) via Route53 or registrar
 - [ ] **Configure Route53 hosted zone** for DNS management and SSL certificate validation
-- [ ] **Set up development subdomain** (dev.solidity-platform.com) with A records
-- [ ] **Configure staging subdomain** (staging.solidity-platform.com) with A records
-- [ ] **Set up production subdomain** (app.solidity-platform.com) with A records
+- [ ] **Set up development subdomain** (dev.advancedblockchainsecurity.com) with A records
+- [ ] **Configure staging subdomain** (staging.advancedblockchainsecurity.com) with A records
+- [ ] **Set up production subdomain** (app.advancedblockchainsecurity.com) with A records
 - [ ] Set up AWS EKS development cluster with managed node groups (t3.medium nodes)
 - [ ] Configure AWS VPC with public/private subnets and NAT gateways
 - [ ] Install AWS Load Balancer Controller for ALB ingress management
@@ -60,7 +60,7 @@
 - **Tool integration services deploy and update automatically via ArgoCD**
 - **All tool credentials managed securely through AWS Secrets Manager**
 - **Tool API keys rotate automatically without service disruption**
-- **Tools accessible at https://tools.dev.solidity-platform.com**
+- **Tools accessible at https://tools.dev.advancedblockchainsecurity.com**
 - All services deploy successfully to AWS EKS development cluster
 - **ArgoCD successfully deploys and manages cloud application lifecycle via GitOps**
 - **AWS Secrets Manager operational and managing all infrastructure secrets**
@@ -68,7 +68,7 @@
 - SSL termination working with Let's Encrypt certificates via Route53 validation
 - cert-manager automatically provisions and renews certificates with Let's Encrypt
 - AWS ALB routes traffic correctly with SSL termination
-- **ArgoCD UI accessible and shows healthy application status at https://argocd.dev.solidity-platform.com**
+- **ArgoCD UI accessible and shows healthy application status at https://argocd.dev.advancedblockchainsecurity.com**
 - **GitOps workflow functional for cloud deployments and updates**
 - **External Secrets Operator injecting secrets from AWS Secrets Manager into all cloud services**
 - **Domain purchased and DNS properly configured with A records**
@@ -127,7 +127,7 @@
 - Rate limiting blocks requests after threshold
 - RDS connections pool efficiently under load
 - API documentation generates automatically from code
-- **API accessible at https://api.dev.solidity-platform.com**
+- **API accessible at https://api.dev.advancedblockchainsecurity.com**
 
 #### Sprint 3: Slither, Aderyn & Solidity-Metrics Integration  (Weeks 5-6)
 **Technical Milestone**: Working tool integration with secure credential management
@@ -184,7 +184,7 @@
 - **Tool integration services deploy and update automatically via ArgoCD**
 - **All tool credentials managed securely through AWS Secrets Manager**
 - **Tool API keys rotate automatically without service disruption**
-- **Tools accessible at https://tools.dev.solidity-platform.com**
+- **Tools accessible at https://tools.dev.advancedblockchainsecurity.com**
 
 #### Sprint 4: Frontend Dashboard Foundation (Weeks 7-8)
 **Technical Milestone**: React dashboard with secure configuration management
@@ -226,7 +226,7 @@
 - UI responds smoothly on mobile and desktop browsers
 - Error states display helpful messages without crashes
 - **Dynamic configuration updates work without frontend restart**
-- **Frontend accessible at https://app.dev.solidity-platform.com**
+- **Frontend accessible at https://app.dev.advancedblockchainsecurity.com**
 - **CloudFront CDN delivers static assets efficiently**
 
 #### Sprint 5: MythX Integration  (Weeks 9-10)

@@ -61,7 +61,7 @@ API Service AWS Secrets Manager Secrets:
   dev/api-service/jwt-secret: "cloud-development-jwt-signing-key"
   dev/api-service/oauth-google: "Google OAuth client credentials"
   dev/api-service/oauth-github: "GitHub OAuth client credentials"
-  dev/api-service/cors-origins: "https://app.dev.solidity-platform.com"
+  dev/api-service/cors-origins: "https://app.dev.advancedblockchainsecurity.com"
 
 Data Service AWS Secrets Manager Secrets:
   dev/data-service/rds-url: "RDS PostgreSQL connection string with RDS Proxy"
@@ -79,7 +79,7 @@ IAM Policies:
 - [ ] RDS database schema deployed with test data
 - [ ] Data service with ElastiCache caching operational
 - [ ] Basic user and project management working with cloud storage
-- [ ] **Cloud SSL-secured API endpoints accessible via https://api.dev.solidity-platform.com**
+- [ ] **Cloud SSL-secured API endpoints accessible via https://api.dev.advancedblockchainsecurity.com**
 - [ ] **ALB rate limiting protecting cloud API services**
 - [ ] **API and data services deployed and managed via cloud ArgoCD**
 - [ ] **ArgoCD showing healthy status for both services in cloud environment**
@@ -167,7 +167,7 @@ IAM Policies:
 - [ ] Cloud job orchestration system processing analyses with ElastiCache
 - [ ] Tool adapters normalizing results to common format in cloud
 - [ ] Parallel execution of multiple tools working in EKS cluster
-- [ ] **Cloud SSL-secured tool services accessible via https://tools.dev.solidity-platform.com**
+- [ ] **Cloud SSL-secured tool services accessible via https://tools.dev.advancedblockchainsecurity.com**
 - [ ] **Cloud orchestration endpoints protected with proper authentication**
 - [ ] **Tool integration and orchestration services managed via cloud ArgoCD**
 - [ ] **ArgoCD showing healthy deployment status for all cloud tool services**
@@ -240,8 +240,8 @@ Intelligence Engine AWS Secrets Manager Secrets:
 
 Frontend AWS Secrets Manager Secrets:
   dev/frontend/oauth-client-id: "OAuth client ID for authentication"
-  dev/frontend/api-base-url: "https://api.dev.solidity-platform.com"
-  dev/frontend/websocket-url: "wss://api.dev.solidity-platform.com/ws"
+  dev/frontend/api-base-url: "https://api.dev.advancedblockchainsecurity.com"
+  dev/frontend/websocket-url: "wss://api.dev.advancedblockchainsecurity.com/ws"
   dev/frontend/feature-flags: "Dynamic feature flag configuration"
   dev/frontend/analytics-key: "Analytics service API key"
 
@@ -255,7 +255,7 @@ IAM Policies:
 - [ ] React frontend with authentication working against cloud APIs
 - [ ] Real-time communication between frontend and backend via cloud WebSockets
 - [ ] Basic dashboard structure in place for cloud testing
-- [ ] **Frontend accessible via https://app.dev.solidity-platform.com with Let's Encrypt SSL**
+- [ ] **Frontend accessible via https://app.dev.advancedblockchainsecurity.com with Let's Encrypt SSL**
 - [ ] **Cloud security headers configured for frontend protection via ALB**
 - [ ] **Intelligence engine and frontend services deployed via cloud ArgoCD**
 - [ ] **ArgoCD managing cloud frontend deployment lifecycle**
@@ -308,13 +308,13 @@ IAM Policies:
 **Cloud Notification Configuration with AWS Secrets Manager:**
 ```yaml
 Notification Service AWS Secrets Manager Secrets:
-  dev/notification/websocket-url: "wss://notifications.dev.solidity-platform.com"
+  dev/notification/websocket-url: "wss://notifications.dev.advancedblockchainsecurity.com"
   dev/notification/ses-smtp-server: "AWS SES SMTP endpoint"
   dev/notification/ses-username: "AWS SES SMTP username"
   dev/notification/ses-password: "AWS SES SMTP password"
   dev/notification/slack-webhook: "https://hooks.slack.com/services/PROD/WEBHOOK/URL"
-  dev/notification/email-from: "noreply@solidity-platform.com"
-  dev/notification/base-url: "https://app.dev.solidity-platform.com"
+  dev/notification/email-from: "noreply@advancedblockchainsecurity.com"
+  dev/notification/base-url: "https://app.dev.advancedblockchainsecurity.com"
 
 Email Template AWS Secrets Manager Secrets:
   dev/notification/templates/critical-finding: "Critical vulnerability email template"
@@ -660,7 +660,7 @@ New Team Member Setup:
     - AWS CLI configured
     - kubectl configured for EKS
     - Git access to repositories
-    - Domain access (dev.solidity-platform.com)
+    - Domain access (dev.advancedblockchainsecurity.com)
   
   Setup Time: <60 minutes
     1. Clone repositories (5 minutes)

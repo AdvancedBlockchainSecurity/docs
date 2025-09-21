@@ -19,9 +19,9 @@
 - [x] Clone all repositories and create initial folder structures
 - [x] Configure repository templates and README files
 - [ ] **Configure Cloudflare DNS for existing domain** for DNS management
-- [ ] **Set up development subdomain** (dev.solidity-platform.com) with A records
-- [ ] **Configure staging subdomain** (staging.solidity-platform.com) with A records
-- [ ] **Set up production subdomain** (app.solidity-platform.com) with A records
+- [ ] **Set up development subdomain** (dev.advancedblockchainsecurity.com) with A records
+- [ ] **Configure staging subdomain** (staging.advancedblockchainsecurity.com) with A records
+- [ ] **Set up production subdomain** (app.advancedblockchainsecurity.com) with A records
 
 #### Afternoon: AWS Infrastructure Provisioning & Kubernetes Services Setup (5-6 hours)
 
@@ -82,12 +82,12 @@
 **Cloudflare DNS Configuration:**
 ```bash
 # Cloudflare DNS Configuration
-dev.solidity-platform.com → AWS ALB (to be created)
-api.dev.solidity-platform.com → AWS ALB (API Gateway)
-app.dev.solidity-platform.com → AWS ALB (Frontend)
-argocd.dev.solidity-platform.com → AWS ALB (ArgoCD Dashboard)
-grafana.dev.solidity-platform.com → AWS ALB (Monitoring)
-tools.dev.solidity-platform.com → AWS ALB (Tool Integration)
+dev.advancedblockchainsecurity.com → AWS ALB (to be created)
+api.dev.advancedblockchainsecurity.com → AWS ALB (API Gateway)
+app.dev.advancedblockchainsecurity.com → AWS ALB (Frontend)
+argocd.dev.advancedblockchainsecurity.com → AWS ALB (ArgoCD Dashboard)
+grafana.dev.advancedblockchainsecurity.com → AWS ALB (Monitoring)
+tools.dev.advancedblockchainsecurity.com → AWS ALB (Tool Integration)
 ```
 
 **Enhanced AWS Secrets Manager Cloud Development Configuration:**
@@ -239,8 +239,8 @@ Backup Automation:
 
 **Deliverables Day 1:**
 - [ ] All 7 repositories created with basic structure (including new AWS infrastructure repo)
-- [ ] **solidity-platform.com domain configured in Cloudflare with proper DNS records**
-- [ ] **Development (dev.solidity-platform.com), staging (staging.solidity-platform.com), and production (solidity-platform.com) subdomains configured with A records in Cloudflare**
+- [ ] **advancedblockchainsecurity.com domain configured in Cloudflare with proper DNS records**
+- [ ] **Development (dev.advancedblockchainsecurity.com), staging (staging.advancedblockchainsecurity.com), and production (advancedblockchainsecurity.com) subdomains configured with A records in Cloudflare**
 - [ ] **AWS infrastructure deployed via Terraform (VPC, EKS, RDS, ElastiCache)**
 - [ ] **Enhanced security deployed (Security Groups, VPC Endpoints, Network Policies)**
 - [ ] **ECR repositories created with vulnerability scanning and lifecycle policies**
@@ -252,7 +252,7 @@ Backup Automation:
 - [ ] **Let's Encrypt issuer generating SSL certificates automatically via HTTP-01 challenge**
 - [ ] **AWS Secrets Manager configured for application secret storage with enhanced security**
 - [ ] **External Secrets Operator configured with AWS IAM authentication**
-- [ ] **ArgoCD successfully deployed and accessible via https://argocd.dev.solidity-platform.com**
+- [ ] **ArgoCD successfully deployed and accessible via https://argocd.dev.advancedblockchainsecurity.com**
 - [ ] **ArgoCD UI accessible with Let's Encrypt SSL certificates**
 - [ ] **ArgoCD AWS Secrets Manager Plugin configured for secret injection**
 - [ ] **Enhanced Kubernetes security deployed (Pod Security, Resource Quotas, Network Policies)**
@@ -665,7 +665,7 @@ Container Insights:
 
 **Deliverables Day 3:**
 - [ ] Complete enhanced cloud monitoring stack (Prometheus, Grafana, Jaeger, X-Ray) deployed
-- [ ] **Enhanced cloud monitoring dashboards accessible via https://grafana.dev.solidity-platform.com**
+- [ ] **Enhanced cloud monitoring dashboards accessible via https://grafana.dev.advancedblockchainsecurity.com**
 - [ ] **AWS Secrets Manager operational with enhanced monitoring and security**
 - [ ] **Container Insights providing EKS cluster visibility with cost tracking**
 - [ ] Enhanced platform repository with microservice structure and secure cloud configs

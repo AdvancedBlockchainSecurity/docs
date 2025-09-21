@@ -47,7 +47,7 @@
 - [ ] **Secret Rotation**: AWS Secrets Manager secret rotation tested without service restart
 
 **Success Criteria**:
-- API accessible at https://api.dev.solidity-platform.com
+- API accessible at https://api.dev.advancedblockchainsecurity.com
 - JWT tokens expire and refresh correctly using AWS Secrets Manager-managed keys
 - ArgoCD automatically deploys API service updates from Git commits
 - All API secrets managed through AWS Secrets Manager with automatic injection
@@ -75,7 +75,7 @@
 - Job queue processes analyses with proper prioritization using ElastiCache
 - Tool integration services deploy and update automatically via ArgoCD
 - All tool credentials managed securely through AWS Secrets Manager
-- Tools accessible at https://tools.dev.solidity-platform.com
+- Tools accessible at https://tools.dev.advancedblockchainsecurity.com
 
 ---
 
@@ -93,7 +93,7 @@
 - [ ] **GitOps Deployment**: ArgoCD-managed frontend deployment with rollback capability
 
 **Success Criteria**:
-- Frontend accessible at https://app.dev.solidity-platform.com
+- Frontend accessible at https://app.dev.advancedblockchainsecurity.com
 - Users can log in and access personalized dashboard
 - Findings display in real-time as analyses complete
 - Frontend deploys automatically via ArgoCD on Git commits
