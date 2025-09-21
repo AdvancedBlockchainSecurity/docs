@@ -264,7 +264,7 @@ Backup Automation:
 ### **Day 2: Cloud-Ready Service IaC & Enhanced Data Services**
 
 #### Morning: Cloud-Ready Service IaC Framework with Enhanced Security (3-4 hours)
-- [ ] **Create enhanced Kubernetes IaC templates for cloud infrastructure services:**
+- [ ] **Create enhanced Kubernetes IaC templates for all 6 microservices with security hardening:**
   - [ ] **RDS PostgreSQL: IAM service account, External Secret, ConfigMap manifests with encryption**
   - [ ] **ElastiCache Redis: IAM service account, External Secret, ConfigMap manifests with TLS**
   - [ ] **Enhanced Monitoring: Prometheus, Grafana, Jaeger with CloudWatch integration**
@@ -545,7 +545,7 @@ Compliance & Monitoring:
 **Enhanced Directory Structure Created:**
 ```
 solidity-security-platform/
-├── services/
+├── backend/
 │   ├── api-service/
 │   │   ├── k8s/base/ (11 manifests including security policies)
 │   │   ├── helm/ (5 files with security hardening)
