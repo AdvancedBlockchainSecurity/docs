@@ -12,7 +12,7 @@ Tech Stack: Python, FastAPI, React, TypeScript
 Contains: API services, frontend, shared libraries
 ```
 
-### 2. **`solidity-security-aws-infrastructure`** (NEW)
+### 2. **`solidity-security-aws-infrastructure`**
 **AWS Infrastructure as Code repository**
 ```
 Purpose: AWS cloud resource provisioning and management
@@ -82,7 +82,7 @@ solidity-security-platform/
 └── docs/                         # Basic README and setup guides
 ```
 
-### ☁️ **solidity-security-aws-infrastructure** (NEW)
+### ☁️ **solidity-security-aws-infrastructure**
 ```
 solidity-security-aws-infrastructure/
 ├── terraform/
