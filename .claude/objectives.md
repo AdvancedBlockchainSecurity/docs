@@ -16,7 +16,7 @@
 **Primary Objective**: Establish production-ready AWS infrastructure with GitOps deployment automation and secure AWS Secrets Manager integration for immediate team collaboration.
 
 **Key Deliverables**:
-- [ ] **Domain & DNS**: Production domain purchased with Route53 hosted zone and SSL-ready subdomains
+- [ ] **Domain & DNS**: Production domain purchased with Cloudflare
 - [ ] **AWS Infrastructure**: EKS cluster, RDS PostgreSQL, ElastiCache Redis, VPC with security groups
 - [ ] **GitOps Foundation**: ArgoCD deployed with GitHub integration and automated deployment workflows
 - [ ] **Secret Management**: AWS Secrets Manager operational with External Secrets Operator integration
