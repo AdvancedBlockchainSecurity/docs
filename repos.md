@@ -161,7 +161,7 @@ solidity-security-infrastructure/
 │   │   └── argocd-ingress.yaml
 │   ├── applications/
 │   │   ├── app-of-apps.yaml
-│   │   ├── vault-application.yaml
+│   │   ├── aws-secrets-application.yaml
 │   │   ├── monitoring-application.yaml
 │   │   ├── api-service-application.yaml
 │   │   ├── frontend-application.yaml
@@ -174,12 +174,12 @@ solidity-security-infrastructure/
 │       ├── dev-project.yaml
 │       ├── staging-project.yaml
 │       └── prod-project.yaml
-├── vault/
+├── aws-secrets/
 │   ├── deployment/
-│   │   ├── vault-cluster.yaml
+│   │   ├── aws-secrets-cluster.yaml
 │   │   ├── consul-storage.yaml
-│   │   ├── vault-injector.yaml
-│   │   └── vault-ui-ingress.yaml
+│   │   ├── aws-secrets-injector.yaml
+│   │   └── aws-secrets-ui-ingress.yaml
 │   ├── policies/
 │   │   ├── api-service-policy.hcl
 │   │   ├── data-service-policy.hcl
@@ -222,7 +222,7 @@ solidity-security-infrastructure/
 │   │   └── service-monitor.yaml
 │   ├── grafana/
 │   │   ├── grafana-install.yaml
-│   │   ├── grafana-config.yaml
+│   │   ├── grafana-config.yaml (Note: Uses default password configuration)
 │   │   └── grafana-ingress.yaml
 │   ├── jaeger/
 │   │   ├── jaeger-install.yaml
@@ -312,7 +312,7 @@ solidity-security-tools/
 │   │   ├── service.yaml
 │   │   ├── configmap.yaml
 │   │   ├── external-secret.yaml
-│   │   ├── vault-policy.yaml
+│   │   ├── aws-secrets-policy.yaml
 │   │   ├── service-account.yaml
 │   │   ├── pvc.yaml
 │   │   └── ingress.yaml
@@ -323,7 +323,7 @@ solidity-security-tools/
 ├── scripts/
 │   ├── install-tools.sh          # Install all security tools
 │   ├── test-integrations.sh      # Test tool integrations
-│   ├── setup-vault-secrets.sh    # Configure Vault secrets for tools
+│   ├── setup-aws-secrets-secrets.sh    # Configure AWS Secrets Manager secrets for tools
 │   └── performance-test.sh       # Performance testing
 └── README.md
 ```
@@ -336,7 +336,7 @@ solidity-security-docs/
 │   ├── microservices.md
 │   ├── aws-infrastructure.md     # NEW: AWS architecture documentation
 │   ├── kubernetes-services.md    # NEW: K8s services documentation
-│   ├── vault-integration.md      # NEW: Vault secret management
+│   ├── aws-secrets-integration.md      # NEW: AWS Secrets Manager secret management
 │   ├── data-flow.md
 │   └── security-model.md
 ├── development/
@@ -349,7 +349,7 @@ solidity-security-docs/
 │   ├── aws-infrastructure.md     # NEW: AWS infrastructure deployment
 │   ├── kubernetes.md
 │   ├── argocd-setup.md           # NEW: ArgoCD configuration
-│   ├── vault-setup.md            # NEW: Vault deployment and config
+│   ├── aws-secrets-setup.md            # NEW: AWS Secrets Manager deployment and config
 │   ├── monitoring.md
 │   └── ssl-certificates.md       # NEW: Let's Encrypt and cert-manager
 ├── api/
@@ -358,7 +358,7 @@ solidity-security-docs/
 │   └── webhook-documentation.md
 ├── operations/
 │   ├── runbooks/                 # NEW: Operational procedures
-│   │   ├── vault-operations.md
+│   │   ├── aws-secrets-operations.md
 │   │   ├── argocd-operations.md
 │   │   ├── aws-operations.md
 │   │   └── incident-response.md
@@ -381,7 +381,7 @@ solidity-security-monitoring/
 │   ├── rules/                    # Alerting rules
 │   │   ├── infrastructure.yml
 │   │   ├── applications.yml
-│   │   ├── vault.yml             # NEW: Vault monitoring rules
+│   │   ├── aws-secrets.yml             # NEW: AWS Secrets Manager monitoring rules
 │   │   └── aws.yml               # NEW: AWS service monitoring
 │   ├── config/                   # Prometheus configuration
 │   │   ├── prometheus.yml
@@ -390,19 +390,19 @@ solidity-security-monitoring/
 │   └── targets/                  # Service discovery configs
 │       ├── kubernetes-sd.yml
 │       ├── aws-sd.yml            # NEW: AWS service discovery
-│       └── vault-sd.yml          # NEW: Vault service discovery
+│       └── aws-secrets-sd.yml          # NEW: AWS Secrets Manager service discovery
 ├── grafana/
 │   ├── dashboards/               # Dashboard JSON files
 │   │   ├── infrastructure.json
 │   │   ├── applications.json
-│   │   ├── vault.json            # NEW: Vault monitoring dashboard
+│   │   ├── aws-secrets.json            # NEW: AWS Secrets Manager monitoring dashboard
 │   │   ├── aws-services.json     # NEW: AWS services dashboard
 │   │   ├── argocd.json           # NEW: ArgoCD dashboard
 │   │   └── security-metrics.json
 │   ├── datasources/              # Data source configurations
 │   │   ├── prometheus.yml
 │   │   ├── cloudwatch.yml        # NEW: CloudWatch integration
-│   │   └── vault-metrics.yml     # NEW: Vault metrics
+│   │   └── aws-secrets-metrics.yml     # NEW: AWS Secrets Manager metrics
 │   └── provisioning/             # Automated provisioning
 │       ├── dashboards.yml
 │       ├── datasources.yml
@@ -481,7 +481,7 @@ solidity-security-vulnerabilities/
 
 ### Day 3: Kubernetes Infrastructure Repository Setup
 - [ ] **Create ArgoCD installation manifests**
-- [ ] **Set up Vault deployment configurations**
+- [ ] **Set up AWS Secrets Manager deployment configurations**
 - [ ] **Configure AWS Load Balancer Controller manifests**
 - [ ] **Create External Secrets Operator configurations**
 - [ ] **Set up cert-manager with Let's Encrypt**
@@ -518,7 +518,7 @@ solidity-security-vulnerabilities/
 - `DOCKER_REGISTRY_TOKEN` (for ECR)
 - `SLACK_WEBHOOK_URL`
 - `ROUTE53_ACCESS_KEY` (for DNS management)
-- `VAULT_TOKEN` (for Vault management)
+- `VAULT_TOKEN` (for AWS Secrets Manager management)
 
 ## Repository Dependencies
 
@@ -554,13 +554,13 @@ graph TB
    - Set up domain and DNS
 
 2. **Kubernetes Services** (`solidity-security-infrastructure`)
-   - Install ArgoCD, Vault, AWS Load Balancer Controller
+   - Install ArgoCD, AWS Secrets Manager, AWS Load Balancer Controller
    - Configure cert-manager and External Secrets Operator
    - Set up monitoring stack
 
 3. **Platform Applications** (`solidity-security-platform`)
    - Deploy microservices via ArgoCD
-   - Configure applications with Vault secrets
+   - Configure applications with AWS Secrets Manager secrets
    - Test end-to-end functionality
 
 This repository structure supports your cloud-first microservices architecture while maintaining clear separation between AWS infrastructure provisioning and Kubernetes service deployment, enabling independent development workflows and proper infrastructure management.

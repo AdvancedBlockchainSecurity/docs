@@ -18,36 +18,35 @@
 - [ ] Install AWS Load Balancer Controller for ALB ingress management
 - [ ] Install cert-manager with Let's Encrypt and Route53 DNS validation
 - [ ] Configure development DNS entries with proper A records pointing to ALB
-- [ ] **Deploy HashiCorp Vault cluster with AWS KMS auto-unseal**
-- [ ] **Configure Vault Consul storage backend for HA**
-- [ ] **Configure Vault PKI engine for certificate authority**
-- [ ] **Configure Vault KV v2 engines for application secrets**
+- [ ] **Configure AWS Secrets Manager for application secret storage**
+- [ ] **Set up AWS IAM roles for Secrets Manager access**
+- [ ] **Configure cert-manager with Let's Encrypt for certificate management**
 - [ ] **Install External Secrets Operator with AWS IAM authentication**
-- [ ] **Configure Vault authentication methods (AWS IAM, Kubernetes)**
+- [ ] **Configure External Secrets Operator for AWS Secrets Manager integration**
 - [ ] **Install ArgoCD in AWS EKS cluster**
 - [ ] **Configure ArgoCD with GitHub repository integration**
 - [ ] **Set up ArgoCD application projects for development**
 - [ ] **Configure ArgoCD RBAC for team access and permissions**
-- [ ] **Configure ArgoCD Vault Plugin for secret injection in GitOps**
+- [ ] **Configure ArgoCD with External Secrets Operator for secret injection in GitOps**
 - [ ] **Create ArgoCD Application manifests for all microservices**
 - [ ] Deploy RDS PostgreSQL 15 with Multi-AZ deployment and automated backups
 - [ ] Deploy ElastiCache Redis with cluster mode enabled
-- [ ] Set up CloudWatch monitoring with Prometheus and Grafana on EKS
+- [ ] Set up CloudWatch monitoring with Prometheus and Grafana on EKS (Note: Grafana uses default password configuration)
 - [ ] Configure ECR for container image storage with vulnerability scanning
 - [ ] Implement GitHub Actions CI/CD pipeline with AWS integration
 - [ ] Create production-ready Docker images with security scanning
 - [ ] Create EKS cluster configuration with spot instances for cost optimization
 - [ ] **Configure ArgoCD sync policies for cloud development workflow**
-- [ ] **Store all infrastructure secrets in Vault (database credentials, monitoring auth)**
+- [ ] **Store all infrastructure secrets in AWS Secrets Manager (database credentials, monitoring auth)**
 - [ ] **Test External Secrets Operator integration with all cloud services**
 
-**Vault Tool Integration**:
-- [ ] **MythX API keys in `secret/tool-integration/mythx-credentials`**
-- [ ] **Tool configurations in `secret/tool-integration/tool-configs`**
-- [ ] **ElastiCache Redis credentials in `secret/orchestration/celery-broker`**
-- [ ] **Worker authentication tokens in `secret/orchestration/worker-auth`**
-- [ ] **Tool integration Vault policy for API key access only**
-- [ ] **Orchestration Vault policy for broker and worker credential access**
+**AWS Secrets Manager Tool Integration**:
+- [ ] **MythX API keys in `tool-integration/mythx-credentials` secret**
+- [ ] **Tool configurations in `tool-integration/tool-configs` secret**
+- [ ] **ElastiCache Redis credentials in `orchestration/celery-broker` secret**
+- [ ] **Worker authentication tokens in `orchestration/worker-auth` secret**
+- [ ] **Tool integration IAM policy for Secrets Manager API key access only**
+- [ ] **Orchestration IAM policy for broker and worker credential access**
 
 **Acceptance Criteria**:
 - Solidity contracts upload successfully to S3 storage
@@ -58,19 +57,19 @@
 - Failed analyses retry automatically with backoff strategy
 - Tool services accessible via AWS ALB with SSL termination
 - **Tool integration services deploy and update automatically via ArgoCD**
-- **All tool credentials managed securely through Vault**
+- **All tool credentials managed securely through AWS Secrets Manager**
 - **Tool API keys rotate automatically without service disruption**
 - **Tools accessible at https://tools.dev.solidity-platform.com**
 - All services deploy successfully to AWS EKS development cluster
 - **ArgoCD successfully deploys and manages cloud application lifecycle via GitOps**
-- **HashiCorp Vault operational and managing all infrastructure secrets**
+- **AWS Secrets Manager operational and managing all infrastructure secrets**
 - CloudWatch monitoring dashboards display metrics from all infrastructure components
 - SSL termination working with Let's Encrypt certificates via Route53 validation
 - cert-manager automatically provisions and renews certificates with Let's Encrypt
 - AWS ALB routes traffic correctly with SSL termination
 - **ArgoCD UI accessible and shows healthy application status at https://argocd.dev.solidity-platform.com**
 - **GitOps workflow functional for cloud deployments and updates**
-- **External Secrets Operator injecting secrets from Vault into all cloud services**
+- **External Secrets Operator injecting secrets from AWS Secrets Manager into all cloud services**
 - **Domain purchased and DNS properly configured with A records**
 
 #### Sprint 2: Core API Foundation (Weeks 3-4)
@@ -78,33 +77,33 @@
 
 **Development Checklist**:
 - [ ] **Implement FastAPI application with OpenAPI 3.0 documentation**
-- [ ] **Create Kubernetes IaC for API service (Deployment, Service, ConfigMap, External Secret, Vault Policy manifests)**
+- [ ] **Create Kubernetes IaC for API service (Deployment, Service, ConfigMap, External Secret, IAM Policy manifests)**
 - [ ] **Create Helm chart for API service with environment-specific values**
 - [ ] **Create ArgoCD Application manifest for API service deployment**
-- [ ] **Configure Vault secrets for API service (JWT keys, OAuth credentials, RDS URLs)**
-- [ ] **Create Vault policies for API service with least privilege access**
+- [ ] **Configure AWS Secrets Manager secrets for API service (JWT keys, OAuth credentials, RDS URLs)**
+- [ ] **Create IAM policies for API service with least privilege access to Secrets Manager**
 - [ ] Set up AWS API Gateway with rate limiting (1000 req/hour) and CloudWatch logging
 - [ ] Configure AWS ALB ingress for API services with Let's Encrypt SSL certificates
 - [ ] **Configure automated deployment pipelines via ArgoCD for API services**
 - [ ] **Set up GitOps workflow for API service updates through ArgoCD**
-- [ ] **Test External Secrets Operator injecting Vault secrets into API service**
-- [ ] Implement JWT authentication with refresh token rotation (keys from Vault)
+- [ ] **Test External Secrets Operator injecting AWS Secrets Manager secrets into API service**
+- [ ] Implement JWT authentication with refresh token rotation (keys from AWS Secrets Manager)
 - [ ] Configure OAuth 2.0 integration
 - [ ] Implement role-based access control (RBAC) middleware
-- [ ] Set up RDS connection pooling with RDS Proxy (credentials from Vault)
+- [ ] Set up RDS connection pooling with RDS Proxy (credentials from AWS Secrets Manager)
 - [ ] Implement audit logging for all API requests with CloudWatch integration
 - [ ] Configure CORS policies for frontend integration
 - [ ] Set up API versioning strategy (/api/v1/, /api/v2/)
 - [ ] Implement health check endpoints with dependency validation
 - [ ] **Configure ArgoCD health checks for API services**
-- [ ] **Test Vault secret rotation for API service without service restart**
+- [ ] **Test AWS Secrets Manager secret rotation for API service without service restart**
 
-**MythX Vault Integration**:
-- [ ] **Primary MythX API key in `secret/tool-integration/mythx-primary`**
-- [ ] **Backup MythX API keys in `secret/tool-integration/mythx-backup`**
-- [ ] **MythX configuration parameters in `secret/tool-integration/mythx-config`**
+**MythX AWS Secrets Manager Integration**:
+- [ ] **Primary MythX API key in `tool-integration/mythx-primary` secret**
+- [ ] **Backup MythX API keys in `tool-integration/mythx-backup` secret**
+- [ ] **MythX configuration parameters in `tool-integration/mythx-config` secret**
 - [ ] **Automatic failover logic when primary credentials are rotated**
-- [ ] **Rate limiting configurations stored in Vault for dynamic updates**
+- [ ] **Rate limiting configurations stored in AWS Secrets Manager for dynamic updates**
 
 **Acceptance Criteria**:
 - Contracts analyze simultaneously with Slither, Aderyn, Solidity-Metrics, and MythX
@@ -114,7 +113,7 @@
 - Dashboard shows findings from all tools with complexity correlation
 - Code metrics enhance vulnerability risk assessment
 - **MythX integration deploys via ArgoCD GitOps workflow**
-- **MythX API credentials rotate automatically via Vault**
+- **MythX API credentials rotate automatically via AWS Secrets Manager**
 - **API key failover works seamlessly during credential rotation**
 - API Gateway routes requests with proper authentication via AWS ALB
 - AWS ALB properly terminates SSL and routes API traffic
@@ -122,8 +121,8 @@
 - **ArgoCD automatically deploys API service updates from Git commits**
 - **API services show healthy status in ArgoCD dashboard**
 - **Rollback capability tested via ArgoCD for API services**
-- **All API secrets managed through Vault with automatic injection**
-- JWT tokens expire and refresh correctly using Vault-managed keys
+- **All API secrets managed through AWS Secrets Manager with automatic injection**
+- JWT tokens expire and refresh correctly using AWS Secrets Manager-managed keys
 - Rate limiting blocks requests after threshold
 - RDS connections pool efficiently under load
 - API documentation generates automatically from code
@@ -139,14 +138,14 @@
 - [ ] **Create Kubernetes IaC for Tool Integration Service**
 - [ ] **Create Helm chart for Tool Integration Service with tool-specific configurations**
 - [ ] **Create ArgoCD Application manifest for Tool Integration Service**
-- [ ] **Store tool API keys and configurations in Vault KV engine**
+- [ ] **Store tool API keys and configurations in AWS Secrets Manager KV engine**
 - [ ] **Configure External Secrets Operator for tool credential injection**
-- [ ] **Create Vault policies for tool integration service access**
+- [ ] **Create AWS Secrets Manager policies for tool integration service access**
 - [ ] **Implement Analysis Orchestration Service with Celery workers on EKS**
 - [ ] **Create Kubernetes IaC for Orchestration Service**
 - [ ] **Create Helm chart for Orchestration Service with worker scaling configuration**
 - [ ] **Create ArgoCD Application manifest for Orchestration Service**
-- [ ] **Store ElastiCache Redis credentials and worker authentication in Vault**
+- [ ] **Store ElastiCache Redis credentials and worker authentication in AWS Secrets Manager**
 - [ ] Design analysis_runs and security_findings database schema on RDS
 - [ ] Add code_metrics table for complexity and maintainability data
 - [ ] Implement contract file upload and storage to S3
@@ -159,12 +158,12 @@
 - [ ] Configure AWS ALB ingress for tool integration services
 - [ ] **Test tool credential rotation without service interruption**
 
-**Extended Tool Vault Integration**:
-- [ ] **Certora API keys in `secret/tool-integration/certora`**
-- [ ] **Echidna configuration secrets in `secret/tool-integration/echidna`**
-- [ ] **Manticore service credentials in `secret/tool-integration/manticore`**
-- [ ] **Third-party analyzer API keys in `secret/tool-integration/analyzers`**
-- [ ] **Custom detector configurations in `secret/tool-integration/detectors`**
+**Extended Tool AWS Secrets Manager Integration**:
+- [ ] **Certora API keys in `secrets-manager/tool-integration/certora`**
+- [ ] **Echidna configuration secrets in `secrets-manager/tool-integration/echidna`**
+- [ ] **Manticore service credentials in `secrets-manager/tool-integration/manticore`**
+- [ ] **Third-party analyzer API keys in `secrets-manager/tool-integration/analyzers`**
+- [ ] **Custom detector configurations in `secrets-manager/tool-integration/detectors`**
 
 **Acceptance Criteria**:
 - All major security tools integrate successfully including enhanced Aderyn
@@ -173,7 +172,7 @@
 - Parallel execution completes faster than sequential runs
 - Tool effectiveness metrics guide optimization decisions
 - **Additional tools deploy via ArgoCD GitOps workflow**
-- **All tool credentials managed securely through Vault**
+- **All tool credentials managed securely through AWS Secrets Manager**
 - Solidity contracts upload successfully to S3 storage
 - Slither, Aderyn, and Solidity-Metrics analyze contracts and store normalized results in RDS
 - Code complexity metrics stored alongside security findings
@@ -182,7 +181,7 @@
 - Failed analyses retry automatically with backoff strategy
 - Tool services accessible via AWS ALB with SSL termination
 - **Tool integration services deploy and update automatically via ArgoCD**
-- **All tool credentials managed securely through Vault**
+- **All tool credentials managed securely through AWS Secrets Manager**
 - **Tool API keys rotate automatically without service disruption**
 - **Tools accessible at https://tools.dev.solidity-platform.com**
 
@@ -195,9 +194,9 @@
 - [ ] **Configure ArgoCD application for frontend deployment**
 - [ ] **Set up automated GitOps workflow for frontend updates via ArgoCD**
 - [ ] **Configure ArgoCD sync policies for frontend application**
-- [ ] **Store frontend configuration secrets in Vault (OAuth client IDs, API endpoints)**
+- [ ] **Store frontend configuration secrets in AWS Secrets Manager (OAuth client IDs, API endpoints)**
 - [ ] **Configure External Secrets Operator for frontend secret injection**
-- [ ] **Create Vault policy for frontend service configuration access**
+- [ ] **Create AWS Secrets Manager policy for frontend service configuration access**
 - [ ] Implement authentication flow with JWT token management
 - [ ] Create dashboard layout with navigation and user management
 - [ ] Implement TanStack Query for API data fetching and caching
@@ -210,7 +209,7 @@
 - [ ] Set up error boundaries with fallback components
 - [ ] Configure CloudFront CDN for static asset delivery
 - [ ] **Test frontend deployment rollback capabilities via ArgoCD**
-- [ ] **Test dynamic configuration updates from Vault for frontend**
+- [ ] **Test dynamic configuration updates from AWS Secrets Manager for frontend**
 
 **Acceptance Criteria**:
 - Users can log in and access personalized dashboard
@@ -219,7 +218,7 @@
 - **Frontend deploys automatically via ArgoCD on Git commits**
 - **ArgoCD shows healthy frontend application status**
 - **Frontend rollback tested and working via ArgoCD**
-- **All frontend configuration managed through Vault**
+- **All frontend configuration managed through AWS Secrets Manager**
 - Findings display in real-time as analyses complete
 - Code complexity metrics visualize in charts and tables
 - Table supports filtering by severity, file, and finding type
@@ -235,8 +234,8 @@
 **Development Checklist**:
 - [ ] Implement MythX adapter with REST API integration
 - [ ] Configure async job polling with configurable timeouts
-- [ ] **Implement API key rotation and failover logic via Vault**
-- [ ] **Store MythX API credentials in Vault with rotation policies**
+- [ ] **Implement API key rotation and failover logic via AWS Secrets Manager**
+- [ ] **Store MythX API credentials in AWS Secrets Manager with rotation policies**
 - [ ] Add MythX analysis modes (quick/standard/deep) selection
 - [ ] Create tool configuration management system
 - [ ] Implement parallel tool execution in orchestration service
@@ -247,7 +246,7 @@
 - [ ] Integrate code complexity metrics with vulnerability risk scoring
 - [ ] Configure AWS ALB ingress for MythX integration service
 - [ ] **Update ArgoCD applications for MythX integration service**
-- [ ] **Test MythX credential rotation via Vault without service interruption**
+- [ ] **Test MythX credential rotation via AWS Secrets Manager without service interruption**
 
 **Acceptance Criteria**:
 - Contracts analyze simultaneously with Slither, Aderyn, Solidity-Metrics, and MythX
@@ -257,7 +256,7 @@
 - Dashboard shows findings from all tools with complexity correlation
 - Code metrics enhance vulnerability risk assessment
 - **MythX integration deploys via ArgoCD GitOps workflow**
-- **MythX API credentials rotate automatically via Vault**
+- **MythX API credentials rotate automatically via AWS Secrets Manager**
 - **API key failover works seamlessly during credential rotation**
 
 #### Sprint 6: Intelligence Engine & Smart Rules  (Weeks 11-12)
@@ -270,9 +269,9 @@
 - [ ] Add confidence multipliers for risk calculations
 - [ ] Create cross-tool validation bonus scoring
 - [ ] Integrate code complexity metrics into risk assessment
-- [ ] **Store algorithm configurations and weights in Vault**
+- [ ] **Store algorithm configurations and weights in AWS Secrets Manager**
 - [ ] **Configure External Secrets Operator for intelligence engine secrets**
-- [ ] **Create Vault policy for intelligence engine configuration access**
+- [ ] **Create AWS Secrets Manager policy for intelligence engine configuration access**
 - [ ] Implement intelligent severity adjustment based on business context
 - [ ] Create rule-based false positive detection using pattern matching
 - [ ] Implement finding status management (open/acknowledged/fixed)
@@ -283,7 +282,7 @@
 - [ ] Configure AWS ALB ingress for intelligence engine service
 - [ ] **Create ArgoCD application for intelligence engine service**
 - [ ] **Configure GitOps deployment for intelligence engine updates**
-- [ ] **Test dynamic algorithm configuration updates from Vault**
+- [ ] **Test dynamic algorithm configuration updates from AWS Secrets Manager**
 
 **Acceptance Criteria**:
 - Duplicate findings merge automatically across tools with 70% accuracy
@@ -295,21 +294,21 @@
 - Export generates properly formatted reports
 - Analytics display meaningful security metrics
 - **Intelligence engine deploys and updates via ArgoCD automatically**
-- **Algorithm configurations update dynamically from Vault**
+- **Algorithm configurations update dynamically from AWS Secrets Manager**
 - **Scoring weights and thresholds tunable without deployment**
 
-### Phase 2: Enterprise Features (Months 4-6) - Production Cloud with Enterprise Vault
+### Phase 2: Enterprise Features (Months 4-6) - Production Cloud with Enterprise AWS Secrets Manager
 
-#### Sprint 7: Production Environment & Advanced Intelligence with Enterprise Vault (Weeks 13-14)
-**Technical Milestone**: Multi-environment AWS deployment with production-grade Vault
+#### Sprint 7: Production Environment & Advanced Intelligence with Enterprise AWS Secrets Manager (Weeks 13-14)
+**Technical Milestone**: Multi-environment AWS deployment with production-grade AWS Secrets Manager
 
 **Development Checklist**:
 - [ ] **Deploy AWS EKS clusters for staging and production environments**
-- [ ] **Deploy HashiCorp Vault Enterprise cluster with multi-AZ HA**
-- [ ] **Configure Vault Enterprise performance replication across regions**
-- [ ] **Set up Vault Enterprise disaster recovery replication**
-- [ ] **Configure Vault Enterprise audit logging to CloudWatch and S3**
-- [ ] **Set up cross-region Vault secret replication**
+- [ ] **Configure AWS Secrets Manager service with multi-AZ HA**
+- [ ] **Configure AWS Secrets Manager performance replication across regions**
+- [ ] **Set up AWS Secrets Manager disaster recovery replication**
+- [ ] **Configure AWS Secrets Manager audit logging to CloudWatch and S3**
+- [ ] **Set up cross-region AWS Secrets Manager secret replication**
 - [ ] **Configure External Secrets Operator with production IAM roles**
 - [ ] **Update ArgoCD for multi-environment deployment management**
 - [ ] **Scale RDS PostgreSQL to production configuration with read replicas**
@@ -334,12 +333,12 @@
 
 **Acceptance Criteria**:
 - **AWS staging and production environments fully operational with EKS**
-- **Production Vault Enterprise cluster operational with HA and auto-unseal**
+- **Production AWS Secrets Manager service operational with HA and auto-unseal**
 - **Database migration completed with zero data loss**
 - **All services running on production AWS with enterprise-grade performance**
 - **Let's Encrypt certificates automatically managed for all environments**
 - **ArgoCD managing multi-environment deployments successfully**
-- **External Secrets Operator working with production Vault Enterprise**
+- **External Secrets Operator working with production AWS Secrets Manager**
 - Rule engine achieves 75% accuracy on vulnerability classification
 - False positive rate reduces below 15% with advanced rules
 - Statistical analysis identifies meaningful patterns in data
@@ -348,7 +347,7 @@
 - Customer feedback collection system captures enhancement data
 - A/B testing validates rule improvements
 - **Advanced features deploy seamlessly via ArgoCD in production**
-- **Vault Enterprise performance meets production targets (<50ms P95)**
+- **AWS Secrets Manager performance meets production targets (<50ms P95)**
 
 #### Sprint 8: Team Collaboration & Workflow  (Weeks 15-16)
 **Technical Milestone**: Multi-user collaboration with secure credential management
@@ -365,9 +364,9 @@
 - [ ] Create Slack integration for team notifications
 - [ ] Implement finding SLA tracking and alerts
 - [ ] **Configure ArgoCD for collaboration service deployments**
-- [ ] **Store team notification credentials in Vault**
+- [ ] **Store team notification credentials in AWS Secrets Manager**
 - [ ] **Configure External Secrets Operator for team service secrets**
-- [ ] **Create Vault policies for collaboration service access**
+- [ ] **Create AWS Secrets Manager policies for collaboration service access**
 
 **Acceptance Criteria**:
 - Team members can comment and collaborate on findings
@@ -376,7 +375,7 @@
 - Notifications deliver reliably via email and Slack
 - SLA breaches trigger appropriate alerts
 - **Collaboration features deploy via ArgoCD GitOps**
-- **All team service credentials managed through Vault**
+- **All team service credentials managed through AWS Secrets Manager**
 
 #### Sprint 9: CI/CD Integration & Automation  (Weeks 17-18)
 **Technical Milestone**: Automated security scanning with secure credential management
@@ -394,7 +393,7 @@
 - [ ] Create CLI tool for local development integration
 - [ ] **Configure ArgoCD for CI/CD integration services**
 - [ ] **Set up GitOps deployment for webhook and integration services**
-- [ ] **Store CI/CD integration credentials in Vault**
+- [ ] **Store CI/CD integration credentials in AWS Secrets Manager**
 - [ ] **Configure dynamic API keys for CI/CD integrations**
 
 **Acceptance Criteria**:
@@ -404,7 +403,7 @@
 - Policy violations prevent deployment to production
 - CLI tool works offline for pre-commit checks
 - **CI/CD integration services managed via ArgoCD**
-- **All CI/CD credentials securely managed through Vault**
+- **All CI/CD credentials securely managed through AWS Secrets Manager**
 
 #### Sprint 10: Advanced Analytics & Reporting  (Weeks 19-20)
 **Technical Milestone**: Executive dashboards with secure data access
@@ -421,7 +420,7 @@
 - [ ] Add team performance metrics and productivity insights
 - [ ] Implement data export APIs for external BI tools
 - [ ] **Configure ArgoCD for analytics and reporting services**
-- [ ] **Store analytics database credentials in Vault**
+- [ ] **Store analytics database credentials in AWS Secrets Manager**
 - [ ] **Configure External Secrets Operator for analytics secrets**
 
 **Acceptance Criteria**:
@@ -431,7 +430,7 @@
 - Custom reports generate with user-defined parameters
 - Data exports integrate successfully with external tools
 - **Analytics services deploy and scale via ArgoCD**
-- **All analytics credentials managed securely through Vault**
+- **All analytics credentials managed securely through AWS Secrets Manager**
 
 #### Sprint 11: Enterprise SSO & Administration  (Weeks 21-22)
 **Technical Milestone**: Enterprise authentication with centralized secret management
@@ -448,8 +447,8 @@
 - [ ] Create compliance reporting for access controls
 - [ ] Implement emergency access procedures for admin lockout
 - [ ] **Update ArgoCD deployments for SSO and admin services**
-- [ ] **Configure Vault LDAP/SAML authentication methods**
-- [ ] **Store SSO certificates and keys in Vault PKI engine**
+- [ ] **Configure AWS Secrets Manager LDAP/SAML authentication methods**
+- [ ] **Store SSO certificates and keys in AWS Secrets Manager PKI engine**
 
 **Acceptance Criteria**:
 - SAML SSO works with Active Directory and Okta
@@ -458,7 +457,7 @@
 - Admin actions generate comprehensive audit trails
 - Emergency access procedures tested and documented
 - **SSO and admin features deploy via ArgoCD**
-- **All SSO credentials and certificates managed through Vault**
+- **All SSO credentials and certificates managed through AWS Secrets Manager**
 
 #### Sprint 12: Performance Optimization & Scaling  (Weeks 23-24)
 **Technical Milestone**: Production-ready performance with secure credential management
@@ -477,8 +476,8 @@
 - [ ] Optimize AWS ALB configuration for high-performance SSL termination
 - [ ] **Configure ArgoCD for performance-optimized deployments**
 - [ ] **Set up ArgoCD sync strategies for zero-downtime updates**
-- [ ] **Optimize Vault Enterprise performance for high-throughput secret access**
-- [ ] **Configure Vault Enterprise performance replication for read scaling**
+- [ ] **Optimize AWS Secrets Manager performance for high-throughput secret access**
+- [ ] **Configure AWS Secrets Manager performance replication for read scaling**
 
 **Acceptance Criteria**:
 - Platform handles 1000+ concurrent users without degradation
@@ -487,9 +486,9 @@
 - Auto-scaling responds to load changes within 60 seconds
 - Circuit breakers prevent cascade failures during outages
 - **ArgoCD manages zero-downtime deployments successfully**
-- **Vault Enterprise performance meets targets under production load**
+- **AWS Secrets Manager performance meets targets under production load**
 
-### Phase 3: Advanced Features & Compliance (Months 7-9) - Full Production with Enterprise Vault
+### Phase 3: Advanced Features & Compliance (Months 7-9) - Full Production with Enterprise AWS Secrets Manager
 
 #### Sprint 13: Additional Tool Integrations  (Weeks 25-26)
 **Technical Milestone**: Extended tool ecosystem with secure credential management
@@ -507,7 +506,7 @@
 - [ ] Create tool effectiveness tracking and optimization
 - [ ] Implement parallel execution optimization for tool combinations
 - [ ] **Configure ArgoCD for additional tool integration services**
-- [ ] **Store all new tool credentials securely in Vault**
+- [ ] **Store all new tool credentials securely in AWS Secrets Manager**
 - [ ] **Configure External Secrets Operator for enhanced tool integrations**
 
 **Acceptance Criteria**:
@@ -517,7 +516,7 @@
 - Parallel execution completes faster than sequential runs
 - Tool effectiveness metrics guide optimization decisions
 - **Additional tools deploy via ArgoCD GitOps workflow**
-- **All tool credentials managed securely through Vault**
+- **All tool credentials managed securely through AWS Secrets Manager**
 
 #### Sprint 14: Compliance Automation Framework  (Weeks 27-28)
 **Technical Milestone**: Automated compliance with secure audit trails
@@ -534,8 +533,8 @@
 - [ ] Add compliance training tracking and reminders
 - [ ] Create third-party auditor portal for evidence review
 - [ ] **Configure ArgoCD for compliance automation services**
-- [ ] **Store compliance certificates and keys in Vault**
-- [ ] **Configure audit trail encryption and signing via Vault**
+- [ ] **Store compliance certificates and keys in AWS Secrets Manager**
+- [ ] **Configure audit trail encryption and signing via AWS Secrets Manager**
 
 **Acceptance Criteria**:
 - SOC 2 reports generate automatically with current evidence
@@ -544,7 +543,7 @@
 - Policy violations trigger automatic remediation workflows
 - Auditor portal provides secure access to compliance evidence
 - **Compliance services managed via ArgoCD**
-- **All compliance credentials and certificates managed through Vault**
+- **All compliance credentials and certificates managed through AWS Secrets Manager**
 
 #### Sprint 15: Advanced Enterprise Integration  (Weeks 29-30)
 **Technical Milestone**: Deep enterprise system integration with secure credential management
@@ -561,8 +560,8 @@
 - [ ] Create custom dashboard embedding for external portals
 - [ ] Implement single sign-on propagation to integrated systems
 - [ ] **Configure ArgoCD for enterprise integration services**
-- [ ] **Store all enterprise integration credentials in Vault**
-- [ ] **Configure webhook signing keys and API credentials via Vault**
+- [ ] **Store all enterprise integration credentials in AWS Secrets Manager**
+- [ ] **Configure webhook signing keys and API credentials via AWS Secrets Manager**
 
 **Acceptance Criteria**:
 - Security findings automatically create tickets in Jira/ServiceNow
@@ -571,7 +570,7 @@
 - API integrations work reliably with enterprise rate limits
 - SSO propagates seamlessly across integrated systems
 - **Enterprise integrations deploy via ArgoCD**
-- **All integration credentials managed securely through Vault**
+- **All integration credentials managed securely through AWS Secrets Manager**
 
 #### Sprint 16: Global Deployment & Multi-Tenancy  (Weeks 31-32)
 **Technical Milestone**: Production-ready global deployment with distributed secret management
@@ -589,8 +588,8 @@
 - [ ] Implement federated search across tenant boundaries
 - [ ] **Configure ArgoCD for multi-region deployment management**
 - [ ] **Set up ArgoCD application sets for multi-tenant environments**
-- [ ] **Deploy Vault Enterprise clusters in multiple regions with replication**
-- [ ] **Configure cross-region Vault secret replication**
+- [ ] **Configure AWS Secrets Manager services in multiple regions with replication**
+- [ ] **Configure cross-region AWS Secrets Manager secret replication**
 
 **Acceptance Criteria**:
 - Platform deploys successfully in multiple AWS regions
@@ -599,7 +598,7 @@
 - Disaster recovery procedures meet <4 hour RTO target
 - Usage tracking provides accurate billing across tenants
 - **ArgoCD manages multi-region deployments successfully**
-- **Vault provides global secret management with regional compliance**
+- **AWS Secrets Manager provides global secret management with regional compliance**
 
 #### Sprint 17: Production Readiness & Launch Preparation  (Weeks 33-34)
 **Technical Milestone**: Production deployment with comprehensive secret management
@@ -619,9 +618,9 @@
 - [ ] **Finalize ArgoCD production deployment configuration**
 - [ ] **Test ArgoCD disaster recovery and rollback procedures**
 - [ ] **Configure ArgoCD for production monitoring and alerting**
-- [ ] **Complete Vault Enterprise security hardening and audit preparation**
-- [ ] **Test Vault Enterprise disaster recovery and cross-region failover**
-- [ ] **Validate Vault Enterprise performance under production load**
+- [ ] **Complete AWS Secrets Manager security hardening and audit preparation**
+- [ ] **Test AWS Secrets Manager disaster recovery and cross-region failover**
+- [ ] **Validate AWS Secrets Manager performance under production load**
 
 **Acceptance Criteria**:
 - Penetration testing shows no critical vulnerabilities
@@ -631,8 +630,8 @@
 - Compliance audits pass without major findings
 - **ArgoCD production deployment fully tested and operational**
 - **ArgoCD disaster recovery procedures validated**
-- **Vault Enterprise production deployment secure and performant**
-- **Vault Enterprise disaster recovery and multi-region failover tested**
+- **AWS Secrets Manager production deployment secure and performant**
+- **AWS Secrets Manager disaster recovery and multi-region failover tested**
 
 ## Technical Milestone Validation
 
@@ -646,7 +645,7 @@ Each sprint completion requires:
 - [ ] Stakeholder acceptance of delivered functionality
 - [ ] **ArgoCD applications deploy successfully with green health status**
 - [ ] **GitOps workflow tested and functional for all components**
-- [ ] **Vault integration tested and secrets properly managed**
+- [ ] **AWS Secrets Manager integration tested and secrets properly managed**
 - [ ] **External Secrets Operator functioning correctly**
 
 ### Production Readiness Criteria
@@ -660,8 +659,8 @@ Before production deployment:
 - [ ] **ArgoCD production configuration validated and tested**
 - [ ] **GitOps workflows proven reliable for production deployment**
 - [ ] **ArgoCD disaster recovery and rollback procedures operational**
-- [ ] **Vault Enterprise production cluster operational with HA and security hardening**
-- [ ] **Vault Enterprise disaster recovery and cross-region replication tested**
+- [ ] **AWS Secrets Manager production cluster operational with HA and security hardening**
+- [ ] **AWS Secrets Manager disaster recovery and cross-region replication tested**
 - [ ] **All secrets properly managed with appropriate rotation policies**
 
 ## Cloud Development Environment Summary 
@@ -673,7 +672,7 @@ Cloud Development Costs (Months 1-3):
   RDS PostgreSQL (Multi-AZ): ~$50/month
   ElastiCache Redis: ~$30/month
   Route53 + Domain: ~$20/month
-  Vault Cluster: ~$50/month
+  AWS Secrets Manager Cluster: ~$50/month
   ALB + Data Transfer: ~$30/month
   Total Development Costs: ~$380/month
 
@@ -682,15 +681,15 @@ Production Scaling Costs (Month 4+):
   AWS EKS Staging: ~$300/month
   RDS PostgreSQL + Replicas: ~$200/month
   ElastiCache + Clustering: ~$100/month
-  Vault Enterprise: ~$200/month (optional)
+  AWS Secrets Manager: ~$200/month (optional)
   AWS KMS + Other Services: ~$100/month
   CloudFront CDN: ~$50/month
   Total Production Costs: ~$1,450/month (scales with usage)
 ```
 
-### **Vault Benefits Summary:**
+### **AWS Secrets Manager Benefits Summary:**
 ```yaml
-Cloud Vault Development:
+Cloud AWS Secrets Manager Development:
   - Enterprise secret management from day one
   - Production-grade policies and procedures
   - Automatic secret rotation and lifecycle management
@@ -698,7 +697,7 @@ Cloud Vault Development:
   - AWS IAM integration for access control
   - Real production patterns and workflows
 
-Production Vault Benefits:
+Production AWS Secrets Manager Benefits:
   - High availability and disaster recovery
   - Automatic backup and cross-region replication
   - Performance replication for global scale
@@ -722,4 +721,4 @@ Cloud-First Advantages:
   - Real DNS and domain management experience
 ```
 
-This comprehensive cloud development sprint plan provides enterprise-grade secret management with HashiCorp Vault from day one in cloud development, ensuring production readiness while maintaining rapid development velocity without local resource constraints. The plan includes proper domain setup and DNS management for a professional production-ready platform.
+This comprehensive cloud development sprint plan provides enterprise-grade secret management with AWS Secrets Manager from day one in cloud development, ensuring production readiness while maintaining rapid development velocity without local resource constraints. The plan includes proper domain setup and DNS management for a professional production-ready platform.
