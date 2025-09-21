@@ -20,6 +20,9 @@
 - [x] Configure repository templates and README files
 - [ ] **Purchase production domain** (e.g., solidity-platform.com) via Route53 or registrar
 - [ ] **Configure Route53 hosted zone** for DNS management (if not using Route53 registrar)
+- [ ] **Set up development subdomain** (dev.solidity-platform.com) with A records
+- [ ] **Configure staging subdomain** (staging.solidity-platform.com) with A records
+- [ ] **Set up production subdomain** (app.solidity-platform.com) with A records
 
 #### Afternoon: AWS Infrastructure Provisioning & Kubernetes Services Setup (5-6 hours)
 
@@ -70,6 +73,7 @@ app.dev.solidity-platform.com → AWS ALB (Frontend)
 argocd.dev.solidity-platform.com → AWS ALB (ArgoCD Dashboard)
 vault.dev.solidity-platform.com → AWS ALB (Vault UI)
 grafana.dev.solidity-platform.com → AWS ALB (Monitoring)
+tools.dev.solidity-platform.com → AWS ALB (Tool Integration)
 ```
 
 **Vault Cloud Development Configuration:**
@@ -106,6 +110,7 @@ Auth Methods:
 **Deliverables Day 1:**
 - [ ] All 7 repositories created with basic structure (including new AWS infrastructure repo)
 - [ ] **Production domain purchased and Route53 hosted zone configured**
+- [ ] **Development, staging, and production subdomains configured with DNS records**
 - [ ] **AWS infrastructure deployed via Terraform (VPC, EKS, RDS, ElastiCache)**
 - [ ] **EKS cluster operational with managed node groups**
 - [ ] **RDS PostgreSQL and ElastiCache Redis deployed and accessible**
@@ -118,7 +123,7 @@ Auth Methods:
 - [ ] **ArgoCD UI accessible with Let's Encrypt SSL certificates**
 - [ ] **ArgoCD Vault Plugin configured for secret injection**
 - [ ] **External Secrets Operator configured with AWS IAM authentication**
-- [ ] Both infrastructure repositories with complete cloud setup automation including Vault [ ] Infrastructure repository with complete cloud setup automation including Vault
+- [ ] Infrastructure repository with complete cloud setup automation including Vault
 
 ---
 
@@ -558,7 +563,8 @@ Required Documentation:
 
 ### **Cloud Infrastructure Requirements:**
 - [ ] All services deploy successfully to AWS EKS development cluster
-- [ ] **Domain purchased and Route53 DNS properly configured**
+- [ ] **Domain purchased and Route53 DNS properly configured with A records**
+- [ ] **Development, staging, and production subdomains configured**
 - [ ] CloudWatch monitoring dashboards display metrics from all infrastructure components
 - [ ] Cloud CI/CD pipeline successfully builds and deploys to EKS environment
 - [ ] RDS and ElastiCache connections functional with proper authentication
@@ -590,7 +596,7 @@ Required Documentation:
 - [ ] **CI/CD pipelines using Vault for secret management**
 
 ### **Repository & IaC Requirements:**
-- [ ] All 6 repositories created with proper structure and cloud development documentation
+- [ ] All 7 repositories created with proper structure and cloud development documentation
 - [ ] **IaC templates work for cloud development and production scaling**
 - [ ] Infrastructure as Code validates and deploys successfully to AWS EKS
 - [ ] **Team members can reproduce cloud environment setup in <60 minutes**
@@ -640,6 +646,7 @@ Required Documentation:
 - **Production-like testing** with real AWS services and networking
 - **Enterprise-grade security** with Vault from the beginning
 - **Global accessibility** for distributed teams
+- **Professional domain and SSL** from day one for external testing
 
 ### **Production Scaling Preparation:**
 - **Multi-environment strategy** with dev/staging/production clusters
