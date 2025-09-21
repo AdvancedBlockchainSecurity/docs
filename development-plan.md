@@ -320,24 +320,6 @@ Cross-Region Replication:
 - IAM-based database access via AWS Secrets Manager
 - Audit logging for all database credential usage
 
-#### Data Processing Pipeline
-**Stream Processing**: Amazon Kinesis with Kafka compatibility
-**Batch Processing**: Apache Airflow on EKS for scheduled data jobs
-**Data Warehousing**: Amazon Redshift for analytics and reporting
-**Secret Management**: AWS Secrets Manager credentials for all data pipeline components
-
-**ETL Processes**:
-- **Real-Time**: Kinesis consumers for immediate data processing
-- **Batch**: Hourly/daily aggregation jobs for reporting
-- **Data Quality**: Automated validation and anomaly detection
-- **Data Lineage**: Tracking data flow and transformations
-
-**AWS Secrets Manager Integration for Data Pipeline**:
-- Kinesis credentials and encryption keys managed by AWS Secrets Manager
-- Airflow connection secrets stored in AWS Secrets Manager
-- Redshift credentials automatically rotated via AWS Secrets Manager
-- Data pipeline audit logging through CloudTrail
-
 #### 5. Notification Service
 **Purpose**: Real-time updates, integrations, alerting with secure credential management
 **Technology Stack**: Node.js, Socket.io, Redis, PostgreSQL
