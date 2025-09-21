@@ -264,7 +264,7 @@ Backup Automation:
 ### **Day 2: Cloud-Ready Service IaC & Enhanced Data Services**
 
 #### Morning: Cloud-Ready Service IaC Framework with Enhanced Security (3-4 hours)
-- [ ] **Create enhanced Kubernetes IaC templates for cloud infrastructure components:**
+- [ ] **Create enhanced Kubernetes IaC templates for cloud infrastructure services:**
   - [ ] **RDS PostgreSQL: IAM service account, External Secret, ConfigMap manifests with encryption**
   - [ ] **ElastiCache Redis: IAM service account, External Secret, ConfigMap manifests with TLS**
   - [ ] **Enhanced Monitoring: Prometheus, Grafana, Jaeger with CloudWatch integration**
