@@ -101,9 +101,9 @@ Secret Paths Structure:
   │   ├── worker-credentials
   │   └── queue-credentials
   ├── intelligence-engine/
-  │   ├── ml-api-keys
-  │   ├── model-credentials
-  │   └── algorithm-configs
+  │   ├── algorithm-configs
+  │   ├── rule-weights
+  │   └── pattern-configs
   └── notification/
       ├── smtp-credentials
       ├── webhook-urls
@@ -144,6 +144,10 @@ Database Engine:
 - Parallel analysis for multiple contracts
 - Memory optimization for large contract sets
 - Configuration secrets stored in Vault
+- Built-in detector configuration and custom rule support
+- JSON output parsing for standardized vulnerability reporting
+- Integration with Foundry and Hardhat project structures
+- Performance optimization for large smart contract codebases
 
 **MythX Integration**:
 - REST API with async job polling
@@ -151,6 +155,10 @@ Database Engine:
 - Analysis mode selection (quick/standard/deep)
 - API key rotation and failover via Vault
 - Vault-managed API credentials with automatic rotation
+- Support for all MythX analysis types (static, dynamic, symbolic)
+- Rate limiting and quota management
+- Result correlation with other tool findings
+- Integration with CI/CD pipelines for automated scanning
 
 **Aderyn Integration**:
 - Rust-based CLI wrapper with process management
@@ -160,6 +168,9 @@ Database Engine:
 - Foundry project structure detection
 - Custom detector configuration support
 - Configuration stored in Vault KV engine
+- Support for custom Rust-based detectors
+- Integration with Solidity compilation artifacts
+- Advanced pattern matching for smart contract vulnerabilities
 
 **Solidity-Metrics Integration**:
 - Node.js CLI wrapper with process management
@@ -169,13 +180,33 @@ Database Engine:
 - Support for multiple Solidity compiler versions
 - Integration with vulnerability risk correlation
 - Tool configurations managed via Vault
+- Cyclomatic complexity calculation
+- Function length and parameter count analysis
+- Contract inheritance depth measurement
+- Code duplication detection
 
-**Certora Integration**:
+**Certora Integration** (Future Enhancement):
 - CLI wrapper with process management
 - Specification file generation automation
 - Result parsing from JSON output
 - Resource allocation for verification jobs
 - API credentials stored securely in Vault
+- Formal verification result integration
+- Specification template management
+- Verification report generation
+
+**Echidna Integration** (Future Enhancement):
+- Fuzzing campaign management
+- Property-based testing integration
+- Corpus generation and management
+- Coverage-guided fuzzing results
+- Integration with existing test suites
+
+**Manticore Integration** (Future Enhancement):
+- Symbolic execution engine integration
+- Path exploration and constraint solving
+- Vulnerability detection through symbolic analysis
+- Integration with other static analysis results
 
 **Tool Output Normalization**:
 - Standardized vulnerability schema (SWC-based)
@@ -190,16 +221,16 @@ Database Engine:
 - Automatic secret rotation for supported APIs
 
 #### 2. Intelligence Engine Service
-**Purpose**: Cross-tool correlation, deduplication, ML-based analysis with secure configuration management
-**Technology Stack**: Python 3.11, scikit-learn, spaCy, PostgreSQL, Redis
+**Purpose**: Cross-tool correlation, deduplication, rule-based analysis with secure configuration management
+**Technology Stack**: Python 3.11, NLP libraries, PostgreSQL, Redis
 **Design Pattern**: Pipeline pattern with pluggable analyzers
-**Secret Management**: Vault KV for ML API keys and algorithm configurations
+**Secret Management**: Vault KV for algorithm configurations
 
 **Deduplication Algorithm Specifications**:
 - **Syntactic Matching**: Exact file path + line number matching
 - **Semantic Matching**: AST-based similarity using tree-edit distance
 - **Fuzzy Matching**: Levenshtein distance on vulnerability descriptions
-- **ML Classification**: Supervised learning model for duplicate detection
+- **Rule-Based Classification**: Pattern-based duplicate detection
 
 **Risk Scoring Engine**:
 - **Base Severity Weights**: Critical(10), High(7), Medium(4), Low(2), Info(1)
@@ -209,17 +240,17 @@ Database Engine:
 - **Business Context**: Function criticality weighting based on gas usage patterns
 - **Historical Data**: False positive penalty based on similar past findings
 
-**Machine Learning Components**:
-- **Training Data Collection**: Customer feedback on false positives (Phase 1)
-- **Feature Engineering**: Code complexity metrics, function signatures, control flow (Phase 2)
-- **Model Training**: Supervised learning on 6+ months of customer data (Phase 2)
-- **Inference Pipeline**: Real-time scoring during analysis runs (Phase 2)
-- **Model Versioning**: MLflow for experiment tracking and model deployment (Phase 2)
+**Rule-Based Analysis Components**:
+- **Pattern Recognition**: Statistical pattern matching for vulnerability signatures
+- **False Positive Detection**: Rule-based filtering using known patterns
+- **Severity Adjustment**: Context-aware severity modification
+- **Remediation Suggestions**: Template-based fix recommendations
+- **Statistical Analysis**: Trend analysis and anomaly detection
 
 **Vault Integration**:
-- ML service API keys stored in `secret/intelligence-engine/ml-api-keys`
-- Algorithm weights and configurations in `secret/intelligence-engine/configs`
-- Model encryption keys for securing ML models at rest
+- Algorithm configurations stored in `secret/intelligence-engine/algorithm-configs`
+- Rule weights and thresholds in `secret/intelligence-engine/rule-weights`
+- Pattern configurations in `secret/intelligence-engine/pattern-configs`
 - External Secrets Operator for credential injection
 
 #### 3. Analysis Orchestration Service

@@ -41,38 +41,26 @@
 - [ ] **Store all infrastructure secrets in Vault (database credentials, monitoring auth)**
 - [ ] **Test External Secrets Operator integration with all cloud services**
 
-**Vault-Specific Deliverables**:
-- [ ] **Vault accessible at https://vault.dev.solidity-platform.com with UI enabled**
-- [ ] **PKI engine issuing certificates for cloud services with Let's Encrypt integration**
-- [ ] **KV engines storing application secrets with proper access policies**
-- [ ] **External Secrets Operator successfully injecting secrets from Vault**
-- [ ] **ArgoCD Vault Plugin working for GitOps secret management**
-- [ ] **All RDS and ElastiCache credentials managed through Vault**
-- [ ] **Vault policies configured for each service with least privilege access**
-- [ ] **Secret rotation tested for all cloud infrastructure components**
-
-**DNS and Domain Configuration**:
-```yaml
-Domain Setup:
-  Root Domain: solidity-platform.com
-  Development: dev.solidity-platform.com
-  Staging: staging.solidity-platform.com
-  Production: app.solidity-platform.com
-
-A Records (Route53):
-  dev.solidity-platform.com → AWS ALB (development)
-  api.dev.solidity-platform.com → AWS ALB (API Gateway)
-  vault.dev.solidity-platform.com → AWS ALB (Vault UI)
-  argocd.dev.solidity-platform.com → AWS ALB (ArgoCD Dashboard)
-  grafana.dev.solidity-platform.com → AWS ALB (Monitoring)
-
-SSL Certificates:
-  Let's Encrypt wildcard: *.dev.solidity-platform.com
-  Let's Encrypt wildcard: *.staging.solidity-platform.com
-  Let's Encrypt wildcard: *.solidity-platform.com
-```
+**Vault Tool Integration**:
+- [ ] **MythX API keys in `secret/tool-integration/mythx-credentials`**
+- [ ] **Tool configurations in `secret/tool-integration/tool-configs`**
+- [ ] **ElastiCache Redis credentials in `secret/orchestration/celery-broker`**
+- [ ] **Worker authentication tokens in `secret/orchestration/worker-auth`**
+- [ ] **Tool integration Vault policy for API key access only**
+- [ ] **Orchestration Vault policy for broker and worker credential access**
 
 **Acceptance Criteria**:
+- Solidity contracts upload successfully to S3 storage
+- Slither, Aderyn, and Solidity-Metrics analyze contracts and store normalized results in RDS
+- Code complexity metrics stored alongside security findings
+- Job queue processes analyses with proper prioritization using ElastiCache
+- Analysis status updates in real-time via WebSocket
+- Failed analyses retry automatically with backoff strategy
+- Tool services accessible via AWS ALB with SSL termination
+- **Tool integration services deploy and update automatically via ArgoCD**
+- **All tool credentials managed securely through Vault**
+- **Tool API keys rotate automatically without service disruption**
+- **Tools accessible at https://tools.dev.solidity-platform.com**
 - All services deploy successfully to AWS EKS development cluster
 - **ArgoCD successfully deploys and manages cloud application lifecycle via GitOps**
 - **HashiCorp Vault operational and managing all infrastructure secrets**
@@ -111,15 +99,23 @@ SSL Certificates:
 - [ ] **Configure ArgoCD health checks for API services**
 - [ ] **Test Vault secret rotation for API service without service restart**
 
-**Vault Integration Specifics**:
-- [ ] **JWT signing keys stored in `secret/api-service/jwt-secrets` with rotation policy**
-- [ ] **OAuth provider credentials in `secret/api-service/oauth-credentials`**
-- [ ] **RDS connection strings in `secret/api-service/database-credentials`**
-- [ ] **API service Vault policy allowing read access to its secret paths only**
-- [ ] **External Secrets Operator configured with refresh intervals for API secrets**
-- [ ] **Test dynamic secret updates without API service restart**
+**MythX Vault Integration**:
+- [ ] **Primary MythX API key in `secret/tool-integration/mythx-primary`**
+- [ ] **Backup MythX API keys in `secret/tool-integration/mythx-backup`**
+- [ ] **MythX configuration parameters in `secret/tool-integration/mythx-config`**
+- [ ] **Automatic failover logic when primary credentials are rotated**
+- [ ] **Rate limiting configurations stored in Vault for dynamic updates**
 
 **Acceptance Criteria**:
+- Contracts analyze simultaneously with Slither, Aderyn, Solidity-Metrics, and MythX
+- Tool failures don't block other tool execution
+- API quotas respect rate limits without errors
+- Results aggregate properly across different tools
+- Dashboard shows findings from all tools with complexity correlation
+- Code metrics enhance vulnerability risk assessment
+- **MythX integration deploys via ArgoCD GitOps workflow**
+- **MythX API credentials rotate automatically via Vault**
+- **API key failover works seamlessly during credential rotation**
 - API Gateway routes requests with proper authentication via AWS ALB
 - AWS ALB properly terminates SSL and routes API traffic
 - cert-manager manages Let's Encrypt certificates for API endpoints
@@ -163,15 +159,21 @@ SSL Certificates:
 - [ ] Configure AWS ALB ingress for tool integration services
 - [ ] **Test tool credential rotation without service interruption**
 
-**Vault Tool Integration**:
-- [ ] **MythX API keys in `secret/tool-integration/mythx-credentials`**
-- [ ] **Tool configurations in `secret/tool-integration/tool-configs`**
-- [ ] **ElastiCache Redis credentials in `secret/orchestration/celery-broker`**
-- [ ] **Worker authentication tokens in `secret/orchestration/worker-auth`**
-- [ ] **Tool integration Vault policy for API key access only**
-- [ ] **Orchestration Vault policy for broker and worker credential access**
+**Extended Tool Vault Integration**:
+- [ ] **Certora API keys in `secret/tool-integration/certora`**
+- [ ] **Echidna configuration secrets in `secret/tool-integration/echidna`**
+- [ ] **Manticore service credentials in `secret/tool-integration/manticore`**
+- [ ] **Third-party analyzer API keys in `secret/tool-integration/analyzers`**
+- [ ] **Custom detector configurations in `secret/tool-integration/detectors`**
 
 **Acceptance Criteria**:
+- All major security tools integrate successfully including enhanced Aderyn
+- Tool selection algorithms choose appropriate tools automatically
+- Plugin architecture allows easy addition of new tools
+- Parallel execution completes faster than sequential runs
+- Tool effectiveness metrics guide optimization decisions
+- **Additional tools deploy via ArgoCD GitOps workflow**
+- **All tool credentials managed securely through Vault**
 - Solidity contracts upload successfully to S3 storage
 - Slither, Aderyn, and Solidity-Metrics analyze contracts and store normalized results in RDS
 - Code complexity metrics stored alongside security findings
@@ -210,14 +212,6 @@ SSL Certificates:
 - [ ] **Test frontend deployment rollback capabilities via ArgoCD**
 - [ ] **Test dynamic configuration updates from Vault for frontend**
 
-**Frontend Vault Integration**:
-- [ ] **OAuth client credentials in `secret/frontend/oauth-client-id`**
-- [ ] **API base URLs in `secret/frontend/api-endpoints`**
-- [ ] **Feature flags in `secret/frontend/feature-flags`**
-- [ ] **Analytics keys in `secret/frontend/analytics-credentials`**
-- [ ] **Frontend Vault policy allowing read access to frontend secrets only**
-- [ ] **Runtime configuration injection without build-time secret exposure**
-
 **Acceptance Criteria**:
 - Users can log in and access personalized dashboard
 - Frontend served via AWS ALB with proper SSL termination
@@ -255,13 +249,6 @@ SSL Certificates:
 - [ ] **Update ArgoCD applications for MythX integration service**
 - [ ] **Test MythX credential rotation via Vault without service interruption**
 
-**MythX Vault Integration**:
-- [ ] **Primary MythX API key in `secret/tool-integration/mythx-primary`**
-- [ ] **Backup MythX API keys in `secret/tool-integration/mythx-backup`**
-- [ ] **MythX configuration parameters in `secret/tool-integration/mythx-config`**
-- [ ] **Automatic failover logic when primary credentials are rotated**
-- [ ] **Rate limiting configurations stored in Vault for dynamic updates**
-
 **Acceptance Criteria**:
 - Contracts analyze simultaneously with Slither, Aderyn, Solidity-Metrics, and MythX
 - Tool failures don't block other tool execution
@@ -297,13 +284,6 @@ SSL Certificates:
 - [ ] **Create ArgoCD application for intelligence engine service**
 - [ ] **Configure GitOps deployment for intelligence engine updates**
 - [ ] **Test dynamic algorithm configuration updates from Vault**
-
-**Intelligence Engine Vault Integration**:
-- [ ] **Risk scoring weights in `secret/intelligence-engine/scoring-weights`**
-- [ ] **Algorithm thresholds in `secret/intelligence-engine/thresholds`**
-- [ ] **ML model configurations in `secret/intelligence-engine/ml-config`**
-- [ ] **False positive patterns in `secret/intelligence-engine/fp-patterns`**
-- [ ] **Runtime algorithm tuning without service restart**
 
 **Acceptance Criteria**:
 - Duplicate findings merge automatically across tools with 70% accuracy
@@ -348,21 +328,9 @@ SSL Certificates:
 - [ ] Add rule-based severity adjustment using multiple factors
 - [ ] Create intelligent finding categorization using NLP libraries
 - [ ] Implement pattern matching for known vulnerability signatures
-- [ ] Add customer feedback collection for future ML training data
+- [ ] Add customer feedback collection for future enhancement
 - [ ] Create A/B testing framework for rule improvements
 - [ ] **Update ArgoCD deployments for production infrastructure**
-
-**Production Vault Enterprise Architecture**:
-- [ ] **Multi-AZ Vault Enterprise cluster for high availability**
-- [ ] **AWS KMS auto-unseal for zero-touch startup**
-- [ ] **Consul Enterprise storage cluster for Vault backend**
-- [ ] **Performance replication to multiple read-only Vault clusters**
-- [ ] **Disaster recovery replication to secondary region**
-- [ ] **Vault Enterprise audit logs streamed to CloudWatch and S3**
-- [ ] **AWS IAM authentication for production service accounts**
-- [ ] **Dynamic database secrets with production-grade rotation**
-- [ ] **PKI engine for production internal service certificates**
-- [ ] **Transit engine for production application-level encryption**
 
 **Acceptance Criteria**:
 - **AWS staging and production environments fully operational with EKS**
@@ -377,7 +345,7 @@ SSL Certificates:
 - Statistical analysis identifies meaningful patterns in data
 - AST similarity detection improves deduplication accuracy
 - Template remediation provides relevant, actionable suggestions
-- Customer feedback collection system captures ML training data
+- Customer feedback collection system captures enhancement data
 - A/B testing validates rule improvements
 - **Advanced features deploy seamlessly via ArgoCD in production**
 - **Vault Enterprise performance meets production targets (<50ms P95)**
@@ -400,12 +368,6 @@ SSL Certificates:
 - [ ] **Store team notification credentials in Vault**
 - [ ] **Configure External Secrets Operator for team service secrets**
 - [ ] **Create Vault policies for collaboration service access**
-
-**Vault Integration for Team Features**:
-- [ ] **Team notification webhooks in `secret/collaboration/webhooks`**
-- [ ] **Email service credentials in `secret/collaboration/smtp`**
-- [ ] **Slack bot tokens in `secret/collaboration/slack-tokens`**
-- [ ] **User authentication secrets in `secret/collaboration/auth`**
 
 **Acceptance Criteria**:
 - Team members can comment and collaborate on findings
@@ -435,13 +397,6 @@ SSL Certificates:
 - [ ] **Store CI/CD integration credentials in Vault**
 - [ ] **Configure dynamic API keys for CI/CD integrations**
 
-**Vault CI/CD Integration**:
-- [ ] **GitHub App credentials in `secret/cicd/github-app`**
-- [ ] **GitLab tokens in `secret/cicd/gitlab-tokens`**
-- [ ] **Jenkins API keys in `secret/cicd/jenkins-api`**
-- [ ] **Webhook signing keys in `secret/cicd/webhook-secrets`**
-- [ ] **Dynamic credential generation for CI/CD pipelines**
-
 **Acceptance Criteria**:
 - GitHub PRs block merging on critical security findings
 - CI pipelines integrate seamlessly with existing workflows
@@ -469,12 +424,6 @@ SSL Certificates:
 - [ ] **Store analytics database credentials in Vault**
 - [ ] **Configure External Secrets Operator for analytics secrets**
 
-**Vault Analytics Integration**:
-- [ ] **Redshift credentials in `secret/analytics/redshift`**
-- [ ] **BI tool API keys in `secret/analytics/bi-apis`**
-- [ ] **Report delivery credentials in `secret/analytics/delivery`**
-- [ ] **Data export encryption keys in `secret/analytics/export-keys`**
-
 **Acceptance Criteria**:
 - Executive dashboards load in <2 seconds with large datasets
 - Scheduled reports deliver automatically to stakeholders
@@ -501,13 +450,6 @@ SSL Certificates:
 - [ ] **Update ArgoCD deployments for SSO and admin services**
 - [ ] **Configure Vault LDAP/SAML authentication methods**
 - [ ] **Store SSO certificates and keys in Vault PKI engine**
-
-**Vault SSO Integration**:
-- [ ] **SAML certificates in Vault PKI engine**
-- [ ] **LDAP bind credentials in `secret/sso/ldap-bind`**
-- [ ] **OAuth provider secrets in `secret/sso/oauth-providers`**
-- [ ] **MFA service credentials in `secret/sso/mfa-providers`**
-- [ ] **Session encryption keys in `secret/sso/session-keys`**
 
 **Acceptance Criteria**:
 - SAML SSO works with Active Directory and Okta
@@ -537,13 +479,6 @@ SSL Certificates:
 - [ ] **Set up ArgoCD sync strategies for zero-downtime updates**
 - [ ] **Optimize Vault Enterprise performance for high-throughput secret access**
 - [ ] **Configure Vault Enterprise performance replication for read scaling**
-
-**Vault Performance Optimization**:
-- [ ] **Vault Enterprise performance replication to multiple read replicas**
-- [ ] **Vault Agent caching for high-frequency secret access**
-- [ ] **Database credential caching with automatic refresh**
-- [ ] **PKI certificate caching and bulk operations**
-- [ ] **Vault metrics monitoring and performance tuning**
 
 **Acceptance Criteria**:
 - Platform handles 1000+ concurrent users without degradation
@@ -575,13 +510,6 @@ SSL Certificates:
 - [ ] **Store all new tool credentials securely in Vault**
 - [ ] **Configure External Secrets Operator for enhanced tool integrations**
 
-**Extended Tool Vault Integration**:
-- [ ] **Certora API keys in `secret/tool-integration/certora`**
-- [ ] **Echidna configuration secrets in `secret/tool-integration/echidna`**
-- [ ] **Manticore service credentials in `secret/tool-integration/manticore`**
-- [ ] **Third-party analyzer API keys in `secret/tool-integration/analyzers`**
-- [ ] **Custom detector configurations in `secret/tool-integration/detectors`**
-
 **Acceptance Criteria**:
 - All major security tools integrate successfully including enhanced Aderyn
 - Tool selection algorithms choose appropriate tools automatically
@@ -609,13 +537,6 @@ SSL Certificates:
 - [ ] **Store compliance certificates and keys in Vault**
 - [ ] **Configure audit trail encryption and signing via Vault**
 
-**Compliance Vault Integration**:
-- [ ] **Compliance certificates in Vault PKI engine**
-- [ ] **Audit trail signing keys in `secret/compliance/audit-signing`**
-- [ ] **Third-party auditor credentials in `secret/compliance/auditor-access`**
-- [ ] **Compliance framework configurations in `secret/compliance/frameworks`**
-- [ ] **Evidence encryption keys in `secret/compliance/evidence-encryption`**
-
 **Acceptance Criteria**:
 - SOC 2 reports generate automatically with current evidence
 - NIST framework mapping updates based on security findings
@@ -625,44 +546,7 @@ SSL Certificates:
 - **Compliance services managed via ArgoCD**
 - **All compliance credentials and certificates managed through Vault**
 
-#### Sprint 15: Machine Learning Integration with Vault (Weeks 29-30)
-**Technical Milestone**: ML-powered analysis with secure model management
-
-**Development Checklist**:
-- [ ] Implement feature engineering pipeline using collected training data
-- [ ] Set up MLflow for experiment tracking and model versioning
-- [ ] Create supervised learning model for false positive prediction
-- [ ] Implement semantic similarity matching using embeddings
-- [ ] Add ML-based vulnerability severity prediction
-- [ ] Create model inference pipeline for real-time scoring
-- [ ] Implement automated model retraining pipeline
-- [ ] Add model performance monitoring and drift detection
-- [ ] Create ML-powered remediation suggestion ranking
-- [ ] Implement confidence scoring for ML predictions
-- [ ] Add A/B testing for ML vs rule-based approaches
-- [ ] Create ML model explainability features for enterprise customers
-- [ ] **Configure ArgoCD for ML pipeline deployment and management**
-- [ ] **Store ML model encryption keys in Vault**
-- [ ] **Configure ML service API credentials in Vault**
-
-**ML Vault Integration**:
-- [ ] **ML model encryption keys in `secret/ml/model-encryption`**
-- [ ] **MLflow credentials in `secret/ml/mlflow-auth`**
-- [ ] **Model serving API keys in `secret/ml/serving-apis`**
-- [ ] **Training data access credentials in `secret/ml/training-data`**
-- [ ] **Model artifact signing keys in `secret/ml/artifact-signing`**
-
-**Acceptance Criteria**:
-- ML model achieves >85% accuracy using 6+ months of training data
-- False positive rate improves additional 10-15% beyond rule-based system
-- Model inference latency stays below 100ms per finding
-- Automated retraining maintains model performance over time
-- A/B testing shows statistically significant improvement over rules
-- Enterprise customers can understand ML decision rationale
-- **ML services deploy and update via ArgoCD**
-- **All ML credentials and keys managed securely through Vault**
-
-#### Sprint 16: Advanced Enterprise Integration with Vault (Weeks 31-32)
+#### Sprint 15: Advanced Enterprise Integration with Vault (Weeks 29-30)
 **Technical Milestone**: Deep enterprise system integration with secure credential management
 
 **Development Checklist**:
@@ -680,14 +564,6 @@ SSL Certificates:
 - [ ] **Store all enterprise integration credentials in Vault**
 - [ ] **Configure webhook signing keys and API credentials via Vault**
 
-**Enterprise Integration Vault Storage**:
-- [ ] **Jira API credentials in `secret/integrations/jira`**
-- [ ] **ServiceNow integration keys in `secret/integrations/servicenow`**
-- [ ] **Teams webhook URLs in `secret/integrations/teams`**
-- [ ] **Salesforce API keys in `secret/integrations/salesforce`**
-- [ ] **PagerDuty service keys in `secret/integrations/pagerduty`**
-- [ ] **Webhook signing secrets in `secret/integrations/webhook-secrets`**
-
 **Acceptance Criteria**:
 - Security findings automatically create tickets in Jira/ServiceNow
 - Teams integration provides interactive security management
@@ -697,7 +573,7 @@ SSL Certificates:
 - **Enterprise integrations deploy via ArgoCD**
 - **All integration credentials managed securely through Vault**
 
-#### Sprint 17: Global Deployment & Multi-Tenancy with Vault (Weeks 33-34)
+#### Sprint 16: Global Deployment & Multi-Tenancy with Vault (Weeks 31-32)
 **Technical Milestone**: Production-ready global deployment with distributed secret management
 
 **Development Checklist**:
@@ -716,14 +592,6 @@ SSL Certificates:
 - [ ] **Deploy Vault Enterprise clusters in multiple regions with replication**
 - [ ] **Configure cross-region Vault secret replication**
 
-**Multi-Region Vault Architecture**:
-- [ ] **Primary Vault cluster in us-east-1 with full read/write**
-- [ ] **Performance replicas in eu-west-1 and ap-southeast-1**
-- [ ] **Disaster recovery replica in us-west-2**
-- [ ] **Cross-region secret replication with encryption in transit**
-- [ ] **Region-specific secret engines for data sovereignty**
-- [ ] **Tenant-specific Vault namespaces for isolation**
-
 **Acceptance Criteria**:
 - Platform deploys successfully in multiple AWS regions
 - Data residency controls prevent cross-border data transfer
@@ -733,7 +601,7 @@ SSL Certificates:
 - **ArgoCD manages multi-region deployments successfully**
 - **Vault provides global secret management with regional compliance**
 
-#### Sprint 18: Production Readiness & Launch Preparation with Vault (Weeks 35-36)
+#### Sprint 17: Production Readiness & Launch Preparation with Vault (Weeks 33-34)
 **Technical Milestone**: Production deployment with comprehensive secret management
 
 **Development Checklist**:
@@ -754,15 +622,6 @@ SSL Certificates:
 - [ ] **Complete Vault Enterprise security hardening and audit preparation**
 - [ ] **Test Vault Enterprise disaster recovery and cross-region failover**
 - [ ] **Validate Vault Enterprise performance under production load**
-
-**Production Vault Readiness**:
-- [ ] **Vault Enterprise cluster hardened according to security best practices**
-- [ ] **All secrets rotated with production-grade rotation policies**
-- [ ] **Vault audit logs configured for compliance requirements**
-- [ ] **Disaster recovery procedures tested and validated**
-- [ ] **Performance benchmarks meeting SLA requirements**
-- [ ] **Vault backup and restore procedures automated**
-- [ ] **Cross-region replication tested and operational**
 
 **Acceptance Criteria**:
 - Penetration testing shows no critical vulnerabilities
@@ -861,18 +720,6 @@ Cloud-First Advantages:
   - Global accessibility for distributed teams
   - Let's Encrypt SSL certificates from day one
   - Real DNS and domain management experience
-```
-
-### **Domain and DNS Benefits:**
-```yaml
-Production Domain Setup:
-  - Professional domain from day one
-  - Let's Encrypt SSL certificates for all environments
-  - Route53 DNS management and validation
-  - Proper subdomain structure for different environments
-  - AWS ALB integration with automatic SSL termination
-  - CloudFront CDN ready for global distribution
-  - Real production patterns for DNS and SSL
 ```
 
 This comprehensive cloud development sprint plan provides enterprise-grade secret management with HashiCorp Vault from day one in cloud development, ensuring production readiness while maintaining rapid development velocity without local resource constraints. The plan includes proper domain setup and DNS management for a professional production-ready platform.
