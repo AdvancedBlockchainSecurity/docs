@@ -16,8 +16,7 @@
 #### Quarter 1 (Months 1-3): Foundation
 **Milestones:**
 - ✅ Complete market research and customer discovery
-- ✅ Secure initial funding ($500k-1M seed round)
-- ✅ Build core team (6-8 engineers + PM)
+- ✅ Build core MVP as solo developer using Claude Code
 - ✅ Develop MVP with 4 security tools integrated (Slither, Aderyn, Solidity-Metrics, MythX)
 - ✅ Implement rule-based intelligence engine with smart deduplication
 - ✅ Launch alpha version with 5 pilot customers
@@ -27,7 +26,7 @@
 - 20+ security reviews completed through platform
 - <15% false positive rate achieved with rule-based system
 - 30% reduction in review time demonstrated
-- Vulnerability database queries integrated into development workflows
+- Data collection pipeline operational for future vulnerability database
 
 **Revenue Target:** $0 (pilot program, no revenue)
 
@@ -35,7 +34,7 @@
 **Milestones:**
 - ✅ Enhance platform based on pilot feedback
 - ✅ Implement enterprise features (SSO, RBAC, compliance)
-- ✅ Launch vulnerability database API with 1,000+ documented vulnerabilities
+- ✅ Begin collecting customer data for future vulnerability database
 - ✅ Enhance rule-based intelligence with advanced pattern recognition
 - ✅ Integrate code complexity metrics with risk assessment
 - ✅ Scale to 10 enterprise customers
@@ -44,13 +43,13 @@
 
 **Customer Success Criteria:**
 - 10 paying enterprise customers
-- $75k ARR achieved (increased from $50k due to vulnerability database revenue)
+- $50k ARR achieved (core platform only, database launches Month 12)
 - 90% customer satisfaction score
 - 50% reduction in security review time
 - <10% false positive rate with enhanced rule-based system
 - Code complexity integration improves risk assessment accuracy by 25%
 
-**Revenue Target:** $75k ARR
+**Revenue Target:** $50k ARR
 
 ### Phase 2: Growth & Scale (Months 7-18)
 **Objective:** Scale to significant market presence and establish competitive moats
@@ -61,60 +60,57 @@
 - ✅ Integrate 7+ additional security tools (Echidna, Manticore, Certora, etc.)
 - ✅ Release advanced analytics and reporting with code complexity insights
 - ✅ Implement sophisticated rule-based analysis capabilities
-- ✅ Begin ML training data collection from customer feedback
-- ✅ Launch public vulnerability database with community contributions
-- ✅ Scale to 25 enterprise customers
+- ✅ Begin preparing vulnerability database from collected customer data
+- ✅ Scale to 20 enterprise customers
 
 **Customer Success Criteria:**
-- 25 enterprise customers
-- $400k ARR (increased from $300k due to vulnerability database subscriptions)
+- 20 enterprise customers
+- $200k ARR with enhanced platform capabilities
 - 95% customer retention rate
 - Expand within existing accounts (upselling)
 - Industry recognition and awards
-- 2,000+ vulnerabilities in database with community contributions
-- Sufficient training data collected for future ML implementation
+- Sufficient customer data collected for vulnerability database launch
 
-**Revenue Target:** $400k ARR
+**Revenue Target:** $200k ARR
 
 #### Quarter 4 (Months 10-12): Platform Leadership
 **Milestones:**
-- ✅ Series A funding ($3-5M) based on growth metrics
-- ✅ Expand team to 15-20 people
+- ✅ Launch vulnerability database API with patterns from customer data
+- ✅ Expand team with first hire at $400k ARR milestone
 - ✅ Launch partner ecosystem and integrations
-- ✅ Launch vulnerability database marketplace with bounty program
-- ✅ International market expansion (EU focus)
-- ✅ Achieve 50 enterprise customers
+- ✅ Begin vulnerability database monetization
+- ✅ International market expansion planning
+- ✅ Achieve 30 enterprise customers
 
 **Customer Success Criteria:**
-- 50 enterprise customers
-- $900k ARR (increased from $750k due to database marketplace revenue)
-- Launch in 2 additional geographic markets
+- 30 enterprise customers
+- $400k ARR (platform + new vulnerability database API revenue)
+- Launch vulnerability database with 1,000+ documented patterns
 - Establish thought leadership through content/conferences
 - Build waiting list of prospects
-- 5,000+ vulnerabilities with verified exploit code
+- First team member hired to support growth
 
-**Revenue Target:** $900k ARR
+**Revenue Target:** $400k ARR
 
-#### Quarter 5-6 (Months 13-18): Market Dominance
+#### Quarter 5-6 (Months 13-18): Market Presence
 **Milestones:**
-- ✅ Scale to 100+ enterprise customers
+- ✅ Scale to 50+ enterprise customers
 - ✅ Launch advanced compliance automation
-- ✅ Implement machine learning capabilities using collected training data
+- ✅ Begin implementing machine learning capabilities using collected training data
 - ✅ Develop proprietary security research capabilities
 - ✅ Establish ecosystem partnerships with major auditors
 - ✅ Launch vulnerability database enterprise licensing
-- ✅ Achieve profitability on unit economics
+- ✅ Build small team (3-5 people) funded by revenue
 
 **Customer Success Criteria:**
-- 100+ enterprise customers
-- $2.5M ARR (increased from $2M due to vulnerability database licensing)
-- Industry standard for enterprise security operations
-- ML-enhanced false positive reduction (<5% rate)
+- 50+ enterprise customers
+- $1.2M ARR (platform + vulnerability database licensing)
+- Enhanced false positive reduction (<8% rate)
 - Expand into additional blockchain ecosystems
-- Positive unit economics and path to profitability
-- 10,000+ vulnerabilities with real-time threat intelligence
+- Positive unit economics and profitability
+- 2,000+ vulnerabilities with real-time patterns
 
-**Revenue Target:** $2.5M ARR
+**Revenue Target:** $1.2M ARR
 
 ### Phase 3: Market Leadership & Innovation (Months 19-36)
 **Objective:** Establish platform as industry standard and expand into adjacent markets
@@ -125,19 +121,19 @@
 - **ML & AI Innovation**: Full machine learning deployment with LLM integration
 - **Compliance Leadership**: Expand to cover all major regulatory frameworks
 - **Vulnerability Intelligence**: Real-time threat detection and early warning system
-- **Acquisition Strategy**: Acquire complementary security tools and teams
-- **International Growth**: Expand to Asia-Pacific markets
+- **Team Scaling**: Revenue-funded team growth to 8-12 people
+- **International Growth**: Expand to European markets
 
 **Customer Success Criteria:**
-- 300+ enterprise customers across multiple blockchain ecosystems
-- $10M ARR with 40%+ growth rate (increased from $8M due to vulnerability intelligence)
+- 100+ enterprise customers across multiple blockchain ecosystems
+- $4M ARR with 40%+ growth rate
 - Market leadership position in Web3 security
-- AI-powered analysis providing 85%+ accuracy in vulnerability detection
+- AI-powered analysis providing 80%+ accuracy in vulnerability detection
 - Strategic partnerships with major blockchain foundations
 - Thought leadership through original security research
-- Global vulnerability database with 25,000+ entries
+- Global vulnerability database with 10,000+ entries
 
-**Revenue Target:** $10M ARR
+**Revenue Target:** $4M ARR
 
 #### Year 3 (Months 31-36): Adjacent Market Expansion
 **Strategic Initiatives:**
@@ -145,18 +141,18 @@
 - **Developer Tools**: Integrated development environment with security
 - **Insurance Integration**: Partner with cyber insurance providers using vulnerability data
 - **Enterprise Software**: White-label solutions for large enterprises
-- **Vulnerability Marketplace**: Premium threat intelligence and zero-day research
-- **IPO Preparation**: Position for potential public offering
+- **Vulnerability Marketplace**: Premium threat intelligence and research
+- **Series A Preparation**: Position for growth funding with proven traction
 
 **Customer Success Criteria:**
-- 500+ customers across Web3 and traditional software
-- $25M ARR with sustainable growth (increased from $20M due to vulnerability marketplace)
+- 200+ customers across Web3 and traditional software
+- $8M ARR with sustainable growth
 - Multiple product lines and revenue streams
-- International presence in 10+ countries
+- International presence in 5+ countries
 - Recognized as category-defining company
 - Industry-standard vulnerability database with real-time feeds
 
-**Revenue Target:** $25M ARR
+**Revenue Target:** $8M ARR
 
 ## Go-to-Market Strategy
 
@@ -195,23 +191,23 @@
 
 ### Sales Strategy
 
-#### Phase 1: Direct Sales (Months 1-12)
-- **Sales Team**: CEO + 1 dedicated enterprise sales rep
+#### Phase 1: Solo Direct Sales (Months 1-12)
+- **Sales Team**: Solo founder with technical expertise
 - **Customer Acquisition**: Warm intros, conference networking, content marketing
-- **Sales Cycle**: 3-6 months enterprise sales
-- **Deal Size**: $10k-50k annual contracts
+- **Sales Cycle**: 2-4 months enterprise sales
+- **Deal Size**: $5k-25k annual contracts
 
-#### Phase 2: Scaled Sales (Months 13-24)
-- **Sales Team**: VP Sales + 3-5 enterprise reps + 2 SDRs
+#### Phase 2: Small Team Sales (Months 13-24)
+- **Sales Team**: Founder + 1 sales rep at $400k ARR milestone
 - **Customer Acquisition**: Outbound sales, partner referrals, inbound leads
-- **Sales Cycle**: 2-4 months with proven case studies
-- **Deal Size**: $25k-100k annual contracts
+- **Sales Cycle**: 2-3 months with proven case studies
+- **Deal Size**: $15k-50k annual contracts
 
-#### Phase 3: Channel Partners (Months 25-36)
+#### Phase 3: Scaled Sales (Months 25-36)
 - **Partner Ecosystem**: Audit firms, blockchain consultancies, system integrators
-- **Sales Team**: 8-12 sales professionals across regions
+- **Sales Team**: 3-4 sales professionals
 - **Customer Acquisition**: Partner channel + brand recognition
-- **Deal Size**: $50k-250k annual contracts + upselling
+- **Deal Size**: $25k-100k annual contracts + upselling
 
 ### Marketing Strategy
 
@@ -291,35 +287,35 @@
 
 ### Revenue Model
 - **SaaS Subscriptions**: Primary revenue from annual contracts
-- **Vulnerability Database API**: Tiered access to vulnerability intelligence
+- **Vulnerability Database API**: Tiered access to vulnerability intelligence (Month 12+)
 - **Professional Services**: Implementation and custom integrations
 - **Training & Certification**: Security training programs
 - **Threat Intelligence**: Premium real-time vulnerability feeds
 - **Marketplace Commission**: Revenue share from vulnerability bounty program
 
 ### Unit Economics (Year 2 Target)
-- **Average Contract Value (ACV)**: $60,000 (increased due to vulnerability database add-ons)
-- **Customer Acquisition Cost (CAC)**: $18,000
-- **Customer Lifetime Value (LTV)**: $250,000
-- **LTV/CAC Ratio**: 13.9x
-- **Gross Margin**: 87% (higher margin on database products)
-- **Net Revenue Retention**: 125%
+- **Average Contract Value (ACV)**: $50,000 (realistic for solo-built platform)
+- **Customer Acquisition Cost (CAC)**: $6,000 (bootstrap efficiency)
+- **Customer Lifetime Value (LTV)**: $200,000
+- **LTV/CAC Ratio**: 33.3x
+- **Gross Margin**: 92% (minimal labor costs)
+- **Net Revenue Retention**: 120%
 
 ### Financial Milestones
 ```
-Month 6:   $75k ARR      (10 customers + vulnerability database)
-Month 12:  $900k ARR     (50 customers + database marketplace)
-Month 18:  $2.5M ARR     (100 customers + enterprise licensing)
-Month 24:  $6M ARR       (200 customers + threat intelligence)
-Month 30:  $15M ARR      (350 customers + vulnerability marketplace)
-Month 36:  $30M ARR      (500 customers + premium intelligence)
+Month 6:   $50k ARR      (10 customers, core platform only)
+Month 12:  $400k ARR     (30 customers + vulnerability database API launch)
+Month 18:  $1.2M ARR     (50 customers + database subscriptions)
+Month 24:  $3M ARR       (100 customers + scaled team)
+Month 30:  $4M ARR       (125 customers + market expansion)
+Month 36:  $8M ARR       (200 customers + international growth)
 ```
 
 ### Funding Strategy
-- **Seed Round**: $500k-1M (Month 3) - Product development and team
-- **Series A**: $3-5M (Month 12) - Growth and scaling
-- **Series B**: $15-25M (Month 24) - Market expansion and international
-- **Series C**: $50-75M (Month 36) - Adjacent markets and potential IPO prep
+- **Bootstrap Phase**: $0 external funding (Months 1-12)
+- **Optional Seed**: $250k-500k (Month 12+) for accelerated growth
+- **Series A**: $1-3M (Month 18+) for team scaling and market expansion
+- **Series B**: $5-15M (Month 30+) for international and adjacent markets
 
 ## Risk Assessment & Mitigation
 
@@ -344,8 +340,8 @@ Month 36:  $30M ARR      (500 customers + premium intelligence)
 **Mitigation**: Regular security audits, penetration testing, bug bounty program
 
 ### Business Risks
-**Risk**: Key team member departure
-**Mitigation**: Strong equity incentives, clear succession planning
+**Risk**: Solo founder dependency
+**Mitigation**: Strategic hiring plan and knowledge documentation
 
 **Risk**: Customer concentration risk
 **Mitigation**: Diverse customer base across industries and geographies
@@ -365,13 +361,13 @@ Month 36:  $30M ARR      (500 customers + premium intelligence)
 - **Revenue Growth**: 100%+ year-over-year
 - **Customer Retention**: >95% annual retention
 - **Net Revenue Retention**: >120%
-- **Customer Acquisition Cost Payback**: <12 months
+- **Customer Acquisition Cost Payback**: <6 months
 
 ### Market Metrics
-- **Market Share**: 20% of target enterprise market by Year 3
-- **Brand Recognition**: Top 3 mindshare in enterprise security
-- **Thought Leadership**: 50+ speaking engagements annually
-- **Customer Advocacy**: 50+ customer references and case studies
+- **Market Share**: 10% of target enterprise market by Year 3
+- **Brand Recognition**: Top 5 mindshare in enterprise security
+- **Thought Leadership**: 25+ speaking engagements annually
+- **Customer Advocacy**: 25+ customer references and case studies
 
 ## Strategic Partnerships
 
@@ -395,4 +391,4 @@ Month 36:  $30M ARR      (500 customers + premium intelligence)
 - **Cloud Providers**: Deep integrations with AWS, Azure, GCP
 - **DevOps Tools**: Native integrations with CI/CD platforms
 
-This strategic roadmap provides a comprehensive path from startup to market leader, with clear milestones, financial targets, and risk mitigation strategies for building the unified Solidity security platform.
+This strategic roadmap provides a comprehensive path from solo founder to $8M ARR in 36 months, with clear milestones, financial targets, and risk mitigation strategies for building the unified Solidity security platform through bootstrap-friendly growth.
