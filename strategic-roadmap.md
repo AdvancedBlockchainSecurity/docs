@@ -312,10 +312,12 @@ Month 36:  $8M ARR       (200 customers + international growth)
 ```
 
 ### Funding Strategy
-- **Bootstrap Phase**: $0 external funding (Months 1-12)
-- **Optional Seed**: $250k-500k (Month 12+) for accelerated growth
-- **Series A**: $1-3M (Month 18+) for team scaling and market expansion
-- **Series B**: $5-15M (Month 30+) for international and adjacent markets
+- **Bootstrap-First Approach**: $0 external funding required (Months 1-36)
+- **Proof of Concept**: Bootstrap to $8M ARR with 37% profit margins ($3M annual profit)
+- **Optional Acceleration Capital** (only after proving bootstrap success):
+  - **Series A (Month 24+)**: $1-3M for faster market capture, not survival
+  - **Series B (Month 36+)**: $5-15M for international expansion and adjacent markets
+- **Key Principle**: Funding accelerates timeline, doesn't change profitable outcome
 
 ## Risk Assessment & Mitigation
 

@@ -236,22 +236,30 @@ Year 3:  37% profit margin  ($3M profit on $8M revenue)
 
 ## **Use of Funds**
 
-### **Bootstraped - No Funding Required**
+### **Bootstrap Success - No Funding Required**
 
-**Months 1-12: Self-Funded**
+**Months 1-36: Self-Funded Growth**
 - Solo development with Claude Code
-- Minimal costs (~$50k annually)
-- Customer revenue funds all growth
-
-**Months 13-24: Revenue-Funded Growth**
-- First hire at $400k ARR milestone
 - All expansion funded by customer revenue
-- Maintain 60%+ profit margins
+- **Proof of Concept**: $8M ARR with $3M annual profit (37% margin)
 
-**Optional Growth Capital (Month 18+): $1-3M Series A**
-- **Accelerated hiring** for faster market capture
-- **International expansion** into European markets
-- **Advanced R&D** for next-generation features
+### **Optional Acceleration Capital** 
+**Only after proving bootstrap model works:**
+
+**Series A (Month 24+): $1-3M**
+- **Purpose**: Faster market capture, not survival
+- **Use**: Accelerated hiring to reach $20M ARR faster
+- **Alternative**: Continue profitable bootstrap growth
+
+**Series B (Month 36+): $5-15M**
+- **Purpose**: International expansion and adjacent markets  
+- **Use**: Geographic expansion, M&A opportunities
+- **Alternative**: Expand organically with $3M annual cash flow
+
+### **Investment Positioning**
+- **"We don't need funding - we want it for acceleration"**
+- Bootstrap success completely de-risks investment
+- Funding accelerates timeline, doesn't change profitable outcome
 
 ---
 
