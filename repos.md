@@ -81,7 +81,7 @@ solidity-security-api-service/
 **Security tool adapters and integrations**
 ```
 Purpose: Slither, Aderyn, MythX, Solidity-Metrics adapters
-Tech Stack: Python 3.11, asyncio, aiohttp, subprocess, Rust/Node.js wrappers
+Tech Stack: Python 3.11, asyncio, aiohttp, subprocess, Rust wrappers (for Slither, Aderyn), Node.js wrappers (for MythX, Solidity-Metrics)
 Contains: Tool adapters, result normalizers, rate limiting, plugin architecture
 ```
 
