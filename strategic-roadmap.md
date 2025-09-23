@@ -312,7 +312,27 @@ Month 36:  $8M ARR       (200 customers + international growth)
 ```
 
 ### Funding Strategy
-- **Bootstrap-First Approach**: $0 external funding required (Months 1-36)
+
+#### **Bootstrap Cash Flow Management**
+**Months 1-6 (Pre-Revenue):**
+- **Personal Investment**: $15k founder investment for initial infrastructure
+- **Minimal Burn Rate**: ~$1,500/month (AWS infrastructure, tools, domain, basic operations)*
+- **Runway**: 10+ months to first revenue without external funding
+
+*Note: AWS cost calculations in progress - estimate may be refined
+
+**Months 7-12 (Early Revenue):**
+- **Working Capital**: Net-30 payment terms require 1-2 months cash buffer
+- **Enterprise Sales Cycles**: 2-4 month cycles need bridge financing
+- **Solution**: Invoice factoring or revenue-based financing if needed ($15-30k)
+
+**Months 13+ (Positive Cash Flow):**
+- **Self-Sustaining**: Monthly recurring revenue exceeds monthly costs
+- **Working Capital Growth**: Use 20% of monthly revenue for working capital buffer
+- **Enterprise Payments**: Build 60-90 day cash reserve for payment delays
+
+#### **Bootstrap-First Approach** 
+- **Total External Capital**: $0-75k maximum (founder investment + potential invoice factoring)
 - **Proof of Concept**: Bootstrap to $8M ARR with 37% profit margins ($3M annual profit)
 - **Optional Acceleration Capital** (only after proving bootstrap success):
   - **Series A (Month 24+)**: $1-3M for faster market capture, not survival
