@@ -36,7 +36,7 @@
 - [ ] Implement GitHub Actions CI/CD pipeline with AWS integration
 - [ ] Create production-ready Docker images with security scanning
 - [ ] Create EKS cluster configuration with spot instances for cost optimization
-- [ ] **Configure ArgoCD sync policies for cloud staging workflow**
+- [ ] **Configure ArgoCD sync policies for cloud development workflow**
 - [ ] **Store all infrastructure secrets in AWS Secrets Manager (database credentials, monitoring auth)**
 - [ ] **Test External Secrets Operator integration with all cloud services**
 
