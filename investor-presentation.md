@@ -128,15 +128,15 @@ Think of it like:
 ## **Business Model & Unit Economics**
 
 ### **SaaS Subscription Revenue**
-- **Starter**: $5k/year (small teams, 3 projects)
-- **Professional**: $25k/year (enterprise teams, unlimited projects)
-- **Enterprise**: $75k/year (large organizations, advanced compliance)
+- **Starter**: $10k/year (small teams, 5 projects)
+- **Professional**: $50k/year (enterprise teams, unlimited projects)
+- **Enterprise**: $150k/year (large organizations, advanced compliance)
 
 ### **Target Unit Economics (Year 2)**
-- **Average Contract Value**: $50,000
+- **Average Contract Value**: $75,000
 - **Customer Acquisition Cost**: $6,000
-- **Customer Lifetime Value**: $200,000
-- **LTV/CAC Ratio**: 33.3x
+- **Customer Lifetime Value**: $300,000
+- **LTV/CAC Ratio**: 50x
 - **Gross Margin**: 92%
 - **Net Revenue Retention**: 120%
 
@@ -187,9 +187,9 @@ Think of it like:
 
 ### **Revenue Growth - Bootstrap to $8M ARR**
 ```
-Year 1:  $400k ARR    (30 customers @ $13k average)
-Year 2:  $3M ARR      (100 customers @ $30k average)
-Year 3:  $8M ARR      (200 customers @ $40k average)
+Year 1:  $400k ARR    (20 customers @ $20k average)
+Year 2:  $3M ARR      (60 customers @ $50k average)
+Year 3:  $8M ARR      (107 customers @ $75k average)
 ```
 
 ### **Profit Margins**
@@ -236,12 +236,31 @@ Year 3:  37% profit margin  ($3M profit on $8M revenue)
 
 ## **Use of Funds**
 
-### **Bootstrap Success - No Funding Required**
+### **Bootstrap Cash Flow Management**
 
-**Months 1-36: Self-Funded Growth**
-- Solo development with Claude Code
-- All expansion funded by customer revenue
-- **Proof of Concept**: $8M ARR with $3M annual profit (37% margin)
+**Phase 1 (Months 1-6): Pre-Revenue**
+- **Founder Investment**: $15k for initial infrastructure and operations
+- **Monthly Burn**: ~$1,500 (AWS infrastructure, tools, domain, basic operations)*
+- **Runway**: 10+ months to first customer revenue
+
+*Note: AWS cost calculations in progress - estimate may be refined
+
+**Phase 2 (Months 7-12): Early Revenue**
+- **Working Capital Challenge**: Net-30 payment terms create cash flow gaps
+- **Enterprise Sales**: 2-4 month cycles require bridge financing
+- **Solutions**: Invoice factoring or revenue-based financing ($15-30k if needed)
+
+**Phase 3 (Months 13+): Self-Sustaining**
+- **Positive Cash Flow**: Monthly recurring revenue exceeds costs
+- **Working Capital Buffer**: Maintain 60-90 day cash reserve
+- **Enterprise Payment Delays**: 20% of revenue allocated to working capital
+
+### **Bootstrap Success - Minimal External Capital**
+
+**Total Bootstrap Investment**: $15-45k maximum
+- $15k founder investment
+- $0-30k optional working capital bridge (invoice factoring/RBF)
+- **No equity dilution** - debt instruments only if needed
 
 ### **Optional Acceleration Capital** 
 **Only after proving bootstrap model works:**
@@ -258,8 +277,8 @@ Year 3:  37% profit margin  ($3M profit on $8M revenue)
 
 ### **Investment Positioning**
 - **"We don't need funding - we want it for acceleration"**
-- Bootstrap success completely de-risks investment
-- Funding accelerates timeline, doesn't change profitable outcome
+- Bootstrap success with minimal capital proves exceptional capital efficiency
+- Any equity funding comes from position of strength, not necessity
 
 ---
 
