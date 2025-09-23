@@ -294,10 +294,10 @@
 - **Marketplace Commission**: Revenue share from vulnerability bounty program
 
 ### Unit Economics (Year 2 Target)
-- **Average Contract Value (ACV)**: $50,000 (realistic for solo-built platform)
+- **Average Contract Value (ACV)**: $75,000 (enterprise value pricing)
 - **Customer Acquisition Cost (CAC)**: $6,000 (bootstrap efficiency)
-- **Customer Lifetime Value (LTV)**: $200,000
-- **LTV/CAC Ratio**: 33.3x
+- **Customer Lifetime Value (LTV)**: $300,000
+- **LTV/CAC Ratio**: 50x
 - **Gross Margin**: 92% (minimal labor costs)
 - **Net Revenue Retention**: 120%
 
