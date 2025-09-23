@@ -2,12 +2,33 @@
 
 ## Development Phases & Milestones
 
-### Phase 1: Foundation & MVP (Months 1-3) - Cloud Development 
+### Phase 1: Foundation & MVP (Months 1-3) - Local Development + Cloud Development 
 
-#### Sprint 1: AWS Infrastructure Foundation  (Weeks 1-2)
-**Technical Milestone**: Complete cloud development environment with enterprise secret management
+#### Sprint 1: Local Development Foundation + AWS Infrastructure Foundation  (Weeks 1-2)
+**Technical Milestone**: Complete local development environment with minikube + complete cloud development environment with enterprise secret management
 
-**Development Checklist**:
+**Local Development Checklist**:
+- [ ] **Set up local minikube cluster (8GB RAM, 4 CPUs)**
+- [ ] **Enable minikube addons (ingress, metrics-server, storage)**
+- [ ] **Deploy local PostgreSQL with persistent volumes for development data**
+- [ ] **Deploy local Redis with persistent storage for caching and job queues**
+- [ ] **Install NGINX ingress controller for local traffic routing**
+- [ ] **Install cert-manager with self-signed cluster issuer for local HTTPS development**
+- [ ] **Configure local DNS resolution via /etc/hosts entries**
+- [ ] **Deploy ArgoCD in local minikube cluster**
+- [ ] **Configure ArgoCD with GitHub repository integration for local development**
+- [ ] **Set up ArgoCD application projects for local development**
+- [ ] **Configure ArgoCD RBAC for team access and permissions**
+- [ ] **Create ArgoCD Application manifests for all microservices (local)**
+- [ ] **Deploy local monitoring stack (Prometheus, Grafana) with persistent storage**
+- [ ] **Set up local development workflows with hot reloading**
+- [ ] **Create local development Docker images and registry configuration**
+- [ ] **Configure ArgoCD sync policies for local development workflow**
+- [ ] **Store all local development secrets in Kubernetes secrets**
+- [ ] **Test ArgoCD GitOps workflow with local services**
+- [ ] **Create local infrastructure IaC in `solidity-security-infrastructure/local/`**
+
+**Cloud Development Checklist**:
 - [ ] **Purchase production domain** (e.g., advancedblockchainsecurity.com) via Cloudflare or registrar
 - [ ] **Configure Cloudflare hosted zone** for DNS management and SSL certificate validation
 - [ ] **Configure staging subdomain** (staging.advancedblockchainsecurity.com) with A records
@@ -40,15 +61,11 @@
 - [ ] **Store all infrastructure secrets in AWS Secrets Manager (database credentials, monitoring auth)**
 - [ ] **Test External Secrets Operator integration with all cloud services**
 
-**AWS Secrets Manager Tool Integration**:
-- [ ] **MythX API keys in `dev/tool-integration/mythx-credentials`**
-- [ ] **Tool configurations in `dev/tool-integration/tool-configs`**
-- [ ] **ElastiCache Redis credentials in `dev/orchestration/celery-broker`**
-- [ ] **Worker authentication tokens in `dev/orchestration/worker-auth`**
-- [ ] **Tool integration IAM policy for API key access only**
-- [ ] **Orchestration IAM policy for broker and worker credential access**
-
 **Acceptance Criteria**:
+- **Local platform fully functional at http://app.solidity-security.local**
+- **All microservices deployed via local ArgoCD GitOps**
+- **Complete security analysis workflow working locally**
+- **Team can reproduce local environment in <30 minutes**
 - Solidity contracts upload successfully to S3 storage
 - Slither, Aderyn, and Solidity-Metrics analyze contracts and store normalized results in RDS
 - Code complexity metrics stored alongside security findings
@@ -97,13 +114,6 @@
 - [ ] Implement health check endpoints with dependency validation
 - [ ] **Configure ArgoCD health checks for API services**
 - [ ] **Test AWS Secrets Manager secret rotation for API service without service restart**
-
-**MythX AWS Secrets Manager Integration**:
-- [ ] **Primary MythX API key in `dev/tool-integration/mythx-primary`**
-- [ ] **Backup MythX API keys in `dev/tool-integration/mythx-backup`**
-- [ ] **MythX configuration parameters in `dev/tool-integration/mythx-config`**
-- [ ] **Automatic failover logic when primary credentials are rotated**
-- [ ] **Rate limiting configurations stored in AWS Secrets Manager for dynamic updates**
 
 **Acceptance Criteria**:
 - Contracts analyze simultaneously with Slither, Aderyn, Solidity-Metrics, and MythX
@@ -157,13 +167,6 @@
 - [ ] Set up dead letter queue for permanently failed jobs
 - [ ] Configure AWS ALB ingress for tool integration services
 - [ ] **Test tool credential rotation without service interruption**
-
-**Extended Tool AWS Secrets Manager Integration**:
-- [ ] **Certora API keys in `dev/tool-integration/certora`**
-- [ ] **Echidna configuration secrets in `dev/tool-integration/echidna`**
-- [ ] **Manticore service credentials in `dev/tool-integration/manticore`**
-- [ ] **Third-party analyzer API keys in `dev/tool-integration/analyzers`**
-- [ ] **Custom detector configurations in `dev/tool-integration/detectors`**
 
 **Acceptance Criteria**:
 - All major security tools integrate successfully including enhanced Aderyn
@@ -661,26 +664,3 @@ Before production deployment:
 - [ ] **AWS Secrets Manager production deployment operational with HA and security hardening**
 - [ ] **AWS Secrets Manager disaster recovery and cross-region replication tested**
 - [ ] **All secrets properly managed with appropriate rotation policies**
-
-## Cloud Staging Environment Summary
-
-### **Cost Analysis:**
-```yaml
-Cloud Staging Costs (Months 1-3):
-  AWS EKS Staging: ~$200/month
-  RDS PostgreSQL (Single-AZ): ~$25/month
-  ElastiCache Redis (Single-node): ~$15/month
-  AWS Secrets Manager: ~$10/month
-  ALB + Data Transfer: ~$30/month
-  Total Staging Costs: ~$290/month
-
-Production Scaling Costs (Month 4+):
-  AWS EKS Production: ~$500/month
-  AWS EKS Staging: ~$300/month
-  RDS PostgreSQL + Replicas: ~$200/month
-  ElastiCache + Clustering: ~$100/month
-  AWS Secrets Manager + Cross-Region: ~$50/month
-  AWS KMS + Other Services: ~$100/month
-  CloudFront CDN: ~$50/month
-  Total Production Costs: ~$1,300/month (scales with usage)
-```

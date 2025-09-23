@@ -23,7 +23,42 @@
 - [ ] **Configure staging subdomain** (staging.advancedblockchainsecurity.com) with A records
 - [ ] **Set up production subdomain** (app.advancedblockchainsecurity.com) with A records
 
-#### Afternoon: AWS Infrastructure Provisioning & Kubernetes Services Setup (5-6 hours)
+#### Setup Local Machine
+
+- [ ] **Set up local minikube cluster (8GB RAM, 4 CPUs)**
+- [ ] **Enable minikube addons (ingress, metrics-server, storage)**
+- [ ] **Deploy local PostgreSQL with persistent volumes**
+- [ ] **Deploy local Redis with persistent storage**
+- [ ] **Configure local DNS resolution via /etc/hosts**
+- [ ] **Install NGINX ingress controller for local development**
+- [ ] **Install cert-manager with self-signed cluster issuer for local SSL**
+
+##### **Local Infrastructure IaC Creation (1 hour)**
+- [ ] **Create local infrastructure in `solidity-security-infrastructure/local/`:**
+  - [ ] **PostgreSQL deployment with persistent volume**
+  - [ ] **Redis deployment with persistent volume**
+  - [ ] **NGINX ingress controller installation**
+  - [ ] **cert-manager with self-signed issuer for local SSL**
+  - [ ] **ArgoCD installation with local configuration**
+  - [ ] **Prometheus and Grafana monitoring stack**
+  - [ ] **Local persistent volumes for development data**
+  - [ ] **Service discovery and networking configurations**
+
+##### **Local Infrastructure Deployment (1 hour)**
+- [ ] **Deploy local development infrastructure using minikube:**
+  - [ ] **Start minikube with appropriate resources (8GB RAM, 4 CPUs)**
+  - [ ] **Enable required minikube addons (ingress, metrics-server, storage)**
+  - [ ] **Deploy PostgreSQL with persistent storage**
+  - [ ] **Deploy Redis with persistent storage**
+  - [ ] **Install NGINX ingress controller**
+  - [ ] **Deploy cert-manager with self-signed cluster issuer**
+  - [ ] **Set up local DNS resolution (127.0.0.1 entries in /etc/hosts)**
+  - [ ] **Deploy ArgoCD with local configuration**
+  - [ ] **Install monitoring stack (Prometheus, Grafana)**
+  - [ ] **Configure persistent volumes for development data**
+  - [ ] **Update kubeconfig for minikube cluster access**
+
+#### Afternoon: AWS Infrastructure Provisioning & Kubernetes Services Setup
 
 ##### **AWS Infrastructure IaC Creation (2-3 hours)**
 - [ ] **Create Terraform modules in `solidity-security-aws-infrastructure` repository:**
@@ -89,153 +124,6 @@ grafana.dev.advancedblockchainsecurity.com → AWS ALB (Monitoring)
 tools.dev.advancedblockchainsecurity.com → AWS ALB (Tool Integration)
 ```
 
-**Enhanced AWS Secrets Manager Cloud Development Configuration:**
-```yaml
-AWS Secrets Manager Setup:
-  Secret Organization:
-    - Environment-based prefixes (dev/, staging/, prod/)
-    - Service-based grouping (api-service/, data-service/, etc.)
-    - Automatic rotation for database credentials
-    - Cross-service secret sharing via IAM policies
-  
-Secret Categories:
-  Application Secrets:
-    - JWT signing keys
-    - OAuth provider credentials
-    - API keys and tokens
-  Database Secrets:
-    - RDS connection strings with auto-rotation
-    - ElastiCache credentials
-    - Database encryption keys
-  Integration Secrets:
-    - Tool API keys (MythX, etc.)
-    - Webhook URLs
-    - SMTP credentials
-  Container Registry:
-    - ECR authentication tokens
-    - Image scanning configuration
-    - Image signing keys
-    
-IAM Integration:
-  Service Accounts:
-    - EKS pod identities with IRSA (IAM Roles for Service Accounts)
-    - Least privilege access to specific secrets
-    - Cross-account access for multi-environment setups
-  Policies:
-    - Environment-specific secret access
-    - Service-specific secret permissions
-    - Audit logging via CloudTrail
-```
-
-**Enhanced Security Configuration:**
-```yaml
-Network Security:
-  Security Groups:
-    - EKS cluster security group (restricted API access)
-    - Worker node security group (minimal required ports)
-    - RDS security group (PostgreSQL 5432 from EKS only)
-    - ElastiCache security group (Redis 6379 from EKS only)
-    - ALB security group (HTTP/HTTPS from internet)
-  
-  VPC Endpoints:
-    - ECR API and DKR endpoints for secure container pulls
-    - S3 endpoint for secure file storage access
-    - Secrets Manager endpoint for secure secret retrieval
-    - CloudWatch Logs endpoint for secure log shipping
-  
-  Network Policies:
-    - Frontend pods can only access API service
-    - API service can only access data service and external APIs
-    - Data service can only access RDS and ElastiCache
-    - Tool integration isolated from other services
-  
-  Pod Security:
-    - Non-root containers required
-    - Read-only root filesystem where possible
-    - No privileged containers
-    - Resource limits enforced
-```
-
-**Enhanced Monitoring & Compliance:**
-```yaml
-CloudWatch Integration:
-  Log Groups:
-    - /aws/eks/cluster/solidity-dev/cluster (EKS control plane logs)
-    - /aws/eks/cluster/solidity-dev/application (application logs)
-    - /aws/rds/instance/solidity-dev-postgres/postgresql (RDS logs)
-    - /aws/elasticache/solidity-dev-redis (ElastiCache logs)
-  
-  Container Insights:
-    - EKS cluster metrics and performance data
-    - Pod and container resource utilization
-    - Application performance monitoring
-  
-AWS Config Rules:
-  - EKS cluster encryption enabled
-  - RDS instances encrypted
-  - S3 buckets encrypted
-  - Security groups restrict SSH access
-  - EBS volumes encrypted
-
-GuardDuty Protection:
-  - EKS runtime security monitoring
-  - Malicious network activity detection
-  - Cryptocurrency mining detection
-  - Suspicious API calls monitoring
-```
-
-**Enhanced Container Registry Strategy:**
-```yaml
-ECR Configuration:
-  Repositories:
-    - solidity-security/api-service
-    - solidity-security/tool-integration
-    - solidity-security/orchestration
-    - solidity-security/intelligence-engine
-    - solidity-security/data-service
-    - solidity-security/notification
-    - solidity-security/frontend
-  
-  Lifecycle Policies:
-    - Keep last 10 tagged images
-    - Delete untagged images after 1 day
-    - Keep production images indefinitely
-  
-  Security Scanning:
-    - Automatic vulnerability scanning on push
-    - Critical/High CVE blocking policies
-    - SBOM (Software Bill of Materials) generation
-  
-  Image Signing:
-    - AWS Signer for image authenticity
-    - Admission controller to verify signatures
-    - Audit trail for all image operations
-```
-
-**Enhanced Storage & Backup Strategy:**
-```yaml
-EBS Storage Classes:
-  gp3: General purpose (default) - cost optimized
-  io2: High IOPS for database workloads
-  sc1: Cold storage for backup data
-  
-Backup Automation:
-  RDS Automated Backups:
-    - Point-in-time recovery enabled
-    - 7-day backup retention
-    - Cross-region backup replication
-  
-  EBS Snapshots:
-    - Daily snapshots of persistent volumes
-    - 30-day snapshot retention
-    - Cross-AZ snapshot replication
-  
-  Application Backups:
-    - Velero for Kubernetes resource backup
-    - S3 backend for backup storage
-    - Automated backup testing
-```
-
 **Deliverables Day 1:**
 - [ ] All 7 repositories created with basic structure (including new AWS infrastructure repo)
 - [ ] **advancedblockchainsecurity.com domain configured in Cloudflare with proper DNS records**
@@ -293,7 +181,7 @@ Backup Automation:
 - [ ] **Create enhanced AWS Secrets Manager secret templates for each microservice with rotation**
 - [ ] **Configure ArgoCD AWS Secrets Manager integration for automatic secret injection**
 
-##### **ENHANCED BREAKDOWN: Microservice Template Creation with Advanced Security**
+##### **Microservice Template Creation with Advanced Security**
 
 ###### **1. API Service Templates (Enhanced)**
 - [ ] **Create `api-service/` directory structure:**
@@ -434,102 +322,6 @@ Backup Automation:
 - [ ] **Test AWS Secrets Manager integration with ArgoCD for automatic secret injection with audit trails**
 - [ ] **Validate External Secrets Operator functionality with cloud AWS Secrets Manager and encryption**
 
-**Enhanced Environment Strategy:**
-```yaml
-Cloud Development:
-  - Let's Encrypt certificates via Cloudflare DNS validation with auto-renewal
-  - RDS PostgreSQL single-AZ with automated backups and encryption at rest (Multi-AZ upgrade ready)
-  - ElastiCache Redis single-node with encryption in transit/at rest (cluster mode upgrade ready)
-  - Cloudflare DNS resolution for service discovery with health checks
-  - AWS ALB with SSL termination, WAF integration, and security headers
-  - AWS Secrets Manager with automatic secret rotation and audit logging
-  - External Secrets Operator with AWS IAM authentication and encryption
-  - VPC Endpoints for secure AWS service communication
-  - Network Policies for micro-segmentation and zero-trust networking
-  - Pod Security Standards for container security hardening
-
-Production Ready (Future):
-  - Multi-AZ RDS with read replicas and cross-region backup
-  - ElastiCache Redis cluster automatic failover and global datastore
-  - CloudFront CDN for global distribution with WAF integration
-  - AWS Shield Advanced for DDoS protection
-  - AWS Secrets Manager with cross-region replication and enterprise features
-  - Cross-region disaster recovery with automated failover
-  - Advanced monitoring with AWS X-Ray and custom metrics
-```
-
-**Enhanced AWS Secrets Manager Secret Organization:**
-```yaml
-Secret Paths with Enhanced Security:
-  dev/api-service/jwt-secret: "JWT signing key with rotation"
-  dev/api-service/oauth-credentials: "OAuth provider credentials with refresh"
-  dev/api-service/database-encryption-key: "Field-level encryption key"
-  dev/data-service/rds-credentials: "RDS PostgreSQL with auto-rotation"
-  dev/data-service/elasticache-credentials: "ElastiCache Redis with TLS"
-  dev/data-service/backup-encryption-key: "Backup encryption key"
-  dev/tool-integration/mythx-api-key: "MythX API credentials with failover"
-  dev/tool-integration/tool-credentials: "Tool-specific API keys with rotation"
-  dev/tool-integration/signing-keys: "Tool result signing keys"
-  dev/notification/ses-credentials: "AWS SES with DKIM keys"
-  dev/notification/slack-webhook: "Slack integration with signing"
-  dev/notification/encryption-keys: "Message encryption keys"
-  dev/orchestration/elasticache-broker: "ElastiCache broker with TLS"
-  dev/orchestration/worker-auth-tokens: "Worker authentication with rotation"
-  dev/intelligence-engine/ml-api-keys: "ML service API keys with rotation"
-  dev/intelligence-engine/model-encryption-keys: "ML model encryption keys"
-
-Security Enhancements:
-  - All secrets encrypted with AWS KMS customer-managed keys
-  - Automatic rotation policies with zero-downtime updates
-  - Cross-region replication for disaster recovery
-  - Audit logging with CloudTrail integration
-  - IAM policies with least-privilege access
-  - Version control with automatic rollback capabilities
-```
-
-**Enhanced Security Configuration:**
-```yaml
-Container Security:
-  Image Scanning:
-    - Vulnerability scanning on every image push
-    - Critical/High CVE blocking policies
-    - SBOM generation and tracking
-    - Image signing with AWS Signer
-  
-  Runtime Security:
-    - Non-root containers enforced
-    - Read-only root filesystem where possible
-    - No privileged containers allowed
-    - Resource limits strictly enforced
-    - Security contexts with minimal capabilities
-  
-Network Security:
-  VPC Endpoints:
-    - ECR API/DKR for secure container image pulls
-    - S3 for secure file storage without internet
-    - Secrets Manager for secure secret retrieval
-    - CloudWatch Logs for secure log shipping
-  
-  Network Policies:
-    - Default deny all ingress/egress
-    - Service-specific allow rules
-    - External API access restrictions
-    - DNS policy enforcement
-  
-Compliance & Monitoring:
-  AWS Config Rules:
-    - EKS encryption in transit/at rest
-    - RDS encryption enabled
-    - Security groups compliance
-    - EBS volume encryption
-  
-  GuardDuty Monitoring:
-    - Runtime security threats
-    - Malicious network activity
-    - Cryptocurrency mining detection
-    - Anomalous API behavior
-```
-
 **Deliverables Day 2:**
 - [ ] Complete enhanced Kubernetes IaC templates for all 6 microservices with security hardening
 - [ ] Helm charts with development values and production-ready security structure
@@ -624,50 +416,6 @@ solidity-security-platform/
 - [ ] **Configure backup and disaster recovery for ArgoCD applications**
 - [ ] **Set up ArgoCD notifications with security incident integration**
 
-**Enhanced Cloud Monitoring Configuration with AWS Secrets Manager:**
-```yaml
-Prometheus:
-  - Scrape EKS cluster metrics via CloudWatch with security filtering
-  - Service discovery for EKS services with authentication
-  - S3 storage with configurable retention and encryption
-  - OAuth credentials stored in AWS Secrets Manager with rotation
-  - Custom security metrics for threat detection
-  - Cost monitoring and optimization alerts
-
-Grafana:
-  - Pre-configured dashboards for cloud development and security
-  - CloudWatch data source configuration with IAM authentication
-  - SNS alerting integration with security escalation
-  - Admin credentials managed by AWS Secrets Manager with MFA
-  - OAuth integration with AWS Secrets Manager-managed secrets
-  - RBAC integration with team-based access control
-
-Jaeger:
-  - S3 storage for trace persistence with encryption
-  - Distributed deployment for scalability and availability
-  - Authentication credentials in AWS Secrets Manager with rotation
-  - Security tracing for audit compliance
-
-AWS X-Ray:
-  - Application performance monitoring with security insights
-  - Distributed tracing with service map visualization
-  - Integration with CloudWatch for unified monitoring
-  - Cost optimization through intelligent sampling
-
-AWS Secrets Manager Metrics:
-  - AWS Secrets Manager API metrics to CloudWatch with alerting
-  - Secret usage monitoring with anomaly detection
-  - Access pattern tracking with security analysis
-  - Rotation metrics with failure alerting
-  - Cost monitoring and optimization
-
-Container Insights:
-  - EKS cluster performance monitoring with cost attribution
-  - Pod and container resource utilization with optimization
-  - Network traffic analysis with security insights
-  - Application performance correlation with infrastructure
-```
-
 **Deliverables Day 3:**
 - [ ] Complete enhanced cloud monitoring stack (Prometheus, Grafana, Jaeger, X-Ray) deployed
 - [ ] **Enhanced cloud monitoring dashboards accessible via https://grafana.dev.advancedblockchainsecurity.com**
@@ -717,32 +465,6 @@ Container Insights:
 - [ ] **Test AWS Secrets Manager secret rotation for tool credentials with zero-downtime**
 - [ ] **Configure tool result signing and verification with cryptographic validation**
 - [ ] **Set up tool performance monitoring with security and cost tracking**
-
-**Enhanced Cloud CI/CD Strategy with AWS Secrets Manager:**
-```yaml
-Development Workflow:
-  1. Commit to feature branch with security scanning
-  2. GitHub Actions runs enhanced tests and builds images with vulnerability scanning
-  3. AWS Secrets Manager provides secrets for CI/CD processes with audit logging
-  4. Push images to ECR with vulnerability scanning, SBOM generation, and signing
-  5. ArgoCD automatically syncs cloud deployment with AWS Secrets Manager secrets and validation
-  6. Test changes in secure cloud environment with monitoring
-  7. Merge to main triggers production-ready build with security compliance
-
-AWS Secrets Manager Integration:
-  - CI/CD secrets stored in AWS Secrets Manager with encryption
-  - IAM-based access control for pipelines with least privilege
-  - Automatic secret rotation for build credentials with zero-downtime
-  - Cross-environment secret management with compliance tracking
-  - Audit logging with security incident integration
-
-Security Enhancements:
-  - Container image signing with AWS Signer and verification
-  - SBOM generation and vulnerability tracking
-  - Security policy enforcement gates
-  - Automated remediation for known vulnerabilities
-  - Compliance validation in deployment pipeline
-```
 
 **Deliverables Day 4:**
 - [ ] Complete enhanced cloud CI/CD pipeline for infrastructure validation with security
@@ -796,23 +518,6 @@ Security Enhancements:
 - [ ] **Prepare enhanced production scaling strategy documentation with security**
 - [ ] **Create comparison guide: development vs production configurations including enhanced security**
 - [ ] Run final validation of all enhanced Sprint 1 acceptance criteria
-
-**Enhanced Cloud Environment Documentation with AWS Secrets Manager:**
-```yaml
-Required Documentation:
-  - Enhanced cloud setup automation scripts including AWS Secrets Manager deployment
-  - EKS cluster configuration and resource requirements with security hardening
-  - Cloudflare DNS and Let's Encrypt SSL certificate setup with monitoring
-  - Enhanced AWS Secrets Manager configuration and IAM setup with security
-  - Enhanced AWS Secrets Manager secret management procedures and security policies
-  - Enhanced ArgoCD cloud deployment and management with backup strategies
-  - Enhanced External Secrets Operator configuration and troubleshooting
-  - Container security procedures and compliance validation
-  - Network security configuration and monitoring
-  - Backup and disaster recovery procedures with testing validation
-  - Enhanced troubleshooting common cloud development issues including security
-  - Enhanced production scaling preparation checklist including security migration
-```
 
 **Deliverables Day 5:**
 - [ ] Enhanced end-to-end cloud integration testing complete with security validation
@@ -930,38 +635,3 @@ Required Documentation:
 - **Auto-scaling and performance** optimization built into templates with security
 - **Enhanced disaster recovery** and backup procedures planned and documented
 - **Security compliance** ready for enterprise deployment with audit trails
-
-## Enhanced IaC Storage Strategy Summary
-
-- **Enhanced Infrastructure IaC** → `solidity-security-infrastructure` repository
-  - AWS EKS and VPC configurations with security hardening
-  - Enhanced cloud AWS Secrets Manager deployment and configuration
-  - RDS and ElastiCache configurations with encryption
-  - Enhanced ArgoCD Applications for cloud environments
-- **Enhanced Application IaC** → Embedded in service directories within platform repository
-  - Development Helm values with enhanced cloud AWS Secrets Manager integration
-  - Production Helm values with scaling, HA configurations, and security
-  - Enhanced IAM policies and secret templates for each service
-- **Enhanced Monitoring IaC** → `solidity-security-monitoring` repository
-  - Enhanced cloud monitoring stack configurations with AWS Secrets Manager integration
-  - CloudWatch integration and alerting configurations with security
-- **Enhanced CI/CD IaC** → `.github/workflows` in respective repositories
-  - Enhanced cloud development workflows with AWS Secrets Manager integration
-  - Production deployment workflows with ECR, EKS, and security scanning
-- **Enhanced Documentation** → `solidity-security-docs` repository
-  - Enhanced cloud development setup guides including AWS Secrets Manager
-  - Production scaling procedures including enhanced AWS Secrets Manager configuration
-  - Enhanced AWS Secrets Manager operational guides and troubleshooting
-- **Enhanced Tool Configurations** → `solidity-security-tools` repository
-  - Enhanced cloud tool adapter configurations with AWS Secrets Manager secret management
-- **Enhanced ArgoCD Applications** → `solidity-security-infrastructure/argocd/`
-  - Enhanced cloud development applications with AWS Secrets Manager integration
-  - Production-ready applications with scaling configurations and security
-- **Enhanced GitOps Configurations** → `solidity-security-infrastructure/gitops/`
-  - Enhanced cloud GitOps patterns and workflows with AWS Secrets Manager
-  - Production GitOps templates with enterprise features and security
-- **Enhanced AWS Secrets Manager Configurations** → `solidity-security-infrastructure/aws-secrets/`
-  - Enhanced cloud AWS Secrets Manager deployment manifests
-  - Production AWS Secrets Manager configurations with HA, DR, and security
-  - Enhanced AWS Secrets Manager IAM policies and secret templates
-  - Enhanced AWS Secrets Manager operational procedures and automation
