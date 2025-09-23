@@ -53,9 +53,9 @@ Sprint 1 establishes the foundational infrastructure and repository structure fo
 **Priority**: P0 (Critical)
 
 **Infrastructure Deployment Strategy**:
+- Deploy all infrastructure components (PostgreSQL, Redis, ArgoCD, Prometheus, Grafana, NGINX, Cert-Manager) via Kustomize
 - Install CRDs via Helm for cert-manager, Prometheus Operator, and NGINX Ingress
-- Deploy all infrastructure components (PostgreSQL, Redis, ArgoCD, Prometheus, Grafana) via Kustomize
-- Use Kustomize base configurations with local environment overlays
+- Use Kustomize base configurations overlays (local, staging, prod)
 - Configure enterprise-ready infrastructure with scaling and customization capabilities
 - **Namespace Convention**: Use `[service]-[overlay]` naming pattern (e.g., `grafana-local`, `grafana-staging`, `grafana-prod`, `nginx-local`, `nginx-staging`, `nginx-prod`, `postgresql-local`, `redis-local`, `argocd-local`, `prometheus-local`)
 - [ ] minikube cluster operational with specified resources (16GB RAM, 6 CPUs)
