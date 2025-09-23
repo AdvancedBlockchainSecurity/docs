@@ -516,7 +516,7 @@ Tech Stack: React 18, TypeScript, React Hook Form, TanStack Query
 Contains: Upload components, progress tracking, analysis history
 ```
 
-### **`solidity-security-contract-parser`** (~8K LOC) 🦀
+### 11. **`solidity-security-contract-parser`** (~8K LOC) 🦀
 **High-performance Solidity parsing and AST generation - Pure Rust**
 ```
 Purpose: Contract parsing, AST generation, dependency analysis, source mapping
@@ -598,7 +598,7 @@ solidity-security-contract-parser/
 
 ### **Shared Libraries (1 repo)**
 
-### 11. **`solidity-security-shared`** (~7K LOC) 🦀
+### 12. **`solidity-security-shared`** (~7K LOC) 🦀
 **Common utilities and schemas - Multi-language**
 ```
 Purpose: Shared types, utilities, authentication helpers, validation schemas
@@ -680,7 +680,7 @@ solidity-security-shared/
 
 ### **Infrastructure Repositories (3 repos)**
 
-### 12. **`solidity-security-aws-infrastructure`**
+### 13. **`solidity-security-aws-infrastructure`**
 **AWS Infrastructure as Code repository**
 ```
 Purpose: AWS cloud resource provisioning and management
@@ -688,7 +688,7 @@ Tech Stack: Terraform, AWS CLI, CloudFormation
 Contains: VPC, EKS, RDS, ElastiCache, IAM, Secrets Manager configurations
 ```
 
-### 10. **`solidity-security-infrastructure`**
+### 14. **`solidity-security-infrastructure`**
 **Kubernetes Infrastructure as Code repository**
 ```
 Purpose: Kubernetes service definitions and deployment scripts
@@ -696,7 +696,7 @@ Tech Stack: Helm, Kubernetes manifests, ArgoCD, GitHub Actions
 Contains: K8s manifests, ArgoCD applications, CI/CD pipelines
 ```
 
-### 11. **`solidity-security-monitoring`**
+### 15. **`solidity-security-monitoring`**
 **Observability and monitoring configurations**
 ```
 Purpose: Monitoring, alerting, and observability setup
@@ -706,7 +706,7 @@ Contains: Grafana dashboards, Prometheus rules, alerting configs
 
 ### **Supporting Repositories (3 repos)**
 
-### 15. **`solidity-security-docs`**
+### 16. **`solidity-security-docs`**
 **Documentation and knowledge base**
 ```
 Purpose: Technical documentation, API docs, user guides
@@ -714,7 +714,7 @@ Tech Stack: Markdown, Docusaurus/GitBook
 Contains: Architecture docs, setup guides, API documentation
 ```
 
-### 13. **`solidity-security-tools`**
+### 17. **`solidity-security-tools`**
 **Security tool configurations and utilities**
 ```
 Purpose: Tool installation scripts, configuration templates, test contracts
@@ -722,7 +722,7 @@ Tech Stack: Shell scripts, Docker, tool-specific configs
 Contains: Tool installation scripts, test fixtures, tool version management
 ```
 
-### 14. **`solidity-security-vulnerabilities`**
+### 18. **`solidity-security-vulnerabilities`**
 **Vulnerability database and intelligence**
 ```
 Purpose: Vulnerability data, patterns, and threat intelligence
