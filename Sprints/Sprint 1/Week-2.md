@@ -695,7 +695,7 @@ This completes Sprint 1 with a fully functional MVP platform running entirely in
 Cloud Development Costs (Week 1-2):
   AWS EKS Development: ~$200/month
   RDS PostgreSQL (Single-AZ): ~$25/month
-  ElastiCache Redis: ~$30/month
+  ElastiCache Redis: ~$15/month
   AWS Secrets Manager: ~$10/month
   ALB + Data Transfer: ~$30/month
   CloudWatch + Monitoring: ~$20/month
