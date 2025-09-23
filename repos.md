@@ -164,10 +164,10 @@ solidity-security-tool-integration/
 **Risk scoring and vulnerability correlation - Hybrid Python/Rust**
 ```
 Purpose: Deduplication, risk scoring, pattern matching, false positive detection
-Tech Stack: Rust computation engine + Python ML/API wrapper
+Tech Stack: Rust computation engine + Python Machine Learning/API wrapper
 Rust Components: AST similarity, pattern matching, deduplication algorithms
-Python Components: ML models, API layer, business logic
-Contains: ML algorithms, deduplication logic, risk scoring, pattern analysis
+Python Components: Machine Learning models, API layer, business logic
+Contains: Machine Learning algorithms, deduplication logic, risk scoring, pattern analysis
 ```
 
 **Directory Structure:**
