@@ -21,7 +21,7 @@
 - **Kubernetes**: AWS EKS with managed node groups and development cluster
 - **Database**: RDS PostgreSQL with Multi-AZ deployment
 - **Caching**: ElastiCache Redis with cluster mode
-- **SSL Strategy**: Let's Encrypt certificates with Route53 DNS validation
+- **SSL Strategy**: Let's Encrypt certificates with Cloudflare DNS validation
 - **Load Balancing**: AWS Application Load Balancer with SSL termination
 - **Container Registry**: Amazon ECR with vulnerability scanning
 - **ArgoCD**: Cloud deployment managing development applications
@@ -44,8 +44,7 @@
 
 #### Domain Purchase and Configuration
 **Domain Strategy**: Purchase production domain for immediate cloud deployment
-- [ ] **Purchase production domain** (e.g., advancedblockchainsecurity.com) via Route53 or domain registrar
-- [ ] **Configure Route53 hosted zone** for DNS management
+- [ ] **Purchase production domain** (e.g., advancedblockchainsecurity.com) via Cloudflare or domain registrar
 - [ ] **Set up development subdomain** (dev.advancedblockchainsecurity.com)
 - [ ] **Configure staging subdomain** (staging.advancedblockchainsecurity.com)
 - [ ] **Set up production subdomain** (app.advancedblockchainsecurity.com)
@@ -752,7 +751,6 @@ Cloud Development Costs (Months 1-3):
   AWS EKS Development: ~$200/month
   RDS PostgreSQL (Multi-AZ): ~$50/month
   ElastiCache Redis: ~$30/month
-  Route53 + Domain: ~$20/month
   AWS Secrets Manager: ~$10/month
   Total Development Costs: ~$310/month
 

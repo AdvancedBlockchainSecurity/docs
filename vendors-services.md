@@ -8,7 +8,6 @@
 | Amazon Web Services (AWS) | VPC (Virtual Private Cloud) | Network infrastructure | Included in EKS |  |
 | Amazon Web Services (AWS) | RDS PostgreSQL | Primary database with Multi-AZ | $50 (dev), $200 (prod) |  |
 | Amazon Web Services (AWS) | ElastiCache Redis | Caching and message broker | $30 (dev), $100 (prod) |  |
-| Amazon Web Services (AWS) | Route53 | DNS management and SSL validation | $20/month |  |
 | Amazon Web Services (AWS) | Application Load Balancer (ALB) | Load balancing and SSL termination | $30 (dev), $100 (prod) |  |
 | Amazon Web Services (AWS) | CloudFront | CDN for global content delivery | $0-50 (usage-based) |  |
 | Amazon Web Services (AWS) | ECR | Container image storage | $10-30 (usage-based) |  |

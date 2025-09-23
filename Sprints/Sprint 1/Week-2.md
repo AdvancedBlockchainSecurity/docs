@@ -640,7 +640,7 @@ AWS Secrets Manager Testing Scenarios:
 - [ ] **ElastiCache Redis production clustering plan ready**
 - [ ] **Let's Encrypt certificate management for production documented**
 - [ ] **AWS ALB production optimization configurations prepared**
-- [ ] **Route53 DNS production management strategy prepared**
+- [ ] **Cloudflare DNS production management strategy prepared**
 - [ ] **ECR container registry production workflows ready**
 - [ ] **AWS IAM and security configurations for production prepared**
 - [ ] **CloudWatch monitoring production integration documented**
@@ -696,7 +696,6 @@ Cloud Development Costs (Week 1-2):
   AWS EKS Development: ~$200/month
   RDS PostgreSQL (Multi-AZ): ~$50/month
   ElastiCache Redis: ~$30/month
-  Route53 + Domain: ~$20/month
   AWS Secrets Manager: ~$10/month
   ALB + Data Transfer: ~$30/month
   CloudWatch + Monitoring: ~$20/month
