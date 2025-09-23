@@ -29,8 +29,8 @@
 - [ ] **Create Terraform modules in `solidity-security-aws-infrastructure` repository:**
   - [ ] **VPC module with public/private subnets, NAT gateways, Internet gateway**
   - [ ] **EKS cluster module with managed node groups, OIDC provider, and private API endpoint**
-  - [ ] **RDS PostgreSQL module with Multi-AZ deployment, parameter groups, and KMS encryption**
-  - [ ] **ElastiCache Redis module with cluster mode and parameter groups**
+  - [ ] **RDS PostgreSQL module with single-AZ deployment, parameter groups, and KMS encryption (Multi-AZ upgrade ready)**
+  - [ ] **ElastiCache Redis module with single-node mode and parameter groups (cluster mode upgrade ready)**
   - [ ] **IAM module for EKS service roles and policies**
   - [ ] **Secrets Manager module for application secrets**
   - [ ] **Security Groups module for network access control and optimization**
@@ -41,10 +41,10 @@
 
 ##### **AWS Infrastructure Deployment (2-3 hours)**
 - [ ] **Deploy AWS cloud infrastructure using Terraform:**
-  - [ ] **Create VPC with public/private subnets across 3 AZs**
+  - [ ] **Create VPC with public/private subnets in single AZ**
   - [ ] **Deploy EKS cluster with managed node groups (t3.medium, 3 nodes) and private API endpoint**
-  - [ ] **Provision RDS PostgreSQL 15 Multi-AZ with automated backups and KMS encryption**
-  - [ ] **Deploy ElastiCache Redis cluster with encryption**
+  - [ ] **Provision RDS PostgreSQL 15 single-AZ with automated backups and KMS encryption (Multi-AZ upgrade ready)**
+  - [ ] **Deploy ElastiCache Redis single-node with encryption (cluster mode upgrade ready)**
   - [ ] **Configure Cloudflare DNS with development DNS records pointing to ALB**
   - [ ] **Create IAM roles for EKS services and AWS integrations**
   - [ ] **Set up AWS Secrets Manager for application secrets**
@@ -416,7 +416,7 @@ Backup Automation:
 - [ ] **Create enhanced AWS Secrets Manager templates:** `aws-secrets/notification-secrets.json`
 
 #### Afternoon: Enhanced Cloud Data Services + Infrastructure ArgoCD Applications (3-4 hours)
-- [ ] **Deploy RDS PostgreSQL 15 Multi-AZ with automated backups and encryption**
+- [ ] **Deploy RDS PostgreSQL 15 single-AZ with automated backups and KMS encryption (Multi-AZ upgrade ready)**
 - [ ] **Configure RDS credentials in AWS Secrets Manager with auto-rotation and audit logging**
 - [ ] **Configure RDS Proxy for connection pooling with SSL/TLS encryption**
 - [ ] **Deploy ElastiCache Redis with cluster mode enabled and encryption in transit/at rest**
@@ -438,8 +438,8 @@ Backup Automation:
 ```yaml
 Cloud Development:
   - Let's Encrypt certificates via Cloudflare DNS validation with auto-renewal
-  - RDS PostgreSQL Multi-AZ with automated backups and encryption at rest
-  - ElastiCache Redis with cluster mode and encryption in transit/at rest
+  - RDS PostgreSQL single-AZ with automated backups and encryption at rest (Multi-AZ upgrade ready)
+  - ElastiCache Redis single-node with encryption in transit/at rest (cluster mode upgrade ready)
   - Cloudflare DNS resolution for service discovery with health checks
   - AWS ALB with SSL termination, WAF integration, and security headers
   - AWS Secrets Manager with automatic secret rotation and audit logging
@@ -449,8 +449,8 @@ Cloud Development:
   - Pod Security Standards for container security hardening
 
 Production Ready (Future):
-  - Multi-region RDS with read replicas and cross-region backup
-  - ElastiCache Redis cluster with automatic failover and global datastore
+  - Multi-AZ RDS with read replicas and cross-region backup
+  - ElastiCache Redis cluster automatic failover and global datastore
   - CloudFront CDN for global distribution with WAF integration
   - AWS Shield Advanced for DDoS protection
   - AWS Secrets Manager with cross-region replication and enterprise features

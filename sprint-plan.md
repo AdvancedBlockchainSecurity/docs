@@ -10,14 +10,13 @@
 **Development Checklist**:
 - [ ] **Purchase production domain** (e.g., advancedblockchainsecurity.com) via Cloudflare or registrar
 - [ ] **Configure Cloudflare hosted zone** for DNS management and SSL certificate validation
-- [ ] **Set up development subdomain** (dev.advancedblockchainsecurity.com) with A records
 - [ ] **Configure staging subdomain** (staging.advancedblockchainsecurity.com) with A records
 - [ ] **Set up production subdomain** (app.advancedblockchainsecurity.com) with A records
-- [ ] Set up AWS EKS development cluster with managed node groups (t3.medium nodes)
+- [ ] Set up AWS EKS staging cluster with managed node groups (t3.medium nodes)
 - [ ] Configure AWS VPC with public/private subnets and NAT gateways
 - [ ] Install AWS Load Balancer Controller for ALB ingress management
 - [ ] Install cert-manager with Let's Encrypt and Cloudflare DNS validation
-- [ ] Configure development DNS entries with proper A records pointing to ALB
+- [ ] Configure staging DNS entries with proper A records pointing to ALB
 - [ ] **Deploy AWS Secrets Manager for application secret storage**
 - [ ] **Configure AWS Secrets Manager with environment-based secret organization**
 - [ ] **Set up automatic secret rotation for database credentials**
@@ -26,12 +25,12 @@
 - [ ] **Configure AWS IAM roles and policies for least-privilege secret access**
 - [ ] **Install ArgoCD in AWS EKS cluster**
 - [ ] **Configure ArgoCD with GitHub repository integration**
-- [ ] **Set up ArgoCD application projects for development**
+- [ ] **Set up ArgoCD application projects for staging**
 - [ ] **Configure ArgoCD RBAC for team access and permissions**
 - [ ] **Configure ArgoCD External Secrets integration for secret injection in GitOps**
 - [ ] **Create ArgoCD Application manifests for all microservices**
-- [ ] Deploy RDS PostgreSQL 15 with Multi-AZ deployment and automated backups
-- [ ] Deploy ElastiCache Redis with cluster mode enabled
+- [ ] Deploy RDS PostgreSQL 15 with single-AZ deployment and automated backups (Multi-AZ upgrade ready)
+- [ ] Deploy ElastiCache Redis single-node with encryption (cluster mode upgrade ready)
 - [ ] Set up CloudWatch monitoring with Prometheus and Grafana on EKS
 - [ ] Configure ECR for container image storage with vulnerability scanning
 - [ ] Implement GitHub Actions CI/CD pipeline with AWS integration
@@ -61,7 +60,7 @@
 - **All tool credentials managed securely through AWS Secrets Manager**
 - **Tool API keys rotate automatically without service disruption**
 - **Tools accessible at https://tools.dev.advancedblockchainsecurity.com**
-- All services deploy successfully to AWS EKS development cluster
+- All services deploy successfully to AWS EKS staging cluster
 - **ArgoCD successfully deploys and manages cloud application lifecycle via GitOps**
 - **AWS Secrets Manager operational and managing all infrastructure secrets**
 - CloudWatch monitoring dashboards display metrics from all infrastructure components
@@ -663,17 +662,17 @@ Before production deployment:
 - [ ] **AWS Secrets Manager disaster recovery and cross-region replication tested**
 - [ ] **All secrets properly managed with appropriate rotation policies**
 
-## Cloud Development Environment Summary 
+## Cloud Staging Environment Summary
 
 ### **Cost Analysis:**
 ```yaml
-Cloud Development Costs (Months 1-3):
-  AWS EKS Development: ~$200/month
-  RDS PostgreSQL (Multi-AZ): ~$50/month
-  ElastiCache Redis: ~$30/month
+Cloud Staging Costs (Months 1-3):
+  AWS EKS Staging: ~$200/month
+  RDS PostgreSQL (Single-AZ): ~$25/month
+  ElastiCache Redis (Single-node): ~$15/month
   AWS Secrets Manager: ~$10/month
   ALB + Data Transfer: ~$30/month
-  Total Development Costs: ~$340/month
+  Total Staging Costs: ~$290/month
 
 Production Scaling Costs (Month 4+):
   AWS EKS Production: ~$500/month
@@ -685,39 +684,3 @@ Production Scaling Costs (Month 4+):
   CloudFront CDN: ~$50/month
   Total Production Costs: ~$1,300/month (scales with usage)
 ```
-
-### **AWS Secrets Manager Benefits Summary:**
-```yaml
-Cloud AWS Secrets Manager Development:
-  - Native AWS integration from day one
-  - Production-grade policies and procedures
-  - Automatic secret rotation and lifecycle management
-  - Multi-environment secret isolation
-  - AWS IAM integration for access control
-  - Real production patterns and workflows
-
-Production AWS Secrets Manager Benefits:
-  - High availability and disaster recovery
-  - Automatic backup and cross-region replication
-  - Cross-region replication for global scale
-  - Enterprise compliance and audit logging
-  - AWS KMS integration for enhanced security
-  - Multi-cloud secret management capabilities
-```
-
-### **Development Benefits:**
-```yaml
-Cloud-First Advantages:
-  - No local resource constraints (MacBook Air friendly)
-  - Team collaboration ready from day one
-  - Production-like environment for accurate testing
-  - Real cloud networking and service integration
-  - Automatic scaling and load balancing
-  - Enterprise-grade monitoring and alerting
-  - Fast iteration with cloud-native CI/CD
-  - Global accessibility for distributed teams
-  - Let's Encrypt SSL certificates from day one
-  - Real DNS and domain management experience
-```
-
-This comprehensive cloud development sprint plan provides enterprise-grade secret management with AWS Secrets Manager from day one in cloud development, ensuring production readiness while maintaining rapid development velocity without local resource constraints. The plan includes proper domain setup and DNS management for a professional production-ready platform.

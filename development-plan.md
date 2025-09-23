@@ -19,7 +19,7 @@
 #### Phase 1: Cloud Development Foundation (Months 1-3)
 **Infrastructure**: AWS EKS with production-grade services and enterprise secret management
 - **Kubernetes**: AWS EKS with managed node groups and development cluster
-- **Database**: RDS PostgreSQL with Multi-AZ deployment
+- **Database**: RDS PostgreSQL with single-AZ deployment for MVP (Multi-AZ upgrade ready)
 - **Caching**: ElastiCache Redis with cluster mode
 - **SSL Strategy**: Let's Encrypt certificates with Cloudflare DNS validation
 - **Load Balancing**: AWS Application Load Balancer with SSL termination
@@ -721,8 +721,8 @@ spec:
 
 #### AWS Infrastructure Components
 **Compute**: EKS clusters with managed node groups and Spot instances
-**Database**: RDS PostgreSQL with Multi-AZ deployment and read replicas
-**Caching**: ElastiCache Redis with cluster mode enabled
+**Database**: RDS PostgreSQL single-AZ for MVP (Multi-AZ upgrade ready for production)
+**Caching**: ElastiCache Redis single-node for MVP (cluster mode upgrade ready for production)
 **Storage**: S3 for contract files with lifecycle policies
 **Networking**: VPC with public/private subnets and NAT gateways
 **Security**: IAM roles, security groups, and VPC endpoints
@@ -730,7 +730,7 @@ spec:
 **Secret Management**: AWS Secrets Manager with cross-region replication
 
 #### AWS Secrets Manager Cloud Architecture
-**High Availability**: Multi-AZ AWS Secrets Manager with cross-region replication
+**High Availability**: Single-AZ AWS Secrets Manager for MVP (Multi-AZ with cross-region replication upgrade ready for production)
 **Automatic Rotation**: AWS Lambda-based rotation for database credentials
 **Backup Strategy**: Automated cross-region secret replication
 **Disaster Recovery**: Cross-region AWS Secrets Manager replication for DR
@@ -738,8 +738,8 @@ spec:
 **Integration**: AWS IAM authentication and policy-based access control
 
 #### Multi-Environment Strategy
-**Development Environment**: Single EKS cluster with reduced resources
-**Staging Environment**: Production-like configuration for testing
+**Staging Environment**: Single EKS cluster with reduced resources for MVP testing and validation
+**Staging Cost Optimization**: Single-AZ deployment to minimize costs during MVP phase
 **Production Environment**: Multi-AZ, high-availability configuration
 **Cost Optimization**: Spot instances, scheduled scaling, resource tagging
 
@@ -749,10 +749,10 @@ spec:
 ```yaml
 Cloud Development Costs (Months 1-3):
   AWS EKS Development: ~$200/month
-  RDS PostgreSQL (Multi-AZ): ~$50/month
-  ElastiCache Redis: ~$30/month
+  RDS PostgreSQL (Single-AZ): ~$25/month
+  ElastiCache Redis (Single-node): ~$15/month
   AWS Secrets Manager: ~$10/month
-  Total Development Costs: ~$310/month
+  Total Development Costs: ~$250/month
 
 Production Scaling Costs (Month 4+):
   AWS EKS Production: ~$500/month
