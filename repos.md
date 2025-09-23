@@ -1,7 +1,5 @@
 # Sprint 1 Repository Structure - Microservice Architecture (~85K LOC)
 
-Based on the estimated ~85K LOC and need for manageable repository sizes, here are the repositories you need to create. **Rust is used from Day 1 for performance-critical services.**
-
 ## Core Repositories (17 repos)
 
 ### **Backend Service Repositories (6 repos)**
