@@ -83,7 +83,6 @@ Sprint 1 establishes the foundational infrastructure and repository structure fo
 - Local DNS resolution configuration and ingress rules via Kustomize
 
 **Deliverables**:
-**Deliverables**:
 - [ ] minikube cluster operational with specified resources (16GB RAM, 6 CPUs)
 - [ ] All required addons enabled and functional (ingress, metrics-server, storage, dashboard)
 - [ ] Cluster health validated and documented
