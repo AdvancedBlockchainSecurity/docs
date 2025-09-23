@@ -738,7 +738,8 @@ spec:
 **Integration**: AWS IAM authentication and policy-based access control
 
 #### Multi-Environment Strategy
-**Staging Environment**: Single EKS cluster with reduced resources and single-AZ for MVP cost optimization
+**Staging Environment**: Single EKS cluster with reduced resources for MVP testing and validation
+**Staging Cost Optimization**: Single-AZ deployment to minimize costs during MVP phase
 **Production Environment**: Multi-AZ, high-availability configuration
 **Cost Optimization**: Spot instances, scheduled scaling, resource tagging
 
