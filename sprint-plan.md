@@ -8,15 +8,15 @@
 **Technical Milestone**: Complete cloud development environment with enterprise secret management
 
 **Development Checklist**:
-- [ ] **Purchase production domain** (e.g., advancedblockchainsecurity.com) via Route53 or registrar
-- [ ] **Configure Route53 hosted zone** for DNS management and SSL certificate validation
+- [ ] **Purchase production domain** (e.g., advancedblockchainsecurity.com) via Cloudflare or registrar
+- [ ] **Configure Cloudflare hosted zone** for DNS management and SSL certificate validation
 - [ ] **Set up development subdomain** (dev.advancedblockchainsecurity.com) with A records
 - [ ] **Configure staging subdomain** (staging.advancedblockchainsecurity.com) with A records
 - [ ] **Set up production subdomain** (app.advancedblockchainsecurity.com) with A records
 - [ ] Set up AWS EKS development cluster with managed node groups (t3.medium nodes)
 - [ ] Configure AWS VPC with public/private subnets and NAT gateways
 - [ ] Install AWS Load Balancer Controller for ALB ingress management
-- [ ] Install cert-manager with Let's Encrypt and Route53 DNS validation
+- [ ] Install cert-manager with Let's Encrypt and Cloudflare DNS validation
 - [ ] Configure development DNS entries with proper A records pointing to ALB
 - [ ] **Deploy AWS Secrets Manager for application secret storage**
 - [ ] **Configure AWS Secrets Manager with environment-based secret organization**
@@ -65,7 +65,7 @@
 - **ArgoCD successfully deploys and manages cloud application lifecycle via GitOps**
 - **AWS Secrets Manager operational and managing all infrastructure secrets**
 - CloudWatch monitoring dashboards display metrics from all infrastructure components
-- SSL termination working with Let's Encrypt certificates via Route53 validation
+- SSL termination working with Let's Encrypt certificates via Cloudflare validation
 - cert-manager automatically provisions and renews certificates with Let's Encrypt
 - AWS ALB routes traffic correctly with SSL termination
 - **ArgoCD UI accessible and shows healthy application status at https://argocd.dev.advancedblockchainsecurity.com**
@@ -671,7 +671,6 @@ Cloud Development Costs (Months 1-3):
   AWS EKS Development: ~$200/month
   RDS PostgreSQL (Multi-AZ): ~$50/month
   ElastiCache Redis: ~$30/month
-  Route53 + Domain: ~$20/month
   AWS Secrets Manager: ~$10/month
   ALB + Data Transfer: ~$30/month
   Total Development Costs: ~$340/month

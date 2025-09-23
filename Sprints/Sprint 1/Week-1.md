@@ -31,7 +31,6 @@
   - [ ] **EKS cluster module with managed node groups, OIDC provider, and private API endpoint**
   - [ ] **RDS PostgreSQL module with Multi-AZ deployment, parameter groups, and KMS encryption**
   - [ ] **ElastiCache Redis module with cluster mode and parameter groups**
-  - [ ] **Route53 module for health checks (optional)**
   - [ ] **IAM module for EKS service roles and policies**
   - [ ] **Secrets Manager module for application secrets**
   - [ ] **Security Groups module for network access control and optimization**
@@ -438,10 +437,10 @@ Backup Automation:
 **Enhanced Environment Strategy:**
 ```yaml
 Cloud Development:
-  - Let's Encrypt certificates via Route53 DNS validation with auto-renewal
+  - Let's Encrypt certificates via Cloudflare DNS validation with auto-renewal
   - RDS PostgreSQL Multi-AZ with automated backups and encryption at rest
   - ElastiCache Redis with cluster mode and encryption in transit/at rest
-  - Route53 DNS resolution for service discovery with health checks
+  - Cloudflare DNS resolution for service discovery with health checks
   - AWS ALB with SSL termination, WAF integration, and security headers
   - AWS Secrets Manager with automatic secret rotation and audit logging
   - External Secrets Operator with AWS IAM authentication and encryption
@@ -803,7 +802,7 @@ Security Enhancements:
 Required Documentation:
   - Enhanced cloud setup automation scripts including AWS Secrets Manager deployment
   - EKS cluster configuration and resource requirements with security hardening
-  - Route53 DNS and Let's Encrypt SSL certificate setup with monitoring
+  - Cloudflare DNS and Let's Encrypt SSL certificate setup with monitoring
   - Enhanced AWS Secrets Manager configuration and IAM setup with security
   - Enhanced AWS Secrets Manager secret management procedures and security policies
   - Enhanced ArgoCD cloud deployment and management with backup strategies
@@ -911,7 +910,7 @@ Required Documentation:
 ## Enhanced Cloud Development Strategy Summary
 
 ### **Cost Management:**
-- **Enhanced development costs** approximately $320-400/month during Sprints 1-6 (Route53 costs removed)
+- **Enhanced development costs** approximately $320-400/month during Sprints 1-6
 - **Enhanced production scaling** planned for $1,400+/month with full enterprise security features
 - **Cost optimization** through Cloudflare DNS (free), spot instances, scheduled scaling, resource tagging, and monitoring
 
