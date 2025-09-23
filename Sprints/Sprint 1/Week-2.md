@@ -29,8 +29,8 @@
 - [ ] Implement JWT authentication and authorization middleware for cloud testing
 - [ ] Set up RDS connection pooling via RDS Proxy and ORM configuration
 - [ ] Create user management endpoints (register, login, profile) with RDS database
-- [ ] Implement organization and project management APIs for cloud development
-- [ ] Configure CORS policies for cloud frontend development
+- [ ] Implement organization and project management APIs for cloud
+- [ ] Configure CORS policies for cloud frontend
 - [ ] Set up health check and readiness probe endpoints for CloudWatch monitoring
 - [ ] **Deploy API service via ArgoCD by committing code to platform repository**
 - [ ] **Test ArgoCD automatic sync for cloud API service updates**
@@ -67,23 +67,23 @@
 - [ ] **Test ArgoCD rollback functionality for cloud data service**
 - [ ] **Validate AWS Secrets Manager secret rotation for RDS credentials**
 
-**Cloud Development Configuration with AWS Secrets Manager:**
+**Cloud Staging Configuration with AWS Secrets Manager:**
 ```yaml
 API Service AWS Secrets Manager Secrets:
-  dev/api-service/jwt-secret: "cloud-development-jwt-signing-key"
-  dev/api-service/oauth-google: "Google OAuth client credentials"
-  dev/api-service/oauth-github: "GitHub OAuth client credentials"
-  dev/api-service/cors-origins: "https://app.dev.advancedblockchainsecurity.com"
+  staging/api-service/jwt-secret: "cloud-staging-jwt-signing-key"
+  staging/api-service/oauth-google: "Google OAuth client credentials"
+  staging/api-service/oauth-github: "GitHub OAuth client credentials"
+  staging/api-service/cors-origins: "https://app.staging.advancedblockchainsecurity.com"
 
 Data Service AWS Secrets Manager Secrets:
-  dev/data-service/rds-url: "RDS PostgreSQL connection string with RDS Proxy"
-  dev/data-service/elasticache-url: "ElastiCache Redis cluster endpoint"
-  dev/data-service/encryption-key: "AES-256 encryption key for sensitive data"
-  dev/data-service/audit-signing-key: "Key for audit log integrity"
+  staging/data-service/rds-url: "RDS PostgreSQL connection string with RDS Proxy"
+  staging/data-service/elasticache-url: "ElastiCache Redis cluster endpoint"
+  staging/data-service/encryption-key: "AES-256 encryption key for sensitive data"
+  staging/data-service/audit-signing-key: "Key for audit log integrity"
 
 IAM Policies:
-  api-service-policy: "Access to dev/api-service/* secrets"
-  data-service-policy: "Access to dev/data-service/* secrets"
+  api-service-policy: "Access to staging/api-service/* secrets"
+  data-service-policy: "Access to staging/data-service/* secrets"
 ```
 
 **Deliverables Day 6:**
@@ -140,7 +140,7 @@ IAM Policies:
   - [ ] **`orchestrator/`** - Analysis workflow orchestration logic
   - [ ] **`queue_manager/`** - Job queue and priority management
 - [ ] **Set up Celery with ElastiCache Redis broker for job queue**
-- [ ] **Implement analysis workflow orchestration for cloud development**
+- [ ] **Implement analysis workflow orchestration for cloud**
 - [ ] **Verify Kubernetes IaC for Orchestration Service in `solidity-security-platform/backend/orchestration-service/`:**
   - [ ] **`deployment.yaml`** - Celery workers with scaling configuration and AWS secrets
   - [ ] **`service.yaml`** - Worker communication
@@ -453,7 +453,7 @@ AWS Secrets Manager Testing Scenarios:
   - Cross-service secret access with IAM policies
   - Policy changes and access control validation
   - Backup and restore procedures with cross-region replication
-  - High availability simulation with AWS multi-AZ
+  - Single-AZ deployment validation (Multi-AZ upgrade simulation for production readiness)
   - Performance under load with CloudWatch monitoring
   - Integration with External Secrets Operator
   - ArgoCD AWS Secrets Manager Plugin functionality
@@ -694,12 +694,12 @@ This completes Sprint 1 with a fully functional MVP platform running entirely in
 ```yaml
 Cloud Development Costs (Week 1-2):
   AWS EKS Development: ~$200/month
-  RDS PostgreSQL (Multi-AZ): ~$50/month
+  RDS PostgreSQL (Single-AZ): ~$25/month
   ElastiCache Redis: ~$30/month
   AWS Secrets Manager: ~$10/month
   ALB + Data Transfer: ~$30/month
   CloudWatch + Monitoring: ~$20/month
-  Total Development Costs: ~$360/month
+  Total Development Costs: ~$315/month
 
 Production Scaling Costs (Sprint 7+):
   AWS EKS Production: ~$500/month
