@@ -53,9 +53,9 @@ Sprint 1 establishes the foundational infrastructure and repository structure fo
 **Priority**: P0 (Critical)
 
 **Deliverables**:
-- [ ] Install and start minikube with 12GB RAM and 6 CPUs
-- [ ] Enable addons: ingress, metrics-server, storage-provisioner, dashboard
-- [ ] Verify cluster health
+- [x] Install and start minikube with 12GB RAM and 6 CPUs
+- [x] Enable addons: ingress, metrics-server, storage-provisioner, dashboard
+- [x] Verify cluster health
 
 **Acceptance Criteria**:
 - minikube cluster running with proper resources
@@ -70,12 +70,12 @@ Sprint 1 establishes the foundational infrastructure and repository structure fo
 **Priority**: P0 (Critical)
 
 **Deliverables**:
-- [ ] Install NGINX Ingress CRDs via Helm
-- [ ] Install cert-manager CRDs via Helm
-- [ ] Install Prometheus Operator CRDs via Helm
-- [ ] Install ArgoCD CRDs via Helm
-- [ ] Create all Kustomize base configurations (PostgreSQL, Redis, NGINX, cert-manager, Prometheus, Grafana, ArgoCD)
-- [ ] Create all Kustomize local overlays for each service
+- [x] Install NGINX Ingress CRDs via Helm
+- [x] Install cert-manager CRDs via Helm
+- [x] Install Prometheus Operator CRDs via Helm
+- [x] Install ArgoCD CRDs via Helm
+- [x] Create all Kustomize base configurations (PostgreSQL, Redis, NGINX, cert-manager, Prometheus, Grafana, ArgoCD)
+- [x] Create all Kustomize local overlays for each service
 
 **Acceptance Criteria**:
 - All CRDs installed successfully
@@ -89,14 +89,14 @@ Sprint 1 establishes the foundational infrastructure and repository structure fo
 **Priority**: P0 (Critical)
 
 **Deliverables**:
-- [ ] Deploy PostgreSQL via Kustomize in `postgresql-local` namespace
-- [ ] Deploy Redis via Kustomize in `redis-local` namespace
-- [ ] Deploy NGINX Ingress via Kustomize in `nginx-local` namespace
-- [ ] Deploy cert-manager via Kustomize in `cert-manager-local` namespace
-- [ ] Deploy Prometheus via Kustomize in `prometheus-local` namespace
-- [ ] Deploy Grafana via Kustomize in `grafana-local` namespace
-- [ ] Deploy ArgoCD via Kustomize in `argocd-local` namespace
-- [ ] Configure local DNS in /etc/hosts for *.solidity-security.local
+- [x] Deploy PostgreSQL via Kustomize in `postgresql-local` namespace
+- [x] Deploy Redis via Kustomize in `redis-local` namespace
+- [x] Deploy NGINX Ingress via Kustomize in `nginx-local` namespace
+- [x] Deploy cert-manager via Kustomize in `cert-manager-local` namespace
+- [x] Deploy Prometheus via Kustomize in `prometheus-local` namespace
+- [x] Deploy Grafana via Kustomize in `grafana-local` namespace
+- [x] Deploy ArgoCD via Kustomize in `argocd-local` namespace
+- [x] Configure local DNS in /etc/hosts for *.solidity-security.local
 
 **Acceptance Criteria**:
 - All infrastructure services running in their namespaces
