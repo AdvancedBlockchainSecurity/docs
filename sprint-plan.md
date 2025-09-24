@@ -19,12 +19,12 @@
 - [ ] **Deploy local PostgreSQL with persistent volumes from `solidity-security-aws-infrastructure/local/`**
 - [ ] **Deploy local Redis with persistent storage from infrastructure IaC**
 - [ ] **Install NGINX ingress controller for local traffic routing**
-- [ ] **Install cert-manager with self-signed cluster issuer from `solidity-security-aws-infrastructure//local/`**
+- [ ] **Install cert-manager with self-signed cluster issuer from `solidity-security-aws-infrastructure/local/`**
 - [ ] **Configure local DNS resolution via /etc/hosts entries (*.solidity-security.local)**
-- [ ] **Deploy ArgoCD in local minikube cluster using `solidity-security-aws-infrastructure//local/argocd/`**
+- [ ] **Deploy ArgoCD in local minikube cluster using `solidity-security-aws-infrastructure/local/argocd/`**
 - [ ] **Configure ArgoCD with GitHub integration for all 18 repositories**
 - [ ] **Set up ArgoCD application projects for local development environments**
-- [ ] **Configure ArgoCD RBAC for team access using `solidity-security-aws-infrastructure//argocd-config/`**
+- [ ] **Configure ArgoCD RBAC for team access using `solidity-security-aws-infrastructure/argocd-config/`**
 - [ ] **Deploy local monitoring stack (Prometheus, Grafana) using `solidity-security-monitoring/local/`**
 - [ ] **Set up local development workflows with hot reloading for all services**
 - [ ] **Configure local container registry for development images**
@@ -158,7 +158,7 @@
 - [ ] **Configure staging DNS entries with A records pointing to ALB**
 
 **Staging Kubernetes Infrastructure Development & Deployment**:
-- [ ] **Configure ArgoCD for staging environment using `solidity-security-aws-infrastructure//staging/`**
+- [ ] **Configure ArgoCD for staging environment using `solidity-security-aws-infrastructure/staging/`**
 - [ ] **Install External Secrets Operator with AWS IAM authentication**
 - [ ] **Configure AWS Secrets Store CSI Driver for direct secret mounting**
 - [ ] **Deploy monitoring stack (Prometheus, Grafana) using `solidity-security-monitoring/staging/`**
@@ -578,7 +578,7 @@
 - [ ] **Configure DNS entries with A records pointing to ALB**
 
 **Cloud Kubernetes Infrastructure**:
-- [ ] **Configure ArgoCD for cloud environment using `solidity-security-aws-infrastructure//staging/`**
+- [ ] **Configure ArgoCD for cloud environment using `solidity-security-aws-infrastructure/staging/`**
 - [ ] **Install External Secrets Operator with AWS IAM authentication**
 - [ ] **Configure AWS Secrets Store CSI Driver for direct secret mounting**
 - [ ] **Deploy monitoring stack (Prometheus, Grafana) using `solidity-security-monitoring/staging/`**
