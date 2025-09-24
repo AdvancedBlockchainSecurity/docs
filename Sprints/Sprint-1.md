@@ -43,182 +43,143 @@ Sprint 1 establishes the foundational infrastructure and repository structure fo
 
 ## Detailed Task Breakdown
 
-## Week 1: Infrastructure Foundation & Repository Setup
+# Week 1: Infrastructure Foundation & Repository Setup
 
-### Day 1-2: Local Infrastructure Development & Deployment
+## Day 1-2: Local Infrastructure Development & Deployment
 
-#### Task 1.1: minikube Cluster Setup
+### Task 1.1: minikube Cluster Setup
 **Estimated Time**: 4 hours  
 **Owner**: DevOps/Platform Team  
 **Priority**: P0 (Critical)
 
-**Infrastructure Deployment Strategy**:
-- Deploy all infrastructure components (PostgreSQL, Redis, ArgoCD, Prometheus, Grafana, NGINX, Cert-Manager) via Kustomize
-- Install CRDs via Helm for cert-manager, Prometheus Operator, and NGINX Ingress
-- Use Kustomize base configurations overlays (local, staging, prod)
-- Configure enterprise-ready infrastructure with scaling and customization capabilities
-- **Namespace Convention**: Use `[service]-[overlay]` naming pattern (e.g., `grafana-local`, `grafana-staging`, `grafana-prod`, `nginx-local`, `nginx-staging`, `nginx-prod`, `postgresql-local`, `redis-local`, `argocd-local`, `prometheus-local`)
-- [ ] minikube cluster operational with specified resources (16GB RAM, 6 CPUs)
-- [ ] All required addons enabled and functional (ingress, metrics-server, storage, dashboard)
-- [ ] Cluster health validated and documented
+**Deliverables**:
+- [ ] Install and start minikube with 12GB RAM and 6 CPUs
+- [ ] Enable addons: ingress, metrics-server, storage-provisioner, dashboard
+- [ ] Verify cluster health
 
 **Acceptance Criteria**:
-- minikube cluster running with 16GB RAM and 6 CPUs allocated
-- All addons (ingress, metrics-server, storage, dashboard) enabled and healthy
-- kubectl context properly configured for local development
+- minikube cluster running with proper resources
+- All addons enabled and healthy
+- kubectl context configured
 
 ---
 
-#### Task 1.2: Core Infrastructure Services Deployment
-**Estimated Time**: 6 hours  
+### Task 1.2: Kubernetes Resource Installation
+**Estimated Time**: 3 hours  
 **Owner**: DevOps/Platform Team  
 **Priority**: P0 (Critical)
 
-**Infrastructure Services to Deploy**:
-- PostgreSQL StatefulSet with persistent storage via Kustomize base + local overlay
-- Redis deployment with persistent storage via Kustomize base + local overlay
-- NGINX ingress controller via Kustomize configuration (CRDs installed via Helm)
-- cert-manager via Kustomize ClusterIssuer and Certificate resources (CRDs installed via Helm)
-- Prometheus and Grafana deployments via Kustomize (CRDs installed via Helm)
-- Local DNS resolution configuration and ingress rules via Kustomize
-
 **Deliverables**:
-- [ ] minikube cluster operational with specified resources (16GB RAM, 6 CPUs)
-- [ ] All required addons enabled and functional (ingress, metrics-server, storage, dashboard)
-- [ ] Cluster health validated and documented
-- [ ] CRDs installed via Helm for cert-manager, Prometheus, and NGINX Ingress
-- [ ] PostgreSQL StatefulSet with persistent storage deployed via Kustomize in `postgresql-local` namespace
-- [ ] Redis deployment with persistent storage deployed via Kustomize in `redis-local` namespace
-- [ ] NGINX ingress controller deployed and configured via Kustomize in `nginx-local` namespace
-- [ ] cert-manager configured with self-signed cluster issuer via Kustomize in `cert-manager-local` namespace
-- [ ] Prometheus and Grafana monitoring stack deployed via Kustomize in `prometheus-local` and `grafana-local` namespaces
-- [ ] Local DNS resolution configured in /etc/hosts
+- [ ] Install NGINX Ingress CRDs via Helm
+- [ ] Install cert-manager CRDs via Helm
+- [ ] Install Prometheus Operator CRDs via Helm
+- [ ] Install ArgoCD CRDs via Helm
+- [ ] Create all Kustomize base configurations (PostgreSQL, Redis, NGINX, cert-manager, Prometheus, Grafana, ArgoCD)
+- [ ] Create all Kustomize local overlays for each service
 
 **Acceptance Criteria**:
-- minikube cluster running with 16GB RAM and 6 CPUs allocated
-- All addons (ingress, metrics-server, storage, dashboard) enabled and healthy
-- PostgreSQL accessible from within cluster on port 5432 via Kustomize-deployed StatefulSet in `postgresql-local` namespace
-- Redis accessible from within cluster on port 6379 via Kustomize-deployed service in `redis-local` namespace
-- NGINX ingress controller processing traffic correctly with Kustomize configuration in `nginx-local` namespace
-- cert-manager generating self-signed certificates using Kustomize-managed ClusterIssuer in `cert-manager-local` namespace
-- Prometheus and Grafana operational with Kustomize-deployed monitoring stack in `prometheus-local` and `grafana-local` namespaces
-- Local DNS resolving *.solidity-security.local domains
+- All CRDs installed successfully
+- All Kustomize configurations created
 
 ---
 
-#### Task 1.3: ArgoCD Installation & Configuration
-**Estimated Time**: 4 hours  
+### Task 1.3: Infrastructure Deployment
+**Estimated Time**: 3 hours  
 **Owner**: DevOps/Platform Team  
 **Priority**: P0 (Critical)
 
-**ArgoCD Setup Requirements**:
-- Install ArgoCD CRDs via Helm
-- Deploy ArgoCD server components in `argocd-local` namespace via Kustomize
-- ArgoCD CLI installation and configuration
-- RBAC configuration for team access via Kustomize patches
-- GitHub integration for repository access via Kustomize secrets
-- Local ingress configuration for ArgoCD UI via Kustomize overlays
+**Deliverables**:
+- [ ] Deploy PostgreSQL via Kustomize in `postgresql-local` namespace
+- [ ] Deploy Redis via Kustomize in `redis-local` namespace
+- [ ] Deploy NGINX Ingress via Kustomize in `nginx-local` namespace
+- [ ] Deploy cert-manager via Kustomize in `cert-manager-local` namespace
+- [ ] Deploy Prometheus via Kustomize in `prometheus-local` namespace
+- [ ] Deploy Grafana via Kustomize in `grafana-local` namespace
+- [ ] Deploy ArgoCD via Kustomize in `argocd-local` namespace
+- [ ] Configure local DNS in /etc/hosts for *.solidity-security.local
+
+**Acceptance Criteria**:
+- All infrastructure services running in their namespaces
+- Local DNS resolving correctly
+- All services healthy and accessible
+
+---
+
+### Task 1.4: ArgoCD Configuration
+**Estimated Time**: 2 hours  
+**Owner**: DevOps/Platform Team  
+**Priority**: P0 (Critical)
 
 **Deliverables**:
-- [ ] ArgoCD CRDs installed via Helm
-- [ ] ArgoCD server components deployed via Kustomize in `argocd-local` namespace and accessible
-- [ ] ArgoCD CLI installed and configured
-- [ ] RBAC configured for team access via Kustomize
-- [ ] GitHub integration for repository access configured via Kustomize
+- [ ] Install and configure ArgoCD CLI
+- [ ] Configure GitHub integration
+- [ ] Configure RBAC policies
 
 **Acceptance Criteria**:
 - ArgoCD UI accessible at https://argocd.solidity-security.local
-- Team members can authenticate and access applications
-- GitHub repositories properly connected for GitOps workflow
+- GitHub repositories connected
+- Team authentication working
 
 ---
 
-### Day 3-4: Repository Architecture & Shared Libraries
+## Day 3-4: Repository Architecture & Shared Libraries
 
-#### Task 1.4: Core Repository Setup & Multi-Language Shared Library
+### Task 1.5: Core Repository Setup & Multi-Language Shared Library
 **Estimated Time**: 8 hours  
 **Owner**: Full Stack Team  
 **Priority**: P0 (Critical)
 
-**Repository Structure Implementation**:
-- Initialize all 18 repositories with proper directory structures
-- Implement multi-language shared library architecture
-- Set up PyO3 bindings for Python-Rust integration
-- Configure WASM bindings for TypeScript-Rust integration
-- Establish build systems for each language/repository
-
-**Shared Library Components**:
-- **Rust Core**: Types, validation, crypto, constants, utilities
-- **Python Bindings**: Pydantic schemas, authentication, PyO3 integration
-- **TypeScript Bindings**: Type definitions, validation schemas, WASM integration
-
 **Deliverables**:
-- [ ] All 18 repositories initialized with proper structure
-- [ ] Multi-language shared library with Rust, Python, and TypeScript components
-- [ ] PyO3 bindings for Python-Rust integration
-- [ ] WASM bindings for TypeScript-Rust integration
-- [ ] Build systems configured for each language/repository
+- [ ] Initialize all 18 repositories
+- [ ] Build Rust core library (types, validation, crypto, utils)
+- [ ] Build Python bindings with PyO3
+- [ ] Build TypeScript bindings with WASM
+- [ ] Create Makefile for builds and tests
+- [ ] Set up CI/CD workflow
 
 **Acceptance Criteria**:
-- All repositories have proper directory structure and README files
-- Shared library compiles successfully in all three languages
-- Cross-language bindings functional and tested
-- Development dependencies properly configured
+- Shared library compiles in Rust, Python, TypeScript
+- Cross-language bindings functional
+- All tests passing
 
 ---
 
-### Day 5-6: Development Environment & Container Images
+## Day 5-6: Development Environment & Container Images
 
-#### Task 1.5: Development Dependencies & Build Systems
+### Task 1.6: Development Dependencies & Build Systems
 **Estimated Time**: 6 hours  
 **Owner**: Full Stack Team  
 **Priority**: P1 (High)
 
-**Development Environment Setup**:
-- Configure Python development dependencies (FastAPI, SQLAlchemy, pytest, etc.)
-- Set up TypeScript development environment (React, Vite, Jest, etc.)
-- Configure Rust development environment (Axum, tokio, testing frameworks)
-- Establish shared library distribution and integration
-
 **Deliverables**:
-- [ ] Development dependencies configured for all repositories
-- [ ] Build systems (Python setuptools, npm/yarn, Cargo) functional
-- [ ] Development Docker images created for each service type
-- [ ] Hot reloading configured for local development
+- [ ] Configure Python dependencies (FastAPI, SQLAlchemy, Celery, pytest, etc.)
+- [ ] Configure TypeScript dependencies (React, Vite, TanStack Query, Zustand, etc.)
+- [ ] Configure Rust dependencies (Axum, tokio, serde, etc.)
+- [ ] Integrate shared library into all services
+- [ ] Test all environments
 
 **Acceptance Criteria**:
-- All services can be built and run locally
-- Development dependencies installed and functional
-- Hot reloading working for all frontend services
-- Shared library properly integrated across all services
+- All services build and run locally
+- Shared library integrated
 
 ---
 
-#### Task 1.6: Local Development Docker Images
+### Task 1.7: Local Development Docker Images
 **Estimated Time**: 4 hours  
 **Owner**: DevOps Team  
 **Priority**: P1 (High)
 
-**Container Image Development**:
-- Create multi-stage Docker builds for Python services
-- Develop TypeScript/Node.js container images with hot reloading
-- Build Rust service containers with optimal performance
-- Set up local container registry in minikube
-- Configure automated image building and pushing
-
 **Deliverables**:
-- [ ] Docker images built for all service types (Python, TypeScript, Rust)
-- [ ] Local container registry operational in minikube
-- [ ] Image building and pushing automated with scripts
-- [ ] Development images configured with hot reloading
+- [ ] Enable minikube registry addon
+- [ ] Create Dockerfiles for all services (Python, TypeScript, Rust)
+- [ ] Build all images with dev tag
+- [ ] Push images to local registry
+- [ ] Create build automation scripts
 
 **Acceptance Criteria**:
-- All Docker images build successfully
-- Images can be pushed to and pulled from local registry
-- Development containers start with proper hot reloading
-- Resource limits and security contexts properly configured
-
----
+- All images build successfully
+- Images available in local registry
+- Hot reloading configured
 
 ## Week 2: Microservice Templates & Platform Integration
 
