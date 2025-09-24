@@ -5,8 +5,8 @@
 ### High-Level Architecture
 **Microservices Architecture Pattern** with event-driven communication and enterprise-grade secret management
 - **API Gateway**: Kong or AWS API Gateway for rate limiting, authentication, routing
-- **Service Mesh**: Istio for service-to-service communication, load balancing, circuit breaking
-- **Ingress Controller**: AWS Application Load Balancer (ALB) with SSL termination and traffic routing
+- **Service Mesh**: Istio for service-to-service mTLS, traffic management, and observability
+- **Ingress Controller**: Istio Gateway + AWS Application Load Balancer (ALB) with SSL termination
 - **Certificate Management**: cert-manager with Let's Encrypt for automated SSL certificate provisioning
 - **Secret Management**: AWS Secrets Manager for centralized secret storage, rotation, and policy enforcement
 - **Secret Injection**: External Secrets Operator for Kubernetes-native secret injection from AWS Secrets Manager
@@ -18,6 +18,7 @@
 
 #### Phase 1: Cloud Development Foundation (Months 1-3)
 **Infrastructure**: AWS EKS with production-grade services and enterprise secret management
+- **Service Mesh**: Istio with mTLS, distributed tracing, and traffic management
 - **Kubernetes**: AWS EKS with managed node groups and development cluster
 - **Database**: RDS PostgreSQL with single-AZ deployment for MVP (Multi-AZ upgrade ready)
 - **Caching**: ElastiCache Redis with cluster mode
@@ -69,6 +70,32 @@ Subdomains:
 ```
 
 ### Core Services Architecture
+
+#### Istio Service Mesh Architecture
+**mTLS Configuration Strategy**:
+- **Development**: PERMISSIVE mode (allows both mTLS and plain text)
+- **Staging**: STRICT mode with automatic certificate rotation
+- **Production**: STRICT mode with enterprise-grade policies
+
+**Traffic Management**:
+- **Circuit Breakers**: Automatic failure isolation for all services
+- **Retries**: Configurable retry policies with exponential backoff
+- **Timeouts**: Service-specific timeout configurations
+- **Load Balancing**: Advanced algorithms (least request, random, round robin)
+
+**Observability Integration**:
+- **Distributed Tracing**: Jaeger integration for request tracing
+- **Metrics**: Prometheus scraping of Istio metrics
+- **Visualization**: Kiali for service mesh topology
+- **Logging**: Envoy access logs integrated with centralized logging
+
+**Namespace Configuration**:
+```yaml
+Istio Namespaces (Local):
+  istio-system-local: Control plane and ingress gateway
+  
+Sidecar Injection (Automatic):
+  All application namespaces: api-service-local, dashboard-local, etc.
 
 #### Secret Management Architecture
 **AWS Secrets Manager Integration Strategy**:

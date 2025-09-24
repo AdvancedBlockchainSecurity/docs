@@ -690,8 +690,8 @@ Contains: VPC, EKS, RDS, ElastiCache, IAM, Secrets Manager configurations
 **Kubernetes Infrastructure as Code repository**
 ```
 Purpose: Kubernetes service definitions and deployment scripts
-Tech Stack: Helm, Kubernetes manifests, ArgoCD, GitHub Actions
-Contains: K8s manifests, ArgoCD applications, CI/CD pipelines
+Tech Stack: Kustomize, Kubernetes manifests, ArgoCD, Istio, GitHub Actions
+Contains: K8s manifests, ArgoCD applications, CI/CD pipelines, Istio service definitions
 ```
 
 ### 15. **`solidity-security-monitoring`**

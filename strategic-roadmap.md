@@ -259,6 +259,7 @@
 #### vs. Traditional Security Tools (Slither, etc.)
 **Differentiation:**
 - Unified platform vs. fragmented tools
+- Enterprise-grade service mesh with zero-trust networking
 - Intelligent correlation and deduplication
 - Enterprise workflow integration
 - Automated compliance documentation
@@ -270,8 +271,10 @@
 ### Competitive Moats
 
 #### Technical Moats
+- **Service Mesh Architecture**: Enterprise-grade Istio deployment with mTLS
 - **Data Network Effects**: Larger dataset improves ML false positive detection
 - **Vulnerability Intelligence**: Comprehensive database creates switching costs
+- **Zero-Trust Security**: Istio-based mTLS for all service communication
 - **Integration Complexity**: Deep enterprise system integrations create switching costs
 - **Proprietary Intelligence**: Custom risk scoring and correlation algorithms
 - **Code Complexity Correlation**: Unique integration of complexity metrics with security

@@ -8,8 +8,14 @@
 **Technical Milestone**: Complete local development environment with all 18 repositories and infrastructure foundation
 
 **Local Infrastructure Development & Deployment**:
-- [ ] **Set up local minikube cluster (16GB RAM, 6 CPUs for all services)**
+- [ ] **Set up local minikube cluster (12GB RAM, 6 CPUs for all services)**
 - [ ] **Enable minikube addons (ingress, metrics-server, storage, dashboard)**
+- [ ] **Install Istio CRDs via Helm for service mesh**
+- [ ] **Deploy Istio control plane via Kustomize in `istio-system-local` namespace**
+- [ ] **Configure Istio Gateway for ingress traffic management**
+- [ ] **Enable automatic sidecar injection for all service namespaces**
+- [ ] **Deploy Jaeger for distributed tracing**
+- [ ] **Deploy Kiali for service mesh visualization**
 - [ ] **Deploy local PostgreSQL with persistent volumes from `solidity-security-aws-infrastructure/local/`**
 - [ ] **Deploy local Redis with persistent storage from infrastructure IaC**
 - [ ] **Install NGINX ingress controller for local traffic routing**
@@ -34,8 +40,10 @@
 
 **Backend Microservice Template Creation (Local)**:
 - [ ] **Create API Service Template for `solidity-security-api-service`:**
-  - [ ] `k8s/base/deployment.yaml` - FastAPI with resource limits, local secrets
-  - [ ] `k8s/base/service.yaml` - ClusterIP service configuration
+  - [ ] `k8s/base/deployment.yaml` - FastAPI with Istio annotations for sidecar injection
+  - [ ] `k8s/base/service.yaml` - ClusterIP service configuration with Istio labels
+  - [ ] `k8s/base/virtualservice.yaml` - Istio VirtualService for traffic routing
+  - [ ] `k8s/base/destinationrule.yaml` - Istio DestinationRule for circuit breakers
   - [ ] `k8s/base/configmap.yaml` - Non-sensitive configuration
   - [ ] `k8s/base/ingress.yaml` - NGINX ingress with local SSL
   - [ ] `helm/api-service/` - Helm chart with local values
@@ -111,6 +119,10 @@
 
 **Acceptance Criteria**:
 - **All 18 repositories properly structured and initialized**
+- **Istio service mesh operational with mTLS in PERMISSIVE mode**
+- **All services have Istio sidecars automatically injected**
+- **Distributed tracing working via Jaeger for all service calls**
+- **Kiali dashboard showing service mesh topology**
 - **Local platform fully functional at https://app.solidity-security.local**
 - **All services deployed via ArgoCD GitOps workflow locally**
 - **Complete security analysis workflow operational locally**
