@@ -661,7 +661,7 @@
 - [ ] **Configure AWS Shield for DDoS protection**
 
 **Production Kubernetes Setup**:
-- [ ] **Deploy ArgoCD for production using `solidity-security-aws-infrastructure/e/production/`**
+- [ ] **Deploy ArgoCD for production using `solidity-security-aws-infrastructure/production/`**
 - [ ] **Configure External Secrets Operator with production IAM roles**
 - [ ] **Deploy production monitoring stack using `solidity-security-monitoring/production/`**
 - [ ] **Set up log aggregation with Amazon OpenSearch**
