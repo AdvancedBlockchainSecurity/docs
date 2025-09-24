@@ -111,7 +111,7 @@ Sprint 1 establishes the foundational infrastructure and repository structure fo
 **Priority**: P0 (Critical)
 
 **Deliverables**:
-- [ ] Install and configure ArgoCD CLI
+- [x] Install and configure ArgoCD CLI
 - [ ] Configure GitHub integration
 - [ ] Configure RBAC policies
 
