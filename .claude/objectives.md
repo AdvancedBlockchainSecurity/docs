@@ -19,6 +19,7 @@
 - [ ] **Domain & DNS**: Production domain purchased with Cloudflare
 - [ ] **AWS Infrastructure**: EKS cluster, RDS PostgreSQL, ElastiCache Redis, VPC with security groups
 - [ ] **GitOps Foundation**: ArgoCD deployed with GitHub integration and automated deployment workflows
+- [ ] **Service Mesh**: Istio & Jaeger deployed with mTLS, observability, and traffic management
 - [ ] **Secret Management**: AWS Secrets Manager operational with External Secrets Operator integration
 - [ ] **SSL & Security**: Let's Encrypt certificates with cert-manager and AWS ALB SSL termination
 - [ ] **Repository Structure**: 7 repositories with IaC templates for all 6 microservices
@@ -30,6 +31,10 @@
 - External Secrets Operator successfully injecting secrets from AWS Secrets Manager
 - Domain purchased and DNS properly configured with A records
 - Team can reproduce cloud environment setup in <60 minutes
+- Istio service mesh operational with automatic sidecar injection
+- mTLS encryption enabled for all service-to-service communication
+- Distributed tracing functional via Jaeger integration
+- Kiali dashboard accessible for service mesh visualization
 
 ---
 

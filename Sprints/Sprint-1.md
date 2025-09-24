@@ -9,7 +9,8 @@ Sprint 1 establishes the foundational infrastructure and repository structure fo
 ## Technical Architecture
 
 ### Local Infrastructure Components
-- **minikube cluster**: 16GB RAM, 6 CPUs for all services
+- **minikube cluster**: 12GB RAM, 6 CPUs for all services
+- **Istio & Jaeger Service Mesh**: mTLS, traffic management, observability (CRDs via Helm)
 - **PostgreSQL**: Local StatefulSet deployment with persistent volumes via Kustomize
 - **Redis**: Local caching and message queue deployment via Kustomize
 - **NGINX Ingress Controller**: Traffic routing via Kustomize (CRDs via Helm)
@@ -74,8 +75,17 @@ Sprint 1 establishes the foundational infrastructure and repository structure fo
 - [x] Install cert-manager CRDs via Helm
 - [x] Install Prometheus Operator CRDs via Helm
 - [x] Install ArgoCD CRDs via Helm
-- [x] Create all Kustomize base configurations (PostgreSQL, Redis, NGINX, cert-manager, Prometheus, Grafana, ArgoCD)
+- [x] Install Istio CRDs via Helm
+- [x] Create all Kustomize base configurations (PostgreSQL, Redis, NGINX, cert-manager, Prometheus, Grafana, ArgoCD, Istio, Jaeger)
 - [x] Create all Kustomize local overlays for each service
+- [ ] Install Istio CRDs via Helm
+- [ ] Install Istio control plane via Kustomize in `istio-system-local` namespace
+- [ ] Configure Istio Gateway for ingress traffic management
+- [ ] Enable automatic sidecar injection for service namespaces
+- [ ] Configure mTLS policies (PERMISSIVE mode for local)
+- [ ] Install Jaeger for distributed tracing
+- [ ] Install Kiali for service mesh visualization
+- [ ] Configure basic Istio traffic management rules
 
 **Acceptance Criteria**:
 - All CRDs installed successfully
@@ -96,12 +106,23 @@ Sprint 1 establishes the foundational infrastructure and repository structure fo
 - [x] Deploy Prometheus via Kustomize in `prometheus-local` namespace
 - [x] Deploy Grafana via Kustomize in `grafana-local` namespace
 - [x] Deploy ArgoCD via Kustomize in `argocd-local` namespace
-- [x] Configure local DNS in /etc/hosts for *.solidity-security.local
+- [x] Deploy Istio & Jaeger via Kustomize in `[service]-local` namespace
+- [ ] Istio sidecar injection enabled for all application namespaces
+- [x] Configure local DNS in /etc/hosts for *.advancedblockchainsecurity.local
+- [ ] Configure Istio automatic sidecar injection for application namespaces
+- [ ] Deploy Jaeger for distributed tracing
+- [ ] Deploy Kiali for service mesh visualization
 
 **Acceptance Criteria**:
 - All infrastructure services running in their namespaces
 - Local DNS resolving correctly
 - All services healthy and accessible
+- Istio control plane running in `istio-system-local` namespace
+- All service namespaces configured with automatic Istio sidecar injection
+- Istio mTLS working in PERMISSIVE mode for compatibility
+- Jaeger UI accessible for distributed tracing
+- Kiali dashboard showing service mesh topology
+- Basic Istio circuit breaker and retry policies operational
 
 ---
 
