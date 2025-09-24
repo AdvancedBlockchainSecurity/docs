@@ -754,7 +754,7 @@ All 18 repositories will be fully integrated and operational:
 #### **Infrastructure & Support (7 repositories)**
 - `solidity-security-shared`: Multi-language shared libraries
 - `solidity-security-aws-infrastructure`: AWS resource provisioning
-- `solidity-security-infrastructure`: Kubernetes service definitions
+- `solidity-security-infrastructure`: Unified interface for all security analysis tools
 - `solidity-security-monitoring`: Observability configuration
 - `solidity-security-docs`: Documentation and knowledge base
 - `solidity-security-tools`: Tool installation and configuration
