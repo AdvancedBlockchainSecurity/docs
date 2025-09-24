@@ -169,28 +169,6 @@ solidity-security-platform/
 └── tests/                            # Integration tests
 ```
 
-### **Infrastructure Repository (`solidity-security-infrastructure`)**
-Contains ArgoCD applications pointing to platform repository services:
-
-```
-solidity-security-infrastructure/
-├── argocd/
-│   ├── applications/
-│   │   ├── api-service-application.yaml      # → platform/backend/api-service
-│   │   ├── tool-integration-application.yaml # → platform/backend/tool-integration-service
-│   │   ├── orchestration-application.yaml    # → platform/backend/orchestration-service
-│   │   ├── intelligence-engine-application.yaml # → platform/backend/intelligence-engine-service
-│   │   ├── data-service-application.yaml     # → platform/backend/data-service
-│   │   ├── notification-application.yaml     # → platform/backend/notification-service
-│   │   ├── frontend-application.yaml         # → platform/frontend
-│   │   └── app-of-apps.yaml                  # Manages all applications
-│   └── projects/                     # ArgoCD project definitions
-├── external-secrets/                 # External Secrets Operator configs
-├── cert-manager/                     # Certificate management
-├── aws-load-balancer-controller/     # ALB controller
-└── cluster-services/                 # Cluster-wide services
-```
-
 #### 1. Tool Integration Service
 **Purpose**: Unified interface for all security analysis tools with secure credential management
 **Technology Stack**: Python 3.11, FastAPI, Celery, Redis, Rust runtime for Aderyn
@@ -573,33 +551,11 @@ solidity-security-infrastructure/
 #### ArgoCD Integration Strategy
 **Repository Structure**: ArgoCD Applications in infrastructure repo pointing to platform repo services
 **GitOps Workflow**: 
-1. Developer commits code to `solidity-security-platform/backend/{service-name}/`
+1. Developer commits code to `solidity-security-aws-infrastructure/k8s/overlays/{overlay}/argocd/apps/{service-name}/`
 2. ArgoCD detects changes via webhook or polling
 3. ArgoCD syncs Kubernetes manifests from platform repo to cluster
 4. External Secrets Operator injects secrets from AWS Secrets Manager
 5. Service deploys with updated configuration
-
-**ArgoCD Application Example**:
-```yaml
-# solidity-security-infrastructure/argocd/applications/api-service-application.yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: api-service
-  namespace: argocd
-spec:
-  source:
-    repoURL: https://github.com/your-org/solidity-security-platform
-    path: backend/api-service/k8s/base
-    targetRevision: main
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: solidity-platform
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-```
 
 #### Monitoring & Observability
 **Metrics Stack**: Prometheus, Grafana, AlertManager, CloudWatch

@@ -686,15 +686,7 @@ Tech Stack: Terraform, AWS CLI, CloudFormation
 Contains: VPC, EKS, RDS, ElastiCache, IAM, Secrets Manager configurations
 ```
 
-### 14. **`solidity-security-infrastructure`**
-**Kubernetes Infrastructure as Code repository**
-```
-Purpose: Kubernetes service definitions and deployment scripts
-Tech Stack: Kustomize, Kubernetes manifests, ArgoCD, Istio, GitHub Actions
-Contains: K8s manifests, ArgoCD applications, CI/CD pipelines, Istio service definitions
-```
-
-### 15. **`solidity-security-monitoring`**
+### 14. **`solidity-security-monitoring`**
 **Observability and monitoring configurations**
 ```
 Purpose: Monitoring, alerting, and observability setup
@@ -704,7 +696,7 @@ Contains: Grafana dashboards, Prometheus rules, alerting configs
 
 ### **Supporting Repositories (3 repos)**
 
-### 16. **`solidity-security-docs`**
+### 15. **`solidity-security-docs`**
 **Documentation and knowledge base**
 ```
 Purpose: Technical documentation, API docs, user guides
@@ -712,7 +704,7 @@ Tech Stack: Markdown, Docusaurus/GitBook
 Contains: Architecture docs, setup guides, API documentation
 ```
 
-### 17. **`solidity-security-tools`**
+### 16. **`solidity-security-tools`**
 **Security tool configurations and utilities**
 ```
 Purpose: Tool installation scripts, configuration templates, test contracts
@@ -720,7 +712,7 @@ Tech Stack: Shell scripts, Docker, tool-specific configs
 Contains: Tool installation scripts, test fixtures, tool version management
 ```
 
-### 18. **`solidity-security-vulnerabilities`**
+### 17. **`solidity-security-vulnerabilities`**
 **Vulnerability database and intelligence**
 ```
 Purpose: Vulnerability data, patterns, and threat intelligence
