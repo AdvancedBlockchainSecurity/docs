@@ -78,14 +78,14 @@ Sprint 1 establishes the foundational infrastructure and repository structure fo
 - [x] Install Istio CRDs via Helm
 - [x] Create all Kustomize base configurations (PostgreSQL, Redis, NGINX, cert-manager, Prometheus, Grafana, ArgoCD, Istio, Jaeger)
 - [x] Create all Kustomize local overlays for each service
-- [ ] Install Istio CRDs via Helm
-- [ ] Install Istio control plane via Kustomize in `istio-system-local` namespace
-- [ ] Configure Istio Gateway for ingress traffic management
-- [ ] Enable automatic sidecar injection for service namespaces
-- [ ] Configure mTLS policies (PERMISSIVE mode for local)
-- [ ] Install Jaeger for distributed tracing
-- [ ] Install Kiali for service mesh visualization
-- [ ] Configure basic Istio traffic management rules
+- [x] Install Istio CRDs via Helm
+- [x] Install Istio control plane via Kustomize in `istio-system-local` namespace
+- [x] Configure Istio Gateway for ingress traffic management
+- [x] Enable automatic sidecar injection for service namespaces
+- [x] Configure mTLS policies (PERMISSIVE mode for local)
+- [x] Install Jaeger for distributed tracing
+- [x] Install Kiali for service mesh visualization
+- [x] Configure basic Istio traffic management rules
 
 **Acceptance Criteria**:
 - All CRDs installed successfully
@@ -107,11 +107,11 @@ Sprint 1 establishes the foundational infrastructure and repository structure fo
 - [x] Deploy Grafana via Kustomize in `grafana-local` namespace
 - [x] Deploy ArgoCD via Kustomize in `argocd-local` namespace
 - [x] Deploy Istio & Jaeger via Kustomize in `[service]-local` namespace
-- [ ] Istio sidecar injection enabled for all application namespaces
+- [x] Istio sidecar injection enabled for all application namespaces
 - [x] Configure local DNS in /etc/hosts for *.advancedblockchainsecurity.local
-- [ ] Configure Istio automatic sidecar injection for application namespaces
-- [ ] Deploy Jaeger for distributed tracing
-- [ ] Deploy Kiali for service mesh visualization
+- [x] Configure Istio automatic sidecar injection for application namespaces
+- [x] Deploy Jaeger for distributed tracing
+- [x] Deploy Kiali for service mesh visualization
 
 **Acceptance Criteria**:
 - All infrastructure services running in their namespaces
@@ -134,7 +134,7 @@ Sprint 1 establishes the foundational infrastructure and repository structure fo
 **Deliverables**:
 - [x] Install and configure ArgoCD CLI
 - [ ] Configure GitHub integration
-- [ ] Configure ArgoCD integration
+- [x] Configure ArgoCD integration
 - [ ] Configure RBAC policies
 
 **Acceptance Criteria**:
