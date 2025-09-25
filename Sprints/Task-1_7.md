@@ -129,7 +129,7 @@ Create optimized Docker images for all services with development-focused configu
 
 ### Technical Requirements
 - Builder stage: rust:1.74-slim with full toolchain
-- Runtime stage: debian:bookworm-slim with ca-certificates
+- Runtime stage: debian:bullseye-slim with ca-certificates
 - Cargo dependency caching for faster rebuilds
 - Binary executable copied to runtime stage
 - Exposed port 8080 for HTTP API
