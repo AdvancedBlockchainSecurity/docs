@@ -186,21 +186,20 @@ Sprint 1 establishes the foundational infrastructure and repository structure fo
 
 ---
 
-### Task 1.7: Local Development Docker Images
+### Task 1.7: Development Docker Images
 **Estimated Time**: 4 hours  
 **Owner**: DevOps Team  
 **Priority**: P1 (High)
 
 **Deliverables**:
-- [ ] Enable minikube registry addon
 - [ ] Create Dockerfiles for all services (Python, TypeScript, Rust)
 - [ ] Build all images with dev tag
-- [ ] Push images to local registry
+- [ ] Push images to registry
 - [ ] Create build automation scripts
 
 **Acceptance Criteria**:
 - All images build successfully
-- Images available in local registry
+- Images available in registry
 - Hot reloading configured
 
 ## Week 2: Microservice Templates & Platform Integration
