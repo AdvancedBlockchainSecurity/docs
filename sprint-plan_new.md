@@ -49,14 +49,15 @@
 **Technical Milestone**: Complete Kubernetes infrastructure with GitOps foundation
 
 **Kubernetes Infrastructure Deployment**:
+- Create Kustomize base manifests for all infrastructure components
 - Install Istio CRDs via Helm for service mesh foundation
 - Deploy Istio control plane via Kustomize in istio-system namespace for both environments
-- Configure Istio Gateway for ingress traffic management
+- Configure Istio Gateway for ingress traffic management via Kustomize overlays
 - Enable automatic sidecar injection for all application namespaces
-- Deploy Jaeger for distributed tracing integration with Istio
-- Deploy Kiali for service mesh visualization and management
-- Configure AWS Load Balancer Controller for ALB management
-- Install cert-manager with Let's Encrypt and Cloudflare DNS validation
+- Deploy Jaeger for distributed tracing integration with Istio via Kustomize
+- Deploy Kiali for service mesh visualization and management via Kustomize
+- Deploy AWS Load Balancer Controller via Kustomize with IRSA configuration
+- Deploy cert-manager with Let's Encrypt and Cloudflare DNS validation via Kustomize
 
 **DNS Service Configuration**:
 - Configure DNS service records pointing to AWS Application Load Balancer
@@ -64,18 +65,18 @@
 - Configure ArgoCD dashboard access via subdomains
 
 **Additional Infrastructure Components**:
-- Install External Secrets Operator for AWS Secrets Manager integration
-- Deploy monitoring stack (Prometheus, Grafana) for both environments
-- Configure GitHub Actions CI/CD pipeline with AWS integration
+- Deploy External Secrets Operator via Kustomize for AWS Secrets Manager integration
+- Deploy monitoring stack (Prometheus, Grafana) via Kustomize for both environments
+- Configure GitHub Actions CI/CD pipeline with Kustomize deployment automation
 
 **ArgoCD Bootstrap & GitOps Foundation**:
-- Deploy ArgoCD in staging environment
-- Deploy ArgoCD in production environment
+- Deploy ArgoCD in staging environment via Kustomize
+- Deploy ArgoCD in production environment via Kustomize
 - Configure ArgoCD with GitHub integration for all 17 repositories
-- Set up ArgoCD application projects for development environments
-- Configure ArgoCD RBAC for team access
-- Create ArgoCD applications for infrastructure management
-- Configure ArgoCD sync policies and automation
+- Set up ArgoCD application projects for Kustomize-based deployments
+- Configure ArgoCD RBAC for team access via Kustomize overlays
+- Create ArgoCD applications for Kustomize infrastructure management
+- Configure ArgoCD sync policies for automated Kustomize deployments
 
 **Enhanced Microservice Templates**:
 - Create production-ready Kustomize base configurations for all backend services

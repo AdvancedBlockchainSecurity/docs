@@ -16,13 +16,31 @@ Deploy scalable and secure EKS clusters for staging and production environments 
 ## Directory Structure Requirements
 
 ```
-eks-infrastructure/
-├── cluster-configs/               # EKS cluster configuration files
-├── node-groups/                   # Managed node group configurations
-├── autoscaling/                   # Cluster and node autoscaling setup
-├── security/                      # Security policies and network configs
-├── logging/                       # CloudWatch logging configuration
-└── README.md
+solidity-security-aws-infrastructure/
+├── terraform/
+│   └── modules/
+│       └── eks/                   # EKS Terraform module
+│           ├── cluster.tf         # EKS cluster configuration
+│           ├── node_groups.tf     # Managed node group configs
+│           ├── variables.tf       # EKS module variables
+│           └── outputs.tf         # EKS module outputs
+└── k8s/
+    ├── base/                      # Kustomize base configurations
+    │   ├── eks-cluster/           # Base EKS configurations
+    │   │   ├── kustomization.yaml # Base kustomization
+    │   │   └── cluster-config.yaml # Basic cluster settings
+    │   └── node-groups/           # Base node group configs
+    │       ├── kustomization.yaml
+    │       └── node-group.yaml
+    └── overlays/                  # Environment-specific overlays
+        ├── staging/               # Staging environment overlay
+        │   ├── kustomization.yaml # Staging customizations
+        │   ├── cluster-patch.yaml # Staging cluster patches
+        │   └── node-group-patch.yaml # Staging node configs
+        └── production/            # Production environment overlay
+            ├── kustomization.yaml # Production customizations
+            ├── cluster-patch.yaml # Production cluster patches
+            └── node-group-patch.yaml # Production node configs
 ```
 
 ## Step 1: EKS Cluster Creation (2 hours)
@@ -33,8 +51,9 @@ eks-infrastructure/
 - Configure cluster networking and security settings
 
 ### Key Components to Implement
-- **Staging Cluster**: EKS cluster with development-appropriate sizing
-- **Production Cluster**: EKS cluster with production-grade configuration
+- **EKS Terraform Module**: Infrastructure as code for cluster deployment
+- **Kustomize Base Configs**: Base Kubernetes configurations for reusability
+- **Environment Overlays**: Staging and production-specific customizations
 - **Network Integration**: VPC and subnet integration from Task 1.2
 
 ### Technical Requirements
@@ -55,12 +74,14 @@ eks-infrastructure/
 - Configure node group security and networking
 
 ### Key Components to Implement
-- **Node Group Types**: General-purpose nodes for mixed workloads
-- **Instance Selection**: Appropriate instance types for workload requirements
-- **Scaling Configuration**: Min/max nodes and scaling policies
+- **Kustomize Base Manifests**: Base node group configurations
+- **Environment Overlays**: Staging vs production node sizing and scaling
+- **Instance Selection**: Appropriate instance types via Kustomize patches
+- **Scaling Configuration**: Min/max nodes and autoscaling policies
 
 ### Integration Strategy
-- Node groups spanning multiple availability zones
+- Kustomize base configurations with environment-specific patches
+- Node groups configured for single-AZ MVP deployment
 - Integration with cluster autoscaler for demand-based scaling
 - Security group integration for node communication
 
@@ -123,9 +144,10 @@ eks-infrastructure/
 
 ## Key Implementation Notes
 
-1. **Version Management**: Use latest stable Kubernetes version for security and feature updates
-2. **Security**: Configure private endpoint access with limited public access for administration
-3. **Scaling**: Set appropriate min/max node counts to balance cost and availability
+1. **Kustomize Structure**: Use base configurations with environment overlays for maintainability
+2. **Version Management**: Use latest stable Kubernetes version for security and feature updates
+3. **Security**: Configure private endpoint access with limited public access for administration
+4. **Configuration Management**: All Kubernetes resources managed via Kustomize for GitOps compatibility
 4. **Monitoring**: Enable comprehensive logging for troubleshooting and security auditing
 
 ---

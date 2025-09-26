@@ -16,13 +16,40 @@ Deploy monitoring and observability stack with Prometheus metrics collection, Gr
 ## Directory Structure Requirements
 
 ```
-monitoring-infrastructure/
-├── prometheus/                    # Prometheus configuration and rules
-├── grafana/                       # Grafana dashboards and config
-├── cloudwatch/                    # CloudWatch integration setup
-├── alerting/                      # Alert rules and notification config
-├── dashboards/                    # Platform health dashboards
-└── README.md
+solidity-security-aws-infrastructure/
+└── k8s/
+    ├── base/                      # Kustomize base configurations
+    │   ├── prometheus/
+    │   │   ├── kustomization.yaml # Prometheus base config
+    │   │   ├── deployment.yaml    # Prometheus deployment
+    │   │   ├── configmap.yaml     # Prometheus configuration
+    │   │   ├── service.yaml       # Prometheus service
+    │   │   └── rbac.yaml          # Prometheus RBAC
+    │   ├── grafana/
+    │   │   ├── kustomization.yaml # Grafana base config
+    │   │   ├── deployment.yaml    # Grafana deployment
+    │   │   ├── configmap.yaml     # Grafana configuration
+    │   │   ├── dashboards/        # Dashboard ConfigMaps
+    │   │   └── secret.yaml        # Grafana admin credentials
+    │   ├── node-exporter/
+    │   │   ├── kustomization.yaml # Node Exporter base config
+    │   │   ├── daemonset.yaml     # Node Exporter DaemonSet
+    │   │   └── service.yaml       # Node Exporter service
+    │   └── cloudwatch-exporter/
+    │       ├── kustomization.yaml # CloudWatch Exporter base config
+    │       ├── deployment.yaml    # CloudWatch Exporter deployment
+    │       └── configmap.yaml     # CloudWatch metrics config
+    └── overlays/                  # Environment-specific overlays
+        ├── staging/               # Staging monitoring overlay
+        │   ├── kustomization.yaml # Staging customizations
+        │   ├── prometheus-patch.yaml # Staging Prometheus config
+        │   ├── grafana-patch.yaml # Staging Grafana config
+        │   └── retention-patch.yaml # Staging retention policies
+        └── production/            # Production monitoring overlay
+            ├── kustomization.yaml # Production customizations
+            ├── prometheus-patch.yaml # Production Prometheus config
+            ├── grafana-patch.yaml # Production Grafana config
+            └── retention-patch.yaml # Production retention policies
 ```
 
 ## Step 1: Prometheus Deployment and Configuration (1.5 hours)
@@ -33,9 +60,10 @@ monitoring-infrastructure/
 - Set up metrics collection from cluster components and applications
 
 ### Key Components to Implement
-- **Prometheus Server**: Core metrics collection and storage
+- **Kustomize Base Manifests**: Base Prometheus configuration with RBAC
+- **Environment Overlays**: Staging vs production retention and resource limits
 - **Service Discovery**: Automatic discovery of Kubernetes services and pods
-- **Metrics Collection**: Cluster, node, and application metrics
+- **Metrics Collection**: Cluster, node, and application metrics via Kustomize
 
 ### Technical Requirements
 - Prometheus deployment with persistent storage
@@ -55,13 +83,15 @@ monitoring-infrastructure/
 - Create initial platform health dashboards
 
 ### Key Components to Implement
-- **Grafana Deployment**: Grafana server with persistent configuration storage
-- **AWS Integration**: Secrets Manager for credential management
-- **Data Sources**: Prometheus and CloudWatch data source configuration
+- **Kustomize Base Manifests**: Base Grafana deployment with ConfigMaps
+- **Environment Overlays**: Environment-specific dashboard and data source configurations
+- **AWS Integration**: Secrets Manager integration via External Secrets Operator
+- **Data Sources**: Prometheus and CloudWatch data source configuration via Kustomize
 
 ### Integration Strategy
+- Kustomize-based deployment with environment-specific configurations
 - External Secrets Operator integration for Grafana credentials
-- Multi-environment dashboard organization
+- Multi-environment dashboard organization via Kustomize overlays
 - Role-based access control for team members
 
 ## Step 3: CloudWatch Integration and Alerting (30 minutes)

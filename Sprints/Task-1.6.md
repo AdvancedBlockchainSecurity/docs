@@ -16,13 +16,38 @@ Install and configure critical Kubernetes infrastructure components to enable se
 ## Directory Structure Requirements
 
 ```
-kubernetes-infrastructure/
-├── aws-load-balancer-controller/  # ALB controller configuration
-├── cert-manager/                  # Certificate management setup
-├── external-secrets/              # External Secrets Operator config
-├── csi-secrets-driver/            # CSI driver for secret mounting
-├── monitoring/                    # Component monitoring setup
-└── README.md
+solidity-security-aws-infrastructure/
+└── k8s/
+    ├── base/                      # Kustomize base configurations
+    │   ├── aws-load-balancer-controller/
+    │   │   ├── kustomization.yaml # ALB controller base config
+    │   │   ├── deployment.yaml    # Controller deployment
+    │   │   ├── rbac.yaml          # RBAC configurations
+    │   │   └── service-account.yaml # ServiceAccount with IRSA
+    │   ├── cert-manager/
+    │   │   ├── kustomization.yaml # cert-manager base config
+    │   │   ├── deployment.yaml    # cert-manager deployment
+    │   │   ├── cluster-issuer.yaml # Let's Encrypt ClusterIssuer
+    │   │   └── cloudflare-secret.yaml # Cloudflare API secret template
+    │   ├── external-secrets/
+    │   │   ├── kustomization.yaml # External Secrets base config
+    │   │   ├── operator.yaml      # External Secrets Operator
+    │   │   ├── cluster-secret-store.yaml # AWS Secrets Manager store
+    │   │   └── rbac.yaml          # RBAC for External Secrets
+    │   └── monitoring/
+    │       ├── kustomization.yaml # Monitoring base config
+    │       └── service-monitors.yaml # Service monitoring configs
+    └── overlays/                  # Environment-specific overlays
+        ├── staging/               # Staging environment overlay
+        │   ├── kustomization.yaml # Staging customizations
+        │   ├── alb-controller-patch.yaml # Staging ALB config
+        │   ├── cert-manager-patch.yaml # Staging cert config
+        │   └── external-secrets-patch.yaml # Staging secrets config
+        └── production/            # Production environment overlay
+            ├── kustomization.yaml # Production customizations
+            ├── alb-controller-patch.yaml # Production ALB config
+            ├── cert-manager-patch.yaml # Production cert config
+            └── external-secrets-patch.yaml # Production secrets config
 ```
 
 ## Step 1: AWS Load Balancer Controller Installation (1.5 hours)
@@ -33,9 +58,10 @@ kubernetes-infrastructure/
 - Validate ALB provisioning and integration capabilities
 
 ### Key Components to Implement
-- **Controller Installation**: Helm chart deployment with appropriate configuration
-- **IAM Integration**: Service account with IRSA for AWS API access
-- **ALB Configuration**: Default configuration for application load balancers
+- **Kustomize Base Manifests**: Base AWS Load Balancer Controller configuration
+- **IRSA Configuration**: ServiceAccount with IAM Role for Service Accounts (IRSA)
+- **Environment Overlays**: Staging and production-specific controller settings
+- **ALB Configuration**: Default IngressClass and load balancer settings
 
 ### Technical Requirements
 - IRSA (IAM Roles for Service Accounts) configuration
@@ -51,11 +77,13 @@ kubernetes-infrastructure/
 - Set up Cloudflare DNS integration for certificate validation
 
 ### Key Components to Implement
-- **cert-manager Installation**: Core cert-manager components
-- **ClusterIssuers**: Let's Encrypt staging and production issuers
+- **Kustomize Base Manifests**: Base cert-manager configuration
+- **ClusterIssuers**: Let's Encrypt staging and production issuers via Kustomize
 - **DNS01 Challenge**: Cloudflare DNS validation configuration
+- **Environment Overlays**: Staging vs production certificate configurations
 
 ### Integration Strategy
+- Kustomize-based deployment with environment-specific certificate configurations
 - DNS validation using Cloudflare API for domain ownership proof
 - Automatic certificate renewal and management
 - Integration with ingress controllers for SSL termination
@@ -68,60 +96,63 @@ kubernetes-infrastructure/
 - Set up IRSA for secure AWS Secrets Manager access
 
 ### Core Dependencies
+- **Kustomize Base Manifests**: Base External Secrets Operator configuration
 - **External Secrets Operator**: Kubernetes-native secret synchronization
-- **CSI Secrets Driver**: Direct secret mounting capabilities
-- **IAM Integration**: Secure AWS API access without credentials
+- **CSI Secrets Driver**: Direct secret mounting capabilities via Kustomize
+- **Environment Overlays**: Staging vs production secrets configurations
 
 ### Integration Requirements
+- Kustomize-based deployment with environment-specific configurations
 - Integration with AWS Secrets Manager from Task 1.4
-- Service account configuration for each service namespace
+- Service account configuration for each service namespace via overlays
 - Secret synchronization and automatic rotation support
 
 ## Success Criteria & Validation
 
 ### Load Balancer Requirements
-- [ ] AWS Load Balancer Controller operational in staging cluster
-- [ ] AWS Load Balancer Controller operational in production cluster
+- [ ] Kustomize base manifests created for AWS Load Balancer Controller
+- [ ] Environment overlays configured for staging and production
+- [ ] AWS Load Balancer Controller operational in both clusters
 - [ ] IRSA configured for ALB management permissions
-- [ ] Test ALB creation and deletion functionality
 - [ ] ALB integration with VPC subnets validated
 
 ### Certificate Management Requirements
-- [ ] cert-manager installed and operational in both clusters
-- [ ] Let's Encrypt ClusterIssuers configured for staging and production
-- [ ] Cloudflare DNS validation configured and functional
+- [ ] Kustomize base manifests created for cert-manager
+- [ ] Environment overlays configured with Let's Encrypt ClusterIssuers
+- [ ] cert-manager deployed and operational in both clusters
+- [ ] Cloudflare DNS validation configured via Kustomize
 - [ ] Test certificate issuance for domain validation
-- [ ] Automatic certificate renewal configured
 
 ### Secrets Management Requirements
-- [ ] External Secrets Operator installed and configured
-- [ ] AWS Secrets Store CSI Driver operational
+- [ ] Kustomize base manifests created for External Secrets Operator
+- [ ] Environment overlays configured for AWS Secrets Manager integration
+- [ ] External Secrets Operator deployed and operational
 - [ ] IRSA configured for AWS Secrets Manager access
-- [ ] Test secret synchronization from AWS Secrets Manager
-- [ ] Secret mounting capabilities validated
+- [ ] Test secret synchronization from AWS Secrets Manager via Kustomize
 
 ## Implementation Priority
 
 ### Phase 1: Load Balancer Controller (1.5 hours)
-1. Install AWS Load Balancer Controller via Helm in both clusters
-2. Configure IRSA and IAM policies for ALB management
-3. Validate ALB creation and VPC integration
+1. Create Kustomize base manifests for AWS Load Balancer Controller
+2. Configure environment overlays for staging and production clusters
+3. Deploy via kubectl apply -k and validate ALB creation
 
 ### Phase 2: Certificate Management (1.5 hours)
-1. Install cert-manager with CRDs and webhook components
-2. Configure Let's Encrypt ClusterIssuers with DNS01 challenges
-3. Set up Cloudflare DNS integration and test certificate issuance
+1. Create Kustomize base manifests for cert-manager components
+2. Configure environment overlays with Let's Encrypt ClusterIssuers
+3. Deploy via Kustomize and test certificate issuance with Cloudflare DNS
 
 ### Phase 3: Secrets Integration (1 hour)
-1. Install External Secrets Operator and configure AWS integration
-2. Install and configure AWS Secrets Store CSI Driver
-3. Test secret synchronization and mounting capabilities
+1. Create Kustomize base manifests for External Secrets Operator
+2. Configure environment overlays for AWS Secrets Manager integration
+3. Deploy via Kustomize and test secret synchronization capabilities
 
 ## Key Implementation Notes
 
-1. **IRSA Configuration**: Ensure proper IAM roles are created and associated with service accounts
-2. **DNS Integration**: Cloudflare API credentials must be securely stored and accessible
-3. **Namespace Strategy**: Install components in dedicated system namespaces for organization
+1. **Kustomize Structure**: Use base configurations with environment overlays for maintainability
+2. **IRSA Configuration**: Ensure proper IAM roles are created and associated with service accounts
+3. **DNS Integration**: Cloudflare API credentials must be securely stored and accessible
+4. **GitOps Ready**: All manifests structured for ArgoCD deployment in future tasks
 4. **Monitoring**: Enable monitoring for all infrastructure components to track health and performance
 
 ---
