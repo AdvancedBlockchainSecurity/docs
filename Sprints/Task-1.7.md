@@ -108,7 +108,7 @@ solidity-security-monitoring/
 
 ### Integration Requirements
 - Prometheus metrics from EKS, pods, and infrastructure services
-- Log aggregation from application and infrastructure components via Prometheus
+- Log aggregation from application and infrastructure components via a dedicated log aggregation tool (e.g., Fluentd, Fluent Bit, or Loki)
 - Alert routing and notification configuration
 
 ## Success Criteria & Validation
