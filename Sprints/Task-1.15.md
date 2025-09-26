@@ -1,5 +1,9 @@
 # Task 1.15: Documentation and Team Onboarding - Objectives & Implementation Details
 
+## Repository: `solidity-security-docs`
+
+Documentation and knowledge base repository containing technical documentation, API docs, user guides, architecture documentation, team training materials, and onboarding procedures for the entire Solidity Security Platform.
+
 **✅ ALIGNMENT CHECK**: This implementation creates comprehensive documentation and training materials for AWS infrastructure, GitOps workflows, and team onboarding as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
@@ -16,12 +20,32 @@ Create comprehensive documentation and training materials to enable team product
 ## Directory Structure Requirements
 
 ```
-documentation/
-├── aws-infrastructure/           # AWS setup and management guides
+solidity-security-docs/
 ├── architecture/                 # System design and service interactions
+│   ├── overview.md              # Platform architecture overview
+│   ├── service-diagrams/        # Service interaction diagrams
+│   ├── data-flow/               # Data flow documentation
+│   └── security-model/          # Security architecture
+├── aws-infrastructure/           # AWS setup and management guides
+│   ├── setup/                   # Infrastructure setup guides
+│   ├── eks-management/          # EKS cluster management
+│   ├── secrets-manager/         # Secrets management procedures
+│   ├── monitoring/              # Monitoring and alerting
+│   └── troubleshooting/         # AWS-specific troubleshooting
+├── services/                     # Service-specific documentation
+│   ├── backend/                 # Backend service docs
+│   ├── frontend/                # Frontend service docs
+│   └── shared/                  # Shared library docs
 ├── operational-procedures/       # Deployment and troubleshooting
+│   ├── deployment/              # Deployment procedures
+│   ├── gitops/                  # ArgoCD and GitOps workflows
+│   ├── monitoring/              # Operational monitoring
+│   └── incident-response/       # Incident response procedures
 ├── team-training/               # Onboarding and training materials
-├── troubleshooting/             # Common issues and solutions
+│   ├── onboarding/              # New team member onboarding
+│   ├── aws-training/            # AWS competency training
+│   ├── development/             # Development workflows
+│   └── troubleshooting/         # Troubleshooting training
 └── README.md
 ```
 

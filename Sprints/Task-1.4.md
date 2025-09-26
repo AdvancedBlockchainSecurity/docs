@@ -1,5 +1,9 @@
 # Task 1.4: AWS Secrets Manager Setup - Objectives & Implementation Details
 
+## Repository: `solidity-security-aws-infrastructure`
+
+AWS Infrastructure as Code repository containing all cloud infrastructure configurations. This task focuses on the security module providing AWS Secrets Manager infrastructure with IAM policies and rotation capabilities for secure credential management.
+
 **✅ ALIGNMENT CHECK**: This implementation establishes secure credential management for all platform services using AWS Secrets Manager with External Secrets Operator integration as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
@@ -16,12 +20,24 @@ Deploy and configure AWS Secrets Manager for secure credential storage with auto
 ## Directory Structure Requirements
 
 ```
-aws-secrets-infrastructure/
-├── secrets-manager-configs/       # Secrets Manager configuration
-├── iam-policies/                  # IAM roles and policies
-├── rotation-configs/              # Automatic rotation setup
-├── external-secrets/              # External Secrets Operator configs
-├── secret-templates/              # Secret organization templates
+solidity-security-aws-infrastructure/
+├── terraform/
+│   ├── modules/
+│   │   ├── security/              # Security and secrets management
+│   │   │   ├── secrets_manager.tf # Secrets Manager configuration
+│   │   │   ├── iam_roles.tf       # IAM roles and policies
+│   │   │   ├── rotation_policies.tf # Automatic rotation
+│   │   │   ├── kms_keys.tf        # KMS encryption keys
+│   │   │   ├── variables.tf       # Module variables
+│   │   │   └── outputs.tf         # Module outputs
+│   │   └── monitoring/
+│   │       └── secrets_monitoring.tf # Secrets access monitoring
+│   ├── environments/
+│   │   ├── staging/               # Staging secrets config
+│   │   └── production/            # Production secrets config
+│   └── shared/                    # Shared security components
+├── k8s/
+│   └── external-secrets/          # External Secrets Operator configs
 └── README.md
 ```
 

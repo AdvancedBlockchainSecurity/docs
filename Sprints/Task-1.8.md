@@ -9,7 +9,7 @@ Deploy and configure ArgoCD for GitOps workflow management with GitHub integrati
 
 ### Key Requirements (from docs)
 - **ArgoCD Deployment**: ArgoCD in staging and production with AWS Secrets Manager integration
-- **GitHub Integration**: Connection to all 18 repositories for deployment management
+- **GitHub Integration**: Connection to all 17 repositories for deployment management
 - **Access Control**: RBAC policies for team access and security
 - **SSL Configuration**: SSL termination and domain access
 
@@ -46,7 +46,7 @@ argocd-infrastructure/
 ## Step 2: GitHub Integration and Repository Access (1.5 hours)
 
 ### Objectives
-- Configure GitHub integration for all 18 repositories
+- Configure GitHub integration for all 17 repositories
 - Set up SSH key or token-based authentication
 - Configure repository access and sync policies
 
@@ -87,7 +87,7 @@ argocd-infrastructure/
 - [ ] Resource limits configured appropriate for environment load
 
 ### GitHub Integration Requirements
-- [ ] All 18 repositories connected and accessible in ArgoCD
+- [ ] All 17 repositories connected and accessible in ArgoCD
 - [ ] GitHub authentication configured via External Secrets Operator
 - [ ] Repository synchronization functional with appropriate policies
 - [ ] Webhook integration configured for automatic sync triggers
@@ -109,7 +109,7 @@ argocd-infrastructure/
 3. Configure persistent storage and External Secrets Operator integration
 
 ### Phase 2: Repository Integration (1.5 hours)
-1. Configure GitHub repository connections for all 18 services
+1. Configure GitHub repository connections for all 17 services
 2. Set up authentication credentials via External Secrets Operator
 3. Configure repository synchronization policies and webhook integration
 
@@ -137,7 +137,7 @@ argocd-infrastructure/
 - [ ] ArgoCD deployed in production environment with high availability
 - [ ] External Secrets Operator integration configured for credentials
 - [ ] Resource limits and security contexts configured
-- [ ] All 18 GitHub repositories connected to ArgoCD
+- [ ] All 17 GitHub repositories connected to ArgoCD
 - [ ] GitHub authentication configured via External Secrets
 - [ ] Repository synchronization policies configured
 - [ ] Webhook integration set up for automatic sync

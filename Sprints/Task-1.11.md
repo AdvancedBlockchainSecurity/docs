@@ -1,5 +1,13 @@
 # Task 1.11: Frontend Microservice Kubernetes Templates - Objectives & Implementation Details
 
+## Repositories: Frontend Service Repositories
+
+This task creates Kubernetes templates for all frontend service repositories:
+- `solidity-security-ui-core` (Shared UI components and design system, React/TypeScript)
+- `solidity-security-dashboard` (Dashboard and metrics interface, React/TypeScript)
+- `solidity-security-findings` (Finding management and analysis results, React/TypeScript)
+- `solidity-security-analysis` (Contract analysis workflow, React/TypeScript)
+
 **✅ ALIGNMENT CHECK**: This implementation creates production-ready Kubernetes deployment templates for all 4 frontend services with React optimization, environment configuration, and ALB integration as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
@@ -12,6 +20,29 @@ Create comprehensive Kubernetes templates for all frontend microservices with Re
 - **Environment Configuration**: ConfigMaps for environment-specific API endpoints
 - **ALB Integration**: Ingress routing with SSL termination for frontend access
 - **Asset Optimization**: Build-time optimization and static asset caching
+
+## Directory Structure Requirements
+
+### Example: `solidity-security-dashboard`
+```
+solidity-security-dashboard/
+├── k8s/
+│   ├── base/
+│   │   ├── deployment.yaml        # React app deployment with NGINX
+│   │   ├── service.yaml           # Kubernetes service
+│   │   ├── configmap.yaml         # Environment-specific config
+│   │   └── ingress.yaml           # ALB ingress with SSL
+│   └── overlays/
+│       ├── staging/               # Staging-specific configs
+│       └── production/            # Production-specific configs
+├── src/                           # React application source
+├── public/                        # Static assets
+├── package.json                   # Node.js dependencies
+├── vite.config.ts                 # Vite build configuration
+├── Dockerfile                     # Multi-stage build
+├── nginx.conf                     # NGINX configuration
+└── README.md
+```
 
 ## Service Categories & Dependencies
 

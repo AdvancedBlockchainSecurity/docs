@@ -1,6 +1,17 @@
 # Task 1.10: Backend Microservice Kubernetes Templates - Objectives & Implementation Details
 
-**✅ ALIGNMENT CHECK**: This implementation creates production-ready Kubernetes deployment templates for all 7 backend services with External Secrets integration, IRSA configuration, and comprehensive monitoring as specified in Sprint 1 documentation.
+## Repositories: Backend Service Repositories
+
+This task creates Kubernetes templates for all backend service repositories:
+- `solidity-security-api-service` (FastAPI authentication and API gateway)
+- `solidity-security-tool-integration` (Security tool adapters, Hybrid Python/Rust)
+- `solidity-security-intelligence-engine` (~Risk scoring and ML analysis, Hybrid Python/Rust)
+- `solidity-security-orchestration` (Workflow management, Python Celery)
+- `solidity-security-data-service` (Database and caching, Hybrid Python/Rust)
+- `solidity-security-notification` (Real-time notifications, Node.js/TypeScript)
+- `solidity-security-contract-parser` (High-performance parsing, Pure Rust)
+
+**✅ ALIGNMENT CHECK**: This implementation creates production-ready Kubernetes deployment templates for all 6 backend services plus the contract parser service with External Secrets integration, IRSA configuration, and comprehensive monitoring as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
 
@@ -13,21 +24,51 @@ Create comprehensive Kubernetes templates for all backend microservices with sec
 - **IRSA Configuration**: IAM Roles for Service Accounts for AWS access
 - **Monitoring**: Health checks, metrics, and autoscaling configurations
 
+## Directory Structure Requirements
+
+### Example: `solidity-security-api-service`
+```
+solidity-security-api-service/
+├── k8s/
+│   ├── base/
+│   │   ├── deployment.yaml        # Kubernetes deployment
+│   │   ├── service.yaml           # Kubernetes service
+│   │   ├── configmap.yaml         # Configuration
+│   │   ├── external-secret.yaml   # AWS Secrets Manager integration
+│   │   ├── service-account.yaml   # IRSA service account
+│   │   ├── hpa.yaml               # Horizontal Pod Autoscaler
+│   │   └── ingress.yaml           # ALB ingress
+│   └── overlays/
+│       ├── staging/               # Staging-specific configs
+│       │   ├── kustomization.yaml
+│       │   └── patches/
+│       └── production/            # Production-specific configs
+│           ├── kustomization.yaml
+│           └── patches/
+├── src/                           # Application source code
+├── tests/                         # Test files
+├── requirements.txt               # Dependencies
+├── Dockerfile                     # Container build
+└── README.md
+```
+
 ## Service Categories & Dependencies
 
-### Backend Services (7 services)
-- `api-service` (FastAPI application with authentication and JWT handling)
-- `tool-integration` (Multi-container deployment for Python, Rust, and Node.js tools)
-- `intelligence-engine` (Hybrid Python/Rust deployment for ML processing)
-- `orchestration` (Celery worker deployment with auto-scaling)
-- `data-service` (Hybrid Python/Rust deployment for high-performance operations)
-- `notification` (Node.js WebSocket server deployment)
-- `contract-parser` (Pure Rust HTTP API deployment)
+### Backend Services (6 services)
+- `api-service` (FastAPI authentication and API gateway)
+- `tool-integration` (Multi-container deployment for Python, Rust, and Node.js tools, Hybrid Python/Rust)
+- `intelligence-engine` (Hybrid Python/Rust deployment for ML processing and risk scoring)
+- `orchestration` (Celery worker deployment with auto-scaling for workflow management)
+- `data-service` (Hybrid Python/Rust deployment for high-performance database operations)
+- `notification` (Node.js WebSocket server deployment for real-time notifications)
+
+### Contract Parser Service (1 service)
+- `contract-parser` (Pure Rust HTTP API deployment for high-performance Solidity parsing)
 
 ## Step 1: Core Service Templates (4 hours)
 
 ### Objectives
-- Create Kubernetes deployment manifests for all 7 backend services
+- Create Kubernetes deployment manifests for all 6 backend services plus contract parser
 - Configure service definitions for internal communication
 - Set up ConfigMaps for non-sensitive configuration
 
@@ -83,7 +124,7 @@ Create comprehensive Kubernetes templates for all backend microservices with sec
 ## Success Criteria & Validation
 
 ### Template Infrastructure Requirements
-- [ ] Kubernetes deployment templates created for all 7 backend services
+- [ ] Kubernetes deployment templates created for all 6 backend services plus contract parser
 - [ ] Service definitions configured for internal service communication
 - [ ] ConfigMaps implemented for environment-specific configuration
 - [ ] Security contexts configured for container security hardening
