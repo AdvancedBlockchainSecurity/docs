@@ -60,24 +60,24 @@ solidity-security-shared/
 ## Service Categories & Dependencies
 
 ### Backend Services (6 repositories)
-- `solidity-security-api-service` (~10K LOC, FastAPI authentication and API gateway)
-- `solidity-security-tool-integration` (~12K LOC, Security tool adapters, Hybrid Python/Rust)
-- `solidity-security-intelligence-engine` (~8K LOC, Risk scoring and vulnerability correlation, Hybrid Python/Rust)
-- `solidity-security-orchestration` (~6K LOC, Analysis workflow and job management, Python Celery)
-- `solidity-security-data-service` (~7K LOC, Database access and caching layer, Hybrid Python/Rust)
-- `solidity-security-notification` (~5K LOC, Real-time notifications and integrations, Node.js/TypeScript)
+- `solidity-security-api-service` (FastAPI authentication and API gateway)
+- `solidity-security-tool-integration` (Security tool adapters, Hybrid Python/Rust)
+- `solidity-security-intelligence-engine` (Risk scoring and vulnerability correlation, Hybrid Python/Rust)
+- `solidity-security-orchestration` (Analysis workflow and job management, Python Celery)
+- `solidity-security-data-service` (Database access and caching layer, Hybrid Python/Rust)
+- `solidity-security-notification` (Real-time notifications and integrations, Node.js/TypeScript)
 
 ### Contract Parser Service (1 repository)
-- `solidity-security-contract-parser` (~8K LOC, High-performance Solidity parsing and AST generation, Pure Rust)
+- `solidity-security-contract-parser` (High-performance Solidity parsing and AST generation, Pure Rust)
 
 ### Frontend Applications (4 repositories)
-- `solidity-security-ui-core` (~8K LOC, Shared UI components and design system, React/TypeScript)
-- `solidity-security-dashboard` (~8K LOC, Dashboard and metrics interface, React/TypeScript)
-- `solidity-security-findings` (~8K LOC, Finding management and analysis results, React/TypeScript)
-- `solidity-security-analysis` (~6K LOC, Contract analysis workflow, React/TypeScript)
+- `solidity-security-ui-core` (Shared UI components and design system, React/TypeScript)
+- `solidity-security-dashboard` (Dashboard and metrics interface, React/TypeScript)
+- `solidity-security-findings` (Finding management and analysis results, React/TypeScript)
+- `solidity-security-analysis` (Contract analysis workflow, React/TypeScript)
 
 ### Shared Libraries (1 repository)
-- `solidity-security-shared` (~7K LOC, Common utilities and schemas, Multi-language Rust/Python/TypeScript)
+- `solidity-security-shared` (Common utilities and schemas, Multi-language Rust/Python/TypeScript)
 
 ### Infrastructure & Support (5 repositories)
 - `solidity-security-aws-infrastructure` (AWS Infrastructure as Code, Terraform)

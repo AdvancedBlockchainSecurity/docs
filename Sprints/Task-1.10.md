@@ -3,13 +3,13 @@
 ## Repositories: Backend Service Repositories
 
 This task creates Kubernetes templates for all backend service repositories:
-- `solidity-security-api-service` (~10K LOC, FastAPI authentication and API gateway)
-- `solidity-security-tool-integration` (~12K LOC, Security tool adapters, Hybrid Python/Rust)
-- `solidity-security-intelligence-engine` (~8K LOC, Risk scoring and ML analysis, Hybrid Python/Rust)
-- `solidity-security-orchestration` (~6K LOC, Workflow management, Python Celery)
-- `solidity-security-data-service` (~7K LOC, Database and caching, Hybrid Python/Rust)
-- `solidity-security-notification` (~5K LOC, Real-time notifications, Node.js/TypeScript)
-- `solidity-security-contract-parser` (~8K LOC, High-performance parsing, Pure Rust)
+- `solidity-security-api-service` (FastAPI authentication and API gateway)
+- `solidity-security-tool-integration` (Security tool adapters, Hybrid Python/Rust)
+- `solidity-security-intelligence-engine` (~Risk scoring and ML analysis, Hybrid Python/Rust)
+- `solidity-security-orchestration` (Workflow management, Python Celery)
+- `solidity-security-data-service` (Database and caching, Hybrid Python/Rust)
+- `solidity-security-notification` (Real-time notifications, Node.js/TypeScript)
+- `solidity-security-contract-parser` (High-performance parsing, Pure Rust)
 
 **✅ ALIGNMENT CHECK**: This implementation creates production-ready Kubernetes deployment templates for all 6 backend services plus the contract parser service with External Secrets integration, IRSA configuration, and comprehensive monitoring as specified in Sprint 1 documentation.
 
@@ -55,15 +55,15 @@ solidity-security-api-service/
 ## Service Categories & Dependencies
 
 ### Backend Services (6 services)
-- `api-service` (~10K LOC, FastAPI authentication and API gateway)
-- `tool-integration` (~12K LOC, Multi-container deployment for Python, Rust, and Node.js tools, Hybrid Python/Rust)
-- `intelligence-engine` (~8K LOC, Hybrid Python/Rust deployment for ML processing and risk scoring)
-- `orchestration` (~6K LOC, Celery worker deployment with auto-scaling for workflow management)
-- `data-service` (~7K LOC, Hybrid Python/Rust deployment for high-performance database operations)
-- `notification` (~5K LOC, Node.js WebSocket server deployment for real-time notifications)
+- `api-service` (FastAPI authentication and API gateway)
+- `tool-integration` (Multi-container deployment for Python, Rust, and Node.js tools, Hybrid Python/Rust)
+- `intelligence-engine` (Hybrid Python/Rust deployment for ML processing and risk scoring)
+- `orchestration` (Celery worker deployment with auto-scaling for workflow management)
+- `data-service` (Hybrid Python/Rust deployment for high-performance database operations)
+- `notification` (Node.js WebSocket server deployment for real-time notifications)
 
 ### Contract Parser Service (1 service)
-- `contract-parser` (~8K LOC, Pure Rust HTTP API deployment for high-performance Solidity parsing)
+- `contract-parser` (Pure Rust HTTP API deployment for high-performance Solidity parsing)
 
 ## Step 1: Core Service Templates (4 hours)
 
