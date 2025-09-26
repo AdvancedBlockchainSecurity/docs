@@ -86,15 +86,17 @@ solidity-security-shared/
 - `solidity-security-tools` (Security tool configurations and utilities)
 - `solidity-security-vulnerabilities` (Vulnerability database and intelligence)
 
-## Step 1: Repository Structure Initialization (3 hours)
+## Step 1: Repository Structure Initialization and Tool Migration (3.5 hours)
 
 ### Objectives
 - Initialize all 17 repositories with language-specific directory structures
+- Migrate existing security tool interface from `solidity-security-infrastructure`
 - Configure repository settings and branch protection
 - Set up repository-specific documentation templates
 
 ### Key Components to Implement
 - **Repository Creation**: GitHub repository creation with appropriate templates
+- **Tool Migration**: Migrate unified security tool interface to proper repositories
 - **Directory Structure**: Language-specific project organization
 - **Branch Protection**: Main branch protection and review requirements
 
@@ -103,6 +105,29 @@ solidity-security-shared/
 - Language-specific build files and dependency management
 - README templates with service-specific documentation
 - .gitignore files appropriate for each technology stack
+
+### Tool Migration Strategy
+**From `solidity-security-infrastructure` to proper locations:**
+
+1. **Unified Tool Interface** → `solidity-security-tool-integration`
+   - Move tool adapters and execution logic
+   - Implement hybrid Python/Rust architecture
+   - Add FastAPI service layer
+
+2. **Tool Installation Scripts** → `solidity-security-tools`
+   - Move installation and configuration scripts
+   - Add tool version management
+   - Create test contract fixtures
+
+3. **Vulnerability Definitions** → `solidity-security-vulnerabilities`
+   - Move vulnerability patterns and mappings
+   - Add SWC definitions and severity data
+   - Create threat intelligence database
+
+4. **Infrastructure Rename** → `solidity-security-aws-infrastructure`
+   - Rename repository for AWS focus
+   - Add Terraform modules and configurations
+   - Remove old tool interface code
 
 ## Step 2: Multi-Language Shared Library Development (2.5 hours)
 
@@ -163,10 +188,12 @@ solidity-security-shared/
 
 ## Implementation Priority
 
-### Phase 1: Repository Structure (3 hours)
+### Phase 1: Repository Structure and Tool Migration (3.5 hours)
 1. Create all 17 repositories with technology-specific directory structures
-2. Configure repository settings, branch protection, and team access
-3. Implement README templates and basic documentation structure
+2. Migrate security tool interface from `solidity-security-infrastructure` to appropriate repositories
+3. Set up `solidity-security-aws-infrastructure` repository structure
+4. Configure repository settings, branch protection, and team access
+5. Implement README templates and basic documentation structure
 
 ### Phase 2: Shared Library Development (2.5 hours)
 1. Build Rust core library with essential types and utilities
@@ -194,6 +221,10 @@ solidity-security-shared/
 ## Task Checklist
 - [ ] Task 1.9 started
 - [ ] All 17 repositories created with proper directory structures
+- [ ] Security tool interface migrated from `solidity-security-infrastructure` to `solidity-security-tool-integration`
+- [ ] Tool installation scripts migrated to `solidity-security-tools`
+- [ ] Vulnerability definitions migrated to `solidity-security-vulnerabilities`
+- [ ] `solidity-security-aws-infrastructure` repository properly structured for Terraform modules
 - [ ] Repository settings and branch protection configured
 - [ ] Team access and permissions configured
 - [ ] README templates and documentation implemented
