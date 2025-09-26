@@ -1,5 +1,9 @@
 # Task 1.3: AWS Database and Cache Infrastructure - Objectives & Implementation Details
 
+## Repository: `solidity-security-aws-infrastructure`
+
+AWS Infrastructure as Code repository containing all cloud infrastructure configurations. This task focuses on the storage module providing RDS PostgreSQL and ElastiCache Redis infrastructure for data persistence and caching.
+
 **✅ ALIGNMENT CHECK**: This implementation establishes the data persistence and caching infrastructure required for the Solidity Security Platform's backend services as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
@@ -16,12 +20,24 @@ Deploy production-ready RDS PostgreSQL and ElastiCache Redis infrastructure with
 ## Directory Structure Requirements
 
 ```
-aws-database-infrastructure/
-├── rds-configs/                   # RDS configuration files
-├── elasticache-configs/           # ElastiCache configuration files
-├── security-groups/               # Database-specific security groups
-├── backup-policies/               # Backup and maintenance configurations
-├── monitoring/                    # Database monitoring setup
+solidity-security-aws-infrastructure/
+├── terraform/
+│   ├── modules/
+│   │   ├── storage/               # RDS and ElastiCache modules
+│   │   │   ├── rds.tf            # RDS PostgreSQL configuration
+│   │   │   ├── elasticache.tf    # ElastiCache Redis configuration
+│   │   │   ├── security_groups.tf # Database security groups
+│   │   │   ├── parameter_groups.tf # Database parameter groups
+│   │   │   ├── backup_policies.tf # Backup and maintenance
+│   │   │   ├── variables.tf      # Module variables
+│   │   │   └── outputs.tf        # Module outputs
+│   │   └── monitoring/
+│   │       ├── rds_monitoring.tf # RDS CloudWatch monitoring
+│   │       └── cache_monitoring.tf # ElastiCache monitoring
+│   ├── environments/
+│   │   ├── staging/               # Staging database config
+│   │   └── production/            # Production database config
+│   └── shared/                    # Shared storage components
 └── README.md
 ```
 

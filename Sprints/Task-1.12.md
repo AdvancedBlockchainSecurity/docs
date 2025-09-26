@@ -1,6 +1,10 @@
 # Task 1.12: ArgoCD Application Definitions - Objectives & Implementation Details
 
-**✅ ALIGNMENT CHECK**: This implementation creates ArgoCD Application manifests for all 11 services with AppProjects, RBAC policies, and automated GitOps workflows as specified in Sprint 1 documentation.
+## Repository: `solidity-security-aws-infrastructure`
+
+AWS Infrastructure as Code repository containing ArgoCD Application definitions, AppProjects, and GitOps workflow configurations for managing all platform services across staging and production environments.
+
+**✅ ALIGNMENT CHECK**: This implementation creates ArgoCD Application manifests for all platform services (7 backend + 4 frontend) with AppProjects, RBAC policies, and automated GitOps workflows as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
 
@@ -8,19 +12,49 @@
 Create comprehensive ArgoCD Application manifests with Application of Apps pattern, automated sync policies, and team access control for all platform services.
 
 ### Key Requirements (from docs)
-- **Application Manifests**: ArgoCD Applications for all 11 services
+- **Application Manifests**: ArgoCD Applications for all platform services
 - **AppProjects**: RBAC policies and project organization
 - **Application of Apps**: Pattern for service management at scale
 - **GitOps Workflow**: Automated deployment with Git webhook integration
 
+## Directory Structure Requirements
+
+```
+solidity-security-aws-infrastructure/
+├── argocd/
+│   ├── applications/              # ArgoCD Application manifests
+│   │   ├── backend-services/      # Backend service applications
+│   │   ├── frontend-services/     # Frontend service applications
+│   │   ├── infrastructure/        # Infrastructure applications
+│   │   └── app-of-apps.yaml       # Application of Apps pattern
+│   ├── projects/                  # ArgoCD AppProject definitions
+│   │   ├── staging-project.yaml   # Staging environment project
+│   │   └── production-project.yaml # Production environment project
+│   ├── rbac/                      # RBAC policies and configurations
+│   └── webhooks/                  # GitHub webhook configurations
+├── k8s/
+│   └── argocd/                    # ArgoCD server deployment
+└── README.md
+```
+
 ## Service Categories & Dependencies
 
-### Backend Services (7 applications)
-- API Service, Tool Integration, Intelligence Engine, Orchestration
-- Data Service, Notification, Contract Parser
+### Backend Services (6 applications)
+- `solidity-security-api-service` (~10K LOC, FastAPI authentication and API gateway)
+- `solidity-security-tool-integration` (~12K LOC, Security tool adapters, Hybrid Python/Rust)
+- `solidity-security-intelligence-engine` (~8K LOC, Risk scoring and ML analysis, Hybrid Python/Rust)
+- `solidity-security-orchestration` (~6K LOC, Workflow management, Python Celery)
+- `solidity-security-data-service` (~7K LOC, Database and caching, Hybrid Python/Rust)
+- `solidity-security-notification` (~5K LOC, Real-time notifications, Node.js/TypeScript)
+
+### Contract Parser Service (1 application)
+- `solidity-security-contract-parser` (~8K LOC, High-performance parsing, Pure Rust)
 
 ### Frontend Services (4 applications)
-- UI Core, Dashboard, Findings, Analysis
+- `solidity-security-ui-core` (~8K LOC, Shared components, React/TypeScript)
+- `solidity-security-dashboard` (~8K LOC, Main dashboard, React/TypeScript)
+- `solidity-security-findings` (~8K LOC, Finding management, React/TypeScript)
+- `solidity-security-analysis` (~6K LOC, Analysis workflow, React/TypeScript)
 
 ### Infrastructure (Additional applications)
 - Monitoring stack, secrets management
@@ -28,7 +62,7 @@ Create comprehensive ArgoCD Application manifests with Application of Apps patte
 ## Step 1: ArgoCD Application Manifests (3 hours)
 
 ### Objectives
-- Create ArgoCD Application manifests for all 11 services
+- Create ArgoCD Application manifests for all platform services
 - Configure repository connections and sync policies
 - Set up environment-specific application configurations
 
@@ -80,7 +114,7 @@ Create comprehensive ArgoCD Application manifests with Application of Apps patte
 ## Success Criteria & Validation
 
 ### Application Configuration Requirements
-- [ ] ArgoCD Application manifests created for all 7 backend services
+- [ ] ArgoCD Application manifests created for all 6 backend services plus contract parser
 - [ ] ArgoCD Application manifests created for all 4 frontend services
 - [ ] Infrastructure applications configured for monitoring and secrets
 - [ ] Environment-specific configurations separated (staging/production)
@@ -103,7 +137,7 @@ Create comprehensive ArgoCD Application manifests with Application of Apps patte
 ## Implementation Priority
 
 ### Phase 1: Application Manifests (3 hours)
-1. Create ArgoCD Applications for all backend services with appropriate configurations
+1. Create ArgoCD Applications for all 6 backend services plus contract parser with appropriate configurations
 2. Build frontend service Applications with React-specific deployment settings
 3. Configure infrastructure Applications for monitoring and secret management
 4. Set up environment-specific Application configurations
@@ -133,7 +167,7 @@ Create comprehensive ArgoCD Application manifests with Application of Apps patte
 
 ## Task Checklist
 - [ ] Task 1.12 started
-- [ ] ArgoCD Application manifests created for all 7 backend services
+- [ ] ArgoCD Application manifests created for all 6 backend services plus contract parser
 - [ ] ArgoCD Application manifests created for all 4 frontend services
 - [ ] Infrastructure applications configured (monitoring, secrets)
 - [ ] Environment-specific configurations separated and validated

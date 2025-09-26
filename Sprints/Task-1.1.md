@@ -1,5 +1,9 @@
 # Task 1.1: Domain Registration and DNS Configuration - Objectives & Implementation Details
 
+## Repository: `solidity-security-aws-infrastructure`
+
+AWS Infrastructure as Code repository containing all cloud infrastructure configurations, including VPC, EKS, RDS, ElastiCache, IAM, and Secrets Manager configurations. This repository manages the foundational infrastructure components required for the Solidity Security Platform.
+
 **✅ ALIGNMENT CHECK**: This implementation establishes the foundational domain infrastructure required for the Solidity Security Platform's staging and production environments as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
@@ -16,11 +20,25 @@ Set up domain registration and DNS configuration to support staging and producti
 ## Directory Structure Requirements
 
 ```
-cloudflare-dns/
-├── dns-records/                   # DNS record configurations
-├── subdomain-configs/             # Subdomain-specific settings
-├── ssl-certificates/              # Certificate management configs
-├── dns-validation/                # DNS validation scripts
+solidity-security-aws-infrastructure/
+├── terraform/
+│   ├── modules/
+│   │   ├── networking/            # VPC, subnets, security groups
+│   │   ├── compute/               # EKS clusters, node groups
+│   │   ├── storage/               # RDS, ElastiCache
+│   │   ├── security/              # IAM, Secrets Manager
+│   │   └── dns/                   # Route53, domain management
+│   ├── environments/
+│   │   ├── staging/               # Staging environment config
+│   │   └── production/            # Production environment config
+│   └── shared/                    # Shared infrastructure components
+├── cloudflare/
+│   ├── dns-records/               # DNS record configurations
+│   ├── subdomain-configs/         # Subdomain-specific settings
+│   └── ssl-certificates/          # Certificate management configs
+├── scripts/
+│   ├── setup/                     # Infrastructure setup scripts
+│   └── validation/                # DNS validation scripts
 └── README.md
 ```
 

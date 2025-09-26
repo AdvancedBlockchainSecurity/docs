@@ -1,5 +1,9 @@
 # Task 1.2: AWS VPC and Networking Infrastructure - Objectives & Implementation Details
 
+## Repository: `solidity-security-aws-infrastructure`
+
+AWS Infrastructure as Code repository containing all cloud infrastructure configurations, including VPC, EKS, RDS, ElastiCache, IAM, and Secrets Manager configurations. This task focuses on the networking module providing secure foundation for all AWS services.
+
 **✅ ALIGNMENT CHECK**: This implementation establishes the secure networking foundation required for EKS, RDS, and ElastiCache services as specified in Sprint 1 AWS infrastructure requirements.
 
 ## High-Level Objectives
@@ -16,12 +20,24 @@ Create secure and scalable VPC infrastructure with multi-AZ design to support EK
 ## Directory Structure Requirements
 
 ```
-aws-vpc-infrastructure/
-├── terraform/                     # Infrastructure as Code
-├── security-groups/               # Security group configurations
-├── networking/                    # VPC, subnets, routing tables
-├── endpoints/                     # VPC endpoint configurations
-├── monitoring/                    # Network monitoring setup
+solidity-security-aws-infrastructure/
+├── terraform/
+│   ├── modules/
+│   │   ├── networking/            # VPC, subnets, security groups
+│   │   │   ├── vpc.tf            # VPC configuration
+│   │   │   ├── subnets.tf        # Public/private subnets
+│   │   │   ├── security_groups.tf # Security group rules
+│   │   │   ├── nat_gateways.tf   # NAT gateway configuration
+│   │   │   ├── vpc_endpoints.tf  # VPC endpoints for AWS services
+│   │   │   ├── routing.tf        # Route tables and routing
+│   │   │   ├── variables.tf      # Module variables
+│   │   │   └── outputs.tf        # Module outputs
+│   │   └── monitoring/
+│   │       └── vpc_flow_logs.tf  # VPC Flow Logs configuration
+│   ├── environments/
+│   │   ├── staging/               # Staging network config
+│   │   └── production/            # Production network config
+│   └── shared/                    # Shared networking components
 └── README.md
 ```
 
