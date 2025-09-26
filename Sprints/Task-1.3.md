@@ -50,12 +50,12 @@ solidity-security-aws-infrastructure/
 
 ### Key Components to Implement
 - **Staging Database**: RDS PostgreSQL 15 with appropriate sizing
-- **Production Database**: RDS PostgreSQL 15 with high availability
+- **Production Database**: RDS PostgreSQL 15 single-AZ for MVP
 - **Security Groups**: Database access limited to EKS nodes only
 
 ### Technical Requirements
 - PostgreSQL 15 with automated backups enabled
-- Multi-AZ deployment for production high availability
+- Single-AZ deployment for MVP cost optimization
 - Encrypted storage with KMS key management
 - Database parameter groups optimized for workload
 
@@ -67,7 +67,7 @@ solidity-security-aws-infrastructure/
 - Set up Redis security groups and network access controls
 
 ### Key Components to Implement
-- **Redis Clusters**: Staging and production ElastiCache clusters
+- **Redis Clusters**: Single-AZ staging and production ElastiCache clusters
 - **Encryption**: In-transit and at-rest encryption configuration
 - **Security Groups**: Redis access limited to application services
 
@@ -97,7 +97,7 @@ solidity-security-aws-infrastructure/
 
 ### RDS Infrastructure Requirements
 - [ ] RDS PostgreSQL 15 staging instance operational and accessible from EKS
-- [ ] RDS PostgreSQL 15 production instance operational with Multi-AZ
+- [ ] RDS PostgreSQL 15 production instance operational in single AZ
 - [ ] Automated backups configured with 7-day retention minimum
 - [ ] Database encryption enabled with AWS KMS
 - [ ] Database security groups configured with EKS-only access
@@ -120,7 +120,7 @@ solidity-security-aws-infrastructure/
 
 ### Phase 1: RDS Database Deployment (1.5 hours)
 1. Deploy RDS PostgreSQL 15 staging instance with automated backups
-2. Deploy RDS PostgreSQL 15 production instance with Multi-AZ configuration
+2. Deploy RDS PostgreSQL 15 production instance in single AZ for MVP
 3. Configure database security groups restricting access to EKS nodes only
 
 ### Phase 2: ElastiCache Redis Deployment (1 hour)
@@ -135,7 +135,7 @@ solidity-security-aws-infrastructure/
 
 ## Key Implementation Notes
 
-1. **Database Sizing**: Start with appropriate instance types, plan for auto-scaling in production
+1. **Database Sizing**: Start with cost-optimized instance types for MVP, single-AZ deployment
 2. **Security**: Use security groups to enforce network-level access controls
 3. **Backup Strategy**: Configure automated backups with appropriate retention periods
 4. **Monitoring**: Enable detailed monitoring for performance optimization and troubleshooting
@@ -149,7 +149,7 @@ solidity-security-aws-infrastructure/
 ## Task Checklist
 - [ ] Task 1.3 started
 - [ ] RDS PostgreSQL 15 staging instance deployed and configured
-- [ ] RDS PostgreSQL 15 production instance deployed with Multi-AZ
+- [ ] RDS PostgreSQL 15 production instance deployed in single AZ
 - [ ] Database security groups configured with EKS-only access
 - [ ] Automated backups enabled with appropriate retention
 - [ ] Database encryption enabled with KMS
