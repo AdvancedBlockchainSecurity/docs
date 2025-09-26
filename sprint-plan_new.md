@@ -7,10 +7,12 @@
 #### Sprint 1: AWS Infrastructure Foundation & Repository Setup (Weeks 1-2)
 **Technical Milestone**: Complete AWS infrastructure foundation with all repositories properly structured
 
-**AWS Infrastructure Development**:
+**Domain Registration & Initial Setup**:
 - Purchase production domain via Cloudflare
-- Configure Cloudflare hosted zone for DNS management and SSL validation
-- Configure staging and production subdomains
+- Configure Cloudflare hosted zone for DNS management
+- Set up staging and production subdomain zones (preparation only)
+
+**AWS Infrastructure Development**:
 - Develop VPC, subnets, security groups, and networking components
 - Design EKS cluster configuration with managed node groups for staging and production
 - Configure RDS PostgreSQL 15 with automated backups for both environments
@@ -55,7 +57,13 @@
 - Deploy Kiali for service mesh visualization and management
 - Configure AWS Load Balancer Controller for ALB management
 - Install cert-manager with Let's Encrypt and Cloudflare DNS validation
-- Configure DNS entries with A records pointing to ALB
+
+**DNS Service Configuration**:
+- Configure DNS service records pointing to AWS Application Load Balancer
+- Set up SSL certificate automation with DNS validation
+- Configure ArgoCD dashboard access via subdomains
+
+**Additional Infrastructure Components**:
 - Install External Secrets Operator for AWS Secrets Manager integration
 - Deploy monitoring stack (Prometheus, Grafana) for both environments
 - Configure GitHub Actions CI/CD pipeline with AWS integration
@@ -86,6 +94,9 @@
 - Jaeger distributed tracing working for all service calls
 - Kiali dashboard showing service mesh topology and health
 - cert-manager provisioning Let's Encrypt certificates successfully
+- DNS service records configured and pointing to AWS ALB targets
+- SSL certificates working for all configured domains
+- ArgoCD dashboard accessible via configured subdomains
 - ArgoCD deployed and operational in both environments
 - External Secrets Operator integrating with AWS Secrets Manager
 - CloudWatch monitoring operational with proper metrics collection
