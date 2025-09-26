@@ -5,13 +5,13 @@
 ## High-Level Objectives
 
 ### Primary Goal
-Deploy monitoring and observability stack with Prometheus metrics collection, Grafana visualization, and alerting capabilities.
+Deploy comprehensive monitoring and observability stack with Prometheus metrics collection, Grafana visualization, Loki log aggregation, and AlertManager for alerting.
 
 ### Key Requirements (from docs)
 - **Metrics Collection**: Prometheus for cluster and application metrics
 - **Visualization**: Grafana with AWS Secrets Manager integration
-- **Logging**: Centralized logging with Prometheus and Grafana integration
-- **Alerting**: Service monitoring and alerting rules for infrastructure health
+- **Logging**: Loki for log aggregation with Fluent Bit for log collection
+- **Alerting**: AlertManager for routing and notification management
 
 ## Directory Structure Requirements
 
@@ -35,20 +35,34 @@ solidity-security-monitoring/
     │   │   ├── kustomization.yaml # Node Exporter base config
     │   │   ├── daemonset.yaml     # Node Exporter DaemonSet
     │   │   └── service.yaml       # Node Exporter service
-    │   └── alertmanager/
-    │       ├── kustomization.yaml # AlertManager base config
-    │       ├── deployment.yaml    # AlertManager deployment
-    │       └── configmap.yaml     # AlertManager configuration
+    │   ├── alertmanager/
+    │   │   ├── kustomization.yaml # AlertManager base config
+    │   │   ├── deployment.yaml    # AlertManager deployment
+    │   │   └── configmap.yaml     # AlertManager configuration
+    │   ├── loki/
+    │   │   ├── kustomization.yaml # Loki base config
+    │   │   ├── deployment.yaml    # Loki deployment
+    │   │   ├── configmap.yaml     # Loki configuration
+    │   │   └── service.yaml       # Loki service
+    │   └── fluent-bit/
+    │       ├── kustomization.yaml # Fluent Bit base config
+    │       ├── daemonset.yaml     # Fluent Bit DaemonSet
+    │       ├── configmap.yaml     # Fluent Bit configuration
+    │       └── rbac.yaml          # Fluent Bit RBAC
     └── overlays/                  # Environment-specific overlays
         ├── staging/               # Staging monitoring overlay
         │   ├── kustomization.yaml # Staging customizations
         │   ├── prometheus-patch.yaml # Staging Prometheus config
         │   ├── grafana-patch.yaml # Staging Grafana config
+        │   ├── loki-patch.yaml    # Staging Loki config
+        │   ├── fluent-bit-patch.yaml # Staging Fluent Bit config
         │   └── retention-patch.yaml # Staging retention policies
         └── production/            # Production monitoring overlay
             ├── kustomization.yaml # Production customizations
             ├── prometheus-patch.yaml # Production Prometheus config
             ├── grafana-patch.yaml # Production Grafana config
+            ├── loki-patch.yaml    # Production Loki config
+            ├── fluent-bit-patch.yaml # Production Fluent Bit config
             └── retention-patch.yaml # Production retention policies
 ```
 
@@ -94,7 +108,26 @@ solidity-security-monitoring/
 - Multi-environment dashboard organization via Kustomize overlays
 - Role-based access control for team members
 
-## Step 3: AlertManager Setup and Alerting (30 minutes)
+## Step 3: Loki and Fluent Bit Logging Setup (1 hour)
+
+### Objectives
+- Deploy Loki for log aggregation and storage
+- Deploy Fluent Bit for log collection from all pods and nodes
+- Integrate logging with Grafana for unified observability
+
+### Key Components to Implement
+- **Kustomize Base Manifests**: Base Loki and Fluent Bit configurations
+- **Environment Overlays**: Environment-specific log retention and resource limits
+- **Log Collection**: Fluent Bit DaemonSet for comprehensive log collection
+- **Grafana Integration**: Loki data source configuration for log querying
+
+### Integration Strategy
+- Kustomize-based deployment with environment-specific configurations
+- Fluent Bit deployed as DaemonSet for node-level log collection
+- Loki storage optimized for cost-effective log retention
+- Native Grafana integration for unified metrics and logs view
+
+## Step 4: AlertManager Setup and Alerting (30 minutes)
 
 ### Objectives
 - Configure AlertManager for alert routing and notification
@@ -126,9 +159,15 @@ solidity-security-monitoring/
 - [ ] Initial platform health dashboards created and functional
 - [ ] Role-based access control configured for team access
 
+### Loki and Fluent Bit Logging Requirements
+- [ ] Loki deployed and operational for log aggregation and storage
+- [ ] Fluent Bit deployed as DaemonSet for log collection from all pods and nodes
+- [ ] Loki data source configured in Grafana for log querying
+- [ ] Log retention policies configured for staging and production environments
+- [ ] Unified metrics and logs view operational in Grafana dashboards
+
 ### AlertManager and Alerting Requirements
 - [ ] AlertManager deployed and operational for alert routing
-- [ ] Log aggregation operational for cluster and application logs via Prometheus
 - [ ] Basic alerting rules configured for infrastructure health
 - [ ] Alert routing configured for team notification via AlertManager
 - [ ] Platform health monitoring dashboards displaying real-time data
@@ -145,7 +184,12 @@ solidity-security-monitoring/
 2. Configure Prometheus data sources
 3. Create initial platform health and infrastructure dashboards
 
-### Phase 3: AlertManager and Alerting (30 minutes)
+### Phase 3: Loki and Fluent Bit Logging (1 hour)
+1. Deploy Loki for log aggregation and storage
+2. Deploy Fluent Bit DaemonSet for comprehensive log collection
+3. Configure Loki data source in Grafana for unified observability
+
+### Phase 4: AlertManager and Alerting (30 minutes)
 1. Deploy AlertManager for alert routing and notification management
 2. Set up basic alerting rules for infrastructure health monitoring
 3. Create notification routing via AlertManager and validate alert delivery
@@ -159,7 +203,7 @@ solidity-security-monitoring/
 
 ---
 
-**Estimated Time**: 3 hours
+**Estimated Time**: 4 hours
 **Owner**: DevOps Team
 **Priority**: P1 (High)
 
@@ -174,7 +218,10 @@ solidity-security-monitoring/
 - [ ] Prometheus data sources configured in Grafana
 - [ ] Initial platform health dashboards created
 - [ ] Role-based access control configured for Grafana
-- [ ] Log aggregation configured and functional
+- [ ] Loki deployed and operational for log aggregation
+- [ ] Fluent Bit deployed as DaemonSet for log collection
+- [ ] Loki data source configured in Grafana
+- [ ] Unified metrics and logs view functional in Grafana
 - [ ] Basic alerting rules configured for infrastructure health
 - [ ] Alert routing and notification configured
 - [ ] Platform monitoring validated and operational

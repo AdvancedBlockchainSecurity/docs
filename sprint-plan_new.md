@@ -20,7 +20,7 @@
 - Configure AWS Secrets Manager for centralized secret management with automatic rotation
 - Configure AWS IAM roles and policies with least privilege
 - Design ECR repositories for all services
-- Configure CloudWatch monitoring and logging
+- Configure Prometheus, Grafana, Loki + Fluent Bit monitoring and logging
 - Deploy AWS VPC and networking infrastructure
 - Deploy EKS clusters for staging and production
 - Deploy RDS PostgreSQL instances with security groups
@@ -66,7 +66,7 @@
 
 **Additional Infrastructure Components**:
 - Deploy External Secrets Operator via Kustomize for AWS Secrets Manager integration
-- Deploy monitoring stack (Prometheus, Grafana) via Kustomize for both environments
+- Deploy monitoring stack (Prometheus, Grafana, Loki + Fluent Bit) via Kustomize for both environments
 - Configure GitHub Actions CI/CD pipeline with Kustomize deployment automation
 
 **ArgoCD Bootstrap & GitOps Foundation**:
@@ -100,7 +100,7 @@
 - ArgoCD dashboard accessible via configured subdomains
 - ArgoCD deployed and operational in both environments
 - External Secrets Operator integrating with AWS Secrets Manager
-- CloudWatch monitoring operational with proper metrics collection
+- Prometheus, Grafana, Loki + Fluent Bit monitoring operational with proper metrics and log collection
 - All microservice Kustomize templates created with enterprise security
 - IRSA configured for all services with least-privilege access
 - ArgoCD managing infrastructure deployments successfully
@@ -347,7 +347,7 @@
 - Complete end-to-end integration testing of all services
 - Implement comprehensive error handling and recovery
 - Optimize performance across all platform components
-- Add comprehensive logging and monitoring
+- Add comprehensive logging via Loki + Fluent Bit and monitoring
 - Implement platform-wide configuration management
 - Create automated testing suite for continuous integration
 
@@ -663,7 +663,7 @@
 - Implement business metric monitoring and alerting
 - Create operational dashboards for platform health
 - Configure automated alerting and escalation procedures
-- Implement log aggregation and analysis
+- Implement log aggregation and analysis via Loki + Fluent Bit
 
 **Support Infrastructure**:
 - Create customer support infrastructure and procedures

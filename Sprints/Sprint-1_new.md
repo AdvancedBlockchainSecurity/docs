@@ -17,7 +17,7 @@ Sprint 1 establishes the foundational AWS infrastructure and repository structur
 - **AWS Load Balancer Controller**: Application Load Balancer with SSL termination
 - **External Secrets Operator**: Kubernetes-native secret injection from AWS Secrets Manager
 - **ArgoCD**: GitOps workflow management for both environments
-- **CloudWatch**: Monitoring and logging integration
+- **Monitoring & Logging**: Prometheus, Grafana, Loki + Fluent Bit integration
 
 ### Multi-Language Technology Stack
 - **🦀 Rust Components** (37% of codebase): High-performance parsing, similarity analysis, cryptographic operations
@@ -172,13 +172,13 @@ production/ (same structure)
 - Deploy EKS production cluster with managed node groups
 - Configure cluster autoscaling and node group scaling
 - Set up cluster security and network policies
-- Configure EKS cluster logging to CloudWatch
+- Configure EKS cluster logging with Loki + Fluent Bit
 
 **Acceptance Criteria**:
 - EKS clusters operational and accessible via kubectl
 - Node groups configured with appropriate instance types
 - Cluster autoscaling functional
-- Cluster logging operational in CloudWatch
+- Cluster logging operational with Loki + Fluent Bit
 
 ---
 
@@ -210,14 +210,14 @@ production/ (same structure)
 **Deliverables**:
 - Deploy Prometheus for metrics collection in both clusters
 - Deploy Grafana with AWS Secrets Manager integration
-- Configure CloudWatch monitoring and logging
+- Configure Prometheus, Grafana, Loki + Fluent Bit monitoring and logging
 - Set up service monitoring and alerting rules
 - Create initial platform health dashboards
 
 **Acceptance Criteria**:
 - Prometheus collecting metrics from cluster components
 - Grafana operational with AWS Secrets Manager credential management
-- CloudWatch logging receiving cluster and application logs
+- Loki + Fluent Bit receiving cluster and application logs
 - Basic alerting rules configured for infrastructure health
 
 ---
@@ -486,7 +486,7 @@ production/ (same structure)
 **AWS Integration**:
 - External Secrets Operator managing service credentials
 - IRSA providing secure AWS service access
-- CloudWatch logging for service communication
+- Loki + Fluent Bit logging for service communication
 - ALB health checks and load balancing
 
 **Deliverables**:
