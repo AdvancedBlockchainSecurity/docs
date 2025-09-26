@@ -21,23 +21,10 @@ Set up domain registration and DNS configuration to support staging and producti
 
 ```
 solidity-security-aws-infrastructure/
-├── terraform/
-│   ├── modules/
-│   │   ├── networking/            # VPC, subnets, security groups
-│   │   ├── compute/               # EKS clusters, node groups
-│   │   ├── storage/               # RDS, ElastiCache
-│   │   ├── security/              # IAM, Secrets Manager
-│   │   └── dns/                   # Route53, domain management
-│   ├── environments/
-│   │   ├── staging/               # Staging environment config
-│   │   └── production/            # Production environment config
-│   └── shared/                    # Shared infrastructure components
 ├── cloudflare/
 │   ├── dns-records/               # DNS record configurations
-│   ├── subdomain-configs/         # Subdomain-specific settings
-│   └── ssl-certificates/          # Certificate management configs
+│   └── subdomain-configs/         # Subdomain-specific settings
 ├── scripts/
-│   ├── setup/                     # Infrastructure setup scripts
 │   └── validation/                # DNS validation scripts
 └── README.md
 ```
