@@ -696,7 +696,7 @@
   - [ ] `k8s/base/external-secret.yaml` - Enterprise tool credentials with vendor SLA compliance
   - [ ] `k8s/base/secret-provider-class.yaml` - Production CSI for enterprise tool authentication
   - [ ] `k8s/base/service-account.yaml` - Production IRSA with tool vendor integrations
-  - [ ] `k8s/base/pvc.yaml` - Production encrypted EBS with cross-AZ replication and backup
+  - [ ] `k8s/base/pvc.yaml` - Production encrypted EBS with backup
   - [ ] `k8s/base/ingress.yaml` - Production ALB with tool-specific enterprise rate limiting
   - [ ] `k8s/base/network-policy.yaml` - Enterprise network access controls with vendor compliance
   - [ ] `k8s/base/pod-security-policy.yaml` - Production security for enterprise tool execution

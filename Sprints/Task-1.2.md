@@ -162,5 +162,4 @@ solidity-security-aws-infrastructure/
 - [ ] VPC endpoints configured for AWS services
 - [ ] Network monitoring enabled with VPC Flow Logs
 - [ ] Security group rules tested and validated
-- [ ] Cross-AZ connectivity validated
 - [ ] Task 1.2 completed and infrastructure operational
