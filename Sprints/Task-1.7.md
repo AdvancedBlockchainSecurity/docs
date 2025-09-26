@@ -16,7 +16,7 @@ Deploy monitoring and observability stack with Prometheus metrics collection, Gr
 ## Directory Structure Requirements
 
 ```
-solidity-security-aws-infrastructure/
+solidity-security-monitoring/
 └── k8s/
     ├── base/                      # Kustomize base configurations
     │   ├── prometheus/
