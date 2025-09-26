@@ -22,7 +22,7 @@ Configure secure and resilient inter-service communication with authentication p
 - **Database Connections**: Connection pooling and optimization
 
 ### AWS Integration Points
-- **External Secrets**: Service credential management
+- **Vault Secrets**: Service credential management
 - **IRSA Integration**: Secure AWS service access
 - **Loki Logging**: Service communication monitoring via Loki + Fluent Bit
 - **ALB Health Checks**: Load balancing and health monitoring

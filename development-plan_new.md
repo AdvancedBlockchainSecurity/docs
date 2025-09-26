@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-**Architecture Vision**: Enterprise-grade microservices platform with AWS-first cloud infrastructure, AWS Secrets Manager secret management, and Istio service mesh for comprehensive Solidity security analysis.
+**Architecture Vision**: Enterprise-grade microservices platform with AWS-first cloud infrastructure, HashiCorp Vault secret management, and Istio service mesh for comprehensive Solidity security analysis.
 
 **Development Strategy**: 18 sprints across 36 weeks, organized in 3 phases, with cloud-native development from day one using production-ready AWS infrastructure and GitOps deployment workflows.
 
@@ -16,8 +16,8 @@
 - **Service Mesh**: Istio for service-to-service mTLS, traffic management, and observability
 - **Ingress Controller**: Istio Gateway + AWS Application Load Balancer (ALB) with SSL termination
 - **Certificate Management**: cert-manager with Let's Encrypt for automated SSL certificate provisioning
-- **Secret Management**: AWS Secrets Manager for centralized secret storage, rotation, and policy enforcement
-- **Secret Injection**: External Secrets Operator for Kubernetes-native secret injection from AWS Secrets Manager
+- **Secret Management**: HashiCorp Vault for centralized secret storage, rotation, and policy enforcement
+- **Secret Injection**: Vault Secrets Operator for Kubernetes-native secret injection from Vault
 - **Event Bus**: Apache Kafka for async messaging between services
 - **Container Orchestration**: AWS EKS with Helm charts for deployment
 - **Observability**: Prometheus metrics, Jaeger tracing, structured logging with Fluentd
@@ -28,20 +28,20 @@
 - **Production Environment**: Multi-AZ deployment with auto-scaling (~$1,250/month at scale)
 - **Database**: PostgreSQL StatefulSets with persistent volumes and automated backups
 - **Caching**: ElastiCache Redis with clustering and failover
-- **Secret Management**: AWS Secrets Manager with automatic rotation and cross-region replication
+- **Secret Management**: HashiCorp Vault with automatic rotation and high availability
 - **Cost**: $250-350/month for development, scaling to $500-2500/month in production
 
-### AWS Secrets Manager Architecture
+### HashiCorp Vault Architecture
 
 #### Secret Management Integration Strategy
-**AWS Secrets Manager Configuration**:
-- **Development**: AWS Secrets Manager with automatic rotation and CloudTrail logging
-- **Production**: AWS Secrets Manager with cross-region replication and enterprise features
+**HashiCorp Vault Configuration**:
+- **Development**: Vault deployed in Kubernetes with automatic rotation and audit logging
+- **Production**: Vault with high availability and enterprise features
 - **Secret Categories**: Application secrets, database credentials, API keys, certificates
 - **Authentication**: AWS IAM roles, IRSA (IAM Roles for Service Accounts), cross-account access
-- **Secret Injection**: External Secrets Operator with IAM-based access control
+- **Secret Injection**: Vault Secrets Operator with Kubernetes RBAC-based access control
 
-**AWS Secrets Manager Secret Organization**:
+**HashiCorp Vault Secret Organization**:
 ```yaml
 Secret Paths Structure:
   Environment-based organization:
@@ -79,7 +79,7 @@ Cross-Region Replication:
   Automatic failover and sync
 ```
 
-**AWS Secrets Manager Security Features**:
+**HashiCorp Vault Security Features**:
 - **Encryption**: Encryption in transit and at rest with AWS KMS
 - **Access Control**: IAM-based access control with least privilege
 - **Audit Logging**: Comprehensive audit trails via CloudTrail
@@ -87,7 +87,7 @@ Cross-Region Replication:
 - **Automatic Rotation**: Lambda-based rotation for supported services
 - **Version Management**: Secret versioning with rollback capabilities
 
-**AWS Secrets Manager Performance Optimization**:
+**HashiCorp Vault Performance Optimization**:
 - **Caching**: SDK-level caching for high-throughput applications
 - **Retrieval Patterns**: Optimized access patterns to minimize API calls
 - **Batch Operations**: Bulk secret retrieval for initialization
@@ -108,7 +108,7 @@ Cross-Region Replication:
 - Design EKS cluster configuration with managed node groups
 - Configure PostgreSQL 15 StatefulSets with persistent volumes for both environments
 - Configure ElastiCache Redis with encryption for both environments
-- Set up AWS Secrets Manager for secret management with automatic rotation
+- Set up HashiCorp Vault for secret management with automatic rotation
 - Configure AWS IAM roles and policies with least privilege access
 - Design ECR repositories for all services with vulnerability scanning
 - Configure CloudWatch monitoring and logging integration
@@ -156,7 +156,7 @@ Support & Documentation (4):
 - AWS infrastructure fully operational in staging and production environments
 - EKS clusters accessible with proper networking and security configuration
 - PostgreSQL StatefulSets and ElastiCache deployed and accessible from EKS with encryption
-- AWS Secrets Manager operational with proper IAM integration and encryption
+- HashiCorp Vault operational with proper Kubernetes integration and encryption
 - All 18 repositories properly structured, initialized, and integrated
 - Shared libraries working consistently across Python, TypeScript, and Rust services
 - ECR repositories configured with automated vulnerability scanning
@@ -174,7 +174,7 @@ Support & Documentation (4):
 - Configure AWS Load Balancer Controller for ALB management
 - Install cert-manager with Let's Encrypt and Cloudflare DNS validation
 - Configure DNS entries with A records pointing to ALB
-- Install External Secrets Operator for AWS Secrets Manager integration
+- Install Vault Secrets Operator for HashiCorp Vault integration
 - Deploy monitoring stack (Prometheus, Grafana) for both environments
 - Configure GitHub Actions CI/CD pipeline with AWS integration
 
@@ -191,7 +191,7 @@ Support & Documentation (4):
 - Create production-ready Kustomize base configurations for all backend services
 - Create production-ready Kustomize base configurations for all frontend services
 - Create environment-specific Kustomize overlays (staging/production)
-- Configure AWS Secrets Manager integration via Kustomize patches for all services
+- Configure HashiCorp Vault integration via Kustomize patches for all services
 - Configure Istio VirtualService and DestinationRule templates via Kustomize
 - Set up IRSA (IAM Roles for Service Accounts) for all services
 - Configure network policies and pod security policies via Kustomize
@@ -205,7 +205,7 @@ Support & Documentation (4):
 - Kiali dashboard showing complete service mesh topology and health
 - cert-manager provisioning Let's Encrypt certificates successfully
 - ArgoCD deployed and operational in both staging and production environments
-- External Secrets Operator integrating with AWS Secrets Manager for secret management
+- Vault Secrets Operator integrating with HashiCorp Vault for secret management
 - CloudWatch monitoring operational with proper metrics collection and alerting
 - All microservice Kustomize templates created with enterprise security policies
 - IRSA configured for all services with least-privilege access
@@ -232,7 +232,7 @@ Support & Documentation (4):
 - Implement database migrations with Alembic and rollback procedures
 - Configure connection pooling with PostgreSQL in Kubernetes and optimization
 - Implement multi-tier caching strategies with ElastiCache Redis
-- Configure AWS Secrets Manager integration for database credentials with rotation
+- Configure HashiCorp Vault integration for database credentials with rotation
 - Deploy Data service to staging via ArgoCD with proper monitoring
 - Test database operations, caching, and performance under load
 
@@ -242,7 +242,7 @@ Support & Documentation (4):
 - Configure email notification templates and SMTP integration
 - Implement notification preference management with user controls
 - Set up message queue with ElastiCache Redis for reliability
-- Configure AWS Secrets Manager integration for notification credentials
+- Configure HashiCorp Vault integration for notification credentials
 - Deploy Notification service to staging via ArgoCD
 - Test WebSocket connections, real-time notifications, and scaling
 
@@ -252,7 +252,7 @@ Support & Documentation (4):
 - Validate database operations and caching performance optimization
 - Test inter-service communication with proper error handling
 - Configure comprehensive health checks and monitoring endpoints
-- Validate AWS Secrets Manager integration and automatic rotation
+- Validate HashiCorp Vault integration and automatic rotation
 - Test service mesh communication and observability
 
 **Acceptance Criteria**:
@@ -263,7 +263,7 @@ Support & Documentation (4):
 - All backend services deployed via ArgoCD with proper monitoring
 - Inter-service communication working correctly with Istio mTLS
 - Health checks and monitoring endpoints operational with alerting
-- AWS Secrets Manager properly managing credentials with automatic rotation
+- HashiCorp Vault properly managing credentials with automatic rotation
 
 #### Sprint 4: Security Tool Integration & Orchestration (Weeks 7-8)
 **Technical Milestone**: Core security tool integration with workflow orchestration
@@ -275,7 +275,7 @@ Support & Documentation (4):
 - Create tool registry and factory pattern for extensibility and plugin architecture
 - Implement result normalization to standardized vulnerability schema (SWC-based)
 - Configure tool-specific rate limiting and quota management with respect for API limits
-- Configure AWS Secrets Manager integration for tool credentials with secure rotation
+- Configure HashiCorp Vault integration for tool credentials with secure rotation
 - Deploy Tool Integration service to staging via ArgoCD with proper scaling
 
 **Tool Integration Specifications**:
@@ -285,7 +285,7 @@ Support & Documentation (4):
 - Custom detector plugin support for extensibility
 - Parallel analysis for multiple contracts with resource management
 - Memory optimization for large contract sets
-- Configuration secrets stored in AWS Secrets Manager with automatic rotation
+- Configuration secrets stored in HashiCorp Vault with automatic rotation
 - Built-in detector configuration and custom rule support
 - JSON output parsing for standardized vulnerability reporting
 - Integration with Foundry and Hardhat project structures
@@ -294,7 +294,7 @@ Support & Documentation (4):
 **MythX Integration** (Added in Sprint 6):
 - REST API with async job polling and WebSocket support for real-time updates
 - Analysis mode selection (quick/standard/deep) with cost optimization
-- API key rotation and failover via AWS Secrets Manager with automatic credential management
+- API key rotation and failover via HashiCorp Vault with automatic credential management
 - Support for all MythX analysis types (static, dynamic, symbolic)
 - Rate limiting and quota management with respect for API limits
 - Result correlation with other tool findings for enhanced accuracy
@@ -307,7 +307,7 @@ Support & Documentation (4):
 - Performance optimization for large codebases with parallel processing
 - Foundry project structure detection and integration
 - Custom detector configuration support for extensibility
-- Configuration stored in AWS Secrets Manager with secure credential management
+- Configuration stored in HashiCorp Vault with secure credential management
 - Support for custom Rust-based detectors
 - Integration with Solidity compilation artifacts
 - Advanced pattern matching for smart contract vulnerabilities
@@ -319,7 +319,7 @@ Support & Documentation (4):
 - AST-based analysis for maintainability scores
 - Support for multiple Solidity compiler versions
 - Integration with vulnerability risk correlation algorithms
-- Tool configurations managed via AWS Secrets Manager
+- Tool configurations managed via HashiCorp Vault
 - Cyclomatic complexity calculation with threshold configuration
 - Function length and parameter count analysis
 - Contract inheritance depth measurement
@@ -332,7 +332,7 @@ Support & Documentation (4):
 - Create retry logic with exponential backoff for failed analyses
 - Set up dead letter queue for permanently failed jobs
 - Implement comprehensive analysis status tracking with real-time updates
-- Configure AWS Secrets Manager integration for broker credentials with rotation
+- Configure HashiCorp Vault integration for broker credentials with rotation
 - Deploy Orchestration service to staging via ArgoCD with monitoring
 
 **Job Scheduling & Workflow Engine**:
@@ -475,7 +475,7 @@ Support & Documentation (4):
 - Add MythX analysis modes (quick/standard/deep) selection with cost optimization
 - Create MythX-specific rate limiting and quota management with monitoring
 - Implement comprehensive MythX result parsing and normalization to standard schema
-- Configure MythX authentication and credential management via AWS Secrets Manager
+- Configure MythX authentication and credential management via HashiCorp Vault
 - Deploy enhanced Tool Integration service with MythX support and monitoring
 
 **Multi-Tool Orchestration Enhancement**:
@@ -554,7 +554,7 @@ Support & Documentation (4):
 - Implement enterprise-grade error handling and recovery procedures
 - Optimize performance across all platform components with profiling
 - Add comprehensive logging and monitoring with distributed tracing
-- Implement platform-wide configuration management with AWS Secrets Manager integration
+- Implement platform-wide configuration management with HashiCorp Vault integration
 - Create automated testing suite for continuous integration and deployment
 
 **Production Deployment Preparation**:
@@ -703,7 +703,7 @@ Support & Documentation (4):
 - **Versioning**: URL-based versioning (/api/v1/, /api/v2/) with deprecation strategy
 - **Pagination**: Cursor-based pagination for large datasets with performance optimization
 - **Filtering**: GraphQL-style filtering with field selection and complex queries
-- **Security**: AWS Secrets Manager-managed API keys and JWT tokens with proper rotation
+- **Security**: HashiCorp Vault-managed API keys and JWT tokens with proper rotation
 - **Rate Limiting**: Per-user and per-endpoint limits with burst allowance
 - **Error Handling**: Structured error responses with proper HTTP status codes
 
@@ -832,7 +832,7 @@ Support & Documentation (4):
 - Specification file generation automation with templates
 - Result parsing from JSON output with detailed proof analysis
 - Resource allocation for verification jobs with queue management
-- API credentials stored securely in AWS Secrets Manager with automatic rotation
+- API credentials stored securely in HashiCorp Vault with automatic rotation
 - Formal verification result integration with other security findings
 - Specification template management with version control
 - Verification report generation with detailed explanations
@@ -911,7 +911,7 @@ Support & Documentation (4):
 - **At Rest**: AES-256-GCM for database and file storage with proper key management
 - **In Transit**: TLS 1.3 for all external communications with certificate pinning
 - **Application Level**: Field-level encryption for sensitive data with tokenization
-- **Key Management**: AWS Secrets Manager and AWS KMS integration for key rotation and escrow
+- **Key Management**: HashiCorp Vault with built-in encryption for key rotation and escrow
 
 **Privacy Controls**:
 - **Data Isolation**: Comprehensive tenant-based data segregation with encryption
@@ -947,14 +947,14 @@ Support & Documentation (4):
 - **Metrics Stack**: Prometheus, Grafana, AlertManager, CloudWatch with custom dashboards
 - **Logging Stack**: Fluentd, CloudWatch Logs, Elasticsearch, Kibana with correlation
 - **Tracing Stack**: Jaeger, OpenTelemetry, AWS X-Ray with distributed tracing
-- **AWS Secrets Manager Monitoring**: Comprehensive metrics and audit log monitoring
+- **HashiCorp Vault Monitoring**: Comprehensive metrics and audit log monitoring
 
 **Key Metrics & Alerting**:
 - **Golden Signals**: Latency, traffic, errors, saturation with intelligent thresholds
 - **Business Metrics**: Analysis completion rate, false positive rate, customer satisfaction
 - **Infrastructure Metrics**: CPU, memory, disk, network utilization with predictive alerting
 - **Custom Metrics**: Tool-specific metrics, queue depths, processing times
-- **AWS Secrets Manager Metrics**: Secret access patterns, rotation success, performance monitoring
+- **HashiCorp Vault Metrics**: Secret access patterns, rotation success, performance monitoring
 
 **Alerting Strategy**:
 - **Severity Levels**: Critical (page on-call), Warning (notify team), Info (log only)
@@ -1187,7 +1187,7 @@ Each sprint completion requires:
 - **Stakeholder Acceptance**: Delivered functionality meets requirements with user validation
 - **GitOps Deployment**: ArgoCD applications deploying successfully with healthy status
 - **Infrastructure Validation**: AWS infrastructure operational with proper monitoring
-- **Secret Management**: External Secrets Operator functioning correctly with AWS Secrets Manager across all environments
+- **Secret Management**: Vault Secrets Operator functioning correctly with HashiCorp Vault across all environments
 
 ### Production Readiness Validation
 

@@ -30,16 +30,16 @@ argocd-infrastructure/
 ### Objectives
 - Deploy ArgoCD in staging environment with AWS integration
 - Deploy ArgoCD in production environment with AWS integration
-- Configure ArgoCD with External Secrets Operator for credential management
+- Configure ArgoCD with Vault Secrets Operator for credential management
 
 ### Key Components to Implement
 - **ArgoCD Server**: Core ArgoCD components (server, repo-server, application-controller)
-- **AWS Integration**: External Secrets Operator integration for GitHub credentials
+- **Vault Integration**: Vault Secrets Operator integration for GitHub credentials
 - **High Availability**: Multi-replica deployment for production environment
 
 ### Technical Requirements
 - ArgoCD deployment with persistent storage for configuration
-- External Secrets integration for GitHub tokens and SSH keys
+- Vault Secrets integration for GitHub tokens and SSH keys
 - Resource limits and requests appropriate for environment
 - Security context configuration for container security
 
@@ -82,13 +82,13 @@ argocd-infrastructure/
 ### ArgoCD Infrastructure Requirements
 - [ ] ArgoCD operational in staging environment with persistent storage
 - [ ] ArgoCD operational in production environment with high availability
-- [ ] External Secrets Operator integration functional for credential management
+- [ ] Vault Secrets Operator integration functional for credential management
 - [ ] ArgoCD server accessible and responsive
 - [ ] Resource limits configured appropriate for environment load
 
 ### GitHub Integration Requirements
 - [ ] All 17 repositories connected and accessible in ArgoCD
-- [ ] GitHub authentication configured via External Secrets Operator
+- [ ] GitHub authentication configured via Vault Secrets Operator
 - [ ] Repository synchronization functional with appropriate policies
 - [ ] Webhook integration configured for automatic sync triggers
 - [ ] Repository access validated for deployment operations
@@ -106,11 +106,11 @@ argocd-infrastructure/
 ### Phase 1: Core ArgoCD Deployment (2 hours)
 1. Deploy ArgoCD server components in staging with AWS Secrets integration
 2. Deploy ArgoCD server components in production with high availability
-3. Configure persistent storage and External Secrets Operator integration
+3. Configure persistent storage and Vault Secrets Operator integration
 
 ### Phase 2: Repository Integration (1.5 hours)
 1. Configure GitHub repository connections for all 17 services
-2. Set up authentication credentials via External Secrets Operator
+2. Set up authentication credentials via Vault Secrets Operator
 3. Configure repository synchronization policies and webhook integration
 
 ### Phase 3: SSL and Access Control (30 minutes)
@@ -121,7 +121,7 @@ argocd-infrastructure/
 ## Key Implementation Notes
 
 1. **High Availability**: Configure ArgoCD with multiple replicas in production for reliability
-2. **Security**: Use External Secrets Operator for all credential management
+2. **Security**: Use Vault Secrets Operator for all credential management
 3. **Access Control**: Implement least-privilege RBAC policies for team access
 4. **Monitoring**: Enable ArgoCD metrics collection for monitoring and alerting
 
@@ -135,10 +135,10 @@ argocd-infrastructure/
 - [ ] Task 1.8 started
 - [ ] ArgoCD deployed in staging environment with persistent storage
 - [ ] ArgoCD deployed in production environment with high availability
-- [ ] External Secrets Operator integration configured for credentials
+- [ ] Vault Secrets Operator integration configured for credentials
 - [ ] Resource limits and security contexts configured
 - [ ] All 17 GitHub repositories connected to ArgoCD
-- [ ] GitHub authentication configured via External Secrets
+- [ ] GitHub authentication configured via Vault Secrets
 - [ ] Repository synchronization policies configured
 - [ ] Webhook integration set up for automatic sync
 - [ ] SSL certificates provisioned for ArgoCD domains
