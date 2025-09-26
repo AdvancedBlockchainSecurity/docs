@@ -78,7 +78,7 @@ solidity-security-api-service/
 ### 2. **`solidity-security-tool-integration`** (~12K LOC)
 **Security tool adapters and integrations - Hybrid Python/Rust**
 ```
-Purpose: Slither, Aderyn, MythX, Solidity-Metrics adapters (migrated from old solidity-security-infrastructure)
+Purpose: Slither, Aderyn, MythX, Solidity-Metrics adapters (migrated from solidity-security-infrastructure)
 Tech Stack: Python 3.11 + Rust core, asyncio, aiohttp, subprocess, Rust wrappers (for Slither, Aderyn), Node.js wrappers (for MythX, Solidity-Metrics)
 Rust Components: High-performance tool execution, parallel processing, native Aderyn integration
 Python Components: FastAPI service layer, external integrations, configuration management
