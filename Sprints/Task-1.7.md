@@ -1,16 +1,16 @@
 # Task 1.7: Monitoring and Observability Setup - Objectives & Implementation Details
 
-**✅ ALIGNMENT CHECK**: This implementation establishes comprehensive monitoring and observability infrastructure using Prometheus, Grafana, and CloudWatch integration as specified in Sprint 1 documentation.
+**✅ ALIGNMENT CHECK**: This implementation establishes comprehensive monitoring and observability infrastructure using Prometheus and Grafana as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
 
 ### Primary Goal
-Deploy monitoring and observability stack with Prometheus metrics collection, Grafana visualization, CloudWatch integration, and alerting capabilities.
+Deploy monitoring and observability stack with Prometheus metrics collection, Grafana visualization, and alerting capabilities.
 
 ### Key Requirements (from docs)
 - **Metrics Collection**: Prometheus for cluster and application metrics
 - **Visualization**: Grafana with AWS Secrets Manager integration
-- **Logging**: CloudWatch monitoring and logging integration
+- **Logging**: Centralized logging with Prometheus and Grafana integration
 - **Alerting**: Service monitoring and alerting rules for infrastructure health
 
 ## Directory Structure Requirements
@@ -35,10 +35,10 @@ solidity-security-monitoring/
     │   │   ├── kustomization.yaml # Node Exporter base config
     │   │   ├── daemonset.yaml     # Node Exporter DaemonSet
     │   │   └── service.yaml       # Node Exporter service
-    │   └── cloudwatch-exporter/
-    │       ├── kustomization.yaml # CloudWatch Exporter base config
-    │       ├── deployment.yaml    # CloudWatch Exporter deployment
-    │       └── configmap.yaml     # CloudWatch metrics config
+    │   └── alertmanager/
+    │       ├── kustomization.yaml # AlertManager base config
+    │       ├── deployment.yaml    # AlertManager deployment
+    │       └── configmap.yaml     # AlertManager configuration
     └── overlays/                  # Environment-specific overlays
         ├── staging/               # Staging monitoring overlay
         │   ├── kustomization.yaml # Staging customizations
@@ -79,14 +79,14 @@ solidity-security-monitoring/
 
 ### Objectives
 - Deploy Grafana with AWS Secrets Manager integration
-- Configure data sources for Prometheus and CloudWatch
+- Configure data sources for Prometheus
 - Create initial platform health dashboards
 
 ### Key Components to Implement
 - **Kustomize Base Manifests**: Base Grafana deployment with ConfigMaps
 - **Environment Overlays**: Environment-specific dashboard and data source configurations
 - **AWS Integration**: Secrets Manager integration via External Secrets Operator
-- **Data Sources**: Prometheus and CloudWatch data source configuration via Kustomize
+- **Data Sources**: Prometheus data source configuration via Kustomize
 
 ### Integration Strategy
 - Kustomize-based deployment with environment-specific configurations
@@ -94,21 +94,21 @@ solidity-security-monitoring/
 - Multi-environment dashboard organization via Kustomize overlays
 - Role-based access control for team members
 
-## Step 3: CloudWatch Integration and Alerting (30 minutes)
+## Step 3: AlertManager Setup and Alerting (30 minutes)
 
 ### Objectives
-- Configure CloudWatch monitoring and logging integration
+- Configure AlertManager for alert routing and notification
 - Set up service monitoring and alerting rules
 - Create platform health dashboards and alerts
 
 ### Core Dependencies
-- **CloudWatch Integration**: Metrics and logs from EKS and AWS services
+- **AlertManager Integration**: Alert routing and notification management
 - **Alert Rules**: Infrastructure health and performance alerting
 - **Dashboard Creation**: Initial monitoring dashboards for platform health
 
 ### Integration Requirements
-- CloudWatch metrics from EKS, RDS, ElastiCache
-- Log aggregation from application and infrastructure components
+- Prometheus metrics from EKS, pods, and infrastructure services
+- Log aggregation from application and infrastructure components via Prometheus
 - Alert routing and notification configuration
 
 ## Success Criteria & Validation
@@ -123,15 +123,14 @@ solidity-security-monitoring/
 ### Grafana Visualization Requirements
 - [ ] Grafana deployed with AWS Secrets Manager credential integration
 - [ ] Prometheus data sources configured and operational
-- [ ] CloudWatch data sources configured for AWS service metrics
 - [ ] Initial platform health dashboards created and functional
 - [ ] Role-based access control configured for team access
 
-### CloudWatch and Alerting Requirements
-- [ ] CloudWatch integration receiving metrics from EKS and AWS services
-- [ ] Log aggregation operational for cluster and application logs
+### AlertManager and Alerting Requirements
+- [ ] AlertManager deployed and operational for alert routing
+- [ ] Log aggregation operational for cluster and application logs via Prometheus
 - [ ] Basic alerting rules configured for infrastructure health
-- [ ] Alert routing configured for team notification
+- [ ] Alert routing configured for team notification via AlertManager
 - [ ] Platform health monitoring dashboards displaying real-time data
 
 ## Implementation Priority
@@ -143,13 +142,13 @@ solidity-security-monitoring/
 
 ### Phase 2: Grafana and Visualization (1 hour)
 1. Deploy Grafana with External Secrets Operator integration
-2. Configure Prometheus and CloudWatch data sources
+2. Configure Prometheus data sources
 3. Create initial platform health and infrastructure dashboards
 
-### Phase 3: CloudWatch and Alerting (30 minutes)
-1. Configure CloudWatch integration for AWS service monitoring
+### Phase 3: AlertManager and Alerting (30 minutes)
+1. Deploy AlertManager for alert routing and notification management
 2. Set up basic alerting rules for infrastructure health monitoring
-3. Create notification routing and validate alert delivery
+3. Create notification routing via AlertManager and validate alert delivery
 
 ## Key Implementation Notes
 
@@ -173,10 +172,8 @@ solidity-security-monitoring/
 - [ ] Application metrics collection configured
 - [ ] Grafana deployed with AWS Secrets Manager integration
 - [ ] Prometheus data sources configured in Grafana
-- [ ] CloudWatch data sources configured in Grafana
 - [ ] Initial platform health dashboards created
 - [ ] Role-based access control configured for Grafana
-- [ ] CloudWatch integration operational for AWS services
 - [ ] Log aggregation configured and functional
 - [ ] Basic alerting rules configured for infrastructure health
 - [ ] Alert routing and notification configured
