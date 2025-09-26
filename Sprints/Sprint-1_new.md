@@ -11,7 +11,7 @@ Sprint 1 establishes the foundational AWS infrastructure and repository structur
 
 ### AWS Infrastructure Components
 - **EKS Cluster**: AWS Kubernetes service with managed node groups for staging and production
-- **RDS PostgreSQL**: Database with automated backups and encryption
+- **PostgreSQL StatefulSets**: Database with automated backups and encryption in Kubernetes
 - **ElastiCache Redis**: Caching and message queue with encryption
 - **AWS Secrets Manager**: Centralized secret storage with automatic rotation
 - **AWS Load Balancer Controller**: Application Load Balancer with SSL termination
@@ -76,7 +76,7 @@ Sprint 1 establishes the foundational AWS infrastructure and repository structur
 
 **Deliverables**:
 - Create VPC with public and private subnets across multiple AZs
-- Configure security groups for EKS, RDS, and ElastiCache
+- Configure security groups for EKS and ElastiCache, network policies for PostgreSQL
 - Set up NAT gateways for private subnet internet access
 - Configure VPC endpoints for AWS services
 - Implement network security controls and monitoring
@@ -95,14 +95,14 @@ Sprint 1 establishes the foundational AWS infrastructure and repository structur
 **Priority**: P0 (Critical)
 
 **Deliverables**:
-- Deploy RDS PostgreSQL 15 with automated backups for staging
-- Deploy RDS PostgreSQL 15 with automated backups for production
+- Deploy PostgreSQL 15 StatefulSets with persistent volumes for staging
+- Deploy PostgreSQL 15 StatefulSets with persistent volumes for production
 - Configure ElastiCache Redis with encryption for staging
 - Configure ElastiCache Redis with encryption for production
 - Set up database security groups and access controls
 
 **Acceptance Criteria**:
-- RDS instances operational and accessible from EKS
+- PostgreSQL StatefulSets operational and accessible within Kubernetes
 - ElastiCache clusters operational with encryption enabled
 - Database credentials stored securely
 - Backup and maintenance windows configured
@@ -365,7 +365,7 @@ production/ (same structure)
 
 **Acceptance Criteria**:
 - All backend service templates deploy successfully to staging EKS
-- Services can communicate with RDS and ElastiCache via External Secrets
+- Services can communicate with PostgreSQL and ElastiCache via External Secrets
 - AWS Secrets Manager integration functional for all services
 - Health checks pass and services register correctly
 - IRSA providing appropriate AWS permissions
@@ -564,7 +564,7 @@ production/ (same structure)
 **AWS-Specific Documentation**:
 - EKS cluster management and troubleshooting
 - AWS Secrets Manager integration and secret management
-- RDS and ElastiCache operational procedures
+- PostgreSQL StatefulSets and ElastiCache operational procedures
 - ArgoCD deployment and application management
 - Monitoring and alerting configuration
 
@@ -677,7 +677,7 @@ production/ (same structure)
 ## Sprint 1 Success Criteria & Validation
 
 ### Technical Milestones
-- **AWS Infrastructure Operational**: EKS clusters, RDS, ElastiCache, and Secrets Manager functional in staging and production
+- **AWS Infrastructure Operational**: EKS clusters, PostgreSQL StatefulSets, ElastiCache, and Secrets Manager functional in staging and production
 - **Repository Architecture Complete**: All 18 repositories structured with comprehensive documentation
 - **GitOps Foundation**: ArgoCD managing deployments with automated sync and self-healing
 - **Multi-Language Integration**: Shared libraries working across Python, TypeScript, and Rust
@@ -693,7 +693,7 @@ production/ (same structure)
 - **Performance**: Infrastructure capable of handling target enterprise workloads
 
 ### Team Productivity & Knowledge
-- **AWS Competency**: Team demonstrates proficiency with EKS, RDS, Secrets Manager management
+- **AWS Competency**: Team demonstrates proficiency with EKS, PostgreSQL in Kubernetes, Secrets Manager management
 - **GitOps Proficiency**: Team skilled in ArgoCD workflow and troubleshooting
 - **Architecture Understanding**: Team understands multi-service cloud architecture
 - **Documentation Quality**: Comprehensive guides enabling independent development and operations
@@ -731,7 +731,7 @@ Sprint 2 will focus on core backend service development and deployment to the AW
 
 ### Core Backend Development
 - Implement FastAPI authentication service with AWS Secrets Manager integration
-- Develop data service with RDS and ElastiCache integration
+- Develop data service with PostgreSQL StatefulSets and ElastiCache integration
 - Create notification service with real-time WebSocket capabilities
 - Deploy all services to staging environment via ArgoCD
 

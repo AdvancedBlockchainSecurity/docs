@@ -75,7 +75,7 @@ Develop comprehensive end-to-end testing suite covering the complete platform wo
 - Confirm SSL certificate provisioning and renewal
 
 ### Core Dependencies
-- **AWS Service Testing**: Secrets Manager, RDS, ElastiCache integration
+- **AWS Service Testing**: Secrets Manager, PostgreSQL StatefulSets, ElastiCache integration
 - **Real-time Communication**: WebSocket connection and message delivery
 - **Certificate Management**: SSL certificate lifecycle testing
 

@@ -34,7 +34,7 @@ production-infrastructure/
 
 ### Key Components to Implement
 - **Network Security**: Production-specific security groups and network policies
-- **Database Backup**: Enhanced backup strategies for single-AZ RDS deployment
+- **Database Backup**: Enhanced backup strategies for PostgreSQL StatefulSets deployment
 - **EKS Scaling**: Production cluster autoscaling and node management
 
 ### Technical Requirements

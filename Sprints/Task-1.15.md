@@ -58,7 +58,7 @@ solidity-security-docs/
 
 ### Key Components to Implement
 - **EKS Management**: Cluster setup, node management, and troubleshooting
-- **AWS Services**: RDS, ElastiCache, Secrets Manager operational procedures
+- **AWS Services**: PostgreSQL StatefulSets, ElastiCache, Secrets Manager operational procedures
 - **Monitoring**: CloudWatch, Grafana, and Prometheus management guides
 
 ### Technical Requirements
@@ -106,7 +106,7 @@ solidity-security-docs/
 ### AWS Infrastructure Documentation Requirements
 - [ ] EKS cluster management and troubleshooting guides created
 - [ ] AWS Secrets Manager integration and secret management documented
-- [ ] RDS and ElastiCache operational procedures documented
+- [ ] PostgreSQL StatefulSets and ElastiCache operational procedures documented
 - [ ] ArgoCD deployment and application management guides created
 - [ ] Monitoring and alerting configuration documentation complete
 
@@ -128,7 +128,7 @@ solidity-security-docs/
 
 ### Phase 1: AWS Infrastructure Documentation (2 hours)
 1. Create EKS cluster management and troubleshooting comprehensive guides
-2. Document AWS service integration procedures for RDS, ElastiCache, Secrets Manager
+2. Document AWS service integration procedures for PostgreSQL StatefulSets, ElastiCache, Secrets Manager
 3. Build monitoring and alerting configuration and management documentation
 
 ### Phase 2: Architecture Documentation (1.5 hours)
@@ -158,7 +158,7 @@ solidity-security-docs/
 - [ ] Task 1.15 started
 - [ ] EKS cluster management and troubleshooting guides created
 - [ ] AWS Secrets Manager integration and management documented
-- [ ] RDS and ElastiCache operational procedures documented
+- [ ] PostgreSQL StatefulSets and ElastiCache operational procedures documented
 - [ ] ArgoCD deployment and application management guides created
 - [ ] Monitoring and alerting configuration documentation complete
 - [ ] Comprehensive architecture diagrams created with service interactions

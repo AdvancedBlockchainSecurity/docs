@@ -126,7 +126,7 @@ solidity-security-shared/
 
 4. **Infrastructure Management** → `solidity-security-aws-infrastructure`
    - AWS cloud resources via Terraform
-   - EKS, RDS, ElastiCache configurations
+   - EKS, PostgreSQL StatefulSets, ElastiCache configurations
    - IAM and security policies
 
 ## Step 2: Multi-Language Shared Library Development (2.5 hours)

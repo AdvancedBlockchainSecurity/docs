@@ -2,18 +2,18 @@
 
 ## Repository: `solidity-security-aws-infrastructure`
 
-AWS Infrastructure as Code repository containing all cloud infrastructure configurations, including VPC, EKS, RDS, ElastiCache, IAM, and Secrets Manager configurations. This task focuses on the networking module providing secure foundation for all AWS services.
+AWS Infrastructure as Code repository containing all cloud infrastructure configurations, including VPC, EKS, PostgreSQL in Kubernetes, ElastiCache, IAM, and Secrets Manager configurations. This task focuses on the networking module providing secure foundation for all AWS services.
 
-**✅ ALIGNMENT CHECK**: This implementation establishes the secure networking foundation required for EKS, RDS, and ElastiCache services as specified in Sprint 1 AWS infrastructure requirements.
+**✅ ALIGNMENT CHECK**: This implementation establishes the secure networking foundation required for EKS, PostgreSQL StatefulSets, and ElastiCache services as specified in Sprint 1 AWS infrastructure requirements.
 
 ## High-Level Objectives
 
 ### Primary Goal
-Create secure and scalable VPC infrastructure with multi-AZ design to support EKS clusters, RDS databases, and ElastiCache services.
+Create secure and scalable VPC infrastructure with multi-AZ design to support EKS clusters, PostgreSQL StatefulSets, and ElastiCache services.
 
 ### Key Requirements (from docs)
 - **VPC Design**: Single-AZ VPC with public and private subnets for MVP deployment
-- **Security Groups**: Configured for EKS, RDS, and ElastiCache with least-privilege access
+- **Security Groups**: Configured for EKS and ElastiCache with least-privilege access, NetworkPolicies for PostgreSQL
 - **Internet Access**: NAT gateways for secure private subnet internet connectivity
 - **Service Integration**: VPC endpoints for AWS services to reduce internet egress
 
@@ -72,7 +72,7 @@ solidity-security-aws-infrastructure/
 
 ### Key Components to Implement
 - **EKS Security Groups**: Node groups, control plane, and pod communication
-- **RDS Security Groups**: Database access limited to EKS nodes
+- **Database Security**: PostgreSQL access controlled via Kubernetes NetworkPolicies
 - **ElastiCache Security Groups**: Cache access limited to application services
 
 ### Integration Strategy
@@ -108,7 +108,7 @@ solidity-security-aws-infrastructure/
 
 ### Security Configuration Requirements
 - [ ] EKS security groups configured with least-privilege access
-- [ ] RDS security groups allowing only EKS node access
+- [ ] PostgreSQL NetworkPolicies configured for pod-to-pod communication
 - [ ] ElastiCache security groups with restricted application access
 - [ ] Network ACLs configured for additional security layers
 - [ ] Security group rules documented and validated
@@ -128,7 +128,7 @@ solidity-security-aws-infrastructure/
 
 ### Phase 2: Security and Access Control (1.5 hours)
 1. Configure EKS security groups for cluster communication and node access
-2. Set up RDS security groups with database-specific access controls
+2. Plan PostgreSQL NetworkPolicies for Kubernetes-native security controls
 3. Create ElastiCache security groups for cache service access
 
 ### Phase 3: Connectivity and Optimization (1 hour)
@@ -156,7 +156,7 @@ solidity-security-aws-infrastructure/
 - [ ] Private subnet deployed in single availability zone
 - [ ] Internet Gateway attached and routing tables configured
 - [ ] EKS security groups configured with proper access controls
-- [ ] RDS security groups configured for database access
+- [ ] PostgreSQL NetworkPolicies planned for Kubernetes security
 - [ ] ElastiCache security groups configured for cache access
 - [ ] NAT gateway deployed in single AZ
 - [ ] VPC endpoints configured for AWS services

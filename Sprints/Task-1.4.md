@@ -106,7 +106,7 @@ solidity-security-aws-infrastructure/
 - **Integration Testing**: External Secrets Operator connectivity
 
 ### Integration Requirements
-- Rotation policies compatible with RDS and ElastiCache
+- Rotation policies compatible with PostgreSQL and ElastiCache
 - Secret access logging for security monitoring
 - Testing framework for secret retrieval validation
 

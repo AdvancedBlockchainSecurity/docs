@@ -55,7 +55,7 @@ sprint-completion/
 - Ensure team readiness for Sprint 2 development tasks
 
 ### Key Components to Implement
-- **AWS Competency**: EKS, RDS, Secrets Manager management skills
+- **AWS Competency**: EKS, PostgreSQL in Kubernetes, Secrets Manager management skills
 - **GitOps Proficiency**: ArgoCD workflow and troubleshooting capabilities
 - **Architecture Understanding**: Multi-service cloud architecture comprehension
 

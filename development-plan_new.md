@@ -26,7 +26,7 @@
 **AWS-First Development**: Production-grade cloud infrastructure from day one
 - **Development Environment**: AWS EKS with staging/production parity (~$250/month)
 - **Production Environment**: Multi-AZ deployment with auto-scaling (~$1,250/month at scale)
-- **Database**: RDS PostgreSQL with read replicas and automated backups
+- **Database**: PostgreSQL StatefulSets with persistent volumes and automated backups
 - **Caching**: ElastiCache Redis with clustering and failover
 - **Secret Management**: AWS Secrets Manager with automatic rotation and cross-region replication
 - **Cost**: $250-350/month for development, scaling to $500-2500/month in production
@@ -106,7 +106,7 @@ Cross-Region Replication:
 - Configure staging and production subdomains with A records
 - Develop VPC, subnets, security groups, and networking components
 - Design EKS cluster configuration with managed node groups
-- Configure RDS PostgreSQL 15 with automated backups for both environments
+- Configure PostgreSQL 15 StatefulSets with persistent volumes for both environments
 - Configure ElastiCache Redis with encryption for both environments
 - Set up AWS Secrets Manager for secret management with automatic rotation
 - Configure AWS IAM roles and policies with least privilege access
@@ -155,7 +155,7 @@ Support & Documentation (4):
 **Acceptance Criteria**:
 - AWS infrastructure fully operational in staging and production environments
 - EKS clusters accessible with proper networking and security configuration
-- RDS and ElastiCache deployed and accessible from EKS with encryption
+- PostgreSQL StatefulSets and ElastiCache deployed and accessible from EKS with encryption
 - AWS Secrets Manager operational with proper IAM integration and encryption
 - All 18 repositories properly structured, initialized, and integrated
 - Shared libraries working consistently across Python, TypeScript, and Rust services
@@ -230,7 +230,7 @@ Support & Documentation (4):
 - Implement SQLAlchemy models and comprehensive database schema
 - Create repository pattern for data access with proper abstraction
 - Implement database migrations with Alembic and rollback procedures
-- Configure connection pooling with RDS PostgreSQL and optimization
+- Configure connection pooling with PostgreSQL in Kubernetes and optimization
 - Implement multi-tier caching strategies with ElastiCache Redis
 - Configure AWS Secrets Manager integration for database credentials with rotation
 - Deploy Data service to staging via ArgoCD with proper monitoring
@@ -258,7 +258,7 @@ Support & Documentation (4):
 **Acceptance Criteria**:
 - All API services accessible via AWS ALB with SSL and security policies
 - JWT authentication and refresh working correctly with all providers
-- Database operations performing efficiently with RDS and proper caching
+- Database operations performing efficiently with PostgreSQL in Kubernetes and proper caching
 - WebSocket connections functional for real-time updates with scaling
 - All backend services deployed via ArgoCD with proper monitoring
 - Inter-service communication working correctly with Istio mTLS
@@ -1075,7 +1075,7 @@ Support & Documentation (4):
 - **End-to-End Tests (10%)**: Complete user journey testing with realistic scenarios and performance validation
 
 **Test Data Management**:
-- **Test Databases**: Isolated RDS instances per environment with realistic data volumes
+- **Test Databases**: Isolated PostgreSQL StatefulSets per environment with realistic data volumes
 - **Data Fixtures**: Reusable test data factories and builders with automated generation
 - **Test Isolation**: Transaction rollback between tests with proper cleanup
 - **Seed Data**: Consistent seed data for development and testing environments
@@ -1149,7 +1149,7 @@ Support & Documentation (4):
 | `solidity-security-tool-integration` | Sprint 4, 6, 13 | Slither, Aderyn, MythX, Certora | Python, Rust, Node.js |
 | `solidity-security-intelligence-engine` | Sprint 4, 7, 11 | ML models, deduplication | Python, ML libraries, Redis |
 | `solidity-security-orchestration` | Sprint 4 | Celery, job queues, Redis | Python, Celery, Redis |
-| `solidity-security-data-service` | Sprint 3 | PostgreSQL, caching | SQLAlchemy, Redis, RDS |
+| `solidity-security-data-service` | Sprint 3 | PostgreSQL, caching | SQLAlchemy, Redis, Kubernetes |
 | `solidity-security-notification` | Sprint 3, 8 | WebSocket, email, Slack | Node.js, Socket.io, SMTP |
 | `solidity-security-contract-parser` | Sprint 4 | Solidity parsing, AST | Rust, HTTP API |
 
@@ -1164,7 +1164,7 @@ Support & Documentation (4):
 ### Infrastructure & Operations (3 repositories)
 | Repository | Sprint Integration | Key Dependencies | Technical Stack |
 |------------|-------------------|------------------|-----------------|
-| `solidity-security-aws-infrastructure` | Sprint 1, 2 | EKS, RDS, networking | Terraform, Kubernetes |
+| `solidity-security-aws-infrastructure` | Sprint 1, 2 | EKS, PostgreSQL StatefulSets, networking | Terraform, Kubernetes |
 | `solidity-security-monitoring` | Sprint 2, 15 | Prometheus, Grafana | Monitoring stack, alerts |
 | `solidity-security-shared` | Sprint 1 | Multi-language libraries | Python, TypeScript, Rust |
 

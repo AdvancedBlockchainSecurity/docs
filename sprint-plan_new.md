@@ -15,7 +15,7 @@
 **AWS Infrastructure Development**:
 - Develop VPC, subnets, security groups, and networking components
 - Design EKS cluster configuration with managed node groups for staging and production
-- Configure RDS PostgreSQL 15 with automated backups for both environments
+- Configure PostgreSQL in Kubernetes StatefulSets for both environments (cost-optimized)
 - Configure ElastiCache Redis with encryption for both environments
 - Configure AWS Secrets Manager for centralized secret management with automatic rotation
 - Configure AWS IAM roles and policies with least privilege
@@ -23,7 +23,7 @@
 - Configure Prometheus, Grafana, Loki + Fluent Bit monitoring and logging
 - Deploy AWS VPC and networking infrastructure
 - Deploy EKS clusters for staging and production
-- Deploy RDS PostgreSQL instances with security groups
+- Deploy PostgreSQL StatefulSets in Kubernetes with persistent volumes
 - Deploy ElastiCache Redis clusters
 - Configure AWS Secrets Manager with proper IAM policies and KMS encryption
 
@@ -39,7 +39,7 @@
 **Acceptance Criteria**:
 - AWS infrastructure fully operational in staging and production
 - EKS clusters accessible with proper networking configuration
-- RDS and ElastiCache deployed and accessible from EKS
+- PostgreSQL StatefulSets and ElastiCache deployed and accessible from EKS
 - AWS Secrets Manager operational with proper IAM integration and encryption
 - All 17 repositories properly structured and initialized
 - Shared libraries working across Python, TypeScript, and Rust services
@@ -124,7 +124,7 @@
 - Implement SQLAlchemy models and database schema
 - Create repository pattern for data access
 - Implement database migrations with Alembic
-- Configure connection pooling with RDS PostgreSQL
+- Configure connection pooling with PostgreSQL in Kubernetes
 - Implement caching strategies with ElastiCache Redis
 - Configure AWS Secrets Manager integration for database credentials
 - Deploy Data service to staging via ArgoCD
@@ -151,7 +151,7 @@
 **Acceptance Criteria**:
 - API services accessible via AWS ALB with SSL
 - JWT authentication and refresh working correctly
-- Database operations performing efficiently with RDS
+- Database operations performing efficiently with PostgreSQL in Kubernetes
 - WebSocket connections functional for real-time updates
 - All backend services deployed via ArgoCD
 - Inter-service communication working correctly
