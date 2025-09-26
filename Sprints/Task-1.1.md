@@ -9,7 +9,7 @@ AWS Infrastructure as Code repository containing all cloud infrastructure config
 ## High-Level Objectives
 
 ### Primary Goal
-Register domain and set up initial DNS infrastructure. Actual service DNS records will be configured after AWS infrastructure is deployed.
+Register the domain and set up initial DNS infrastructure. Actual service DNS records will be configured after AWS infrastructure is deployed.
 
 ### Key Requirements (from docs)
 - **Domain Registration**: Purchase production domain via Cloudflare
