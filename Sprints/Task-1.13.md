@@ -24,7 +24,7 @@ Configure secure and resilient inter-service communication with authentication p
 ### AWS Integration Points
 - **External Secrets**: Service credential management
 - **IRSA Integration**: Secure AWS service access
-- **CloudWatch Logging**: Service communication monitoring
+- **Loki Logging**: Service communication monitoring via Loki + Fluent Bit
 - **ALB Health Checks**: Load balancing and health monitoring
 
 ## Step 1: Service-to-Service Communication Setup (2 hours)
@@ -104,7 +104,7 @@ Configure secure and resilient inter-service communication with authentication p
 - [ ] Retry logic configured with exponential backoff
 - [ ] Health checks reflect service and dependency status accurately
 - [ ] Service failures isolated without cascading effects
-- [ ] CloudWatch logging capturing service communication metrics
+- [ ] Loki logging capturing service communication metrics via Fluent Bit
 
 ## Implementation Priority
 
@@ -128,7 +128,7 @@ Configure secure and resilient inter-service communication with authentication p
 
 1. **Authentication**: Ensure JWT tokens are properly validated and propagated across all service boundaries
 2. **Error Handling**: Implement comprehensive error handling with appropriate HTTP status codes
-3. **Monitoring**: Add detailed logging and metrics for service communication patterns
+3. **Monitoring**: Add detailed logging via Loki + Fluent Bit and metrics for service communication patterns
 4. **Security**: Use HTTPS/WSS for all external communication and secure internal traffic
 
 ---
@@ -153,6 +153,6 @@ Configure secure and resilient inter-service communication with authentication p
 - [ ] Retry logic configured with exponential backoff
 - [ ] Health checks configured with dependency awareness
 - [ ] Service failure isolation tested and functional
-- [ ] CloudWatch logging configured for service communication
+- [ ] Loki logging configured for service communication via Fluent Bit
 - [ ] End-to-end communication testing completed
 - [ ] Task 1.13 completed with resilient service communication operational
