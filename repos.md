@@ -78,7 +78,7 @@ solidity-security-api-service/
 ### 2. **`solidity-security-tool-integration`** (~12K LOC)
 **Security tool adapters and integrations - Hybrid Python/Rust**
 ```
-Purpose: Slither, Aderyn, MythX, Solidity-Metrics adapters (migrated from solidity-security-infrastructure)
+Purpose: Slither, Aderyn, MythX, Solidity-Metrics adapters
 Tech Stack: Python 3.11 + Rust core, asyncio, aiohttp, subprocess, Rust wrappers (for Slither, Aderyn), Node.js wrappers (for MythX, Solidity-Metrics)
 Rust Components: High-performance tool execution, parallel processing, native Aderyn integration
 Python Components: FastAPI service layer, external integrations, configuration management
@@ -681,12 +681,11 @@ solidity-security-shared/
 ### **Infrastructure Repositories (3 repos)**
 
 ### 13. **`solidity-security-aws-infrastructure`**
-**AWS Infrastructure as Code repository (renamed from solidity-security-infrastructure)**
+**AWS Infrastructure as Code repository**
 ```
-Purpose: AWS cloud resource provisioning and management (no longer contains tool interfaces)
+Purpose: AWS cloud resource provisioning and management
 Tech Stack: Terraform, AWS CLI, CloudFormation
 Contains: VPC, EKS, RDS, ElastiCache, IAM, Secrets Manager configurations
-Note: Security tool interfaces migrated to solidity-security-tool-integration
 ```
 
 ### 14. **`solidity-security-monitoring`**
@@ -708,21 +707,19 @@ Contains: Architecture docs, setup guides, API documentation
 ```
 
 ### 16. **`solidity-security-tools`**
-**Security tool configurations and utilities (enhanced with migrated content)**
+**Security tool configurations and utilities**
 ```
-Purpose: Tool installation scripts, configuration templates, test contracts (includes migrated installation scripts)
+Purpose: Tool installation scripts, configuration templates, test contracts
 Tech Stack: Shell scripts, Docker, tool-specific configs
 Contains: Tool installation scripts, test fixtures, tool version management, configuration templates
-Migration: Tool installation and configuration scripts from old solidity-security-infrastructure
 ```
 
 ### 17. **`solidity-security-vulnerabilities`**
-**Vulnerability database and intelligence (enhanced with migrated content)**
+**Vulnerability database and intelligence**
 ```
-Purpose: Vulnerability data, patterns, and threat intelligence (includes migrated vulnerability definitions)
+Purpose: Vulnerability data, patterns, and threat intelligence
 Tech Stack: JSON/YAML schemas, Python scripts
 Contains: Vulnerability definitions, patterns, threat intelligence, SWC mappings, severity classifications
-Migration: Vulnerability patterns and definitions from old solidity-security-infrastructure
 ```
 
 ## Repository Size Summary
