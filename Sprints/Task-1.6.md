@@ -1,6 +1,6 @@
 # Task 1.6: Kubernetes Infrastructure Components - Objectives & Implementation Details
 
-**✅ ALIGNMENT CHECK**: This implementation installs essential Kubernetes infrastructure components including AWS Load Balancer Controller, cert-manager, and External Secrets Operator as specified in Sprint 1 documentation.
+**✅ ALIGNMENT CHECK**: This implementation installs essential Kubernetes infrastructure components including AWS Load Balancer Controller, cert-manager, and Vault Secrets Operator as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
 
@@ -10,7 +10,7 @@ Install and configure critical Kubernetes infrastructure components to enable se
 ### Key Requirements (from docs)
 - **Load Balancer Controller**: AWS Load Balancer Controller for ALB management
 - **Certificate Management**: cert-manager with Let's Encrypt and DNS validation
-- **Secret Integration**: External Secrets Operator with AWS IAM authentication
+- **Secret Integration**: Vault Secrets Operator with Kubernetes RBAC authentication
 - **CSI Driver**: AWS Secrets Store CSI Driver for direct secret mounting
 
 ## Directory Structure Requirements
@@ -30,10 +30,10 @@ solidity-security-aws-infrastructure/
     │   │   ├── cluster-issuer.yaml # Let's Encrypt ClusterIssuer
     │   │   └── cloudflare-secret.yaml # Cloudflare API secret template
     │   ├── external-secrets/
-    │   │   ├── kustomization.yaml # External Secrets base config
-    │   │   ├── operator.yaml      # External Secrets Operator
+    │   │   ├── kustomization.yaml # Vault Secrets base config
+    │   │   ├── operator.yaml      # Vault Secrets Operator
     │   │   ├── cluster-secret-store.yaml # AWS Secrets Manager store
-    │   │   └── rbac.yaml          # RBAC for External Secrets
+    │   │   └── rbac.yaml          # RBAC for Vault Secrets
     │   └── monitoring/
     │       ├── kustomization.yaml # Monitoring base config
     │       └── service-monitors.yaml # Service monitoring configs
@@ -91,13 +91,13 @@ solidity-security-aws-infrastructure/
 ## Step 3: Secrets Management Integration (1 hour)
 
 ### Objectives
-- Install External Secrets Operator for AWS Secrets Manager integration
+- Install Vault Secrets Operator for HashiCorp Vault integration
 - Configure AWS Secrets Store CSI Driver for direct secret mounting
 - Set up IRSA for secure AWS Secrets Manager access
 
 ### Core Dependencies
-- **Kustomize Base Manifests**: Base External Secrets Operator configuration
-- **External Secrets Operator**: Kubernetes-native secret synchronization
+- **Kustomize Base Manifests**: Base Vault Secrets Operator configuration
+- **Vault Secrets Operator**: Kubernetes-native secret synchronization
 - **CSI Secrets Driver**: Direct secret mounting capabilities via Kustomize
 - **Environment Overlays**: Staging vs production secrets configurations
 
@@ -124,9 +124,9 @@ solidity-security-aws-infrastructure/
 - [ ] Test certificate issuance for domain validation
 
 ### Secrets Management Requirements
-- [ ] Kustomize base manifests created for External Secrets Operator
+- [ ] Kustomize base manifests created for Vault Secrets Operator
 - [ ] Environment overlays configured for AWS Secrets Manager integration
-- [ ] External Secrets Operator deployed and operational
+- [ ] Vault Secrets Operator deployed and operational
 - [ ] IRSA configured for AWS Secrets Manager access
 - [ ] Test secret synchronization from AWS Secrets Manager via Kustomize
 
@@ -143,7 +143,7 @@ solidity-security-aws-infrastructure/
 3. Deploy via Kustomize and test certificate issuance with Cloudflare DNS
 
 ### Phase 3: Secrets Integration (1 hour)
-1. Create Kustomize base manifests for External Secrets Operator
+1. Create Kustomize base manifests for Vault Secrets Operator
 2. Configure environment overlays for AWS Secrets Manager integration
 3. Deploy via Kustomize and test secret synchronization capabilities
 
@@ -171,7 +171,7 @@ solidity-security-aws-infrastructure/
 - [ ] Let's Encrypt ClusterIssuers configured (staging and production)
 - [ ] Cloudflare DNS integration configured and tested
 - [ ] Test certificate issuance completed successfully
-- [ ] External Secrets Operator installed and configured
+- [ ] Vault Secrets Operator installed and configured
 - [ ] AWS Secrets Store CSI Driver installed and operational
 - [ ] IRSA configured for AWS Secrets Manager access
 - [ ] Secret synchronization from AWS Secrets Manager tested

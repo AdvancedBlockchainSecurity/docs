@@ -99,12 +99,12 @@ solidity-security-monitoring/
 ### Key Components to Implement
 - **Kustomize Base Manifests**: Base Grafana deployment with ConfigMaps
 - **Environment Overlays**: Environment-specific dashboard and data source configurations
-- **AWS Integration**: Secrets Manager integration via External Secrets Operator
+- **Vault Integration**: HashiCorp Vault integration via Vault Secrets Operator
 - **Data Sources**: Prometheus data source configuration via Kustomize
 
 ### Integration Strategy
 - Kustomize-based deployment with environment-specific configurations
-- External Secrets Operator integration for Grafana credentials
+- Vault Secrets Operator integration for Grafana credentials
 - Multi-environment dashboard organization via Kustomize overlays
 - Role-based access control for team members
 
@@ -180,7 +180,7 @@ solidity-security-monitoring/
 3. Set up service monitors for automatic target detection and validation
 
 ### Phase 2: Grafana and Visualization (1 hour)
-1. Deploy Grafana with External Secrets Operator integration
+1. Deploy Grafana with Vault Secrets Operator integration
 2. Configure Prometheus data sources
 3. Create initial platform health and infrastructure dashboards
 
@@ -198,7 +198,7 @@ solidity-security-monitoring/
 
 1. **Resource Management**: Configure appropriate resource limits for monitoring components
 2. **Data Retention**: Set retention policies balancing storage costs with historical data needs
-3. **Security**: Use External Secrets Operator for all monitoring credential management
+3. **Security**: Use Vault Secrets Operator for all monitoring credential management
 4. **Dashboard Organization**: Create environment-specific dashboard folders for clear organization
 
 ---

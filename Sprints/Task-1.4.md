@@ -1,43 +1,43 @@
-# Task 1.4: AWS Secrets Manager Setup - Objectives & Implementation Details
+# Task 1.4: Vault Setup - Objectives & Implementation Details
 
 ## Repository: `solidity-security-aws-infrastructure`
 
-AWS Infrastructure as Code repository containing all cloud infrastructure configurations. This task focuses on the security module providing AWS Secrets Manager infrastructure with IAM policies and rotation capabilities for secure credential management.
+AWS Infrastructure as Code repository containing all cloud infrastructure configurations. This task focuses on the security module providing HashiCorp Vault infrastructure with Kubernetes integration and rotation capabilities for secure credential management.
 
-**✅ ALIGNMENT CHECK**: This implementation establishes secure credential management for all platform services using AWS Secrets Manager with External Secrets Operator integration as specified in Sprint 1 documentation.
+**✅ ALIGNMENT CHECK**: This implementation establishes secure credential management for all platform services using HashiCorp Vault with Vault Secrets Operator integration as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
 
 ### Primary Goal
-Deploy and configure AWS Secrets Manager for secure credential storage with automatic rotation and Kubernetes integration via External Secrets Operator.
+Deploy and configure HashiCorp Vault for secure credential storage with automatic rotation and native Kubernetes integration via Vault Secrets Operator.
 
 ### Key Requirements (from docs)
-- **Secrets Manager**: Deploy for staging and production environments
-- **IAM Configuration**: Roles and policies for secure secret access
-- **Automatic Rotation**: Rotation policies for database credentials
-- **Organization Structure**: Hierarchical secret organization for all services
+- **Vault Deployment**: Deploy for staging and production environments in Kubernetes
+- **RBAC Configuration**: Vault policies and Kubernetes service accounts for secure secret access
+- **Automatic Rotation**: Rotation policies for database credentials using Vault's dynamic secrets
+- **Organization Structure**: Hierarchical secret organization using Vault's KV secrets engine
 
 ## Directory Structure Requirements
 
 ```
-solidity-security-aws-infrastructure/
-├── terraform/
-│   ├── modules/
-│   │   ├── security/              # Security and secrets management
-│   │   │   ├── secrets_manager.tf # Secrets Manager configuration
-│   │   │   ├── iam_roles.tf       # IAM roles and policies
-│   │   │   ├── rotation_policies.tf # Automatic rotation
-│   │   │   ├── kms_keys.tf        # KMS encryption keys
-│   │   │   ├── variables.tf       # Module variables
-│   │   │   └── outputs.tf         # Module outputs
-│   │   └── monitoring/
-│   │       └── secrets_monitoring.tf # Secrets access monitoring
-│   ├── environments/
-│   │   ├── staging/               # Staging secrets config
-│   │   └── production/            # Production secrets config
-│   └── shared/                    # Shared security components
-├── k8s/
-│   └── external-secrets/          # External Secrets Operator configs
+solidity-security-monitoring/
+├── vault/
+│   ├── manifests/                 # Kubernetes manifests for Vault
+│   │   ├── vault-namespace.yaml   # Vault namespace
+│   │   ├── vault-statefulset.yaml # Vault StatefulSet configuration
+│   │   ├── vault-service.yaml     # Vault service
+│   │   ├── vault-configmap.yaml   # Vault configuration
+│   │   ├── vault-rbac.yaml        # RBAC for Vault
+│   │   └── vault-pvc.yaml         # Persistent volume claims
+│   ├── policies/                  # Vault policies
+│   │   ├── backend-services.hcl   # Backend service policies
+│   │   ├── frontend-services.hcl  # Frontend service policies
+│   │   └── admin.hcl              # Admin policies
+│   ├── auth/                      # Authentication methods
+│   │   └── kubernetes-auth.hcl    # Kubernetes auth configuration
+│   └── secrets-engines/           # Secrets engine configurations
+│       ├── kv-v2.hcl              # KV v2 secrets engine
+│       └── database.hcl           # Database secrets engine
 └── README.md
 ```
 
@@ -58,23 +58,23 @@ solidity-security-aws-infrastructure/
 - `findings` (Database connections, API credentials)
 - `analysis` (Service endpoints, authentication tokens)
 
-## Step 1: Secrets Manager Infrastructure (1.5 hours)
+## Step 1: Vault Infrastructure (1.5 hours)
 
 ### Objectives
-- Deploy AWS Secrets Manager for staging and production environments
-- Configure IAM roles and policies for least-privilege secret access
-- Set up secret organization structure for all services
+- Deploy HashiCorp Vault StatefulSets for staging and production environments
+- Configure Vault policies and Kubernetes RBAC for least-privilege secret access
+- Set up secret organization structure using Vault's KV v2 secrets engine
 
 ### Key Components to Implement
-- **Secrets Manager**: Service deployment in both environments
-- **IAM Policies**: Least-privilege access for services and External Secrets Operator
-- **Secret Organization**: Hierarchical structure for service categorization
+- **Vault Deployment**: StatefulSet deployment in both Kubernetes environments
+- **RBAC Policies**: Least-privilege access for services and Vault Secrets Operator
+- **Secret Organization**: Hierarchical structure using Vault's KV v2 secrets engine
 
 ### Technical Requirements
-- Environment-specific secret isolation (staging/production)
-- Service-specific IAM roles for secret access
-- Secret naming convention for easy management
-- Encryption at rest using AWS KMS
+- Environment-specific secret isolation using Vault namespaces
+- Service-specific Kubernetes service accounts for secret access
+- Secret naming convention using Vault's hierarchical paths
+- Encryption at rest using Vault's built-in encryption
 
 ## Step 2: Secret Organization and Structure (1 hour)
 
@@ -89,9 +89,9 @@ solidity-security-aws-infrastructure/
 - **Initial Secrets**: Database credentials, Redis credentials, basic service keys
 
 ### Integration Strategy
-- Secret organization supporting External Secrets Operator
-- Environment-specific secret namespacing
-- Service-specific secret access patterns
+- Secret organization supporting Vault Secrets Operator
+- Environment-specific secret namespacing using Vault namespaces
+- Service-specific secret access patterns using Vault policies
 
 ## Step 3: Automatic Rotation and Monitoring (30 minutes)
 
@@ -101,23 +101,23 @@ solidity-security-aws-infrastructure/
 - Validate secret retrieval from Kubernetes services
 
 ### Core Dependencies
-- **Rotation Policies**: Database credential automatic rotation
-- **Access Monitoring**: CloudTrail logging for secret access
-- **Integration Testing**: External Secrets Operator connectivity
+- **Rotation Policies**: Database credential automatic rotation using Vault's database secrets engine
+- **Access Monitoring**: Vault audit logging for secret access
+- **Integration Testing**: Vault Secrets Operator connectivity
 
 ### Integration Requirements
-- Rotation policies compatible with PostgreSQL and ElastiCache
-- Secret access logging for security monitoring
-- Testing framework for secret retrieval validation
+- Rotation policies compatible with PostgreSQL using Vault's database secrets engine
+- Secret access logging for security monitoring via Vault audit logs
+- Testing framework for secret retrieval validation with Vault CLI
 
 ## Success Criteria & Validation
 
-### Secrets Manager Infrastructure Requirements
-- [ ] AWS Secrets Manager operational in staging environment
-- [ ] AWS Secrets Manager operational in production environment
-- [ ] IAM roles configured with least-privilege secret access
-- [ ] Secret organization structure implemented per specification
-- [ ] KMS encryption configured for all secrets
+### Vault Infrastructure Requirements
+- [ ] HashiCorp Vault operational in staging environment
+- [ ] HashiCorp Vault operational in production environment
+- [ ] Vault policies configured with least-privilege secret access
+- [ ] Secret organization structure implemented using KV v2 secrets engine
+- [ ] Vault encryption configured for all secrets
 
 ### Secret Organization Requirements
 - [ ] Backend service secrets organized by service category
@@ -127,35 +127,35 @@ solidity-security-aws-infrastructure/
 - [ ] Tool integration secrets (MythX, etc.) properly organized
 
 ### Integration and Security Requirements
-- [ ] External Secrets Operator IAM integration configured
-- [ ] Secret rotation policies configured for database credentials
-- [ ] CloudTrail logging enabled for secret access monitoring
-- [ ] Secret retrieval tested from Kubernetes environment
-- [ ] Access controls validated for service-specific secret access
+- [ ] Vault Secrets Operator Kubernetes integration configured
+- [ ] Secret rotation policies configured for database credentials using Vault's database engine
+- [ ] Vault audit logging enabled for secret access monitoring
+- [ ] Secret retrieval tested from Kubernetes environment using Vault CLI
+- [ ] Access controls validated for service-specific secret access using Vault policies
 
 ## Implementation Priority
 
 ### Phase 1: Core Infrastructure (1.5 hours)
-1. Deploy AWS Secrets Manager in staging and production environments
-2. Configure IAM roles and policies for External Secrets Operator integration
-3. Set up KMS encryption and secret organization hierarchy
+1. Deploy HashiCorp Vault StatefulSets in staging and production environments
+2. Configure Vault policies and Kubernetes RBAC for Vault Secrets Operator integration
+3. Set up Vault encryption and secret organization hierarchy using KV v2 engine
 
 ### Phase 2: Secret Organization (1 hour)
-1. Create service-specific secret categories and initial secrets
-2. Deploy database and Redis credentials with rotation configuration
-3. Set up tool integration secrets (API keys, third-party credentials)
+1. Create service-specific secret categories and initial secrets using Vault KV v2
+2. Deploy database credentials with dynamic rotation using Vault's database engine
+3. Set up tool integration secrets (API keys, third-party credentials) in Vault
 
 ### Phase 3: Monitoring and Validation (30 minutes)
-1. Configure automatic rotation policies for database credentials
-2. Enable CloudTrail logging for secret access monitoring
-3. Test secret retrieval integration with External Secrets Operator
+1. Configure automatic rotation policies for database credentials using Vault's database engine
+2. Enable Vault audit logging for secret access monitoring
+3. Test secret retrieval integration with Vault Secrets Operator
 
 ## Key Implementation Notes
 
-1. **Secret Naming**: Use consistent naming convention: `{environment}/{service}/{secret-type}`
-2. **Access Control**: Implement least-privilege IAM policies for each service
-3. **Rotation**: Configure automatic rotation for database credentials to enhance security
-4. **Monitoring**: Enable comprehensive logging for secret access and rotation events
+1. **Secret Naming**: Use consistent naming convention: `{environment}/{service}/{secret-type}` in Vault KV v2
+2. **Access Control**: Implement least-privilege Vault policies for each service
+3. **Rotation**: Configure automatic rotation for database credentials using Vault's database engine
+4. **Monitoring**: Enable comprehensive Vault audit logging for secret access and rotation events
 
 ---
 
@@ -165,18 +165,18 @@ solidity-security-aws-infrastructure/
 
 ## Task Checklist
 - [ ] Task 1.4 started
-- [ ] AWS Secrets Manager deployed in staging environment
-- [ ] AWS Secrets Manager deployed in production environment
-- [ ] IAM roles and policies configured for External Secrets Operator
-- [ ] Secret organization structure implemented
-- [ ] KMS encryption configured for all secrets
-- [ ] Backend service secrets created and organized
-- [ ] Frontend service secrets created and organized
-- [ ] Database credentials stored with rotation policies
-- [ ] Redis credentials configured with access controls
-- [ ] Tool integration secrets (MythX, APIs) stored securely
-- [ ] Automatic rotation policies configured for database credentials
-- [ ] CloudTrail logging enabled for secret access monitoring
-- [ ] External Secrets Operator integration tested and validated
-- [ ] Service-specific secret access controls validated
-- [ ] Task 1.4 completed with full secret management operational
+- [ ] HashiCorp Vault deployed in staging environment
+- [ ] HashiCorp Vault deployed in production environment
+- [ ] Vault policies and Kubernetes RBAC configured for Vault Secrets Operator
+- [ ] Secret organization structure implemented using KV v2 engine
+- [ ] Vault encryption configured for all secrets
+- [ ] Backend service secrets created and organized in Vault
+- [ ] Frontend service secrets created and organized in Vault
+- [ ] Database credentials stored with dynamic rotation policies using Vault's database engine
+- [ ] Redis credentials configured with access controls in Vault
+- [ ] Tool integration secrets (MythX, APIs) stored securely in Vault
+- [ ] Automatic rotation policies configured for database credentials using Vault
+- [ ] Vault audit logging enabled for secret access monitoring
+- [ ] Vault Secrets Operator integration tested and validated
+- [ ] Service-specific secret access controls validated using Vault policies
+- [ ] Task 1.4 completed with full Vault secret management operational

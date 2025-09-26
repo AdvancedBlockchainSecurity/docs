@@ -17,7 +17,7 @@
 - Design EKS cluster configuration with managed node groups for staging and production
 - Configure PostgreSQL in Kubernetes StatefulSets for both environments (cost-optimized)
 - Configure ElastiCache Redis with encryption for both environments
-- Configure AWS Secrets Manager for centralized secret management with automatic rotation
+- Configure HashiCorp Vault for centralized secret management with automatic rotation
 - Configure AWS IAM roles and policies with least privilege
 - Design ECR repositories for all services
 - Configure Prometheus, Grafana, Loki + Fluent Bit monitoring and logging
@@ -25,7 +25,7 @@
 - Deploy EKS clusters for staging and production
 - Deploy PostgreSQL StatefulSets in Kubernetes with persistent volumes
 - Deploy ElastiCache Redis clusters
-- Configure AWS Secrets Manager with proper IAM policies and KMS encryption
+- Configure HashiCorp Vault with proper Kubernetes RBAC and built-in encryption
 
 **Repository Setup & Foundation**:
 - Initialize all 17 repositories with proper directory structures
@@ -40,7 +40,7 @@
 - AWS infrastructure fully operational in staging and production
 - EKS clusters accessible with proper networking configuration
 - PostgreSQL StatefulSets and ElastiCache deployed and accessible from EKS
-- AWS Secrets Manager operational with proper IAM integration and encryption
+- HashiCorp Vault operational with proper Kubernetes integration and encryption
 - All 17 repositories properly structured and initialized
 - Shared libraries working across Python, TypeScript, and Rust services
 - ECR repositories configured and accessible
@@ -65,7 +65,7 @@
 - Configure ArgoCD dashboard access via subdomains
 
 **Additional Infrastructure Components**:
-- Deploy External Secrets Operator via Kustomize for AWS Secrets Manager integration
+- Deploy Vault Secrets Operator via Kustomize for HashiCorp Vault integration
 - Deploy monitoring stack (Prometheus, Grafana, Loki + Fluent Bit) via Kustomize for both environments
 - Configure GitHub Actions CI/CD pipeline with Kustomize deployment automation
 
@@ -82,7 +82,7 @@
 - Create production-ready Kustomize base configurations for all backend services
 - Create production-ready Kustomize base configurations for all frontend services
 - Create environment-specific Kustomize overlays (staging/production)
-- Configure AWS Secrets Manager integration via Kustomize patches for all services
+- Configure HashiCorp Vault integration via Kustomize patches for all services
 - Configure Istio VirtualService and DestinationRule templates via Kustomize
 - Set up IRSA (IAM Roles for Service Accounts) for all services
 - Configure network policies and pod security policies via Kustomize
@@ -99,7 +99,7 @@
 - SSL certificates working for all configured domains
 - ArgoCD dashboard accessible via configured subdomains
 - ArgoCD deployed and operational in both environments
-- External Secrets Operator integrating with AWS Secrets Manager
+- Vault Secrets Operator integrating with HashiCorp Vault
 - Prometheus, Grafana, Loki + Fluent Bit monitoring operational with proper metrics and log collection
 - All microservice Kustomize templates created with enterprise security
 - IRSA configured for all services with least-privilege access
@@ -126,7 +126,7 @@
 - Implement database migrations with Alembic
 - Configure connection pooling with PostgreSQL in Kubernetes
 - Implement caching strategies with ElastiCache Redis
-- Configure AWS Secrets Manager integration for database credentials
+- Configure HashiCorp Vault integration for database credentials
 - Deploy Data service to staging via ArgoCD
 - Test database operations and caching
 
@@ -136,7 +136,7 @@
 - Configure email notification templates and SMTP integration
 - Implement notification preference management
 - Set up message queue with ElastiCache Redis
-- Configure AWS Secrets Manager integration for notification credentials
+- Configure HashiCorp Vault integration for notification credentials
 - Deploy Notification service to staging via ArgoCD
 - Test WebSocket connections and real-time notifications
 
@@ -146,7 +146,7 @@
 - Validate database operations and caching performance
 - Test inter-service communication
 - Configure health checks and monitoring endpoints
-- Validate AWS Secrets Manager integration
+- Validate HashiCorp Vault integration
 
 **Acceptance Criteria**:
 - API services accessible via AWS ALB with SSL
@@ -156,7 +156,7 @@
 - All backend services deployed via ArgoCD
 - Inter-service communication working correctly
 - Health checks and monitoring endpoints operational
-- AWS Secrets Manager properly managing credentials
+- HashiCorp Vault properly managing credentials
 
 #### Sprint 4: Security Tool Integration & Orchestration (Weeks 7-8)
 **Technical Milestone**: Core security tool integration with workflow orchestration
@@ -168,7 +168,7 @@
 - Create tool registry and factory pattern for extensibility
 - Implement result normalization to standardized vulnerability schema
 - Configure tool-specific rate limiting and quota management
-- Configure AWS Secrets Manager integration for tool credentials
+- Configure HashiCorp Vault integration for tool credentials
 - Deploy Tool Integration service to staging via ArgoCD
 
 **Orchestration Service Development**:
@@ -178,7 +178,7 @@
 - Create retry logic with exponential backoff for failed analyses
 - Set up dead letter queue for permanently failed jobs
 - Implement analysis status tracking
-- Configure AWS Secrets Manager integration for broker credentials
+- Configure HashiCorp Vault integration for broker credentials
 - Deploy Orchestration service to staging via ArgoCD
 
 **Contract Parser Service Development**:
@@ -276,7 +276,7 @@
 - Add MythX analysis modes (quick/standard/deep) selection
 - Create MythX-specific rate limiting and quota management
 - Implement MythX result parsing and normalization
-- Configure MythX authentication and credential management via AWS Secrets Manager
+- Configure MythX authentication and credential management via HashiCorp Vault
 - Deploy enhanced Tool Integration service with MythX support
 
 **Multi-Tool Orchestration Enhancement**:
@@ -843,7 +843,7 @@ Each sprint completion requires:
 - ArgoCD applications deploying successfully with healthy status
 - GitOps workflow tested and functional across all affected repositories
 - AWS infrastructure operational with proper monitoring
-- External Secrets Operator functioning correctly with AWS Secrets Manager across all environments
+- Vault Secrets Operator functioning correctly with HashiCorp Vault across all environments
 
 ### Production Readiness Validation
 

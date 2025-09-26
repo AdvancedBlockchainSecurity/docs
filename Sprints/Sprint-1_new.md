@@ -13,9 +13,9 @@ Sprint 1 establishes the foundational AWS infrastructure and repository structur
 - **EKS Cluster**: AWS Kubernetes service with managed node groups for staging and production
 - **PostgreSQL StatefulSets**: Database with automated backups and encryption in Kubernetes
 - **ElastiCache Redis**: Caching and message queue with encryption
-- **AWS Secrets Manager**: Centralized secret storage with automatic rotation
+- **HashiCorp Vault**: Centralized secret storage with automatic rotation
 - **AWS Load Balancer Controller**: Application Load Balancer with SSL termination
-- **External Secrets Operator**: Kubernetes-native secret injection from AWS Secrets Manager
+- **Vault Secrets Operator**: Kubernetes-native secret injection from HashiCorp Vault
 - **ArgoCD**: GitOps workflow management for both environments
 - **Monitoring & Logging**: Prometheus, Grafana, Loki + Fluent Bit integration
 
@@ -33,7 +33,7 @@ Sprint 1 establishes the foundational AWS infrastructure and repository structur
 4. **Shared Libraries**: Multi-language shared library with Python/TypeScript/Rust support
 5. **Service Templates**: Production-ready Kubernetes manifests for all microservices
 6. **DNS and Domain Setup**: Production domain with SSL certificates
-7. **Secret Management**: AWS Secrets Manager integration with External Secrets Operator
+7. **Secret Management**: HashiCorp Vault integration with Vault Secrets Operator
 
 ### Success Metrics
 - All 18 repositories properly structured and functional
@@ -41,7 +41,7 @@ Sprint 1 establishes the foundational AWS infrastructure and repository structur
 - Complete security analysis workflow deployable to cloud
 - ArgoCD managing all service deployments with automated sync
 - Domain accessible with SSL certificates
-- AWS Secrets Manager properly managing all credentials
+- HashiCorp Vault properly managing all credentials
 
 ## Detailed Task Breakdown
 
@@ -109,14 +109,14 @@ Sprint 1 establishes the foundational AWS infrastructure and repository structur
 
 ---
 
-### Task 1.4: AWS Secrets Manager Setup
+### Task 1.4: HashiCorp Vault Setup
 **Estimated Time**: 3 hours
 **Owner**: DevOps Team
 **Priority**: P0 (Critical)
 
 **Deliverables**:
-- Deploy AWS Secrets Manager for staging environment
-- Deploy AWS Secrets Manager for production environment
+- Deploy HashiCorp Vault for staging environment
+- Deploy HashiCorp Vault for production environment
 - Configure IAM roles and policies for secret access
 - Set up automatic rotation policies for database credentials
 - Create secret organization structure for all services
@@ -153,7 +153,7 @@ production/ (same structure)
 ```
 
 **Acceptance Criteria**:
-- AWS Secrets Manager operational in both environments
+- HashiCorp Vault operational in both environments
 - IAM policies configured with least-privilege access
 - Secret rotation policies configured
 - Secret organization structure implemented
@@ -191,13 +191,13 @@ production/ (same structure)
 - Install AWS Load Balancer Controller in both clusters
 - Install cert-manager for Let's Encrypt certificates
 - Configure cert-manager with Cloudflare DNS validation
-- Install External Secrets Operator with AWS IAM authentication
-- Configure AWS Secrets Store CSI Driver for direct secret mounting
+- Install Vault Secrets Operator with Kubernetes RBAC authentication
+- Configure Vault CSI Driver for direct secret mounting
 
 **Acceptance Criteria**:
 - AWS Load Balancer Controller operational for ALB management
 - cert-manager provisioning Let's Encrypt certificates via DNS validation
-- External Secrets Operator integrating with AWS Secrets Manager
+- Vault Secrets Operator integrating with HashiCorp Vault
 - CSI Driver operational for direct secret mounting
 
 ---
@@ -209,14 +209,14 @@ production/ (same structure)
 
 **Deliverables**:
 - Deploy Prometheus for metrics collection in both clusters
-- Deploy Grafana with AWS Secrets Manager integration
+- Deploy Grafana with HashiCorp Vault integration
 - Configure Prometheus, Grafana, Loki + Fluent Bit monitoring and logging
 - Set up service monitoring and alerting rules
 - Create initial platform health dashboards
 
 **Acceptance Criteria**:
 - Prometheus collecting metrics from cluster components
-- Grafana operational with AWS Secrets Manager credential management
+- Grafana operational with HashiCorp Vault credential management
 - Loki + Fluent Bit receiving cluster and application logs
 - Basic alerting rules configured for infrastructure health
 
@@ -230,8 +230,8 @@ production/ (same structure)
 **Priority**: P0 (Critical)
 
 **Deliverables**:
-- Deploy ArgoCD in staging environment with AWS Secrets Manager integration
-- Deploy ArgoCD in production environment with AWS Secrets Manager integration
+- Deploy ArgoCD in staging environment with HashiCorp Vault integration
+- Deploy ArgoCD in production environment with HashiCorp Vault integration
 - Configure GitHub integration for all 18 repositories
 - Set up RBAC policies for team access
 - Configure SSL termination and domain access
@@ -304,7 +304,7 @@ production/ (same structure)
 **Template Components for Each Service**:
 - Kubernetes deployment manifests with security contexts
 - Service definitions for internal communication
-- External Secret manifests for AWS Secrets Manager integration
+- Vault Secret manifests for HashiCorp Vault integration
 - Ingress configurations for ALB with SSL termination
 - ConfigMaps for non-sensitive configuration
 - IRSA (IAM Roles for Service Accounts) configurations
@@ -316,13 +316,13 @@ production/ (same structure)
 
 **API Service**:
 - FastAPI application with authentication and JWT handling
-- Database connection via External Secrets
+- Database connection via Vault Secrets
 - OAuth provider integration
 - Health checks and metrics endpoints
 
 **Tool Integration Service**:
 - Multi-container deployment for Python, Rust, and Node.js tools
-- Tool credential management via AWS Secrets Manager
+- Tool credential management via HashiCorp Vault
 - Parallel execution coordination
 - Tool-specific rate limiting and quota management
 
@@ -334,7 +334,7 @@ production/ (same structure)
 
 **Orchestration Service**:
 - Celery worker deployment with auto-scaling
-- Redis broker connection via External Secrets
+- Redis broker connection via Vault Secrets
 - Job queue management and monitoring
 - Dead letter queue handling
 
@@ -358,15 +358,15 @@ production/ (same structure)
 
 **Deliverables**:
 - Complete Kubernetes templates for all 7 backend services
-- External Secret manifests for AWS Secrets Manager integration
+- Vault Secret manifests for HashiCorp Vault integration
 - IRSA configurations for least-privilege AWS access
 - Service mesh configuration for inter-service communication
 - Health check endpoints and monitoring configurations
 
 **Acceptance Criteria**:
 - All backend service templates deploy successfully to staging EKS
-- Services can communicate with PostgreSQL and ElastiCache via External Secrets
-- AWS Secrets Manager integration functional for all services
+- Services can communicate with PostgreSQL and ElastiCache via Vault Secrets
+- HashiCorp Vault integration functional for all services
 - Health checks pass and services register correctly
 - IRSA providing appropriate AWS permissions
 
@@ -484,7 +484,7 @@ production/ (same structure)
 - Error handling and retry mechanisms
 
 **AWS Integration**:
-- External Secrets Operator managing service credentials
+- Vault Secrets Operator managing service credentials
 - IRSA providing secure AWS service access
 - Loki + Fluent Bit logging for service communication
 - ALB health checks and load balancing
@@ -527,7 +527,7 @@ production/ (same structure)
 - Error handling and recovery scenarios
 
 **AWS Infrastructure Testing**:
-- External Secrets Operator secret retrieval and rotation
+- Vault Secrets Operator secret retrieval and rotation
 - Database connection and transaction handling
 - Cache performance and invalidation
 - Service scaling and load balancing
@@ -545,7 +545,7 @@ production/ (same structure)
 - All services respond within acceptable performance targets
 - Real-time updates working correctly across entire platform
 - Load testing demonstrates system handles target concurrent load
-- AWS integrations (secrets, database, cache) working reliably
+- Vault integrations (secrets, database, cache) working reliably
 
 ---
 
@@ -563,7 +563,7 @@ production/ (same structure)
 
 **AWS-Specific Documentation**:
 - EKS cluster management and troubleshooting
-- AWS Secrets Manager integration and secret management
+- HashiCorp Vault integration and secret management
 - PostgreSQL StatefulSets and ElastiCache operational procedures
 - ArgoCD deployment and application management
 - Monitoring and alerting configuration
@@ -677,13 +677,13 @@ production/ (same structure)
 ## Sprint 1 Success Criteria & Validation
 
 ### Technical Milestones
-- **AWS Infrastructure Operational**: EKS clusters, PostgreSQL StatefulSets, ElastiCache, and Secrets Manager functional in staging and production
+- **AWS Infrastructure Operational**: EKS clusters, PostgreSQL StatefulSets, ElastiCache, and HashiCorp Vault functional in staging and production
 - **Repository Architecture Complete**: All 18 repositories structured with comprehensive documentation
 - **GitOps Foundation**: ArgoCD managing deployments with automated sync and self-healing
 - **Multi-Language Integration**: Shared libraries working across Python, TypeScript, and Rust
 - **Service Templates**: Production-ready Kubernetes manifests for all microservices
 - **Domain and SSL**: Production domain accessible with valid SSL certificates
-- **Secret Management**: AWS Secrets Manager integrated with External Secrets Operator
+- **Secret Management**: HashiCorp Vault integrated with Vault Secrets Operator
 
 ### Platform Accessibility & Performance
 - **Staging Environment**: staging.advancedblockchainsecurity.com accessible and functional
@@ -693,7 +693,7 @@ production/ (same structure)
 - **Performance**: Infrastructure capable of handling target enterprise workloads
 
 ### Team Productivity & Knowledge
-- **AWS Competency**: Team demonstrates proficiency with EKS, PostgreSQL in Kubernetes, Secrets Manager management
+- **AWS Competency**: Team demonstrates proficiency with EKS, PostgreSQL in Kubernetes, HashiCorp Vault management
 - **GitOps Proficiency**: Team skilled in ArgoCD workflow and troubleshooting
 - **Architecture Understanding**: Team understands multi-service cloud architecture
 - **Documentation Quality**: Comprehensive guides enabling independent development and operations
@@ -705,7 +705,7 @@ production/ (same structure)
 - Comprehensive documentation updated for all components
 - ArgoCD applications deploying successfully with healthy status
 - AWS infrastructure operational with proper monitoring and alerting
-- External Secrets Operator functioning correctly across all environments
+- Vault Secrets Operator functioning correctly across all environments
 
 ## Risk Mitigation & Contingency Plans
 
@@ -730,7 +730,7 @@ production/ (same structure)
 Sprint 2 will focus on core backend service development and deployment to the AWS infrastructure established in Sprint 1:
 
 ### Core Backend Development
-- Implement FastAPI authentication service with AWS Secrets Manager integration
+- Implement FastAPI authentication service with HashiCorp Vault integration
 - Develop data service with PostgreSQL StatefulSets and ElastiCache integration
 - Create notification service with real-time WebSocket capabilities
 - Deploy all services to staging environment via ArgoCD

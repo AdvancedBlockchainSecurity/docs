@@ -60,7 +60,7 @@ solidity-security-api-service/
 │   │   ├── deployment.yaml        # Kubernetes deployment
 │   │   ├── service.yaml           # Kubernetes service
 │   │   ├── configmap.yaml         # Configuration
-│   │   ├── external-secret.yaml   # AWS Secrets Manager integration
+│   │   ├── vault-secret.yaml      # HashiCorp Vault integration
 │   │   └── ingress.yaml           # ALB ingress
 │   └── overlays/
 │       ├── staging/               # Staging-specific configs
@@ -685,7 +685,7 @@ solidity-security-shared/
 ```
 Purpose: AWS cloud resource provisioning and management
 Tech Stack: Terraform, AWS CLI, CloudFormation
-Contains: VPC, EKS, RDS, ElastiCache, IAM, Secrets Manager configurations
+Contains: VPC, EKS, PostgreSQL in Kubernetes, ElastiCache, IAM configurations
 ```
 
 ### 14. **`solidity-security-monitoring`**

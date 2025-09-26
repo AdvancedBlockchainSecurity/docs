@@ -8,8 +8,8 @@
 - **Service Mesh**: Istio for service-to-service mTLS, traffic management, and observability
 - **Ingress Controller**: Istio Gateway + AWS Application Load Balancer (ALB) with SSL termination
 - **Certificate Management**: cert-manager with Let's Encrypt for automated SSL certificate provisioning
-- **Secret Management**: AWS Secrets Manager for centralized secret storage, rotation, and policy enforcement
-- **Secret Injection**: External Secrets Operator for Kubernetes-native secret injection from AWS Secrets Manager
+- **Secret Management**: HashiCorp Vault for centralized secret storage, rotation, and policy enforcement
+- **Secret Injection**: Vault Secrets Operator for Kubernetes-native secret injection from HashiCorp Vault
 - **Event Bus**: Apache Kafka for async messaging between services
 - **Container Orchestration**: AWS EKS with Helm charts for deployment
 - **Observability**: Prometheus metrics, Jaeger tracing, structured logging with Fluentd
@@ -26,19 +26,19 @@
 - **Load Balancing**: AWS Application Load Balancer with SSL termination
 - **Container Registry**: Amazon ECR with vulnerability scanning
 - **ArgoCD**: Cloud deployment managing development applications
-- **Secret Management**: AWS Secrets Manager with automatic rotation and cross-region replication
-- **Secret Injection**: External Secrets Operator with AWS IAM integration
+- **Secret Management**: HashiCorp Vault with automatic rotation and high availability
+- **Secret Injection**: Vault Secrets Operator with Kubernetes RBAC integration
 - **Cost**: $250-350/month for development environment
 
 #### Phase 2: Production Scaling (Month 4+)
-**Infrastructure**: Multi-environment AWS deployment with enterprise AWS Secrets Manager
+**Infrastructure**: Multi-environment AWS deployment with enterprise HashiCorp Vault
 - **Multi-Environment**: Separate EKS clusters for dev/staging/production
 - **Database**: RDS PostgreSQL with read replicas and automated backups
 - **Caching**: ElastiCache Redis with clustering and failover
 - **Global Distribution**: CloudFront CDN and multi-region deployment
 - **Monitoring**: CloudWatch integration with Prometheus and Grafana
-- **Secret Management**: AWS Secrets Manager with cross-region replication and enterprise features
-- **Disaster Recovery**: Multi-region AWS Secrets Manager replication and backup
+- **Secret Management**: HashiCorp Vault with high availability and enterprise features
+- **Disaster Recovery**: Multi-region HashiCorp Vault replication and backup
 - **Cost**: $500-2500/month based on usage and scale
 
 ### Domain and DNS Setup
@@ -98,14 +98,14 @@ Sidecar Injection (Automatic):
   All application namespaces: api-service-local, dashboard-local, etc.
 
 #### Secret Management Architecture
-**AWS Secrets Manager Integration Strategy**:
-- **Development**: AWS Secrets Manager with automatic rotation and CloudTrail logging
-- **Production**: AWS Secrets Manager with cross-region replication and enterprise features
+**HashiCorp Vault Integration Strategy**:
+- **Development**: HashiCorp Vault with automatic rotation and audit logging
+- **Production**: HashiCorp Vault with high availability and enterprise features
 - **Secret Categories**: Application secrets, database credentials, API keys, certificates
 - **Authentication**: AWS IAM roles, IRSA (IAM Roles for Service Accounts), cross-account access
 - **Secret Injection**: External Secrets Operator with IAM-based access control
 
-**AWS Secrets Manager Secret Organization**:
+**HashiCorp Vault Secret Organization**:
 ```yaml
 Secret Paths Structure:
   Environment-based organization:
@@ -173,7 +173,7 @@ solidity-security-platform/
 **Purpose**: Unified interface for all security analysis tools with secure credential management
 **Technology Stack**: Python 3.11, FastAPI, Celery, Redis, Rust runtime for Aderyn
 **Design Pattern**: Adapter pattern with plugin architecture
-**Secret Management**: AWS Secrets Manager for API keys, External Secrets Operator for injection
+**Secret Management**: HashiCorp Vault for API keys, Vault Secrets Operator for injection
 **Location**: `solidity-security-platform/backend/tool-integration-service/`
 
 **Technical Requirements**:
@@ -273,7 +273,7 @@ solidity-security-platform/
 **Purpose**: Cross-tool correlation, deduplication, rule-based analysis with secure configuration management
 **Technology Stack**: Python 3.11, NLP libraries, PostgreSQL, Redis
 **Design Pattern**: Pipeline pattern with pluggable analyzers
-**Secret Management**: AWS Secrets Manager for algorithm configurations
+**Secret Management**: HashiCorp Vault for algorithm configurations
 **Location**: `solidity-security-platform/backend/intelligence-engine-service/`
 
 **Deduplication Algorithm Specifications**:
@@ -307,7 +307,7 @@ solidity-security-platform/
 **Purpose**: Manage analysis workflows, resource allocation, job scheduling with secure credential management
 **Technology Stack**: Python 3.11, Celery, Redis, PostgreSQL
 **Design Pattern**: Workflow orchestration with DAG execution
-**Secret Management**: AWS Secrets Manager for broker credentials and worker authentication
+**Secret Management**: HashiCorp Vault for broker credentials and worker authentication
 **Location**: `solidity-security-platform/backend/orchestration-service/`
 
 **Job Scheduling**:
@@ -332,7 +332,7 @@ solidity-security-platform/
 **Purpose**: Centralized data management, caching, search with secure database credential management
 **Technology Stack**: RDS PostgreSQL 15, ElastiCache Redis 7, Elasticsearch 8
 **Design Pattern**: CQRS with event sourcing for audit trails
-**Secret Management**: AWS Secrets Manager with automatic rotation for database credentials
+**Secret Management**: HashiCorp Vault with automatic rotation for database credentials
 **Location**: `solidity-security-platform/backend/data-service/`
 
 **Database Schema Design**:
@@ -380,7 +380,7 @@ solidity-security-platform/
 **Purpose**: Real-time updates, integrations, alerting with secure credential management
 **Technology Stack**: Node.js, Socket.io, Redis, PostgreSQL
 **Design Pattern**: Publisher-subscriber with WebSocket broadcasting
-**Secret Management**: AWS Secrets Manager for SMTP credentials and webhook URLs
+**Secret Management**: HashiCorp Vault for SMTP credentials and webhook URLs
 **Location**: `solidity-security-platform/backend/notification-service/`
 
 **Real-Time Communication**:
