@@ -40,21 +40,21 @@ solidity-security-aws-infrastructure/
 ## Service Categories & Dependencies
 
 ### Backend Services (6 applications)
-- `solidity-security-api-service` (~10K LOC, FastAPI authentication and API gateway)
-- `solidity-security-tool-integration` (~12K LOC, Security tool adapters, Hybrid Python/Rust)
-- `solidity-security-intelligence-engine` (~8K LOC, Risk scoring and ML analysis, Hybrid Python/Rust)
-- `solidity-security-orchestration` (~6K LOC, Workflow management, Python Celery)
-- `solidity-security-data-service` (~7K LOC, Database and caching, Hybrid Python/Rust)
-- `solidity-security-notification` (~5K LOC, Real-time notifications, Node.js/TypeScript)
+- `solidity-security-api-service` (FastAPI authentication and API gateway)
+- `solidity-security-tool-integration` (Security tool adapters, Hybrid Python/Rust)
+- `solidity-security-intelligence-engine` (Risk scoring and ML analysis, Hybrid Python/Rust)
+- `solidity-security-orchestration` (Workflow management, Python Celery)
+- `solidity-security-data-service` (Database and caching, Hybrid Python/Rust)
+- `solidity-security-notification` (Real-time notifications, Node.js/TypeScript)
 
 ### Contract Parser Service (1 application)
-- `solidity-security-contract-parser` (~8K LOC, High-performance parsing, Pure Rust)
+- `solidity-security-contract-parser` (High-performance parsing, Pure Rust)
 
 ### Frontend Services (4 applications)
-- `solidity-security-ui-core` (~8K LOC, Shared components, React/TypeScript)
-- `solidity-security-dashboard` (~8K LOC, Main dashboard, React/TypeScript)
-- `solidity-security-findings` (~8K LOC, Finding management, React/TypeScript)
-- `solidity-security-analysis` (~6K LOC, Analysis workflow, React/TypeScript)
+- `solidity-security-ui-core` (Shared components, React/TypeScript)
+- `solidity-security-dashboard` (Main dashboard, React/TypeScript)
+- `solidity-security-findings` (Finding management, React/TypeScript)
+- `solidity-security-analysis` (Analysis workflow, React/TypeScript)
 
 ### Infrastructure (Additional applications)
 - Monitoring stack, secrets management

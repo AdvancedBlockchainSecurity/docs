@@ -3,10 +3,10 @@
 ## Repositories: Frontend Service Repositories
 
 This task creates Kubernetes templates for all frontend service repositories:
-- `solidity-security-ui-core` (~8K LOC, Shared UI components and design system, React/TypeScript)
-- `solidity-security-dashboard` (~8K LOC, Dashboard and metrics interface, React/TypeScript)
-- `solidity-security-findings` (~8K LOC, Finding management and analysis results, React/TypeScript)
-- `solidity-security-analysis` (~6K LOC, Contract analysis workflow, React/TypeScript)
+- `solidity-security-ui-core` (Shared UI components and design system, React/TypeScript)
+- `solidity-security-dashboard` (Dashboard and metrics interface, React/TypeScript)
+- `solidity-security-findings` (Finding management and analysis results, React/TypeScript)
+- `solidity-security-analysis` (Contract analysis workflow, React/TypeScript)
 
 **✅ ALIGNMENT CHECK**: This implementation creates production-ready Kubernetes deployment templates for all 4 frontend services with React optimization, environment configuration, and ALB integration as specified in Sprint 1 documentation.
 
