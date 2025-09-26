@@ -76,11 +76,13 @@ solidity-security-api-service/
 ```
 
 ### 2. **`solidity-security-tool-integration`** (~12K LOC)
-**Security tool adapters and integrations**
+**Security tool adapters and integrations - Hybrid Python/Rust**
 ```
 Purpose: Slither, Aderyn, MythX, Solidity-Metrics adapters
-Tech Stack: Python 3.11, asyncio, aiohttp, subprocess, Rust wrappers (for Slither, Aderyn), Node.js wrappers (for MythX, Solidity-Metrics)
-Contains: Tool adapters, result normalizers, rate limiting, plugin architecture
+Tech Stack: Python 3.11 + Rust core, asyncio, aiohttp, subprocess, Rust wrappers (for Slither, Aderyn), Node.js wrappers (for MythX, Solidity-Metrics)
+Rust Components: High-performance tool execution, parallel processing, native Aderyn integration
+Python Components: FastAPI service layer, external integrations, configuration management
+Contains: Tool adapters, result normalizers, rate limiting, plugin architecture, unified tool interface
 ```
 
 **Directory Structure:**
@@ -709,7 +711,7 @@ Contains: Architecture docs, setup guides, API documentation
 ```
 Purpose: Tool installation scripts, configuration templates, test contracts
 Tech Stack: Shell scripts, Docker, tool-specific configs
-Contains: Tool installation scripts, test fixtures, tool version management
+Contains: Tool installation scripts, test fixtures, tool version management, configuration templates
 ```
 
 ### 17. **`solidity-security-vulnerabilities`**
@@ -717,7 +719,7 @@ Contains: Tool installation scripts, test fixtures, tool version management
 ```
 Purpose: Vulnerability data, patterns, and threat intelligence
 Tech Stack: JSON/YAML schemas, Python scripts
-Contains: Vulnerability definitions, patterns, threat intelligence
+Contains: Vulnerability definitions, patterns, threat intelligence, SWC mappings, severity classifications
 ```
 
 ## Repository Size Summary
