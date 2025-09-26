@@ -12,7 +12,7 @@ AWS Infrastructure as Code repository containing all cloud infrastructure config
 Create secure and scalable VPC infrastructure with multi-AZ design to support EKS clusters, RDS databases, and ElastiCache services.
 
 ### Key Requirements (from docs)
-- **VPC Design**: Multi-AZ VPC with public and private subnets
+- **VPC Design**: Single-AZ VPC with public and private subnets for MVP deployment
 - **Security Groups**: Configured for EKS, RDS, and ElastiCache with least-privilege access
 - **Internet Access**: NAT gateways for secure private subnet internet connectivity
 - **Service Integration**: VPC endpoints for AWS services to reduce internet egress
@@ -50,18 +50,18 @@ solidity-security-aws-infrastructure/
 
 ### Key Components to Implement
 - **VPC Creation**: /16 CIDR block for scalability
-- **Public Subnets**: 2+ subnets across AZs for load balancers
-- **Private Subnets**: 2+ subnets across AZs for EKS nodes and databases
+- **Public Subnet**: Single public subnet for load balancer
+- **Private Subnet**: Single private subnet for EKS nodes and databases
 
 ### Technical Requirements
-- Multi-AZ deployment for high availability
+- Single-AZ deployment for MVP cost optimization
 - Proper CIDR block allocation for future growth
 - Route table configuration for public and private subnets
 - Internet Gateway for public subnet internet access
 
 ### Performance Goals
-- Low-latency inter-subnet communication
-- Redundant network paths across availability zones
+- Low-latency intra-subnet communication
+- Simplified network architecture for MVP deployment
 
 ## Step 2: Security Groups and Network Controls (1.5 hours)
 
@@ -93,7 +93,7 @@ solidity-security-aws-infrastructure/
 - **Network Monitoring**: VPC Flow Logs and CloudWatch integration
 
 ### Integration Requirements
-- NAT gateway deployment across multiple AZs for redundancy
+- Single NAT gateway deployment for MVP cost efficiency
 - VPC endpoints for AWS service access without internet routing
 - Network monitoring for security and performance analysis
 
@@ -101,8 +101,8 @@ solidity-security-aws-infrastructure/
 
 ### VPC Infrastructure Requirements
 - [ ] VPC created with appropriate CIDR block (/16 or larger)
-- [ ] Public subnets deployed across at least 2 availability zones
-- [ ] Private subnets deployed across at least 2 availability zones
+- [ ] Public subnet deployed in single availability zone
+- [ ] Private subnet deployed in single availability zone
 - [ ] Internet Gateway attached and routing configured
 - [ ] Route tables configured for public and private subnet traffic
 
@@ -114,17 +114,17 @@ solidity-security-aws-infrastructure/
 - [ ] Security group rules documented and validated
 
 ### High Availability Requirements
-- [ ] NAT gateways deployed across multiple AZs for redundancy
+- [ ] NAT gateway deployed in single AZ for MVP
 - [ ] VPC endpoints operational for S3, ECR, Secrets Manager, CloudWatch
 - [ ] Network monitoring enabled with VPC Flow Logs
-- [ ] Cross-AZ communication tested and validated
+- [ ] Single-AZ network communication tested and validated
 
 ## Implementation Priority
 
 ### Phase 1: Core VPC Infrastructure (1.5 hours)
 1. Create VPC with /16 CIDR block for maximum flexibility and growth
-2. Deploy public subnets in 2+ AZs for load balancer placement
-3. Deploy private subnets in 2+ AZs for EKS nodes and databases
+2. Deploy public subnet in single AZ for load balancer placement
+3. Deploy private subnet in single AZ for EKS nodes and databases
 
 ### Phase 2: Security and Access Control (1.5 hours)
 1. Configure EKS security groups for cluster communication and node access
@@ -132,7 +132,7 @@ solidity-security-aws-infrastructure/
 3. Create ElastiCache security groups for cache service access
 
 ### Phase 3: Connectivity and Optimization (1 hour)
-1. Deploy NAT gateways in each AZ for private subnet internet access
+1. Deploy single NAT gateway for private subnet internet access
 2. Configure VPC endpoints for AWS services to reduce egress costs
 3. Enable VPC Flow Logs and network monitoring for security analysis
 
@@ -140,7 +140,7 @@ solidity-security-aws-infrastructure/
 
 1. **CIDR Planning**: Use /16 VPC CIDR with /24 subnets to allow for future expansion
 2. **Security Groups**: Follow least-privilege principle with specific port and protocol restrictions
-3. **High Availability**: Ensure all critical components span multiple availability zones
+3. **MVP Architecture**: Single-AZ deployment for cost optimization, can expand to multi-AZ later
 4. **Cost Optimization**: Use VPC endpoints to minimize NAT gateway and internet egress costs
 
 ---
@@ -152,13 +152,13 @@ solidity-security-aws-infrastructure/
 ## Task Checklist
 - [ ] Task 1.2 started
 - [ ] VPC created with appropriate CIDR block allocation
-- [ ] Public subnets deployed across multiple availability zones
-- [ ] Private subnets deployed across multiple availability zones
+- [ ] Public subnet deployed in single availability zone
+- [ ] Private subnet deployed in single availability zone
 - [ ] Internet Gateway attached and routing tables configured
 - [ ] EKS security groups configured with proper access controls
 - [ ] RDS security groups configured for database access
 - [ ] ElastiCache security groups configured for cache access
-- [ ] NAT gateways deployed across multiple AZs
+- [ ] NAT gateway deployed in single AZ
 - [ ] VPC endpoints configured for AWS services
 - [ ] Network monitoring enabled with VPC Flow Logs
 - [ ] Security group rules tested and validated
