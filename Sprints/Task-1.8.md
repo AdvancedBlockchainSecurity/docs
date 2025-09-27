@@ -15,13 +15,39 @@ Deploy and configure ArgoCD for GitOps workflow management with GitHub integrati
 
 ## Directory Structure Requirements
 
+ArgoCD configuration will be integrated into the existing infrastructure repository:
+
 ```
-argocd-infrastructure/
-├── argocd-configs/                # ArgoCD server configuration
-├── github-integration/            # GitHub repository connections
-├── rbac-policies/                 # Role-based access control
-├── ssl-certificates/              # SSL and ingress configuration
-├── applications/                  # Initial application definitions
+solidity-security-aws-infrastructure/
+├── argocd/
+│   ├── base/
+│   │   ├── kustomization.yaml      # Base ArgoCD configuration
+│   │   ├── deployment.yaml         # ArgoCD server deployment
+│   │   ├── service.yaml            # ArgoCD service definition
+│   │   ├── configmap.yaml          # ArgoCD configuration
+│   │   ├── rbac-configmap.yaml     # RBAC policies
+│   │   └── ingress.yaml            # ArgoCD ingress configuration
+│   └── overlays/
+│       ├── local/
+│       │   ├── kustomization.yaml  # Local environment overlay
+│       │   ├── configmap-patch.yaml
+│       │   └── ingress-patch.yaml
+│       ├── staging/
+│       │   ├── kustomization.yaml  # Staging environment overlay
+│       │   ├── configmap-patch.yaml
+│       │   ├── ingress-patch.yaml
+│       │   └── vault-secret.yaml   # Vault Secrets integration
+│       └── production/
+│           ├── kustomization.yaml  # Production environment overlay
+│           ├── configmap-patch.yaml
+│           ├── ingress-patch.yaml
+│           ├── vault-secret.yaml   # Vault Secrets integration
+│           └── ha-patches.yaml     # High availability configuration
+├── applications/                   # ArgoCD Application definitions
+│   ├── backend-services/
+│   ├── frontend-services/
+│   ├── infrastructure/
+│   └── app-of-apps.yaml           # Application of Applications pattern
 └── README.md
 ```
 
@@ -104,19 +130,22 @@ argocd-infrastructure/
 ## Implementation Priority
 
 ### Phase 1: Core ArgoCD Deployment (2 hours)
-1. Deploy ArgoCD server components in staging with AWS Secrets integration
-2. Deploy ArgoCD server components in production with high availability
-3. Configure persistent storage and Vault Secrets Operator integration
+1. Create ArgoCD Kustomize base configuration in `solidity-security-aws-infrastructure/argocd/base/`
+2. Deploy ArgoCD server components in staging using Kustomize overlay in `argocd/overlays/staging/`
+3. Deploy ArgoCD server components in production using Kustomize overlay in `argocd/overlays/production/`
+4. Configure persistent storage and Vault Secrets Operator integration via Kustomize patches
 
 ### Phase 2: Repository Integration (1.5 hours)
-1. Configure GitHub repository connections for all 17 services
-2. Set up authentication credentials via Vault Secrets Operator
-3. Configure repository synchronization policies and webhook integration
+1. Configure GitHub repository connections for all 17 services via ArgoCD configmap patches
+2. Set up authentication credentials via Vault Secrets integration in environment overlays
+3. Create ArgoCD Application definitions in `applications/` directory
+4. Configure repository synchronization policies and webhook integration
 
 ### Phase 3: SSL and Access Control (30 minutes)
-1. Configure SSL certificates and ingress for domain access
-2. Set up RBAC policies for team access and permission management
-3. Validate ArgoCD accessibility and GitHub integration functionality
+1. Configure SSL certificates and ingress via Kustomize ingress patches
+2. Set up RBAC policies via `rbac-configmap.yaml` in base configuration
+3. Apply environment-specific ingress patches for domain configuration
+4. Validate ArgoCD accessibility and GitHub integration functionality
 
 ## Key Implementation Notes
 
