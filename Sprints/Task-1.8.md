@@ -8,7 +8,7 @@
 Deploy and configure ArgoCD for GitOps workflow management with GitHub integration, SSL termination, and team access control.
 
 ### Key Requirements (from docs)
-- **ArgoCD Deployment**: ArgoCD in staging and production with AWS Secrets Manager integration
+- **ArgoCD Deployment**: ArgoCD in staging and production with Vault integration
 - **GitHub Integration**: Connection to all 17 repositories for deployment management
 - **Access Control**: RBAC policies for team access and security
 - **SSL Configuration**: SSL termination and domain access
