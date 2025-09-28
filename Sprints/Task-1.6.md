@@ -10,7 +10,7 @@ Install and configure critical Kubernetes infrastructure components to enable se
 ### Key Requirements (from docs)
 - **Load Balancer Controller**: AWS Load Balancer Controller for ALB management
 - **Certificate Management**: cert-manager with Let's Encrypt and DNS validation
-- **Secret Integration**: Vault Secrets Operator with Kubernetes RBAC authentication
+- **Secret Integration**: Vault Secrets Operator with Kubernetes RBAC authentication in external-secrets-staging and external-secrets-production namespaces
 - **CSI Driver**: AWS Secrets Store CSI Driver for direct secret mounting
 
 ## Directory Structure Requirements
@@ -91,19 +91,19 @@ solidity-security-aws-infrastructure/
 ## Step 3: Secrets Management Integration (1 hour)
 
 ### Objectives
-- Install Vault Secrets Operator for HashiCorp Vault integration
+- Install Vault Secrets Operator for HashiCorp Vault Community Edition integration in external-secrets-staging and external-secrets-production namespaces
 - Configure AWS Secrets Store CSI Driver for direct secret mounting
 - Set up IRSA for secure AWS Secrets Manager access
 
 ### Core Dependencies
 - **Kustomize Base Manifests**: Base Vault Secrets Operator configuration
-- **Vault Secrets Operator**: Kubernetes-native secret synchronization
+- **Vault Secrets Operator**: Kubernetes-native secret synchronization in external-secrets-staging and external-secrets-production namespaces
 - **CSI Secrets Driver**: Direct secret mounting capabilities via Kustomize
 - **Environment Overlays**: Staging vs production secrets configurations
 
 ### Integration Requirements
 - Kustomize-based deployment with environment-specific configurations
-- Integration with AWS Secrets Manager from Task 1.4
+- Integration with HashiCorp Vault Community Edition from Task 1.4
 - Service account configuration for each service namespace via overlays
 - Secret synchronization and automatic rotation support
 
@@ -125,10 +125,10 @@ solidity-security-aws-infrastructure/
 
 ### Secrets Management Requirements
 - [ ] Kustomize base manifests created for Vault Secrets Operator
-- [ ] Environment overlays configured for AWS Secrets Manager integration
+- [ ] Environment overlays configured for HashiCorp Vault Community Edition integration
 - [ ] Vault Secrets Operator deployed and operational
-- [ ] IRSA configured for AWS Secrets Manager access
-- [ ] Test secret synchronization from AWS Secrets Manager via Kustomize
+- [ ] Kubernetes auth configured for HashiCorp Vault Community Edition access
+- [ ] Test secret synchronization from HashiCorp Vault Community Edition via Kustomize
 
 ## Implementation Priority
 
@@ -144,7 +144,7 @@ solidity-security-aws-infrastructure/
 
 ### Phase 3: Secrets Integration (1 hour)
 1. Create Kustomize base manifests for Vault Secrets Operator
-2. Configure environment overlays for AWS Secrets Manager integration
+2. Configure environment overlays for HashiCorp Vault Community Edition integration
 3. Deploy via Kustomize and test secret synchronization capabilities
 
 ## Key Implementation Notes
@@ -173,8 +173,8 @@ solidity-security-aws-infrastructure/
 - [ ] Test certificate issuance completed successfully
 - [ ] Vault Secrets Operator installed and configured
 - [ ] AWS Secrets Store CSI Driver installed and operational
-- [ ] IRSA configured for AWS Secrets Manager access
-- [ ] Secret synchronization from AWS Secrets Manager tested
+- [ ] Kubernetes auth configured for HashiCorp Vault Community Edition access
+- [ ] Secret synchronization from HashiCorp Vault Community Edition tested
 - [ ] Secret mounting capabilities validated
 - [ ] All infrastructure components monitored and healthy
 - [ ] Task 1.6 completed with all components operational

@@ -17,7 +17,7 @@
 - Design EKS cluster configuration with managed node groups for staging and production
 - Configure PostgreSQL in Kubernetes StatefulSets for both environments (cost-optimized)
 - Configure ElastiCache Redis with encryption for both environments
-- Configure HashiCorp Vault for centralized secret management with automatic rotation
+- Configure HashiCorp Vault Community Edition for centralized secret management in vault-staging and vault-production namespaces
 - Configure AWS IAM roles and policies with least privilege
 - Design ECR repositories for all services
 - Configure Prometheus, Grafana, Loki + Fluent Bit monitoring and logging
@@ -25,7 +25,7 @@
 - Deploy EKS clusters for staging and production
 - Deploy PostgreSQL StatefulSets in Kubernetes with persistent volumes
 - Deploy ElastiCache Redis clusters
-- Configure HashiCorp Vault with proper Kubernetes RBAC and built-in encryption
+- Configure HashiCorp Vault Community Edition with proper Kubernetes RBAC and built-in encryption in vault-staging and vault-production namespaces
 
 **Repository Setup & Foundation**:
 - Initialize all 17 repositories with proper directory structures
@@ -40,7 +40,7 @@
 - AWS infrastructure fully operational in staging and production
 - EKS clusters accessible with proper networking configuration
 - PostgreSQL StatefulSets and ElastiCache deployed and accessible from EKS
-- HashiCorp Vault operational with proper Kubernetes integration and encryption
+- HashiCorp Vault Community Edition operational with proper Kubernetes integration and encryption in vault-staging and vault-production namespaces
 - All 17 repositories properly structured and initialized
 - Shared libraries working across Python, TypeScript, and Rust services
 - ECR repositories configured and accessible
@@ -51,13 +51,13 @@
 **Kubernetes Infrastructure Deployment**:
 - Create Kustomize base manifests for all infrastructure components
 - Install Istio CRDs via Helm for service mesh foundation
-- Deploy Istio control plane via Kustomize in istio-system namespace for both environments
+- Deploy Istio control plane via Kustomize in istio-staging and istio-production namespaces
 - Configure Istio Gateway for ingress traffic management via Kustomize overlays
 - Enable automatic sidecar injection for all application namespaces
 - Deploy Jaeger for distributed tracing integration with Istio via Kustomize
 - Deploy Kiali for service mesh visualization and management via Kustomize
 - Deploy AWS Load Balancer Controller via Kustomize with IRSA configuration
-- Deploy cert-manager with Let's Encrypt and Cloudflare DNS validation via Kustomize
+- Deploy cert-manager with Let's Encrypt and Cloudflare DNS validation via Kustomize in cert-manager-staging and cert-manager-production namespaces
 
 **DNS Service Configuration**:
 - Configure DNS service records pointing to AWS Application Load Balancer
@@ -65,8 +65,8 @@
 - Configure ArgoCD dashboard access via subdomains
 
 **Additional Infrastructure Components**:
-- Deploy Vault Secrets Operator via Kustomize for HashiCorp Vault integration
-- Deploy monitoring stack (Prometheus, Grafana, Loki + Fluent Bit) via Kustomize for both environments
+- Deploy Vault Secrets Operator via Kustomize for HashiCorp Vault integration in external-secrets-staging and external-secrets-production namespaces
+- Deploy monitoring stack (Prometheus, Grafana, Loki + Fluent Bit) via Kustomize in monitoring-staging and monitoring-production namespaces
 - Configure GitHub Actions CI/CD pipeline with Kustomize deployment automation
 
 **ArgoCD Bootstrap & GitOps Foundation**:
@@ -94,16 +94,16 @@
 - All services have Istio sidecars automatically injected
 - Jaeger distributed tracing working for all service calls
 - Kiali dashboard showing service mesh topology and health
-- cert-manager provisioning Let's Encrypt certificates successfully
+- cert-manager provisioning Let's Encrypt certificates successfully in cert-manager-staging and cert-manager-production namespaces
 - DNS service records configured and pointing to AWS ALB targets
 - SSL certificates working for all configured domains
 - ArgoCD dashboard accessible via configured subdomains
-- ArgoCD deployed and operational in both environments
-- Vault Secrets Operator integrating with HashiCorp Vault
-- Prometheus, Grafana, Loki + Fluent Bit monitoring operational with proper metrics and log collection
+- ArgoCD deployed and operational in argocd-staging and argocd-production namespaces
+- Vault Secrets Operator integrating with HashiCorp Vault from external-secrets-staging and external-secrets-production namespaces
+- Prometheus, Grafana, Loki + Fluent Bit monitoring operational with proper metrics and log collection in monitoring-staging and monitoring-production namespaces
 - All microservice Kustomize templates created with enterprise security
 - IRSA configured for all services with least-privilege access
-- ArgoCD managing infrastructure deployments successfully
+- ArgoCD managing infrastructure deployments successfully from argocd-staging and argocd-production namespaces
 
 #### Sprint 3: Core Backend Services Development (Weeks 5-6)
 **Technical Milestone**: Complete backend microservices implementation with AWS deployment
@@ -126,7 +126,7 @@
 - Implement database migrations with Alembic
 - Configure connection pooling with PostgreSQL in Kubernetes
 - Implement caching strategies with ElastiCache Redis
-- Configure HashiCorp Vault integration for database credentials
+- Configure HashiCorp Vault Community Edition integration for database credentials
 - Deploy Data service to staging via ArgoCD
 - Test database operations and caching
 
@@ -136,7 +136,7 @@
 - Configure email notification templates and SMTP integration
 - Implement notification preference management
 - Set up message queue with ElastiCache Redis
-- Configure HashiCorp Vault integration for notification credentials
+- Configure HashiCorp Vault Community Edition integration for notification credentials
 - Deploy Notification service to staging via ArgoCD
 - Test WebSocket connections and real-time notifications
 
@@ -146,7 +146,7 @@
 - Validate database operations and caching performance
 - Test inter-service communication
 - Configure health checks and monitoring endpoints
-- Validate HashiCorp Vault integration
+- Validate HashiCorp Vault Community Edition integration
 
 **Acceptance Criteria**:
 - API services accessible via AWS ALB with SSL
@@ -156,7 +156,7 @@
 - All backend services deployed via ArgoCD
 - Inter-service communication working correctly
 - Health checks and monitoring endpoints operational
-- HashiCorp Vault properly managing credentials
+- HashiCorp Vault Community Edition properly managing credentials
 
 #### Sprint 4: Security Tool Integration & Orchestration (Weeks 7-8)
 **Technical Milestone**: Core security tool integration with workflow orchestration
@@ -168,7 +168,7 @@
 - Create tool registry and factory pattern for extensibility
 - Implement result normalization to standardized vulnerability schema
 - Configure tool-specific rate limiting and quota management
-- Configure HashiCorp Vault integration for tool credentials
+- Configure HashiCorp Vault Community Edition integration for tool credentials
 - Deploy Tool Integration service to staging via ArgoCD
 
 **Orchestration Service Development**:
@@ -178,7 +178,7 @@
 - Create retry logic with exponential backoff for failed analyses
 - Set up dead letter queue for permanently failed jobs
 - Implement analysis status tracking
-- Configure HashiCorp Vault integration for broker credentials
+- Configure HashiCorp Vault Community Edition integration for broker credentials
 - Deploy Orchestration service to staging via ArgoCD
 
 **Contract Parser Service Development**:
@@ -276,7 +276,7 @@
 - Add MythX analysis modes (quick/standard/deep) selection
 - Create MythX-specific rate limiting and quota management
 - Implement MythX result parsing and normalization
-- Configure MythX authentication and credential management via HashiCorp Vault
+- Configure MythX authentication and credential management via HashiCorp Vault Community Edition
 - Deploy enhanced Tool Integration service with MythX support
 
 **Multi-Tool Orchestration Enhancement**:
@@ -347,12 +347,12 @@
 - Complete end-to-end integration testing of all services
 - Implement comprehensive error handling and recovery
 - Optimize performance across all platform components
-- Add comprehensive logging via Loki + Fluent Bit and monitoring
+- Add comprehensive logging via Loki + Fluent Bit and monitoring in monitoring-staging and monitoring-production namespaces
 - Implement platform-wide configuration management
 - Create automated testing suite for continuous integration
 
 **Production Deployment Preparation**:
-- Deploy all services to production environment via ArgoCD
+- Deploy all services to production environment via ArgoCD from argocd-production namespace
 - Configure production DNS and SSL certificates
 - Validate all integrations and data flows in production
 - Test platform resilience and error recovery
@@ -663,7 +663,7 @@
 - Implement business metric monitoring and alerting
 - Create operational dashboards for platform health
 - Configure automated alerting and escalation procedures
-- Implement log aggregation and analysis via Loki + Fluent Bit
+- Implement log aggregation and analysis via Loki + Fluent Bit in monitoring-staging and monitoring-production namespaces
 
 **Support Infrastructure**:
 - Create customer support infrastructure and procedures
@@ -840,7 +840,7 @@ Each sprint completion requires:
 - Performance benchmarks meeting defined targets
 - Documentation updated for all new features and integrations
 - Stakeholder acceptance of delivered functionality
-- ArgoCD applications deploying successfully with healthy status
+- ArgoCD applications deploying successfully with healthy status from argocd-staging and argocd-production namespaces
 - GitOps workflow tested and functional across all affected repositories
 - AWS infrastructure operational with proper monitoring
 - Vault Secrets Operator functioning correctly with HashiCorp Vault across all environments
@@ -854,7 +854,7 @@ Before production deployment:
 - Monitoring and alerting systems operational across all services
 - Compliance requirements met and validated
 - Customer support procedures and documentation complete
-- ArgoCD production configuration validated and disaster recovery tested
+- ArgoCD production configuration validated and disaster recovery tested in argocd-production namespace
 - GitOps workflows proven reliable for production deployment
 - AWS infrastructure production-ready with HA and security hardening
 - All secrets properly managed with appropriate rotation policies
@@ -866,7 +866,7 @@ Platform performance targets:
 - Platform availability of 99.9% with comprehensive monitoring
 - Database operations with sub-20ms response times under load
 - Auto-scaling response time within 30 seconds of load changes
-- Zero-downtime deployments via ArgoCD GitOps workflow
+- Zero-downtime deployments via ArgoCD GitOps workflow from argocd-staging and argocd-production namespaces
 
 Security and compliance targets:
 - Zero critical security vulnerabilities in production

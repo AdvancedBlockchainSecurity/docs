@@ -4,17 +4,17 @@
 
 AWS Infrastructure as Code repository containing all cloud infrastructure configurations. This task focuses on the security module providing HashiCorp Vault infrastructure with Kubernetes integration and rotation capabilities for secure credential management.
 
-**✅ ALIGNMENT CHECK**: This implementation establishes secure credential management for all platform services using HashiCorp Vault with Vault Secrets Operator integration as specified in Sprint 1 documentation.
+**✅ ALIGNMENT CHECK**: This implementation establishes secure credential management for all platform services using HashiCorp Vault Community Edition with Vault Secrets Operator integration as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
 
 ### Primary Goal
-Deploy and configure HashiCorp Vault for secure credential storage with automatic rotation and native Kubernetes integration via Vault Secrets Operator.
+Deploy and configure HashiCorp Vault Community Edition for secure credential storage with manual unsealing and native Kubernetes integration via Vault Secrets Operator in vault-staging and vault-production namespaces.
 
 ### Key Requirements (from docs)
-- **Vault Deployment**: Deploy for staging and production environments in Kubernetes
+- **Vault Deployment**: Deploy Community Edition for staging and production environments in vault-staging and vault-production namespaces
 - **RBAC Configuration**: Vault policies and Kubernetes service accounts for secure secret access
-- **Automatic Rotation**: Rotation policies for database credentials using Vault's dynamic secrets
+- **Manual Management**: Manual secret management with Vault Community Edition (no enterprise auto-rotation)
 - **Organization Structure**: Hierarchical secret organization using Vault's KV secrets engine
 
 ## Directory Structure Requirements
@@ -61,12 +61,12 @@ solidity-security-monitoring/
 ## Step 1: Vault Infrastructure (1.5 hours)
 
 ### Objectives
-- Deploy HashiCorp Vault StatefulSets for staging and production environments
+- Deploy HashiCorp Vault Community Edition StatefulSets in vault-staging and vault-production namespaces
 - Configure Vault policies and Kubernetes RBAC for least-privilege secret access
 - Set up secret organization structure using Vault's KV v2 secrets engine
 
 ### Key Components to Implement
-- **Vault Deployment**: StatefulSet deployment in both Kubernetes environments
+- **Vault Deployment**: Community Edition StatefulSet deployment in vault-staging and vault-production namespaces
 - **RBAC Policies**: Least-privilege access for services and Vault Secrets Operator
 - **Secret Organization**: Hierarchical structure using Vault's KV v2 secrets engine
 
@@ -96,25 +96,25 @@ solidity-security-monitoring/
 ## Step 3: Automatic Rotation and Monitoring (30 minutes)
 
 ### Objectives
-- Configure automatic rotation policies for database credentials
+- Configure manual secret management for database credentials (Community Edition limitation)
 - Set up secret access monitoring and alerting
 - Validate secret retrieval from Kubernetes services
 
 ### Core Dependencies
-- **Rotation Policies**: Database credential automatic rotation using Vault's database secrets engine
+- **Manual Rotation**: Database credential manual rotation using Vault Community Edition KV engine
 - **Access Monitoring**: Vault audit logging for secret access
 - **Integration Testing**: Vault Secrets Operator connectivity
 
 ### Integration Requirements
-- Rotation policies compatible with PostgreSQL using Vault's database secrets engine
+- Manual rotation procedures compatible with PostgreSQL using Vault Community Edition
 - Secret access logging for security monitoring via Vault audit logs
 - Testing framework for secret retrieval validation with Vault CLI
 
 ## Success Criteria & Validation
 
 ### Vault Infrastructure Requirements
-- [ ] HashiCorp Vault operational in staging environment
-- [ ] HashiCorp Vault operational in production environment
+- [ ] HashiCorp Vault Community Edition operational in vault-staging namespace
+- [ ] HashiCorp Vault Community Edition operational in vault-production namespace
 - [ ] Vault policies configured with least-privilege secret access
 - [ ] Secret organization structure implemented using KV v2 secrets engine
 - [ ] Vault encryption configured for all secrets
@@ -128,7 +128,7 @@ solidity-security-monitoring/
 
 ### Integration and Security Requirements
 - [ ] Vault Secrets Operator Kubernetes integration configured
-- [ ] Secret rotation policies configured for database credentials using Vault's database engine
+- [ ] Manual secret rotation procedures documented for database credentials using Vault Community Edition
 - [ ] Vault audit logging enabled for secret access monitoring
 - [ ] Secret retrieval tested from Kubernetes environment using Vault CLI
 - [ ] Access controls validated for service-specific secret access using Vault policies
@@ -136,17 +136,17 @@ solidity-security-monitoring/
 ## Implementation Priority
 
 ### Phase 1: Core Infrastructure (1.5 hours)
-1. Deploy HashiCorp Vault StatefulSets in staging and production environments
+1. Deploy HashiCorp Vault Community Edition StatefulSets in vault-staging and vault-production namespaces
 2. Configure Vault policies and Kubernetes RBAC for Vault Secrets Operator integration
 3. Set up Vault encryption and secret organization hierarchy using KV v2 engine
 
 ### Phase 2: Secret Organization (1 hour)
 1. Create service-specific secret categories and initial secrets using Vault KV v2
-2. Deploy database credentials with dynamic rotation using Vault's database engine
+2. Deploy database credentials with manual rotation procedures using Vault Community Edition KV engine
 3. Set up tool integration secrets (API keys, third-party credentials) in Vault
 
 ### Phase 3: Monitoring and Validation (30 minutes)
-1. Configure automatic rotation policies for database credentials using Vault's database engine
+1. Configure manual rotation procedures for database credentials using Vault Community Edition
 2. Enable Vault audit logging for secret access monitoring
 3. Test secret retrieval integration with Vault Secrets Operator
 
@@ -154,8 +154,8 @@ solidity-security-monitoring/
 
 1. **Secret Naming**: Use consistent naming convention: `{environment}/{service}/{secret-type}` in Vault KV v2
 2. **Access Control**: Implement least-privilege Vault policies for each service
-3. **Rotation**: Configure automatic rotation for database credentials using Vault's database engine
-4. **Monitoring**: Enable comprehensive Vault audit logging for secret access and rotation events
+3. **Manual Rotation**: Configure manual rotation procedures for database credentials using Vault Community Edition
+4. **Monitoring**: Enable comprehensive Vault audit logging for secret access and manual rotation events
 
 ---
 
@@ -165,17 +165,17 @@ solidity-security-monitoring/
 
 ## Task Checklist
 - [ ] Task 1.4 started
-- [ ] HashiCorp Vault deployed in staging environment
-- [ ] HashiCorp Vault deployed in production environment
+- [ ] HashiCorp Vault Community Edition deployed in vault-staging namespace
+- [ ] HashiCorp Vault Community Edition deployed in vault-production namespace
 - [ ] Vault policies and Kubernetes RBAC configured for Vault Secrets Operator
 - [ ] Secret organization structure implemented using KV v2 engine
 - [ ] Vault encryption configured for all secrets
 - [ ] Backend service secrets created and organized in Vault
 - [ ] Frontend service secrets created and organized in Vault
-- [ ] Database credentials stored with dynamic rotation policies using Vault's database engine
+- [ ] Database credentials stored with manual rotation procedures using Vault Community Edition KV engine
 - [ ] Redis credentials configured with access controls in Vault
 - [ ] Tool integration secrets (MythX, APIs) stored securely in Vault
-- [ ] Automatic rotation policies configured for database credentials using Vault
+- [ ] Manual rotation procedures configured for database credentials using Vault Community Edition
 - [ ] Vault audit logging enabled for secret access monitoring
 - [ ] Vault Secrets Operator integration tested and validated
 - [ ] Service-specific secret access controls validated using Vault policies
