@@ -36,9 +36,20 @@ solidity-security-aws-infrastructure/
 │   │   ├── staging/               # Staging ElastiCache config
 │   │   └── production/            # Production ElastiCache config
 │   └── shared/                    # Shared storage components
+├── kubernetes/
+│   ├── postgresql/                # PostgreSQL StatefulSet manifests
+│   │   ├── base/                  # Base PostgreSQL configuration
+│   │   │   ├── kustomization.yaml # Base kustomization
+│   │   │   ├── statefulset.yaml   # PostgreSQL StatefulSet
+│   │   │   ├── service.yaml       # PostgreSQL service
+│   │   │   ├── configmap.yaml     # PostgreSQL configuration
+│   │   │   ├── secret.yaml        # PostgreSQL credentials
+│   │   │   └── networkpolicy.yaml # PostgreSQL network policies
+│   │   └── overlays/              # Environment-specific overlays
+│   │       ├── staging/           # Staging PostgreSQL config
+│   │       └── production/        # Production PostgreSQL config
+│   └── storage/                   # Storage classes and PV configs
 └── README.md
-
-Note: PostgreSQL deployed as Kubernetes StatefulSet in solidity-security-monitoring repository for both environments
 ```
 
 ## Step 1: PostgreSQL in Kubernetes Configuration (30 minutes)
@@ -94,7 +105,7 @@ Note: PostgreSQL deployed as Kubernetes StatefulSet in solidity-security-monitor
 - Redis credentials stored in AWS Secrets Manager
 - Redis backup and maintenance windows during low-usage periods
 - Cache performance monitoring and alerting
-- PostgreSQL monitoring handled within Kubernetes (Task 1.7)
+- PostgreSQL StatefulSet deployed within this infrastructure repository
 
 ## Success Criteria & Validation
 
@@ -103,7 +114,7 @@ Note: PostgreSQL deployed as Kubernetes StatefulSet in solidity-security-monitor
 - [ ] Persistent volume storage strategy defined with backup capabilities
 - [ ] Pod security contexts and NetworkPolicies planned
 - [ ] Environment-specific resource allocation configured
-- [ ] Integration with Kubernetes-native monitoring planned (handled in Task 1.7)
+- [ ] Integration with Kubernetes-native monitoring planned
 
 ### ElastiCache Infrastructure Requirements
 - [ ] ElastiCache Redis staging cluster operational with encryption
@@ -118,7 +129,7 @@ Note: PostgreSQL deployed as Kubernetes StatefulSet in solidity-security-monitor
 - [ ] Redis AUTH configured for secure access
 - [ ] ElastiCache backup and maintenance windows configured appropriately
 - [ ] Redis connection testing validated from EKS
-- [ ] PostgreSQL security and monitoring handled in Kubernetes (Task 1.7)
+- [ ] PostgreSQL StatefulSet security and monitoring configured
 
 ## Implementation Priority
 
@@ -163,5 +174,5 @@ Note: PostgreSQL deployed as Kubernetes StatefulSet in solidity-security-monitor
 - [ ] CloudWatch monitoring enabled for ElastiCache
 - [ ] Redis backup and maintenance windows configured
 - [ ] Redis connectivity tested from EKS
-- [ ] PostgreSQL implementation handed off to Task 1.7 (Kubernetes deployment)
+- [ ] PostgreSQL StatefulSet manifests created and deployment tested
 - [ ] Task 1.3 completed and validated

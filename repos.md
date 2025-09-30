@@ -685,7 +685,7 @@ solidity-security-shared/
 ```
 Purpose: AWS cloud resource provisioning and management
 Tech Stack: Terraform, AWS CLI, CloudFormation
-Contains: VPC, EKS, PostgreSQL in Kubernetes, ElastiCache, IAM configurations
+Contains: VPC, EKS, PostgreSQL StatefulSets, ElastiCache, IAM configurations
 ```
 
 ### 14. **`solidity-security-monitoring`**
