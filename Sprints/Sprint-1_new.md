@@ -13,11 +13,11 @@ Sprint 1 establishes the foundational AWS infrastructure and repository structur
 - **EKS Cluster**: AWS Kubernetes service with managed node groups for staging and production
 - **PostgreSQL StatefulSets**: Database with automated backups and encryption in Kubernetes
 - **ElastiCache Redis**: Caching and message queue with encryption
-- **HashiCorp Vault**: Centralized secret storage with automatic rotation
+- **HashiCorp Vault Community Edition**: Centralized secret storage in vault-staging and vault-production namespaces
 - **AWS Load Balancer Controller**: Application Load Balancer with SSL termination
-- **Vault Secrets Operator**: Kubernetes-native secret injection from HashiCorp Vault
-- **ArgoCD**: GitOps workflow management for both environments
-- **Monitoring & Logging**: Prometheus, Grafana, Loki + Fluent Bit integration
+- **Vault Secrets Operator**: Kubernetes-native secret injection from HashiCorp Vault in external-secrets-staging and external-secrets-production namespaces
+- **ArgoCD**: GitOps workflow management in argocd-staging and argocd-production namespaces
+- **Monitoring & Logging**: Prometheus, Grafana, Loki + Fluent Bit integration in monitoring-staging and monitoring-production namespaces
 
 ### Multi-Language Technology Stack
 - **🦀 Rust Components** (37% of codebase): High-performance parsing, similarity analysis, cryptographic operations
@@ -33,15 +33,15 @@ Sprint 1 establishes the foundational AWS infrastructure and repository structur
 4. **Shared Libraries**: Multi-language shared library with Python/TypeScript/Rust support
 5. **Service Templates**: Production-ready Kubernetes manifests for all microservices
 6. **DNS and Domain Setup**: Production domain with SSL certificates
-7. **Secret Management**: HashiCorp Vault integration with Vault Secrets Operator
+7. **Secret Management**: HashiCorp Vault Community Edition integration with Vault Secrets Operator
 
 ### Success Metrics
 - All 18 repositories properly structured and functional
 - AWS infrastructure operational in staging and production environments
 - Complete security analysis workflow deployable to cloud
 - ArgoCD managing all service deployments with automated sync
-- Domain accessible with SSL certificates
-- HashiCorp Vault properly managing all credentials
+- Domain accessible with SSL certificates via cert-manager-staging and cert-manager-production namespaces
+- HashiCorp Vault Community Edition properly managing all credentials
 
 ## Detailed Task Breakdown
 
@@ -115,8 +115,8 @@ Sprint 1 establishes the foundational AWS infrastructure and repository structur
 **Priority**: P0 (Critical)
 
 **Deliverables**:
-- Deploy HashiCorp Vault for staging environment
-- Deploy HashiCorp Vault for production environment
+- Deploy HashiCorp Vault Community Edition for staging environment in vault-staging namespace
+- Deploy HashiCorp Vault Community Edition for production environment in vault-production namespace
 - Configure IAM roles and policies for secret access
 - Set up automatic rotation policies for database credentials
 - Create secret organization structure for all services
@@ -153,7 +153,7 @@ production/ (same structure)
 ```
 
 **Acceptance Criteria**:
-- HashiCorp Vault operational in both environments
+- HashiCorp Vault Community Edition operational in vault-staging and vault-production namespaces
 - IAM policies configured with least-privilege access
 - Secret rotation policies configured
 - Secret organization structure implemented
@@ -189,15 +189,15 @@ production/ (same structure)
 
 **Deliverables**:
 - Install AWS Load Balancer Controller in both clusters
-- Install cert-manager for Let's Encrypt certificates
+- Install cert-manager for Let's Encrypt certificates in cert-manager-staging and cert-manager-production namespaces
 - Configure cert-manager with Cloudflare DNS validation
-- Install Vault Secrets Operator with Kubernetes RBAC authentication
+- Install Vault Secrets Operator with Kubernetes RBAC authentication in external-secrets-staging and external-secrets-production namespaces
 - Configure Vault CSI Driver for direct secret mounting
 
 **Acceptance Criteria**:
 - AWS Load Balancer Controller operational for ALB management
-- cert-manager provisioning Let's Encrypt certificates via DNS validation
-- Vault Secrets Operator integrating with HashiCorp Vault
+- cert-manager provisioning Let's Encrypt certificates via DNS validation in cert-manager-staging and cert-manager-production namespaces
+- Vault Secrets Operator integrating with HashiCorp Vault from external-secrets-staging and external-secrets-production namespaces
 - CSI Driver operational for direct secret mounting
 
 ---
@@ -208,15 +208,15 @@ production/ (same structure)
 **Priority**: P1 (High)
 
 **Deliverables**:
-- Deploy Prometheus for metrics collection in both clusters
-- Deploy Grafana with HashiCorp Vault integration
-- Configure Prometheus, Grafana, Loki + Fluent Bit monitoring and logging
+- Deploy Prometheus for metrics collection in monitoring-staging and monitoring-production namespaces
+- Deploy Grafana with HashiCorp Vault Community Edition integration in monitoring-staging and monitoring-production namespaces
+- Configure Prometheus, Grafana, Loki + Fluent Bit monitoring and logging in monitoring-staging and monitoring-production namespaces
 - Set up service monitoring and alerting rules
 - Create initial platform health dashboards
 
 **Acceptance Criteria**:
 - Prometheus collecting metrics from cluster components
-- Grafana operational with HashiCorp Vault credential management
+- Grafana operational with HashiCorp Vault Community Edition credential management
 - Loki + Fluent Bit receiving cluster and application logs
 - Basic alerting rules configured for infrastructure health
 
@@ -230,8 +230,8 @@ production/ (same structure)
 **Priority**: P0 (Critical)
 
 **Deliverables**:
-- Deploy ArgoCD in staging environment with HashiCorp Vault integration
-- Deploy ArgoCD in production environment with HashiCorp Vault integration
+- Deploy ArgoCD in staging environment with HashiCorp Vault Community Edition integration in argocd-staging namespace
+- Deploy ArgoCD in production environment with HashiCorp Vault Community Edition integration in argocd-production namespace
 - Configure GitHub integration for all 18 repositories
 - Set up RBAC policies for team access
 - Configure SSL termination and domain access
@@ -304,7 +304,7 @@ production/ (same structure)
 **Template Components for Each Service**:
 - Kubernetes deployment manifests with security contexts
 - Service definitions for internal communication
-- Vault Secret manifests for HashiCorp Vault integration
+- Vault Secret manifests for HashiCorp Vault Community Edition integration
 - Ingress configurations for ALB with SSL termination
 - ConfigMaps for non-sensitive configuration
 - IRSA (IAM Roles for Service Accounts) configurations
@@ -358,15 +358,15 @@ production/ (same structure)
 
 **Deliverables**:
 - Complete Kubernetes templates for all 7 backend services
-- Vault Secret manifests for HashiCorp Vault integration
+- Vault Secret manifests for HashiCorp Vault Community Edition integration
 - IRSA configurations for least-privilege AWS access
 - Service mesh configuration for inter-service communication
 - Health check endpoints and monitoring configurations
 
 **Acceptance Criteria**:
 - All backend service templates deploy successfully to staging EKS
-- Services can communicate with PostgreSQL and ElastiCache via Vault Secrets
-- HashiCorp Vault integration functional for all services
+- Services can communicate with PostgreSQL and ElastiCache via Vault Secrets from external-secrets-staging and external-secrets-production namespaces
+- HashiCorp Vault Community Edition integration functional for all services
 - Health checks pass and services register correctly
 - IRSA providing appropriate AWS permissions
 
@@ -484,7 +484,7 @@ production/ (same structure)
 - Error handling and retry mechanisms
 
 **AWS Integration**:
-- Vault Secrets Operator managing service credentials
+- Vault Secrets Operator managing service credentials from external-secrets-staging and external-secrets-production namespaces
 - IRSA providing secure AWS service access
 - Loki + Fluent Bit logging for service communication
 - ALB health checks and load balancing
@@ -563,7 +563,7 @@ production/ (same structure)
 
 **AWS-Specific Documentation**:
 - EKS cluster management and troubleshooting
-- HashiCorp Vault integration and secret management
+- HashiCorp Vault Community Edition integration and secret management
 - PostgreSQL StatefulSets and ElastiCache operational procedures
 - ArgoCD deployment and application management
 - Monitoring and alerting configuration
@@ -683,7 +683,7 @@ production/ (same structure)
 - **Multi-Language Integration**: Shared libraries working across Python, TypeScript, and Rust
 - **Service Templates**: Production-ready Kubernetes manifests for all microservices
 - **Domain and SSL**: Production domain accessible with valid SSL certificates
-- **Secret Management**: HashiCorp Vault integrated with Vault Secrets Operator
+- **Secret Management**: HashiCorp Vault Community Edition integrated with Vault Secrets Operator
 
 ### Platform Accessibility & Performance
 - **Staging Environment**: staging.advancedblockchainsecurity.com accessible and functional
@@ -693,7 +693,7 @@ production/ (same structure)
 - **Performance**: Infrastructure capable of handling target enterprise workloads
 
 ### Team Productivity & Knowledge
-- **AWS Competency**: Team demonstrates proficiency with EKS, PostgreSQL in Kubernetes, HashiCorp Vault management
+- **AWS Competency**: Team demonstrates proficiency with EKS, PostgreSQL in Kubernetes, HashiCorp Vault Community Edition management
 - **GitOps Proficiency**: Team skilled in ArgoCD workflow and troubleshooting
 - **Architecture Understanding**: Team understands multi-service cloud architecture
 - **Documentation Quality**: Comprehensive guides enabling independent development and operations
@@ -705,7 +705,7 @@ production/ (same structure)
 - Comprehensive documentation updated for all components
 - ArgoCD applications deploying successfully with healthy status
 - AWS infrastructure operational with proper monitoring and alerting
-- Vault Secrets Operator functioning correctly across all environments
+- Vault Secrets Operator functioning correctly across all environments from external-secrets-staging and external-secrets-production namespaces
 
 ## Risk Mitigation & Contingency Plans
 
@@ -730,7 +730,7 @@ production/ (same structure)
 Sprint 2 will focus on core backend service development and deployment to the AWS infrastructure established in Sprint 1:
 
 ### Core Backend Development
-- Implement FastAPI authentication service with HashiCorp Vault integration
+- Implement FastAPI authentication service with HashiCorp Vault Community Edition integration
 - Develop data service with PostgreSQL StatefulSets and ElastiCache integration
 - Create notification service with real-time WebSocket capabilities
 - Deploy all services to staging environment via ArgoCD

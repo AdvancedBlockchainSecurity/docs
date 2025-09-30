@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-**Architecture Vision**: Enterprise-grade microservices platform with AWS-first cloud infrastructure, HashiCorp Vault secret management, and Istio service mesh for comprehensive Solidity security analysis.
+**Architecture Vision**: Enterprise-grade microservices platform with AWS-first cloud infrastructure, HashiCorp Vault Community Edition secret management, and Istio service mesh for comprehensive Solidity security analysis.
 
 **Development Strategy**: 18 sprints across 36 weeks, organized in 3 phases, with cloud-native development from day one using production-ready AWS infrastructure and GitOps deployment workflows.
 
@@ -15,12 +15,12 @@
 - **API Gateway**: Kong or AWS API Gateway for rate limiting, authentication, routing
 - **Service Mesh**: Istio for service-to-service mTLS, traffic management, and observability
 - **Ingress Controller**: Istio Gateway + AWS Application Load Balancer (ALB) with SSL termination
-- **Certificate Management**: cert-manager with Let's Encrypt for automated SSL certificate provisioning
-- **Secret Management**: HashiCorp Vault for centralized secret storage, rotation, and policy enforcement
-- **Secret Injection**: Vault Secrets Operator for Kubernetes-native secret injection from Vault
+- **Certificate Management**: cert-manager with Let's Encrypt for automated SSL certificate provisioning in cert-manager-staging and cert-manager-production namespaces
+- **Secret Management**: HashiCorp Vault Community Edition for centralized secret storage in vault-staging and vault-production namespaces
+- **Secret Injection**: Vault Secrets Operator for Kubernetes-native secret injection from Vault in external-secrets-staging and external-secrets-production namespaces
 - **Event Bus**: Apache Kafka for async messaging between services
 - **Container Orchestration**: AWS EKS with Helm charts for deployment
-- **Observability**: Prometheus metrics, Jaeger tracing, structured logging with Fluentd
+- **Observability**: Prometheus metrics, Jaeger tracing, structured logging with Fluentd in monitoring-staging and monitoring-production namespaces
 
 ### Cloud Infrastructure Strategy
 **AWS-First Development**: Production-grade cloud infrastructure from day one
@@ -28,20 +28,20 @@
 - **Production Environment**: Multi-AZ deployment with auto-scaling (~$1,250/month at scale)
 - **Database**: PostgreSQL StatefulSets with persistent volumes and automated backups
 - **Caching**: ElastiCache Redis with clustering and failover
-- **Secret Management**: HashiCorp Vault with automatic rotation and high availability
+- **Secret Management**: HashiCorp Vault Community Edition with manual operations and high availability in vault-staging and vault-production namespaces
 - **Cost**: $250-350/month for development, scaling to $500-2500/month in production
 
 ### HashiCorp Vault Architecture
 
 #### Secret Management Integration Strategy
-**HashiCorp Vault Configuration**:
-- **Development**: Vault deployed in Kubernetes with automatic rotation and audit logging
-- **Production**: Vault with high availability and enterprise features
+**HashiCorp Vault Community Edition Configuration**:
+- **Development**: Vault Community Edition deployed in vault-staging namespace with manual operations and audit logging
+- **Production**: Vault Community Edition in vault-production namespace with high availability and community features only
 - **Secret Categories**: Application secrets, database credentials, API keys, certificates
 - **Authentication**: AWS IAM roles, IRSA (IAM Roles for Service Accounts), cross-account access
-- **Secret Injection**: Vault Secrets Operator with Kubernetes RBAC-based access control
+- **Secret Injection**: Vault Secrets Operator with Kubernetes RBAC-based access control from external-secrets-staging and external-secrets-production namespaces
 
-**HashiCorp Vault Secret Organization**:
+**HashiCorp Vault Community Edition Secret Organization**:
 ```yaml
 Secret Paths Structure:
   Environment-based organization:
@@ -79,15 +79,15 @@ Cross-Region Replication:
   Automatic failover and sync
 ```
 
-**HashiCorp Vault Security Features**:
-- **Encryption**: Encryption in transit and at rest with AWS KMS
+**HashiCorp Vault Community Edition Security Features**:
+- **Encryption**: Encryption in transit and at rest with manual unsealing (Community Edition limitation)
 - **Access Control**: IAM-based access control with least privilege
 - **Audit Logging**: Comprehensive audit trails via CloudTrail
-- **Cross-Region Replication**: Disaster recovery and global access
-- **Automatic Rotation**: Lambda-based rotation for supported services
+- **Manual Backups**: Manual snapshot procedures for disaster recovery (Community Edition limitation)
+- **Manual Rotation**: Manual rotation procedures for secrets (Community Edition limitation)
 - **Version Management**: Secret versioning with rollback capabilities
 
-**HashiCorp Vault Performance Optimization**:
+**HashiCorp Vault Community Edition Performance Optimization**:
 - **Caching**: SDK-level caching for high-throughput applications
 - **Retrieval Patterns**: Optimized access patterns to minimize API calls
 - **Batch Operations**: Bulk secret retrieval for initialization
@@ -108,7 +108,7 @@ Cross-Region Replication:
 - Design EKS cluster configuration with managed node groups
 - Configure PostgreSQL 15 StatefulSets with persistent volumes for both environments
 - Configure ElastiCache Redis with encryption for both environments
-- Set up HashiCorp Vault for secret management with automatic rotation
+- Set up HashiCorp Vault Community Edition for secret management in vault-staging and vault-production namespaces
 - Configure AWS IAM roles and policies with least privilege access
 - Design ECR repositories for all services with vulnerability scanning
 - Configure CloudWatch monitoring and logging integration
@@ -156,7 +156,7 @@ Support & Documentation (4):
 - AWS infrastructure fully operational in staging and production environments
 - EKS clusters accessible with proper networking and security configuration
 - PostgreSQL StatefulSets and ElastiCache deployed and accessible from EKS with encryption
-- HashiCorp Vault operational with proper Kubernetes integration and encryption
+- HashiCorp Vault Community Edition operational with proper Kubernetes integration and encryption in vault-staging and vault-production namespaces
 - All 18 repositories properly structured, initialized, and integrated
 - Shared libraries working consistently across Python, TypeScript, and Rust services
 - ECR repositories configured with automated vulnerability scanning
@@ -172,14 +172,14 @@ Support & Documentation (4):
 - Deploy Jaeger for distributed tracing integration with Istio
 - Deploy Kiali for service mesh visualization and management
 - Configure AWS Load Balancer Controller for ALB management
-- Install cert-manager with Let's Encrypt and Cloudflare DNS validation
+- Install cert-manager with Let's Encrypt and Cloudflare DNS validation in cert-manager-staging and cert-manager-production namespaces
 - Configure DNS entries with A records pointing to ALB
-- Install Vault Secrets Operator for HashiCorp Vault integration
-- Deploy monitoring stack (Prometheus, Grafana) for both environments
+- Install Vault Secrets Operator for HashiCorp Vault Community Edition integration in external-secrets-staging and external-secrets-production namespaces
+- Deploy monitoring stack (Prometheus, Grafana) in monitoring-staging and monitoring-production namespaces
 - Configure GitHub Actions CI/CD pipeline with AWS integration
 
 **ArgoCD Bootstrap & GitOps Foundation**:
-- Deploy ArgoCD in staging and production environments
+- Deploy ArgoCD in argocd-staging and argocd-production namespaces
 - Configure ArgoCD with GitHub integration for all 18 repositories
 - Set up ArgoCD application projects for development environments
 - Configure ArgoCD RBAC for team access with proper permissions
@@ -191,7 +191,7 @@ Support & Documentation (4):
 - Create production-ready Kustomize base configurations for all backend services
 - Create production-ready Kustomize base configurations for all frontend services
 - Create environment-specific Kustomize overlays (staging/production)
-- Configure HashiCorp Vault integration via Kustomize patches for all services
+- Configure HashiCorp Vault Community Edition integration via Kustomize patches for all services
 - Configure Istio VirtualService and DestinationRule templates via Kustomize
 - Set up IRSA (IAM Roles for Service Accounts) for all services
 - Configure network policies and pod security policies via Kustomize
@@ -203,9 +203,9 @@ Support & Documentation (4):
 - All services have Istio sidecars automatically injected with proper configuration
 - Jaeger distributed tracing working for all service calls with correlation
 - Kiali dashboard showing complete service mesh topology and health
-- cert-manager provisioning Let's Encrypt certificates successfully
+- cert-manager provisioning Let's Encrypt certificates successfully in cert-manager-staging and cert-manager-production namespaces
 - ArgoCD deployed and operational in both staging and production environments
-- Vault Secrets Operator integrating with HashiCorp Vault for secret management
+- Vault Secrets Operator integrating with HashiCorp Vault Community Edition for secret management from external-secrets-staging and external-secrets-production namespaces
 - CloudWatch monitoring operational with proper metrics collection and alerting
 - All microservice Kustomize templates created with enterprise security policies
 - IRSA configured for all services with least-privilege access
@@ -223,7 +223,7 @@ Support & Documentation (4):
 - Implement comprehensive audit logging for all API requests
 - Configure CORS policies for frontend integration with security headers
 - Create health check endpoints with dependency validation
-- Deploy API service to staging via ArgoCD with proper configuration
+- Deploy API service to staging via ArgoCD from argocd-staging namespace with proper configuration
 - Configure AWS ALB ingress with SSL termination and security policies
 
 **Data Service Development**:
@@ -232,7 +232,7 @@ Support & Documentation (4):
 - Implement database migrations with Alembic and rollback procedures
 - Configure connection pooling with PostgreSQL in Kubernetes and optimization
 - Implement multi-tier caching strategies with ElastiCache Redis
-- Configure HashiCorp Vault integration for database credentials with rotation
+- Configure HashiCorp Vault Community Edition integration for database credentials with manual rotation
 - Deploy Data service to staging via ArgoCD with proper monitoring
 - Test database operations, caching, and performance under load
 
@@ -402,7 +402,7 @@ Support & Documentation (4):
 - Implement authentication components and responsive layouts
 - Set up Storybook for component documentation and testing
 - Create responsive navigation and layout components with accessibility
-- Deploy UI Core service to staging via ArgoCD with proper CDN integration
+- Deploy UI Core service to staging via ArgoCD from argocd-staging namespace with proper CDN integration
 
 **Component Architecture & State Management**:
 - **Design System**: Custom component library with Storybook documentation
@@ -420,7 +420,7 @@ Support & Documentation (4):
 - Implement real-time WebSocket connection for live updates with reconnection
 - Create overview screens with key performance indicators and trends
 - Configure TanStack Query for API data fetching, caching, and synchronization
-- Deploy Dashboard service to staging via ArgoCD with proper performance optimization
+- Deploy Dashboard service to staging via ArgoCD from argocd-staging namespace with proper performance optimization
 
 **Dashboard Visualizations**:
 - **Risk Trend Charts**: Time-series visualization of security metrics with drill-down
@@ -437,14 +437,14 @@ Support & Documentation (4):
 - Create pagination with TanStack Table and virtual scrolling for large datasets
 - Implement detailed finding views and comprehensive status management
 - Create bulk operations for efficient finding management across teams
-- Deploy Findings service to staging via ArgoCD with proper database optimization
+- Deploy Findings service to staging via ArgoCD from argocd-staging namespace with proper database optimization
 
 **Analysis Workflow Development**:
 - Implement intuitive contract upload interface with drag-and-drop support
 - Create comprehensive analysis progress tracking with real-time updates
 - Implement analysis history and result management with search capabilities
 - Configure React Hook Form for form management with validation
-- Deploy Analysis service to staging via ArgoCD with proper file handling
+- Deploy Analysis service to staging via ArgoCD from argocd-staging namespace with proper file handling
 
 **Frontend Integration & Testing**:
 - Integrate frontend with backend API services using proper error handling
@@ -462,7 +462,7 @@ Support & Documentation (4):
 - Authentication flow functional end-to-end with all supported providers
 - Findings display with advanced filtering, sorting, and pagination for large datasets
 - Dashboard shows comprehensive metrics and visualizations from backend services
-- All frontend services deployed via ArgoCD with proper CDN integration
+- All frontend services deployed via ArgoCD from argocd-staging and argocd-production namespaces with proper CDN integration
 - Responsive design working seamlessly on desktop, tablet, and mobile devices
 
 #### Sprint 6: MythX Integration & Platform Completion (Weeks 11-12)
@@ -475,7 +475,7 @@ Support & Documentation (4):
 - Add MythX analysis modes (quick/standard/deep) selection with cost optimization
 - Create MythX-specific rate limiting and quota management with monitoring
 - Implement comprehensive MythX result parsing and normalization to standard schema
-- Configure MythX authentication and credential management via HashiCorp Vault
+- Configure MythX authentication and credential management via HashiCorp Vault Community Edition
 - Deploy enhanced Tool Integration service with MythX support and monitoring
 
 **Multi-Tool Orchestration Enhancement**:

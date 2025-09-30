@@ -5,10 +5,10 @@
 ## High-Level Objectives
 
 ### Primary Goal
-Deploy and configure ArgoCD for GitOps workflow management with GitHub integration, SSL termination, and team access control.
+Deploy and configure ArgoCD for GitOps workflow management in argocd-staging and argocd-production namespaces with GitHub integration, SSL termination, and team access control.
 
 ### Key Requirements (from docs)
-- **ArgoCD Deployment**: ArgoCD in staging and production with Vault integration
+- **ArgoCD Deployment**: ArgoCD in argocd-staging and argocd-production namespaces with Vault Community Edition integration
 - **GitHub Integration**: Connection to all 17 repositories for deployment management
 - **Access Control**: RBAC policies for team access and security
 - **SSL Configuration**: SSL termination and domain access
@@ -54,8 +54,8 @@ solidity-security-aws-infrastructure/
 ## Step 1: ArgoCD Server Deployment (2 hours)
 
 ### Objectives
-- Deploy ArgoCD in staging environment with AWS integration
-- Deploy ArgoCD in production environment with AWS integration
+- Deploy ArgoCD in argocd-staging namespace with AWS integration
+- Deploy ArgoCD in argocd-production namespace with AWS integration
 - Configure ArgoCD with Vault Secrets Operator for credential management
 
 ### Key Components to Implement
@@ -106,8 +106,8 @@ solidity-security-aws-infrastructure/
 ## Success Criteria & Validation
 
 ### ArgoCD Infrastructure Requirements
-- [ ] ArgoCD operational in staging environment with persistent storage
-- [ ] ArgoCD operational in production environment with high availability
+- [ ] ArgoCD operational in argocd-staging namespace with persistent storage
+- [ ] ArgoCD operational in argocd-production namespace with high availability
 - [ ] Vault Secrets Operator integration functional for credential management
 - [ ] ArgoCD server accessible and responsive
 - [ ] Resource limits configured appropriate for environment load
@@ -120,8 +120,8 @@ solidity-security-aws-infrastructure/
 - [ ] Repository access validated for deployment operations
 
 ### SSL and Access Control Requirements
-- [ ] SSL certificates provisioned for ArgoCD staging domain
-- [ ] SSL certificates provisioned for ArgoCD production domain
+- [ ] SSL certificates provisioned for ArgoCD staging domain via cert-manager-staging namespace
+- [ ] SSL certificates provisioned for ArgoCD production domain via cert-manager-production namespace
 - [ ] ArgoCD accessible at argocd.staging.advancedblockchainsecurity.com
 - [ ] ArgoCD accessible at argocd.app.advancedblockchainsecurity.com
 - [ ] RBAC policies configured for team access control
@@ -131,8 +131,8 @@ solidity-security-aws-infrastructure/
 
 ### Phase 1: Core ArgoCD Deployment (2 hours)
 1. Create ArgoCD Kustomize base configuration in `solidity-security-aws-infrastructure/argocd/base/`
-2. Deploy ArgoCD server components in staging using Kustomize overlay in `argocd/overlays/staging/`
-3. Deploy ArgoCD server components in production using Kustomize overlay in `argocd/overlays/production/`
+2. Deploy ArgoCD server components in argocd-staging namespace using Kustomize overlay in `argocd/overlays/staging/`
+3. Deploy ArgoCD server components in argocd-production namespace using Kustomize overlay in `argocd/overlays/production/`
 4. Configure persistent storage and Vault Secrets Operator integration via Kustomize patches
 
 ### Phase 2: Repository Integration (1.5 hours)
@@ -162,8 +162,8 @@ solidity-security-aws-infrastructure/
 
 ## Task Checklist
 - [ ] Task 1.8 started
-- [ ] ArgoCD deployed in staging environment with persistent storage
-- [ ] ArgoCD deployed in production environment with high availability
+- [ ] ArgoCD deployed in argocd-staging namespace with persistent storage
+- [ ] ArgoCD deployed in argocd-production namespace with high availability
 - [ ] Vault Secrets Operator integration configured for credentials
 - [ ] Resource limits and security contexts configured
 - [ ] All 17 GitHub repositories connected to ArgoCD

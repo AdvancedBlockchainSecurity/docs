@@ -9,7 +9,7 @@ Deploy comprehensive monitoring and observability stack with Prometheus metrics 
 
 ### Key Requirements (from docs)
 - **Metrics Collection**: Prometheus for cluster and application metrics
-- **Visualization**: Grafana with AWS Secrets Manager integration
+- **Visualization**: Grafana with HashiCorp Vault Community Edition integration in monitoring-staging and monitoring-production namespaces
 - **Logging**: Loki for log aggregation with Fluent Bit for log collection
 - **Alerting**: AlertManager for routing and notification management
 
@@ -69,7 +69,7 @@ solidity-security-monitoring/
 ## Step 1: Prometheus Deployment and Configuration (1.5 hours)
 
 ### Objectives
-- Deploy Prometheus for metrics collection in both clusters
+- Deploy Prometheus for metrics collection in monitoring-staging and monitoring-production namespaces
 - Configure service discovery for automatic target detection
 - Set up metrics collection from cluster components and applications
 
@@ -92,14 +92,14 @@ solidity-security-monitoring/
 ## Step 2: Grafana Deployment and Integration (1 hour)
 
 ### Objectives
-- Deploy Grafana with AWS Secrets Manager integration
+- Deploy Grafana with HashiCorp Vault Community Edition integration in monitoring-staging and monitoring-production namespaces
 - Configure data sources for Prometheus
 - Create initial platform health dashboards
 
 ### Key Components to Implement
 - **Kustomize Base Manifests**: Base Grafana deployment with ConfigMaps
 - **Environment Overlays**: Environment-specific dashboard and data source configurations
-- **Vault Integration**: HashiCorp Vault integration via Vault Secrets Operator
+- **Vault Integration**: HashiCorp Vault Community Edition integration via Vault Secrets Operator
 - **Data Sources**: Prometheus data source configuration via Kustomize
 
 ### Integration Strategy
@@ -154,7 +154,7 @@ solidity-security-monitoring/
 - [ ] Application metrics collection configured and functional
 
 ### Grafana Visualization Requirements
-- [ ] Grafana deployed with AWS Secrets Manager credential integration
+- [ ] Grafana deployed with HashiCorp Vault Community Edition credential integration in monitoring-staging and monitoring-production namespaces
 - [ ] Prometheus data sources configured and operational
 - [ ] Initial platform health dashboards created and functional
 - [ ] Role-based access control configured for team access
@@ -175,7 +175,7 @@ solidity-security-monitoring/
 ## Implementation Priority
 
 ### Phase 1: Prometheus Deployment (1.5 hours)
-1. Deploy Prometheus server with persistent storage in both clusters
+1. Deploy Prometheus server with persistent storage in monitoring-staging and monitoring-production namespaces
 2. Configure service discovery and metrics collection rules
 3. Set up service monitors for automatic target detection and validation
 
@@ -209,12 +209,12 @@ solidity-security-monitoring/
 
 ## Task Checklist
 - [ ] Task 1.7 started
-- [ ] Prometheus deployed in staging cluster with persistent storage
-- [ ] Prometheus deployed in production cluster with persistent storage
+- [ ] Prometheus deployed in monitoring-staging namespace with persistent storage
+- [ ] Prometheus deployed in monitoring-production namespace with persistent storage
 - [ ] Service discovery configured for automatic target detection
 - [ ] Cluster and node metrics collection operational
 - [ ] Application metrics collection configured
-- [ ] Grafana deployed with AWS Secrets Manager integration
+- [ ] Grafana deployed with HashiCorp Vault Community Edition integration in monitoring-staging and monitoring-production namespaces
 - [ ] Prometheus data sources configured in Grafana
 - [ ] Initial platform health dashboards created
 - [ ] Role-based access control configured for Grafana
