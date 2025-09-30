@@ -4,16 +4,17 @@
 
 AWS Infrastructure as Code repository containing all cloud infrastructure configurations. This task focuses on deploying HashiCorp Vault Community Edition using standardized Kustomize structure with proper StatefulSet configuration for secure credential management.
 
-**✅ ALIGNMENT CHECK**: This implementation establishes secure credential management for all platform services using HashiCorp Vault Community Edition with Vault Secrets Operator integration as specified in Sprint 1 documentation.
+**✅ ALIGNMENT CHECK**: This implementation establishes secure credential management for all platform services using HashiCorp Vault Community Edition with External Secrets Operator integration as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
 
 ### Primary Goal
-Deploy and configure HashiCorp Vault Community Edition for secure credential storage with manual unsealing and native Kubernetes integration via Vault Secrets Operator in vault-staging and vault-production namespaces.
+Deploy and configure HashiCorp Vault Community Edition for secure credential storage with manual unsealing and native Kubernetes integration via External Secrets Operator using ClusterSecretStore for cross-namespace access in vault-staging and vault-production namespaces.
 
 ### Key Requirements (from docs)
 - **Vault Deployment**: Deploy Community Edition for staging and production environments in vault-staging and vault-production namespaces
-- **RBAC Configuration**: Vault policies and Kubernetes service accounts for secure secret access
+- **RBAC Configuration**: Vault policies and Kubernetes service accounts for secure secret access via External Secrets Operator
+- **Cross-Namespace Integration**: ClusterSecretStore configuration for external-secrets-operator service account from external-secrets-system namespace
 - **Manual Management**: Manual secret management with Vault Community Edition (no enterprise auto-rotation)
 - **Organization Structure**: Hierarchical secret organization using Vault's KV secrets engine
 
@@ -45,7 +46,7 @@ solidity-security-aws-infrastructure/
         │       ├── configmap-patch.yaml   # Staging Vault configuration
         │       ├── pvc-patch.yaml          # Staging storage requirements
         │       ├── serviceaccount-patch.yaml # Staging RBAC configuration
-        │       └── externalsecret.yaml     # Vault Secrets Operator integration
+        │       └── externalsecret.yaml     # ClusterSecretStore for External Secrets Operator integration
         │
         └── production/
             └── vault/
@@ -56,9 +57,9 @@ solidity-security-aws-infrastructure/
                 ├── pvc-patch.yaml              # Production storage requirements
                 ├── serviceaccount-patch.yaml  # Production RBAC configuration
                 ├── pdb.yaml                    # PodDisruptionBudget for HA
-                ├── backup-cronjob.yaml         # Vault backup automation
-                ├── externalsecret.yaml         # Vault Secrets Operator integration
-                └── vault-policy.yaml          # Vault access policies
+                ├── backup-cronjob.yaml         # Vault file storage backup automation
+                ├── externalsecret.yaml         # ClusterSecretStore and External Secrets Operator integration
+                └── vault-policy.yaml          # Vault access policies and External Secrets Operator authentication
 ```
 
 ## Service Categories & Dependencies
@@ -94,7 +95,7 @@ solidity-security-aws-infrastructure/
 ### Technical Requirements
 - StatefulSet with persistent volume claims for Vault data storage
 - Headless service configuration for StatefulSet pod discovery
-- Kubernetes authentication method configuration for Vault Secrets Operator
+- Kubernetes authentication method configuration for External Secrets Operator
 - Base security context and resource limits configuration
 
 ### Performance Goals
@@ -112,31 +113,32 @@ solidity-security-aws-infrastructure/
 - **Staging Overlay**: Single replica Vault with smaller storage for development
 - **Production Overlay**: Multi-replica Vault with PodDisruptionBudget and backup automation
 - **Environment Patches**: Resource limits, storage sizes, and replica counts
-- **Vault Secrets Integration**: External Secrets Operator configuration for each environment
+- **External Secrets Integration**: ClusterSecretStore configuration for cross-namespace secret access
 
 ### Integration Strategy
 - Kustomize overlays following standardized directory structure
 - Environment-specific namespace creation and configuration
-- Production-grade backup and recovery procedures via CronJob
-- Vault Secrets Operator integration for secure secret retrieval
+- Production-grade file storage backup and recovery procedures via CronJob
+- External Secrets Operator integration via ClusterSecretStore for cross-namespace secret retrieval
 
 ## Step 3: Deployment and Integration Testing (30 minutes)
 
 ### Objectives
 - Deploy Vault using Kustomize overlays to staging and production environments
-- Validate Vault Secrets Operator integration and secret retrieval
+- Validate External Secrets Operator integration and secret retrieval via ClusterSecretStore
 - Test Vault initialization and unsealing procedures
 
 ### Core Dependencies
 - **Kustomize Deployment**: Deploy via `kubectl apply -k overlays/staging/vault/`
 - **Vault Initialization**: Manual Vault initialization and unsealing process
-- **Integration Testing**: Vault Secrets Operator connectivity from external-secrets namespaces
+- **Integration Testing**: External Secrets Operator connectivity via ClusterSecretStore from external-secrets-system namespace
 
 ### Integration Requirements
 - Validate StatefulSet deployment and persistent storage mounting
 - Test Kubernetes authentication method configuration
-- Verify External Secrets Operator can authenticate and retrieve secrets
-- Confirm proper RBAC permissions for service account access
+- Verify External Secrets Operator can authenticate and retrieve secrets via ClusterSecretStore
+- Confirm proper RBAC permissions for external-secrets-operator service account from external-secrets-system namespace
+- Configure Vault policies to allow cross-namespace authentication (handled in vault-policy.yaml setup scripts)
 
 ## Success Criteria & Validation
 
@@ -160,7 +162,7 @@ solidity-security-aws-infrastructure/
 - [ ] Vault StatefulSet pods running and persistent storage mounted
 - [ ] Vault initialization and unsealing completed manually
 - [ ] External Secrets Operator integration tested and functional
-- [ ] Kubernetes authentication method configured for Vault Secrets Operator
+- [ ] Kubernetes authentication method configured for External Secrets Operator via ClusterSecretStore
 
 ## Implementation Priority
 
@@ -174,13 +176,13 @@ solidity-security-aws-infrastructure/
 1. Create staging overlay in `k8s/overlays/staging/vault/` with single replica configuration
 2. Create production overlay in `k8s/overlays/production/vault/` with HA configuration
 3. Configure environment-specific patches for resources, storage, and namespaces
-4. Set up External Secrets Operator integration manifests for each environment
+4. Set up ClusterSecretStore manifests for External Secrets Operator integration
 
 ### Phase 3: Deployment and Testing (30 minutes)
 1. Deploy Vault to staging environment via `kubectl apply -k overlays/staging/vault/`
 2. Deploy Vault to production environment via `kubectl apply -k overlays/production/vault/`
 3. Initialize and unseal Vault manually for both environments
-4. Test External Secrets Operator integration and secret retrieval
+4. Test External Secrets Operator integration via ClusterSecretStore and validate cross-namespace secret retrieval
 
 ## Key Implementation Notes
 
@@ -188,7 +190,8 @@ solidity-security-aws-infrastructure/
 2. **StatefulSet Configuration**: Use StatefulSet for Vault with persistent storage for data durability
 3. **Environment Separation**: Use separate namespaces (vault-staging, vault-production) for isolation
 4. **RBAC Security**: Implement least-privilege ClusterRole for Vault Kubernetes integration
-5. **Production Hardening**: Include PodDisruptionBudget and backup CronJob for production environment
+5. **Cross-Namespace Authentication**: Configure Vault policies for external-secrets-operator service account from external-secrets-system namespace (handled in vault-policy.yaml setup scripts)
+6. **Production Hardening**: Include PodDisruptionBudget and file storage backup CronJob for production environment
 
 ---
 
@@ -210,11 +213,13 @@ solidity-security-aws-infrastructure/
 - [ ] StatefulSet patches configured for resource limits and replica counts
 - [ ] PVC patches configured for appropriate storage sizes
 - [ ] Production PodDisruptionBudget and backup CronJob configured
-- [ ] External Secrets Operator integration manifests created
+- [ ] ClusterSecretStore manifests created for External Secrets Operator integration
 - [ ] Vault deployed to vault-staging namespace via Kustomize
 - [ ] Vault deployed to vault-production namespace via Kustomize
 - [ ] Vault StatefulSet pods running with persistent storage mounted
 - [ ] Vault initialization and unsealing completed for both environments
-- [ ] Kubernetes authentication method configured for External Secrets Operator
-- [ ] External Secrets Operator integration tested and functional
+- [ ] Kubernetes authentication method configured for External Secrets Operator via ClusterSecretStore
+- [ ] Vault policies configured for external-secrets-operator service account from external-secrets-system namespace
+- [ ] External Secrets Operator integration tested and functional via ClusterSecretStore
+- [ ] Cross-namespace secret retrieval validated
 - [ ] Task 1.4 completed with Vault operational via standardized Kustomize structure
