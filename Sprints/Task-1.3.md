@@ -36,19 +36,43 @@ solidity-security-aws-infrastructure/
 │   │   ├── staging/               # Staging ElastiCache config
 │   │   └── production/            # Production ElastiCache config
 │   └── shared/                    # Shared storage components
-├── kubernetes/
-│   ├── postgresql/                # PostgreSQL StatefulSet manifests
-│   │   ├── base/                  # Base PostgreSQL configuration
-│   │   │   ├── kustomization.yaml # Base kustomization
-│   │   │   ├── statefulset.yaml   # PostgreSQL StatefulSet
-│   │   │   ├── service.yaml       # PostgreSQL service
-│   │   │   ├── configmap.yaml     # PostgreSQL configuration
-│   │   │   ├── secret.yaml        # PostgreSQL credentials
-│   │   │   └── networkpolicy.yaml # PostgreSQL network policies
-│   │   └── overlays/              # Environment-specific overlays
-│   │       ├── staging/           # Staging PostgreSQL config
-│   │       └── production/        # Production PostgreSQL config
-│   └── storage/                   # Storage classes and PV configs
+├── k8s/
+│   ├── base/
+│   │   └── postgresql/
+│   │       ├── kustomization.yaml
+│   │       ├── statefulset.yaml
+│   │       ├── service.yaml
+│   │       ├── configmap.yaml
+│   │       ├── pvc.yaml
+│   │       ├── secret.yaml
+│   │       ├── serviceaccount.yaml
+│   │       └── rbac.yaml
+│   └── overlays/
+│       ├── staging/
+│       │   ├── kustomization.yaml
+│       │   └── postgresql/
+│       │       ├── kustomization.yaml
+│       │       ├── namespace.yaml
+│       │       ├── statefulset-patch.yaml
+│       │       ├── configmap-patch.yaml
+│       │       ├── pvc-patch.yaml
+│       │       └── networkpolicy.yaml
+│       └── production/
+│           ├── kustomization.yaml
+│           └── postgresql/
+│               ├── kustomization.yaml
+│               ├── namespace.yaml
+│               ├── statefulset-patch.yaml
+│               ├── configmap-patch.yaml
+│               ├── pvc-patch.yaml
+│               ├── networkpolicy.yaml
+│               ├── pdb.yaml
+│               ├── backup-cronjob.yaml
+│               ├── resourcequota.yaml
+│               ├── limitrange.yaml
+│               ├── externalsecret.yaml
+│               ├── vault-policy.yaml
+│               └── servicemonitor.yaml
 └── README.md
 ```
 
