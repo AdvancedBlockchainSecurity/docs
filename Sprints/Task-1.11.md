@@ -17,6 +17,7 @@ Create comprehensive Kubernetes templates for all frontend microservices with Re
 
 ### Key Requirements (from docs)
 - **React Applications**: Deployment configurations for React-based frontend services
+- **Authentication UI**: Login pages and authentication flows for each subdomain/application
 - **Environment Configuration**: ConfigMaps for environment-specific API endpoints
 - **ALB Integration**: Ingress routing with SSL termination for frontend access
 - **Asset Optimization**: Build-time optimization and static asset caching
@@ -36,6 +37,16 @@ solidity-security-dashboard/
 │       ├── staging/               # Staging-specific configs
 │       └── production/            # Production-specific configs
 ├── src/                           # React application source
+│   ├── components/
+│   │   ├── auth/                  # Authentication components
+│   │   │   ├── LoginPage.tsx      # Login page component
+│   │   │   ├── AuthProvider.tsx   # Authentication context
+│   │   │   └── ProtectedRoute.tsx # Route protection
+│   │   └── common/                # Shared components
+│   ├── hooks/                     # Custom React hooks
+│   │   └── useAuth.ts            # Authentication hook
+│   └── services/
+│       └── authService.ts        # API service integration
 ├── public/                        # Static assets
 ├── package.json                   # Node.js dependencies
 ├── vite.config.ts                 # Vite build configuration
@@ -47,45 +58,53 @@ solidity-security-dashboard/
 ## Service Categories & Dependencies
 
 ### Frontend Services (4 services)
-- `ui-core` (Shared React component library with Storybook documentation)
-- `dashboard` (Main dashboard React application with real-time WebSocket connections)
-- `findings` (Finding management interface with advanced filtering capabilities)
-- `analysis` (Contract upload interface with analysis progress tracking)
+- `ui-core` (Shared React component library with Storybook documentation and common auth components)
+- `dashboard` (Main dashboard React application with real-time WebSocket connections and login page)
+- `findings` (Finding management interface with advanced filtering capabilities and authentication)
+- `analysis` (Contract upload interface with analysis progress tracking and user authentication)
 
-## Step 1: React Application Templates (2.5 hours)
+## Step 1: React Application Templates with Authentication (3 hours)
 
 ### Objectives
 - Create Kubernetes deployment manifests for all 4 frontend services
 - Configure React application deployment with NGINX serving
+- Implement authentication UI components and login pages for each service
 - Set up build-time optimization and asset bundling
 
 ### Key Components to Implement
+- **Authentication Components**: Login pages, auth providers, and protected routes
 - **Deployment Manifests**: React application deployments with NGINX containers
 - **Build Configuration**: Multi-stage Docker builds with optimization
 - **Static Serving**: NGINX configuration for efficient static asset serving
 
 ### Technical Requirements
+- Login page components for each frontend application
+- JWT token handling and API integration with solidity-security-api-service
 - Multi-stage Docker builds for optimized production images
-- NGINX configuration for React single-page applications
+- NGINX configuration for React single-page applications with auth routing
 - Proper caching headers for static assets
 - Environment variable injection for runtime configuration
 
-## Step 2: Environment Configuration and Integration (1 hour)
+## Step 2: Authentication Integration and Configuration (1.5 hours)
 
 ### Objectives
-- Create ConfigMaps for environment-specific API endpoints
+- Create ConfigMaps for environment-specific API endpoints and auth configuration
 - Configure environment variable injection for React applications
-- Set up service-to-service integration configuration
+- Set up authentication service integration with API gateway
+- Configure JWT token management and refresh logic
 
 ### Key Components to Implement
-- **ConfigMaps**: Environment-specific configuration for API endpoints
-- **Environment Injection**: Runtime configuration for React applications
-- **Service Integration**: Backend API endpoint configuration
+- **Auth ConfigMaps**: Environment-specific authentication and API endpoint configuration
+- **Environment Injection**: Runtime configuration for React applications with auth settings
+- **Service Integration**: Backend API endpoint and authentication service configuration
+- **Token Management**: JWT storage, refresh, and expiration handling
 
 ### Integration Strategy
-- Environment-specific ConfigMaps for staging and production
+- Environment-specific ConfigMaps for staging and production with auth endpoints
 - Runtime environment variable injection without build-time hardcoding
 - API endpoint configuration for backend service integration
+- Authentication flow integration with solidity-security-api-service
+- Subdomain-specific authentication routing and session management
 
 ## Step 3: ALB Ingress and Asset Optimization (30 minutes)
 
@@ -108,16 +127,22 @@ solidity-security-dashboard/
 
 ### React Application Requirements
 - [ ] Kubernetes deployment templates created for all 4 frontend services
+- [ ] Login page components implemented for each frontend application
+- [ ] Authentication context providers and protected routes configured
+- [ ] JWT token handling and API integration implemented
 - [ ] Multi-stage Docker builds configured with production optimization
-- [ ] NGINX configuration implemented for React SPA serving
+- [ ] NGINX configuration implemented for React SPA serving with auth routing
 - [ ] Static asset serving optimized with appropriate caching headers
 - [ ] Build-time optimization configured for production deployments
 
-### Environment Configuration Requirements
-- [ ] ConfigMaps created for environment-specific API endpoint configuration
+### Authentication and Environment Configuration Requirements
+- [ ] ConfigMaps created for environment-specific API endpoint and auth configuration
 - [ ] Environment variable injection configured for runtime configuration
+- [ ] Authentication service integration with solidity-security-api-service configured
+- [ ] JWT token management and refresh logic implemented
 - [ ] Backend service integration configured via environment variables
 - [ ] Service discovery configuration for backend API communication
+- [ ] Subdomain-specific authentication routing configured
 - [ ] Development and production environment configurations separated
 
 ### ALB and Optimization Requirements
@@ -129,16 +154,18 @@ solidity-security-dashboard/
 
 ## Implementation Priority
 
-### Phase 1: React Application Templates (2.5 hours)
-1. Create UI Core service template with component library and Storybook hosting
-2. Build Dashboard service template with real-time WebSocket integration
-3. Develop Findings service template with advanced filtering capabilities
-4. Create Analysis service template with file upload and progress tracking
+### Phase 1: React Application Templates with Authentication (3 hours)
+1. Create UI Core service template with component library, Storybook hosting, and shared auth components
+2. Build Dashboard service template with real-time WebSocket integration and login page
+3. Develop Findings service template with advanced filtering capabilities and authentication
+4. Create Analysis service template with file upload, progress tracking, and user authentication
+5. Implement JWT token handling and API integration for all services
 
-### Phase 2: Environment Configuration (1 hour)
-1. Configure ConfigMaps for environment-specific API endpoints and settings
-2. Set up environment variable injection for runtime React configuration
-3. Configure service integration settings for backend API communication
+### Phase 2: Authentication Integration and Configuration (1.5 hours)
+1. Configure ConfigMaps for environment-specific API endpoints, auth settings, and JWT configuration
+2. Set up environment variable injection for runtime React configuration with authentication
+3. Configure service integration settings for backend API communication and auth service
+4. Implement subdomain-specific authentication routing and session management
 
 ### Phase 3: ALB Integration and Optimization (30 minutes)
 1. Configure ALB ingress with path-based routing for all frontend services
@@ -147,35 +174,43 @@ solidity-security-dashboard/
 
 ## Key Implementation Notes
 
-1. **React Optimization**: Configure webpack optimization and code splitting for production builds
-2. **Environment Flexibility**: Use runtime configuration injection to avoid rebuilding for different environments
-3. **Caching Strategy**: Implement proper caching headers for static assets and API responses
-4. **Health Checks**: Configure appropriate health checks for React applications served by NGINX
+1. **Authentication Architecture**: Integrate with solidity-security-api-service for centralized authentication and JWT token management
+2. **Subdomain Authentication**: Implement subdomain-specific login pages and authentication flows for each application
+3. **React Optimization**: Configure webpack optimization and code splitting for production builds
+4. **Environment Flexibility**: Use runtime configuration injection to avoid rebuilding for different environments
+5. **Caching Strategy**: Implement proper caching headers for static assets and API responses
+6. **Health Checks**: Configure appropriate health checks for React applications served by NGINX
+7. **Security**: Implement secure JWT token storage, refresh logic, and protected route mechanisms
 
 ---
 
-**Estimated Time**: 4 hours
+**Estimated Time**: 5 hours
 **Owner**: Frontend/DevOps Team
 **Priority**: P1 (High)
 
 ## Task Checklist
 - [ ] Task 1.11 started
-- [ ] UI Core service template created with component library deployment
+- [ ] UI Core service template created with component library deployment and shared auth components
 - [ ] Storybook documentation hosting configured for UI Core
-- [ ] Dashboard service template created with WebSocket integration
+- [ ] Login page components implemented for all frontend applications
+- [ ] Authentication context providers and protected routes configured
+- [ ] JWT token handling and API service integration implemented
+- [ ] Dashboard service template created with WebSocket integration and login page
 - [ ] Real-time connection configuration implemented for Dashboard
-- [ ] Findings service template created with filtering capabilities
+- [ ] Findings service template created with filtering capabilities and authentication
 - [ ] Advanced filtering and sorting configuration implemented
-- [ ] Analysis service template created with file upload interface
+- [ ] Analysis service template created with file upload interface and user authentication
 - [ ] Analysis progress tracking and history management configured
 - [ ] Multi-stage Docker builds configured for all services
-- [ ] NGINX configuration implemented for React SPA serving
-- [ ] ConfigMaps created for environment-specific API configurations
-- [ ] Environment variable injection configured for runtime settings
+- [ ] NGINX configuration implemented for React SPA serving with auth routing
+- [ ] ConfigMaps created for environment-specific API and auth configurations
+- [ ] Environment variable injection configured for runtime settings with authentication
 - [ ] Backend service integration configured via environment variables
+- [ ] Authentication service integration with solidity-security-api-service configured
+- [ ] Subdomain-specific authentication routing and session management implemented
 - [ ] ALB ingress configurations created for all frontend services
 - [ ] SSL termination configured with cert-manager
 - [ ] Domain-based routing configured for service access
 - [ ] Health checks implemented for all frontend services
 - [ ] Static asset caching and optimization configured
-- [ ] Task 1.11 completed with production-ready frontend service templates
+- [ ] Task 1.11 completed with production-ready frontend service templates including authentication
