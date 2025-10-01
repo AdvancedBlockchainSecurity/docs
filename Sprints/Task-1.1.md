@@ -11,10 +11,13 @@ AWS Infrastructure as Code repository containing all cloud infrastructure config
 ### Primary Goal
 Register the domain and set up initial DNS infrastructure. Actual service DNS records will be configured after AWS infrastructure is deployed.
 
+**⚠️ CRITICAL DECISION**: Landing page routing strategy must be determined before DNS configuration.
+
 ### Key Requirements (from docs)
 - **Domain Registration**: Purchase production domain via Cloudflare
 - **DNS Management**: Configure Cloudflare hosted zone for DNS management
 - **Subdomain Structure**: Set up staging and production subdomain zones
+- **Landing Page Strategy**: Decide root domain routing for existing DigitalOcean lander
 - **Preparation**: Prepare DNS infrastructure for future service record configuration
 
 ## Directory Structure Requirements
@@ -29,7 +32,43 @@ solidity-security-aws-infrastructure/
 └── README.md
 ```
 
-## Step 1: Domain Purchase and Registration (30 minutes)
+## Step 1: Landing Page Strategy Decision (15 minutes)
+
+### Objectives
+- Determine root domain routing strategy for existing DigitalOcean lander
+- Plan DNS record structure based on landing page decision
+- Document routing architecture for infrastructure team
+
+### Landing Page Strategy Options
+
+**Option A: Preserve DigitalOcean Lander (Minimal Change)**
+```
+@ (root) → DigitalOcean IP                    # Keep existing lander
+app.advancedblockchainsecurity.com → AWS ALB  # Application platform
+www → CNAME to root                           # Points to DigitalOcean lander
+```
+
+**Option B: Migrate to AWS Infrastructure**
+```
+@ (root) → AWS ALB                            # New landing page on AWS
+app.advancedblockchainsecurity.com → AWS ALB  # Application platform
+www → CNAME to root                           # Points to AWS lander
+```
+
+**Option C: Hybrid Path-Based Routing**
+```
+@ (root) → AWS ALB with path routing          # Single ALB with routing rules
+/app/* → Application platform                # App paths
+/* → Landing page content                    # Marketing paths
+www → CNAME to root                          # Points to AWS with routing
+```
+
+### Implementation Requirements
+- **DigitalOcean IP**: Retrieve current lander IP address (if preserving)
+- **DNS Configuration**: Update Cloudflare Terraform variables accordingly
+- **Documentation**: Record decision for infrastructure team
+
+## Step 2: Domain Purchase and Registration (30 minutes)
 
 ### Objectives
 - Purchase production domain through Cloudflare
@@ -46,7 +85,7 @@ solidity-security-aws-infrastructure/
 - DNS zone creation and configuration
 - Domain ownership verification
 
-## Step 2: DNS Zone and Subdomain Setup (1 hour)
+## Step 3: DNS Zone and Subdomain Setup (1 hour)
 
 ### Objectives
 - Configure Cloudflare hosted zone for DNS management
@@ -63,7 +102,7 @@ solidity-security-aws-infrastructure/
 - Subdomain zone structure for ArgoCD and services
 - SSL certificate validation preparation for Let's Encrypt integration
 
-## Step 3: DNS Infrastructure Validation (30 minutes)
+## Step 4: DNS Infrastructure Validation (30 minutes)
 
 ### Objectives
 - Validate DNS zone configuration and propagation
@@ -82,11 +121,18 @@ solidity-security-aws-infrastructure/
 
 ## Success Criteria & Validation
 
+### Landing Page Strategy Requirements
+- [ ] Landing page routing strategy decided (Option A, B, or C)
+- [ ] DigitalOcean lander IP address retrieved (if preserving)
+- [ ] DNS routing architecture documented for infrastructure team
+- [ ] Cloudflare Terraform variables planned based on strategy
+
 ### DNS Infrastructure Requirements
 - [ ] Domain registered and accessible at advancedblockchainsecurity.com
 - [ ] Cloudflare DNS management operational and responding to queries
 - [ ] Staging subdomain zone (staging.advancedblockchainsecurity.com) created and resolvable
 - [ ] Production subdomain zone (app.advancedblockchainsecurity.com) created and resolvable
+- [ ] Root domain routing configured according to chosen landing page strategy
 - [ ] DNS propagation completed globally (verified with multiple DNS checkers)
 
 ### Future Integration Preparation Requirements
@@ -98,17 +144,23 @@ solidity-security-aws-infrastructure/
 
 ## Implementation Priority
 
-### Phase 1: Domain Registration (30 minutes)
+### Phase 1: Landing Page Strategy (15 minutes)
+1. Decide landing page routing strategy (Option A, B, or C)
+2. Retrieve DigitalOcean lander IP address if preserving current setup
+3. Document routing architecture for infrastructure team
+
+### Phase 2: Domain Registration (30 minutes)
 1. Register domain through Cloudflare registrar for integrated DNS management
 2. Configure Cloudflare account settings and security features
 3. Verify domain ownership and management access
 
-### Phase 2: DNS Zone Setup (45 minutes)
+### Phase 3: DNS Zone Setup (45 minutes)
 1. Create Cloudflare DNS zone and configure basic settings
 2. Set up staging subdomain zone structure
 3. Configure production subdomain zone structure
+4. Configure root domain routing according to chosen landing page strategy
 
-### Phase 3: Infrastructure Documentation (15 minutes)
+### Phase 4: Infrastructure Documentation (15 minutes)
 1. Document DNS infrastructure for service team
 2. Plan future DNS record structure for AWS Load Balancer targets
 3. Validate DNS propagation and global resolution
@@ -122,18 +174,22 @@ solidity-security-aws-infrastructure/
 
 ---
 
-**Estimated Time**: 2 hours
+**Estimated Time**: 2.25 hours (added 15 minutes for landing page strategy)
 **Owner**: DevOps Team
 **Priority**: P0 (Critical)
 
 ## Task Checklist
 - [ ] Task 1.1 started
+- [ ] Landing page routing strategy decided and documented
+- [ ] DigitalOcean lander IP retrieved (if preserving current setup)
 - [ ] Domain purchased through Cloudflare
 - [ ] Cloudflare DNS zone created and configured
+- [ ] Root domain routing configured according to landing page strategy
 - [ ] Staging subdomain zone (staging.advancedblockchainsecurity.com) set up and resolvable
 - [ ] Production subdomain zone (app.advancedblockchainsecurity.com) set up and resolvable
 - [ ] DNS infrastructure documented for service team
 - [ ] DNS structure planned for future AWS Load Balancer targets
 - [ ] DNS propagation verified globally
 - [ ] Domain security features enabled in Cloudflare
+- [ ] Landing page routing tested and validated
 - [ ] Task 1.1 completed and validated
