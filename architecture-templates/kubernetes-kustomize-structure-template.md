@@ -1,6 +1,6 @@
 # Kubernetes Kustomize Structure Template - Production Systems
 
-Use this template to generate a production-ready Kustomize folder structure with staging and production overlays.
+Use this template to generate a production-ready Kustomize folder structure with local, staging and production overlays.
 
 ---
 
@@ -21,6 +21,17 @@ k8s/
 │       └── [optional] rbac files (clusterrole.yaml, clusterrolebinding.yaml, rolebinding.yaml)
 │
 └── overlays/
+    ├── local/
+    │   ├── kustomization.yaml
+    │   └── <service-name>/
+    │       ├── kustomization.yaml
+    │       ├── namespace.yaml
+    │       ├── <workload-type>-patch.yaml
+    │       ├── configmap-patch.yaml
+    │       ├── [optional] service-patch.yaml
+    │       ├── [optional] ingress-patch.yaml
+    │       └── [optional] pvc-patch.yaml
+    │
     ├── staging/
     │   ├── kustomization.yaml
     │   └── <service-name>/
@@ -73,6 +84,7 @@ Each service gets its own namespace for:
 - Multi-tenant support
 
 **Naming Convention:**
+- Local: `<service-name>-local`
 - Staging: `<service-name>-staging`
 - Production: `<service-name>-prod`
 
@@ -169,6 +181,24 @@ Each service gets its own namespace for:
 ---
 
 ## Environment-Specific Patterns
+
+### Local Environment (Minikube)
+- **Platform**: Minikube with local Docker registry
+- **Namespace per service**: `<service>-local`
+- **Replicas**: 1 for all services
+- **Resources**: Minimal limits (25-40% of production)
+- **Storage**: Small PVC sizes (1-5Gi)
+- **Logging**: Debug level
+- **Monitoring**: Prometheus and Grafana (lightweight configuration)
+- **Backups**: Disabled
+- **HPA**: Disabled
+- **PDB**: Not required
+- **Network Policies**: Optional
+- **Ingress**: Nginx ingress controller
+- **Secret Management**: Vault Community Edition (single replica)
+- **Certificates**: Self-signed certificates via cert-manager
+- **Service Mesh**: Optional (can be disabled for resource savings)
+- **Database**: Lightweight PostgreSQL and Redis configurations
 
 ### Staging Environment
 - **Namespace per service**: `<service>-staging`
@@ -292,6 +322,14 @@ Options for production:
 
 Template structure includes:
 ```
+overlays/local/<service>/
+├── externalsecret.yaml (if using External Secrets Operator)
+└── vault-policy.yaml (Vault policy for the service)
+
+overlays/staging/<service>/
+├── externalsecret.yaml (if using External Secrets Operator)
+└── vault-policy.yaml (Vault policy for the service)
+
 overlays/production/<service>/
 ├── externalsecret.yaml (if using External Secrets Operator)
 └── vault-policy.yaml (Vault policy for the service)
@@ -316,6 +354,16 @@ k8s/
 ### Service Mesh Integration
 For Istio/Linkerd add to each service overlay:
 ```
+overlays/local/<service>/
+├── virtualservice.yaml (if using Istio)
+├── destinationrule.yaml (if using Istio)
+└── ingress.yaml (nginx ingress for local)
+
+overlays/staging/<service>/
+├── virtualservice.yaml
+├── destinationrule.yaml
+└── gateway.yaml (for ingress services)
+
 overlays/production/<service>/
 ├── virtualservice.yaml
 ├── destinationrule.yaml
@@ -335,7 +383,7 @@ app.kubernetes.io/version: <version>
 app.kubernetes.io/component: <component-type>
 app.kubernetes.io/part-of: <application-name>
 app.kubernetes.io/managed-by: kustomize
-environment: <staging|production>
+environment: <local|staging|production>
 team: <team-name>
 ```
 
@@ -355,6 +403,7 @@ Common production annotations:
 For additional environments:
 ```
 overlays/
+├── local/
 ├── development/
 ├── staging/
 ├── production/
@@ -407,6 +456,49 @@ Production-ready structure must have:
 - [ ] Secrets managed externally (not in Git)
 - [ ] Complete labels following kubernetes standards
 - [ ] Documentation of service dependencies
+
+---
+
+## Local Development Environment Setup
+
+### Minikube Configuration
+
+**Required Components for Local Development:**
+- Minikube with adequate resources (8GB+ RAM, 4+ CPU cores)
+- Nginx Ingress Controller (instead of Istio for simplicity)
+- Vault Community Edition (single replica)
+- Prometheus and Grafana (lightweight monitoring)
+- PostgreSQL and Redis (development configurations)
+- cert-manager with self-signed certificate issuer
+
+**Local Overlay Specifications:**
+```yaml
+# Example local overlay patch
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-name
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: service-name
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+```
+
+**Local Environment Variables:**
+- `ENVIRONMENT=local`
+- `LOG_LEVEL=debug`
+- `VAULT_ADDR=http://vault.vault-local.svc.cluster.local:8200`
+- `PROMETHEUS_URL=http://prometheus.monitoring-local.svc.cluster.local:9090`
+- `GRAFANA_URL=http://grafana.monitoring-local.svc.cluster.local:3000`
 
 ---
 
