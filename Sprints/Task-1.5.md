@@ -13,6 +13,17 @@ Deploy scalable and secure EKS clusters for staging and production environments 
 - **Security**: Cluster security and network policies
 - **Monitoring**: EKS cluster logging to CloudWatch
 
+### Cost Optimization Strategy (Staging)
+**Phase 1 (Sprints 1-5)**: Minimal staging configuration
+- **Node Type**: Single `t3.small` node (instead of `t3.medium`)
+- **Node Count**: 1 node minimum, 2 maximum (vs 2-5 for production)
+- **Addons**: Essential addons only (CoreDNS, VPC-CNI, EBS CSI)
+- **Monitoring**: Basic CloudWatch logging only
+- **Target Cost**: ~$150-200/month for EKS portion
+
+**Phase 2 (Sprint 6+)**: Full staging parity with production
+- Scale to match production configuration for customer testing
+
 ## Directory Structure Requirements
 
 ```
