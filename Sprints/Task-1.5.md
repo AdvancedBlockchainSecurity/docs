@@ -1,14 +1,14 @@
 # Task 1.5: EKS Cluster Deployment - Objectives & Implementation Details
 
-**✅ ALIGNMENT CHECK**: This implementation deploys production-ready EKS clusters for staging and production environments with managed node groups, autoscaling, and CloudWatch integration as specified in Sprint 1 documentation.
+**✅ ALIGNMENT CHECK**: This implementation deploys production-ready EKS clusters for staging and production environments (plus local minikube setup) with managed node groups, autoscaling, and CloudWatch integration as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
 
 ### Primary Goal
-Deploy scalable and secure EKS clusters for staging and production environments with managed node groups, cluster autoscaling, and comprehensive logging.
+Deploy scalable and secure EKS clusters for staging and production environments (plus local minikube for development) with managed node groups, cluster autoscaling, and comprehensive logging.
 
 ### Key Requirements (from docs)
-- **EKS Clusters**: Staging and production clusters with managed node groups
+- **EKS Clusters**: Staging and production clusters with managed node groups, plus minikube for local development
 - **Autoscaling**: Cluster autoscaling and node group scaling configuration
 - **Security**: Cluster security and network policies
 - **Monitoring**: EKS cluster logging to CloudWatch
@@ -44,6 +44,10 @@ solidity-security-aws-infrastructure/
     │       ├── kustomization.yaml
     │       └── node-group.yaml
     └── overlays/                  # Environment-specific overlays
+        ├── local/                 # Local environment (minikube)
+        │   ├── kustomization.yaml # Local customizations
+        │   ├── cluster-patch.yaml # Minikube cluster patches
+        │   └── node-group-patch.yaml # Minikube node configs
         ├── staging/               # Staging environment overlay
         │   ├── kustomization.yaml # Staging customizations
         │   ├── cluster-patch.yaml # Staging cluster patches

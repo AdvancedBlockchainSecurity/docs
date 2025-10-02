@@ -38,6 +38,16 @@ solidity-security-aws-infrastructure/
     │       └── rbac.yaml               # Vault RBAC (ClusterRole, ClusterRoleBinding)
     │
     └── overlays/
+        ├── local/
+        │   └── vault/
+        │       ├── kustomization.yaml     # Local Vault configuration
+        │       ├── namespace.yaml          # vault-local namespace
+        │       ├── statefulset-patch.yaml # Local-specific StatefulSet patches
+        │       ├── configmap-patch.yaml   # Local Vault configuration
+        │       ├── pvc-patch.yaml          # Local storage requirements
+        │       ├── serviceaccount-patch.yaml # Local RBAC configuration
+        │       └── externalsecret.yaml     # ClusterSecretStore for External Secrets Operator integration
+        │
         ├── staging/
         │   └── vault/
         │       ├── kustomization.yaml     # Staging Vault configuration
@@ -124,12 +134,12 @@ solidity-security-aws-infrastructure/
 ## Step 3: Deployment and Integration Testing (30 minutes)
 
 ### Objectives
-- Deploy Vault using Kustomize overlays to staging and production environments
+- Deploy Vault using Kustomize overlays to local, staging and production environments
 - Validate External Secrets Operator integration and secret retrieval via ClusterSecretStore
 - Test Vault initialization and unsealing procedures
 
 ### Core Dependencies
-- **Kustomize Deployment**: Deploy via `kubectl apply -k overlays/staging/vault/`
+- **Kustomize Deployment**: Deploy via `kubectl apply -k overlays/local/vault/` for local development
 - **Vault Initialization**: Manual Vault initialization and unsealing process
 - **Integration Testing**: External Secrets Operator connectivity via ClusterSecretStore from external-secrets-system namespace
 
@@ -150,6 +160,7 @@ solidity-security-aws-infrastructure/
 - [ ] Base namespace template created with placeholder for environment overlay
 
 ### Environment Overlay Requirements
+- [ ] Local overlay created with vault-local namespace for minikube development
 - [ ] Staging overlay created with vault-staging namespace
 - [ ] Production overlay created with vault-production namespace
 - [ ] StatefulSet patches configured for environment-specific resource limits
@@ -173,14 +184,16 @@ solidity-security-aws-infrastructure/
 4. Create base StatefulSet with persistent volume claims and security context
 
 ### Phase 2: Environment Overlays (1 hour)
-1. Create staging overlay in `k8s/overlays/staging/vault/` with single replica configuration
-2. Create production overlay in `k8s/overlays/production/vault/` with HA configuration
+1. Create local overlay in `k8s/overlays/local/vault/` with single replica configuration for minikube
+2. Create staging overlay in `k8s/overlays/staging/vault/` with single replica configuration
+3. Create production overlay in `k8s/overlays/production/vault/` with HA configuration
 3. Configure environment-specific patches for resources, storage, and namespaces
 4. Set up ClusterSecretStore manifests for External Secrets Operator integration
 
 ### Phase 3: Deployment and Testing (30 minutes)
-1. Deploy Vault to staging environment via `kubectl apply -k overlays/staging/vault/`
-2. Deploy Vault to production environment via `kubectl apply -k overlays/production/vault/`
+1. Deploy Vault to local environment via `kubectl apply -k overlays/local/vault/`
+2. Deploy Vault to staging environment via `kubectl apply -k overlays/staging/vault/`
+3. Deploy Vault to production environment via `kubectl apply -k overlays/production/vault/`
 3. Initialize and unseal Vault manually for both environments
 4. Test External Secrets Operator integration via ClusterSecretStore and validate cross-namespace secret retrieval
 

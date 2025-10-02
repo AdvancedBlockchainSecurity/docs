@@ -38,6 +38,11 @@ solidity-security-aws-infrastructure/
     │       ├── kustomization.yaml # Monitoring base config
     │       └── service-monitors.yaml # Service monitoring configs
     └── overlays/                  # Environment-specific overlays
+        ├── local/                 # Local environment overlay
+        │   ├── kustomization.yaml # Local customizations
+        │   ├── nginx-ingress-patch.yaml # Local nginx config
+        │   ├── cert-manager-patch.yaml # Local cert config (self-signed)
+        │   └── external-secrets-patch.yaml # Local secrets config
         ├── staging/               # Staging environment overlay
         │   ├── kustomization.yaml # Staging customizations
         │   ├── alb-controller-patch.yaml # Staging ALB config
@@ -111,7 +116,7 @@ solidity-security-aws-infrastructure/
 
 ### Load Balancer Requirements
 - [ ] Kustomize base manifests created for AWS Load Balancer Controller
-- [ ] Environment overlays configured for staging and production
+- [ ] Environment overlays configured for local, staging and production
 - [ ] AWS Load Balancer Controller operational in both clusters
 - [ ] IRSA configured for ALB management permissions
 - [ ] ALB integration with VPC subnets validated
@@ -134,7 +139,7 @@ solidity-security-aws-infrastructure/
 
 ### Phase 1: Load Balancer Controller (1.5 hours)
 1. Create Kustomize base manifests for AWS Load Balancer Controller
-2. Configure environment overlays for staging and production clusters
+2. Configure environment overlays for local, staging and production clusters
 3. Deploy via kubectl apply -k and validate ALB creation
 
 ### Phase 2: Certificate Management (1.5 hours)

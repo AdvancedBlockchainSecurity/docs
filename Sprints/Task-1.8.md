@@ -1,14 +1,14 @@
 # Task 1.8: ArgoCD Installation and Configuration - Objectives & Implementation Details
 
-**✅ ALIGNMENT CHECK**: This implementation deploys ArgoCD for GitOps workflow management in both staging and production environments with GitHub integration and SSL termination as specified in Sprint 1 documentation.
+**✅ ALIGNMENT CHECK**: This implementation deploys ArgoCD for GitOps workflow management in local, staging and production environments with GitHub integration and SSL termination as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
 
 ### Primary Goal
-Deploy and configure ArgoCD for GitOps workflow management in argocd-staging and argocd-production namespaces with GitHub integration, SSL termination, and team access control.
+Deploy and configure ArgoCD for GitOps workflow management in argocd-local, argocd-staging and argocd-production namespaces with GitHub integration, SSL termination, and team access control.
 
 ### Key Requirements (from docs)
-- **ArgoCD Deployment**: ArgoCD in argocd-staging and argocd-production namespaces with Vault Community Edition integration
+- **ArgoCD Deployment**: ArgoCD in argocd-local, argocd-staging and argocd-production namespaces with Vault Community Edition integration
 - **GitHub Integration**: Connection to all 17 repositories for deployment management
 - **Access Control**: RBAC policies for team access and security
 - **SSL Configuration**: SSL termination and domain access
@@ -106,6 +106,7 @@ solidity-security-aws-infrastructure/
 ## Success Criteria & Validation
 
 ### ArgoCD Infrastructure Requirements
+- [ ] ArgoCD operational in argocd-local namespace with basic configuration for minikube
 - [ ] ArgoCD operational in argocd-staging namespace with persistent storage
 - [ ] ArgoCD operational in argocd-production namespace with high availability
 - [ ] Vault Secrets Operator integration functional for credential management
@@ -120,8 +121,10 @@ solidity-security-aws-infrastructure/
 - [ ] Repository access validated for deployment operations
 
 ### SSL and Access Control Requirements
+- [ ] Self-signed certificates configured for ArgoCD local domain (argocd.local)
 - [ ] SSL certificates provisioned for ArgoCD staging domain via cert-manager-staging namespace
 - [ ] SSL certificates provisioned for ArgoCD production domain via cert-manager-production namespace
+- [ ] ArgoCD accessible at argocd.local (local development)
 - [ ] ArgoCD accessible at argocd.staging.advancedblockchainsecurity.com
 - [ ] ArgoCD accessible at argocd.app.advancedblockchainsecurity.com
 - [ ] RBAC policies configured for team access control
@@ -131,8 +134,9 @@ solidity-security-aws-infrastructure/
 
 ### Phase 1: Core ArgoCD Deployment (2 hours)
 1. Create ArgoCD Kustomize base configuration in `solidity-security-aws-infrastructure/argocd/base/`
-2. Deploy ArgoCD server components in argocd-staging namespace using Kustomize overlay in `argocd/overlays/staging/`
-3. Deploy ArgoCD server components in argocd-production namespace using Kustomize overlay in `argocd/overlays/production/`
+2. Deploy ArgoCD server components in argocd-local namespace using Kustomize overlay in `argocd/overlays/local/`
+3. Deploy ArgoCD server components in argocd-staging namespace using Kustomize overlay in `argocd/overlays/staging/`
+4. Deploy ArgoCD server components in argocd-production namespace using Kustomize overlay in `argocd/overlays/production/`
 4. Configure persistent storage and Vault Secrets Operator integration via Kustomize patches
 
 ### Phase 2: Repository Integration (1.5 hours)

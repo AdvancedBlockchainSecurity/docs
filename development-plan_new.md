@@ -190,7 +190,7 @@ Support & Documentation (4):
 **Enhanced Microservice Templates**:
 - Create production-ready Kustomize base configurations for all backend services
 - Create production-ready Kustomize base configurations for all frontend services
-- Create environment-specific Kustomize overlays (staging/production)
+- Create environment-specific Kustomize overlays (local/staging/production)
 - Configure HashiCorp Vault Community Edition integration via Kustomize patches for all services
 - Configure Istio VirtualService and DestinationRule templates via Kustomize
 - Set up IRSA (IAM Roles for Service Accounts) for all services
