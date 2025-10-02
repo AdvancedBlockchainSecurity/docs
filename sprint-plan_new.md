@@ -14,7 +14,7 @@
 
 **AWS Infrastructure Development**:
 - Develop VPC, subnets, security groups, and networking components
-- Design EKS cluster configuration with managed node groups for staging and production, plus minikube setup for local development
+- Design EKS cluster configuration with managed node groups for staging and production, but use minikube setup for local development
 - Configure PostgreSQL in Kubernetes StatefulSets for all environments (cost-optimized for staging/production, lightweight for local)
 - Configure ElastiCache Redis with encryption for staging/production environments, standard Redis for local development
 - Configure HashiCorp Vault Community Edition for centralized secret management in vault-local, vault-staging and vault-production namespaces
