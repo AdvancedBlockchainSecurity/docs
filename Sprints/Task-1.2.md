@@ -71,6 +71,18 @@ This S3 backend deployment is **Step 0** in the corrected AWS resource deploymen
 - **DynamoDB Table**: State locking table to prevent concurrent modifications
 - **Backend Configuration**: Secure remote state management setup
 
+### Cost Optimization Strategy (Staging)
+**Phase 1 (Sprints 1-5)**: Minimal staging configuration
+- **Single AZ deployment** (reduce NAT gateway costs from ~$45/month to ~$22/month)
+- **Smaller subnet allocation** (efficient IP usage)
+- **Essential VPC endpoints only** (S3, ECR for EKS)
+- **Basic security groups** (expanded in Phase 2)
+- **Target Cost**: ~$30-50/month for networking portion
+
+**Phase 2 (Sprint 6+)**: Full multi-AZ staging
+- Scale to multi-AZ for production parity testing
+- Additional VPC endpoints and security hardening
+
 ### Technical Requirements
 - S3 bucket with versioning and encryption enabled
 - DynamoDB table with LockID primary key for state locking

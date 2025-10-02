@@ -18,6 +18,19 @@ Deploy fully cost-optimized database infrastructure with PostgreSQL in Kubernete
 - **Backup Strategy**: Kubernetes persistent volume snapshots and Redis backup capabilities
 - **Cost Optimization**: Use PostgreSQL in Kubernetes instead of managed services (~$1200+/month savings)
 
+### Cost Optimization Strategy (Staging)
+**Phase 1 (Sprints 1-5)**: Minimal staging configuration
+- **ElastiCache**: `cache.t3.micro` (single node, no clustering)
+- **PostgreSQL**: Reduced resource requests (1GB RAM, 0.5 CPU vs 4GB/2CPU production)
+- **Storage**: 20GB persistent volumes (vs 100GB+ production)
+- **Backup**: Basic snapshots only (no cross-region replication)
+- **Target Cost**: ~$50-80/month for storage portion
+
+**Phase 2 (Sprint 6+)**: Full staging parity
+- Scale ElastiCache to cluster mode
+- Match production PostgreSQL resource allocation
+- Implement full backup and replication strategy
+
 ## Directory Structure Requirements
 
 ```
