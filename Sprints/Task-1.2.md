@@ -47,7 +47,19 @@ solidity-security-aws-infrastructure/
 └── README.md
 ```
 
-## Step 1: Terraform State Backend Setup (30 minutes)
+## Step 0: Deploy S3 State Backend (DEPLOY FIRST - 30 minutes)
+
+**⚠️ CRITICAL: Deploy this BEFORE any other AWS infrastructure tasks**
+
+### Deployment Order Context
+This S3 backend deployment is **Step 0** in the corrected AWS resource deployment sequence:
+- **Step 0**: Deploy S3 State Backend (Task 1.2 - THIS STEP)
+- **Step 1**: VPC & Networking (Task 1.2 - remaining steps)
+- **Step 2**: ElastiCache (Task 1.3)
+- **Step 3**: EKS Clusters (Task 1.5)
+- **Step 4**: IAM for Controllers (Task 1.6)
+- **Step 5**: Load Balancer Controller (Task 1.6)
+- **Step 6**: DNS (Task 1.1) - moved to last
 
 ### Objectives
 - Create S3 bucket for Terraform remote state storage
@@ -70,7 +82,7 @@ solidity-security-aws-infrastructure/
 - Public access blocked on S3 bucket
 - Least-privilege IAM policies for state management
 
-## Step 2: VPC and Subnet Architecture (1.5 hours)
+## Step 1: VPC and Subnet Architecture (1.5 hours)
 
 ### Objectives
 - Create VPC with proper CIDR block allocation
@@ -92,7 +104,7 @@ solidity-security-aws-infrastructure/
 - Low-latency intra-subnet communication
 - Simplified network architecture for MVP deployment
 
-## Step 3: Security Groups and Network Controls (1.5 hours)
+## Step 2: Security Groups and Network Controls (1.5 hours)
 
 ### Objectives
 - Configure security groups with least-privilege access principles
@@ -109,7 +121,7 @@ solidity-security-aws-infrastructure/
 - Ingress rules for load balancers and external access
 - Egress rules for internet access and AWS service communication
 
-## Step 4: NAT Gateways and VPC Endpoints (1 hour)
+## Step 3: NAT Gateways and VPC Endpoints (1 hour)
 
 ### Objectives
 - Deploy NAT gateways for secure private subnet internet access
@@ -156,22 +168,22 @@ solidity-security-aws-infrastructure/
 
 ## Implementation Priority
 
-### Phase 1: State Backend Setup (30 minutes)
+### Phase 0: State Backend Setup (30 minutes) - DEPLOY FIRST
 1. Create S3 bucket for Terraform remote state with versioning and encryption
 2. Configure DynamoDB table for Terraform state locking
 3. Set up backend configuration files for staging and production environments
 
-### Phase 2: Core VPC Infrastructure (1.5 hours)
+### Phase 1: Core VPC Infrastructure (1.5 hours)
 1. Create VPC with /16 CIDR block for maximum flexibility and growth
 2. Deploy public subnet in single AZ for load balancer placement
 3. Deploy private subnet in single AZ for EKS nodes and databases
 
-### Phase 3: Security and Access Control (1.5 hours)
+### Phase 2: Security and Access Control (1.5 hours)
 1. Configure EKS security groups for cluster communication and node access
 2. Plan PostgreSQL NetworkPolicies for Kubernetes-native security controls
 3. Create ElastiCache security groups for cache service access
 
-### Phase 4: Connectivity and Optimization (1 hour)
+### Phase 3: Connectivity and Optimization (1 hour)
 1. Deploy single NAT gateway for private subnet internet access
 2. Configure VPC endpoints for AWS services to reduce egress costs
 3. Enable VPC Flow Logs and network monitoring for security analysis
