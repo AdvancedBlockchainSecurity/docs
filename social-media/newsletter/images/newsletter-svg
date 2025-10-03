@@ -1,0 +1,106 @@
+<svg viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0e27;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1f3a;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+    
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="1200" fill="url(#bgGradient)"/>
+  
+  <!-- Grid Pattern -->
+  <g opacity="0.1">
+    <line x1="0" y1="150" x2="1200" y2="150" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="0" y1="300" x2="1200" y2="300" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="0" y1="450" x2="1200" y2="450" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="0" y1="600" x2="1200" y2="600" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="0" y1="750" x2="1200" y2="750" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="0" y1="900" x2="1200" y2="900" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="0" y1="1050" x2="1200" y2="1050" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="150" y1="0" x2="150" y2="1200" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="300" y1="0" x2="300" y2="1200" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="450" y1="0" x2="450" y2="1200" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="1200" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="750" y1="0" x2="750" y2="1200" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="900" y1="0" x2="900" y2="1200" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="1050" y1="0" x2="1050" y2="1200" stroke="#3b82f6" stroke-width="1"/>
+  </g>
+  
+  <!-- Shield Icon -->
+  <g transform="translate(520, 120)">
+    <path d="M80 10 L140 40 L140 120 C140 150 125 165 80 180 C35 165 20 150 20 120 L20 40 Z" 
+          fill="none" stroke="url(#accentGradient)" stroke-width="4" filter="url(#glow)"/>
+    <path d="M55 90 L75 110 L110 65" 
+          fill="none" stroke="#06b6d4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Main Title -->
+  <text x="600" y="380" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="#ffffff" text-anchor="middle">
+    Web3 Security Brief
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="440" font-family="Arial, sans-serif" font-size="32" fill="#94a3b8" text-anchor="middle">
+    Your weekly guide to smart contract security
+  </text>
+  
+  <!-- Stat Box 1 -->
+  <g transform="translate(150, 520)">
+    <rect width="300" height="140" rx="12" fill="rgba(59, 130, 246, 0.1)" stroke="#3b82f6" stroke-width="2"/>
+    <text x="150" y="65" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#3b82f6" text-anchor="middle">
+      $3.1B
+    </text>
+    <text x="150" y="105" font-family="Arial, sans-serif" font-size="22" fill="#94a3b8" text-anchor="middle">
+      Lost in H1 2025
+    </text>
+  </g>
+  
+  <!-- Stat Box 2 -->
+  <g transform="translate(750, 520)">
+    <rect width="300" height="140" rx="12" fill="rgba(6, 182, 212, 0.1)" stroke="#06b6d4" stroke-width="2"/>
+    <text x="150" y="65" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#06b6d4" text-anchor="middle">
+      1,000+
+    </text>
+    <text x="150" y="105" font-family="Arial, sans-serif" font-size="22" fill="#94a3b8" text-anchor="middle">
+      Security Pros
+    </text>
+  </g>
+  
+  <!-- Stat Box 3 -->
+  <g transform="translate(450, 710)">
+    <rect width="300" height="140" rx="12" fill="rgba(99, 102, 241, 0.1)" stroke="#6366f1" stroke-width="2"/>
+    <text x="150" y="65" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#6366f1" text-anchor="middle">
+      Weekly
+    </text>
+    <text x="150" y="105" font-family="Arial, sans-serif" font-size="22" fill="#94a3b8" text-anchor="middle">
+      Every Wednesday
+    </text>
+  </g>
+  
+  <!-- Key Benefits -->
+  <g transform="translate(600, 980)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="28" fill="#ffffff" text-anchor="middle">
+      ✓ Smart contract exploit breakdowns with code
+    </text>
+    <text x="0" y="55" font-family="Arial, sans-serif" font-size="28" fill="#ffffff" text-anchor="middle">
+      ✓ Emerging vulnerability patterns
+    </text>
+    <text x="0" y="110" font-family="Arial, sans-serif" font-size="28" fill="#ffffff" text-anchor="middle">
+      ✓ Actionable security techniques
+    </text>
+  </g>
+</svg>
