@@ -316,11 +316,15 @@ production/ (same structure)
 
 **Services Requiring Templates**:
 
-**API Service**:
-- FastAPI application with authentication and JWT handling
-- Database connection via Vault Secrets
-- OAuth provider integration
-- Health checks and metrics endpoints
+**API Service** (Domain-Driven Design Architecture):
+- FastAPI application with DDD + Clean Architecture + CQRS
+- Domain layer: Pure business logic (entities, value objects, domain services)
+- Application layer: Use cases with command/query separation (CQRS)
+- Infrastructure layer: Database, external services, security implementations
+- Presentation layer: API endpoints, middleware, exception handling
+- Database connection via Vault Secrets with repository pattern
+- OAuth provider integration with domain services
+- Health checks and metrics endpoints with observability infrastructure
 
 **Tool Integration Service**:
 - Multi-container deployment for Python, Rust, and Node.js tools

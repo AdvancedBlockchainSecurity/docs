@@ -4,76 +4,303 @@
 
 ### **Backend Service Repositories (6 repos)**
 
-### 1. **`solidity-security-api-service`** (~10K LOC) ✅ **SHARED LIBRARY INTEGRATED**
-**FastAPI authentication and API gateway**
+### 1. **`solidity-security-api-service`** (~10K LOC) ✅ **SHARED LIBRARY INTEGRATED** + **DDD ARCHITECTURE**
+**FastAPI authentication and API gateway with Domain-Driven Design**
 ```
-Purpose: User management, authentication, API routing, JWT handling
+Purpose: User management, authentication, API routing, JWT handling, project management
 Tech Stack: Python 3.13, FastAPI, SQLAlchemy, Pydantic, JWT
-Contains: FastAPI routers, auth middleware, user management, API documentation
+Architecture: Domain-Driven Design (DDD) + Clean Architecture + CQRS
+Contains: Domain entities, application use cases, infrastructure adapters, API interfaces
 Integration: Docker multi-stage build with PyO3 v0.22 bindings (10x performance boost)
 ```
 
-**Directory Structure:**
+**Production-Ready DDD Architecture:**
 ```
 solidity-security-api-service/
 ├── src/
-│   ├── auth/
-│   │   ├── __init__.py
-│   │   ├── router.py              # Authentication endpoints
-│   │   ├── schemas.py             # Pydantic auth models
-│   │   ├── models.py              # SQLAlchemy user models
-│   │   ├── dependencies.py        # Auth dependencies & JWT validation
-│   │   ├── service.py             # Authentication business logic
-│   │   ├── utils.py               # Auth utilities (hashing, etc.)
-│   │   └── exceptions.py          # Auth-specific exceptions
-│   ├── users/
-│   │   ├── __init__.py
-│   │   ├── router.py              # User management endpoints
-│   │   ├── schemas.py             # User Pydantic models
-│   │   ├── models.py              # User SQLAlchemy models
-│   │   ├── service.py             # User business logic
-│   │   └── dependencies.py        # User-specific dependencies
-│   ├── projects/
-│   │   ├── __init__.py
-│   │   ├── router.py              # Project management endpoints
-│   │   ├── schemas.py             # Project schemas
-│   │   ├── models.py              # Project database models
-│   │   └── service.py             # Project business logic
-│   ├── core/
-│   │   ├── __init__.py
-│   │   ├── config.py              # FastAPI configuration & settings
-│   │   ├── security.py            # Security utilities, CORS, etc.
-│   │   ├── database.py            # Database connection & session
-│   │   └── exceptions.py          # Global exception handlers
-│   └── main.py                    # FastAPI application entry point
-├── alembic/                       # Database migrations
-│   ├── versions/                  # Migration files
-│   ├── env.py                     # Alembic environment
-│   └── script.py.mako            # Migration template
-├── tests/
-│   ├── __init__.py
-│   ├── conftest.py               # Pytest configuration
-│   ├── test_auth.py              # Authentication tests
-│   ├── test_users.py             # User management tests
-│   └── test_projects.py          # Project management tests
-├── k8s/
+│   ├── domain/                     # Domain Layer - Pure Business Logic
+│   │   ├── entities/              # Core business entities
+│   │   │   ├── __init__.py
+│   │   │   ├── user.py            # User domain entity
+│   │   │   ├── project.py         # Project domain entity
+│   │   │   ├── analysis.py        # Analysis domain entity
+│   │   │   └── base.py            # Base entity class
+│   │   ├── repositories/          # Repository interfaces (abstract)
+│   │   │   ├── __init__.py
+│   │   │   ├── user_repository.py # User repository interface
+│   │   │   ├── project_repository.py # Project repository interface
+│   │   │   └── analysis_repository.py # Analysis repository interface
+│   │   ├── services/              # Domain services (business rules)
+│   │   │   ├── __init__.py
+│   │   │   ├── user_service.py    # User domain service
+│   │   │   ├── project_service.py # Project domain service
+│   │   │   ├── analysis_service.py # Analysis domain service
+│   │   │   └── auth_service.py    # Authentication domain service
+│   │   ├── value_objects/         # Domain value objects
+│   │   │   ├── __init__.py
+│   │   │   ├── email.py           # Email value object
+│   │   │   ├── password.py        # Password value object
+│   │   │   └── analysis_status.py # Analysis status value object
+│   │   └── exceptions/            # Domain-specific exceptions
+│   │       ├── __init__.py
+│   │       ├── user_exceptions.py
+│   │       ├── project_exceptions.py
+│   │       └── auth_exceptions.py
+│   │
+│   ├── application/               # Application Layer - Use Cases
+│   │   ├── auth/                  # Authentication use cases
+│   │   │   ├── commands/          # CQRS Commands (write operations)
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── login_command.py
+│   │   │   │   ├── register_command.py
+│   │   │   │   ├── change_password_command.py
+│   │   │   │   └── logout_command.py
+│   │   │   ├── queries/           # CQRS Queries (read operations)
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── get_user_query.py
+│   │   │   │   ├── get_current_user_query.py
+│   │   │   │   └── validate_token_query.py
+│   │   │   └── handlers/          # Command/Query handlers
+│   │   │       ├── __init__.py
+│   │   │       ├── auth_command_handlers.py
+│   │   │       └── auth_query_handlers.py
+│   │   ├── users/                 # User management use cases
+│   │   │   ├── commands/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── create_user_command.py
+│   │   │   │   ├── update_user_command.py
+│   │   │   │   └── delete_user_command.py
+│   │   │   ├── queries/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── get_user_by_id_query.py
+│   │   │   │   ├── list_users_query.py
+│   │   │   │   └── search_users_query.py
+│   │   │   └── handlers/
+│   │   │       ├── __init__.py
+│   │   │       ├── user_command_handlers.py
+│   │   │       └── user_query_handlers.py
+│   │   ├── projects/              # Project management use cases
+│   │   │   ├── commands/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── create_project_command.py
+│   │   │   │   ├── update_project_command.py
+│   │   │   │   └── delete_project_command.py
+│   │   │   ├── queries/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── get_project_query.py
+│   │   │   │   ├── list_projects_query.py
+│   │   │   │   └── get_user_projects_query.py
+│   │   │   └── handlers/
+│   │   │       ├── __init__.py
+│   │   │       ├── project_command_handlers.py
+│   │   │       └── project_query_handlers.py
+│   │   └── analysis/              # Analysis workflow use cases
+│   │       ├── commands/
+│   │       │   ├── __init__.py
+│   │       │   ├── submit_analysis_command.py
+│   │       │   ├── cancel_analysis_command.py
+│   │       │   └── retry_analysis_command.py
+│   │       ├── queries/
+│   │       │   ├── __init__.py
+│   │       │   ├── get_analysis_status_query.py
+│   │       │   ├── get_analysis_results_query.py
+│   │       │   └── list_analyses_query.py
+│   │       └── handlers/
+│   │           ├── __init__.py
+│   │           ├── analysis_command_handlers.py
+│   │           └── analysis_query_handlers.py
+│   │
+│   ├── infrastructure/            # Infrastructure Layer - External Concerns
+│   │   ├── database/
+│   │   │   ├── models/            # SQLAlchemy models (data persistence)
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── user_model.py
+│   │   │   │   ├── project_model.py
+│   │   │   │   ├── analysis_model.py
+│   │   │   │   └── base_model.py
+│   │   │   ├── repositories/      # Repository implementations
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── user_repository_impl.py
+│   │   │   │   ├── project_repository_impl.py
+│   │   │   │   └── analysis_repository_impl.py
+│   │   │   ├── migrations/        # Alembic database migrations
+│   │   │   │   ├── env.py
+│   │   │   │   ├── script.py.mako
+│   │   │   │   └── versions/
+│   │   │   ├── connection.py      # Database connection setup
+│   │   │   └── session.py         # Database session management
+│   │   ├── external_services/     # External service clients
+│   │   │   ├── __init__.py
+│   │   │   ├── contract_parser_client.py
+│   │   │   ├── intelligence_engine_client.py
+│   │   │   ├── tool_integration_client.py
+│   │   │   └── notification_client.py
+│   │   ├── monitoring/            # Observability infrastructure
+│   │   │   ├── __init__.py
+│   │   │   ├── metrics.py         # Prometheus metrics
+│   │   │   ├── logging.py         # Structured logging
+│   │   │   ├── tracing.py         # Distributed tracing
+│   │   │   └── health_checks.py   # Health check endpoints
+│   │   ├── security/              # Security implementations
+│   │   │   ├── __init__.py
+│   │   │   ├── jwt_handler.py     # JWT token handling
+│   │   │   ├── password_hasher.py # Password hashing/verification
+│   │   │   ├── permissions.py     # Permission checking
+│   │   │   └── rate_limiter.py    # API rate limiting
+│   │   └── messaging/             # Message queue implementations
+│   │       ├── __init__.py
+│   │       ├── redis_client.py    # Redis message queue
+│   │       └── event_publisher.py # Domain event publishing
+│   │
+│   ├── presentation/              # Presentation Layer - API Interface
+│   │   ├── api/
+│   │   │   ├── v1/               # API versioning
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── auth/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── router.py  # Auth endpoints
+│   │   │   │   │   └── schemas.py # Auth request/response schemas
+│   │   │   │   ├── users/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── router.py  # User management endpoints
+│   │   │   │   │   └── schemas.py # User schemas
+│   │   │   │   ├── projects/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── router.py  # Project endpoints
+│   │   │   │   │   └── schemas.py # Project schemas
+│   │   │   │   ├── analysis/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── router.py  # Analysis endpoints
+│   │   │   │   │   └── schemas.py # Analysis schemas
+│   │   │   │   └── health/
+│   │   │   │       ├── __init__.py
+│   │   │   │       └── router.py  # Health check endpoints
+│   │   │   └── dependencies.py    # FastAPI dependencies (DI container)
+│   │   ├── middleware/           # Custom middleware
+│   │   │   ├── __init__.py
+│   │   │   ├── auth_middleware.py # Authentication middleware
+│   │   │   ├── logging_middleware.py # Request logging
+│   │   │   ├── metrics_middleware.py # Metrics collection
+│   │   │   └── cors_middleware.py # CORS handling
+│   │   └── exception_handlers.py # Global exception handling
+│   │
+│   ├── shared/                   # Shared utilities and configuration
+│   │   ├── config/              # Configuration management
+│   │   │   ├── __init__.py
+│   │   │   ├── settings.py       # Application settings
+│   │   │   ├── database_config.py # Database configuration
+│   │   │   ├── security_config.py # Security configuration
+│   │   │   └── monitoring_config.py # Monitoring configuration
+│   │   ├── constants/           # Application constants
+│   │   │   ├── __init__.py
+│   │   │   ├── enums.py          # Enumeration constants
+│   │   │   ├── messages.py       # Error/success messages
+│   │   │   └── permissions.py    # Permission constants
+│   │   ├── utils/               # Utility functions
+│   │   │   ├── __init__.py
+│   │   │   ├── datetime_utils.py # Date/time utilities
+│   │   │   ├── validation_utils.py # Input validation
+│   │   │   ├── crypto_utils.py   # Cryptographic utilities
+│   │   │   └── string_utils.py   # String manipulation
+│   │   └── events/              # Domain events
+│   │       ├── __init__.py
+│   │       ├── user_events.py    # User domain events
+│   │       ├── project_events.py # Project domain events
+│   │       └── analysis_events.py # Analysis domain events
+│   │
+│   └── main.py                  # Application entry point & DI container setup
+│
+├── tests/                       # Comprehensive test suite
+│   ├── unit/                   # Unit tests (isolated)
+│   │   ├── domain/             # Domain layer tests
+│   │   ├── application/        # Application layer tests
+│   │   └── infrastructure/     # Infrastructure tests
+│   ├── integration/            # Integration tests
+│   │   ├── api/                # API endpoint tests
+│   │   ├── database/           # Database integration tests
+│   │   └── external_services/  # External service tests
+│   ├── e2e/                    # End-to-end tests
+│   │   └── workflows/          # Complete workflow tests
+│   ├── fixtures/               # Test data fixtures
+│   ├── conftest.py            # Pytest configuration
+│   └── __init__.py
+│
+├── k8s/                        # Kubernetes deployment manifests
 │   ├── base/
-│   │   ├── deployment.yaml        # Kubernetes deployment
-│   │   ├── service.yaml           # Kubernetes service
-│   │   ├── configmap.yaml         # Configuration
-│   │   ├── vault-secret.yaml      # HashiCorp Vault integration
-│   │   └── ingress.yaml           # ALB ingress
+│   │   ├── api-service/        # Base Kubernetes resources
+│   │   │   ├── kustomization.yaml
+│   │   │   ├── deployment.yaml
+│   │   │   ├── service.yaml
+│   │   │   ├── configmap.yaml
+│   │   │   ├── external-secret.yaml # Vault secrets integration
+│   │   │   └── ingress.yaml
+│   │   └── migrations/         # Database migration job
+│   │       ├── kustomization.yaml
+│   │       └── migration-job.yaml
 │   └── overlays/
-│       ├── staging/               # Staging-specific configs
-│       └── production/            # Production-specific configs
-├── requirements.txt               # Python dependencies
-├── requirements-dev.txt           # Development dependencies
-├── Dockerfile                     # Container build
-├── docker-compose.yml             # Local development
-├── alembic.ini                    # Alembic configuration
-├── pytest.ini                    # Pytest configuration
-├── .env.example                   # Environment variables template
-└── README.md                      # Setup and usage documentation
+│       ├── local/              # Local development (minikube)
+│       │   ├── kustomization.yaml
+│       │   └── api-service/
+│       │       ├── kustomization.yaml
+│       │       ├── namespace.yaml
+│       │       ├── deployment-patch.yaml
+│       │       └── configmap-patch.yaml
+│       ├── staging/            # Staging environment
+│       │   ├── kustomization.yaml
+│       │   └── api-service/
+│       │       ├── kustomization.yaml
+│       │       ├── namespace.yaml
+│       │       ├── deployment-patch.yaml
+│       │       ├── configmap-patch.yaml
+│       │       ├── hpa.yaml
+│       │       └── service-patch.yaml
+│       └── production/         # Production environment
+│           ├── kustomization.yaml
+│           └── api-service/
+│               ├── kustomization.yaml
+│               ├── namespace.yaml
+│               ├── deployment-patch.yaml
+│               ├── configmap-patch.yaml
+│               ├── hpa.yaml
+│               ├── pdb.yaml
+│               ├── networkpolicy.yaml
+│               ├── servicemonitor.yaml
+│               ├── resourcequota.yaml
+│               └── limitrange.yaml
+│
+├── docs/                       # Service-specific documentation
+│   ├── architecture/          # Architecture documentation
+│   │   ├── domain-model.md    # Domain model documentation
+│   │   ├── api-design.md      # API design principles
+│   │   └── security.md        # Security architecture
+│   ├── development/           # Development guides
+│   │   ├── setup.md           # Local setup guide
+│   │   ├── testing.md         # Testing guidelines
+│   │   └── contributing.md    # Contribution guidelines
+│   └── deployment/            # Deployment documentation
+│       ├── kubernetes.md      # Kubernetes deployment
+│       └── monitoring.md      # Monitoring setup
+│
+├── scripts/                    # Development and deployment scripts
+│   ├── build.sh               # Build script
+│   ├── test.sh                # Test execution script
+│   ├── migrate.sh             # Database migration script
+│   └── deploy.sh              # Deployment script
+│
+├── requirements/              # Dependency management
+│   ├── base.txt              # Base dependencies
+│   ├── development.txt       # Development dependencies
+│   ├── testing.txt           # Testing dependencies
+│   └── production.txt        # Production dependencies
+│
+├── .env.example               # Environment variables template
+├── alembic.ini                # Alembic configuration
+├── pytest.ini                # Pytest configuration
+├── pyproject.toml             # Python project configuration
+├── Dockerfile                 # Multi-stage container build
+├── docker-compose.yml         # Local development environment
+├── Makefile                   # Development task automation
+└── README.md                  # Service documentation
 ```
 
 ### 2. **`solidity-security-tool-integration`** (~12K LOC)
