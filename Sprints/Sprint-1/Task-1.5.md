@@ -1,28 +1,32 @@
 # Task 1.5: EKS Cluster Deployment - Objectives & Implementation Details
 
-**✅ ALIGNMENT CHECK**: This implementation deploys production-ready EKS clusters for staging and production environments (plus local minikube setup) with managed node groups, autoscaling, and CloudWatch integration as specified in Sprint 1 documentation.
+**✅ ALIGNMENT CHECK**: This implementation deploys production-ready EKS clusters for staging and production environments with managed node groups, and autoscaling integration as specified in Sprint 1 documentation.
+
+**Note**: local development will use minikube, not EKS.
 
 ## High-Level Objectives
 
 ### Primary Goal
-Deploy scalable and secure EKS clusters for staging and production environments (plus local minikube for development) with managed node groups, cluster autoscaling, and comprehensive logging.
+Deploy scalable and secure EKS clusters for staging and production environments with managed node groups, cluster autoscaling, and comprehensive logging.
 
 ### Key Requirements (from docs)
-- **EKS Clusters**: Staging and production clusters with managed node groups, plus minikube for local development
+- **EKS Clusters**: Staging and production clusters with managed node groups
 - **Autoscaling**: Cluster autoscaling and node group scaling configuration
 - **Security**: Cluster security and network policies
-- **Monitoring**: EKS cluster logging to CloudWatch
 
 ### Cost Optimization Strategy (Staging)
 **Phase 1 (Sprints 1-5)**: Minimal staging configuration
 - **Node Type**: Single `t3.small` node (instead of `t3.medium`)
 - **Node Count**: 1 node minimum, 2 maximum (vs 2-5 for production)
 - **Addons**: Essential addons only (CoreDNS, VPC-CNI, EBS CSI)
-- **Monitoring**: Basic CloudWatch logging only
+- **Monitoring**: Basic kubernetes logging only
 - **Target Cost**: ~$150-200/month for EKS portion
 
 **Phase 2 (Sprint 6+)**: Full staging parity with production
 - Scale to match production configuration for customer testing
+
+## Standards Reference
+- **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 
 ## Directory Structure Requirements
 
@@ -104,17 +108,16 @@ solidity-security-aws-infrastructure/
 
 ### Objectives
 - Configure cluster autoscaling for both environments
-- Set up EKS cluster logging to CloudWatch
 - Validate cluster accessibility and node readiness
 
 ### Core Dependencies
 - **Cluster Autoscaler**: Automatic node scaling based on pod demands
-- **CloudWatch Logging**: API server, audit, authenticator, controllerManager, scheduler logs
+- **Loki Logging**: API server, audit, authenticator, controllerManager, scheduler logs
 - **kubectl Access**: Cluster accessibility validation
 
 ### Integration Requirements
 - IAM roles for cluster autoscaler functionality
-- CloudWatch log groups for cluster logging
+- Loki log streams for cluster logging
 - kubeconfig generation for cluster access
 
 ## Success Criteria & Validation
@@ -134,8 +137,8 @@ solidity-security-aws-infrastructure/
 - [ ] Instance types selected for workload requirements
 
 ### Monitoring and Access Requirements
-- [ ] CloudWatch logging operational for all cluster components
-- [ ] kubectl access configured for both staging and production
+- [ ] Loki logging operational for all cluster components
+- [ ] kubectl access configured for local, staging and production
 - [ ] Cluster health monitoring and alerting configured
 - [ ] Node readiness and cluster status validated
 - [ ] IAM roles and policies configured for cluster operations
@@ -153,7 +156,7 @@ solidity-security-aws-infrastructure/
 3. Set up cluster autoscaler with IAM roles and permissions
 
 ### Phase 3: Monitoring and Validation (30 minutes)
-1. Enable CloudWatch logging for all cluster components
+1. Enable Loki logging for all cluster components
 2. Configure kubectl access and validate cluster connectivity
 3. Test node scaling and cluster autoscaler functionality
 
@@ -172,18 +175,40 @@ solidity-security-aws-infrastructure/
 **Priority**: P0 (Critical)
 
 ## Task Checklist
-- [ ] Task 1.5 started
-- [ ] EKS staging cluster created and configured
-- [ ] EKS production cluster created and configured
-- [ ] Cluster networking integrated with VPC subnets
-- [ ] Cluster security groups configured properly
-- [ ] Managed node groups created for both clusters
-- [ ] Node groups configured across multiple availability zones
-- [ ] Instance types selected appropriate for workloads
-- [ ] Cluster autoscaling configured with IAM roles
-- [ ] Node group scaling policies set up
-- [ ] CloudWatch logging enabled for all cluster components
-- [ ] kubectl access configured and tested
-- [ ] Cluster health and node readiness validated
-- [ ] Autoscaler functionality tested and operational
-- [ ] Task 1.5 completed with clusters ready for workloads
+
+### Local Development Environment
+- [ ] minikube cluster installed and configured with required addons
+- [ ] minikube ingress controller enabled for local service access
+- [ ] Local Docker registry configured for minikube image access
+- [ ] kubectl configured for minikube cluster management
+- [ ] Local cluster resource limits configured for development
+- [ ] minikube persistent volume provisioner configured
+- [ ] Local service discovery and DNS resolution tested
+- [ ] Development node scaling and resource management verified
+
+### Staging Environment
+- [ ] EKS staging cluster created and configured with cost-optimized settings
+- [ ] Staging cluster networking integrated with VPC subnets
+- [ ] Staging cluster security groups configured properly
+- [ ] Managed node groups created for staging cluster (t3.small instances)
+- [ ] Node groups configured for single availability zone (cost optimization)
+- [ ] Staging cluster autoscaling configured with IAM roles
+- [ ] Node group scaling policies set up for staging (1-2 nodes)
+- [ ] Loki logging enabled for staging cluster components
+- [ ] kubectl access configured and tested for staging
+- [ ] Staging cluster health and node readiness validated
+
+### Production Environment
+- [ ] EKS production cluster created and configured with high availability
+- [ ] Production cluster networking integrated with multi-AZ VPC subnets
+- [ ] Production cluster security groups configured with strict access controls
+- [ ] Managed node groups created for production cluster (optimized instance types)
+- [ ] Node groups configured across multiple availability zones for HA
+- [ ] Production instance types selected appropriate for workloads
+- [ ] Production cluster autoscaling configured with IAM roles
+- [ ] Production node group scaling policies set up (2-5+ nodes)
+- [ ] Loki logging enabled for all production cluster components
+- [ ] kubectl access configured and tested for production
+- [ ] Production cluster health and node readiness validated
+- [ ] Production autoscaler functionality tested and operational
+- [ ] Production monitoring and alerting configured

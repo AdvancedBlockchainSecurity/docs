@@ -13,6 +13,9 @@ Deploy and configure ArgoCD for GitOps workflow management in argocd-local, argo
 - **Access Control**: RBAC policies for team access and security
 - **SSL Configuration**: SSL termination and domain access
 
+## Standards Reference
+- **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
+
 ## Directory Structure Requirements
 
 ArgoCD configuration will be integrated into the existing infrastructure repository:
@@ -165,19 +168,42 @@ solidity-security-aws-infrastructure/
 **Priority**: P0 (Critical)
 
 ## Task Checklist
-- [ ] Task 1.8 started
+
+### Local Development Environment
+- [ ] ArgoCD Helm chart installed in minikube for local development
+- [ ] Local ArgoCD configured with development repositories access
+- [ ] Development GitOps workflow configured for local deployments
+- [ ] Local ArgoCD accessible via port forwarding (localhost:8080)
+- [ ] Development applications configured for local minikube deployment
+- [ ] Local repository sync policies configured for development workflow
+- [ ] Development RBAC policies configured for local access
+
+### Staging Environment
+- [ ] Kustomize base manifests created for ArgoCD in infrastructure repository
+- [ ] Staging overlay created in `argocd/overlays/staging/` directory
 - [ ] ArgoCD deployed in argocd-staging namespace with persistent storage
+- [ ] Vault Secrets Operator integration configured for staging credentials
+- [ ] Staging resource limits and security contexts configured
+- [ ] GitHub repositories connected to staging ArgoCD (subset for staging)
+- [ ] GitHub authentication configured via Vault Secrets for staging
+- [ ] Repository synchronization policies configured for staging
+- [ ] Webhook integration set up for automatic sync in staging
+- [ ] SSL certificates provisioned for staging ArgoCD domain
+- [ ] ArgoCD accessible at argocd-staging.advancedblockchainsecurity.com
+- [ ] Staging RBAC policies configured for team access control
+
+### Production Environment
+- [ ] Production overlay created in `argocd/overlays/production/` directory
 - [ ] ArgoCD deployed in argocd-production namespace with high availability
-- [ ] Vault Secrets Operator integration configured for credentials
-- [ ] Resource limits and security contexts configured
-- [ ] All 17 GitHub repositories connected to ArgoCD
-- [ ] GitHub authentication configured via Vault Secrets
-- [ ] Repository synchronization policies configured
-- [ ] Webhook integration set up for automatic sync
-- [ ] SSL certificates provisioned for ArgoCD domains
-- [ ] ArgoCD accessible at argocd.staging.advancedblockchainsecurity.com
+- [ ] Production Vault Secrets Operator integration configured for credentials
+- [ ] Production resource limits and security contexts configured
+- [ ] All 17 GitHub repositories connected to production ArgoCD
+- [ ] Production GitHub authentication configured via Vault Secrets
+- [ ] Production repository synchronization policies configured
+- [ ] Production webhook integration set up for automatic sync
+- [ ] Production SSL certificates provisioned for ArgoCD domains
 - [ ] ArgoCD accessible at argocd.app.advancedblockchainsecurity.com
-- [ ] RBAC policies configured for team access control
-- [ ] Team authentication functional via GitHub integration
-- [ ] ArgoCD functionality validated with repository access
-- [ ] Task 1.8 completed with GitOps workflow operational
+- [ ] Production RBAC policies configured for team access control
+- [ ] Production team authentication functional via GitHub integration
+- [ ] Production ArgoCD functionality validated with repository access
+- [ ] Production GitOps workflow operational and validated

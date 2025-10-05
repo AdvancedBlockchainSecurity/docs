@@ -2,17 +2,17 @@
 
 ## Repository: `solidity-security-aws-infrastructure`
 
-AWS Infrastructure as Code repository containing all cloud infrastructure configurations. This task focuses on configuring DNS service records using the AWS Load Balancer targets deployed in previous tasks.
+AWS Infrastructure as Code repository containing all cloud infrastructure configurations. This task focuses on configuring DNS service records using AWS Application Load Balancer (ALB) targets for staging/production environments, while local development uses NGINX Ingress Controller.
 
 **✅ ALIGNMENT CHECK**: This implementation configures the actual DNS service records pointing to AWS infrastructure, completing the domain setup started in Task 1.1.
 
 ## High-Level Objectives
 
 ### Primary Goal
-Configure DNS service records in Cloudflare to point to AWS Load Balancer targets, enabling access to staging and production environments.
+Configure DNS service records in Cloudflare to point to AWS Application Load Balancer (ALB) targets for staging/production environments, enabling access to cloud-hosted services. Local development uses NGINX Ingress Controller for routing.
 
 ### Key Requirements (from docs)
-- **Service DNS Records**: Configure A/CNAME records pointing to AWS ALB
+- **Service DNS Records**: Configure A/CNAME records pointing to AWS Application Load Balancer (ALB) for staging/production
 - **SSL Certificate Validation**: Set up DNS validation records for Let's Encrypt
 - **Subdomain Routing**: Configure service-specific subdomain routing
 - **ArgoCD Access**: Configure DNS records for ArgoCD dashboard access
@@ -33,7 +33,7 @@ solidity-security-aws-infrastructure/
 
 ### Objectives
 - Discover AWS Application Load Balancer DNS names from deployed infrastructure
-- Document ALB targets for staging and production environments
+- Document ALB targets for local, staging and production environments
 - Validate ALB accessibility and health status
 
 ### Key Components to Implement
@@ -50,7 +50,7 @@ solidity-security-aws-infrastructure/
 
 ### Objectives
 - Configure A/CNAME records pointing to AWS ALB targets
-- Set up staging and production service routing
+- Set up local, staging and production service routing
 - Configure ArgoCD dashboard access
 
 ### Key Components to Implement
@@ -128,14 +128,33 @@ solidity-security-aws-infrastructure/
 **Dependencies**: Task 1.5 (EKS Deployment), Task 1.6 (Kubernetes Infrastructure)
 
 ## Task Checklist
-- [ ] Task 1.6a started
-- [ ] AWS Application Load Balancer targets discovered and documented
+
+### Local Development Environment
+- [ ] Local ingress controller configured for development service access
+- [ ] /etc/hosts entries configured for local service routing
+- [ ] Local ingress rules configured for service access via minikube
+- [ ] Self-signed certificates configured for local HTTPS access
+- [ ] Local ArgoCD access configured via port forwarding or ingress
+- [ ] Development domain resolution tested (*.local.advancedblockchainsecurity.com)
+- [ ] Local SSL certificate validation working for development services
+
+### Staging Environment
+- [ ] AWS Application Load Balancer targets discovered and documented for staging
 - [ ] Staging DNS records configured and pointing to staging ALB
+- [ ] ArgoCD staging DNS records configured (argocd-staging.advancedblockchainsecurity.com)
+- [ ] DNS validation records configured for staging SSL certificate automation
+- [ ] cert-manager integration with Cloudflare DNS validated for staging
+- [ ] Staging SSL certificates issued successfully via Let's Encrypt
+- [ ] Staging services accessible via HTTPS at staging.advancedblockchainsecurity.com
+- [ ] Staging DNS propagation verified globally for all service records
+
+### Production Environment
+- [ ] AWS Application Load Balancer targets discovered and documented for production
 - [ ] Production DNS records configured and pointing to production ALB
-- [ ] ArgoCD DNS records configured for both environments
-- [ ] DNS validation records configured for SSL certificate automation
-- [ ] cert-manager integration with Cloudflare DNS validated
-- [ ] SSL certificates issued successfully via Let's Encrypt
-- [ ] All configured services accessible via HTTPS
-- [ ] DNS propagation verified globally for all service records
-- [ ] Task 1.6a completed and validated
+- [ ] ArgoCD production DNS records configured (argocd.advancedblockchainsecurity.com)
+- [ ] Production DNS validation records configured for SSL certificate automation
+- [ ] cert-manager integration with Cloudflare DNS validated for production
+- [ ] Production SSL certificates issued successfully via Let's Encrypt
+- [ ] Production services accessible via HTTPS at app.advancedblockchainsecurity.com
+- [ ] Production DNS propagation verified globally for all service records
+- [ ] Production SSL certificate monitoring and renewal configured

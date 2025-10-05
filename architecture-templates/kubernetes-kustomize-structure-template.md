@@ -315,7 +315,7 @@ Default resource constraints:
 **Production systems should NOT store secrets in Git.**
 
 Options for production:
-- External Secrets Operator (AWS Secrets Manager, Vault, GCP Secret Manager)
+- External Secrets Operator (Vault Community, Vault, GCP Secret Manager)
 - Vault with Kubernetes auth
 - SOPS (encrypted files in Git)
 - CSI Secret Driver

@@ -2,14 +2,14 @@
 
 ## Repository: `solidity-security-aws-infrastructure`
 
-AWS Infrastructure as Code repository containing all cloud infrastructure configurations, including VPC, EKS, PostgreSQL in Kubernetes, ElastiCache, IAM, and Secrets Manager configurations. This task focuses on the networking module providing secure foundation for all AWS services.
+AWS Infrastructure as Code repository containing all cloud infrastructure configurations, including VPC, EKS, PostgreSQL in Kubernetes, ElastiCache, IAM, and Vault Community configurations. This task focuses on the networking module providing secure foundation for all AWS services.
 
 **✅ ALIGNMENT CHECK**: This implementation establishes the secure networking foundation required for EKS, PostgreSQL StatefulSets, and ElastiCache services as specified in Sprint 1 AWS infrastructure requirements.
 
 ## High-Level Objectives
 
 ### Primary Goal
-Create secure and scalable VPC infrastructure with multi-AZ design to support EKS clusters, PostgreSQL StatefulSets, and ElastiCache services.
+Create secure and scalable VPC infrastructure with single-AZ for staging and multi-AZ for production to support EKS clusters, PostgreSQL StatefulSets, and ElastiCache services.
 
 ### Key Requirements (from docs)
 - **VPC Design**: Single-AZ VPC with public and private subnets for MVP deployment
@@ -17,6 +17,9 @@ Create secure and scalable VPC infrastructure with multi-AZ design to support EK
 - **Internet Access**: NAT gateways for secure private subnet internet connectivity
 - **Service Integration**: VPC endpoints for AWS services to reduce internet egress
 - **Terraform State Management**: S3 bucket and DynamoDB table for remote state storage and locking
+
+## Standards Reference
+- **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 
 ## Directory Structure Requirements
 
@@ -75,7 +78,7 @@ This S3 backend deployment is **Step 0** in the corrected AWS resource deploymen
 **Phase 1 (Sprints 1-5)**: Minimal staging configuration
 - **Single AZ deployment** (reduce NAT gateway costs from ~$45/month to ~$22/month)
 - **Smaller subnet allocation** (efficient IP usage)
-- **Essential VPC endpoints only** (S3, ECR for EKS)
+- **Essential VPC endpoints only** (S3, Harbor Registry for EKS)
 - **Basic security groups** (expanded in Phase 2)
 - **Target Cost**: ~$30-50/month for networking portion
 
@@ -142,12 +145,13 @@ This S3 backend deployment is **Step 0** in the corrected AWS resource deploymen
 
 ### Core Dependencies
 - **NAT Gateways**: High-availability NAT gateway deployment
-- **VPC Endpoints**: S3, ECR, Secrets Manager, and CloudWatch endpoints
-- **Network Monitoring**: VPC Flow Logs and CloudWatch integration
+- **VPC Endpoints**: S3, Harbor Registry, Vault Community endpoints
+- **Network Monitoring**: VPC Flow Logs and Prometheus integration
 
 ### Integration Requirements
 - Single NAT gateway deployment for MVP cost efficiency
-- VPC endpoints for AWS service access without internet routing
+- VPC endpoints for AWS service access and Harbor registry routing without internet egress
+- Harbor registry integration with Kubernetes via service mesh and ingress controllers
 - Network monitoring for security and performance analysis
 
 ## Success Criteria & Validation
@@ -174,7 +178,7 @@ This S3 backend deployment is **Step 0** in the corrected AWS resource deploymen
 
 ### High Availability Requirements
 - [ ] NAT gateway deployed in single AZ for MVP
-- [ ] VPC endpoints operational for S3, ECR, Secrets Manager, CloudWatch
+- [ ] VPC endpoints operational for S3, Harbor Registry, Vault Community
 - [ ] Network monitoring enabled with VPC Flow Logs
 - [ ] Single-AZ network communication tested and validated
 
@@ -214,20 +218,43 @@ This S3 backend deployment is **Step 0** in the corrected AWS resource deploymen
 **Priority**: P0 (Critical)
 
 ## Task Checklist
-- [ ] Task 1.2 started
-- [ ] S3 bucket created for Terraform state storage
-- [ ] DynamoDB table created for state locking
-- [ ] Backend configuration files created for staging and production
-- [ ] Terraform remote state initialized and tested
-- [ ] VPC created with appropriate CIDR block allocation
-- [ ] Public subnet deployed in single availability zone
-- [ ] Private subnet deployed in single availability zone
+
+### Local Development Environment
+- [ ] minikube cluster networking verified and operational
+- [ ] Docker bridge network configuration validated for container communication
+- [ ] Local Docker registry network access configured
+- [ ] minikube ingress controller enabled and configured
+- [ ] Local service discovery and DNS resolution tested
+- [ ] Port forwarding configuration validated for service access
+- [ ] Local network policies tested for pod-to-pod communication
+- [ ] Development environment network isolation verified
+
+### Staging Environment
+- [ ] S3 bucket created for Terraform state storage (staging)
+- [ ] DynamoDB table created for state locking (staging)
+- [ ] Terraform remote state initialized for staging environment
+- [ ] AWS VPC created with appropriate CIDR block allocation
+- [ ] Public subnet deployed in single availability zone (staging)
+- [ ] Private subnet deployed in single availability zone (staging)
 - [ ] Internet Gateway attached and routing tables configured
-- [ ] EKS security groups configured with proper access controls
+- [ ] EKS security groups configured for staging cluster
+- [ ] ElastiCache security groups configured for staging cache access
+- [ ] NAT gateway deployed in single AZ (staging)
+- [ ] VPC endpoints configured for AWS services (staging)
+
+### Production Environment
+- [ ] S3 bucket created for Terraform state storage (production)
+- [ ] DynamoDB table created for state locking (production)
+- [ ] Terraform remote state initialized for production environment
+- [ ] Production VPC created with multi-AZ CIDR block allocation
+- [ ] Public subnets deployed across multiple availability zones
+- [ ] Private subnets deployed across multiple availability zones
+- [ ] Production Internet Gateway and routing tables configured
+- [ ] EKS security groups configured with production access controls
 - [ ] PostgreSQL NetworkPolicies planned for Kubernetes security
-- [ ] ElastiCache security groups configured for cache access
-- [ ] NAT gateway deployed in single AZ
-- [ ] VPC endpoints configured for AWS services
+- [ ] ElastiCache security groups configured for production cache access
+- [ ] NAT gateways deployed across multiple AZs for high availability
+- [ ] VPC endpoints configured for all required AWS services
 - [ ] Network monitoring enabled with VPC Flow Logs
-- [ ] Security group rules tested and validated
-- [ ] Task 1.2 completed and infrastructure operational
+- [ ] Security group rules tested and validated for production
+- [ ] Network infrastructure operational and validated

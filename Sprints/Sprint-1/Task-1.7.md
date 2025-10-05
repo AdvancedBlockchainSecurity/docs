@@ -9,9 +9,12 @@ Deploy comprehensive monitoring and observability stack with Prometheus metrics 
 
 ### Key Requirements (from docs)
 - **Metrics Collection**: Prometheus for cluster and application metrics
-- **Visualization**: Grafana with HashiCorp Vault Community Edition integration in monitoring-staging and monitoring-production namespaces
+- **Visualization**: Grafana with HashiCorp Vault Community Edition integration in monitoring-local, monitoring-staging and monitoring-production namespaces
 - **Logging**: Loki for log aggregation with Fluent Bit for log collection
 - **Alerting**: AlertManager for routing and notification management
+
+## Standards Reference
+- **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 
 ## Directory Structure Requirements
 
@@ -50,6 +53,13 @@ solidity-security-monitoring/
     │       ├── configmap.yaml     # Fluent Bit configuration
     │       └── rbac.yaml          # Fluent Bit RBAC
     └── overlays/                  # Environment-specific overlays
+        ├── local/                 # Local development overlay
+        │   ├── kustomization.yaml # Local development customizations
+        │   ├── prometheus-patch.yaml # Local Prometheus config
+        │   ├── grafana-patch.yaml # Local Grafana config
+        │   ├── loki-patch.yaml    # Local Loki config
+        │   ├── fluent-bit-patch.yaml # Local Fluent Bit config
+        │   └── retention-patch.yaml # Local retention policies
         ├── staging/               # Staging monitoring overlay
         │   ├── kustomization.yaml # Staging customizations
         │   ├── prometheus-patch.yaml # Staging Prometheus config
@@ -69,7 +79,7 @@ solidity-security-monitoring/
 ## Step 1: Prometheus Deployment and Configuration (1.5 hours)
 
 ### Objectives
-- Deploy Prometheus for metrics collection in monitoring-staging and monitoring-production namespaces
+- Deploy Prometheus for metrics collection in monitoring-local, monitoring-staging and monitoring-production namespaces
 - Configure service discovery for automatic target detection
 - Set up metrics collection from cluster components and applications
 
@@ -92,7 +102,7 @@ solidity-security-monitoring/
 ## Step 2: Grafana Deployment and Integration (1 hour)
 
 ### Objectives
-- Deploy Grafana with HashiCorp Vault Community Edition integration in monitoring-staging and monitoring-production namespaces
+- Deploy Grafana with HashiCorp Vault Community Edition integration in monitoring-local, monitoring-staging and monitoring-production namespaces
 - Configure data sources for Prometheus
 - Create initial platform health dashboards
 
@@ -154,7 +164,7 @@ solidity-security-monitoring/
 - [ ] Application metrics collection configured and functional
 
 ### Grafana Visualization Requirements
-- [ ] Grafana deployed with HashiCorp Vault Community Edition credential integration in monitoring-staging and monitoring-production namespaces
+- [ ] Grafana deployed with HashiCorp Vault Community Edition credential integration in monitoring-local, monitoring-staging and monitoring-production namespaces
 - [ ] Prometheus data sources configured and operational
 - [ ] Initial platform health dashboards created and functional
 - [ ] Role-based access control configured for team access
@@ -175,7 +185,7 @@ solidity-security-monitoring/
 ## Implementation Priority
 
 ### Phase 1: Prometheus Deployment (1.5 hours)
-1. Deploy Prometheus server with persistent storage in monitoring-staging and monitoring-production namespaces
+1. Deploy Prometheus server with persistent storage
 2. Configure service discovery and metrics collection rules
 3. Set up service monitors for automatic target detection and validation
 
@@ -208,21 +218,44 @@ solidity-security-monitoring/
 **Priority**: P1 (High)
 
 ## Task Checklist
-- [ ] Task 1.7 started
+
+### Local Development Environment
+- [ ] prometheus Helm chart installed in minikube
+- [ ] Prometheus configured for local development metrics collection
+- [ ] Grafana configured with development dashboards and data sources
+- [ ] Local alerting configured for development monitoring
+- [ ] Local log collection configured via Fluent Bit or built-in logging
+- [ ] Development metrics and monitoring accessible via port forwarding
+- [ ] Local dashboard for platform development health monitoring
+- [ ] Development alert testing and validation completed
+
+### Staging Environment
+- [ ] Kustomize base manifests created for Prometheus monitoring stack
+- [ ] Environment overlays configured for staging monitoring infrastructure
 - [ ] Prometheus deployed in monitoring-staging namespace with persistent storage
+- [ ] Service discovery configured for automatic target detection in staging
+- [ ] Staging cluster and node metrics collection operational
+- [ ] Application metrics collection configured for staging services
+- [ ] Grafana deployed with HashiCorp Vault integration in monitoring-staging namespace
+- [ ] Prometheus data sources configured in staging Grafana
+- [ ] Staging platform health dashboards created and functional
+- [ ] Loki deployed and operational for staging log aggregation
+- [ ] Fluent Bit deployed as DaemonSet for staging log collection
+- [ ] Staging unified metrics and logs view functional in Grafana
+
+### Production Environment
+- [ ] Production overlays configured for monitoring infrastructure
 - [ ] Prometheus deployed in monitoring-production namespace with persistent storage
-- [ ] Service discovery configured for automatic target detection
-- [ ] Cluster and node metrics collection operational
-- [ ] Application metrics collection configured
-- [ ] Grafana deployed with HashiCorp Vault Community Edition integration in monitoring-staging and monitoring-production namespaces
-- [ ] Prometheus data sources configured in Grafana
-- [ ] Initial platform health dashboards created
-- [ ] Role-based access control configured for Grafana
-- [ ] Loki deployed and operational for log aggregation
-- [ ] Fluent Bit deployed as DaemonSet for log collection
-- [ ] Loki data source configured in Grafana
-- [ ] Unified metrics and logs view functional in Grafana
-- [ ] Basic alerting rules configured for infrastructure health
-- [ ] Alert routing and notification configured
-- [ ] Platform monitoring validated and operational
-- [ ] Task 1.7 completed with full observability stack functional
+- [ ] Production service discovery configured for automatic target detection
+- [ ] Production cluster and node metrics collection operational
+- [ ] Production application metrics collection configured
+- [ ] Grafana deployed with HashiCorp Vault integration in monitoring-production namespace
+- [ ] Production Prometheus data sources configured in Grafana
+- [ ] Production platform health dashboards created and optimized
+- [ ] Role-based access control configured for production Grafana
+- [ ] Production Loki deployed and operational for log aggregation
+- [ ] Production Fluent Bit deployed as DaemonSet for comprehensive log collection
+- [ ] Production unified metrics and logs view functional in Grafana
+- [ ] Production alerting rules configured for infrastructure health
+- [ ] Alert routing and notification configured for production alerts
+- [ ] Production monitoring validated and fully operational

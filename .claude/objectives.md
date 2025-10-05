@@ -13,22 +13,22 @@
 ### Sprint 1: AWS Infrastructure Foundation (Weeks 1-2)
 **Technical Milestone**: Complete cloud development environment with enterprise secret management
 
-**Primary Objective**: Establish production-ready AWS infrastructure with GitOps deployment automation and secure AWS Secrets Manager integration for immediate team collaboration.
+**Primary Objective**: Establish production-ready AWS infrastructure with GitOps deployment automation and secure Vault Community integration for immediate team collaboration.
 
 **Key Deliverables**:
 - [ ] **Domain & DNS**: Production domain purchased with Cloudflare
 - [ ] **AWS Infrastructure**: EKS cluster, RDS PostgreSQL, ElastiCache Redis, VPC with security groups
 - [ ] **GitOps Foundation**: ArgoCD deployed with GitHub integration and automated deployment workflows
 - [ ] **Service Mesh**: Istio & Jaeger deployed with mTLS, observability, and traffic management
-- [ ] **Secret Management**: AWS Secrets Manager operational with External Secrets Operator integration
+- [ ] **Secret Management**: Vault Community operational with External Secrets Operator integration
 - [ ] **SSL & Security**: Let's Encrypt certificates with cert-manager and AWS ALB SSL termination
 - [ ] **Repository Structure**: 7 repositories with IaC templates for all 6 microservices
 
 **Success Criteria**:
 - All services deploy successfully to AWS EKS development cluster
 - ArgoCD successfully deploys and manages cloud application lifecycle via GitOps
-- AWS Secrets Manager operational and managing all application secrets
-- External Secrets Operator successfully injecting secrets from AWS Secrets Manager
+- Vault Community operational and managing all application secrets
+- External Secrets Operator successfully injecting secrets from Vault Community
 - Domain purchased and DNS properly configured with A records
 - Team can reproduce cloud environment setup in <60 minutes
 - Istio service mesh operational with automatic sidecar injection
@@ -45,17 +45,17 @@
 
 **Key Deliverables**:
 - [ ] **FastAPI Application**: Complete API service with OpenAPI 3.0 documentation
-- [ ] **Authentication**: JWT authentication with OAuth 2.0 integration using AWS Secrets Manager
+- [ ] **Authentication**: JWT authentication with OAuth 2.0 integration using Vault Community
 - [ ] **Database Integration**: RDS connection pooling with RDS Proxy and encrypted credentials
 - [ ] **Cloud Deployment**: ArgoCD-managed API service deployment with health checks
 - [ ] **Rate Limiting**: AWS ALB ingress with rate limiting and security headers
-- [ ] **Secret Rotation**: AWS Secrets Manager secret rotation tested without service restart
+- [ ] **Secret Rotation**: Vault Community secret rotation tested without service restart
 
 **Success Criteria**:
 - API accessible at https://api.dev.advancedblockchainsecurity.com
-- JWT tokens expire and refresh correctly using AWS Secrets Manager-managed keys
+- JWT tokens expire and refresh correctly using Vault Community-managed keys
 - ArgoCD automatically deploys API service updates from Git commits
-- All API secrets managed through AWS Secrets Manager with automatic injection
+- All API secrets managed through Vault Community with automatic injection
 - Rate limiting blocks requests after threshold
 - Rollback capability tested via ArgoCD for API services
 
@@ -79,7 +79,7 @@
 - Slither, Aderyn, and Solidity-Metrics analyze contracts and store normalized results in RDS
 - Job queue processes analyses with proper prioritization using ElastiCache
 - Tool integration services deploy and update automatically via ArgoCD
-- All tool credentials managed securely through AWS Secrets Manager
+- All tool credentials managed securely through Vault Community
 - Tools accessible at https://tools.dev.advancedblockchainsecurity.com
 
 ---
@@ -102,7 +102,7 @@
 - Users can log in and access personalized dashboard
 - Findings display in real-time as analyses complete
 - Frontend deploys automatically via ArgoCD on Git commits
-- All frontend configuration managed through AWS Secrets Manager
+- All frontend configuration managed through Vault Community
 - Dynamic configuration updates work without frontend restart
 
 ---
@@ -114,7 +114,7 @@
 
 **Key Deliverables**:
 - [ ] **MythX Adapter**: REST API integration with async job polling and configurable timeouts
-- [ ] **Credential Management**: API key rotation and failover logic via AWS Secrets Manager
+- [ ] **Credential Management**: API key rotation and failover logic via Vault Community
 - [ ] **Analysis Modes**: Quick/standard/deep analysis mode selection
 - [ ] **Parallel Execution**: Multi-tool analysis with proper result aggregation
 - [ ] **Tool Comparison**: Frontend dashboard showing findings from all tools
@@ -124,7 +124,7 @@
 - Contracts analyze simultaneously with Slither, Aderyn, Solidity-Metrics, and MythX
 - Tool failures don't block other tool execution
 - MythX integration deploys via ArgoCD GitOps workflow
-- MythX API credentials rotate automatically via AWS Secrets Manager
+- MythX API credentials rotate automatically via Vault Community
 - API key failover works seamlessly during credential rotation
 - Dashboard shows findings from all tools with complexity correlation
 
@@ -140,7 +140,7 @@
 - [ ] **Risk Scoring**: Rule-based scoring with severity weights and confidence multipliers
 - [ ] **False Positive Detection**: Pattern matching and rule-based filtering
 - [ ] **Finding Management**: Status management (open/acknowledged/fixed) and bulk operations
-- [ ] **Dynamic Configuration**: Algorithm weights and thresholds stored in AWS Secrets Manager
+- [ ] **Dynamic Configuration**: Algorithm weights and thresholds stored in Vault Community
 - [ ] **Analytics Dashboard**: Basic metrics and export functionality (PDF/CSV)
 
 **Success Criteria**:
@@ -148,7 +148,7 @@
 - Risk scores calculate consistently using rule-based algorithm
 - Rule-based false positive detection achieves 35% reduction
 - Intelligence engine deploys and updates via ArgoCD automatically
-- Algorithm configurations update dynamically from AWS Secrets Manager
+- Algorithm configurations update dynamically from Vault Community
 - Scoring weights and thresholds tunable without deployment
 
 ---
@@ -156,7 +156,7 @@
 ## Phase 2: Enterprise Features (Months 4-6) - Production Cloud
 
 ### Sprint 7: Production Environment & Advanced Intelligence (Weeks 13-14)
-**Primary Objective**: Deploy multi-environment AWS infrastructure with production-grade AWS Secrets Manager and advanced rule engine.
+**Primary Objective**: Deploy multi-environment AWS infrastructure with production-grade Vault Community and advanced rule engine.
 
 ### Sprint 8: Team Collaboration & Workflow (Weeks 15-16)
 **Primary Objective**: Implement multi-user collaboration features with secure team credential management.
@@ -202,7 +202,7 @@ Each sprint must meet:
 - [ ] Security scans show no critical vulnerabilities
 - [ ] Performance benchmarks meet defined targets
 - [ ] ArgoCD applications deploy successfully with green health status
-- [ ] AWS Secrets Manager integration tested and secrets properly managed
+- [ ] Vault Community integration tested and secrets properly managed
 
 ### Business Success Criteria
 - [ ] Complete security analysis workflow functional in cloud environment
@@ -224,7 +224,7 @@ Each sprint must meet:
 
 ### In Scope (Must Have)
 - ✅ **Cloud-first development** with AWS EKS from day one
-- ✅ **Enterprise secret management** with AWS Secrets Manager
+- ✅ **Enterprise secret management** with Vault Community
 - ✅ **GitOps deployment** with ArgoCD automation
 - ✅ **SSL termination** with Let's Encrypt certificates
 - ✅ **Core tool integration** (Slither, Aderyn, MythX, Solidity-Metrics)
@@ -257,7 +257,7 @@ Each sprint must meet:
 AWS EKS Development: ~$200/month
 RDS PostgreSQL (Multi-AZ): ~$50/month
 ElastiCache Redis: ~$30/month
-AWS Secrets Manager: ~$10/month
+Vault Community: ~$10/month
 ALB + Data Transfer: ~$30/month
 Total: ~$340/month
 ```
@@ -268,7 +268,7 @@ AWS EKS Production: ~$500/month
 AWS EKS Staging: ~$300/month
 RDS PostgreSQL + Replicas: ~$200/month
 ElastiCache + Clustering: ~$100/month
-AWS Secrets Manager + Cross-Region: ~$50/month
+Vault Community + Cross-Region: ~$50/month
 CloudFront CDN: ~$50/month
 Total: ~$1,200/month (scales with usage)
 ```
@@ -279,7 +279,7 @@ Total: ~$1,200/month (scales with usage)
 
 ### Technical Risks
 - **Cloud Complexity**: Mitigated by cloud-first approach from Sprint 1
-- **Secret Management**: Mitigated by AWS Secrets Manager integration from day one
+- **Secret Management**: Mitigated by Vault Community integration from day one
 - **Tool Integration**: Mitigated by adapter pattern and standardized schemas
 - **Performance**: Mitigated by production-grade infrastructure and monitoring
 

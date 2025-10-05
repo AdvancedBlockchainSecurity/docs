@@ -1,21 +1,26 @@
 # Task 1.6: Kubernetes Infrastructure Components - Objectives & Implementation Details
 
-**✅ ALIGNMENT CHECK**: This implementation installs essential Kubernetes infrastructure components including AWS Load Balancer Controller, cert-manager, and Vault Secrets Operator as specified in Sprint 1 documentation.
+**✅ ALIGNMENT CHECK**: This implementation installs essential Kubernetes infrastructure components including NGINX Ingress Controller for local development, AWS Load Balancer Controller for staging/production, cert-manager, and Vault Secrets Operator as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
 
 ### Primary Goal
-Install and configure critical Kubernetes infrastructure components to enable secure ingress, SSL certificate management, and AWS Secrets Manager integration.
+Install and configure critical Kubernetes infrastructure components to enable secure ingress, SSL certificate management, and Vault Community integration.
 
 ### Key Requirements (from docs)
-- **Load Balancer Controller**: AWS Load Balancer Controller for ALB management
+- **Load Balancer Controller**: NGINX Ingress Controller for local development, AWS Load Balancer Controller for ALB management in staging/production
 - **Certificate Management**: cert-manager with Let's Encrypt and DNS validation
-- **Secret Integration**: Vault Secrets Operator with Kubernetes RBAC authentication in external-secrets-staging and external-secrets-production namespaces
-- **CSI Driver**: AWS Secrets Store CSI Driver for direct secret mounting
+- **Secret Integration**: Vault Secrets Operator with Kubernetes RBAC authentication in external-secrets-local, external-secrets-staging and external-secrets-production namespaces
+- **CSI Driver**: Vault Secrets Store CSI Driver for direct secret mounting
+
+## Standards Reference
+- **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 
 ## Directory Structure Requirements
 
-```
+note: nginx needs to be added for local overlay
+
+```yaml
 solidity-security-aws-infrastructure/
 └── k8s/
     ├── base/                      # Kustomize base configurations
@@ -32,7 +37,7 @@ solidity-security-aws-infrastructure/
     │   ├── external-secrets/
     │   │   ├── kustomization.yaml # Vault Secrets base config
     │   │   ├── operator.yaml      # Vault Secrets Operator
-    │   │   ├── cluster-secret-store.yaml # AWS Secrets Manager store
+    │   │   ├── cluster-secret-store.yaml # Vault Community store
     │   │   └── rbac.yaml          # RBAC for Vault Secrets
     │   └── monitoring/
     │       ├── kustomization.yaml # Monitoring base config
@@ -55,18 +60,19 @@ solidity-security-aws-infrastructure/
             └── external-secrets-patch.yaml # Production secrets config
 ```
 
-## Step 1: AWS Load Balancer Controller Installation (1.5 hours)
+## Step 1: Load Balancer Installation (1.5 hours)
 
 ### Objectives
-- Install AWS Load Balancer Controller in both clusters
-- Configure IAM roles and policies for ALB management
-- Validate ALB provisioning and integration capabilities
+- Install NGINX Ingress Controller for local development
+- Install AWS Load Balancer Controller for staging/production clusters
+- Configure IAM roles and policies for ALB management in staging/production
+- Validate load balancer provisioning (NGINX for local, ALB for staging/production)
 
 ### Key Components to Implement
-- **Kustomize Base Manifests**: Base AWS Load Balancer Controller configuration
-- **IRSA Configuration**: ServiceAccount with IAM Role for Service Accounts (IRSA)
-- **Environment Overlays**: Staging and production-specific controller settings
-- **ALB Configuration**: Default IngressClass and load balancer settings
+- **Kustomize Base Manifests**: Base load balancer controller configuration (NGINX for local, AWS for staging/production)
+- **IRSA Configuration**: ServiceAccount with IAM Role for Service Accounts (IRSA) for AWS environments
+- **Environment Overlays**: Environment-specific controller settings (NGINX for local, AWS for staging/production)
+- **Load Balancer Configuration**: Default IngressClass settings (NGINX for local, ALB for staging/production)
 
 ### Technical Requirements
 - IRSA (IAM Roles for Service Accounts) configuration
@@ -74,16 +80,16 @@ solidity-security-aws-infrastructure/
 - Integration with VPC subnets for load balancer placement
 - Support for both internet-facing and internal load balancers
 
-## Step 2: Certificate Management Setup (1.5 hours)
+## Step 2: Certificate Management Setup (Local, Staging, Production) (1.5 hours)
 
 ### Objectives
-- Install cert-manager for automated SSL certificate management
+- Install cert-manager for automated SSL certificate management.
 - Configure Let's Encrypt integration with DNS validation
 - Set up Cloudflare DNS integration for certificate validation
 
 ### Key Components to Implement
 - **Kustomize Base Manifests**: Base cert-manager configuration
-- **ClusterIssuers**: Let's Encrypt staging and production issuers via Kustomize
+- **ClusterIssuers**: Let's Encrypt local, staging and production issuers via Kustomize
 - **DNS01 Challenge**: Cloudflare DNS validation configuration
 - **Environment Overlays**: Staging vs production certificate configurations
 
@@ -96,14 +102,14 @@ solidity-security-aws-infrastructure/
 ## Step 3: Secrets Management Integration (1 hour)
 
 ### Objectives
-- Install Vault Secrets Operator for HashiCorp Vault Community Edition integration in external-secrets-staging and external-secrets-production namespaces
-- Configure AWS Secrets Store CSI Driver for direct secret mounting
-- Set up IRSA for secure AWS Secrets Manager access
+- Install Vault Secrets Operator for HashiCorp Vault Community Edition integration in external-secrets-local, external-secrets-staging and external-secrets-production namespaces
+- Configure Vault Secrets Store CSI Driver for direct secret mounting
+- Set up IRSA for secure Vault Community access
 
 ### Core Dependencies
 - **Kustomize Base Manifests**: Base Vault Secrets Operator configuration
-- **Vault Secrets Operator**: Kubernetes-native secret synchronization in external-secrets-staging and external-secrets-production namespaces
-- **CSI Secrets Driver**: Direct secret mounting capabilities via Kustomize
+- **Vault Secrets Operator**: Kubernetes-native secret synchronization in external-secrets-local, external-secrets-staging and external-secrets-production namespaces
+- **Vault Secrets Driver**: Direct secret mounting capabilities via Kustomize
 - **Environment Overlays**: Staging vs production secrets configurations
 
 ### Integration Requirements
@@ -115,7 +121,7 @@ solidity-security-aws-infrastructure/
 ## Success Criteria & Validation
 
 ### Load Balancer Requirements
-- [ ] Kustomize base manifests created for AWS Load Balancer Controller
+- [ ] Kustomize base manifests created for AWS Load Balancer Controller 
 - [ ] Environment overlays configured for local, staging and production
 - [ ] AWS Load Balancer Controller operational in both clusters
 - [ ] IRSA configured for ALB management permissions
@@ -138,7 +144,7 @@ solidity-security-aws-infrastructure/
 ## Implementation Priority
 
 ### Phase 1: Load Balancer Controller (1.5 hours)
-1. Create Kustomize base manifests for AWS Load Balancer Controller
+1. Create Staging and Production Kustomize base manifests for AWS Load Balancer Controller. Create Local overlay Kustomize base manifests for NGINX.
 2. Configure environment overlays for local, staging and production clusters
 3. Deploy via kubectl apply -k and validate ALB creation
 
@@ -167,19 +173,44 @@ solidity-security-aws-infrastructure/
 **Priority**: P0 (Critical)
 
 ## Task Checklist
-- [ ] Task 1.6 started
+
+### Local Development Environment
+- [ ] nginx-ingress-controller Helm chart installed in minikube
+- [ ] Local ingress controller configured for development service access
+- [ ] Self-signed certificate generation configured for local development
+- [ ] Local External Secrets Operator installed via Helm chart
+- [ ] Local secrets integration with HashiCorp Vault configured
+- [ ] Development ingress rules configured and tested
+- [ ] Local certificate management tested with self-signed certs
+- [ ] Port forwarding configured for direct service access
+
+### Staging Environment
+- [ ] Kustomize base manifests created for AWS Load Balancer Controller
+- [ ] Environment overlays configured for staging ALB controller
 - [ ] AWS Load Balancer Controller installed in staging cluster
+- [ ] IRSA configured for staging Load Balancer Controller
+- [ ] Staging ALB creation and management functionality validated
+- [ ] Kustomize base manifests created for cert-manager
+- [ ] Staging cert-manager installed with CRDs
+- [ ] Let's Encrypt ClusterIssuer configured for staging environment
+- [ ] Cloudflare DNS integration configured and tested for staging
+- [ ] Staging test certificate issuance completed successfully
+- [ ] Vault Secrets Operator installed and configured for staging
+- [ ] Staging Kubernetes auth configured for HashiCorp Vault access
+- [ ] Secret synchronization from HashiCorp Vault tested in staging
+
+### Production Environment
+- [ ] Production overlays configured for AWS Load Balancer Controller
 - [ ] AWS Load Balancer Controller installed in production cluster
-- [ ] IRSA configured for Load Balancer Controller
-- [ ] ALB creation and management functionality validated
-- [ ] cert-manager installed with CRDs in both clusters
-- [ ] Let's Encrypt ClusterIssuers configured (staging and production)
-- [ ] Cloudflare DNS integration configured and tested
-- [ ] Test certificate issuance completed successfully
-- [ ] Vault Secrets Operator installed and configured
-- [ ] AWS Secrets Store CSI Driver installed and operational
-- [ ] Kubernetes auth configured for HashiCorp Vault Community Edition access
-- [ ] Secret synchronization from HashiCorp Vault Community Edition tested
-- [ ] Secret mounting capabilities validated
-- [ ] All infrastructure components monitored and healthy
-- [ ] Task 1.6 completed with all components operational
+- [ ] Production IRSA configured for Load Balancer Controller
+- [ ] Production ALB creation and management functionality validated
+- [ ] Production cert-manager installed with CRDs
+- [ ] Let's Encrypt ClusterIssuer configured for production environment
+- [ ] Production Cloudflare DNS integration configured and tested
+- [ ] Production test certificate issuance completed successfully
+- [ ] Production Vault Secrets Operator installed and configured
+- [ ] Vault Secrets Store CSI Driver installed and operational in production
+- [ ] Production Kubernetes auth configured for HashiCorp Vault access
+- [ ] Production secret synchronization from HashiCorp Vault tested
+- [ ] Production secret mounting capabilities validated
+- [ ] All production infrastructure components monitored and healthy

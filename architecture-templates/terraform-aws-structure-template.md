@@ -122,7 +122,7 @@ terraform/
 
 ### Security Modules
 - `kms-key` - KMS encryption keys
-- `secrets-manager` - Secrets Manager secrets
+- `vault-community` - HashiCorp Vault Community secrets
 - `iam-role` - IAM roles
 - `iam-policy` - IAM policies
 - `waf` - WAF web ACLs
@@ -130,10 +130,10 @@ terraform/
 - `guardduty` - GuardDuty detector
 
 ### Monitoring Modules
-- `cloudwatch-log-group` - CloudWatch log groups
-- `cloudwatch-alarm` - CloudWatch alarms
+- `prometheus-config` - Prometheus configuration
+- `grafana-dashboards` - Grafana dashboard definitions
+- `loki-config` - Loki logging configuration
 - `sns-topic` - SNS topics for alerts
-- `cloudwatch-dashboard` - CloudWatch dashboards
 
 ### Backup & DR Modules
 - `backup-vault` - AWS Backup vault
@@ -283,7 +283,7 @@ terraform {
 - **RDS**: Single-AZ, smaller instances (db.t3.small)
 - **Auto Scaling**: Minimal (1-2 instances)
 - **Backups**: Daily, 7-day retention
-- **Monitoring**: Basic CloudWatch metrics
+- **Monitoring**: Basic Prometheus + Grafana + Loki Stack metrics
 - **Cost Controls**: Auto-shutdown for non-critical resources
 - **Networking**: Simpler architecture, fewer subnets
 - **Security**: Development-friendly policies
@@ -342,7 +342,7 @@ tags = {
 
 ### Secrets Management
 - Never commit secrets to Git
-- Use AWS Secrets Manager or Parameter Store
+- Use HashiCorp Vault Community or AWS Parameter Store
 - Reference secrets via data sources
 - Rotate secrets regularly
 - Use IAM roles, not access keys
@@ -425,7 +425,7 @@ terraform/
 3. Data layer (RDS, DynamoDB, ElastiCache)
 4. Compute layer (ECS, EKS, EC2, Lambda)
 5. DNS (Cloudflare records)
-6. Monitoring (CloudWatch, alarms)
+6. Monitoring (Prometheus + Grafana + Loki Stack, AlertManager)
 7. Security (WAF, GuardDuty, Cloudflare firewall)
 
 ---
@@ -517,7 +517,7 @@ Production-ready Terraform structure must have:
 - [ ] S3 backend with encryption and versioning
 - [ ] DynamoDB table for state locking
 - [ ] Consistent tagging strategy implemented
-- [ ] All secrets in Secrets Manager/Parameter Store
+- [ ] All secrets in Vault Community/Parameter Store
 - [ ] Variables with descriptions and validation
 - [ ] Module versioning strategy
 - [ ] Documentation for all modules
@@ -525,7 +525,7 @@ Production-ready Terraform structure must have:
 - [ ] Backend configuration secured (encryption, MFA delete for prod)
 - [ ] Multi-AZ deployment for production
 - [ ] Backup and disaster recovery configured
-- [ ] CloudWatch monitoring and alarms
+- [ ] Prometheus + Grafana + Loki Stack monitoring and AlertManager
 - [ ] Security groups following least privilege
 - [ ] VPC Flow Logs enabled
 - [ ] GuardDuty enabled

@@ -13,6 +13,9 @@ Configure production environment with security hardening, comprehensive backup p
 - **Backup Procedures**: Disaster recovery and backup validation
 - **SSL Configuration**: Production SSL certificates and domain routing
 
+## Standards Reference
+- **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
+
 ## Directory Structure Requirements
 
 ```
@@ -135,21 +138,44 @@ production-infrastructure/
 **Priority**: P0 (Critical)
 
 ## Task Checklist
-- [ ] Task 1.16 started
-- [ ] Single-AZ database deployment configured with enhanced backup strategies
-- [ ] Production EKS cluster configured with appropriate scaling
-- [ ] Network security controls and policies implemented
-- [ ] Load balancer high availability configuration completed
+
+### Local Development Environment
+- [ ] Local security configuration for development environment
+- [ ] Local backup procedures for development data
+- [ ] Development SSL certificate configuration (self-signed)
+- [ ] Local monitoring and alerting for development testing
+- [ ] Development environment disaster recovery procedures
+- [ ] Local IAM and access control validation for development
+
+### Staging Environment
+- [ ] Staging environment security hardening configuration
+- [ ] Single-AZ staging database deployment with backup strategies
+- [ ] Staging EKS cluster configured with appropriate scaling
+- [ ] Staging network security controls and policies implemented
+- [ ] Staging load balancer configuration completed
+- [ ] Staging IAM policies configured with access controls
+- [ ] Staging audit logging enabled for all services
+- [ ] Staging security scanning and monitoring operational
+- [ ] Staging secret rotation policies configured
+- [ ] Staging monitoring configured with appropriate thresholds
+- [ ] Staging backup and disaster recovery procedures implemented
+- [ ] Staging SSL certificates configured for staging domain
+
+### Production Environment
+- [ ] Production environment security hardening and compliance configuration
+- [ ] Single-AZ production database deployment configured with enhanced backup strategies
+- [ ] Production EKS cluster configured with optimized scaling policies
+- [ ] Production network security controls and policies implemented
+- [ ] Production load balancer high availability configuration completed
 - [ ] Network redundancy and failover paths tested
 - [ ] Production IAM policies configured with stricter access controls
-- [ ] Comprehensive audit logging enabled for all services
-- [ ] Network security controls and compliance monitoring implemented
+- [ ] Comprehensive audit logging enabled for all production services
+- [ ] Production network security controls and compliance monitoring implemented
 - [ ] Security scanning and vulnerability monitoring operational
 - [ ] Production-grade secret rotation policies configured
 - [ ] Production monitoring configured with appropriate thresholds
-- [ ] Alerting and escalation procedures configured
-- [ ] Backup and disaster recovery procedures implemented and tested
-- [ ] SSL certificates configured for production domain
+- [ ] Production alerting and escalation procedures configured
+- [ ] Production backup and disaster recovery procedures implemented and tested
+- [ ] Production SSL certificates configured for production domain
 - [ ] Production domain accessible with valid SSL certificates
-- [ ] High availability testing completed and validated
-- [ ] Task 1.16 completed with production-ready infrastructure operational
+- [ ] Production high availability testing completed and validated

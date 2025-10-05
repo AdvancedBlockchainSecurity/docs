@@ -9,11 +9,13 @@ AWS Infrastructure as Code repository containing all cloud infrastructure config
 ## High-Level Objectives
 
 ### Primary Goal
-Deploy fully cost-optimized database infrastructure with PostgreSQL in Kubernetes for both staging and production environments, plus ElastiCache Redis for caching.
+Deploy fully cost-optimized database infrastructure with PostgreSQL in Kubernetes for local, staging and production environments.
+Deploy fully cost-optimized database infrastructure with Redis in minikube for local overlay environment.
+Deploy fully cost-optimized database infrastructure with ElastiCache Redis in Kubernetes for staging and production environments.
 
 ### Key Requirements (from docs)
-- **Database Infrastructure**: PostgreSQL StatefulSet in Kubernetes for both staging and production
-- **Cache Infrastructure**: ElastiCache Redis with encryption for staging and production
+- **Database Infrastructure**: PostgreSQL StatefulSet in Kubernetes for local, staging and production
+- **Cache Infrastructure**: ElastiCache Redis with encryption for staging and production. Redis for local.
 - **Security Controls**: Kubernetes NetworkPolicies and Redis security groups
 - **Backup Strategy**: Kubernetes persistent volume snapshots and Redis backup capabilities
 - **Cost Optimization**: Use PostgreSQL in Kubernetes instead of managed services (~$1200+/month savings)
@@ -30,6 +32,9 @@ Deploy fully cost-optimized database infrastructure with PostgreSQL in Kubernete
 - Scale ElastiCache to cluster mode
 - Match production PostgreSQL resource allocation
 - Implement full backup and replication strategy
+
+## Standards Reference
+- **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 
 ## Directory Structure Requirements
 
@@ -61,6 +66,15 @@ solidity-security-aws-infrastructure/
 │   │       ├── serviceaccount.yaml
 │   │       └── rbac.yaml
 │   └── overlays/
+│       ├── local/
+│       │   ├── kustomization.yaml
+│       │   └── postgresql/
+│       │       ├── kustomization.yaml
+│       │       ├── namespace.yaml
+│       │       ├── statefulset-patch.yaml
+│       │       ├── configmap-patch.yaml
+│       │       ├── pvc-patch.yaml
+│       │       └── networkpolicy.yaml
 │       ├── staging/
 │       │   ├── kustomization.yaml
 │       │   └── postgresql/
@@ -97,7 +111,7 @@ solidity-security-aws-infrastructure/
 - Define security and networking requirements
 
 ### Key Components to Implement
-- **Database Design**: PostgreSQL StatefulSet configuration for staging and production
+- **Database Design**: PostgreSQL StatefulSet configuration for local, staging and production
 - **Storage Planning**: Persistent volumes with appropriate storage classes
 - **Security Planning**: NetworkPolicies and pod security contexts
 - **Backup Strategy**: Volume snapshots and logical backup procedures
@@ -112,6 +126,7 @@ solidity-security-aws-infrastructure/
 ## Step 2: ElastiCache Redis Deployment (1 hour)
 
 ### Objectives
+- Deploy Redis for local
 - Deploy ElastiCache Redis clusters for staging and production
 - Configure encryption in transit and at rest
 - Set up Redis security groups and network access controls
@@ -135,11 +150,11 @@ solidity-security-aws-infrastructure/
 
 ### Core Dependencies
 - **Security Groups**: Redis ingress rules from EKS nodes only
-- **Monitoring**: CloudWatch metrics for ElastiCache
+- **Monitoring**: Prometheus metrics for Redis
 - **Backup Validation**: ElastiCache backup verification
 
 ### Integration Requirements
-- Redis credentials stored in AWS Secrets Manager
+- Redis credentials stored in Vault Community
 - Redis backup and maintenance windows during low-usage periods
 - Cache performance monitoring and alerting
 - PostgreSQL StatefulSet deployed within this infrastructure repository
@@ -161,8 +176,8 @@ solidity-security-aws-infrastructure/
 - [ ] Redis AUTH configured for secure access
 
 ### Security and Monitoring Requirements
-- [ ] Redis credentials stored securely in AWS Secrets Manager
-- [ ] CloudWatch monitoring enabled for ElastiCache
+- [ ] Redis credentials stored securely in Vault Community
+- [ ] Prometheus monitoring enabled for ElastiCache
 - [ ] Redis AUTH configured for secure access
 - [ ] ElastiCache backup and maintenance windows configured appropriately
 - [ ] Redis connection testing validated from EKS
@@ -171,9 +186,10 @@ solidity-security-aws-infrastructure/
 ## Implementation Priority
 
 ### Phase 1: PostgreSQL Configuration Planning (30 minutes)
-1. Design PostgreSQL StatefulSet configuration for both environments
-2. Plan persistent volume storage and backup strategies
-3. Define security contexts and NetworkPolicies
+1. Design PostgreSQL StatefulSet configuration for local development environment first
+2. Design PostgreSQL StatefulSet configuration for local, staging and production environments
+3. Plan persistent volume storage and backup strategies
+4. Define security contexts and NetworkPolicies
 
 ### Phase 2: ElastiCache Redis Deployment (1 hour)
 1. Deploy ElastiCache Redis staging cluster with encryption enabled
@@ -181,8 +197,8 @@ solidity-security-aws-infrastructure/
 3. Configure Redis security groups for application service access
 
 ### Phase 3: Security and Monitoring (30 minutes)
-1. Store Redis credentials in AWS Secrets Manager
-2. Configure CloudWatch monitoring for ElastiCache
+1. Store Redis credentials in Vault Community
+2. Configure Prometheus monitoring for ElastiCache
 3. Set up Redis backup validation and maintenance windows
 
 ## Key Implementation Notes
@@ -190,7 +206,7 @@ solidity-security-aws-infrastructure/
 1. **Cost Optimization**: PostgreSQL in Kubernetes eliminates managed database costs (~$1200+/month savings)
 2. **Security**: Use Kubernetes NetworkPolicies and pod security contexts for database isolation
 3. **Backup Strategy**: Use Kubernetes persistent volume snapshots and logical backup procedures
-4. **Monitoring**: Use Kubernetes-native monitoring for PostgreSQL, CloudWatch for ElastiCache
+4. **Monitoring**: Use Kubernetes-native monitoring for PostgreSQL, Prometheus for ElastiCache
 
 ---
 
@@ -199,17 +215,41 @@ solidity-security-aws-infrastructure/
 **Priority**: P0 (Critical)
 
 ## Task Checklist
-- [ ] Task 1.3 started
-- [ ] PostgreSQL StatefulSet configuration designed for both environments
-- [ ] Persistent volume storage strategy defined with backup capabilities
-- [ ] Pod security contexts and NetworkPolicies planned
-- [ ] Environment-specific resource allocation configured
+
+### Local Development Environment
+- [ ] PostgreSQL Helm chart (Bitnami) installed in minikube
+- [ ] PostgreSQL configured with development resource limits
+- [ ] Redis Helm chart (Bitnami) installed in minikube
+- [ ] Redis configured for local development access
+- [ ] Local persistent volumes configured for PostgreSQL data
+- [ ] ConfigMaps created for PostgreSQL and Redis configuration
+- [ ] Local service discovery tested for database connections
+- [ ] Port forwarding configured for direct database access
+- [ ] Development database initialized with test data
+- [ ] Local backup and restore procedures validated
+
+### Staging Environment
+- [ ] PostgreSQL StatefulSet configuration designed for staging environment
+- [ ] Staging persistent volume storage strategy defined with backup capabilities
+- [ ] Pod security contexts and NetworkPolicies configured for staging
+- [ ] Environment-specific resource allocation configured (reduced for cost)
+- [ ] PostgreSQL StatefulSet deployed to staging via Kustomize
 - [ ] ElastiCache Redis staging cluster deployed with encryption
+- [ ] Redis security groups configured for staging service access
+- [ ] Redis credentials stored in Vault Community (staging)
+- [ ] Prometheus monitoring enabled for staging ElastiCache
+- [ ] Staging database connectivity tested from EKS
+
+### Production Environment
+- [ ] PostgreSQL StatefulSet configuration designed for production environment
+- [ ] Production persistent volume storage strategy with full backup capabilities
+- [ ] Production pod security contexts and NetworkPolicies configured
+- [ ] Production resource allocation configured for optimal performance
+- [ ] PostgreSQL StatefulSet deployed to production via Kustomize
 - [ ] ElastiCache Redis production cluster deployed with HA
-- [ ] Redis security groups configured for service access
-- [ ] Redis credentials stored in AWS Secrets Manager
-- [ ] CloudWatch monitoring enabled for ElastiCache
-- [ ] Redis backup and maintenance windows configured
-- [ ] Redis connectivity tested from EKS
-- [ ] PostgreSQL StatefulSet manifests created and deployment tested
-- [ ] Task 1.3 completed and validated
+- [ ] Production Redis security groups configured with strict access controls
+- [ ] Production Redis credentials stored in Vault Community
+- [ ] Prometheus monitoring and alerting enabled for production ElastiCache
+- [ ] Redis backup and maintenance windows configured for production
+- [ ] Production database connectivity tested and validated from EKS
+- [ ] PostgreSQL production backup and disaster recovery procedures implemented
