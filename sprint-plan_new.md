@@ -1,34 +1,38 @@
-# Solidity Security Platform - AWS-First Development Sprint Plan
+# Solidity Security Platform - Local-First Development Sprint Plan
 
 ## Development Phases & Milestones
 
-### Phase 1: AWS Foundation & Core Platform (Months 1-3)
+### Phase 1: Local Development Foundation & AWS Platform (Months 1-3)
 
-#### Sprint 1: AWS Infrastructure Foundation & Repository Setup (Weeks 1-2)
-**Technical Milestone**: Complete AWS infrastructure foundation with all repositories properly structured
+#### Sprint 1: Local Development Foundation & Repository Setup (Weeks 1-2)
+**Technical Milestone**: Complete local development foundation with all repositories properly structured, AWS infrastructure prepared
 
 **Domain Registration & Initial Setup**:
 - Purchase production domain via Cloudflare
 - Configure Cloudflare hosted zone for DNS management
 - Set up local, staging and production subdomain zones (preparation only)
 
-**AWS Infrastructure Development**:
-- Develop VPC, subnets, security groups, and networking components
-- Design EKS cluster configuration with managed node groups for staging and production, but use minikube setup for local development
-- Configure PostgreSQL in Kubernetes StatefulSets for all environments (cost-optimized for staging/production, lightweight for local)
-- Configure ElastiCache Redis with encryption for staging/production environments, standard Redis for local development
-- Configure HashiCorp Vault Community Edition for centralized secret management in vault-local, vault-staging and vault-production namespaces
-- Configure AWS IAM roles and policies with least privilege
+**Local Development Setup First**:
+- Setup minikube with local development environment as primary development platform
+- Deploy PostgreSQL StatefulSets in local minikube with lightweight configuration
+- Deploy Redis in local minikube with standard configuration
+- Configure HashiCorp Vault Community Edition for centralized secret management in vault-local namespace
+- Configure Prometheus, Grafana, Loki + Fluent Bit monitoring and logging in local environment
+- Develop all Kubernetes templates and overlays with local-first approach
+
+**AWS Infrastructure Design (for future deployment)**:
+- Design VPC, subnets, security groups, and networking components
+- Design EKS cluster configuration with managed node groups for local, staging and production
+- Design PostgreSQL configuration optimized for local/staging/production with cost optimization
+- Design ElastiCache Redis with encryption for local/staging/production environments
+- Plan HashiCorp Vault Community Edition configuration for vault-staging and vault-production namespaces
+- Design AWS IAM roles and policies with least privilege
 - Design ECR repositories for all services
-- Configure Prometheus, Grafana, Loki + Fluent Bit monitoring and logging
-- Deploy AWS VPC and networking infrastructure
-- Deploy EKS clusters for staging and production, setup minikube for local development
-- Deploy PostgreSQL StatefulSets in Kubernetes with persistent volumes
-- Deploy ElastiCache Redis clusters
-- Configure HashiCorp Vault Community Edition with proper Kubernetes RBAC and built-in encryption in vault-local, vault-staging and vault-production namespaces
+- Plan AWS VPC and networking infrastructure deployment
+- Plan EKS clusters deployment for local, staging and production
 
 **Repository Setup & Foundation**:
-- Initialize all 18 repositories with proper directory structures (including dependency monitoring)
+- Initialize all 17 repositories with proper directory structures (including dependency monitoring)
 - Set up shared library architecture for multi-language support (Python/TypeScript/Rust)
 - **✅ ARCHITECTURE DECISION**: Implement Domain-Driven Design + Clean Architecture + CQRS for API service
 - Configure development dependencies and build systems for each repository
@@ -42,16 +46,19 @@
 - **✅ ARCHITECTURE**: DDD + Clean Architecture implementation with 4-layer separation
 
 **Acceptance Criteria**:
-- AWS infrastructure fully operational in staging and production, local minikube development environment ready
-- EKS clusters accessible with proper networking configuration
-- PostgreSQL StatefulSets and ElastiCache deployed and accessible from EKS
+- Local minikube development environment fully operational and ready as primary development platform
 - Local development: PostgreSQL and Redis running in minikube with minimal resource allocation
-- HashiCorp Vault Community Edition operational with proper Kubernetes integration and encryption in vault-local, vault-staging and vault-production namespaces
+- HashiCorp Vault Community Edition operational with proper Kubernetes integration and encryption in vault-local namespace
 - Local environment: Nginx ingress controller configured for service access
 - Local environment: Prometheus and Grafana deployed for basic monitoring
-- All 18 repositories properly structured and initialized (including dependency monitoring)
+- All Kubernetes templates and overlays developed with local-first approach
+- AWS infrastructure designed and planned for future deployment to local, staging and production
+- EKS cluster configurations designed with proper networking for future deployment
+- PostgreSQL and ElastiCache configurations designed for future local/staging/production deployment
+- HashiCorp Vault configurations planned for vault-staging and vault-production namespaces
+- All 17 repositories properly structured and initialized (including dependency monitoring)
 - **✅ COMPLETED**: Shared libraries working across Python, TypeScript, and Rust services
-- ECR repositories configured and accessible
+- ECR repositories designed for future deployment
 - **✅ COMPLETED**: Docker-based deployment achieving 6-15x performance improvements
 - **✅ COMPLETED**: Production-ready containerization with cross-service compatibility
 - **✅ ENHANCEMENT**: Dependency monitoring with Prometheus/Grafana integration operational

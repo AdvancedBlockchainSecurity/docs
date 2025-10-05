@@ -1,6 +1,6 @@
 # Sprint 1 Repository Structure - Microservice Architecture (~94K LOC)
 
-## Core Repositories (18 repos) ✅ **INCLUDING DEPENDENCY MONITORING**
+## Core Repositories (17 repos) ✅ **INCLUDING DEPENDENCY MONITORING**
 
 ### **Backend Service Repositories (6 repos)**
 
@@ -725,7 +725,7 @@ Integration: WASM-enabled TypeScript package with JavaScript fallbacks (8x perfo
 **Dashboard and metrics interface**
 ```
 Purpose: Main dashboard, metrics visualization, overview screens
-Tech Stack: React 18, TypeScript, Recharts, TanStack Query
+Tech Stack: React, TypeScript, Recharts, TanStack Query
 Contains: Dashboard components, charts, metrics, summary views
 ```
 
@@ -733,7 +733,7 @@ Contains: Dashboard components, charts, metrics, summary views
 **Finding management and analysis results**
 ```
 Purpose: Findings table, detail views, status management, filtering
-Tech Stack: React 18, TypeScript, TanStack Query, TanStack Table
+Tech Stack: React, TypeScript, TanStack Query, TanStack Table
 Contains: Findings components, filters, detail modals, status management
 ```
 
@@ -741,7 +741,7 @@ Contains: Findings components, filters, detail modals, status management
 **Contract analysis workflow**
 ```
 Purpose: Contract upload, analysis progress, history management
-Tech Stack: React 18, TypeScript, React Hook Form, TanStack Query
+Tech Stack: React, TypeScript, React Hook Form, TanStack Query
 Contains: Upload components, progress tracking, analysis history
 Integration: WASM-enabled TypeScript package with JavaScript fallbacks (6x performance boost)
 ```
@@ -957,7 +957,7 @@ Tech Stack: JSON/YAML schemas, Python scripts
 Contains: Vulnerability definitions, patterns, threat intelligence, SWC mappings, severity classifications
 ```
 
-## Repository Size Summary
+## Repository Approximate Size Summary
 
 ```yaml
 Backend Services:           48,000 LOC  (51%)
@@ -979,7 +979,7 @@ Frontend Applications:      30,000 LOC  (32%)
 Shared Libraries:            7,000 LOC  (7%)  (🦀 Python + TypeScript + Rust)
 Infrastructure & Support:    1,000 LOC  (1%)  (Terraform + K8s)
 
-Total Repositories:         18 repos (including dependency monitoring)
+Total Repositories:         17 repos (including dependency monitoring)
 Total Estimated:           96,000 LOC
 Rust Components:           ~35,000 LOC (37% of codebase)
 ```

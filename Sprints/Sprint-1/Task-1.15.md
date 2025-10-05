@@ -17,6 +17,9 @@ Create comprehensive documentation and training materials to enable team product
 - **Training Materials**: Team onboarding checklist and training content
 - **Operational Procedures**: Deployment and troubleshooting procedures
 
+## Standards Reference
+- **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
+
 ## Directory Structure Requirements
 
 ```
@@ -58,8 +61,8 @@ solidity-security-docs/
 
 ### Key Components to Implement
 - **EKS Management**: Cluster setup, node management, and troubleshooting
-- **AWS Services**: PostgreSQL StatefulSets, ElastiCache, Secrets Manager operational procedures
-- **Monitoring**: CloudWatch, Grafana, and Prometheus management guides
+- **AWS Services**: PostgreSQL StatefulSets, ElastiCache, Vault Community operational procedures
+- **Monitoring**: Prometheus + Grafana + Loki Stack management guides
 
 ### Technical Requirements
 - Step-by-step infrastructure setup guides
@@ -105,7 +108,7 @@ solidity-security-docs/
 
 ### AWS Infrastructure Documentation Requirements
 - [ ] EKS cluster management and troubleshooting guides created
-- [ ] AWS Secrets Manager integration and secret management documented
+- [ ] Vault Community integration and secret management documented
 - [ ] PostgreSQL StatefulSets and ElastiCache operational procedures documented
 - [ ] ArgoCD deployment and application management guides created
 - [ ] Monitoring and alerting configuration documentation complete
@@ -128,7 +131,7 @@ solidity-security-docs/
 
 ### Phase 1: AWS Infrastructure Documentation (2 hours)
 1. Create EKS cluster management and troubleshooting comprehensive guides
-2. Document AWS service integration procedures for PostgreSQL StatefulSets, ElastiCache, Secrets Manager
+2. Document AWS service integration procedures for PostgreSQL StatefulSets, ElastiCache, Vault Community
 3. Build monitoring and alerting configuration and management documentation
 
 ### Phase 2: Architecture Documentation (1.5 hours)
@@ -155,21 +158,45 @@ solidity-security-docs/
 **Priority**: P1 (High)
 
 ## Task Checklist
-- [ ] Task 1.15 started
-- [ ] EKS cluster management and troubleshooting guides created
-- [ ] AWS Secrets Manager integration and management documented
-- [ ] PostgreSQL StatefulSets and ElastiCache operational procedures documented
-- [ ] ArgoCD deployment and application management guides created
-- [ ] Monitoring and alerting configuration documentation complete
-- [ ] Comprehensive architecture diagrams created with service interactions
-- [ ] Service deployment and management guides for all 11 services
-- [ ] Troubleshooting guides and runbooks for common issues created
-- [ ] Integration patterns and communication flows documented
-- [ ] Security best practices and compliance guidelines documented
-- [ ] Team onboarding checklist created for independent environment management
-- [ ] GitOps workflow training materials created with hands-on exercises
+
+### Local Development Environment
+- [ ] Local development setup documentation for minikube environment
+- [ ] Local service development and debugging guides created
+- [ ] Development workflow documentation for local testing
+- [ ] Local environment troubleshooting guides and common issues
+- [ ] Development team onboarding checklist for local setup
+- [ ] Local GitOps workflow training for development iteration
+- [ ] Development environment architecture documentation
+
+### Staging Environment
+- [ ] Staging environment setup and management guides created
+- [ ] EKS staging cluster management and troubleshooting guides created
+- [ ] Vault Community staging integration and management documented
+- [ ] PostgreSQL StatefulSets staging operational procedures documented
+- [ ] ArgoCD staging deployment and application management guides created
+- [ ] Staging monitoring and alerting configuration documentation complete
+- [ ] Staging architecture diagrams created with service interactions
+- [ ] Staging service deployment and management guides for all services
+- [ ] Staging troubleshooting guides and runbooks for common issues created
+- [ ] Staging integration patterns and communication flows documented
+- [ ] Staging team onboarding checklist for environment management
+- [ ] Staging GitOps workflow training materials with hands-on exercises
+
+### Production Environment
+- [ ] Production environment setup and management guides created
+- [ ] EKS production cluster management and troubleshooting guides created
+- [ ] Vault Community production integration and management documented
+- [ ] PostgreSQL StatefulSets production operational procedures documented
+- [ ] ArgoCD production deployment and application management guides created
+- [ ] Production monitoring and alerting configuration documentation complete
+- [ ] Comprehensive production architecture diagrams created with service interactions
+- [ ] Production service deployment and management guides for all 11 services
+- [ ] Production troubleshooting guides and runbooks for common issues created
+- [ ] Production integration patterns and communication flows documented
+- [ ] Production security best practices and compliance guidelines documented
+- [ ] Production team onboarding checklist created for independent environment management
+- [ ] Production GitOps workflow training materials created with hands-on exercises
 - [ ] Multi-service debugging and monitoring training content developed
 - [ ] Security training materials for AWS competency created
 - [ ] Training validation procedures and competency checks implemented
-- [ ] Documentation review and approval completed
-- [ ] Task 1.15 completed with comprehensive team enablement materials
+- [ ] Production documentation review and approval completed

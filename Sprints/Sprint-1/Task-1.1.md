@@ -4,7 +4,7 @@
 
 AWS Infrastructure as Code repository containing all cloud infrastructure configurations. This task focuses on the DNS and domain management components for establishing the foundational domain infrastructure.
 
-**✅ ALIGNMENT CHECK**: This implementation establishes the foundational domain infrastructure required for the Solidity Security Platform's staging and production environments as specified in Sprint 1 documentation.
+**✅ ALIGNMENT CHECK**: This implementation establishes the foundational domain infrastructure required for the Solidity Security Platform's local, staging and production environments as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
 
@@ -16,9 +16,12 @@ Register the domain and set up initial DNS infrastructure. Actual service DNS re
 ### Key Requirements (from docs)
 - **Domain Registration**: Purchase production domain via Cloudflare
 - **DNS Management**: Configure Cloudflare hosted zone for DNS management
-- **Subdomain Structure**: Set up staging and production subdomain zones
+- **Subdomain Structure**: Set up local, staging and production subdomain zones
 - **Landing Page Strategy**: Decide root domain routing for existing DigitalOcean lander
 - **Preparation**: Prepare DNS infrastructure for future service record configuration
+
+## Standards Reference
+- **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 
 ## Directory Structure Requirements
 
@@ -44,14 +47,14 @@ solidity-security-aws-infrastructure/
 **Option A: Preserve DigitalOcean Lander (Minimal Change)**
 ```
 @ (root) → DigitalOcean IP                    # Keep existing lander
-app.advancedblockchainsecurity.com → AWS ALB  # Application platform
+app.advancedblockchainsecurity.com → AWS ALB  # Application platform (staging/production)
 www → CNAME to root                           # Points to DigitalOcean lander
 ```
 
 **Option B: Migrate to AWS Infrastructure**
 ```
 @ (root) → AWS ALB                            # New landing page on AWS
-app.advancedblockchainsecurity.com → AWS ALB  # Application platform
+app.advancedblockchainsecurity.com → AWS ALB  # Application platform (staging/production)
 www → CNAME to root                           # Points to AWS lander
 ```
 
@@ -89,7 +92,7 @@ www → CNAME to root                          # Points to AWS with routing
 
 ### Objectives
 - Configure Cloudflare hosted zone for DNS management
-- Set up staging and production subdomain zones
+- Set up local, staging and production subdomain zones
 - Prepare infrastructure for future service routing
 
 ### Key Components to Implement
@@ -179,17 +182,29 @@ www → CNAME to root                          # Points to AWS with routing
 **Priority**: P0 (Critical)
 
 ## Task Checklist
-- [ ] Task 1.1 started
-- [ ] Landing page routing strategy decided and documented
-- [ ] DigitalOcean lander IP retrieved (if preserving current setup)
-- [ ] Domain purchased through Cloudflare
-- [ ] Cloudflare DNS zone created and configured
+
+### Local Development Environment
+- [ ] Local domain configuration for development testing (using localhost or local domains)
+- [ ] Local DNS resolution setup for minikube ingress (e.g., *.local.advancedblockchainsecurity.com)
+- [ ] /etc/hosts entries configured for local service access
+- [ ] Local ingress controller configuration validated
+- [ ] Development domain routing tested with port forwarding
+
+### Staging Environment
+- [ ] Staging subdomain zone (staging.advancedblockchainsecurity.com) created in Cloudflare
+- [ ] AWS ALB configuration planned for staging environment
+- [ ] SSL certificate strategy planned for staging domain
+- [ ] Staging DNS records prepared for AWS Load Balancer targets
+- [ ] Landing page routing strategy decided for staging environment
+
+### Production Environment
+- [ ] Domain purchased through Cloudflare registrar
+- [ ] Production subdomain zone (app.advancedblockchainsecurity.com) created and configured
 - [ ] Root domain routing configured according to landing page strategy
-- [ ] Staging subdomain zone (staging.advancedblockchainsecurity.com) set up and resolvable
-- [ ] Production subdomain zone (app.advancedblockchainsecurity.com) set up and resolvable
+- [ ] Cloudflare DNS zone created and configured with security features
 - [ ] DNS infrastructure documented for service team
-- [ ] DNS structure planned for future AWS Load Balancer targets
+- [ ] DNS structure planned for production AWS Load Balancer targets
 - [ ] DNS propagation verified globally
+- [ ] Production SSL certificate validation prepared
 - [ ] Domain security features enabled in Cloudflare
-- [ ] Landing page routing tested and validated
-- [ ] Task 1.1 completed and validated
+- [ ] Production landing page routing tested and validated

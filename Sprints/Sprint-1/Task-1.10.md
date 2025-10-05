@@ -20,37 +20,13 @@ Create comprehensive Kubernetes templates for all backend microservices with sec
 
 ### Key Requirements (from docs)
 - **Template Components**: Kubernetes manifests with security contexts for each service
-- **External Secrets**: AWS Secrets Manager integration via External Secrets Operator
+- **External Secrets**: Vault Community integration via External Secrets Operator
 - **IRSA Configuration**: IAM Roles for Service Accounts for AWS access
 - **Monitoring**: Health checks, metrics, and autoscaling configurations
 
-## Directory Structure Requirements
-
-### Example: `solidity-security-api-service`
-```
-solidity-security-api-service/
-├── k8s/
-│   ├── base/
-│   │   ├── deployment.yaml        # Kubernetes deployment
-│   │   ├── service.yaml           # Kubernetes service
-│   │   ├── configmap.yaml         # Configuration
-│   │   ├── external-secret.yaml   # AWS Secrets Manager integration
-│   │   ├── service-account.yaml   # IRSA service account
-│   │   ├── hpa.yaml               # Horizontal Pod Autoscaler
-│   │   └── ingress.yaml           # ALB ingress
-│   └── overlays/
-│       ├── staging/               # Staging-specific configs
-│       │   ├── kustomization.yaml
-│       │   └── patches/
-│       └── production/            # Production-specific configs
-│           ├── kustomization.yaml
-│           └── patches/
-├── src/                           # Application source code
-├── tests/                         # Test files
-├── requirements.txt               # Dependencies
-├── Dockerfile                     # Container build
-└── README.md
-```
+## Standards Reference
+- **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
+- **Clean Architecture + DDD Implementation**: Follow the standardized structure defined in `/Users/pwner/Git/ABS/docs/architecture/clean-architecture-decision.md`
 
 ## Service Categories & Dependencies
 
@@ -90,8 +66,8 @@ solidity-security-api-service/
 ## Step 2: Security and Secrets Integration (2.5 hours)
 
 ### Objectives
-- Create External Secret manifests for AWS Secrets Manager integration
-- Configure IRSA (IAM Roles for Service Accounts) for secure AWS access
+- Create External Secret manifests for Vault Community integration
+- Configure IRSA (IAM Roles for Service Accounts) for secure AWS access (staging, production)
 - Set up network policies and pod security policies
 
 ### Key Components to Implement
@@ -109,17 +85,17 @@ solidity-security-api-service/
 ### Objectives
 - Configure health check endpoints and monitoring annotations
 - Set up horizontal pod autoscaling configurations
-- Create ingress configurations for ALB with SSL termination
+- Create ingress configurations (NGINX for local development, ALB for staging/production) with SSL termination
 
 ### Core Dependencies
 - **Health Checks**: Service-specific health and readiness endpoints
 - **HPA Configuration**: CPU and memory-based autoscaling
-- **Ingress Setup**: ALB integration with SSL termination
+- **Ingress Setup**: NGINX Ingress Controller for local development, AWS Application Load Balancer (ALB) for staging/production with SSL termination
 
 ### Integration Requirements
 - Prometheus metrics collection configuration
 - Autoscaling policies appropriate for each service type
-- Load balancer health checks and traffic distribution
+- Load balancer health checks and traffic distribution (NGINX for local, ALB for staging/production)
 
 ## Success Criteria & Validation
 
@@ -131,7 +107,7 @@ solidity-security-api-service/
 - [ ] Resource limits and requests configured for all services
 
 ### Security and Integration Requirements
-- [ ] External Secret manifests created for AWS Secrets Manager integration
+- [ ] External Secret manifests created for Vault Community integration
 - [ ] IRSA configurations implemented for secure AWS service access
 - [ ] Network policies configured for service-to-service communication
 - [ ] Pod security policies implemented for container security
@@ -147,10 +123,11 @@ solidity-security-api-service/
 ## Implementation Priority
 
 ### Phase 1: Core Templates (4 hours)
-1. Create Kubernetes deployment manifests for API service with FastAPI configuration
-2. Build tool integration service templates with multi-container support
-3. Develop intelligence engine and data service templates with hybrid language support
-4. Create orchestration, notification, and contract parser service templates
+1. Create Kubernetes deployment manifests for local development environment first
+2. Create Kubernetes deployment manifests for API service with FastAPI configuration
+3. Build tool integration service templates with multi-container support
+4. Develop intelligence engine and data service templates with hybrid language support
+5. Create orchestration, notification, and contract parser service templates
 
 ### Phase 2: Security Integration (2.5 hours)
 1. Configure External Secret manifests for all service secret requirements
@@ -160,7 +137,7 @@ solidity-security-api-service/
 ### Phase 3: Monitoring and Autoscaling (1.5 hours)
 1. Configure health check endpoints and monitoring annotations
 2. Set up horizontal pod autoscaling policies for scalable services
-3. Create ingress configurations for ALB integration with SSL termination
+3. Create ingress configurations (NGINX for local development, ALB for staging/production) with SSL termination
 
 ## Key Implementation Notes
 
@@ -176,22 +153,49 @@ solidity-security-api-service/
 **Priority**: P0 (Critical)
 
 ## Task Checklist
-- [ ] Task 1.10 started
-- [ ] API service Kubernetes templates created with FastAPI configuration
-- [ ] Tool integration service templates created with multi-container support
-- [ ] Intelligence engine service templates created with Python/Rust hybrid support
-- [ ] Orchestration service templates created with Celery worker configuration
-- [ ] Data service templates created with high-performance configuration
-- [ ] Notification service templates created with WebSocket server configuration
-- [ ] Contract parser service templates created with pure Rust configuration
-- [ ] Service definitions configured for internal communication
-- [ ] ConfigMaps implemented for environment-specific configuration
-- [ ] External Secret manifests created for all services
-- [ ] IRSA configurations implemented with service-specific IAM roles
-- [ ] Network policies configured for service communication security
-- [ ] Security contexts and pod security policies implemented
-- [ ] Health check endpoints and monitoring annotations configured
-- [ ] Horizontal Pod Autoscaling configured for scalable services
-- [ ] Ingress configurations created for ALB integration
-- [ ] All templates validated for deployment readiness
-- [ ] Task 1.10 completed with production-ready backend service templates
+
+### Local Development Environment
+- [ ] Local development Kubernetes templates created for all backend services
+- [ ] Local service discovery configuration for minikube development
+- [ ] Local ConfigMaps implemented for development environment configuration
+- [ ] Local port forwarding configurations for direct service access
+- [ ] Development database and cache connection configurations
+- [ ] Local External Secrets integration with HashiCorp Vault dev mode
+- [ ] Development resource limits configured for local testing
+- [ ] Local ingress rules configured for service access via minikube
+
+### Staging Environment
+- [ ] Staging Kubernetes deployment templates created for all backend services
+- [ ] API service staging templates created with FastAPI configuration
+- [ ] Tool integration service staging templates created with multi-container support
+- [ ] Intelligence engine staging templates created with Python/Rust hybrid support
+- [ ] Orchestration service staging templates created with Celery worker configuration
+- [ ] Data service staging templates created with optimized configuration
+- [ ] Notification service staging templates created with WebSocket server configuration
+- [ ] Contract parser service staging templates created with Rust configuration
+- [ ] Staging service definitions configured for internal communication
+- [ ] Staging ConfigMaps implemented for environment-specific configuration
+- [ ] Staging External Secret manifests created for Vault Community integration
+- [ ] Staging IRSA configurations implemented with service-specific IAM roles
+- [ ] Staging network policies configured for service communication security
+- [ ] Staging health check endpoints and monitoring annotations configured
+
+### Production Environment
+- [ ] Production Kubernetes deployment templates created for all backend services
+- [ ] Production API service templates with FastAPI and performance optimization
+- [ ] Production tool integration service templates with multi-container support
+- [ ] Production intelligence engine templates with Python/Rust hybrid optimization
+- [ ] Production orchestration service templates with Celery worker scaling
+- [ ] Production data service templates with high-performance configuration
+- [ ] Production notification service templates with WebSocket server optimization
+- [ ] Production contract parser service templates with pure Rust optimization
+- [ ] Production service definitions configured for internal communication
+- [ ] Production ConfigMaps implemented for environment-specific configuration
+- [ ] Production External Secret manifests created for all services
+- [ ] Production IRSA configurations implemented with service-specific IAM roles
+- [ ] Production network policies configured for service communication security
+- [ ] Production security contexts and pod security policies implemented
+- [ ] Production health check endpoints and monitoring annotations configured
+- [ ] Production Horizontal Pod Autoscaling configured for scalable services
+- [ ] Production ingress configurations created for AWS Application Load Balancer (ALB) integration
+- [ ] All production templates validated for deployment readiness

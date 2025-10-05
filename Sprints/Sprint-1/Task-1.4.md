@@ -9,14 +9,17 @@ AWS Infrastructure as Code repository containing all cloud infrastructure config
 ## High-Level Objectives
 
 ### Primary Goal
-Deploy and configure HashiCorp Vault Community Edition for secure credential storage with manual unsealing and native Kubernetes integration via External Secrets Operator using ClusterSecretStore for cross-namespace access in vault-staging and vault-production namespaces.
+Deploy and configure HashiCorp Vault Community Edition for secure credential storage with manual unsealing and native Kubernetes integration via External Secrets Operator using ClusterSecretStore for cross-namespace access in vault-local, vault-staging and vault-production namespaces.
 
 ### Key Requirements (from docs)
-- **Vault Deployment**: Deploy Community Edition for staging and production environments in vault-staging and vault-production namespaces
+- **Vault Deployment**: Deploy Community Edition for local, staging and production environments in vault-local, vault-staging and vault-production namespaces
 - **RBAC Configuration**: Vault policies and Kubernetes service accounts for secure secret access via External Secrets Operator
 - **Cross-Namespace Integration**: ClusterSecretStore configuration for external-secrets-operator service account from external-secrets-system namespace
 - **Manual Management**: Manual secret management with Vault Community Edition (no enterprise auto-rotation)
 - **Organization Structure**: Hierarchical secret organization using Vault's KV secrets engine
+
+## Standards Reference
+- **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 
 ## Directory Structure Requirements
 
@@ -115,8 +118,8 @@ solidity-security-aws-infrastructure/
 ## Step 2: Environment Overlays and Configuration (1 hour)
 
 ### Objectives
-- Create staging and production Kustomize overlays with environment-specific configurations
-- Configure namespace patches for vault-staging and vault-production namespaces
+- Create local, staging and production Kustomize overlays with environment-specific configurations
+- Configure namespace patches for vault-local, vault-staging and vault-production namespaces
 - Set up environment-specific StatefulSet and PVC patches
 
 ### Key Components to Implement
@@ -213,26 +216,45 @@ solidity-security-aws-infrastructure/
 **Priority**: P0 (Critical)
 
 ## Task Checklist
-- [ ] Task 1.4 started
+
+### Local Development Environment
+- [ ] HashiCorp Vault Helm chart installed in minikube with dev mode configuration
+- [ ] Vault configured for local development with in-memory storage
+- [ ] Vault UI accessible via port forwarding for development
+- [ ] Local Vault policies configured for development secrets access
+- [ ] Development secrets engine (KV v2) initialized and configured
+- [ ] Local External Secrets Operator integration tested
+- [ ] Development service accounts configured for Vault access
+- [ ] Local vault unsealing procedures documented for development workflow
+
+### Staging Environment
 - [ ] Kustomize base manifests created in `k8s/base/vault/`
 - [ ] Base StatefulSet configured with persistent storage and security context
 - [ ] Base headless service created for StatefulSet pod communication
 - [ ] Base ConfigMap created with Vault configuration and KV v2 engine
 - [ ] Vault RBAC configured with ClusterRole and ServiceAccount
-- [ ] Base namespace template created with environment placeholder
 - [ ] Staging overlay created in `k8s/overlays/staging/vault/`
-- [ ] Production overlay created in `k8s/overlays/production/vault/`
-- [ ] Environment-specific namespace patches configured
-- [ ] StatefulSet patches configured for resource limits and replica counts
-- [ ] PVC patches configured for appropriate storage sizes
-- [ ] Production PodDisruptionBudget and backup CronJob configured
+- [ ] Environment-specific namespace patches configured for vault-staging
+- [ ] StatefulSet patches configured for staging resource limits and replica counts
+- [ ] PVC patches configured for staging storage sizes
 - [ ] ClusterSecretStore manifests created for External Secrets Operator integration
 - [ ] Vault deployed to vault-staging namespace via Kustomize
+- [ ] Vault StatefulSet pods running with persistent storage mounted in staging
+- [ ] Vault initialization and unsealing completed for staging environment
+- [ ] Vault policies configured for development secrets access
+- [ ] Kubernetes authentication method configured for External Secrets Operator
+
+### Production Environment
+- [ ] Production overlay created in `k8s/overlays/production/vault/`
+- [ ] Production namespace patches configured for vault-production
+- [ ] Production StatefulSet patches with optimized resource limits and HA replica counts
+- [ ] Production PVC patches configured for appropriate storage sizes
+- [ ] Production PodDisruptionBudget and backup CronJob configured
 - [ ] Vault deployed to vault-production namespace via Kustomize
-- [ ] Vault StatefulSet pods running with persistent storage mounted
-- [ ] Vault initialization and unsealing completed for both environments
-- [ ] Kubernetes authentication method configured for External Secrets Operator via ClusterSecretStore
-- [ ] Vault policies configured for external-secrets-operator service account from external-secrets-system namespace
+- [ ] Production Vault StatefulSet pods running with persistent storage mounted
+- [ ] Vault initialization and unsealing completed for production environment
+- [ ] Production Kubernetes authentication method configured for External Secrets Operator
+- [ ] Vault policies configured for external-secrets-operator service account
 - [ ] External Secrets Operator integration tested and functional via ClusterSecretStore
-- [ ] Cross-namespace secret retrieval validated
-- [ ] Task 1.4 completed with Vault operational via standardized Kustomize structure
+- [ ] Cross-namespace secret retrieval validated in production
+- [ ] Production backup and disaster recovery procedures implemented

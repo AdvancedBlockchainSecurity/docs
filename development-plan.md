@@ -8,7 +8,7 @@
 - **Service Mesh**: Istio for service-to-service mTLS, traffic management, and observability
 - **Ingress Controller**: Istio Gateway + AWS Application Load Balancer (ALB) with SSL termination
 - **Certificate Management**: cert-manager with Let's Encrypt for automated SSL certificate provisioning
-- **Secret Management**: HashiCorp Vault for centralized secret storage, rotation, and policy enforcement
+- **Secret Management**: HashiCorp Vault Community for centralized secret storage, rotation, and policy enforcement
 - **Secret Injection**: Vault Secrets Operator for Kubernetes-native secret injection from HashiCorp Vault
 - **Event Bus**: Apache Kafka for async messaging between services
 - **Container Orchestration**: AWS EKS with Helm charts for deployment
@@ -26,7 +26,7 @@
 - **Load Balancing**: AWS Application Load Balancer with SSL termination
 - **Container Registry**: Amazon ECR with vulnerability scanning
 - **ArgoCD**: Cloud deployment managing development applications
-- **Secret Management**: HashiCorp Vault with automatic rotation and high availability
+- **Secret Management**: HashiCorp Vault Community with automatic rotation and high availability
 - **Secret Injection**: Vault Secrets Operator with Kubernetes RBAC integration
 - **Cost**: $250-350/month for development environment
 
@@ -36,9 +36,9 @@
 - **Database**: RDS PostgreSQL with read replicas and automated backups
 - **Caching**: ElastiCache Redis with clustering and failover
 - **Global Distribution**: CloudFront CDN and multi-region deployment
-- **Monitoring**: CloudWatch integration with Prometheus and Grafana
-- **Secret Management**: HashiCorp Vault with high availability and enterprise features
-- **Disaster Recovery**: Multi-region HashiCorp Vault replication and backup
+- **Monitoring**: Prometheus + Grafana + Loki Stack integration
+- **Secret Management**: HashiCorp Vault Community with high availability
+- **Disaster Recovery**: Multi-region HashiCorp Vault Community replication and backup
 - **Cost**: $500-2500/month based on usage and scale
 
 ### Domain and DNS Setup
@@ -183,7 +183,7 @@ solidity-security-platform/
 - **Retry Logic**: Exponential backoff with jitter for failed API calls
 - **Timeout Handling**: Configurable timeouts per tool type
 - **Result Caching**: Redis-based caching for identical contract analyses
-- **Credential Management**: AWS Secrets Manager-stored API keys with automatic rotation
+- **Credential Management**: Vault Community-stored API keys with automatic rotation
 
 **Tool Integration Specifications**:
 
@@ -192,7 +192,7 @@ solidity-security-platform/
 - Custom detector plugin support
 - Parallel analysis for multiple contracts
 - Memory optimization for large contract sets
-- Configuration secrets stored in AWS Secrets Manager
+- Configuration secrets stored in Vault Community
 - Built-in detector configuration and custom rule support
 - JSON output parsing for standardized vulnerability reporting
 - Integration with Foundry and Hardhat project structures
@@ -202,8 +202,8 @@ solidity-security-platform/
 - REST API with async job polling
 - WebSocket support for real-time updates
 - Analysis mode selection (quick/standard/deep)
-- API key rotation and failover via AWS Secrets Manager
-- AWS Secrets Manager-managed API credentials with automatic rotation
+- API key rotation and failover via Vault Community
+- Vault Community-managed API credentials with automatic rotation
 - Support for all MythX analysis types (static, dynamic, symbolic)
 - Rate limiting and quota management
 - Result correlation with other tool findings
@@ -216,7 +216,7 @@ solidity-security-platform/
 - Performance optimization for large codebases
 - Foundry project structure detection
 - Custom detector configuration support
-- Configuration stored in AWS Secrets Manager
+- Configuration stored in Vault Community
 - Support for custom Rust-based detectors
 - Integration with Solidity compilation artifacts
 - Advanced pattern matching for smart contract vulnerabilities
@@ -228,7 +228,7 @@ solidity-security-platform/
 - AST-based analysis for maintainability scores
 - Support for multiple Solidity compiler versions
 - Integration with vulnerability risk correlation
-- Tool configurations managed via AWS Secrets Manager
+- Tool configurations managed via Vault Community
 - Cyclomatic complexity calculation
 - Function length and parameter count analysis
 - Contract inheritance depth measurement
@@ -239,7 +239,7 @@ solidity-security-platform/
 - Specification file generation automation
 - Result parsing from JSON output
 - Resource allocation for verification jobs
-- API credentials stored securely in AWS Secrets Manager
+- API credentials stored securely in Vault Community
 - Formal verification result integration
 - Specification template management
 - Verification report generation
@@ -263,7 +263,7 @@ solidity-security-platform/
 - Severity level harmonization across tools
 - Confidence score normalization (0.0-1.0 scale)
 
-**AWS Secrets Manager Integration**:
+**Vault Community Integration**:
 - Tool API keys stored in environment-specific paths
 - External Secrets Operator injecting credentials as Kubernetes secrets
 - IAM policies for least-privilege access to specific secrets
@@ -297,9 +297,9 @@ solidity-security-platform/
 - **Remediation Suggestions**: Template-based fix recommendations
 - **Statistical Analysis**: Trend analysis and anomaly detection
 
-**AWS Secrets Manager Integration**:
+**Vault Community Integration**:
 - Algorithm configurations stored in environment-specific paths
-- Rule weights and thresholds in AWS Secrets Manager
+- Rule weights and thresholds in Vault Community
 - Pattern configurations with automatic updates
 - External Secrets Operator for credential injection
 
@@ -322,8 +322,8 @@ solidity-security-platform/
 - **Dependency Management**: Intelligence engine waits for all tools
 - **Checkpoint System**: Resume interrupted analyses from checkpoints
 
-**AWS Secrets Manager Integration**:
-- Redis broker credentials stored in AWS Secrets Manager
+**Vault Community Integration**:
+- Redis broker credentials stored in Vault Community
 - Worker authentication tokens with automatic rotation
 - Queue encryption keys for securing job data
 - External Secrets Operator managing worker credential injection
@@ -364,16 +364,16 @@ solidity-security-platform/
 - **Partial Indexes**: Conditional indexes for filtered queries
 - **Index Monitoring**: pg_stat_user_indexes for usage tracking
 
-**AWS Secrets Manager Integration**:
-- Automatic database credential rotation via AWS Secrets Manager
-- Database encryption keys stored in AWS Secrets Manager
-- Redis credentials managed through AWS Secrets Manager
+**Vault Community Integration**:
+- Automatic database credential rotation via Vault Community
+- Database encryption keys stored in Vault Community
+- Redis credentials managed through Vault Community
 - External Secrets Operator for automatic credential rotation
 
-**AWS Secrets Manager Database Integration**:
+**Vault Community Database Integration**:
 - Automatic PostgreSQL credential rotation with configurable TTL
 - Automatic credential rotation without service interruption
-- IAM-based database access via AWS Secrets Manager
+- IAM-based database access via Vault Community
 - Audit logging for all database credential usage
 
 #### 5. Notification Service
@@ -395,10 +395,10 @@ solidity-security-platform/
 - **Email Service**: HTML templates with inline vulnerability details
 - **Webhook Support**: Configurable webhooks for external system integration
 
-**AWS Secrets Manager Integration**:
-- SMTP credentials stored in AWS Secrets Manager
-- Slack webhook URLs in AWS Secrets Manager
-- Email templates and configurations in AWS Secrets Manager
+**Vault Community Integration**:
+- SMTP credentials stored in Vault Community
+- Slack webhook URLs in Vault Community
+- Email templates and configurations in Vault Community
 - External Secrets Operator for secure credential injection
 
 ### Frontend Architecture
@@ -406,7 +406,7 @@ solidity-security-platform/
 #### React Application Structure
 **Technology Stack**: React 18, TypeScript 5, Vite, TanStack Query, Zustand
 **Architecture Pattern**: Feature-based folder structure with shared components
-**Secret Management**: AWS Secrets Manager-managed OAuth credentials and API configurations
+**Secret Management**: Vault Community-managed OAuth credentials and API configurations
 **Location**: `solidity-security-platform/frontend/`
 
 **State Management**:
@@ -427,10 +427,10 @@ solidity-security-platform/
 - **Offline Support**: Service worker for basic offline functionality
 - **Push Notifications**: Browser notifications for critical findings
 
-**AWS Secrets Manager Integration**:
-- OAuth client credentials managed via AWS Secrets Manager
-- API endpoint configurations stored in AWS Secrets Manager
-- Feature flags and dynamic configuration via AWS Secrets Manager
+**Vault Community Integration**:
+- OAuth client credentials managed via Vault Community
+- API endpoint configurations stored in Vault Community
+- Feature flags and dynamic configuration via Vault Community
 - External Secrets Operator injecting frontend configuration
 
 #### Visualization Components
@@ -452,9 +452,9 @@ solidity-security-platform/
 ### Security Architecture
 
 #### Authentication & Authorization
-**Technology Stack**: JWT, OAuth 2.0, SAML 2.0, Redis, AWS Secrets Manager
+**Technology Stack**: JWT, OAuth 2.0, SAML 2.0, Redis, Vault Community
 **Design Pattern**: Role-based access control with attribute-based policies
-**Secret Management**: AWS Secrets Manager-managed JWT keys and OAuth credentials
+**Secret Management**: Vault Community-managed JWT keys and OAuth credentials
 
 **Authentication Methods**:
 - **Password-Based**: Argon2 hashing with salt and pepper
@@ -468,8 +468,8 @@ solidity-security-platform/
 - **Policy Engine**: ABAC policies for complex access control scenarios
 - **API Security**: JWT validation, scope checking, rate limiting
 
-**AWS Secrets Manager Integration**:
-- JWT signing keys stored in AWS Secrets Manager with automatic rotation
+**Vault Community Integration**:
+- JWT signing keys stored in Vault Community with automatic rotation
 - OAuth provider credentials managed centrally
 - Session encryption keys for secure state management
 - IAM policies for authentication service access
@@ -479,7 +479,7 @@ solidity-security-platform/
 - **At Rest**: AES-256-GCM for database and file storage
 - **In Transit**: TLS 1.3 for all external communications
 - **Application Level**: Field-level encryption for sensitive data
-- **Key Management**: AWS Secrets Manager and AWS KMS for key rotation
+- **Key Management**: Vault Community and AWS KMS for key rotation
 
 **Privacy Controls**:
 - **Data Isolation**: Tenant-based data segregation
@@ -487,7 +487,7 @@ solidity-security-platform/
 - **Audit Logging**: Immutable logs for all data access and modifications
 - **Data Retention**: Configurable retention policies with automatic purging
 
-**AWS Secrets Manager Security Features**:
+**Vault Community Security Features**:
 - **Encryption**: Encryption in transit and at rest with AWS KMS
 - **Access Control**: IAM-based access control with least privilege
 - **Audit Logging**: Comprehensive audit trails via CloudTrail
@@ -500,14 +500,14 @@ solidity-security-platform/
 **Database Scaling**: RDS read replicas, connection pooling, query optimization
 **Caching Layers**: Multi-tier caching with CloudFront CDN
 **Auto-Scaling**: EKS cluster autoscaler and horizontal pod autoscaling
-**Secret Performance**: AWS Secrets Manager with optimized retrieval patterns
+**Secret Performance**: Vault Community with optimized retrieval patterns
 
 **Performance Targets**:
 - **API Response Time**: P95 < 200ms for CRUD operations
 - **Analysis Throughput**: 1000+ concurrent contract analyses
 - **Database Performance**: P95 < 50ms for indexed queries
 - **Frontend Performance**: First Contentful Paint < 1.5s
-- **AWS Secrets Manager Performance**: P95 < 50ms for secret retrieval
+- **Vault Community Performance**: P95 < 50ms for secret retrieval
 
 #### Resource Management
 **Container Resources**:
@@ -521,14 +521,14 @@ solidity-security-platform/
 - **Vertical Pod Autoscaler**: Right-sizing recommendations
 - **Cluster Autoscaler**: Node scaling based on resource demands
 - **Custom Metrics**: Queue length and analysis time-based scaling
-- **AWS Secrets Manager Scaling**: Optimized retrieval patterns for high-throughput
+- **Vault Community Scaling**: Optimized retrieval patterns for high-throughput
 
 ### DevOps & Infrastructure
 
 #### CI/CD Pipeline
-**Technology Stack**: GitHub Actions, Docker, AWS EKS, ArgoCD, AWS Secrets Manager
+**Technology Stack**: GitHub Actions, Docker, AWS EKS, ArgoCD, Vault Community
 **Pipeline Stages**: Test → Build → Security Scan → Deploy → Verify
-**Secret Management**: AWS Secrets Manager integration for CI/CD credentials and deployment secrets
+**Secret Management**: Vault Community integration for CI/CD credentials and deployment secrets
 
 **Build Process**:
 - **Multi-Stage Builds**: Optimized Docker images with security scanning
@@ -542,7 +542,7 @@ solidity-security-platform/
 - **Canary Releases**: Gradual rollout with automatic rollback on errors
 - **Database Migrations**: Backward-compatible migrations with versioning
 
-**AWS Secrets Manager CI/CD Integration**:
+**Vault Community CI/CD Integration**:
 - Dynamic credentials for deployment pipelines
 - Secret injection during build and deployment processes
 - IAM-based access control for pipeline operations
@@ -554,28 +554,28 @@ solidity-security-platform/
 1. Developer commits code to `solidity-security-aws-infrastructure/k8s/overlays/{overlay}/argocd/apps/{service-name}/`
 2. ArgoCD detects changes via webhook or polling
 3. ArgoCD syncs Kubernetes manifests from platform repo to cluster
-4. External Secrets Operator injects secrets from AWS Secrets Manager
+4. External Secrets Operator injects secrets from Vault Community
 5. Service deploys with updated configuration
 
 #### Monitoring & Observability
-**Metrics Stack**: Prometheus, Grafana, AlertManager, CloudWatch
-**Logging Stack**: Fluentd, CloudWatch Logs, Elasticsearch, Kibana
+**Metrics Stack**: Prometheus, Grafana, AlertManager, VictoriaMetrics
+**Logging Stack**: Loki + Fluent Bit, Elasticsearch, Kibana
 **Tracing Stack**: Jaeger, OpenTelemetry, AWS X-Ray
-**Secret Monitoring**: AWS Secrets Manager metrics and audit log monitoring
+**Secret Monitoring**: Vault Community metrics and audit log monitoring
 
 **Key Metrics**:
 - **Golden Signals**: Latency, traffic, errors, saturation
 - **Business Metrics**: Analysis completion rate, false positive rate
 - **Infrastructure Metrics**: CPU, memory, disk, network utilization
 - **Custom Metrics**: Tool-specific metrics, queue depths, processing times
-- **AWS Secrets Manager Metrics**: Secret access patterns, rotation success, performance
+- **Vault Community Metrics**: Secret access patterns, rotation success, performance
 
 **Alerting Strategy**:
 - **Severity Levels**: Critical (page on-call), Warning (notify team), Info (log only)
 - **Alert Routing**: PagerDuty integration with escalation policies
 - **Alert Correlation**: Group related alerts to reduce noise
 - **Runbook Automation**: Automated remediation for known issues
-- **AWS Secrets Manager Alerting**: Secret expiration, rotation failures, access anomalies
+- **Vault Community Alerting**: Secret expiration, rotation failures, access anomalies
 
 ### API Design
 
@@ -584,7 +584,7 @@ solidity-security-platform/
 **Versioning**: URL-based versioning (/api/v1/, /api/v2/)
 **Pagination**: Cursor-based pagination for large datasets
 **Filtering**: GraphQL-style filtering with field selection
-**Security**: AWS Secrets Manager-managed API keys and JWT tokens
+**Security**: Vault Community-managed API keys and JWT tokens
 
 **Endpoint Design**:
 - **Resource-Based**: RESTful resource naming conventions
@@ -598,18 +598,18 @@ solidity-security-platform/
 - **Burst Allowance**: Short-term burst capability with token bucket
 - **Rate Limit Headers**: Standard headers for client awareness
 
-**AWS Secrets Manager API Integration**:
-- API authentication tokens managed by AWS Secrets Manager
+**Vault Community API Integration**:
+- API authentication tokens managed by Vault Community
 - Dynamic API key generation and rotation
 - Client certificate management via AWS Certificate Manager
-- API rate limiting configurations stored in AWS Secrets Manager
+- API rate limiting configurations stored in Vault Community
 
 #### GraphQL API (Future)
 **Schema Design**: Type-first schema design with code generation
 **Resolvers**: Efficient N+1 query prevention with DataLoader
 **Subscriptions**: Real-time subscriptions for live updates
 **Federation**: Schema federation for microservices
-**Security**: AWS Secrets Manager-managed GraphQL endpoint authentication
+**Security**: Vault Community-managed GraphQL endpoint authentication
 
 ### Testing Strategy
 
@@ -625,28 +625,28 @@ solidity-security-platform/
 - **Service Integration**: Cross-service integration testing
 - **Database Testing**: Test migrations and complex queries with RDS
 - **External API Testing**: Mock external tool APIs with contract testing
-- **AWS Secrets Manager Integration Testing**: Secret injection and rotation testing
+- **Vault Community Integration Testing**: Secret injection and rotation testing
 
 **End-to-End Tests (10%)**:
 - **UI Testing**: Playwright for browser automation
 - **User Workflows**: Complete user journey testing
 - **Performance Testing**: Load testing with realistic data volumes
 - **Security Testing**: Automated security scanning and penetration testing
-- **AWS Secrets Manager E2E Testing**: Complete secret lifecycle testing
+- **Vault Community E2E Testing**: Complete secret lifecycle testing
 
 #### Test Data Management
 **Test Databases**: Isolated RDS instances per environment
 **Data Fixtures**: Reusable test data factories and builders
 **Test Isolation**: Transaction rollback between tests
 **Seed Data**: Consistent seed data for development and testing
-**AWS Secrets Manager Test Secrets**: Isolated namespaces for testing
+**Vault Community Test Secrets**: Isolated namespaces for testing
 
 **Performance Testing**:
 - **Load Testing**: k6 for API load testing
 - **Stress Testing**: Gradual load increase to find breaking points
 - **Volume Testing**: Large dataset testing for database performance
 - **Chaos Engineering**: Controlled failure injection with Chaos Monkey
-- **AWS Secrets Manager Performance Testing**: Secret retrieval under load
+- **Vault Community Performance Testing**: Secret retrieval under load
 
 ### Development Workflow
 
@@ -661,7 +661,7 @@ solidity-security-platform/
 - **Hot Reloading**: Development servers with automatic reload
 - **Database Seeding**: Scripts for consistent cloud data setup
 - **Environment Parity**: Production-like development environment
-- **AWS Secrets Manager Development**: Cloud-based secret management with development namespaces
+- **Vault Community Development**: Cloud-based secret management with development namespaces
 
 #### Code Quality
 **Linting**: ESLint for TypeScript, Black/isort for Python
@@ -675,7 +675,7 @@ solidity-security-platform/
 - **Code Documentation**: Inline comments for complex logic
 - **Architecture Documentation**: Decision records and diagrams
 - **User Documentation**: Step-by-step guides and tutorials
-- **AWS Secrets Manager Documentation**: Secret management procedures and policies
+- **Vault Community Documentation**: Secret management procedures and policies
 
 ### Migration & Deployment Strategy
 
@@ -684,21 +684,21 @@ solidity-security-platform/
 **Migration Strategy**: Forward-only migrations with rollback procedures
 **Zero-Downtime**: Online schema changes with minimal locking
 **Data Validation**: Post-migration validation and integrity checks
-**AWS Secrets Manager Credential Migration**: Seamless database credential rotation during migrations
+**Vault Community Credential Migration**: Seamless database credential rotation during migrations
 
 #### Feature Rollout
 **Feature Flags**: LaunchDarkly for gradual feature rollout
 **A/B Testing**: Statistical significance testing for UI changes
 **Rollback Strategy**: Immediate rollback capability for failed deployments
 **Blue-Green Database**: Database-level blue-green deployment support
-**AWS Secrets Manager Configuration Rollout**: Gradual secret and configuration updates
+**Vault Community Configuration Rollout**: Gradual secret and configuration updates
 
 #### Production Readiness
 **Health Checks**: Comprehensive health check endpoints
 **Graceful Shutdown**: SIGTERM handling with connection draining
 **Circuit Breakers**: Fail-fast pattern for external dependencies
 **Bulkhead Pattern**: Resource isolation between critical and non-critical operations
-**AWS Secrets Manager Readiness**: Health checks for AWS Secrets Manager connectivity and secret availability
+**Vault Community Readiness**: Health checks for Vault Community connectivity and secret availability
 
 ### Cloud Infrastructure Design
 
@@ -709,14 +709,14 @@ solidity-security-platform/
 **Storage**: S3 for contract files with lifecycle policies
 **Networking**: VPC with public/private subnets and NAT gateways
 **Security**: IAM roles, security groups, and VPC endpoints
-**Monitoring**: CloudWatch integration with existing Prometheus stack
-**Secret Management**: AWS Secrets Manager with cross-region replication
+**Monitoring**: Prometheus + Grafana + Loki Stack integration
+**Secret Management**: Vault Community with cross-region replication
 
-#### AWS Secrets Manager Cloud Architecture
-**High Availability**: Single-AZ AWS Secrets Manager for MVP (Multi-AZ with cross-region replication upgrade ready for production)
+#### Vault Community Cloud Architecture
+**High Availability**: Single-AZ Vault Community for MVP (Multi-AZ with cross-region replication upgrade ready for production)
 **Automatic Rotation**: AWS Lambda-based rotation for database credentials
 **Backup Strategy**: Automated cross-region secret replication
-**Disaster Recovery**: Cross-region AWS Secrets Manager replication for DR
+**Disaster Recovery**: Cross-region Vault Community replication for DR
 **Performance**: Optimized retrieval patterns for high-throughput applications
 **Integration**: AWS IAM authentication and policy-based access control
 
@@ -726,7 +726,7 @@ solidity-security-platform/
 **Production Environment**: Multi-AZ, high-availability configuration
 **Cost Optimization**: Spot instances, scheduled scaling, resource tagging
 
-## Cloud Development Environment Summary with AWS Secrets Manager
+## Cloud Development Environment Summary with Vault Community
 
 ### **Cost Analysis:**
 ```yaml
@@ -734,7 +734,7 @@ Cloud Development Costs (Months 1-3):
   AWS EKS Development: ~$200/month
   RDS PostgreSQL (Single-AZ): ~$25/month
   ElastiCache Redis (Single-node): ~$15/month
-  AWS Secrets Manager: ~$10/month
+  Vault Community: ~$10/month
   Total Development Costs: ~$250/month
 
 Production Scaling Costs (Month 4+):
@@ -742,14 +742,14 @@ Production Scaling Costs (Month 4+):
   AWS EKS Staging: ~$300/month
   RDS PostgreSQL + Replicas: ~$200/month
   ElastiCache + Clustering: ~$100/month
-  AWS Secrets Manager + Cross-Region: ~$50/month
+  Vault Community + Cross-Region: ~$50/month
   AWS KMS + Other Services: ~$100/month
   Total Production Costs: ~$1,250/month (scales with usage)
 ```
 
-### **AWS Secrets Manager Benefits Summary:**
+### **Vault Community Benefits Summary:**
 ```yaml
-Cloud AWS Secrets Manager Development:
+Cloud Vault Community Development:
   - Native AWS integration from day one
   - Production-grade policies and procedures
   - Automatic secret rotation and lifecycle management
@@ -757,7 +757,7 @@ Cloud AWS Secrets Manager Development:
   - AWS IAM integration for access control
   - Real production patterns and workflows
 
-Production AWS Secrets Manager Benefits:
+Production Vault Community Benefits:
   - High availability and disaster recovery
   - Automatic backup and cross-region replication
   - Cross-region replication for global scale
@@ -781,4 +781,4 @@ Cloud-First Advantages:
   - GitOps workflow with ArgoCD from day one
 ```
 
-This comprehensive technical development plan provides enterprise-grade secret management with AWS Secrets Manager from day one in cloud development, ensuring production readiness while maintaining rapid development velocity without local resource constraints. The integrated repository structure with platform services containing both code and deployment configurations, managed by ArgoCD applications in the infrastructure repository, creates a streamlined development and deployment workflow.
+This comprehensive technical development plan provides enterprise-grade secret management with Vault Community from day one in cloud development, ensuring production readiness while maintaining rapid development velocity without local resource constraints. The integrated repository structure with platform services containing both code and deployment configurations, managed by ArgoCD applications in the infrastructure repository, creates a streamlined development and deployment workflow.

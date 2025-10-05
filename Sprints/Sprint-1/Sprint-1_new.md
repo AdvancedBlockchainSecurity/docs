@@ -1,23 +1,33 @@
-# Sprint 1: AWS Infrastructure Foundation & Repository Setup
+# Sprint 1: Local Development Foundation, AWS Infrastructure Foundation & Repository Setup
 
 **Duration**: Weeks 1-2 (14 days)
-**Technical Milestone**: Complete AWS infrastructure foundation with all 18 repositories properly structured (including dependency monitoring service)
+**Technical Milestone**: Complete local development foundation with all 17 repositories properly structured, AWS infrastructure designed
 
 ## Overview
 
-Sprint 1 establishes the foundational AWS infrastructure and repository structure for the entire Solidity Security Platform. This sprint focuses on creating a production-ready AWS environment using EKS, implementing GitOps workflows with ArgoCD, and setting up the complete multi-repository architecture that will support the platform's microservice-based design.
+Sprint 1 establishes the foundational local development environment (local overlay), AWS Infrastructure (staging and production overlays) and repository structure for the entire Platform. This sprint focuses on creating a local-first development approach using minikube, implementing GitOps workflows with ArgoCD, and setting up the complete multi-repository architecture that will support the platform's microservice-based design.
 
 ## Technical Architecture
 
-### AWS Infrastructure Components
-- **EKS Cluster**: AWS Kubernetes service with managed node groups for staging and production
+### Local Development Infrastructure (Local)
+- **Minikube Cluster**: Local Kubernetes environment as primary development platform
+- **PostgreSQL StatefulSets**: Database with lightweight configuration for local development
+- **Redis**: Caching and message queue with standard configuration
+- **HashiCorp Vault Community Edition**: Centralized secret storage in vault-local namespace
+- **Nginx Ingress Controller**: Local service access and routing
+- **ArgoCD**: GitOps workflow management in argocd-local namespace
+- **Vault Community**: Vault will be used for secret storage
+- **Monitoring & Logging**: Prometheus, Grafana, Loki + Fluent Bit integration in monitoring-local namespace
+
+### AWS Infrastructure Design (Staging, Production)
+- **EKS Cluster**: AWS Kubernetes service with managed node groups for local, staging and production
 - **PostgreSQL StatefulSets**: Database with automated backups and encryption in Kubernetes
 - **ElastiCache Redis**: Caching and message queue with encryption
-- **HashiCorp Vault Community Edition**: Centralized secret storage in vault-staging and vault-production namespaces
-- **AWS Load Balancer Controller**: Application Load Balancer with SSL termination
-- **Vault Secrets Operator**: Kubernetes-native secret injection from HashiCorp Vault in external-secrets-staging and external-secrets-production namespaces
+- **HashiCorp Vault Community Edition**: Centralized secret storage in vault-local, vault-staging and vault-production namespaces
+- **AWS Load Balancer Controller** (Staging/Production): Application Load Balancer (ALB) with SSL termination for AWS environments
+- **Vault Secrets Operator**: Kubernetes-native secret injection from HashiCorp Vault in external-secrets-local, external-secrets-staging and external-secrets-production namespaces
 - **ArgoCD**: GitOps workflow management in argocd-staging and argocd-production namespaces
-- **Monitoring & Logging**: Prometheus, Grafana, Loki + Fluent Bit integration in monitoring-staging and monitoring-production namespaces
+- **Monitoring & Logging**: Prometheus, Grafana, Loki + Fluent Bit integration in monitoring-local, monitoring-staging and monitoring-production namespaces
 
 ### Multi-Language Technology Stack
 - **🦀 Rust Components** (37% of codebase): High-performance parsing, similarity analysis, cryptographic operations
@@ -27,26 +37,28 @@ Sprint 1 establishes the foundational AWS infrastructure and repository structur
 ## Sprint Goals
 
 ### Primary Objectives
-1. **AWS Infrastructure Foundation**: Complete staging and production AWS infrastructure
-2. **Repository Architecture**: Initialize all 18 repositories with proper structure
-3. **GitOps Foundation**: ArgoCD deployment and configuration for cloud environments
+1. **Local Development Foundation**: Complete local minikube development environment as primary platform
+2. **Repository Architecture**: Initialize all 17 repositories with proper structure
+3. **GitOps Foundation**: ArgoCD deployment and configuration for local development
 4. **Shared Libraries**: Multi-language shared library with Python/TypeScript/Rust support
-5. **Service Templates**: Production-ready Kubernetes manifests for all microservices
-6. **DNS and Domain Setup**: Production domain with SSL certificates
-7. **Secret Management**: HashiCorp Vault Community Edition integration with Vault Secrets Operator
+5. **Service Templates**: Kubernetes manifests with local overlay support for all microservices
+6. **DNS and Domain Setup**: Local development with domain planning for future deployment
+7. **Secret Management**: HashiCorp Vault Community Edition integration in local environment
+8. **AWS Infrastructure Design**: Plan and design AWS infrastructure for future deployment
 
 ### Success Metrics
-- All 18 repositories properly structured and functional (including dependency monitoring)
-- AWS infrastructure operational in staging and production environments
-- Complete security analysis workflow deployable to cloud
-- ArgoCD managing all service deployments with automated sync
-- Domain accessible with SSL certificates via cert-manager-staging and cert-manager-production namespaces
-- HashiCorp Vault Community Edition properly managing all credentials
+- All 17 repositories properly structured and functional (including dependency monitoring)
+- Local minikube development environment fully operational as primary development platform
+- Complete security analysis workflow deployable in local environment
+- ArgoCD managing all service deployments with automated sync in local environment
+- Local domain access configured with nginx ingress controller
+- HashiCorp Vault Community Edition properly managing all credentials in vault-local namespace
+- AWS infrastructure designed and planned for future local, staging and production deployment
 - **✅ ENHANCEMENT**: Dependency monitoring service operational with multi-language scanning
 
 ## Detailed Task Breakdown
 
-# Week 1: AWS Infrastructure Foundation
+# Week 1: Local Development Foundation & AWS Infrastructure Design
 
 ## Day 1-2: Domain Setup & AWS Infrastructure Development
 
@@ -154,7 +166,7 @@ production/ (same structure)
 ```
 
 **Acceptance Criteria**:
-- HashiCorp Vault Community Edition operational in vault-staging and vault-production namespaces
+- HashiCorp Vault Community Edition operational in vault-local, vault-staging and vault-production namespaces
 - IAM policies configured with least-privilege access
 - Secret rotation policies configured
 - Secret organization structure implemented
@@ -189,16 +201,17 @@ production/ (same structure)
 **Priority**: P0 (Critical)
 
 **Deliverables**:
-- Install AWS Load Balancer Controller in both clusters
+- Install NGINX Ingress Controller for local development and AWS Load Balancer Controller in staging/production clusters
 - Install cert-manager for Let's Encrypt certificates in cert-manager-staging and cert-manager-production namespaces
 - Configure cert-manager with Cloudflare DNS validation
-- Install Vault Secrets Operator with Kubernetes RBAC authentication in external-secrets-staging and external-secrets-production namespaces
+- Install Vault Secrets Operator with Kubernetes RBAC authentication in external-secrets-local, external-secrets-staging and external-secrets-production namespaces
 - Configure Vault CSI Driver for direct secret mounting
 
 **Acceptance Criteria**:
-- AWS Load Balancer Controller operational for ALB management
+- NGINX Ingress Controller operational for local development
+- AWS Load Balancer Controller operational for ALB management in staging/production
 - cert-manager provisioning Let's Encrypt certificates via DNS validation in cert-manager-staging and cert-manager-production namespaces
-- Vault Secrets Operator integrating with HashiCorp Vault from external-secrets-staging and external-secrets-production namespaces
+- Vault Secrets Operator integrating with HashiCorp Vault from external-secrets-local, external-secrets-staging and external-secrets-production namespaces
 - CSI Driver operational for direct secret mounting
 
 ---
@@ -209,9 +222,9 @@ production/ (same structure)
 **Priority**: P1 (High)
 
 **Deliverables**:
-- Deploy Prometheus for metrics collection in monitoring-staging and monitoring-production namespaces
-- Deploy Grafana with HashiCorp Vault Community Edition integration in monitoring-staging and monitoring-production namespaces
-- Configure Prometheus, Grafana, Loki + Fluent Bit monitoring and logging in monitoring-staging and monitoring-production namespaces
+- Deploy Prometheus for metrics collection in monitoring-local, monitoring-staging and monitoring-production namespaces
+- Deploy Grafana with HashiCorp Vault Community Edition integration in monitoring-local, monitoring-staging and monitoring-production namespaces
+- Configure Prometheus, Grafana, Loki + Fluent Bit monitoring and logging in monitoring-local, monitoring-staging and monitoring-production namespaces
 - Set up service monitoring and alerting rules
 - Create initial platform health dashboards
 
@@ -233,7 +246,7 @@ production/ (same structure)
 **Deliverables**:
 - Deploy ArgoCD in staging environment with HashiCorp Vault Community Edition integration in argocd-staging namespace
 - Deploy ArgoCD in production environment with HashiCorp Vault Community Edition integration in argocd-production namespace
-- Configure GitHub integration for all 18 repositories
+- Configure GitHub integration for all 17 repositories
 - Set up RBAC policies for team access
 - Configure SSL termination and domain access
 
@@ -251,7 +264,7 @@ production/ (same structure)
 **Priority**: P0 (Critical)
 
 **Repository Initialization**:
-- Initialize all 18 repositories with proper directory structures
+- Initialize all 17 repositories with proper directory structures
 - Set up CI/CD workflow foundations with GitHub Actions
 - Configure repository settings and branch protection
 - Create repository-specific documentation templates
@@ -264,7 +277,7 @@ production/ (same structure)
 - Set up package distribution for all languages
 
 **Deliverables**:
-- All 18 repositories initialized with proper structure:
+- All 17 repositories initialized with proper structure:
   - `solidity-security-api-service`
   - `solidity-security-tool-integration`
   - `solidity-security-intelligence-engine`
@@ -278,7 +291,7 @@ production/ (same structure)
   - `solidity-security-analysis`
   - `solidity-security-shared`
   - `solidity-security-aws-infrastructure`
-  - `solidity-security-monitoring` (✅ **ENHANCED** with dependency monitoring service)
+  - `solidity-security-monitoring` (**ENHANCED** with dependency monitoring service)
   - `solidity-security-docs`
   - `solidity-security-tools`
   - `solidity-security-vulnerabilities`
@@ -307,7 +320,7 @@ production/ (same structure)
 - Kubernetes deployment manifests with security contexts
 - Service definitions for internal communication
 - Vault Secret manifests for HashiCorp Vault Community Edition integration
-- Ingress configurations for ALB with SSL termination
+- Ingress configurations (NGINX for local, ALB for staging/production) with SSL termination
 - ConfigMaps for non-sensitive configuration
 - IRSA (IAM Roles for Service Accounts) configurations
 - Health check endpoints and monitoring annotations
@@ -371,7 +384,7 @@ production/ (same structure)
 
 **Acceptance Criteria**:
 - All backend service templates deploy successfully to staging EKS
-- Services can communicate with PostgreSQL and ElastiCache via Vault Secrets from external-secrets-staging and external-secrets-production namespaces
+- Services can communicate with PostgreSQL and ElastiCache via Vault Secrets from external-secrets-local, external-secrets-staging and external-secrets-production namespaces
 - HashiCorp Vault Community Edition integration functional for all services
 - Health checks pass and services register correctly
 - IRSA providing appropriate AWS permissions
@@ -408,14 +421,14 @@ production/ (same structure)
 **Template Requirements**:
 - React application deployment configurations
 - Environment-specific configuration via ConfigMaps
-- ALB ingress routing with SSL termination
+- Ingress routing with SSL termination (NGINX for local development, ALB for staging/production)
 - Build-time optimization and asset caching
 - Health checks for frontend services
 
 **Deliverables**:
 - Complete Kubernetes templates for all 4 frontend services
 - Environment-specific ConfigMaps for API endpoints
-- ALB ingress configurations for routing
+- Ingress configurations for routing (NGINX for local development, ALB for staging/production)
 - Build-time configuration management
 - Static asset serving optimization
 
@@ -490,10 +503,10 @@ production/ (same structure)
 - Error handling and retry mechanisms
 
 **AWS Integration**:
-- Vault Secrets Operator managing service credentials from external-secrets-staging and external-secrets-production namespaces
+- Vault Secrets Operator managing service credentials from external-secrets-local, external-secrets-staging and external-secrets-production namespaces
 - IRSA providing secure AWS service access
 - Loki + Fluent Bit logging for service communication
-- ALB health checks and load balancing
+- Health checks and load balancing (NGINX for local development, ALB for staging/production)
 
 **Deliverables**:
 - Service-to-service communication patterns implemented
@@ -562,7 +575,7 @@ production/ (same structure)
 
 **Documentation Requirements**:
 - AWS infrastructure setup and management guides
-- Repository-specific documentation for all 18 repositories
+- Repository-specific documentation for all 17 repositories
 - Architecture documentation with service interaction diagrams
 - Deployment and troubleshooting procedures
 - Team onboarding checklist and training materials
@@ -644,15 +657,15 @@ production/ (same structure)
 **Priority**: P0 (Critical)
 
 **Comprehensive Platform Validation**:
-- End-to-end testing in both staging and production environments
+- End-to-end testing in local, staging and production environments
 - Performance validation under realistic load scenarios
 - Security testing and vulnerability assessment
 - Disaster recovery and failover testing
 - Team competency validation and knowledge transfer
 
 **Sprint Completion Validation**:
-- All 18 repositories properly structured and documented
-- AWS infrastructure operational in staging and production
+- All 17 repositories properly structured and documented
+- AWS infrastructure operational in local, staging and production
 - ArgoCD managing all service deployments successfully
 - Complete workflow functional from upload to results
 - Team ready to begin Sprint 2 development tasks
@@ -672,7 +685,7 @@ production/ (same structure)
 - Sprint 2 preparation and transition plan
 
 **Acceptance Criteria**:
-- Platform successfully validated in staging and production environments
+- Platform successfully validated in local, staging and production environments
 - All Sprint 1 objectives completed and documented
 - Team demonstrates competency with AWS infrastructure and GitOps workflow
 - Production environment ready for service deployment
@@ -683,8 +696,8 @@ production/ (same structure)
 ## Sprint 1 Success Criteria & Validation
 
 ### Technical Milestones
-- **AWS Infrastructure Operational**: EKS clusters, PostgreSQL StatefulSets, ElastiCache, and HashiCorp Vault functional in staging and production
-- **Repository Architecture Complete**: All 18 repositories structured with comprehensive documentation
+- **AWS Infrastructure Operational**: EKS clusters, PostgreSQL StatefulSets, ElastiCache, and HashiCorp Vault functional in local, staging and production
+- **Repository Architecture Complete**: All 17 repositories structured with comprehensive documentation
 - **GitOps Foundation**: ArgoCD managing deployments with automated sync and self-healing
 - **Multi-Language Integration**: Shared libraries working across Python, TypeScript, and Rust
 - **Service Templates**: Production-ready Kubernetes manifests for all microservices
@@ -711,7 +724,7 @@ production/ (same structure)
 - Comprehensive documentation updated for all components
 - ArgoCD applications deploying successfully with healthy status
 - AWS infrastructure operational with proper monitoring and alerting
-- Vault Secrets Operator functioning correctly across all environments from external-secrets-staging and external-secrets-production namespaces
+- Vault Secrets Operator functioning correctly across all environments from external-secrets-local, external-secrets-staging and external-secrets-production namespaces
 
 ## Risk Mitigation & Contingency Plans
 
@@ -757,7 +770,7 @@ The successful completion of Sprint 1 provides a robust AWS foundation enabling 
 
 ## Repository Summary
 
-All 18 repositories integrated and operational:
+All 17 repositories integrated and operational:
 
 ### Backend Services (7 repositories)
 - `solidity-security-api-service`: FastAPI gateway and authentication (~10K LOC)
@@ -782,7 +795,7 @@ All 18 repositories integrated and operational:
 - `solidity-security-tools`: Tool installation scripts (Shell/Docker)
 - `solidity-security-vulnerabilities`: Vulnerability database (JSON/YAML)
 
-**Total**: 18 repositories, ~96K LOC, with 37% Rust, 43% Python, 20% TypeScript
+**Total**: 17 repositories, ~96K LOC, with 37% Rust, 43% Python, 20% TypeScript
 **✅ ENHANCEMENT**: Dependency monitoring service added with multi-language scanning capabilities
 
 This comprehensive foundation enables rapid progression to service development and platform functionality in Sprint 2 and beyond.

@@ -13,7 +13,7 @@
 | Amazon Web Services (AWS) | ECR | Container image storage | $10-30 (usage-based) |  |
 | Amazon Web Services (AWS) | S3 | Object storage | $5-20 (usage-based) |  |
 | Amazon Web Services (AWS) | IAM | Identity and access management | n/a |  |
-| Amazon Web Services (AWS) | CloudWatch | Monitoring, logging, and metrics | $20-100 (usage-based) |  |
+| Self-Hosted | Prometheus + Grafana + Loki Stack | Monitoring, logging, and metrics | $0/month (self-hosted) | Replaces CloudWatch |
 | Amazon Web Services (AWS) | X-Ray | Distributed tracing | $5-20 (usage-based) |  |
 | Amazon Web Services (AWS) | Certificate Manager | SSL certificate management | n/a |  |
 | Amazon Web Services (AWS) | KMS | Key management service | $1-10 (usage-based) |  |
@@ -22,7 +22,7 @@
 | Amazon Web Services (AWS) | GuardDuty | Threat detection | $10-30/month |  |
 | Amazon Web Services (AWS) | Config | Compliance monitoring | $5-20/month |  |
 | Amazon Web Services (AWS) | CloudTrail | API auditing | $5-15/month |  |
-| Amazon Web Services (AWS) | Secrets Manager | Enterprise secret management | $10-50/month |  |
+| HashiCorp | Vault Community | Enterprise secret management | $0/month (self-hosted) |  |
 | Cloudflare | DNS Management | DNS and domain configuration | n/a (free tier) |  |
 | Domain Registrar | Domain Purchase | advancedblockchainsecurity.com | $12-20/year |  |
 
@@ -85,8 +85,8 @@
 |--------|--------------|---------|--------------|---------|
 | Argo Project | ArgoCD | GitOps deployment automation | n/a |  |
 | CNCF | Helm | Package management for Kubernetes | n/a |  |
-| External Secrets | External Secrets Operator | Secret injection from AWS Secrets Manager | n/a |  |
-| AWS | AWS Secrets Store CSI Driver | Direct secret mounting | n/a |  |
+| External Secrets | External Secrets Operator | Secret injection from Vault Community | n/a |  |
+| HashiCorp | Vault Secrets Store CSI Driver | Direct secret mounting | n/a |  |
 | cert-manager | cert-manager | Certificate lifecycle management | n/a |  |
 | AWS | AWS Load Balancer Controller | ALB integration | n/a |  |
 | Istio | Istio | Service mesh for microservices | n/a |  |
@@ -221,17 +221,17 @@
 ## Total Estimated Costs
 
 ### Development Environment (Months 1-3)
-- **AWS Infrastructure**: ~$340/month
+- **AWS Infrastructure**: ~$330/month (Vault Community now self-hosted)
 - **MythX API**: ~$200/month
 - **GitHub (Dev Licenses)**: ~$8/month
 - **Domain**: ~$20/year
-- **Total Development**: ~$548/month
+- **Total Development**: ~$538/month
 
 ### Production Environment (Month 4+)
-- **AWS Infrastructure**: ~$1,300/month
+- **AWS Infrastructure**: ~$1,250/month (Vault Community now self-hosted)
 - **MythX API**: ~$500/month
 - **GitHub (Dev Licenses)**: ~$8/month
 - **Documentation Platform**: ~$15/month (optional)
-- **Total Production**: ~$1,823/month
+- **Total Production**: ~$1,773/month
 
 *Note: Costs are estimates and may vary based on usage, team size, and specific requirements. Customer integrations (Slack, Teams, Jira, etc.) use customer subscriptions - we only provide plugins/connectors.*

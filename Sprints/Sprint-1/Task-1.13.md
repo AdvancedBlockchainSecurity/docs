@@ -13,6 +13,9 @@ Configure secure and resilient inter-service communication with authentication p
 - **WebSocket Integration**: Real-time updates and notification capabilities
 - **Resilience**: Circuit breaker patterns and service health checking
 
+## Standards Reference
+- **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
+
 ## Service Categories & Dependencies
 
 ### Communication Patterns
@@ -138,21 +141,48 @@ Configure secure and resilient inter-service communication with authentication p
 **Priority**: P0 (Critical)
 
 ## Task Checklist
-- [ ] Task 1.13 started
-- [ ] Kubernetes DNS service discovery configured for all services
-- [ ] HTTP REST API communication implemented with proper routing
-- [ ] JWT token extraction and validation middleware implemented
-- [ ] Service-to-service authentication configured
-- [ ] Connection pooling and timeout policies configured
-- [ ] WebSocket server implemented in notification service
-- [ ] WebSocket authentication using JWT tokens configured
-- [ ] Frontend WebSocket client integration implemented
-- [ ] Real-time event broadcasting operational
-- [ ] Connection management and reconnection logic implemented
-- [ ] Circuit breaker patterns implemented for critical dependencies
-- [ ] Retry logic configured with exponential backoff
-- [ ] Health checks configured with dependency awareness
-- [ ] Service failure isolation tested and functional
-- [ ] Loki logging configured for service communication via Fluent Bit
-- [ ] End-to-end communication testing completed
-- [ ] Task 1.13 completed with resilient service communication operational
+
+### Local Development Environment
+- [ ] Local Kubernetes DNS service discovery configured for minikube services
+- [ ] Local HTTP REST API communication implemented with development routing
+- [ ] Development JWT token handling and validation for local testing
+- [ ] Local service-to-service authentication configured
+- [ ] Development connection pooling and timeout policies configured
+- [ ] Local WebSocket server testing in notification service
+- [ ] Development WebSocket authentication for local frontend integration
+- [ ] Local real-time event broadcasting operational for development
+- [ ] Development health checks configured for service dependencies
+
+### Staging Environment
+- [ ] Staging Kubernetes DNS service discovery configured for all services
+- [ ] Staging HTTP REST API communication implemented with proper routing
+- [ ] Staging JWT token extraction and validation middleware implemented
+- [ ] Staging service-to-service authentication configured
+- [ ] Staging connection pooling and timeout policies configured
+- [ ] Staging WebSocket server implemented in notification service
+- [ ] Staging WebSocket authentication using JWT tokens configured
+- [ ] Staging frontend WebSocket client integration implemented
+- [ ] Staging real-time event broadcasting operational
+- [ ] Staging connection management and reconnection logic implemented
+- [ ] Staging circuit breaker patterns implemented for critical dependencies
+- [ ] Staging retry logic configured with exponential backoff
+- [ ] Staging health checks configured with dependency awareness
+- [ ] Staging Loki logging configured for service communication via Fluent Bit
+
+### Production Environment
+- [ ] Production Kubernetes DNS service discovery configured for all services
+- [ ] Production HTTP REST API communication implemented with optimized routing
+- [ ] Production JWT token extraction and validation middleware implemented
+- [ ] Production service-to-service authentication configured with security hardening
+- [ ] Production connection pooling and timeout policies configured for performance
+- [ ] Production WebSocket server implemented in notification service with scaling
+- [ ] Production WebSocket authentication using JWT tokens configured
+- [ ] Production frontend WebSocket client integration implemented with reconnection
+- [ ] Production real-time event broadcasting operational with load balancing
+- [ ] Production connection management and reconnection logic implemented
+- [ ] Production circuit breaker patterns implemented for critical dependencies
+- [ ] Production retry logic configured with exponential backoff
+- [ ] Production health checks configured with comprehensive dependency awareness
+- [ ] Production service failure isolation tested and functional
+- [ ] Production Loki logging configured for service communication via Fluent Bit
+- [ ] Production end-to-end communication testing completed and validated

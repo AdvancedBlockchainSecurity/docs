@@ -22,6 +22,9 @@ Create comprehensive Kubernetes templates for all frontend microservices with Re
 - **ALB Integration**: Ingress routing with SSL termination for frontend access
 - **Asset Optimization**: Build-time optimization and static asset caching
 
+## Standards Reference
+- **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
+
 ## Directory Structure Requirements
 
 ### Example: `solidity-security-dashboard`
@@ -34,6 +37,7 @@ solidity-security-dashboard/
 │   │   ├── configmap.yaml         # Environment-specific config
 │   │   └── ingress.yaml           # ALB ingress with SSL
 │   └── overlays/
+│       ├── local/                 # Local development configs
 │       ├── staging/               # Staging-specific configs
 │       └── production/            # Production-specific configs
 ├── src/                           # React application source
@@ -100,7 +104,7 @@ solidity-security-dashboard/
 - **Token Management**: JWT storage, refresh, and expiration handling
 
 ### Integration Strategy
-- Environment-specific ConfigMaps for staging and production with auth endpoints
+- Environment-specific ConfigMaps for local, staging and production with auth endpoints
 - Runtime environment variable injection without build-time hardcoding
 - API endpoint configuration for backend service integration
 - Authentication flow integration with solidity-security-api-service
@@ -155,11 +159,12 @@ solidity-security-dashboard/
 ## Implementation Priority
 
 ### Phase 1: React Application Templates with Authentication (3 hours)
-1. Create UI Core service template with component library, Storybook hosting, and shared auth components
-2. Build Dashboard service template with real-time WebSocket integration and login page
-3. Develop Findings service template with advanced filtering capabilities and authentication
-4. Create Analysis service template with file upload, progress tracking, and user authentication
-5. Implement JWT token handling and API integration for all services
+1. Create local development Kubernetes templates for all frontend services first
+2. Create UI Core service template with component library, Storybook hosting, and shared auth components
+3. Build Dashboard service template with real-time WebSocket integration and login page
+4. Develop Findings service template with advanced filtering capabilities and authentication
+5. Create Analysis service template with file upload, progress tracking, and user authentication
+6. Implement JWT token handling and API integration for all services
 
 ### Phase 2: Authentication Integration and Configuration (1.5 hours)
 1. Configure ConfigMaps for environment-specific API endpoints, auth settings, and JWT configuration
@@ -189,28 +194,55 @@ solidity-security-dashboard/
 **Priority**: P1 (High)
 
 ## Task Checklist
-- [ ] Task 1.11 started
-- [ ] UI Core service template created with component library deployment and shared auth components
-- [ ] Storybook documentation hosting configured for UI Core
-- [ ] Login page components implemented for all frontend applications
-- [ ] Authentication context providers and protected routes configured
-- [ ] JWT token handling and API service integration implemented
-- [ ] Dashboard service template created with WebSocket integration and login page
-- [ ] Real-time connection configuration implemented for Dashboard
-- [ ] Findings service template created with filtering capabilities and authentication
-- [ ] Advanced filtering and sorting configuration implemented
-- [ ] Analysis service template created with file upload interface and user authentication
-- [ ] Analysis progress tracking and history management configured
-- [ ] Multi-stage Docker builds configured for all services
-- [ ] NGINX configuration implemented for React SPA serving with auth routing
-- [ ] ConfigMaps created for environment-specific API and auth configurations
-- [ ] Environment variable injection configured for runtime settings with authentication
-- [ ] Backend service integration configured via environment variables
-- [ ] Authentication service integration with solidity-security-api-service configured
-- [ ] Subdomain-specific authentication routing and session management implemented
-- [ ] ALB ingress configurations created for all frontend services
-- [ ] SSL termination configured with cert-manager
-- [ ] Domain-based routing configured for service access
-- [ ] Health checks implemented for all frontend services
-- [ ] Static asset caching and optimization configured
-- [ ] Task 1.11 completed with production-ready frontend service templates including authentication
+
+### Local Development Environment
+- [ ] Local development Kubernetes templates created for all frontend services
+- [ ] Local React development environment configured with hot reload
+- [ ] Local ingress configurations for frontend service access via minikube
+- [ ] Local authentication integration with development API endpoints
+- [ ] Development ConfigMaps for local API endpoint configuration
+- [ ] Local static asset serving via NGINX in minikube
+- [ ] Development environment variables configured for local testing
+- [ ] Local SSL certificate configuration for development HTTPS testing
+
+### Staging Environment
+- [ ] Staging Kubernetes deployment templates created for all frontend services
+- [ ] UI Core staging service template created with component library deployment and shared auth components
+- [ ] Storybook documentation hosting configured for UI Core staging
+- [ ] Login page components implemented for all staging frontend applications
+- [ ] Authentication context providers and protected routes configured for staging
+- [ ] JWT token handling and API service integration implemented for staging
+- [ ] Dashboard staging service template created with WebSocket integration and login page
+- [ ] Real-time connection configuration implemented for staging Dashboard
+- [ ] Findings staging service template created with filtering capabilities and authentication
+- [ ] Advanced filtering and sorting configuration implemented for staging
+- [ ] Analysis staging service template created with file upload interface and user authentication
+- [ ] Staging ConfigMaps created for environment-specific API and auth configurations
+- [ ] Staging environment variable injection configured for runtime settings with authentication
+- [ ] Staging backend service integration configured via environment variables
+- [ ] Staging authentication service integration with solidity-security-api-service configured
+
+### Production Environment
+- [ ] Production Kubernetes deployment templates created for all frontend services
+- [ ] Production UI Core service template with optimized component library deployment
+- [ ] Production Storybook documentation hosting with SSL and domain configuration
+- [ ] Production login page components implemented for all frontend applications
+- [ ] Production authentication context providers and protected routes configured
+- [ ] Production JWT token handling and API service integration implemented
+- [ ] Production Dashboard service template with WebSocket integration and optimized login page
+- [ ] Production real-time connection configuration implemented for Dashboard
+- [ ] Production Findings service template with advanced filtering and authentication
+- [ ] Production Analysis service template with optimized file upload and user authentication
+- [ ] Production analysis progress tracking and history management configured
+- [ ] Production multi-stage Docker builds configured for all services
+- [ ] Production NGINX configuration implemented for React SPA serving with auth routing
+- [ ] Production ConfigMaps created for environment-specific API and auth configurations
+- [ ] Production environment variable injection configured for runtime settings with authentication
+- [ ] Production backend service integration configured via environment variables
+- [ ] Production authentication service integration with solidity-security-api-service configured
+- [ ] Production subdomain-specific authentication routing and session management implemented
+- [ ] Production ALB ingress configurations created for all frontend services
+- [ ] Production SSL termination configured with cert-manager
+- [ ] Production domain-based routing configured for service access
+- [ ] Production health checks implemented for all frontend services
+- [ ] Production static asset caching and optimization configured

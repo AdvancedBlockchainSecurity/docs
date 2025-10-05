@@ -2,7 +2,7 @@
 
 ## Repository: `solidity-security-aws-infrastructure`
 
-AWS Infrastructure as Code repository containing ArgoCD Application definitions, AppProjects, and GitOps workflow configurations for managing all platform services across staging and production environments.
+AWS Infrastructure as Code repository containing ArgoCD Application definitions, AppProjects, and GitOps workflow configurations for managing all platform services across local, staging and production environments.
 
 **✅ ALIGNMENT CHECK**: This implementation creates ArgoCD Application manifests for all platform services (7 backend + 4 frontend) with AppProjects, RBAC policies, and automated GitOps workflows as specified in Sprint 1 documentation.
 
@@ -17,6 +17,9 @@ Create comprehensive ArgoCD Application manifests with Application of Apps patte
 - **Application of Apps**: Pattern for service management at scale
 - **GitOps Workflow**: Automated deployment with Git webhook integration
 
+## Standards Reference
+- **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
+
 ## Directory Structure Requirements
 
 ```
@@ -28,12 +31,11 @@ solidity-security-aws-infrastructure/
 │   │   ├── infrastructure/        # Infrastructure applications
 │   │   └── app-of-apps.yaml       # Application of Apps pattern
 │   ├── projects/                  # ArgoCD AppProject definitions
+│   │   ├── local-project.yaml     # Local development project
 │   │   ├── staging-project.yaml   # Staging environment project
 │   │   └── production-project.yaml # Production environment project
 │   ├── rbac/                      # RBAC policies and configurations
 │   └── webhooks/                  # GitHub webhook configurations
-├── k8s/
-│   └── argocd/                    # ArgoCD server deployment
 └── README.md
 ```
 
@@ -72,7 +74,7 @@ solidity-security-aws-infrastructure/
 - **Sync Policies**: Automated sync and self-healing configuration
 
 ### Technical Requirements
-- Environment-specific Application manifests (staging/production)
+- Environment-specific Application manifests (local/staging/production)
 - Repository path configuration for service-specific deployments
 - Sync policies with appropriate pruning and self-healing
 - Health checks and sync wave configuration for proper ordering
@@ -137,10 +139,11 @@ solidity-security-aws-infrastructure/
 ## Implementation Priority
 
 ### Phase 1: Application Manifests (3 hours)
-1. Create ArgoCD Applications for all 6 backend services plus contract parser with appropriate configurations
-2. Build frontend service Applications with React-specific deployment settings
-3. Configure infrastructure Applications for monitoring and secret management
-4. Set up environment-specific Application configurations
+1. Create ArgoCD Applications for local development environment first
+2. Create ArgoCD Applications for all 6 backend services plus contract parser with appropriate configurations
+3. Build frontend service Applications with React-specific deployment settings
+4. Configure infrastructure Applications for monitoring and secret management
+5. Set up environment-specific Application configurations
 
 ### Phase 2: Projects and RBAC (2 hours)
 1. Configure AppProjects with team and environment-based organization
@@ -166,20 +169,42 @@ solidity-security-aws-infrastructure/
 **Priority**: P0 (Critical)
 
 ## Task Checklist
-- [ ] Task 1.12 started
-- [ ] ArgoCD Application manifests created for all 6 backend services plus contract parser
-- [ ] ArgoCD Application manifests created for all 4 frontend services
-- [ ] Infrastructure applications configured (monitoring, secrets)
-- [ ] Environment-specific configurations separated and validated
-- [ ] Repository connections and sync policies configured
-- [ ] AppProjects configured with team and environment organization
-- [ ] RBAC policies implemented for team access control
-- [ ] Application of Apps pattern implemented for service management
-- [ ] Team permissions configured with appropriate service access
-- [ ] Automated sync policies configured with self-healing
-- [ ] GitHub webhook integration set up for all repositories
-- [ ] Continuous deployment tested and functional
-- [ ] Rollback capabilities validated and operational
-- [ ] Deployment history and audit logging configured
-- [ ] ArgoCD UI showing healthy status for all applications
-- [ ] Task 1.12 completed with full GitOps workflow operational
+
+### Local Development Environment
+- [ ] Local ArgoCD Application manifests created for development services
+- [ ] Local GitOps workflow configured for minikube deployments
+- [ ] Development Application of Apps pattern for local service management
+- [ ] Local RBAC policies configured for development access
+- [ ] Local repository connections configured for development workflows
+- [ ] Development sync policies configured for rapid iteration
+- [ ] Local service deployment validation via ArgoCD
+
+### Staging Environment
+- [ ] Staging ArgoCD Application manifests created for all backend services
+- [ ] Staging ArgoCD Application manifests created for all frontend services
+- [ ] Staging infrastructure applications configured (monitoring, secrets)
+- [ ] Staging AppProjects configured with team and environment organization
+- [ ] Staging RBAC policies implemented for team access control
+- [ ] Staging Application of Apps pattern implemented for service management
+- [ ] Staging repository connections and sync policies configured
+- [ ] Staging automated sync policies configured with appropriate self-healing
+- [ ] GitHub webhook integration set up for staging repositories
+- [ ] Staging continuous deployment tested and functional
+- [ ] Staging rollback capabilities validated and operational
+
+### Production Environment
+- [ ] Production ArgoCD Application manifests created for all 6 backend services plus contract parser
+- [ ] Production ArgoCD Application manifests created for all 4 frontend services
+- [ ] Production infrastructure applications configured (monitoring, secrets)
+- [ ] Production environment-specific configurations separated and validated
+- [ ] Production repository connections and sync policies configured
+- [ ] Production AppProjects configured with strict team and environment organization
+- [ ] Production RBAC policies implemented for secure team access control
+- [ ] Production Application of Apps pattern implemented for centralized service management
+- [ ] Production team permissions configured with appropriate service access
+- [ ] Production automated sync policies configured with conservative self-healing
+- [ ] Production GitHub webhook integration set up for all repositories
+- [ ] Production continuous deployment tested and functional
+- [ ] Production rollback capabilities validated and operational
+- [ ] Production deployment history and audit logging configured
+- [ ] Production ArgoCD UI showing healthy status for all applications
