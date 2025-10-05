@@ -312,13 +312,15 @@ Default resource constraints:
 ## Cross-Cutting Concerns
 
 ### Secrets Management
-**Production systems should NOT store secrets in Git.**
+**MANDATORY: All secrets MUST be stored in Vault and pulled via External Secrets Operator.**
+**Production systems should NEVER store secrets in Git.**
 
-Options for production:
-- External Secrets Operator (Vault Community, Vault, GCP Secret Manager)
-- Vault with Kubernetes auth
-- SOPS (encrypted files in Git)
-- CSI Secret Driver
+Standardized approach for all environments:
+- **Vault Community Edition**: Secret storage backend
+- **External Secrets Operator**: Secret synchronization to Kubernetes
+- **SecretStore/ClusterSecretStore**: Per-namespace vault backend configuration
+- **ExternalSecret**: Per-service secret retrieval manifests
+- **Vault Policies**: Service-specific access control
 
 Template structure includes:
 ```
@@ -506,7 +508,9 @@ spec:
 
 **DO NOT:**
 - Share namespaces between services in production
-- Store plaintext secrets in Git
+- Store ANY secrets in Git (hardcoded passwords, API keys, certificates)
+- Create Kubernetes Secret resources directly (use ExternalSecret only)
+- Bypass Vault for secret storage (all secrets must go through Vault)
 - Run production without PodDisruptionBudgets
 - Skip backup strategies for stateful services
 - Use `latest` image tags
