@@ -221,8 +221,8 @@ This S3 backend deployment is **Step 0** in the corrected AWS resource deploymen
 
 ### Local Development Environment
 - [ ] minikube cluster networking verified and operational
-- [ ] Docker bridge network configuration validated for container communication
-- [ ] Local Docker registry network access configured
+- [ ] Harbor registry network configuration validated for container communication
+- [ ] Local Harbor registry access configured and tested
 - [ ] minikube ingress controller enabled and configured
 - [ ] Local service discovery and DNS resolution tested
 - [ ] Port forwarding configuration validated for service access
