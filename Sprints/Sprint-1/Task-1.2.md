@@ -222,73 +222,84 @@ This S3 backend deployment is **Step 0** in the corrected AWS resource deploymen
 ### Local Development Environment - Kubernetes Infrastructure ✅ COMPLETED
 **Updated Structure**: All local overlays now follow the standardized kustomize structure template.
 
-#### Core Infrastructure Services ✅ IMPLEMENTED
+#### Core Infrastructure Services ✅ DEPLOYED
 - [x] **Vault Community Edition**: Secret management with External Secrets integration
   - Location: `k8s/overlays/local/vault/` (namespace: `vault-local`)
-  - Features: Kubernetes auth, Redis integration, per-service policies
+  - Features: Dev mode, token auth, single replica (no HA)
+  - Status: Running (1/1)
 - [x] **External Secrets Operator**: Vault-backed secret management
   - Location: `k8s/overlays/local/external-secrets/` (namespace: `external-secrets-local`)
-  - Features: ClusterSecretStore, automatic secret synchronization
+  - Features: Token-based Vault auth, SecretStore per namespace, leader election disabled
+  - Status: Deployed (webhook cert bootstrapped)
 - [x] **Cert-Manager**: Self-signed certificate management for local TLS
   - Location: `k8s/overlays/local/cert-manager/` (namespace: `cert-manager-local`)
-  - Features: Local CA issuer, automatic certificate provisioning
+  - Features: Local CA issuer, ClusterIssuers, leader election disabled
+  - Status: Running (cainjector 1/1)
 - [x] **NGINX Ingress Controller**: Local ingress and TLS termination
   - Location: `k8s/overlays/local/nginx-ingress-controller/` (namespace: `nginx-ingress-local`)
-  - Features: Resource-optimized for minikube, NodePort configuration
+  - Features: Resource-optimized for minikube, single replica
+  - Status: Running (1/1)
 - [x] **Metrics Server**: Local cluster metrics and HPA support
   - Location: `k8s/overlays/local/metrics-server/` (namespace: `metrics-server-local`)
   - Features: Lightweight configuration for minikube
+  - Status: Deployed
 - [x] **Network Policies**: Pod-to-pod communication security
   - Location: `k8s/overlays/local/network-policies/`
   - Features: Default deny, service-specific allow rules
+  - Status: Applied
 
-#### Application Services ✅ IMPLEMENTED
+#### Application Services ✅ DEPLOYED
 - [x] **Redis Cache**: Memory store with Vault integration
   - Location: `k8s/overlays/local/redis/` (namespace: `redis-local`)
-  - Features: External secrets, TLS ingress, service monitoring
-- [x] **PostgreSQL Database**: Primary database with backup strategies
+  - Features: External secrets from Vault, single replica (no HA)
+  - Status: Deployed
+- [x] **PostgreSQL Database**: Primary database with StatefulSet
   - Location: `k8s/overlays/local/postgresql/` (namespace: `postgresql-local`)
-  - Features: StatefulSet, persistent storage, TLS ingress
+  - Features: StatefulSet, persistent storage (5Gi), External secrets from Vault
+  - Status: Running (1/1)
 - [x] **Harbor Registry**: Container image registry with PostgreSQL backend
   - Location: `k8s/overlays/local/harbor/` (namespace: `harbor-local`)
-  - Features: Redis cache integration, web UI, TLS certificates
+  - Features: Redis cache integration, web UI, single replica components
+  - Status: Deployed (initializing)
 - [x] **ArgoCD**: GitOps continuous deployment
   - Location: `k8s/overlays/local/argocd/` (namespace: `argocd-local`)
-  - Features: RBAC configuration, server deployment patches
+  - Features: RBAC configuration, single replica deployments
+  - Status: Deployed (initializing)
 
 #### Structure Compliance ✅ VERIFIED
 - [x] **Per-service namespaces**: `<service>-local` pattern implementation
 - [x] **Template compliance**: Following `kubernetes-kustomize-structure-template.md`
-- [x] **Security integration**: External secrets with vault policies
-- [x] **Resource optimization**: 25-40% of production resources for minikube
-- [x] **TLS automation**: Cert-manager integration across all services
-- [x] **Umbrella kustomization**: Main local overlay coordinates all services
+- [x] **Security integration**: External secrets with Vault token auth
+- [x] **Resource optimization**: Single replica deployments, reduced resources for minikube
+- [x] **TLS automation**: Cert-manager ClusterIssuers and Certificates configured
+- [x] **Umbrella kustomization**: Main local overlay at `k8s/overlays/local/kustomization.yaml`
+- [x] **No HA overhead**: Leader election disabled, single replicas, simple deployments
 
 #### Security Features ✅ IMPLEMENTED
 - [x] **Vault-backed secrets**: No secrets stored in Git, all via External Secrets
-- [x] **Network isolation**: Per-service namespaces with network policies
-- [x] **TLS everywhere**: Automatic HTTPS for all ingress services
-- [x] **RBAC integration**: Service accounts with vault kubernetes auth
+- [x] **Network isolation**: Per-service namespaces with network policies (default deny)
+- [x] **TLS automation**: Certificate resources for Harbor, PostgreSQL, Redis
+- [x] **RBAC integration**: Service accounts with proper ClusterRoles/RoleBindings
 - [x] **Non-root containers**: Security contexts with dropped capabilities
 
-#### Vault Secret Management ✅ IMPLEMENTED
+#### Vault Secret Management ✅ CONFIGURED
 - [x] **Redis secrets**: `secret/data/redis` → ExternalSecret in `redis-local` namespace
-- [x] **Harbor Redis integration**: `secret/data/redis` → ExternalSecret in `harbor-local` namespace
-- [x] **ArgoCD Redis secrets**: `secret/data/argocd` → ExternalSecret in `argocd-local` namespace
-- [x] **Vault policies**: Per-service authentication and authorization roles
+- [x] **PostgreSQL secrets**: `secret/data/postgresql` → ExternalSecret in `postgresql-local` namespace
+- [x] **Harbor secrets**: `secret/data/harbor` + Redis → ExternalSecrets in `harbor-local` namespace
+- [x] **ArgoCD secrets**: `secret/data/argocd` → ExternalSecret in `argocd-local` namespace
+- [x] **Token auth**: Using vault-token secrets with `local-dev-token` for local development
 - [x] **SecretStore configuration**: Per-namespace SecretStore resources with Vault backend
-- [x] **Automatic sync**: 15-second refresh interval for secret synchronization
-- [x] **Secure storage**: All passwords generated and stored in Vault, no hardcoded values
+- [x] **Vault initialization**: All service secrets pre-populated in Vault KV store
 
 ### LEGACY CHECKLIST (Pre-Structure Update)
-- [x] minikube cluster networking verified and operational
-- [x] Harbor registry network configuration validated for container communication
-- [x] Local Harbor registry access configured and tested
-- [x] minikube ingress controller enabled and configured
-- [x] Local service discovery and DNS resolution tested
-- [x] Port forwarding configuration validated for service access
-- [x] Local network policies tested for pod-to-pod communication
-- [x] Development environment network isolation verified
+- [ ] minikube cluster networking verified and operational
+- [ ] Harbor registry network configuration validated for container communication
+- [ ] Local Harbor registry access configured and tested
+- [ ] minikube ingress controller enabled and configured
+- [ ] Local service discovery and DNS resolution tested
+- [ ] Port forwarding configuration validated for service access
+- [ ] Local network policies tested for pod-to-pod communication
+- [ ] Development environment network isolation verified
 
 ### Staging Environment
 - [ ] S3 bucket created for Terraform state storage (staging)
