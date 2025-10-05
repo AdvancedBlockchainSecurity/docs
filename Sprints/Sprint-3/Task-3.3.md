@@ -30,6 +30,11 @@ Database: PostgreSQL integration for user preferences
 - **Scalability**: Horizontal scaling across multiple instances
 - **Memory Efficiency**: Optimized memory usage with connection pooling
 
+### Security Requirements
+- **Secret Management**: ALL secrets (JWT_SECRET, Redis passwords, etc.) MUST be stored in Vault and pulled via External Secrets Operator
+- **No Hardcoded Secrets**: Environment variables loaded from Kubernetes secrets managed by ExternalSecret resources
+- **Vault Integration**: Service account authentication with Vault policies for secret access
+
 ## Real-Time Architecture Design
 
 ### WebSocket Event System
