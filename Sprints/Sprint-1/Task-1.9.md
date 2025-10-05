@@ -149,13 +149,20 @@ solidity-security-shared/
 ### Integration Strategy
 - **Docker-First Approach**: Containerized development and production deployment
 - **Multi-Stage Docker Builds**: Optimized images with PyO3 wheel integration
-- **Container Registry**: Local and production package distribution via containers
+- **Harbor Registry**: Self-hosted container registry for local and production package distribution
 - **Cross-Language Validation**: Docker-based testing framework ensuring consistency
+
+### Harbor Registry Implementation Details
+- **Self-Hosted Registry**: Harbor provides enterprise-grade container registry with RBAC and vulnerability scanning
+- **Resource Requirements**: ~4GB RAM for Harbor deployment, significantly lower cost than managed cloud registries
+- **Multi-Tenancy**: Project-based organization with role-based access control
+- **Vulnerability Scanning**: Built-in Trivy integration for container security scanning
+- **Cost Benefits**: Zero ongoing registry costs vs ECR's storage and transfer fees
 
 ### Docker Implementation Details
 - **Python Services**: Multi-stage builds with pre-built PyO3 wheels (13KB optimized)
 - **TypeScript Applications**: WASM-enabled packages with JavaScript fallbacks
-- **Production Deployment**: Container-based deployment to AWS EKS
+- **Production Deployment**: Container-based deployment to AWS EKS with Harbor registry
 - **Performance**: 6-15x speedup with native Rust acceleration in containers
 
 ## Step 3: CI/CD Pipeline Foundation (30 minutes)
@@ -237,7 +244,7 @@ solidity-security-shared/
 
 ### Local Development Environment
 - [ ] Local development environment setup for shared library development
-- [ ] Local Docker registry configuration for container image testing
+- [ ] Local Harbor registry configuration for container image testing
 - [ ] Local build and test workflows for multi-language shared library
 - [ ] Local Rust development environment with PyO3 and WASM tools
 - [ ] Local Python development environment with PyO3 integration testing
@@ -270,4 +277,4 @@ solidity-security-shared/
 - [ ] Build and test automation operational for all production language stacks
 - [ ] Linting and code quality checks implemented for production standards
 - [ ] CI/CD functionality validated across all production repository types
-- [ ] Production package distribution and container registry integration configured
+- [ ] Production package distribution and Harbor registry integration configured

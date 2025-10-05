@@ -78,7 +78,7 @@ This S3 backend deployment is **Step 0** in the corrected AWS resource deploymen
 **Phase 1 (Sprints 1-5)**: Minimal staging configuration
 - **Single AZ deployment** (reduce NAT gateway costs from ~$45/month to ~$22/month)
 - **Smaller subnet allocation** (efficient IP usage)
-- **Essential VPC endpoints only** (S3, ECR for EKS)
+- **Essential VPC endpoints only** (S3, Harbor Registry for EKS)
 - **Basic security groups** (expanded in Phase 2)
 - **Target Cost**: ~$30-50/month for networking portion
 
@@ -145,12 +145,13 @@ This S3 backend deployment is **Step 0** in the corrected AWS resource deploymen
 
 ### Core Dependencies
 - **NAT Gateways**: High-availability NAT gateway deployment
-- **VPC Endpoints**: S3, ECR, Vault Community endpoints
+- **VPC Endpoints**: S3, Harbor Registry, Vault Community endpoints
 - **Network Monitoring**: VPC Flow Logs and Prometheus integration
 
 ### Integration Requirements
 - Single NAT gateway deployment for MVP cost efficiency
-- VPC endpoints for AWS service access without internet routing
+- VPC endpoints for AWS service access and Harbor registry routing without internet egress
+- Harbor registry integration with Kubernetes via service mesh and ingress controllers
 - Network monitoring for security and performance analysis
 
 ## Success Criteria & Validation
@@ -177,7 +178,7 @@ This S3 backend deployment is **Step 0** in the corrected AWS resource deploymen
 
 ### High Availability Requirements
 - [ ] NAT gateway deployed in single AZ for MVP
-- [ ] VPC endpoints operational for S3, ECR, Vault Community
+- [ ] VPC endpoints operational for S3, Harbor Registry, Vault Community
 - [ ] Network monitoring enabled with VPC Flow Logs
 - [ ] Single-AZ network communication tested and validated
 
