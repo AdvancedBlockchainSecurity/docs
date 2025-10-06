@@ -2,6 +2,10 @@
 
 Use this template to generate a production-ready Terraform folder structure for AWS with staging and production environments.
 
+## Standards Reference
+- **Dependency Versions**: Always use the latest stable versions of all dependencies, libraries, and tools (Terraform providers, modules, etc.)
+- **Secret Management**: All secrets must be stored in HashiCorp Vault. Use Terraform Vault provider to retrieve secrets, never commit secrets to Git repositories.
+
 ---
 
 ## Standard Folder Structure
