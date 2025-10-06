@@ -6,7 +6,7 @@
 
 **Development Strategy**: 18 sprints across 36 weeks, organized in 3 phases, with cloud-native development from day one using production-ready AWS infrastructure and GitOps deployment workflows.
 
-**Technical Approach**: Multi-tool integration (Slither, Aderyn, Solidity-Metrics, MythX, Certora, Echidna) with intelligent deduplication, rule-based analysis, and enterprise workflow integration across 18 specialized repositories.
+**Technical Approach**: Multi-tool integration (Slither, Aderyn, Solidity-Metrics, Mythril, Certora, Echidna) with intelligent deduplication, rule-based analysis, and enterprise workflow integration across 18 specialized repositories.
 
 ## System Architecture Overview
 
@@ -294,11 +294,11 @@ Support & Documentation (3):
 - Integration with Foundry and Hardhat project structures
 - Performance optimization for large smart contract codebases
 
-**MythX Integration** (Added in Sprint 6):
+**Mythril Integration** (Added in Sprint 6):
 - REST API with async job polling and WebSocket support for real-time updates
 - Analysis mode selection (quick/standard/deep) with cost optimization
 - API key rotation and failover via HashiCorp Vault with automatic credential management
-- Support for all MythX analysis types (static, dynamic, symbolic)
+- Support for all Mythril analysis types (static, dynamic, symbolic)
 - Rate limiting and quota management with respect for API limits
 - Result correlation with other tool findings for enhanced accuracy
 - Integration with CI/CD pipelines for automated scanning
@@ -468,18 +468,18 @@ Support & Documentation (3):
 - All frontend services deployed via ArgoCD from argocd-staging and argocd-production namespaces with proper CDN integration
 - Responsive design working seamlessly on desktop, tablet, and mobile devices
 
-#### Sprint 6: MythX Integration & Platform Completion (Weeks 11-12)
+#### Sprint 6: Mythril Integration & Platform Completion (Weeks 11-12)
 **Technical Milestone**: Enterprise tool integration with comprehensive multi-tool analysis
 
-**MythX Integration Development**:
-- Implement comprehensive MythX adapter with REST API integration and error handling
+**Mythril Integration Development**:
+- Implement comprehensive Mythril adapter with REST API integration and error handling
 - Configure async job polling with configurable timeouts and retry logic
 - Implement API key rotation and failover logic for high availability
-- Add MythX analysis modes (quick/standard/deep) selection with cost optimization
-- Create MythX-specific rate limiting and quota management with monitoring
-- Implement comprehensive MythX result parsing and normalization to standard schema
-- Configure MythX authentication and credential management via HashiCorp Vault Community Edition
-- Deploy enhanced Tool Integration service with MythX support and monitoring
+- Add Mythril analysis modes (quick/standard/deep) selection with cost optimization
+- Create Mythril-specific rate limiting and quota management with monitoring
+- Implement comprehensive Mythril result parsing and normalization to standard schema
+- Configure Mythril authentication and credential management via HashiCorp Vault Community Edition
+- Deploy enhanced Tool Integration service with Mythril support and monitoring
 
 **Multi-Tool Orchestration Enhancement**:
 - Enhance orchestration service for 4-tool parallel execution with load balancing
@@ -499,20 +499,20 @@ Support & Documentation (3):
 **Frontend Integration for Multi-Tool Analysis**:
 - Update dashboard to display comprehensive results from all 4 tools
 - Implement detailed tool comparison view in frontend with interactive charts
-- Add MythX-specific analysis mode selection with cost estimates
+- Add Mythril-specific analysis mode selection with cost estimates
 - Create comprehensive tool performance metrics display
 - Implement cost tracking and quota monitoring with alerts and budgeting
 
 **Platform Integration & Testing**:
-- Test 4-tool parallel execution (Slither, Aderyn, Solidity-Metrics, MythX) under load
-- Validate MythX API integration and async polling with error scenarios
+- Test 4-tool parallel execution (Slither, Aderyn, Solidity-Metrics, Mythril) under load
+- Validate Mythril API integration and async polling with error scenarios
 - Test tool failure isolation and recovery with comprehensive scenarios
 - Configure comprehensive multi-tool result aggregation with accuracy validation
-- Validate frontend integration with MythX results and cost tracking
+- Validate frontend integration with Mythril results and cost tracking
 - Conduct end-to-end platform testing with realistic enterprise workloads
 
 **Acceptance Criteria**:
-- MythX integration working reliably with all analysis modes and proper cost optimization
+- Mythril integration working reliably with all analysis modes and proper cost optimization
 - 4-tool parallel execution completing successfully with proper resource management
 - Tool failures don't block other tool execution with proper isolation
 - API quotas respect rate limits without errors and provide cost visibility
@@ -1149,7 +1149,7 @@ Support & Documentation (3):
 | Repository | Sprint Integration | Key Dependencies | Technical Stack |
 |------------|-------------------|------------------|-----------------|
 | `solidity-security-api-service` | Sprint 3 | Authentication, RBAC, JWT | FastAPI, OAuth 2.0, PostgreSQL |
-| `solidity-security-tool-integration` | Sprint 4, 6, 13 | Slither, Aderyn, MythX, Certora | Python, Rust, Node.js |
+| `solidity-security-tool-integration` | Sprint 4, 6, 13 | Slither, Aderyn, Mythril, Certora | Python, Rust, Node.js |
 | `solidity-security-intelligence-engine` | Sprint 4, 7, 11 | ML models, deduplication | Python, ML libraries, Redis |
 | `solidity-security-orchestration` | Sprint 4 | Celery, job queues, Redis | Python, Celery, Redis |
 | `solidity-security-data-service` | Sprint 3 | PostgreSQL, caching | SQLAlchemy, Redis, Kubernetes |

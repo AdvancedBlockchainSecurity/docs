@@ -284,18 +284,18 @@
 - All frontend services deployed via ArgoCD
 - Responsive design working on desktop and mobile
 
-#### Sprint 6: MythX Integration & Platform Completion (Weeks 11-12)
+#### Sprint 6: Mythril Integration & Platform Completion (Weeks 11-12)
 **Technical Milestone**: Enterprise tool integration with comprehensive multi-tool analysis
 
-**MythX Integration Development**:
-- Implement MythX adapter with REST API integration
+**Mythril Integration Development**:
+- Implement Mythril adapter with REST API integration
 - Configure async job polling with configurable timeouts
 - Implement API key rotation and failover logic
-- Add MythX analysis modes (quick/standard/deep) selection
-- Create MythX-specific rate limiting and quota management
-- Implement MythX result parsing and normalization
-- Configure MythX authentication and credential management via HashiCorp Vault Community Edition
-- Deploy enhanced Tool Integration service with MythX support
+- Add Mythril analysis modes (quick/standard/deep) selection
+- Create Mythril-specific rate limiting and quota management
+- Implement Mythril result parsing and normalization
+- Configure Mythril authentication and credential management via HashiCorp Vault Community Edition
+- Deploy enhanced Tool Integration service with Mythril support
 
 **Multi-Tool Orchestration Enhancement**:
 - Enhance orchestration service for 4-tool parallel execution
@@ -315,20 +315,20 @@
 **Frontend Integration for Multi-Tool Analysis**:
 - Update dashboard to display results from all 4 tools
 - Implement tool comparison view in frontend
-- Add MythX-specific analysis mode selection
+- Add Mythril-specific analysis mode selection
 - Create tool performance metrics display
 - Implement cost tracking and quota monitoring
 
 **Platform Integration & Testing**:
-- Test 4-tool parallel execution (Slither, Aderyn, Solidity-Metrics, MythX)
-- Validate MythX API integration and async polling
+- Test 4-tool parallel execution (Slither, Aderyn, Solidity-Metrics, Mythril)
+- Validate Mythril API integration and async polling
 - Test tool failure isolation and recovery
 - Configure comprehensive multi-tool result aggregation
-- Validate frontend integration with MythX results
+- Validate frontend integration with Mythril results
 - Conduct end-to-end platform testing
 
 **Acceptance Criteria**:
-- MythX integration working with all analysis modes
+- Mythril integration working with all analysis modes
 - 4-tool parallel execution completing successfully
 - Tool failures don't block other tool execution
 - API quotas respect rate limits without errors

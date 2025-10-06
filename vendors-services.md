@@ -30,10 +30,11 @@
 
 | Vendor | Service/Tool | Purpose | Monthly Cost | Replace |
 |--------|--------------|---------|--------------|---------|
-| Trail of Bits | Slither | Static analysis for Solidity | n/a |  |
-| Cyfrin | Aderyn | Rust-based static analysis tool | n/a |  |
-| ConsenSys | MythX | Commercial security analysis platform | $200-500/month |  |
-| Open Source | Solidity-Metrics | Code complexity and metrics analysis | n/a |  |
+| Trail of Bits | Slither | Static analysis for Solidity | n/a | Open Source |
+| Cyfrin | Aderyn | Rust-based static analysis tool | n/a | Open Source |
+| ConsenSys | Mythril | Symbolic execution & taint analysis | n/a | Open Source |
+| Semgrep | Semgrep | Pattern-based security scanning | n/a | Open Source |
+| Open Source | Solidity-Metrics | Code complexity and metrics analysis | n/a | Open Source |
 | Certora | Certora Prover | Formal verification platform | $500-2000/month |  |
 | Trail of Bits | Echidna | Fuzzing framework | n/a |  |
 | Trail of Bits | Manticore | Symbolic execution engine | n/a |  |
@@ -222,14 +223,12 @@
 
 ### Development Environment (Months 1-3)
 - **AWS Infrastructure**: ~$330/month (Vault Community now self-hosted)
-- **MythX API**: ~$200/month
 - **GitHub (Dev Licenses)**: ~$8/month
 - **Domain**: ~$20/year
 - **Total Development**: ~$538/month
 
 ### Production Environment (Month 4+)
 - **AWS Infrastructure**: ~$1,250/month (Vault Community now self-hosted)
-- **MythX API**: ~$500/month
 - **GitHub (Dev Licenses)**: ~$8/month
 - **Documentation Platform**: ~$15/month (optional)
 - **Total Production**: ~$1,773/month

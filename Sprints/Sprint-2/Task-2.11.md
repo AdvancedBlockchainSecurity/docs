@@ -38,7 +38,7 @@ Service Communication Patterns:
 ├── External Dependencies:
 │   ├── All Services → PostgreSQL (TCP + TLS)
 │   ├── All Services → Redis (TCP + TLS)
-│   ├── Tool Integration → MythX API (HTTPS)
+│   ├── Tool Integration → Mythril API (HTTPS)
 │   ├── Notification → SMTP/Slack/Teams (HTTPS)
 │   └── All Services → HashiCorp Vault (HTTPS + TLS)
 └── Monitoring Communication:
@@ -185,7 +185,7 @@ Service Communication Patterns:
        ports:
        - protocol: TCP
          port: 8003
-     # External tool APIs (MythX, GitHub)
+     # External tool APIs (Mythril, GitHub)
      - to: {}
        ports:
        - protocol: TCP

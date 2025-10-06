@@ -35,7 +35,7 @@ The Web3 security market has a critical gap: **no platform aggregates third-part
 
 **Development Infrastructure**
 - Tenderly: Full-stack platform with monitoring as integrated component
-- MythX: Orchestrates only its own three internal engines (Mythril, Harvey,マル)
+- Mythril: Orchestrates only its own three internal engines (Mythril, Harvey,マル)
 
 ### 4. The Critical Gap: True Security Orchestration
 

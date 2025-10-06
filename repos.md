@@ -306,8 +306,8 @@ solidity-security-api-service/
 ### 2. **`solidity-security-tool-integration`** (~12K LOC)
 **Security tool adapters and integrations - Hybrid Python/Rust**
 ```
-Purpose: Slither, Aderyn, MythX, Solidity-Metrics adapters
-Tech Stack: Python 3.11 + Rust core, asyncio, aiohttp, subprocess, Rust wrappers (for Slither, Aderyn), Node.js wrappers (for MythX, Solidity-Metrics)
+Purpose: Slither, Aderyn, Mythril, Semgrep, Solidity-Metrics adapters
+Tech Stack: Python 3.11 + Rust core, asyncio, aiohttp, subprocess, Rust wrappers (for Slither, Aderyn), Python wrappers (for Mythril, Semgrep), Node.js wrappers (for Solidity-Metrics)
 Rust Components: High-performance tool execution, parallel processing, native Aderyn integration
 Python Components: FastAPI service layer, external integrations, configuration management
 Contains: Tool adapters, result normalizers, rate limiting, plugin architecture, unified tool interface
@@ -332,12 +332,17 @@ solidity-security-tool-integration/
 │   │   │   ├── rust_wrapper.py    # Rust process management
 │   │   │   ├── config.py          # Aderyn configuration
 │   │   │   └── normalizer.py      # Result normalization
-│   │   ├── mythx/
+│   │   ├── mythril/
 │   │   │   ├── __init__.py
-│   │   │   ├── adapter.py         # MythX API adapter
-│   │   │   ├── async_client.py    # Async HTTP client
-│   │   │   ├── rate_limiter.py    # API rate limiting
-│   │   │   ├── config.py          # MythX configuration
+│   │   │   ├── adapter.py         # Mythril CLI adapter
+│   │   │   ├── process_wrapper.py # Subprocess management
+│   │   │   ├── config.py          # Mythril configuration
+│   │   │   └── normalizer.py      # Result normalization
+│   │   ├── semgrep/
+│   │   │   ├── __init__.py
+│   │   │   ├── adapter.py         # Semgrep adapter
+│   │   │   ├── rules_manager.py   # Custom rules management
+│   │   │   ├── config.py          # Semgrep configuration
 │   │   │   └── normalizer.py      # Result normalization
 │   │   ├── solidity_metrics/
 │   │   │   ├── __init__.py
