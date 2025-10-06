@@ -81,7 +81,7 @@ solidity-security-aws-infrastructure/
 
 ### Backend Services (7 services)
 - `api-service` (JWT secrets, OAuth credentials, database credentials)
-- `tool-integration` (MythX API keys, tool credentials, third-party APIs)
+- `tool-integration` (Mythril API keys, tool credentials, third-party APIs)
 - `data-service` (Database URLs, Redis credentials, encryption keys)
 - `orchestration` (Celery broker, worker credentials, queue credentials)
 - `intelligence-engine` (Algorithm configs, rule weights, pattern configs)
