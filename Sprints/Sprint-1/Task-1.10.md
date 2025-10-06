@@ -25,6 +25,7 @@ Create comprehensive Kubernetes templates for all backend microservices with sec
 - **Monitoring**: Health checks, metrics, and autoscaling configurations
 
 ## Standards Reference
+- **Dependency Versions**: Always use the latest stable versions of all dependencies, libraries, and tools
 - **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 - **Clean Architecture + DDD Implementation**: Follow the standardized structure defined in `/Users/pwner/Git/ABS/docs/architecture/clean-architecture-decision.md`
 - **Secret Management**: All Kubernetes secrets must be stored in HashiCorp Vault and synchronized to clusters using External Secrets Operator. No secrets should be committed to Git repositories.
@@ -149,9 +150,68 @@ Create comprehensive Kubernetes templates for all backend microservices with sec
 
 ---
 
-**Estimated Time**: 8 hours
+**Estimated Time**: 8 hours total (2 hours Phase 1, 6 hours Phase 2-3)
 **Owner**: DevOps/Backend Team
 **Priority**: P0 (Critical)
+
+## Implementation Approach: Phased Deployment Strategy
+
+### Phase 1: Local Environment Templates (Current Focus - 2 hours)
+**Immediate Deliverable**: Complete K8s templates for all 7 services in local development environment
+
+**Rationale**:
+- Immediate value with deployable templates to running minikube cluster
+- Validation of patterns before scaling to staging/production
+- Manageable scope (~70 files vs 200+ for all environments)
+- Iterative approach allows fixing issues in local before propagation
+- Establishes proven patterns for subsequent environments
+
+**Scope**:
+- Base templates for all 7 services (deployment.yaml, service.yaml, configmap.yaml)
+- Local overlays (namespace, patches, externalsecret configs)
+- Health checks and resource limits for local environment
+- External Secrets integration with local Vault instance
+- ~7-10 files per service = ~70 files total
+
+**Services Included**:
+1. api-service (FastAPI gateway)
+2. tool-integration (Multi-container Python/Rust/Node.js)
+3. intelligence-engine (Python/Rust hybrid ML)
+4. orchestration (Celery workers)
+5. data-service (Python/Rust database ops)
+6. notification (Node.js WebSocket)
+7. contract-parser (Pure Rust HTTP API)
+
+### Phase 2: Staging Environment Templates (Future - 3 hours)
+**Deliverable**: Staging overlays with increased resources and basic HA
+
+**Approach**: Automated replication using Agent tool or manual extension based on Phase 1 patterns
+
+**Additions**:
+- Staging-specific resource limits (50-70% of production)
+- Staging IRSA configurations for AWS integration
+- Staging ingress with shared load balancer
+- Staging network policies
+
+### Phase 3: Production Environment Templates (Future - 3 hours)
+**Deliverable**: Production-ready templates with full HA, monitoring, and security
+
+**Additions**:
+- Production resource limits and HPA configurations
+- Production IRSA with least-privilege IAM roles
+- Production ingress with ALB and SSL termination
+- Production PodDisruptionBudgets and anti-affinity rules
+- Production monitoring and alerting configurations
+- Production backup and disaster recovery configs
+
+**Benefits of Phased Approach**:
+1. **Faster Time to Value**: Working local deployments immediately
+2. **Risk Mitigation**: Test and validate in local before production
+3. **Resource Efficiency**: Focus effort where it provides immediate benefit
+4. **Pattern Establishment**: Proven templates inform future environments
+5. **Iterative Improvement**: Learn from local deployment experiences
+
+---
 
 ## Task Checklist
 
