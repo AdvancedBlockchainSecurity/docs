@@ -19,6 +19,7 @@ Create comprehensive documentation and training materials to enable team product
 
 ## Standards Reference
 - **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
+- **Secret Management**: All Kubernetes secrets must be stored in HashiCorp Vault and synchronized to clusters using External Secrets Operator. No secrets should be committed to Git repositories.
 
 ## Directory Structure Requirements
 

@@ -27,6 +27,7 @@ Create comprehensive Kubernetes templates for all backend microservices with sec
 ## Standards Reference
 - **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 - **Clean Architecture + DDD Implementation**: Follow the standardized structure defined in `/Users/pwner/Git/ABS/docs/architecture/clean-architecture-decision.md`
+- **Secret Management**: All Kubernetes secrets must be stored in HashiCorp Vault and synchronized to clusters using External Secrets Operator. No secrets should be committed to Git repositories.
 
 ## Service Categories & Dependencies
 

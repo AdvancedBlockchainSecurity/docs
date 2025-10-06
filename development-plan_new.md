@@ -1178,6 +1178,19 @@ Support & Documentation (3):
 | `solidity-security-tools` | Sprint 1 | Tool installation, config | Shell scripts, Docker |
 | `solidity-security-vulnerabilities` | Sprint 7, 11 | Vulnerability database | PostgreSQL, signatures |
 
+## Platform Standards & Best Practices
+
+### Secret Management Standard
+All Kubernetes secrets across all environments (local, staging, production) must follow these requirements:
+- **Storage**: All secrets stored in HashiCorp Vault Community Edition (local: vault-local, staging: vault-staging, production: vault-production namespaces)
+- **Synchronization**: Secrets synchronized to Kubernetes using External Secrets Operator (external-secrets-local, external-secrets-staging, external-secrets-production namespaces)
+- **Git Security**: No secrets committed to Git repositories under any circumstances
+- **Access Control**: Vault RBAC policies configured for least-privilege access per service
+- **Namespace Isolation**: Per-namespace SecretStores for secure secret distribution
+- **Audit Trail**: All secret access logged and monitored through Vault audit logs
+
+Reference implementation completed in Task 1.2 (Local Development Environment).
+
 ## Quality Gates & Success Criteria
 
 ### Sprint Completion Requirements
