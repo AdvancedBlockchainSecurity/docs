@@ -139,6 +139,38 @@ helm install postgresql bitnami/postgresql \
   --namespace default
 ```
 
+#### Configure API Service Database
+
+After PostgreSQL is installed, create a dedicated database and user for the API service:
+
+```bash
+# Get the PostgreSQL pod name
+POD_NAME=$(kubectl get pods -n postgresql-local -l app.kubernetes.io/name=postgresql -o jsonpath='{.items[0].metadata.name}')
+
+# Connect to PostgreSQL and create database
+kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "CREATE DATABASE solidity_security;"
+
+# Create dedicated user for API service
+kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "CREATE USER solidity WITH PASSWORD 'solidity-local-password';"
+
+# Grant privileges
+kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "GRANT ALL PRIVILEGES ON DATABASE solidity_security TO solidity;"
+kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -d solidity_security -c "GRANT ALL ON SCHEMA public TO solidity;"
+
+# Verify database creation
+kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "\l solidity_security"
+```
+
+**Database Credentials for Local Development:**
+- Database: `solidity_security`
+- User: `solidity`
+- Password: `solidity-local-password`
+- Host: `postgresql.postgresql-local.svc.cluster.local`
+- Port: `5432`
+- Connection URL: `postgresql+asyncpg://solidity:solidity-local-password@postgresql.postgresql-local.svc.cluster.local:5432/solidity_security`
+
+**Note:** The API service will automatically create necessary tables (`users`, `sessions`) on startup using SQLAlchemy migrations.
+
 ### Install Redis Cache
 
 ```bash
