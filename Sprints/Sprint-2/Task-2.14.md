@@ -27,6 +27,7 @@ Create comprehensive documentation and training materials for the complete Kuber
 - **Performance Optimization**: Monitoring and tuning guidelines
 
 ## Standards Reference
+- **Dependency Versions**: Always use the latest stable versions of all dependencies, libraries, and tools
 - **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 
 ## Deliverables

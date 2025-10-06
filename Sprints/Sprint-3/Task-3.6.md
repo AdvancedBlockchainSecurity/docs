@@ -1047,6 +1047,7 @@ echo "Local Vault initialization completed successfully!"
 ```
 
 ## Standards Reference
+- **Dependency Versions**: Always use the latest stable versions of all dependencies, libraries, and tools
 - **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 
 ## Deliverables

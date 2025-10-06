@@ -19,6 +19,7 @@ Create secure and scalable VPC infrastructure with single-AZ for staging and mul
 - **Terraform State Management**: S3 bucket and DynamoDB table for remote state storage and locking
 
 ## Standards Reference
+- **Dependency Versions**: Always use the latest stable versions of all dependencies, libraries, and tools
 - **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 - **Secret Management**: All Kubernetes secrets must be stored in HashiCorp Vault and synchronized to clusters using External Secrets Operator. No secrets should be committed to Git repositories.
 

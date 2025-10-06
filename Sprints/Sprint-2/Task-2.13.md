@@ -26,6 +26,7 @@ Conduct comprehensive end-to-end testing of the complete Kubernetes infrastructu
 - **Production Environment**: EKS with production-grade configuration
 
 ## Standards Reference
+- **Dependency Versions**: Always use the latest stable versions of all dependencies, libraries, and tools
 - **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 
 ## Deliverables

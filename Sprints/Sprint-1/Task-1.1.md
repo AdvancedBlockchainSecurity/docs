@@ -21,6 +21,7 @@ Register the domain and set up initial DNS infrastructure. Actual service DNS re
 - **Preparation**: Prepare DNS infrastructure for future service record configuration
 
 ## Standards Reference
+- **Dependency Versions**: Always use the latest stable versions of all dependencies, libraries, and tools
 - **Kubernetes Structure**: Follow the standardized directory structure defined in `docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 - **Secret Management**: All Kubernetes secrets must be stored in HashiCorp Vault and synchronized to clusters using External Secrets Operator. No secrets should be committed to Git repositories.
 
