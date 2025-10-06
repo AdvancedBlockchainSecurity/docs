@@ -638,6 +638,26 @@
 - Configure data encryption at rest and in transit
 - Implement comprehensive security scanning and monitoring
 
+**Authentication Security Enhancements** (see `/docs/security/authentication-security.md`):
+- **CRITICAL**: Migrate JWT storage from localStorage to HttpOnly cookies
+  - Prevents XSS attacks from stealing tokens
+  - Requires backend cookie configuration with httpOnly, secure, sameSite flags
+- **HIGH**: Implement refresh token rotation
+  - Issue new refresh token on each refresh request
+  - Invalidate old tokens immediately
+  - Detect and block token reuse attacks
+- **CRITICAL**: Enforce HTTPS-only communication
+  - Configure SSL/TLS certificates via cert-manager
+  - Enable HSTS headers
+  - Set secure flag on all cookies
+- **MEDIUM**: Add rate limiting on authentication endpoints
+  - Prevent brute force attacks
+  - Implement progressive delays
+- **MEDIUM**: Implement 2FA/MFA for production users
+  - TOTP-based authentication
+  - SMS backup codes
+  - Recovery procedures
+
 **Compliance Implementation**:
 - Implement SOC 2 Type II compliance controls
 - Configure ISO 27001 compliance framework

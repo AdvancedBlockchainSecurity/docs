@@ -224,6 +224,39 @@ api-service-7599655588-5blzs   1/1     Running   0          10m
 6. Configure pod disruption budgets
 7. Add network policies for security
 
+### Authentication Security Enhancements (Priority for Production):
+1. **HttpOnly Cookies** (CRITICAL - prevents XSS token theft)
+   - Move JWT storage from localStorage to HttpOnly cookies
+   - Requires backend to set cookies with `httpOnly`, `secure`, `sameSite` flags
+   - Prevents JavaScript access to tokens (XSS protection)
+
+2. **Refresh Token Rotation** (HIGH)
+   - Issue new refresh token on each refresh request
+   - Invalidate old refresh token immediately
+   - Detect and block token reuse attacks
+
+3. **Token Encryption** (MEDIUM)
+   - Encrypt tokens before storing in localStorage (if cookies not used)
+   - Add additional layer of security
+   - Consider AES-256 encryption
+
+4. **HTTPS Only** (CRITICAL)
+   - Enforce HTTPS for all communication
+   - Set `secure` flag on cookies
+   - Implement HSTS headers
+
+5. **Token Lifetime Optimization** (CURRENT STATUS)
+   - ✅ Access token: 30 minutes (recommended: 15-30 min)
+   - ✅ Refresh token: 7 days (recommended: 7-14 days)
+   - Consider shorter lifetimes for high-security environments
+
+6. **Additional Security Measures**
+   - Implement rate limiting on auth endpoints
+   - Add CAPTCHA for login/register
+   - Enable 2FA/MFA for production users
+   - Monitor for suspicious authentication patterns
+   - Implement session management and forced logout
+
 ## Success Criteria - All Met ✅
 
 - [x] FastAPI application running in minikube
