@@ -630,33 +630,130 @@
 #### Sprint 14: Security Hardening & Compliance (Weeks 27-28)
 **Technical Milestone**: Enterprise-grade security and compliance validation
 
-**Security Hardening**:
+**See:** `docs/Sprints/Sprint-1/Task-1.18-Security-Hardening.md` for comprehensive implementation details
+
+**Week 1 - Critical Infrastructure Security (P0)**:
+- **Authentication Security**:
+  - 🔴 CRITICAL: Migrate JWT storage from localStorage to HttpOnly cookies (4h)
+    - Prevents XSS attacks from stealing tokens
+    - Backend sets cookies with httpOnly, secure, sameSite=strict flags
+    - Frontend removes localStorage token management
+    - Update axios to use withCredentials: true
+  - 🔴 CRITICAL: Implement refresh token rotation with reuse detection (4h)
+    - Issue new refresh token on each refresh request
+    - Invalidate old tokens immediately
+    - Detect and block token reuse attacks
+    - Revoke all user sessions on suspicious activity
+  - 🔴 CRITICAL: Enforce HTTPS-only communication (2h)
+    - Configure SSL/TLS certificates via cert-manager
+    - Enable HSTS headers (max-age=31536000)
+    - Implement security headers middleware
+    - Set secure flag on all cookies
+
+- **Secrets Management** (6h):
+  - 🔴 CRITICAL: HashiCorp Vault integration
+    - Install External Secrets Operator
+    - Configure Vault policies for each service
+    - Create SecretStore and ExternalSecret resources
+    - Migrate all secrets from k8s secrets to Vault
+    - Configure secret rotation automation
+
+- **Network Security** (4h):
+  - 🔴 CRITICAL: Kubernetes NetworkPolicies
+    - Deploy network policies for all services
+    - Default deny-all policy in production namespace
+    - API service ingress limited to ingress controller only
+    - API service egress limited to PostgreSQL, Redis, DNS
+    - Database and Redis isolated from other services
+  - 🔴 CRITICAL: Pod Security Standards
+    - Production namespace enforces restricted PSS
+    - All pods run as non-root with readOnlyRootFilesystem
+    - All capabilities dropped (drop: [ALL])
+    - seccompProfile: RuntimeDefault on all pods
+
+- **Data Encryption** (2h):
+  - 🔴 CRITICAL: Database TLS encryption
+    - Configure PostgreSQL for TLS connections
+    - Update connection strings with sslmode=require
+    - SQLAlchemy SSL context configuration
+    - Connection verification testing
+
+**Week 2 - API Security & WAF (P1)**:
+- **API Security** (4h):
+  - 🟠 HIGH: Comprehensive input validation
+    - Ethereum address validation (regex + checksum)
+    - Network name validation (whitelist)
+    - Text input sanitization (bleach library)
+    - File upload validation (size, type, content)
+  - 🟠 HIGH: API rate limiting (slowapi + Redis)
+    - Authentication endpoints: 5 requests/minute
+    - Contract analysis: 10 requests/minute per user
+    - Read endpoints: 100-200 requests/minute per user
+    - Rate limit headers in responses
+  - 🟠 HIGH: Strict CORS policy
+    - Production origins whitelisted only
+    - allow_credentials: true for cookies
+    - Allowed methods/headers limited
+    - Preflight caching configured
+  - 🟠 HIGH: Request/response logging
+    - All API requests logged with context
+    - User ID, IP, User-Agent tracked
+    - Request ID for distributed tracing
+    - Structured JSON logging
+
+- **Web Application Firewall** (8h):
+  - 🟠 HIGH: AWS WAF / Cloudflare WAF deployment
+    - OWASP ModSecurity Core Rule Set
+    - SQL injection protection
+    - XSS protection
+    - Bot detection and blocking
+    - Geo-blocking configuration
+
+**Week 3-4 - Operational Security (P2)**:
+- **Data Security** (2h):
+  - 🟡 MEDIUM: Redis security hardening
+    - Redis authentication enabled
+    - Redis TLS encryption
+    - Dangerous commands disabled (FLUSHALL, CONFIG)
+    - Connection pooling configured
+
+- **Backup & Recovery** (4h):
+  - 🟡 MEDIUM: Automated database backups
+    - Daily PostgreSQL backup CronJob
+    - S3 backup storage with encryption
+    - Retention policy (30 days → Glacier → 90 days delete)
+    - Backup restoration testing
+
+- **Incident Response** (4h):
+  - 🟡 MEDIUM: Incident response playbook
+    - Detection & triage procedures
+    - Containment strategies
+    - Investigation workflows
+    - Recovery procedures
+    - Post-incident review process
+
+- **Security Monitoring** (4h):
+  - 🟡 MEDIUM: Security alerts configuration
+    - Failed authentication spike alerts
+    - API traffic anomaly detection
+    - Database connection failure alerts
+    - Vault secret access monitoring
+    - Grafana security dashboard
+
+- **Dependency Security** (3h):
+  - 🟡 MEDIUM: Automated dependency scanning
+    - Snyk / Dependabot configuration
+    - Trivy container image scanning
+    - SBOM generation (Syft)
+    - Pre-commit secret detection
+    - Automated security PRs
+
+**AWS Security Services**:
 - Configure AWS Config for compliance monitoring
 - Set up AWS CloudTrail for comprehensive audit logging
 - Configure AWS GuardDuty for threat detection
 - Implement network security controls and monitoring
 - Configure data encryption at rest and in transit
-- Implement comprehensive security scanning and monitoring
-
-**Authentication Security Enhancements** (see `/docs/security/authentication-security.md`):
-- **CRITICAL**: Migrate JWT storage from localStorage to HttpOnly cookies
-  - Prevents XSS attacks from stealing tokens
-  - Requires backend cookie configuration with httpOnly, secure, sameSite flags
-- **HIGH**: Implement refresh token rotation
-  - Issue new refresh token on each refresh request
-  - Invalidate old tokens immediately
-  - Detect and block token reuse attacks
-- **CRITICAL**: Enforce HTTPS-only communication
-  - Configure SSL/TLS certificates via cert-manager
-  - Enable HSTS headers
-  - Set secure flag on all cookies
-- **MEDIUM**: Add rate limiting on authentication endpoints
-  - Prevent brute force attacks
-  - Implement progressive delays
-- **MEDIUM**: Implement 2FA/MFA for production users
-  - TOTP-based authentication
-  - SMS backup codes
-  - Recovery procedures
 
 **Compliance Implementation**:
 - Implement SOC 2 Type II compliance controls
@@ -666,25 +763,46 @@
 - Implement automated policy enforcement
 
 **Security Testing**:
-- Conduct comprehensive penetration testing
-- Perform security code review across all services
-- Test disaster recovery and incident response procedures
-- Validate security monitoring and alerting
-- Conduct compliance audit preparation
+- OWASP ZAP automated scanning (CI/CD integration)
+- Manual penetration testing (Burp Suite)
+- XSS/CSRF/SQL injection testing
+- Rate limiting behavior validation
+- Token rotation and reuse detection testing
+- Network policy isolation verification
 
 **Documentation & Procedures**:
-- Create comprehensive security documentation
-- Document compliance procedures and controls
-- Create incident response playbooks
-- Document operational security procedures
+- ✅ Authentication security best practices (`docs/security/authentication-security.md`)
+- ✅ Production security checklist (`docs/security/production-security-checklist.md`)
+- ⏳ Incident response playbook (`docs/security/incident-response-playbook.md`)
 - Create security training materials
+- Document operational security procedures
+
+**Deliverables** (71 hours total):
+- HttpOnly cookie authentication implemented
+- All secrets migrated to HashiCorp Vault
+- Network policies deployed for all services
+- Database and Redis TLS connections operational
+- API rate limiting functional on all endpoints
+- Security monitoring dashboard in Grafana
+- Automated backup/restore procedures tested
+- Incident response playbook created and team trained
 
 **Acceptance Criteria**:
-- All security hardening measures implemented and validated
-- Compliance frameworks fully implemented with evidence collection
-- Penetration testing shows no critical vulnerabilities
-- Security monitoring and alerting fully operational
+- All P0 (Critical) security controls implemented ✅
+- All P1 (High) security controls implemented ✅
+- Security audit passed (no critical/high vulnerabilities)
+- Penetration testing completed and findings remediated
+- Secrets management fully automated with Vault
+- Network isolation verified with NetworkPolicies
+- Security monitoring alerts functional
+- Backup/restore tested successfully
 - Incident response procedures tested and validated
+- Team trained on security protocols
+
+**Related Documentation**:
+- `docs/Sprints/Sprint-1/Task-1.18-Security-Hardening.md` - Detailed implementation guide
+- `docs/security/authentication-security.md` - Authentication best practices
+- `docs/security/production-security-checklist.md` - Comprehensive security validation
 
 #### Sprint 15: Operational Readiness & Monitoring (Weeks 29-30)
 **Technical Milestone**: Production operations and comprehensive monitoring

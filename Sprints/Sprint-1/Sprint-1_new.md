@@ -693,6 +693,72 @@ production/ (same structure)
 
 ---
 
+### Task 1.18: Production Security Hardening
+**Estimated Time**: 2-4 weeks (71 hours total)
+**Owner**: Security Team
+**Priority**: 🔴 P0 (Critical for Production)
+
+**See:** `Task-1.18-Security-Hardening.md` for comprehensive implementation details
+
+**Week 1 - Critical Security (P0)**:
+- HttpOnly cookies for JWT storage (prevents XSS token theft)
+- Refresh token rotation with reuse detection
+- HTTPS enforcement with security headers
+- HashiCorp Vault integration for secrets management
+- Kubernetes NetworkPolicies for zero-trust networking
+- Pod Security Standards enforcement (restricted)
+- Database TLS encryption
+
+**Week 2 - API Security (P1)**:
+- Comprehensive input validation (Ethereum addresses, text sanitization)
+- API rate limiting on all endpoints (slowapi + Redis)
+- Strict CORS policy configuration
+- Request/response security logging
+- Web Application Firewall (WAF) deployment
+
+**Week 3-4 - Operational Security (P2)**:
+- Redis authentication and TLS encryption
+- Automated database backups with S3 storage
+- Incident response playbook and procedures
+- Security monitoring alerts (Prometheus/AlertManager)
+- Dependency scanning automation (Snyk/Trivy)
+- Audit logging for compliance
+
+**Security Testing**:
+- OWASP ZAP automated scanning
+- Manual penetration testing (Burp Suite)
+- XSS/CSRF/SQL injection testing
+- Rate limiting validation
+- Token rotation verification
+
+**Deliverables**:
+- HttpOnly cookie authentication implemented
+- All secrets migrated to HashiCorp Vault
+- Network policies deployed for all services
+- Database and Redis TLS connections
+- API rate limiting operational
+- Security monitoring dashboard
+- Automated backup/restore procedures
+- Incident response playbook
+- Production security checklist completed
+
+**Acceptance Criteria**:
+- All P0 (Critical) security controls implemented
+- Security audit passed (no critical/high vulnerabilities)
+- Penetration testing completed and remediated
+- Secrets management fully automated with Vault
+- Network isolation verified with NetworkPolicies
+- Security monitoring alerts functional
+- Backup/restore tested successfully
+- Team trained on incident response procedures
+
+**Related Documentation**:
+- `docs/security/authentication-security.md` - Authentication best practices
+- `docs/security/production-security-checklist.md` - Comprehensive security validation
+- `docs/security/incident-response-playbook.md` - Security incident procedures (to be created)
+
+---
+
 ## Sprint 1 Success Criteria & Validation
 
 ### Technical Milestones
