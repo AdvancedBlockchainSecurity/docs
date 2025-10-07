@@ -223,6 +223,18 @@
 - Test tool failure isolation and recovery
 - Validate real-time status updates across all analysis stages
 
+**URL-Based Contract Scanning**:
+- Implement contract source fetching from Etherscan API
+- Add support for Blockscout API integration
+- Implement multi-chain support (Ethereum, BSC, Polygon, Arbitrum, Optimism)
+- Create contract bytecode verification against source
+- Implement URL validation and sanitization
+- Configure rate limiting for blockchain explorer APIs
+- Create endpoint: `POST /api/v1/contracts/from-url`
+- Add network selection and contract address validation
+- Implement automatic source file extraction from API responses
+- Test URL scanning with various blockchain explorers
+
 **Acceptance Criteria**:
 - Core security tools (Slither, Aderyn, Solidity-Metrics) integrate successfully
 - Contract parsing provides accurate AST and dependency information
@@ -231,6 +243,9 @@
 - Basic deduplication working with measurable accuracy
 - Rule-based risk scoring providing consistent assessments
 - Real-time status updates working across all analysis stages
+- URL-based contract scanning functional for Etherscan and Blockscout
+- Multi-chain support working for Ethereum, BSC, Polygon, Arbitrum, Optimism
+- Contract source verification against bytecode successful
 - All tool services accessible via AWS ALB with proper authentication
 
 #### Sprint 5: Frontend Development & Integration (Weeks 9-10)
@@ -284,8 +299,21 @@
 - All frontend services deployed via ArgoCD
 - Responsive design working on desktop and mobile
 
-#### Sprint 6: Mythril Integration & Platform Completion (Weeks 11-12)
-**Technical Milestone**: Enterprise tool integration with comprehensive multi-tool analysis
+#### Sprint 6: Mythril Integration & Multi-Language Foundation (Weeks 11-12)
+**Technical Milestone**: Enterprise tool integration with multi-language architecture foundation
+
+**Multi-Language Architecture Foundation**:
+- Design and implement contract language detection system
+- Add `language` and `compiler_version` fields to contracts table
+- Create language enumeration (Solidity, Vyper, Rust/Solana, Move, Cairo)
+- Implement automatic language detection from source code
+- Update contract creation API to support language selection
+- Create language-specific tool routing in orchestration service
+- Design language-specific vulnerability schema extensions
+- Add language icons and badges to UI components
+- Implement language filtering in contract list and search
+- Create migration script for existing contracts (default: Solidity)
+- **See**: `/Users/pwner/Git/ABS/TaskDocs/SolidityOps/multi-language-architecture.md` for detailed implementation
 
 **Mythril Integration Development**:
 - Implement Mythril adapter with REST API integration
@@ -328,20 +356,44 @@
 - Conduct end-to-end platform testing
 
 **Acceptance Criteria**:
+- Multi-language architecture supports Solidity, Vyper, and Rust/Solana contracts
+- Language detection automatically identifies contract language from source code
+- Contract creation UI includes language selector with visual indicators
+- Language-specific tool routing correctly selects appropriate security tools
 - Mythril integration working with all analysis modes
-- 4-tool parallel execution completing successfully
+- 4-tool parallel execution completing successfully for Solidity contracts
 - Tool failures don't block other tool execution
 - API quotas respect rate limits without errors
 - Results aggregate properly across all tools
 - Dashboard shows findings from all tools with comparison metrics
-- Tool comparison view provides meaningful insights
+- Language filtering and badges working in UI
 - All services operational via AWS infrastructure
 - Complete platform functional from upload to results display
 
 ### Phase 2: Advanced Features & Intelligence (Months 4-6)
 
-#### Sprint 7: Rule-Based Intelligence & Analytics (Weeks 13-14)
-**Technical Milestone**: Enhanced intelligence system with basic analytics
+#### Sprint 7: Solana SAST Integration & Analytics (Weeks 13-14)
+**Technical Milestone**: Complete Solana/Rust security analysis with enhanced intelligence
+
+**Solana SAST Tool Integration**:
+- Implement Soteria analyzer adapter for Rust/Solana contracts
+- Add Anchor security framework integration and best practices validation
+- Create Sec3 security tool adapter with vulnerability detection
+- Implement Solana-specific vulnerability pattern library
+- Add Rust compiler warning integration (clippy, rustc)
+- Create Solana program verification and validation checks
+- Implement Solana-specific risk scoring algorithms
+- Add network-specific checks (Solana Mainnet vs Devnet)
+- Deploy Solana tool integration service to all environments
+- **See**: `/Users/pwner/Git/ABS/TaskDocs/SolidityOps/solana-sast-integration.md` for detailed implementation
+
+**Cross-Language Analytics Development**:
+- Create language comparison dashboard and metrics
+- Implement cross-language vulnerability pattern detection
+- Add language-specific statistics and reporting
+- Create multi-language project support and aggregation
+- Implement language distribution charts and visualizations
+- Add language-specific best practices recommendations
 
 **Rule-Based Intelligence Enhancement**:
 - Enhance rule-based deduplication with improved algorithms
@@ -378,12 +430,18 @@
 - Prepare production operational procedures
 
 **Acceptance Criteria**:
+- Solana SAST tools (Soteria, Anchor, Sec3) integrated and functional
+- Rust/Solana contracts can be uploaded, analyzed, and scanned successfully
+- Solana-specific vulnerabilities detected with appropriate severity ratings
+- Cross-language analytics dashboard shows metrics for both Solidity and Solana
+- Language comparison features provide meaningful insights
+- Multi-language projects support contracts in different languages
 - Rule-based intelligence achieves measurable deduplication accuracy improvement
 - False positive rate demonstrably reduced with rule-based system
 - Basic analytics dashboard provides meaningful insights
 - Complete platform functional with all core features integrated
 - Platform performance meets defined benchmarks
-- End-to-end workflow validated from upload to results
+- End-to-end workflow validated from upload to results for all supported languages
 - All services operational in production environment
 - Production monitoring and alerting fully functional
 
