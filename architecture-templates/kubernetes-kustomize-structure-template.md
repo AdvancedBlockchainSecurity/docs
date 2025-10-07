@@ -381,17 +381,23 @@ overlays/production/<service>/
 ## Labels and Annotations
 
 ### Standard Labels
-All resources should include:
+All resources should include standard Kubernetes labels using the `labels` field (not deprecated `commonLabels`):
+
+**In kustomization.yaml:**
+```yaml
+labels:
+- pairs:
+    app.kubernetes.io/name: <service>
+    app.kubernetes.io/instance: <environment>-<service>
+    app.kubernetes.io/version: <version>
+    app.kubernetes.io/component: <component-type>
+    app.kubernetes.io/part-of: <application-name>
+    app.kubernetes.io/managed-by: kustomize
+    environment: <local|staging|production>
+    team: <team-name>
 ```
-app.kubernetes.io/name: <service>
-app.kubernetes.io/instance: <environment>-<service>
-app.kubernetes.io/version: <version>
-app.kubernetes.io/component: <component-type>
-app.kubernetes.io/part-of: <application-name>
-app.kubernetes.io/managed-by: kustomize
-environment: <local|staging|production>
-team: <team-name>
-```
+
+**Note**: Use `labels` with `pairs` syntax, not the deprecated `commonLabels` field.
 
 ### Production Annotations
 Common production annotations:
