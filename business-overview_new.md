@@ -8,7 +8,7 @@
 **"Enterprise blockchain teams are drowning in fragmented security tools while vulnerabilities slip through the cracks"**
 
 - **$2.36 billion** lost to smart contract hacks in 2024 alone across 760 incidents
-- Enterprise teams juggle **8+ security tools** with no unified view
+- Enterprise teams juggle **7+ security tools** with no unified view
 - **69% of developers** report tool fragmentation significantly impacts productivity
 - Security reviews take **3.5 hours on average** manually correlating findings
 - **90% of exploited projects** never underwent any security audit
@@ -64,7 +64,7 @@ Think of it like:
 **Key Platform Capabilities:**
 
 ### **1. Unified Security Dashboard**
-- Aggregates **8+ security tools** in one platform (Slither, Mythril, Semgrep, Aderyn, Certora, Echidna, Manticore, Solidity-Metrics)
+- Aggregates **7+ security tools** in one platform (Slither, Mythril, Semgrep, Aderyn, Certora, Echidna, Manticore)
 - **Intelligent deduplication** reduces findings by 60% through cross-tool correlation (Sprint 4, 7)
 - **AI-powered risk scoring** prioritizes critical vulnerabilities automatically (Sprint 11)
 

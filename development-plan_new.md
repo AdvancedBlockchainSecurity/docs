@@ -6,7 +6,7 @@
 
 **Development Strategy**: 18 sprints across 36 weeks, organized in 3 phases, with cloud-native development from day one using production-ready AWS infrastructure and GitOps deployment workflows.
 
-**Technical Approach**: Multi-tool integration (Slither, Aderyn, Solidity-Metrics, Mythril, Certora, Echidna) with intelligent deduplication, rule-based analysis, and enterprise workflow integration across 18 specialized repositories.
+**Technical Approach**: Multi-tool integration (Slither, Aderyn, Mythril, Certora, Echidna) with intelligent deduplication, rule-based analysis, and enterprise workflow integration across 18 specialized repositories.
 
 ## System Architecture Overview
 
@@ -274,7 +274,6 @@ Support & Documentation (3):
 **Tool Integration Service Development**:
 - Implement Slither adapter using slither-analyzer Python package with optimization
 - Implement Aderyn adapter with Rust CLI wrapper and JSON parsing
-- Implement Solidity-Metrics adapter with Node.js CLI wrapper and performance tuning
 - Create tool registry and factory pattern for extensibility and plugin architecture
 - Implement result normalization to standardized vulnerability schema (SWC-based)
 - Configure tool-specific rate limiting and quota management with respect for API limits
@@ -315,7 +314,6 @@ Support & Documentation (3):
 - Integration with Solidity compilation artifacts
 - Advanced pattern matching for smart contract vulnerabilities
 
-**Solidity-Metrics Integration**:
 - Node.js CLI wrapper with process management and error handling
 - npm package installation and version management
 - Comprehensive code complexity metrics extraction
@@ -387,7 +385,7 @@ Support & Documentation (3):
 - Validate real-time status updates across all analysis stages
 
 **Acceptance Criteria**:
-- Core security tools (Slither, Aderyn, Solidity-Metrics) integrate successfully with high accuracy
+- Core security tools (Slither, Aderyn, Mythril) integrate successfully with high accuracy
 - Contract parsing provides accurate AST and dependency information for complex contracts
 - Job queue processes analyses with proper prioritization and resource management
 - Failed analyses retry automatically with appropriate backoff and recovery
@@ -504,7 +502,7 @@ Support & Documentation (3):
 - Implement cost tracking and quota monitoring with alerts and budgeting
 
 **Platform Integration & Testing**:
-- Test 4-tool parallel execution (Slither, Aderyn, Solidity-Metrics, Mythril) under load
+- Test 3-tool parallel execution (Slither, Aderyn, Mythril) under load
 - Validate Mythril API integration and async polling with error scenarios
 - Test tool failure isolation and recovery with comprehensive scenarios
 - Configure comprehensive multi-tool result aggregation with accuracy validation

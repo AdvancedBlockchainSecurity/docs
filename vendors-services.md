@@ -34,7 +34,6 @@
 | Cyfrin | Aderyn | Rust-based static analysis tool | n/a | Open Source |
 | ConsenSys | Mythril | Symbolic execution & taint analysis | n/a | Open Source |
 | Semgrep | Semgrep | Pattern-based security scanning | n/a | Open Source |
-| Open Source | Solidity-Metrics | Code complexity and metrics analysis | n/a | Open Source |
 | Certora | Certora Prover | Formal verification platform | $500-2000/month |  |
 | Trail of Bits | Echidna | Fuzzing framework | n/a |  |
 | Trail of Bits | Manticore | Symbolic execution engine | n/a |  |

@@ -126,12 +126,6 @@ web3<8,>=7.10
 - CPU: 250m
 - Timeout: 180s
 
-### Solidity-Metrics
-- Image: `scanner-solidity-metrics:0.1.0` (custom build)
-- Memory: 512Mi
-- CPU: 250m
-- Timeout: 120s
-
 ## RBAC Configuration
 
 **ServiceAccount**:

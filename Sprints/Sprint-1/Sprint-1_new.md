@@ -821,7 +821,7 @@ Sprint 2 will focus on core backend service development and deployment to the AW
 - Deploy all services to staging environment via ArgoCD
 
 ### Tool Integration Foundation
-- Implement basic security tool adapters (Slither, Aderyn, Solidity-Metrics)
+- Implement basic security tool adapters (Slither, Aderyn, Mythril)
 - Create tool orchestration system with Celery and Redis
 - Develop basic intelligence engine for result processing
 - Test multi-tool analysis workflow end-to-end

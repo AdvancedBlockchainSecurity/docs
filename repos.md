@@ -306,8 +306,8 @@ solidity-security-api-service/
 ### 2. **`solidity-security-tool-integration`** (~12K LOC)
 **Security tool adapters and integrations - Hybrid Python/Rust**
 ```
-Purpose: Slither, Aderyn, Mythril, Semgrep, Solidity-Metrics adapters
-Tech Stack: Python 3.11 + Rust core, asyncio, aiohttp, subprocess, Rust wrappers (for Slither, Aderyn), Python wrappers (for Mythril, Semgrep), Node.js wrappers (for Solidity-Metrics)
+Purpose: Slither, Aderyn, Mythril, Semgrep adapters
+Tech Stack: Python 3.11 + Rust core, asyncio, aiohttp, subprocess, Rust wrappers (for Slither, Aderyn), Python wrappers (for Mythril, Semgrep), 
 Rust Components: High-performance tool execution, parallel processing, native Aderyn integration
 Python Components: FastAPI service layer, external integrations, configuration management
 Contains: Tool adapters, result normalizers, rate limiting, plugin architecture, unified tool interface
@@ -344,7 +344,6 @@ solidity-security-tool-integration/
 │   │   │   ├── rules_manager.py   # Custom rules management
 │   │   │   ├── config.py          # Semgrep configuration
 │   │   │   └── normalizer.py      # Result normalization
-│   │   ├── solidity_metrics/
 │   │   │   ├── __init__.py
 │   │   │   ├── adapter.py         # Solidity-Metrics adapter
 │   │   │   ├── nodejs_wrapper.py  # Node.js process wrapper
@@ -372,7 +371,6 @@ solidity-security-tool-integration/
 │   ├── install_slither.sh
 │   ├── install_aderyn.sh
 │   ├── install_mythx.sh
-│   └── install_solidity_metrics.sh
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py
@@ -383,7 +381,6 @@ solidity-security-tool-integration/
 │   ├── test_slither.py
 │   ├── test_aderyn.py
 │   ├── test_mythx.py
-│   ├── test_solidity_metrics.py
 │   └── integration/
 │       └── test_parallel_execution.py
 ├── k8s/                           # Kubernetes manifests

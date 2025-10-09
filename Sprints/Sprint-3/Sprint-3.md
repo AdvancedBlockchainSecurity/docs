@@ -704,7 +704,6 @@ Sprint 4 will focus on security tool integration and orchestration, building on 
 ### Security Tool Integration
 - Implement Slither adapter with Python API integration
 - Develop Aderyn adapter with Rust CLI wrapper
-- Create Solidity-Metrics adapter with Node.js wrapper
 - Build unified tool interface and result normalization
 
 ### Orchestration System

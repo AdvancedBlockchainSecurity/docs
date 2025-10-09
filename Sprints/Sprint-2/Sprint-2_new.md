@@ -956,7 +956,7 @@ Sprint 3 will focus on core backend service development and deployment using the
 - Deploy all backend services via ArgoCD GitOps workflow
 
 ### Tool Integration Foundation
-- Implement security tool adapters (Slither, Aderyn, Solidity-Metrics)
+- Implement security tool adapters (Slither, Aderyn, Mythril)
 - Create tool orchestration system with Celery and Redis
 - Develop intelligence engine for result processing and correlation
 - Test multi-tool analysis workflow through service mesh

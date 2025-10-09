@@ -182,7 +182,6 @@
 **Tool Integration Service Development**:
 - Implement Slither adapter using slither-analyzer Python package
 - Implement Aderyn adapter with Rust CLI wrapper and JSON parsing
-- Implement Solidity-Metrics adapter with Node.js CLI wrapper
 - Create tool registry and factory pattern for extensibility
 - Implement result normalization to standardized vulnerability schema
 - Configure tool-specific rate limiting and quota management
@@ -236,7 +235,7 @@
 - Test URL scanning with various blockchain explorers
 
 **Acceptance Criteria**:
-- Core security tools (Slither, Aderyn, Solidity-Metrics) integrate successfully
+- Core security tools (Slither, Aderyn, Mythril) integrate successfully
 - Contract parsing provides accurate AST and dependency information
 - Job queue processes analyses with proper prioritization
 - Failed analyses retry automatically with appropriate backoff
@@ -348,7 +347,7 @@
 - Implement cost tracking and quota monitoring
 
 **Platform Integration & Testing**:
-- Test 4-tool parallel execution (Slither, Aderyn, Solidity-Metrics, Mythril)
+- Test 4-tool parallel execution (Slither, Aderyn, Mythril, Mythril)
 - Validate Mythril API integration and async polling
 - Test tool failure isolation and recovery
 - Configure comprehensive multi-tool result aggregation
