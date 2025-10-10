@@ -58,16 +58,16 @@
 **Priority**: HIGH - Foundation for production deployment
 
 **Tasks**:
-1. **✅ Sprint 14 Security Hardening - Phase 1 COMPLETE** (8h completed)
+1. **✅ Sprint 14 Security Hardening - Phase 1 & 2 COMPLETE** (16h completed)
    - ✅ Migrated JWT to HttpOnly cookies (XSS protection) - OWASP A03:2025
    - ✅ Fixed CORS configuration (origin validation, credentials support) - OWASP A05:2025
    - ✅ Fixed Redis authentication
    - ✅ Implemented semantic versioning for Docker images
    - ✅ Fixed deprecated Kustomize fields across all services (13 files)
-   - ⏳ Deploy NetworkPolicies (service isolation) - Pending
-   - ⏳ Enable database TLS encryption - Pending
-   - ⏳ Implement API rate limiting (DoS protection) - Pending
-   - ⏳ Enforce Pod Security Standards - Pending
+   - ✅ Deploy NetworkPolicies (service isolation) - COMPLETE
+   - ✅ Enable database TLS encryption (256-bit TLS_AES_256_GCM_SHA384) - COMPLETE
+   - ✅ Implement API rate limiting (DoS protection, Redis-backed) - COMPLETE
+   - ✅ Enforce Pod Security Standards (runAsNonRoot, drop ALL caps) - COMPLETE
 
 2. **Implement Automated Testing** (20h)
    - Integration test suite

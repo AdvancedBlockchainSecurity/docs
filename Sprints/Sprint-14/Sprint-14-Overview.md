@@ -403,13 +403,21 @@ spec:
 **Story**: As a security engineer, I need to enable TLS encryption for all database connections so that data in transit is protected.
 
 **Acceptance Criteria**:
-- [ ] PostgreSQL configured for TLS connections
-- [ ] Connection strings updated with sslmode=require
-- [ ] SQLAlchemy SSL context configuration
-- [ ] TLS certificates provisioned for PostgreSQL
-- [ ] Connection verification tests passing
-- [ ] Non-TLS connections rejected
-- [ ] Documentation updated
+- [x] PostgreSQL configured for TLS connections
+- [x] Connection strings updated with sslmode=require
+- [x] SQLAlchemy SSL context configuration
+- [x] TLS certificates provisioned for PostgreSQL
+- [x] Connection verification tests passing
+- [x] Non-TLS connections rejected
+- [x] Documentation updated
+
+**Status**: ✅ **COMPLETE** (Oct 9, 2025)
+- PostgreSQL SSL enabled with TLS 1.2+
+- 256-bit encryption (TLS_AES_256_GCM_SHA384)
+- cert-manager certificate automation
+- `sslmode=require` in DATABASE_URL
+- Verified via `pg_stat_ssl` queries
+- See: `SPRINT-14-SECURITY-HARDENING-PHASE-2.md`
 
 **Implementation**:
 ```python
