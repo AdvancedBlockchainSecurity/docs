@@ -475,7 +475,7 @@ invariant totalSupplyEqualsBalances()
 
 #### 2.4 Plugin Architecture (10 hours)
 
-**Plugin SDK** (`solidity-security-plugin-sdk`):
+**Plugin SDK** (`blocksecops-plugin-sdk`):
 ```python
 # Plugin SDK for third-party tools
 from abc import ABC, abstractmethod

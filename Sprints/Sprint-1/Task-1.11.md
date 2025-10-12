@@ -3,10 +3,10 @@
 ## Repositories: Frontend Service Repositories
 
 This task creates Kubernetes templates for all frontend service repositories:
-- `solidity-security-ui-core` (Shared UI components and design system, React/TypeScript)
-- `solidity-security-dashboard` (Dashboard and metrics interface, React/TypeScript)
-- `solidity-security-findings` (Finding management and analysis results, React/TypeScript)
-- `solidity-security-analysis` (Contract analysis workflow, React/TypeScript)
+- `blocksecops-ui-core` (Shared UI components and design system, React/TypeScript)
+- `blocksecops-dashboard` (Dashboard and metrics interface, React/TypeScript)
+- `blocksecops-findings` (Finding management and analysis results, React/TypeScript)
+- `blocksecops-analysis` (Contract analysis workflow, React/TypeScript)
 
 **✅ ALIGNMENT CHECK**: This implementation creates production-ready Kubernetes deployment templates for all 4 frontend services with React optimization, environment configuration, and ALB integration as specified in Sprint 1 documentation.
 
@@ -29,9 +29,9 @@ Create comprehensive Kubernetes templates for all frontend microservices with Re
 
 ## Directory Structure Requirements
 
-### Example: `solidity-security-dashboard`
+### Example: `blocksecops-dashboard`
 ```
-solidity-security-dashboard/
+blocksecops-dashboard/
 ├── k8s/
 │   ├── base/
 │   │   ├── deployment.yaml        # React app deployment with NGINX
@@ -85,7 +85,7 @@ solidity-security-dashboard/
 
 ### Technical Requirements
 - Login page components for each frontend application
-- JWT token handling and API integration with solidity-security-api-service
+- JWT token handling and API integration with blocksecops-api-service
 - Multi-stage Docker builds for optimized production images
 - NGINX configuration for React single-page applications with auth routing
 - Proper caching headers for static assets
@@ -109,7 +109,7 @@ solidity-security-dashboard/
 - Environment-specific ConfigMaps for local, staging and production with auth endpoints
 - Runtime environment variable injection without build-time hardcoding
 - API endpoint configuration for backend service integration
-- Authentication flow integration with solidity-security-api-service
+- Authentication flow integration with blocksecops-api-service
 - Subdomain-specific authentication routing and session management
 
 ## Step 3: ALB Ingress and Asset Optimization (30 minutes)
@@ -144,7 +144,7 @@ solidity-security-dashboard/
 ### Authentication and Environment Configuration Requirements
 - [ ] ConfigMaps created for environment-specific API endpoint and auth configuration
 - [ ] Environment variable injection configured for runtime configuration
-- [ ] Authentication service integration with solidity-security-api-service configured
+- [ ] Authentication service integration with blocksecops-api-service configured
 - [ ] JWT token management and refresh logic implemented
 - [ ] Backend service integration configured via environment variables
 - [ ] Service discovery configuration for backend API communication
@@ -181,7 +181,7 @@ solidity-security-dashboard/
 
 ## Key Implementation Notes
 
-1. **Authentication Architecture**: Integrate with solidity-security-api-service for centralized authentication and JWT token management
+1. **Authentication Architecture**: Integrate with blocksecops-api-service for centralized authentication and JWT token management
 2. **Subdomain Authentication**: Implement subdomain-specific login pages and authentication flows for each application
 3. **React Optimization**: Configure webpack optimization and code splitting for production builds
 4. **Environment Flexibility**: Use runtime configuration injection to avoid rebuilding for different environments
@@ -222,7 +222,7 @@ solidity-security-dashboard/
 - [ ] Staging ConfigMaps created for environment-specific API and auth configurations
 - [ ] Staging environment variable injection configured for runtime settings with authentication
 - [ ] Staging backend service integration configured via environment variables
-- [ ] Staging authentication service integration with solidity-security-api-service configured
+- [ ] Staging authentication service integration with blocksecops-api-service configured
 
 ### Production Environment
 - [ ] Production Kubernetes deployment templates created for all frontend services
@@ -241,7 +241,7 @@ solidity-security-dashboard/
 - [ ] Production ConfigMaps created for environment-specific API and auth configurations
 - [ ] Production environment variable injection configured for runtime settings with authentication
 - [ ] Production backend service integration configured via environment variables
-- [ ] Production authentication service integration with solidity-security-api-service configured
+- [ ] Production authentication service integration with blocksecops-api-service configured
 - [ ] Production subdomain-specific authentication routing and session management implemented
 - [ ] Production ALB ingress configurations created for all frontend services
 - [ ] Production SSL termination configured with cert-manager

@@ -33,7 +33,7 @@ Deploy scalable and secure EKS clusters for staging and production environments 
 ## Directory Structure Requirements
 
 ```
-solidity-security-aws-infrastructure/
+blocksecops-aws-infrastructure/
 ├── terraform/
 │   └── modules/
 │       └── eks/                   # EKS Terraform module

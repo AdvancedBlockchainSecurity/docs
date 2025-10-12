@@ -7,33 +7,33 @@ This guide sets up a local minikube development environment for the SolidityOps 
 ## Repository Architecture (17 repos - 94K LOC)
 
 ### Backend Service Repositories (6 repos)
-- `solidity-security-api-service` - FastAPI authentication and API gateway (10K LOC Python)
-- `solidity-security-tool-integration` - Security tool adapters (12K LOC Hybrid Python/Rust)
-- `solidity-security-intelligence-engine` - Risk scoring and correlation (8K LOC Hybrid Python/Rust)
-- `solidity-security-orchestration` - Analysis workflow management (6K LOC Python Celery)
-- `solidity-security-data-service` - Database access layer (7K LOC Hybrid Python/Rust)
-- `solidity-security-notification` - Real-time notifications (5K LOC Node.js/TypeScript)
+- `blocksecops-api-service` - FastAPI authentication and API gateway (10K LOC Python)
+- `blocksecops-tool-integration` - Security tool adapters (12K LOC Hybrid Python/Rust)
+- `blocksecops-intelligence-engine` - Risk scoring and correlation (8K LOC Hybrid Python/Rust)
+- `blocksecops-orchestration` - Analysis workflow management (6K LOC Python Celery)
+- `blocksecops-data-service` - Database access layer (7K LOC Hybrid Python/Rust)
+- `blocksecops-notification` - Real-time notifications (5K LOC Node.js/TypeScript)
 
 ### Contract Parser Repository (1 repo)
-- `solidity-security-contract-parser` - Solidity parsing and AST (8K LOC Pure Rust)
+- `blocksecops-contract-parser` - Solidity parsing and AST (8K LOC Pure Rust)
 
 ### Frontend Application Repositories (4 repos)
-- `solidity-security-ui-core` - Shared UI components (8K LOC React/TypeScript)
-- `solidity-security-dashboard` - Main dashboard interface (8K LOC React/TypeScript)
-- `solidity-security-findings` - Finding management (8K LOC React/TypeScript)
-- `solidity-security-analysis` - Analysis workflow (6K LOC React/TypeScript)
+- `blocksecops-ui-core` - Shared UI components (8K LOC React/TypeScript)
+- `blocksecops-dashboard` - Main dashboard interface (8K LOC React/TypeScript)
+- `blocksecops-findings` - Finding management (8K LOC React/TypeScript)
+- `blocksecops-analysis` - Analysis workflow (6K LOC React/TypeScript)
 
 ### Shared Libraries Repository (1 repo)
-- `solidity-security-shared` - Multi-language utilities (7K LOC Rust/Python/TypeScript)
+- `blocksecops-shared` - Multi-language utilities (7K LOC Rust/Python/TypeScript)
 
 ### Infrastructure Repositories (2 repos)
-- `solidity-security-aws-infrastructure` - Infrastructure as Code
-- `solidity-security-monitoring` - Observability configurations
+- `blocksecops-aws-infrastructure` - Infrastructure as Code
+- `blocksecops-monitoring` - Observability configurations
 
 ### Supporting Repositories (3 repos)
-- `solidity-security-docs` - Documentation
-- `solidity-security-tools` - Tool configurations
-- `solidity-security-vulnerabilities` - Vulnerability database
+- `blocksecops-docs` - Documentation
+- `blocksecops-tools` - Tool configurations
+- `blocksecops-vulnerabilities` - Vulnerability database
 
 ## Prerequisites
 
@@ -77,11 +77,11 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 cd /Users/pwner/Git/ABS
 
 # Verify all 17 repositories exist
-ls -la | grep solidity-security | wc -l
+ls -la | grep blocksecops | wc -l
 # Should return 17
 
 # Verify specific repositories
-ls -d solidity-security-*/
+ls -d blocksecops-*/
 ```
 
 ## Step 2: minikube Setup
@@ -148,26 +148,26 @@ After PostgreSQL is installed, create a dedicated database and user for the API 
 POD_NAME=$(kubectl get pods -n postgresql-local -l app.kubernetes.io/name=postgresql -o jsonpath='{.items[0].metadata.name}')
 
 # Connect to PostgreSQL and create database
-kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "CREATE DATABASE solidity_security;"
+kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "CREATE DATABASE blocksecops;"
 
 # Create dedicated user for API service
 kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "CREATE USER solidity WITH PASSWORD 'solidity-local-password';"
 
 # Grant privileges
-kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "GRANT ALL PRIVILEGES ON DATABASE solidity_security TO solidity;"
-kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -d solidity_security -c "GRANT ALL ON SCHEMA public TO solidity;"
+kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "GRANT ALL PRIVILEGES ON DATABASE blocksecops TO solidity;"
+kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -d blocksecops -c "GRANT ALL ON SCHEMA public TO solidity;"
 
 # Verify database creation
-kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "\l solidity_security"
+kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "\l blocksecops"
 ```
 
 **Database Credentials for Local Development:**
-- Database: `solidity_security`
+- Database: `blocksecops`
 - User: `solidity`
 - Password: `solidity-local-password`
 - Host: `postgresql.postgresql-local.svc.cluster.local`
 - Port: `5432`
-- Connection URL: `postgresql+asyncpg://solidity:solidity-local-password@postgresql.postgresql-local.svc.cluster.local:5432/solidity_security`
+- Connection URL: `postgresql+asyncpg://solidity:solidity-local-password@postgresql.postgresql-local.svc.cluster.local:5432/blocksecops`
 
 **Note:** The API service will automatically create necessary tables (`users`, `sessions`) on startup using SQLAlchemy migrations.
 
@@ -223,7 +223,7 @@ cd /Users/pwner/Git/ABS
 ./build-all-images.sh --tag dev --registry localhost:5000
 
 # Verify images built successfully
-docker images | grep solidity-security
+docker images | grep blocksecops
 ```
 
 ## Step 5: Deploy Services
@@ -232,19 +232,19 @@ docker images | grep solidity-security
 
 ```bash
 # Create namespace for services
-kubectl create namespace solidity-security
+kubectl create namespace blocksecops
 
 # Deploy backend services using existing k8s manifests
 for service in api-service data-service intelligence-engine orchestration notification tool-integration contract-parser; do
-  if [ -d "solidity-security-$service/k8s/base" ]; then
-    kubectl apply -f solidity-security-$service/k8s/base/ -n solidity-security
+  if [ -d "blocksecops-$service/k8s/base" ]; then
+    kubectl apply -f blocksecops-$service/k8s/base/ -n blocksecops
   fi
 done
 
 # Deploy frontend services
 for service in ui-core dashboard findings analysis; do
-  if [ -d "solidity-security-$service/k8s/base" ]; then
-    kubectl apply -f solidity-security-$service/k8s/base/ -n solidity-security
+  if [ -d "blocksecops-$service/k8s/base" ]; then
+    kubectl apply -f blocksecops-$service/k8s/base/ -n blocksecops
   fi
 done
 ```
@@ -258,7 +258,7 @@ kubectl create configmap service-config \
   --from-literal=REDIS_URL=redis://redis-master:6379 \
   --from-literal=VAULT_URL=http://vault:8200 \
   --from-literal=VAULT_TOKEN=dev-root-token \
-  --namespace solidity-security
+  --namespace blocksecops
 ```
 
 ## Step 6: Access Configuration
@@ -267,10 +267,10 @@ kubectl create configmap service-config \
 
 ```bash
 # Forward API service
-kubectl port-forward svc/solidity-security-api-service 8000:8000 -n solidity-security &
+kubectl port-forward svc/blocksecops-api-service 8000:8000 -n blocksecops &
 
 # Forward main dashboard
-kubectl port-forward svc/solidity-security-dashboard 3000:3000 -n solidity-security &
+kubectl port-forward svc/blocksecops-dashboard 3000:3000 -n blocksecops &
 
 # Forward Grafana
 kubectl port-forward svc/monitoring-grafana 3001:80 -n monitoring &
@@ -290,7 +290,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: solidityops-ingress
-  namespace: solidity-security
+  namespace: blocksecops
 spec:
   rules:
   - host: api.solidityops.local
@@ -300,7 +300,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: solidity-security-api-service
+            name: blocksecops-api-service
             port:
               number: 8000
   - host: dashboard.solidityops.local
@@ -310,7 +310,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: solidity-security-dashboard
+            name: blocksecops-dashboard
             port:
               number: 3000
 EOF
@@ -328,7 +328,7 @@ echo "$(minikube ip) dashboard.solidityops.local" | sudo tee -a /etc/hosts
 
 ```bash
 # Check all pods are running
-kubectl get pods -n solidity-security
+kubectl get pods -n blocksecops
 
 # Check infrastructure services
 kubectl get pods -n default | grep -E "(postgresql|redis|vault)"
@@ -354,20 +354,20 @@ kubectl exec -it redis-master-0 -- redis-cli ping
 
 ```bash
 # Monitor all service logs
-kubectl logs -f -l app=solidity-security -n solidity-security
+kubectl logs -f -l app=blocksecops -n blocksecops
 
 # Monitor specific service
-kubectl logs -f deployment/solidity-security-api-service -n solidity-security
+kubectl logs -f deployment/blocksecops-api-service -n blocksecops
 ```
 
 ### Service Management
 
 ```bash
 # Restart service after code changes
-kubectl rollout restart deployment/solidity-security-api-service -n solidity-security
+kubectl rollout restart deployment/blocksecops-api-service -n blocksecops
 
 # Scale service replicas
-kubectl scale deployment solidity-security-api-service --replicas=2 -n solidity-security
+kubectl scale deployment blocksecops-api-service --replicas=2 -n blocksecops
 ```
 
 ## Environment Management
@@ -379,7 +379,7 @@ kubectl scale deployment solidity-security-api-service --replicas=2 -n solidity-
 pkill -f "kubectl port-forward"
 
 # Remove services
-kubectl delete namespace solidity-security
+kubectl delete namespace blocksecops
 
 # Reset minikube
 minikube delete && minikube start
@@ -390,8 +390,8 @@ minikube delete && minikube start
 ```bash
 # Start development environment
 minikube start
-kubectl port-forward svc/solidity-security-api-service 8000:8000 -n solidity-security &
-kubectl port-forward svc/solidity-security-dashboard 3000:3000 -n solidity-security &
+kubectl port-forward svc/blocksecops-api-service 8000:8000 -n blocksecops &
+kubectl port-forward svc/blocksecops-dashboard 3000:3000 -n blocksecops &
 
 # Stop development environment
 minikube stop

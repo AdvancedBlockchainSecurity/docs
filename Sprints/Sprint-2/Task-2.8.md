@@ -84,7 +84,7 @@ app-of-apps/
    spec:
      project: infrastructure
      source:
-       repoURL: https://github.com/your-org/solidity-security-aws-infrastructure
+       repoURL: https://github.com/your-org/blocksecops-aws-infrastructure
        targetRevision: main
        path: app-of-apps/infrastructure/overlays/staging
      destination:
@@ -118,7 +118,7 @@ app-of-apps/
    spec:
      project: backend-services
      source:
-       repoURL: https://github.com/your-org/solidity-security-backend-apps
+       repoURL: https://github.com/your-org/blocksecops-backend-apps
        targetRevision: main
        path: app-of-apps/backend-services/overlays/staging
      destination:
@@ -150,7 +150,7 @@ app-of-apps/
    spec:
      project: frontend-services
      source:
-       repoURL: https://github.com/your-org/solidity-security-frontend-apps
+       repoURL: https://github.com/your-org/blocksecops-frontend-apps
        targetRevision: main
        path: app-of-apps/frontend-services/overlays/staging
      destination:
@@ -185,7 +185,7 @@ app-of-apps/
      spec:
        project: infrastructure
        source:
-         repoURL: https://github.com/your-org/solidity-security-aws-infrastructure
+         repoURL: https://github.com/your-org/blocksecops-aws-infrastructure
          targetRevision: main
          path: k8s/istio/overlays/staging
        destination:
@@ -206,7 +206,7 @@ app-of-apps/
      spec:
        project: infrastructure
        source:
-         repoURL: https://github.com/your-org/solidity-security-aws-infrastructure
+         repoURL: https://github.com/your-org/blocksecops-aws-infrastructure
          targetRevision: main
          path: k8s/cert-manager/overlays/staging
        destination:
@@ -227,7 +227,7 @@ app-of-apps/
      spec:
        project: infrastructure
        source:
-         repoURL: https://github.com/your-org/solidity-security-aws-infrastructure
+         repoURL: https://github.com/your-org/blocksecops-aws-infrastructure
          targetRevision: main
          path: k8s/external-secrets/overlays/staging
        destination:
@@ -248,7 +248,7 @@ app-of-apps/
      spec:
        project: infrastructure
        source:
-         repoURL: https://github.com/your-org/solidity-security-monitoring
+         repoURL: https://github.com/your-org/blocksecops-monitoring
          targetRevision: main
          path: k8s/monitoring/overlays/staging
        destination:
@@ -276,7 +276,7 @@ app-of-apps/
      spec:
        project: backend-services
        source:
-         repoURL: https://github.com/your-org/solidity-security-api-service
+         repoURL: https://github.com/your-org/blocksecops-api-service
          targetRevision: main
          path: k8s/overlays/staging
        destination:
@@ -299,7 +299,7 @@ app-of-apps/
      spec:
        project: backend-services
        source:
-         repoURL: https://github.com/your-org/solidity-security-tool-integration
+         repoURL: https://github.com/your-org/blocksecops-tool-integration
          targetRevision: main
          path: k8s/overlays/staging
        destination:
@@ -320,7 +320,7 @@ app-of-apps/
      spec:
        project: backend-services
        source:
-         repoURL: https://github.com/your-org/solidity-security-intelligence-engine
+         repoURL: https://github.com/your-org/blocksecops-intelligence-engine
          targetRevision: main
          path: k8s/overlays/staging
        destination:
@@ -341,7 +341,7 @@ app-of-apps/
      spec:
        project: backend-services
        source:
-         repoURL: https://github.com/your-org/solidity-security-orchestration
+         repoURL: https://github.com/your-org/blocksecops-orchestration
          targetRevision: main
          path: k8s/overlays/staging
        destination:
@@ -362,7 +362,7 @@ app-of-apps/
      spec:
        project: backend-services
        source:
-         repoURL: https://github.com/your-org/solidity-security-data-service
+         repoURL: https://github.com/your-org/blocksecops-data-service
          targetRevision: main
          path: k8s/overlays/staging
        destination:
@@ -383,7 +383,7 @@ app-of-apps/
      spec:
        project: backend-services
        source:
-         repoURL: https://github.com/your-org/solidity-security-notification
+         repoURL: https://github.com/your-org/blocksecops-notification
          targetRevision: main
          path: k8s/overlays/staging
        destination:
@@ -404,7 +404,7 @@ app-of-apps/
      spec:
        project: backend-services
        source:
-         repoURL: https://github.com/your-org/solidity-security-contract-parser
+         repoURL: https://github.com/your-org/blocksecops-contract-parser
          targetRevision: main
          path: k8s/overlays/staging
        destination:
@@ -465,19 +465,19 @@ app-of-apps/
      webhooks.github.secret: |
        - secret: $webhook-secret
          repositories:
-         - "https://github.com/your-org/solidity-security-api-service"
-         - "https://github.com/your-org/solidity-security-tool-integration"
-         - "https://github.com/your-org/solidity-security-intelligence-engine"
-         - "https://github.com/your-org/solidity-security-orchestration"
-         - "https://github.com/your-org/solidity-security-data-service"
-         - "https://github.com/your-org/solidity-security-notification"
-         - "https://github.com/your-org/solidity-security-contract-parser"
-         - "https://github.com/your-org/solidity-security-ui-core"
-         - "https://github.com/your-org/solidity-security-dashboard"
-         - "https://github.com/your-org/solidity-security-findings"
-         - "https://github.com/your-org/solidity-security-analysis"
-         - "https://github.com/your-org/solidity-security-aws-infrastructure"
-         - "https://github.com/your-org/solidity-security-monitoring"
+         - "https://github.com/your-org/blocksecops-api-service"
+         - "https://github.com/your-org/blocksecops-tool-integration"
+         - "https://github.com/your-org/blocksecops-intelligence-engine"
+         - "https://github.com/your-org/blocksecops-orchestration"
+         - "https://github.com/your-org/blocksecops-data-service"
+         - "https://github.com/your-org/blocksecops-notification"
+         - "https://github.com/your-org/blocksecops-contract-parser"
+         - "https://github.com/your-org/blocksecops-ui-core"
+         - "https://github.com/your-org/blocksecops-dashboard"
+         - "https://github.com/your-org/blocksecops-findings"
+         - "https://github.com/your-org/blocksecops-analysis"
+         - "https://github.com/your-org/blocksecops-aws-infrastructure"
+         - "https://github.com/your-org/blocksecops-monitoring"
    ```
 
 2. **Webhook Service Configuration**:
@@ -605,7 +605,7 @@ app-of-apps/
    curl -X POST https://argocd-webhook.staging.advancedblockchainsecurity.com/api/webhook \
      -H "Content-Type: application/json" \
      -H "X-GitHub-Event: push" \
-     -d '{"repository": {"clone_url": "https://github.com/your-org/solidity-security-api-service"}}'
+     -d '{"repository": {"clone_url": "https://github.com/your-org/blocksecops-api-service"}}'
 
    # Check ArgoCD logs for webhook processing
    kubectl logs -n argocd-staging deployment/argocd-server | grep webhook

@@ -6,7 +6,7 @@
 
 ## Context
 
-The Solidity Security Platform requires a robust, maintainable, and scalable architecture that can support:
+The BlockSecOps Platform requires a robust, maintainable, and scalable architecture that can support:
 
 - Complex business logic for security analysis workflows
 - Multiple external service integrations (tools, databases, messaging)
@@ -187,4 +187,4 @@ We will implement **Domain-Driven Design (DDD) + Clean Architecture + CQRS** for
 5. Build presentation layer with FastAPI endpoints
 6. Comprehensive testing and documentation
 
-This architecture decision provides a solid foundation for building a maintainable, scalable, and testable Solidity Security Platform.
+This architecture decision provides a solid foundation for building a maintainable, scalable, and testable BlockSecOps Platform.

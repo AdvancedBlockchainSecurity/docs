@@ -1,10 +1,10 @@
 # Task 1.1: Domain Registration and Initial DNS Setup - Objectives & Implementation Details
 
-## Repository: `solidity-security-aws-infrastructure`
+## Repository: `blocksecops-aws-infrastructure`
 
 AWS Infrastructure as Code repository containing all cloud infrastructure configurations. This task focuses on the DNS and domain management components for establishing the foundational domain infrastructure.
 
-**✅ ALIGNMENT CHECK**: This implementation establishes the foundational domain infrastructure required for the Solidity Security Platform's local, staging and production environments as specified in Sprint 1 documentation.
+**✅ ALIGNMENT CHECK**: This implementation establishes the foundational domain infrastructure required for the BlockSecOps Platform's local, staging and production environments as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
 
@@ -28,7 +28,7 @@ Register the domain and set up initial DNS infrastructure. Actual service DNS re
 ## Directory Structure Requirements
 
 ```
-solidity-security-aws-infrastructure/
+blocksecops-aws-infrastructure/
 ├── cloudflare/
 │   ├── dns-records/               # DNS record configurations
 │   └── subdomain-configs/         # Subdomain-specific settings

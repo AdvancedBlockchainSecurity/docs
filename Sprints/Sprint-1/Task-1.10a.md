@@ -133,7 +133,7 @@ resources:
 
 commonLabels:
   app.kubernetes.io/name: <service>
-  app.kubernetes.io/part-of: solidity-security-platform
+  app.kubernetes.io/part-of: blocksecops-platform
   environment: local
 ```
 
@@ -365,13 +365,13 @@ curl http://localhost:8080/health/live
 ## Files Tracking
 
 ### Repositories to Update
-- [ ] solidity-security-api-service
-- [ ] solidity-security-tool-integration
-- [ ] solidity-security-intelligence-engine
-- [ ] solidity-security-orchestration
-- [ ] solidity-security-data-service
-- [ ] solidity-security-notification
-- [ ] solidity-security-contract-parser
+- [ ] blocksecops-api-service
+- [ ] blocksecops-tool-integration
+- [ ] blocksecops-intelligence-engine
+- [ ] blocksecops-orchestration
+- [ ] blocksecops-data-service
+- [ ] blocksecops-notification
+- [ ] blocksecops-contract-parser
 
 ### Files per Repository (~9-10 files)
 **Base** (~4 files):

@@ -41,7 +41,7 @@ The complete security scanning platform is fully operational and production-read
 
 ### **Backend Service Repositories (6 repos)**
 
-### 1. **`blocksecops-api-service`** (~10K LOC) ✅ **SHARED LIBRARY INTEGRATED** + **DDD ARCHITECTURE** + **SECURITY HARDENED**
+### 1. **`solidity-security-api-service`** (~10K LOC) ✅ **SHARED LIBRARY INTEGRATED** + **DDD ARCHITECTURE** + **SECURITY HARDENED**
 **FastAPI authentication and API gateway with Domain-Driven Design**
 ```
 Purpose: User management, authentication, API routing, JWT handling, project management
@@ -55,7 +55,7 @@ Security: HttpOnly cookies (XSS protection), CORS hardening (origin validation),
 
 **Production-Ready DDD Architecture:**
 ```
-blocksecops-api-service/
+solidity-security-api-service/
 ├── src/
 │   ├── domain/                     # Domain Layer - Pure Business Logic
 │   │   ├── entities/              # Core business entities
@@ -342,7 +342,7 @@ blocksecops-api-service/
 └── README.md                  # Service documentation
 ```
 
-### 2. **`blocksecops-tool-integration`** (~12K LOC) ✅ **MVP COMPLETE - SPRINT 8**
+### 2. **`solidity-security-tool-integration`** (~12K LOC) ✅ **MVP COMPLETE - SPRINT 8**
 **Security tool adapters and integrations - Kubernetes Jobs-based scanner execution**
 ```
 Purpose: Multi-scanner orchestration (Slither, Mythril, Aderyn) via Kubernetes Jobs
@@ -355,7 +355,7 @@ MVP Capabilities: Creates scanner Jobs, delivers source via ConfigMaps, collects
 
 **Directory Structure:**
 ```
-blocksecops-tool-integration/
+solidity-security-tool-integration/
 ├── src/
 │   ├── adapters/
 │   │   ├── __init__.py
@@ -430,7 +430,7 @@ blocksecops-tool-integration/
 └── README.md
 ```
 
-### 3. **`blocksecops-intelligence-engine`** (~8K LOC) 🦀
+### 3. **`solidity-security-intelligence-engine`** (~8K LOC) 🦀
 **Risk scoring and vulnerability correlation - Hybrid Python/Rust**
 ```
 Purpose: Deduplication, risk scoring, pattern matching, false positive detection
@@ -442,7 +442,7 @@ Contains: Machine Learning algorithms, deduplication logic, risk scoring, patter
 
 **Directory Structure:**
 ```
-blocksecops-intelligence-engine/
+solidity-security-intelligence-engine/
 ├── rust-core/                    # High-performance computation engine
 │   ├── Cargo.toml
 │   ├── src/
@@ -505,7 +505,7 @@ blocksecops-intelligence-engine/
 └── README.md
 ```
 
-### 4. **`blocksecops-orchestration`** (~6K LOC)
+### 4. **`solidity-security-orchestration`** (~6K LOC)
 **Analysis workflow and job management**
 ```
 Purpose: Celery workers, job queues, workflow orchestration, task scheduling
@@ -515,7 +515,7 @@ Contains: Task definitions, workflow DAGs, job scheduling, worker management
 
 **Directory Structure:**
 ```
-blocksecops-orchestration/
+solidity-security-orchestration/
 ├── src/
 │   ├── tasks/
 │   │   ├── __init__.py
@@ -569,7 +569,7 @@ blocksecops-orchestration/
 └── README.md
 ```
 
-### 5. **`blocksecops-data-service`** (~7K LOC) 🦀
+### 5. **`solidity-security-data-service`** (~7K LOC) 🦀
 **Database access and caching layer - Hybrid Python/Rust**
 ```
 Purpose: Data models, repository pattern, caching, database migrations
@@ -581,7 +581,7 @@ Contains: Database models, repositories, migrations, caching strategies
 
 **Directory Structure:**
 ```
-blocksecops-data-service/
+solidity-security-data-service/
 ├── rust-engine/                  # High-performance data engine
 │   ├── Cargo.toml
 │   ├── src/
@@ -652,7 +652,7 @@ blocksecops-data-service/
 └── README.md
 ```
 
-### 6. **`blocksecops-notification`** (~5K LOC)
+### 6. **`solidity-security-notification`** (~5K LOC)
 **Real-time notifications and integrations**
 ```
 Purpose: WebSocket server, email notifications, Slack/Teams integrations
@@ -662,7 +662,7 @@ Contains: WebSocket server, email templates, third-party integrations
 
 **Directory Structure:**
 ```
-blocksecops-notification/
+solidity-security-notification/
 ├── src/
 │   ├── websocket/
 │   │   ├── index.ts               # Socket.IO server setup
@@ -754,7 +754,7 @@ blocksecops-notification/
 
 ### **Frontend Repositories (4 repos)**
 
-### 7. **`blocksecops-ui-core`** (~8K LOC) ✅ **SHARED LIBRARY INTEGRATED**
+### 7. **`solidity-security-ui-core`** (~8K LOC) ✅ **SHARED LIBRARY INTEGRATED**
 **Shared UI components and design system**
 ```
 Purpose: Reusable components, layouts, authentication, theme system
@@ -763,7 +763,7 @@ Contains: UI components, layouts, auth components, design tokens, utilities
 Integration: WASM-enabled TypeScript package with JavaScript fallbacks (8x performance boost)
 ```
 
-### 8. **`blocksecops-dashboard`** (~12K LOC) ✅ **MVP COMPLETE - PRODUCTION READY**
+### 8. **`solidity-security-dashboard`** (~12K LOC) ✅ **MVP COMPLETE - PRODUCTION READY**
 **Full-featured security dashboard with real-time updates**
 ```
 Purpose: Complete security scanning interface (MVP)
@@ -779,7 +779,7 @@ Features:
   - Security Hardening (CSP, DOMPurify sanitization, token validation)
 ```
 
-### 9. **`blocksecops-findings`** (~8K LOC)
+### 9. **`solidity-security-findings`** (~8K LOC)
 **Finding management and analysis results**
 ```
 Purpose: Findings table, detail views, status management, filtering
@@ -787,7 +787,7 @@ Tech Stack: React, TypeScript, TanStack Query, TanStack Table
 Contains: Findings components, filters, detail modals, status management
 ```
 
-### 10. **`blocksecops-analysis`** (~6K LOC) ✅ **SHARED LIBRARY INTEGRATED**
+### 10. **`solidity-security-analysis`** (~6K LOC) ✅ **SHARED LIBRARY INTEGRATED**
 **Contract analysis workflow**
 ```
 Purpose: Contract upload, analysis progress, history management
@@ -796,7 +796,7 @@ Contains: Upload components, progress tracking, analysis history
 Integration: WASM-enabled TypeScript package with JavaScript fallbacks (6x performance boost)
 ```
 
-### 11. **`blocksecops-contract-parser`** (~8K LOC) 🦀
+### 11. **`solidity-security-contract-parser`** (~8K LOC) 🦀
 **High-performance Solidity parsing and AST generation - Pure Rust**
 ```
 Purpose: Contract parsing, AST generation, dependency analysis, source mapping
@@ -807,7 +807,7 @@ Benefits: 10-50x faster parsing, memory safety, true parallelism
 
 **Directory Structure:**
 ```
-blocksecops-contract-parser/
+solidity-security-contract-parser/
 ├── Cargo.toml
 ├── src/
 │   ├── main.rs                   # HTTP server entry point
@@ -878,7 +878,7 @@ blocksecops-contract-parser/
 
 ### **Shared Libraries (1 repo)**
 
-### 12. **`blocksecops-shared`** (~7K LOC) 🦀 ✅ **PRODUCTION DEPLOYED**
+### 12. **`solidity-security-shared`** (~7K LOC) 🦀 ✅ **PRODUCTION DEPLOYED**
 **Common utilities and schemas - Multi-language**
 ```
 Purpose: Shared types, utilities, authentication helpers, validation schemas
@@ -890,7 +890,7 @@ Performance: 6-15x speedup for critical operations, 100% cross-language compatib
 
 **Directory Structure:**
 ```
-blocksecops-shared/
+solidity-security-shared/
 ├── rust/                         # Rust shared libraries
 │   ├── Cargo.toml
 │   ├── src/
@@ -962,7 +962,7 @@ blocksecops-shared/
 
 ### **Infrastructure Repositories (2 repos)**
 
-### 13. **`blocksecops-aws-infrastructure`**
+### 13. **`solidity-security-aws-infrastructure`**
 **AWS Infrastructure as Code repository**
 ```
 Purpose: AWS cloud resource provisioning and management
@@ -972,7 +972,7 @@ Contains: VPC, EKS, PostgreSQL StatefulSets, ElastiCache, IAM configurations
 
 ### **Monitoring & Operations (1 repo)**
 
-### 14. **`blocksecops-monitoring`** ✅ **DEPENDENCY MONITORING DEPLOYED**
+### 14. **`solidity-security-monitoring`** ✅ **DEPENDENCY MONITORING DEPLOYED**
 **Observability and monitoring configurations + Dependency Monitoring Service**
 ```
 Purpose: Monitoring, alerting, observability setup + Multi-language dependency scanning
@@ -983,7 +983,7 @@ Additional: Multi-language dependency collectors (Python, Node.js, Rust), securi
 
 ### **Supporting Repositories (3 repos)**
 
-### 15. **`blocksecops-docs`**
+### 15. **`solidity-security-docs`**
 **Documentation and knowledge base**
 ```
 Purpose: Technical documentation, API docs, user guides
@@ -991,7 +991,7 @@ Tech Stack: Markdown, Docusaurus/GitBook
 Contains: Architecture docs, setup guides, API documentation
 ```
 
-### 16. **`blocksecops-tools`**
+### 16. **`solidity-security-tools`**
 **Security tool configurations and utilities**
 ```
 Purpose: Tool installation scripts, configuration templates, test contracts
@@ -999,7 +999,7 @@ Tech Stack: Shell scripts, Docker, tool-specific configs
 Contains: Tool installation scripts, test fixtures, tool version management, configuration templates
 ```
 
-### 17. **`blocksecops-vulnerabilities`**
+### 17. **`solidity-security-vulnerabilities`**
 **Vulnerability database and intelligence**
 ```
 Purpose: Vulnerability data, patterns, and threat intelligence

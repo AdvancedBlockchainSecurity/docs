@@ -37,7 +37,7 @@ Any other directory is **completely ignored** by GitHub.
 ### Directory Structure
 
 ```
-solidity-security-api-service/
+blocksecops-api-service/
 ├── .github/               # ❌ DISABLED - GitHub Actions won't find workflows
 │   └── workflows/         # (empty or removed)
 ├── github/                # ✅ ACTIVE - act reads workflows here

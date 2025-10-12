@@ -64,7 +64,7 @@ web3<8,>=7.10
 ## Documentation Created
 
 ### Technical Documentation
-**File**: `/Users/pwner/Git/ABS/solidity-security-docs/deployment/scanner-execution-architecture.md`
+**File**: `/Users/pwner/Git/ABS/blocksecops-docs/deployment/scanner-execution-architecture.md`
 
 **Contents**:
 - Architecture decision rationale
@@ -195,7 +195,7 @@ rules:
 
 - Sprint Plan: `/Users/pwner/Git/ABS/docs/sprint-plan_new.md` (Sprint 4)
 - Development Plan: `/Users/pwner/Git/ABS/docs/development-plan_new.md` (Sprint 4)
-- Technical Docs: `/Users/pwner/Git/ABS/solidity-security-docs/deployment/scanner-execution-architecture.md`
+- Technical Docs: `/Users/pwner/Git/ABS/blocksecops-docs/deployment/scanner-execution-architecture.md`
 - Task Docs: `/Users/pwner/Git/ABS/TaskDocs/SolidityOps/k8s-jobs-scanner-implementation.md`
 
 ## References

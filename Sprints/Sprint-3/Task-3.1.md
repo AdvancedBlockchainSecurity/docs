@@ -4,11 +4,11 @@
 **Estimated Time**: 8 hours
 **Owner**: Backend Team
 **Priority**: P0 (Critical)
-**Repository**: `solidity-security-api-service`
+**Repository**: `blocksecops-api-service`
 
 ## Overview
 
-Implement a comprehensive FastAPI application using Domain-Driven Design (DDD), Clean Architecture, and CQRS patterns. This service will serve as the primary API gateway for the Solidity Security Platform, handling authentication, user management, and project orchestration.
+Implement a comprehensive FastAPI application using Domain-Driven Design (DDD), Clean Architecture, and CQRS patterns. This service will serve as the primary API gateway for the BlockSecOps Platform, handling authentication, user management, and project orchestration.
 
 ## Technical Requirements
 
@@ -457,7 +457,7 @@ from typing import List, Optional
 
 class Settings(BaseSettings):
     # Application
-    app_name: str = "Solidity Security API"
+    app_name: str = "BlockSecOps API"
     debug: bool = False
     api_version: str = "v1"
 

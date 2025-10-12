@@ -1,4 +1,4 @@
-# Unified Solidity Security Platform - Sprint-Aligned Strategic Roadmap
+# Unified BlockSecOps Platform - Sprint-Aligned Strategic Roadmap
 
 ## Executive Summary
 

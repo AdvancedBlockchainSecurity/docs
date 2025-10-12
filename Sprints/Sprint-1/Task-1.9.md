@@ -2,7 +2,7 @@
 
 ## Repositories: All 17 Platform Repositories
 
-This task spans across all 17 repositories in the Solidity Security Platform, establishing proper directory structures, shared libraries, and CI/CD foundations. The primary focus is on the `solidity-security-shared` repository which provides multi-language utilities used across all services.
+This task spans across all 17 repositories in the BlockSecOps Platform, establishing proper directory structures, shared libraries, and CI/CD foundations. The primary focus is on the `blocksecops-shared` repository which provides multi-language utilities used across all services.
 
 **✅ ALIGNMENT CHECK**: This implementation initializes all 17 repositories with proper structure, multi-language shared library, and CI/CD foundations as specified in Sprint 1 documentation.
 
@@ -24,9 +24,9 @@ Initialize all 17 repositories with proper directory structures, create multi-la
 
 ## Directory Structure Requirements
 
-### Primary Repository: `solidity-security-shared`
+### Primary Repository: `blocksecops-shared`
 ```
-solidity-security-shared/
+blocksecops-shared/
 ├── rust/                         # Rust shared libraries
 │   ├── Cargo.toml
 │   ├── src/
@@ -65,31 +65,31 @@ solidity-security-shared/
 ## Service Categories & Dependencies
 
 ### Backend Services (6 repositories)
-- `solidity-security-api-service` (FastAPI authentication and API gateway)
-- `solidity-security-tool-integration` (Security tool adapters, Hybrid Python/Rust)
-- `solidity-security-intelligence-engine` (Risk scoring and vulnerability correlation, Hybrid Python/Rust)
-- `solidity-security-orchestration` (Analysis workflow and job management, Python Celery)
-- `solidity-security-data-service` (Database access and caching layer, Hybrid Python/Rust)
-- `solidity-security-notification` (Real-time notifications and integrations, Node.js/TypeScript)
+- `blocksecops-api-service` (FastAPI authentication and API gateway)
+- `blocksecops-tool-integration` (Security tool adapters, Hybrid Python/Rust)
+- `blocksecops-intelligence-engine` (Risk scoring and vulnerability correlation, Hybrid Python/Rust)
+- `blocksecops-orchestration` (Analysis workflow and job management, Python Celery)
+- `blocksecops-data-service` (Database access and caching layer, Hybrid Python/Rust)
+- `blocksecops-notification` (Real-time notifications and integrations, Node.js/TypeScript)
 
 ### Contract Parser Service (1 repository)
-- `solidity-security-contract-parser` (High-performance Solidity parsing and AST generation, Pure Rust)
+- `blocksecops-contract-parser` (High-performance Solidity parsing and AST generation, Pure Rust)
 
 ### Frontend Applications (4 repositories)
-- `solidity-security-ui-core` (Shared UI components and design system, React/TypeScript)
-- `solidity-security-dashboard` (Dashboard and metrics interface, React/TypeScript)
-- `solidity-security-findings` (Finding management and analysis results, React/TypeScript)
-- `solidity-security-analysis` (Contract analysis workflow, React/TypeScript)
+- `blocksecops-ui-core` (Shared UI components and design system, React/TypeScript)
+- `blocksecops-dashboard` (Dashboard and metrics interface, React/TypeScript)
+- `blocksecops-findings` (Finding management and analysis results, React/TypeScript)
+- `blocksecops-analysis` (Contract analysis workflow, React/TypeScript)
 
 ### Shared Libraries (1 repository)
-- `solidity-security-shared` (Common utilities and schemas, Multi-language Rust/Python/TypeScript)
+- `blocksecops-shared` (Common utilities and schemas, Multi-language Rust/Python/TypeScript)
 
 ### Infrastructure & Support (5 repositories)
-- `solidity-security-aws-infrastructure` (AWS Infrastructure as Code, Terraform)
-- `solidity-security-monitoring` (Observability and monitoring configurations)
-- `solidity-security-docs` (Documentation and knowledge base)
-- `solidity-security-tools` (Security tool configurations and utilities)
-- `solidity-security-vulnerabilities` (Vulnerability database and intelligence)
+- `blocksecops-aws-infrastructure` (AWS Infrastructure as Code, Terraform)
+- `blocksecops-monitoring` (Observability and monitoring configurations)
+- `blocksecops-docs` (Documentation and knowledge base)
+- `blocksecops-tools` (Security tool configurations and utilities)
+- `blocksecops-vulnerabilities` (Vulnerability database and intelligence)
 
 ## Step 1: Repository Structure Initialization (3 hours)
 
@@ -114,22 +114,22 @@ solidity-security-shared/
 ### Security Tool Integration Architecture
 **Distributed across repositories:**
 
-1. **Tool Integration Service** → `solidity-security-tool-integration`
+1. **Tool Integration Service** → `blocksecops-tool-integration`
    - Tool adapters and execution logic
    - Hybrid Python/Rust architecture
    - FastAPI service layer for tool coordination
 
-2. **Tool Configuration** → `solidity-security-tools`
+2. **Tool Configuration** → `blocksecops-tools`
    - Installation and configuration scripts
    - Tool version management
    - Test contract fixtures
 
-3. **Vulnerability Intelligence** → `solidity-security-vulnerabilities`
+3. **Vulnerability Intelligence** → `blocksecops-vulnerabilities`
    - Vulnerability patterns and mappings
    - SWC definitions and severity data
    - Threat intelligence database
 
-4. **Infrastructure Management** → `solidity-security-aws-infrastructure`
+4. **Infrastructure Management** → `blocksecops-aws-infrastructure`
    - AWS cloud resources via Terraform
    - EKS, PostgreSQL StatefulSets, ElastiCache configurations
    - IAM and security policies
@@ -215,7 +215,7 @@ solidity-security-shared/
 ### Phase 1: Repository Structure (3 hours)
 1. Create all 17 repositories with technology-specific directory structures
 2. Set up security tool integration architecture across appropriate repositories
-3. Configure `solidity-security-aws-infrastructure` repository structure
+3. Configure `blocksecops-aws-infrastructure` repository structure
 4. Configure repository settings, branch protection, and team access
 5. Implement README templates and basic documentation structure
 
@@ -258,9 +258,9 @@ solidity-security-shared/
 - [ ] All 17 repositories created with proper directory structures
 - [ ] Repository settings and branch protection configured for staging workflows
 - [ ] Team access and permissions configured for staging collaboration
-- [ ] Security tool integration architecture set up in `solidity-security-tool-integration`
-- [ ] Tool installation and configuration structure created in `solidity-security-tools`
-- [ ] Vulnerability intelligence structure created in `solidity-security-vulnerabilities`
+- [ ] Security tool integration architecture set up in `blocksecops-tool-integration`
+- [ ] Tool installation and configuration structure created in `blocksecops-tools`
+- [ ] Vulnerability intelligence structure created in `blocksecops-vulnerabilities`
 - [ ] Staging repository integration with GitHub Actions workflows
 - [ ] Cross-language build system implemented with Makefile for staging
 - [ ] Package distribution configured for staging environment testing
@@ -268,7 +268,7 @@ solidity-security-shared/
 
 ### Production Environment
 - [ ] Production repository architecture structured for all 17 repositories
-- [ ] `solidity-security-aws-infrastructure` repository structured for Terraform modules
+- [ ] `blocksecops-aws-infrastructure` repository structured for Terraform modules
 - [ ] Production branch protection and security policies configured
 - [ ] README templates and production documentation implemented
 - [ ] Language-specific configuration files (.gitignore, build files) added for production

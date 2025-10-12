@@ -588,7 +588,7 @@ kubectl edit configmap data-service-config
 #### Database Backup
 ```bash
 # Manual database backup
-kubectl exec -it postgresql-0 -- pg_dump -U postgres solidity_security > backup.sql
+kubectl exec -it postgresql-0 -- pg_dump -U postgres blocksecops > backup.sql
 
 # Verify backup integrity
 kubectl exec -it postgresql-0 -- pg_restore --list backup.sql

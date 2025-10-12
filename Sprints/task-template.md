@@ -128,7 +128,7 @@ Use this template when asking Claude Code to implement sprint tasks. Replace bra
 To use this template, fill in:
 - [TASK_NUMBER]: 1.5, 2.3, etc.
 - [TASK_NAME]: Development Dependencies & Build Systems
-- [REPOSITORY_NAME]: solidity-security-shared
+- [REPOSITORY_NAME]: blocksecops-shared
 - [SERVICE_CATEGORY]: Backend Python Services, Frontend TypeScript Services
 - [NUMBER]: 6, 4, etc.
 - [TIME_ESTIMATE]: 3 hours, 30 minutes, etc.

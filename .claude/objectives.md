@@ -1,4 +1,4 @@
-# Sprint Objectives - Solidity Security Platform
+# Sprint Objectives - BlockSecOps Platform
 
 ## Executive Summary
 

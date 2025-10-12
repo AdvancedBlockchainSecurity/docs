@@ -4,7 +4,7 @@
 **Estimated Time**: 6 hours
 **Owner**: Backend Team
 **Priority**: P0 (Critical)
-**Repository**: `solidity-security-data-service`
+**Repository**: `blocksecops-data-service`
 
 ## Overview
 
@@ -624,7 +624,7 @@ class RedisCache:
     def make_key(self, *parts: str) -> str:
         """Generate a consistent cache key from parts"""
         key_string = ":".join(str(part) for part in parts)
-        return f"solidity_security:{key_string}"
+        return f"blocksecops:{key_string}"
 
     def hash_key(self, data: Dict[str, Any]) -> str:
         """Generate a hash-based key for complex query parameters"""
@@ -787,7 +787,7 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import create_async_engine
 from alembic import context
-from solidity_security_shared.config import settings
+from blocksecops_shared.config import settings
 
 # Import all models to ensure they're registered
 from python_orm.src.models import *

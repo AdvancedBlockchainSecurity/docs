@@ -1,10 +1,10 @@
 # Task 1.3: AWS Database and Cache Infrastructure - Objectives & Implementation Details
 
-## Repository: `solidity-security-aws-infrastructure`
+## Repository: `blocksecops-aws-infrastructure`
 
 AWS Infrastructure as Code repository containing all cloud infrastructure configurations. This task focuses on the storage module providing PostgreSQL StatefulSets and ElastiCache Redis infrastructure for data persistence and caching.
 
-**✅ ALIGNMENT CHECK**: This implementation establishes the data persistence and caching infrastructure required for the Solidity Security Platform's backend services as specified in Sprint 1 documentation.
+**✅ ALIGNMENT CHECK**: This implementation establishes the data persistence and caching infrastructure required for the BlockSecOps Platform's backend services as specified in Sprint 1 documentation.
 
 ## High-Level Objectives
 
@@ -41,7 +41,7 @@ Deploy fully cost-optimized database infrastructure with ElastiCache Redis in Ku
 ## Directory Structure Requirements
 
 ```
-solidity-security-aws-infrastructure/
+blocksecops-aws-infrastructure/
 ├── terraform/
 │   ├── modules/
 │   │   ├── storage/               # ElastiCache Redis modules only

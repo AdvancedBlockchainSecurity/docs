@@ -5,7 +5,7 @@
 
 ## Overview
 
-Sprint 3 focuses on implementing the core backend services that form the foundation of the Solidity Security Platform. Building on the local development environment and Kubernetes foundation established in previous sprints, this sprint delivers production-ready backend microservices with comprehensive security, monitoring, and scalability features, developed locally first with AWS deployment preparation.
+Sprint 3 focuses on implementing the core backend services that form the foundation of the BlockSecOps Platform. Building on the local development environment and Kubernetes foundation established in previous sprints, this sprint delivers production-ready backend microservices with comprehensive security, monitoring, and scalability features, developed locally first with AWS deployment preparation.
 
 ## Technical Architecture
 
@@ -58,7 +58,7 @@ Sprint 3 focuses on implementing the core backend services that form the foundat
 **Estimated Time**: 8 hours
 **Owner**: Backend Team
 **Priority**: P0 (Critical)
-**Repository**: `solidity-security-api-service`
+**Repository**: `blocksecops-api-service`
 
 **Domain-Driven Design Implementation**:
 - **Domain Layer**: Pure business logic with entities, value objects, and domain services
@@ -101,7 +101,7 @@ Monitoring: Prometheus metrics integration
 **Estimated Time**: 6 hours
 **Owner**: Backend Team
 **Priority**: P0 (Critical)
-**Repository**: `solidity-security-data-service`
+**Repository**: `blocksecops-data-service`
 
 **Data Architecture**:
 - **Repository Pattern**: Abstraction layer for data access
@@ -154,7 +154,7 @@ Audit_Logs (id, user_id, action, resource, details, ip_address, timestamp)
 **Estimated Time**: 6 hours
 **Owner**: Full Stack Team
 **Priority**: P0 (Critical)
-**Repository**: `solidity-security-notification`
+**Repository**: `blocksecops-notification`
 
 **Real-Time Architecture**:
 - **WebSocket Server**: Socket.IO for robust real-time communication
@@ -207,7 +207,7 @@ interface AnalysisEvents {
 **Estimated Time**: 4 hours
 **Owner**: Full Stack Team
 **Priority**: P1 (High)
-**Repository**: `solidity-security-notification`
+**Repository**: `blocksecops-notification`
 
 **Communication Integration**:
 - **SMTP Integration**: Secure email delivery with authentication
@@ -444,7 +444,7 @@ Application Optimization:
 **Estimated Time**: 6 hours
 **Owner**: DevOps Team
 **Priority**: P0 (Critical)
-**Repository**: `solidity-security-aws-infrastructure`
+**Repository**: `blocksecops-aws-infrastructure`
 
 **Deployment Architecture**:
 - **ArgoCD GitOps**: Automated deployment and sync policies
@@ -494,7 +494,7 @@ Monitoring:
 **Estimated Time**: 3 hours
 **Owner**: DevOps Team
 **Priority**: P0 (Critical)
-**Repository**: `solidity-security-aws-infrastructure`
+**Repository**: `blocksecops-aws-infrastructure`
 
 **SSL and Domain Configuration**:
 - **cert-manager**: Automated Let's Encrypt certificate provisioning
@@ -725,12 +725,12 @@ The successful completion of Sprint 3 provides a robust backend foundation that 
 Sprint 3 directly impacts 3 core repositories:
 
 ### Backend Services (3 repositories)
-- **`solidity-security-api-service`**: FastAPI gateway with DDD architecture (~10K LOC)
-- **`solidity-security-data-service`**: Data access layer with caching (~7K LOC, Hybrid Python/Rust)
-- **`solidity-security-notification`**: Real-time notifications (~5K LOC, Node.js/TypeScript)
+- **`blocksecops-api-service`**: FastAPI gateway with DDD architecture (~10K LOC)
+- **`blocksecops-data-service`**: Data access layer with caching (~7K LOC, Hybrid Python/Rust)
+- **`blocksecops-notification`**: Real-time notifications (~5K LOC, Node.js/TypeScript)
 
 ### Infrastructure Support (1 repository)
-- **`solidity-security-aws-infrastructure`**: Kubernetes manifests and ArgoCD configurations
+- **`blocksecops-aws-infrastructure`**: Kubernetes manifests and ArgoCD configurations
 
 **Total Development**: ~22K LOC across 4 repositories with production-ready deployment to local environment first, with AWS staging readiness.
 

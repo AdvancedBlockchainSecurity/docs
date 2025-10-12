@@ -38,23 +38,23 @@
 - **Templates**: `/Users/pwner/Git/ABS/docs/architecture-templates/`
 
 ### Technical Documentation
-- **Dev Guides**: `/Users/pwner/Git/ABS/solidity-security-docs/development/`
-- **Architecture Specs**: `/Users/pwner/Git/ABS/solidity-security-docs/architecture/`
-- **Local Dev**: `/Users/pwner/Git/ABS/solidity-security-docs/local-development/`
+- **Dev Guides**: `/Users/pwner/Git/ABS/blocksecops-docs/development/`
+- **Architecture Specs**: `/Users/pwner/Git/ABS/blocksecops-docs/architecture/`
+- **Local Dev**: `/Users/pwner/Git/ABS/blocksecops-docs/local-development/`
 
 ### Code Repositories
 ```
 /Users/pwner/Git/ABS/
-├── solidity-security-api-service/          # FastAPI gateway
-├── solidity-security-data-service/         # Database operations
-├── solidity-security-intelligence-engine/  # ML & risk scoring
-├── solidity-security-orchestration/        # Celery workflows
-├── solidity-security-tool-integration/     # Security tool adapters
-├── solidity-security-notification/         # WebSocket notifications
-├── solidity-security-contract-parser/      # Rust parser
-├── solidity-security-dashboard/            # React UI
-├── solidity-security-shared/               # Multi-language types
-└── solidity-security-aws-infrastructure/   # Terraform/K8s
+├── blocksecops-api-service/          # FastAPI gateway
+├── blocksecops-data-service/         # Database operations
+├── blocksecops-intelligence-engine/  # ML & risk scoring
+├── blocksecops-orchestration/        # Celery workflows
+├── blocksecops-tool-integration/     # Security tool adapters
+├── blocksecops-notification/         # WebSocket notifications
+├── blocksecops-contract-parser/      # Rust parser
+├── blocksecops-dashboard/            # React UI
+├── blocksecops-shared/               # Multi-language types
+└── blocksecops-aws-infrastructure/   # Terraform/K8s
 ```
 
 ---
@@ -64,7 +64,7 @@
 ### Build a New Service
 ```bash
 # 1. Navigate to service repo
-cd /Users/pwner/Git/ABS/solidity-security-<service>
+cd /Users/pwner/Git/ABS/blocksecops-<service>
 
 # 2. Check existing code
 ls -la
@@ -100,7 +100,7 @@ kubectl apply -k k8s/overlays/local
 ### Connect Dashboard to Backend
 ```bash
 # 1. Update dashboard API endpoint
-cd /Users/pwner/Git/ABS/solidity-security-dashboard
+cd /Users/pwner/Git/ABS/blocksecops-dashboard
 # Edit src/utils/env.ts
 
 # 2. Update API base URL to point to service
@@ -141,7 +141,7 @@ When building ANY service, ensure:
 
 ### Code Structure ✅
 - [ ] Follows Clean Architecture + DDD (4 layers: domain, application, infrastructure, presentation)
-- [ ] Uses shared library types from solidity-security-shared
+- [ ] Uses shared library types from blocksecops-shared
 - [ ] Has comprehensive tests (unit + integration)
 - [ ] Implements all 3 health check endpoints (/health/live, /health/ready, /health/startup)
 
@@ -195,7 +195,7 @@ When building ANY service, ensure:
 ```bash
 Host: postgresql.postgresql-local.svc.cluster.local
 Port: 5432
-Database: solidity_security
+Database: blocksecops
 User: postgres
 Password: postgres  # From Vault in production
 ```
@@ -232,7 +232,7 @@ kubectl get externalsecret -n <service>-local
 kubectl describe externalsecret <service>-secret -n <service>-local
 
 # 4. Check Vault secrets exist
-kubectl exec -n vault-local vault-0 -- vault kv get secret/solidity-security/<service>/local
+kubectl exec -n vault-local vault-0 -- vault kv get secret/blocksecops/<service>/local
 ```
 
 ### Image pull failures
@@ -254,7 +254,7 @@ kubectl get pods -n postgresql-local
 
 # 2. Test connection
 kubectl run -it --rm debug --image=postgres:17 --restart=Never -- \
-  psql -h postgresql.postgresql-local.svc -U postgres -d solidity_security
+  psql -h postgresql.postgresql-local.svc -U postgres -d blocksecops
 
 # 3. Check secrets
 kubectl get secret -n <service>-local <service>-secret -o jsonpath='{.data.DATABASE_URL}' | base64 -d
@@ -283,12 +283,12 @@ kubectl get secret -n <service>-local <service>-secret -o jsonpath='{.data.DATAB
 
 ### Internal Docs (Read First)
 - Clean Architecture: `/Users/pwner/Git/ABS/docs/architecture/clean-architecture-decision.md`
-- DDD Guide: `/Users/pwner/Git/ABS/solidity-security-docs/development/ddd-implementation-guide.md`
+- DDD Guide: `/Users/pwner/Git/ABS/blocksecops-docs/development/ddd-implementation-guide.md`
 - K8s Structure: `/Users/pwner/Git/ABS/docs/architecture-templates/kubernetes-kustomize-structure-template.md`
 
 ### Code Examples
-- Best reference: `solidity-security-shared/` - Complete multi-language implementation
-- API patterns: Check `solidity-security-api-service/` for FastAPI patterns
+- Best reference: `blocksecops-shared/` - Complete multi-language implementation
+- API patterns: Check `blocksecops-api-service/` for FastAPI patterns
 - K8s examples: Any service's `k8s/` directory
 
 ---

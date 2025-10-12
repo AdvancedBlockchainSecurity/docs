@@ -97,7 +97,7 @@ Create comprehensive documentation and training materials for the complete Kuber
    ```bash
    # Create ArgoCD application
    argocd app create api-service \
-     --repo https://github.com/your-org/solidity-security-api-service \
+     --repo https://github.com/your-org/blocksecops-api-service \
      --path k8s/overlays/staging \
      --dest-server https://kubernetes.default.svc \
      --dest-namespace api-service \

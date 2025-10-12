@@ -4,7 +4,7 @@
 **Estimated Time**: 6 hours
 **Owner**: DevOps Team
 **Priority**: P0 (Critical)
-**Repository**: `solidity-security-aws-infrastructure`
+**Repository**: `blocksecops-aws-infrastructure`
 
 ## Overview
 
@@ -40,9 +40,9 @@ Load Balancing: Kubernetes Ingress with advanced routing
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: solidity-security
+  name: blocksecops
   labels:
-    app.kubernetes.io/name: solidity-security
+    app.kubernetes.io/name: blocksecops
     app.kubernetes.io/part-of: solidity-platform
     security.policy: restricted
 ---
@@ -67,7 +67,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: api-service
-  namespace: solidity-security
+  namespace: blocksecops
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/api-service-role
 ---
@@ -75,7 +75,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: data-service
-  namespace: solidity-security
+  namespace: blocksecops
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/data-service-role
 ---
@@ -83,7 +83,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: notification-service
-  namespace: solidity-security
+  namespace: blocksecops
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/notification-service-role
 ---
@@ -91,7 +91,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: solidity-security
+  namespace: blocksecops
   name: service-role
 rules:
 - apiGroups: [""]
@@ -105,17 +105,17 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: service-binding
-  namespace: solidity-security
+  namespace: blocksecops
 subjects:
 - kind: ServiceAccount
   name: api-service
-  namespace: solidity-security
+  namespace: blocksecops
 - kind: ServiceAccount
   name: data-service
-  namespace: solidity-security
+  namespace: blocksecops
 - kind: ServiceAccount
   name: notification-service
-  namespace: solidity-security
+  namespace: blocksecops
 roleRef:
   kind: Role
   name: service-role
@@ -129,7 +129,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: api-service-netpol
-  namespace: solidity-security
+  namespace: blocksecops
 spec:
   podSelector:
     matchLabels:
@@ -189,7 +189,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: data-service-netpol
-  namespace: solidity-security
+  namespace: blocksecops
 spec:
   podSelector:
     matchLabels:
@@ -232,7 +232,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: notification-service-netpol
-  namespace: solidity-security
+  namespace: blocksecops
 spec:
   podSelector:
     matchLabels:
@@ -282,7 +282,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api-service
-  namespace: solidity-security
+  namespace: blocksecops
   labels:
     app: api-service
     component: backend
@@ -317,7 +317,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: api-service
-        image: solidity-security/api-service:latest
+        image: blocksecops/api-service:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000
@@ -386,14 +386,14 @@ spec:
       tolerations:
       - key: "app"
         operator: "Equal"
-        value: "solidity-security"
+        value: "blocksecops"
         effect: "NoSchedule"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: api-service
-  namespace: solidity-security
+  namespace: blocksecops
   labels:
     app: api-service
 spec:
@@ -414,7 +414,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: data-service
-  namespace: solidity-security
+  namespace: blocksecops
   labels:
     app: data-service
     component: backend
@@ -449,7 +449,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: data-service
-        image: solidity-security/data-service:latest
+        image: blocksecops/data-service:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8001
@@ -519,7 +519,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: data-service
-  namespace: solidity-security
+  namespace: blocksecops
   labels:
     app: data-service
 spec:
@@ -540,7 +540,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: notification-service
-  namespace: solidity-security
+  namespace: blocksecops
   labels:
     app: notification-service
     component: backend
@@ -575,7 +575,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: notification-service
-        image: solidity-security/notification-service:latest
+        image: blocksecops/notification-service:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8002
@@ -645,7 +645,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: notification-service
-  namespace: solidity-security
+  namespace: blocksecops
   labels:
     app: notification-service
 spec:
@@ -672,7 +672,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: postgres-config
-  namespace: solidity-security
+  namespace: blocksecops
 data:
   postgresql.conf: |
     # PostgreSQL configuration for high performance
@@ -697,7 +697,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres
-  namespace: solidity-security
+  namespace: blocksecops
   labels:
     app: postgres
     component: database
@@ -725,7 +725,7 @@ spec:
           name: postgres
         env:
         - name: POSTGRES_DB
-          value: "solidity_security"
+          value: "blocksecops"
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
@@ -789,7 +789,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres
-  namespace: solidity-security
+  namespace: blocksecops
   labels:
     app: postgres
 spec:
@@ -806,7 +806,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres-headless
-  namespace: solidity-security
+  namespace: blocksecops
   labels:
     app: postgres
 spec:
@@ -828,7 +828,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: redis-config
-  namespace: solidity-security
+  namespace: blocksecops
 data:
   redis.conf: |
     # Redis configuration for high performance
@@ -851,7 +851,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis
-  namespace: solidity-security
+  namespace: blocksecops
   labels:
     app: redis
     component: cache
@@ -923,7 +923,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: redis-data
-  namespace: solidity-security
+  namespace: blocksecops
 spec:
   accessModes:
   - ReadWriteOnce
@@ -936,7 +936,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis
-  namespace: solidity-security
+  namespace: blocksecops
   labels:
     app: redis
 spec:
@@ -958,21 +958,21 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: solidity-security-platform
+  name: blocksecops-platform
   namespace: argocd
   labels:
-    app.kubernetes.io/name: solidity-security-platform
+    app.kubernetes.io/name: blocksecops-platform
 spec:
   project: default
   source:
-    repoURL: https://github.com/solidity-security/aws-infrastructure.git
+    repoURL: https://github.com/blocksecops/aws-infrastructure.git
     targetRevision: main
     path: kubernetes/manifests
     directory:
       recurse: true
   destination:
     server: https://kubernetes.default.svc
-    namespace: solidity-security
+    namespace: blocksecops
   syncPolicy:
     automated:
       prune: true
@@ -1000,7 +1000,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/solidity-security/aws-infrastructure.git
+    repoURL: https://github.com/blocksecops/aws-infrastructure.git
     targetRevision: main
     path: kubernetes/monitoring
     directory:
@@ -1025,14 +1025,14 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: solidity-security
+  name: blocksecops
   namespace: argocd
 spec:
-  description: Solidity Security Platform applications
+  description: BlockSecOps Platform applications
   sourceRepos:
-  - 'https://github.com/solidity-security/*'
+  - 'https://github.com/blocksecops/*'
   destinations:
-  - namespace: solidity-security
+  - namespace: blocksecops
     server: https://kubernetes.default.svc
   - namespace: monitoring
     server: https://kubernetes.default.svc
@@ -1056,19 +1056,19 @@ spec:
     kind: '*'
   roles:
   - name: developer
-    description: Developer access to Solidity Security applications
+    description: Developer access to BlockSecOps applications
     policies:
-    - p, proj:solidity-security:developer, applications, get, solidity-security/*, allow
-    - p, proj:solidity-security:developer, applications, action/*, solidity-security/*, allow
+    - p, proj:blocksecops:developer, applications, get, blocksecops/*, allow
+    - p, proj:blocksecops:developer, applications, action/*, blocksecops/*, allow
     groups:
-    - solidity-security:developers
+    - blocksecops:developers
   - name: admin
-    description: Admin access to Solidity Security applications
+    description: Admin access to BlockSecOps applications
     policies:
-    - p, proj:solidity-security:admin, applications, *, solidity-security/*, allow
-    - p, proj:solidity-security:admin, repositories, *, *, allow
+    - p, proj:blocksecops:admin, applications, *, blocksecops/*, allow
+    - p, proj:blocksecops:admin, repositories, *, *, allow
     groups:
-    - solidity-security:admins
+    - blocksecops:admins
 ```
 
 ### ArgoCD Sync Hooks and Health Checks
@@ -1078,7 +1078,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: database-migration
-  namespace: solidity-security
+  namespace: blocksecops
   annotations:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-weight: "1"
@@ -1090,7 +1090,7 @@ spec:
       serviceAccountName: migration-service-account
       containers:
       - name: alembic-migration
-        image: solidity-security/api-service:latest
+        image: blocksecops/api-service:latest
         command:
         - python
         - -m
@@ -1115,7 +1115,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: vault-initialization
-  namespace: solidity-security
+  namespace: blocksecops
   annotations:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-weight: "0"
@@ -1149,7 +1149,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: deployment-verification
-  namespace: solidity-security
+  namespace: blocksecops
   annotations:
     argocd.argoproj.io/hook: PostSync
     argocd.argoproj.io/hook-weight: "1"
@@ -1183,7 +1183,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: api-service-hpa
-  namespace: solidity-security
+  namespace: blocksecops
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -1232,7 +1232,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: data-service-hpa
-  namespace: solidity-security
+  namespace: blocksecops
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -1278,7 +1278,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: notification-service-hpa
-  namespace: solidity-security
+  namespace: blocksecops
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -1327,7 +1327,7 @@ spec:
       app: api-service
   namespaceSelector:
     matchNames:
-    - solidity-security
+    - blocksecops
   endpoints:
   - port: http
     path: /metrics
@@ -1347,7 +1347,7 @@ spec:
       app: data-service
   namespaceSelector:
     matchNames:
-    - solidity-security
+    - blocksecops
   endpoints:
   - port: http
     path: /metrics
@@ -1367,7 +1367,7 @@ spec:
       app: notification-service
   namespaceSelector:
     matchNames:
-    - solidity-security
+    - blocksecops
   endpoints:
   - port: http
     path: /metrics
@@ -1381,7 +1381,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: solidity-security-dashboard
+  name: blocksecops-dashboard
   namespace: monitoring
   labels:
     grafana_dashboard: "1"
@@ -1390,7 +1390,7 @@ data:
     {
       "dashboard": {
         "id": null,
-        "title": "Solidity Security Platform",
+        "title": "BlockSecOps Platform",
         "tags": ["solidity", "security", "backend"],
         "timezone": "browser",
         "panels": [
@@ -1453,11 +1453,11 @@ data:
             "type": "graph",
             "targets": [
               {
-                "expr": "rate(container_cpu_usage_seconds_total{namespace=\"solidity-security\"}[5m]) * 100",
+                "expr": "rate(container_cpu_usage_seconds_total{namespace=\"blocksecops\"}[5m]) * 100",
                 "legendFormat": "CPU % - {{pod}}"
               },
               {
-                "expr": "container_memory_usage_bytes{namespace=\"solidity-security\"} / 1024 / 1024",
+                "expr": "container_memory_usage_bytes{namespace=\"blocksecops\"} / 1024 / 1024",
                 "legendFormat": "Memory MB - {{pod}}"
               }
             ]
@@ -1491,7 +1491,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-NAMESPACE="solidity-security"
+NAMESPACE="blocksecops"
 MONITORING_NAMESPACE="monitoring"
 ARGOCD_NAMESPACE="argocd"
 
@@ -1653,7 +1653,7 @@ deploy_secrets() {
 
     # Database connection URL
     kubectl create secret generic database-credentials \
-        --from-literal=connection_url="postgresql://postgres:secure-postgres-password@postgres:5432/solidity_security" \
+        --from-literal=connection_url="postgresql://postgres:secure-postgres-password@postgres:5432/blocksecops" \
         --namespace=$NAMESPACE \
         --dry-run=client -o yaml | kubectl apply -f -
 
@@ -1781,7 +1781,7 @@ health_check() {
 
 # Main deployment function
 main() {
-    log_info "Starting local deployment of Solidity Security Platform..."
+    log_info "Starting local deployment of BlockSecOps Platform..."
 
     check_prerequisites
     setup_storage
@@ -1805,7 +1805,7 @@ cleanup() {
     log_info "Cleaning up local deployment..."
 
     # Delete ArgoCD applications
-    argocd app delete solidity-security-platform --cascade || true
+    argocd app delete blocksecops-platform --cascade || true
     argocd app delete monitoring-stack --cascade || true
 
     # Delete namespaces (this will delete all resources)

@@ -129,7 +129,7 @@ resources:
 **New Files Created**:
 
 ```
-solidity-security-shared/
+blocksecops-shared/
 └── k8s/base/vault-setup/
     ├── kustomization.yaml
     ├── policies-configmap.yaml
@@ -191,7 +191,7 @@ Before deploying services, ensure:
 
 2. ⚠️ **Vault Secrets Populated**:
    - Secrets must be created in Vault at paths specified in External Secrets
-   - Run: `kubectl apply -k /path/to/solidity-security-shared/k8s/base/vault-setup` (Jobs need token fix)
+   - Run: `kubectl apply -k /path/to/blocksecops-shared/k8s/base/vault-setup` (Jobs need token fix)
    - OR manually: Use `kubectl exec` commands to populate Vault secrets
 
 3. ⚠️ **Docker Images Built**:
@@ -207,30 +207,30 @@ Before deploying services, ensure:
 
 ### Modified Files (7 repositories)
 
-1. **solidity-security-api-service**:
+1. **blocksecops-api-service**:
    - Modified: `k8s/base/kustomization.yaml` (removed PodSecurityPolicy)
    - Created: 11 new files in `k8s/base/api-service/` and `k8s/overlays/local/api-service/`
    - Created: `k8s/vault-policies/api-service-policy.hcl`
 
-2. **solidity-security-tool-integration**:
+2. **blocksecops-tool-integration**:
    - Modified: `k8s/base/kustomization.yaml` (removed PodSecurityPolicy)
 
-3. **solidity-security-intelligence-engine**:
+3. **blocksecops-intelligence-engine**:
    - Modified: `k8s/base/kustomization.yaml` (removed PodSecurityPolicy)
 
-4. **solidity-security-orchestration**:
+4. **blocksecops-orchestration**:
    - Modified: `k8s/base/kustomization.yaml` (removed PodSecurityPolicy)
 
-5. **solidity-security-data-service**:
+5. **blocksecops-data-service**:
    - Modified: `k8s/base/kustomization.yaml` (removed PodSecurityPolicy)
 
-6. **solidity-security-notification**:
+6. **blocksecops-notification**:
    - Modified: `k8s/base/kustomization.yaml` (removed PodSecurityPolicy)
 
-7. **solidity-security-contract-parser**:
+7. **blocksecops-contract-parser**:
    - Modified: `k8s/base/kustomization.yaml` (removed PodSecurityPolicy)
 
-### New Files (solidity-security-shared)
+### New Files (blocksecops-shared)
 
 - `k8s/base/vault-setup/kustomization.yaml`
 - `k8s/base/vault-setup/policies-configmap.yaml`

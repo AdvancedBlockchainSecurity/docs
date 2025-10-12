@@ -1,4 +1,4 @@
-# Unified Solidity Security Platform
+# Unified BlockSecOps Platform
 ## Sprint-Aligned Business Overview
 
 ---

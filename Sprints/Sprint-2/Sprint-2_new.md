@@ -974,8 +974,8 @@ The successful completion of Sprint 2 provides a robust, production-ready Kubern
 All 17 repositories will be integrated with the infrastructure established in Sprint 2:
 
 ### Infrastructure Repositories
-- `solidity-security-aws-infrastructure`: Terraform configurations for AWS resources
-- `solidity-security-monitoring`: Prometheus + Grafana + Loki Stack configurations and dependency monitoring service
+- `blocksecops-aws-infrastructure`: Terraform configurations for AWS resources
+- `blocksecops-monitoring`: Prometheus + Grafana + Loki Stack configurations and dependency monitoring service
 
 ### Service Repositories (17 repositories)
 Each service repository will include:
@@ -995,4 +995,4 @@ Repository Structure:
         └── deploy.yaml         # GitHub Actions for ArgoCD sync
 ```
 
-This comprehensive infrastructure foundation enables efficient service development, reliable deployments, and robust operations for the entire Solidity Security Platform.
+This comprehensive infrastructure foundation enables efficient service development, reliable deployments, and robust operations for the entire BlockSecOps Platform.

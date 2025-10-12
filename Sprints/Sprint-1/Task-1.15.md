@@ -1,8 +1,8 @@
 # Task 1.15: Documentation and Team Onboarding - Objectives & Implementation Details
 
-## Repository: `solidity-security-docs`
+## Repository: `blocksecops-docs`
 
-Documentation and knowledge base repository containing technical documentation, API docs, user guides, architecture documentation, team training materials, and onboarding procedures for the entire Solidity Security Platform.
+Documentation and knowledge base repository containing technical documentation, API docs, user guides, architecture documentation, team training materials, and onboarding procedures for the entire BlockSecOps Platform.
 
 **✅ ALIGNMENT CHECK**: This implementation creates comprehensive documentation and training materials for AWS infrastructure, GitOps workflows, and team onboarding as specified in Sprint 1 documentation.
 
@@ -25,7 +25,7 @@ Create comprehensive documentation and training materials to enable team product
 ## Directory Structure Requirements
 
 ```
-solidity-security-docs/
+blocksecops-docs/
 ├── architecture/                 # System design and service interactions
 │   ├── overview.md              # Platform architecture overview
 │   ├── service-diagrams/        # Service interaction diagrams

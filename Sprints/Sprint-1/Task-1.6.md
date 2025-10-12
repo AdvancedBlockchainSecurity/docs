@@ -23,7 +23,7 @@ Install and configure critical Kubernetes infrastructure components to enable se
 note: nginx needs to be added for local overlay
 
 ```yaml
-solidity-security-aws-infrastructure/
+blocksecops-aws-infrastructure/
 └── k8s/
     ├── base/                      # Kustomize base configurations
     │   ├── aws-load-balancer-controller/

@@ -1,4 +1,4 @@
-# Unified Solidity Security Platform - Sprint-Based Technical Development Plan
+# Unified BlockSecOps Platform - Sprint-Based Technical Development Plan
 
 ## Executive Summary
 
@@ -119,29 +119,29 @@ Cross-Region Replication:
 Repository Architecture (17 repositories):
 
 Backend Services (7):
-├── solidity-security-api-service          # Gateway and authentication service
-├── solidity-security-tool-integration     # Security tool orchestration service
-├── solidity-security-intelligence-engine  # AI/ML analysis and intelligence service
-├── solidity-security-orchestration        # Workflow and job management service
-├── solidity-security-data-service         # Data access and caching service
-├── solidity-security-notification         # Real-time notification service
-└── solidity-security-contract-parser      # Solidity parsing service
+├── blocksecops-api-service          # Gateway and authentication service
+├── blocksecops-tool-integration     # Security tool orchestration service
+├── blocksecops-intelligence-engine  # AI/ML analysis and intelligence service
+├── blocksecops-orchestration        # Workflow and job management service
+├── blocksecops-data-service         # Data access and caching service
+├── blocksecops-notification         # Real-time notification service
+└── blocksecops-contract-parser      # Solidity parsing service
 
 Frontend Applications (4):
-├── solidity-security-ui-core              # Shared component library
-├── solidity-security-dashboard            # Main dashboard interface
-├── solidity-security-findings             # Finding management interface
-└── solidity-security-analysis             # Analysis workflow interface
+├── blocksecops-ui-core              # Shared component library
+├── blocksecops-dashboard            # Main dashboard interface
+├── blocksecops-findings             # Finding management interface
+└── blocksecops-analysis             # Analysis workflow interface
 
 Infrastructure & Operations (3):
-├── solidity-security-aws-infrastructure   # AWS resource provisioning and management
-├── solidity-security-monitoring           # Observability and monitoring configuration
-└── solidity-security-shared               # Multi-language shared libraries and utilities
+├── blocksecops-aws-infrastructure   # AWS resource provisioning and management
+├── blocksecops-monitoring           # Observability and monitoring configuration
+└── blocksecops-shared               # Multi-language shared libraries and utilities
 
 Support & Documentation (3):
-├── solidity-security-docs                 # Documentation and knowledge base
-├── solidity-security-tools                # Tool installation and configuration
-└── solidity-security-vulnerabilities      # Vulnerability database and signatures
+├── blocksecops-docs                 # Documentation and knowledge base
+├── blocksecops-tools                # Tool installation and configuration
+└── blocksecops-vulnerabilities      # Vulnerability database and signatures
 ```
 
 **Shared Library Architecture**:
@@ -1146,35 +1146,35 @@ Support & Documentation (3):
 ### Backend Services (7 repositories)
 | Repository | Sprint Integration | Key Dependencies | Technical Stack |
 |------------|-------------------|------------------|-----------------|
-| `solidity-security-api-service` | Sprint 3 | Authentication, RBAC, JWT | FastAPI, OAuth 2.0, PostgreSQL |
-| `solidity-security-tool-integration` | Sprint 4, 6, 13 | Slither, Aderyn, Mythril, Certora | Python, Rust, Node.js |
-| `solidity-security-intelligence-engine` | Sprint 4, 7, 11 | ML models, deduplication | Python, ML libraries, Redis |
-| `solidity-security-orchestration` | Sprint 4 | Celery, job queues, Redis | Python, Celery, Redis |
-| `solidity-security-data-service` | Sprint 3 | PostgreSQL, caching | SQLAlchemy, Redis, Kubernetes |
-| `solidity-security-notification` | Sprint 3, 8 | WebSocket, email, Slack | Node.js, Socket.io, SMTP |
-| `solidity-security-contract-parser` | Sprint 4 | Solidity parsing, AST | Rust, HTTP API |
+| `blocksecops-api-service` | Sprint 3 | Authentication, RBAC, JWT | FastAPI, OAuth 2.0, PostgreSQL |
+| `blocksecops-tool-integration` | Sprint 4, 6, 13 | Slither, Aderyn, Mythril, Certora | Python, Rust, Node.js |
+| `blocksecops-intelligence-engine` | Sprint 4, 7, 11 | ML models, deduplication | Python, ML libraries, Redis |
+| `blocksecops-orchestration` | Sprint 4 | Celery, job queues, Redis | Python, Celery, Redis |
+| `blocksecops-data-service` | Sprint 3 | PostgreSQL, caching | SQLAlchemy, Redis, Kubernetes |
+| `blocksecops-notification` | Sprint 3, 8 | WebSocket, email, Slack | Node.js, Socket.io, SMTP |
+| `blocksecops-contract-parser` | Sprint 4 | Solidity parsing, AST | Rust, HTTP API |
 
 ### Frontend Applications (4 repositories)
 | Repository | Sprint Integration | Key Dependencies | Technical Stack |
 |------------|-------------------|------------------|-----------------|
-| `solidity-security-ui-core` | Sprint 5 | Design system, components | React, TypeScript, Tailwind |
-| `solidity-security-dashboard` | Sprint 5, 7 | Visualizations, real-time | React, D3.js, WebSocket |
-| `solidity-security-findings` | Sprint 5, 8 | Table management, workflow | React, TanStack Table |
-| `solidity-security-analysis` | Sprint 5 | Upload interface, progress | React, forms, file handling |
+| `blocksecops-ui-core` | Sprint 5 | Design system, components | React, TypeScript, Tailwind |
+| `blocksecops-dashboard` | Sprint 5, 7 | Visualizations, real-time | React, D3.js, WebSocket |
+| `blocksecops-findings` | Sprint 5, 8 | Table management, workflow | React, TanStack Table |
+| `blocksecops-analysis` | Sprint 5 | Upload interface, progress | React, forms, file handling |
 
 ### Infrastructure & Operations (3 repositories)
 | Repository | Sprint Integration | Key Dependencies | Technical Stack |
 |------------|-------------------|------------------|-----------------|
-| `solidity-security-aws-infrastructure` | Sprint 1, 2 | EKS, PostgreSQL StatefulSets, networking | Terraform, Kubernetes |
-| `solidity-security-monitoring` | Sprint 2, 15 | Prometheus, Grafana | Monitoring stack, alerts |
-| `solidity-security-shared` | Sprint 1 | Multi-language libraries | Python, TypeScript, Rust |
+| `blocksecops-aws-infrastructure` | Sprint 1, 2 | EKS, PostgreSQL StatefulSets, networking | Terraform, Kubernetes |
+| `blocksecops-monitoring` | Sprint 2, 15 | Prometheus, Grafana | Monitoring stack, alerts |
+| `blocksecops-shared` | Sprint 1 | Multi-language libraries | Python, TypeScript, Rust |
 
 ### Support & Documentation (4 repositories)
 | Repository | Sprint Integration | Key Dependencies | Technical Stack |
 |------------|-------------------|------------------|-----------------|
-| `solidity-security-docs` | Sprint 17 | Documentation, tutorials | Markdown, interactive guides |
-| `solidity-security-tools` | Sprint 1 | Tool installation, config | Shell scripts, Docker |
-| `solidity-security-vulnerabilities` | Sprint 7, 11 | Vulnerability database | PostgreSQL, signatures |
+| `blocksecops-docs` | Sprint 17 | Documentation, tutorials | Markdown, interactive guides |
+| `blocksecops-tools` | Sprint 1 | Tool installation, config | Shell scripts, Docker |
+| `blocksecops-vulnerabilities` | Sprint 7, 11 | Vulnerability database | PostgreSQL, signatures |
 
 ## Platform Standards & Best Practices
 

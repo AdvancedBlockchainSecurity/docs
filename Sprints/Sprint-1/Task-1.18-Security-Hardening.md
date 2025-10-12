@@ -46,7 +46,7 @@ Long-term security improvements and compliance requirements.
 
 ### 1.1 HttpOnly Cookies Implementation
 
-**Repository:** `solidity-security-api-service`
+**Repository:** `blocksecops-api-service`
 
 **Backend Changes (`src/presentation/api/v1/endpoints/auth.py`):**
 ```python
@@ -126,7 +126,7 @@ async def get_current_user_from_cookie(
         raise HTTPException(status_code=401, detail="Invalid token")
 ```
 
-**Frontend Changes (`solidity-security-dashboard/src/lib/api/client.ts`):**
+**Frontend Changes (`blocksecops-dashboard/src/lib/api/client.ts`):**
 ```typescript
 // Remove localStorage token management
 const apiClient = axios.create({
@@ -166,7 +166,7 @@ apiClient.interceptors.response.use(
 );
 ```
 
-**Update AuthContext (`solidity-security-dashboard/src/contexts/AuthContext.tsx`):**
+**Update AuthContext (`blocksecops-dashboard/src/contexts/AuthContext.tsx`):**
 ```typescript
 // Remove localStorage token management
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -509,7 +509,7 @@ vault secrets enable -path=secret kv-v2
 
 # Store database credentials
 vault kv put secret/database/api-service \
-  url="postgresql+asyncpg://solidity:STRONG_PASSWORD@postgresql.postgresql-prod.svc.cluster.local:5432/solidity_security?sslmode=require"
+  url="postgresql+asyncpg://solidity:STRONG_PASSWORD@postgresql.postgresql-prod.svc.cluster.local:5432/blocksecops?sslmode=require"
 
 # Store Redis credentials
 vault kv put secret/redis/api-service \
@@ -691,7 +691,7 @@ postgresql:
 ```bash
 # Update Vault secret with sslmode=require
 vault kv put secret/database/api-service \
-  url="postgresql+asyncpg://solidity:PASSWORD@postgresql.postgresql-prod.svc:5432/solidity_security?sslmode=require"
+  url="postgresql+asyncpg://solidity:PASSWORD@postgresql.postgresql-prod.svc:5432/blocksecops?sslmode=require"
 ```
 
 **SQLAlchemy SSL Configuration (`src/infrastructure/database/connection.py`):**
@@ -709,7 +709,7 @@ engine = create_async_engine(
     connect_args={
         "ssl": ssl_context,
         "server_settings": {
-            "application_name": "solidity-security-api"
+            "application_name": "blocksecops-api"
         }
     },
     pool_size=10,
@@ -1162,7 +1162,7 @@ spec:
                   name: postgresql-secret
                   key: postgres-password
             - name: PGDATABASE
-              value: solidity_security
+              value: blocksecops
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
