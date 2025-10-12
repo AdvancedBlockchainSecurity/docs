@@ -122,7 +122,7 @@ act -n
 
 2. **`docs/LOCAL-TESTING-SETUP.md`** - This quick start guide
 
-3. **`solidity-security-docs/development/local-github-actions.md`** - Central docs copy
+3. **`blocksecops-docs/development/local-github-actions.md`** - Central docs copy
 
 ---
 
@@ -221,7 +221,7 @@ Create `.env.test` (if not exists):
 
 ```bash
 cat > .env.test <<EOF
-DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/solidity_security_test
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/blocksecops_test
 REDIS_URL=redis://localhost:6379/0
 JWT_SECRET_KEY=test-secret-key-for-local-act
 SESSION_SECRET=test-session-secret-for-local-act

@@ -4,7 +4,7 @@
 **Estimated Time**: 3 hours
 **Owner**: DevOps Team
 **Priority**: P0 (Critical)
-**Repository**: `solidity-security-aws-infrastructure`
+**Repository**: `blocksecops-aws-infrastructure`
 
 ## Overview
 
@@ -221,12 +221,12 @@ generate_local_certificates() {
 create_kubernetes_secret() {
     log_info "Creating Kubernetes secret for local SSL certificates..."
 
-    kubectl create namespace solidity-security --dry-run=client -o yaml | kubectl apply -f -
+    kubectl create namespace blocksecops --dry-run=client -o yaml | kubectl apply -f -
 
     kubectl create secret tls local-dev-tls \
         --cert=./certs/local/local-dev.crt \
         --key=./certs/local/local-dev.key \
-        --namespace=solidity-security \
+        --namespace=blocksecops \
         --dry-run=client -o yaml | kubectl apply -f -
 
     log_info "Kubernetes TLS secret created successfully"
@@ -245,7 +245,7 @@ update_hosts_file() {
     # Add new entries
     cat << EOF | sudo tee -a /etc/hosts
 
-# Solidity Security Platform - Local Development
+# BlockSecOps Platform - Local Development
 127.0.0.1 api.local.dev
 127.0.0.1 data.local.dev
 127.0.0.1 notifications.local.dev
@@ -282,7 +282,7 @@ cleanup() {
     log_info "Cleaning up local SSL configuration..."
 
     # Remove Kubernetes secret
-    kubectl delete secret local-dev-tls --namespace=solidity-security --ignore-not-found=true
+    kubectl delete secret local-dev-tls --namespace=blocksecops --ignore-not-found=true
 
     # Remove certificates
     rm -rf ./certs/local
@@ -427,7 +427,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: staging-wildcard-cert
-  namespace: solidity-security
+  namespace: blocksecops
 spec:
   secretName: staging-wildcard-tls
   issuerRef:
@@ -442,7 +442,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: production-wildcard-cert
-  namespace: solidity-security
+  namespace: blocksecops
 spec:
   secretName: production-wildcard-tls
   issuerRef:
@@ -514,7 +514,7 @@ data:
   ssl-session-timeout: "10m"
 
   # Security Headers
-  add-headers: "solidity-security/security-headers"
+  add-headers: "blocksecops/security-headers"
 
   # Performance Configuration
   worker-processes: "auto"
@@ -534,7 +534,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: security-headers
-  namespace: solidity-security
+  namespace: blocksecops
 data:
   X-Frame-Options: "DENY"
   X-Content-Type-Options: "nosniff"
@@ -551,8 +551,8 @@ data:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: solidity-security-local
-  namespace: solidity-security
+  name: blocksecops-local
+  namespace: blocksecops
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -632,8 +632,8 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: solidity-security-staging
-  namespace: solidity-security
+  name: blocksecops-staging
+  namespace: blocksecops
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -695,8 +695,8 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: solidity-security-production
-  namespace: solidity-security
+  name: blocksecops-production
+  namespace: blocksecops
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -1131,7 +1131,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: https-only-policy
-  namespace: solidity-security
+  namespace: blocksecops
 spec:
   podSelector: {}
   policyTypes:

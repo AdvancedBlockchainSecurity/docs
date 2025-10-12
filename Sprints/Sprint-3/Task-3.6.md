@@ -135,7 +135,7 @@ spec:
   method: kubernetes
   mount: kubernetes
   kubernetes:
-    role: solidity-security-services
+    role: blocksecops-services
     serviceAccount: default
 ---
 apiVersion: secrets.hashicorp.com/v1beta1
@@ -266,7 +266,7 @@ vault secrets enable database
 # Configure PostgreSQL connection
 vault write database/config/postgresql \
   plugin_name="postgresql-database-plugin" \
-  connection_url="postgresql://{{username}}:{{password}}@postgres.default.svc.cluster.local:5432/solidity_security?sslmode=disable" \
+  connection_url="postgresql://{{username}}:{{password}}@postgres.default.svc.cluster.local:5432/blocksecops?sslmode=disable" \
   username="vault_admin" \
   password="vault_admin_password" \
   allowed_roles="api-service-role,data-service-role,readonly-role"
@@ -470,7 +470,7 @@ class StaticSecretManager:
             # Add metadata
             metadata = {
                 'description': description or f"Secret stored at {path}",
-                'created_by': 'solidity-security-platform',
+                'created_by': 'blocksecops-platform',
                 'created_at': datetime.utcnow().isoformat()
             }
 
@@ -742,7 +742,7 @@ class VaultClientFactory:
 
             # Authenticate with Vault
             vault_client.auth.kubernetes.login(
-                role='solidity-security-services',
+                role='blocksecops-services',
                 jwt=jwt_token
             )
 
@@ -998,7 +998,7 @@ vault write auth/kubernetes/config \
   kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 
 # Create Kubernetes role
-vault write auth/kubernetes/role/solidity-security-services \
+vault write auth/kubernetes/role/blocksecops-services \
   bound_service_account_names="default" \
   bound_service_account_namespaces="default" \
   policies="api-service-policy,data-service-policy,notification-policy" \
@@ -1007,7 +1007,7 @@ vault write auth/kubernetes/role/solidity-security-services \
 # Initialize database engine
 vault write database/config/postgresql \
   plugin_name="postgresql-database-plugin" \
-  connection_url="postgresql://postgres:postgres@postgres:5432/solidity_security?sslmode=disable" \
+  connection_url="postgresql://postgres:postgres@postgres:5432/blocksecops?sslmode=disable" \
   allowed_roles="api-service-role,data-service-role"
 
 vault write database/roles/api-service-role \

@@ -1,6 +1,6 @@
 # Task 1.4: Vault Setup - Objectives & Implementation Details
 
-## Repository: `solidity-security-aws-infrastructure`
+## Repository: `blocksecops-aws-infrastructure`
 
 AWS Infrastructure as Code repository containing all cloud infrastructure configurations. This task focuses on deploying HashiCorp Vault Community Edition using standardized Kustomize structure with proper StatefulSet configuration for secure credential management.
 
@@ -28,7 +28,7 @@ Deploy and configure HashiCorp Vault Community Edition for secure credential sto
 Following the standard Kustomize structure template for StatefulSet services:
 
 ```
-solidity-security-aws-infrastructure/
+blocksecops-aws-infrastructure/
 └── k8s/
     ├── base/
     │   └── vault/

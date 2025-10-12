@@ -1,4 +1,4 @@
-# Solidity Security Platform - Local-First Development Sprint Plan
+# BlockSecOps Platform - Local-First Development Sprint Plan
 
 > **📋 IMPORTANT - PHASE 3 REQUIREMENTS**
 >
@@ -1030,32 +1030,32 @@
 ## Repository Integration Matrix
 
 ### Backend Services (6 repositories)
-- `solidity-security-api-service` → Gateway and authentication service
-- `solidity-security-tool-integration` → Security tool orchestration service
-- `solidity-security-intelligence-engine` → AI/ML analysis and intelligence service
-- `solidity-security-orchestration` → Workflow and job management service
-- `solidity-security-data-service` → Data access and caching service
-- `solidity-security-notification` → Real-time notification service
-- `solidity-security-contract-parser` → Solidity parsing service
+- `blocksecops-api-service` → Gateway and authentication service
+- `blocksecops-tool-integration` → Security tool orchestration service
+- `blocksecops-intelligence-engine` → AI/ML analysis and intelligence service
+- `blocksecops-orchestration` → Workflow and job management service
+- `blocksecops-data-service` → Data access and caching service
+- `blocksecops-notification` → Real-time notification service
+- `blocksecops-contract-parser` → Solidity parsing service
 
 ### Frontend Applications (4 repositories)
-- `solidity-security-ui-core` → Shared component library
-- `solidity-security-dashboard` → Main dashboard interface
-- `solidity-security-findings` → Finding management interface
-- `solidity-security-analysis` → Analysis workflow interface
+- `blocksecops-ui-core` → Shared component library
+- `blocksecops-dashboard` → Main dashboard interface
+- `blocksecops-findings` → Finding management interface
+- `blocksecops-analysis` → Analysis workflow interface
 
 ### Shared Libraries (1 repository)
-- `solidity-security-shared` → Multi-language shared libraries and utilities
+- `blocksecops-shared` → Multi-language shared libraries and utilities
 
 ### Infrastructure & Operations (2 repositories)
-- `solidity-security-aws-infrastructure` → AWS resource provisioning and management
-- `solidity-security-monitoring` → Observability, monitoring configuration + Dependency monitoring service
+- `blocksecops-aws-infrastructure` → AWS resource provisioning and management
+- `blocksecops-monitoring` → Observability, monitoring configuration + Dependency monitoring service
 
 ### Support & Documentation (4 repositories)
-- `solidity-security-docs` → Documentation and knowledge base
-- `solidity-security-tools` → Tool installation and configuration
-- `solidity-security-vulnerabilities` → Vulnerability database and signatures
-- `solidity-security-api-service` → Additional API service components
+- `blocksecops-docs` → Documentation and knowledge base
+- `blocksecops-tools` → Tool installation and configuration
+- `blocksecops-vulnerabilities` → Vulnerability database and signatures
+- `blocksecops-api-service` → Additional API service components
 
 ## Platform Standards & Best Practices
 

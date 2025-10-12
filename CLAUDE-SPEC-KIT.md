@@ -1,12 +1,12 @@
 # Claude Code Specification Kit
 
 **Last Updated**: October 6, 2025
-**Purpose**: Comprehensive specification for building Solidity Security Platform services
+**Purpose**: Comprehensive specification for building BlockSecOps Platform services
 
 ## 📋 Quick Reference
 
 ### Project Overview
-- **Platform**: Solidity Security Analysis Platform
+- **Platform**: BlockSecOps Analysis Platform
 - **Architecture**: Microservices (7 backend services) + React Dashboard
 - **Infrastructure**: Kubernetes (minikube local, AWS EKS production)
 - **Languages**: Python (FastAPI), Rust, TypeScript/React, Node.js
@@ -260,7 +260,7 @@ localhost:8080/library/<service>:<tag>
 ## 🗄️ Database Schema Standards
 
 ### PostgreSQL (Version 17.4.0)
-**Connection**: `postgresql://postgres:postgres@postgresql.postgresql-local.svc:5432/solidity_security`
+**Connection**: `postgresql://postgres:postgres@postgresql.postgresql-local.svc:5432/blocksecops`
 
 ### Required Tables (Initial Schema)
 
@@ -346,7 +346,7 @@ CREATE INDEX idx_vulnerabilities_status ON vulnerabilities(status);
 
 ### Secret Paths
 ```
-secret/solidity-security/<service>/local/
+secret/blocksecops/<service>/local/
   ├── database_url
   ├── redis_url
   ├── jwt_secret_key
@@ -373,7 +373,7 @@ spec:
   data:
     - secretKey: DATABASE_URL
       remoteRef:
-        key: secret/solidity-security/<service>/local
+        key: secret/blocksecops/<service>/local
         property: database_url
 ```
 
@@ -385,12 +385,12 @@ spec:
 ```bash
 # 1. Create repository
 cd /Users/pwner/Git/ABS/
-mkdir solidity-security-<service>
-cd solidity-security-<service>
+mkdir blocksecops-<service>
+cd blocksecops-<service>
 
 # 2. Initialize git
 git init
-git remote add origin https://github.com/SolidityOps/solidity-security-<service>
+git remote add origin https://github.com/SolidityOps/blocksecops-<service>
 
 # 3. Create directory structure (follow Clean Architecture + DDD)
 mkdir -p src/{domain,application,infrastructure,presentation}
@@ -540,14 +540,14 @@ app = FastAPI(
 - `architecture-templates/kubernetes-kustomize-structure-template.md` - K8s standards
 - `Sprints/Sprint-1/Task-*.md` - Task specifications
 
-**Technical Docs** (`/Users/pwner/Git/ABS/solidity-security-docs/`):
+**Technical Docs** (`/Users/pwner/Git/ABS/blocksecops-docs/`):
 - `development/ddd-implementation-guide.md` - DDD patterns
 - `development/dependency-management.md` - Dependency standards
 - `development/testing-guide.md` - Testing requirements
 - `architecture/api-service-architecture.md` - API service spec
 - `local-development/README.md` - Local setup
 
-**Shared Library** (`/Users/pwner/Git/ABS/solidity-security-shared/`):
+**Shared Library** (`/Users/pwner/Git/ABS/blocksecops-shared/`):
 - `CLAUDE.md` - Multi-language library usage
 - `rust/`, `python/`, `typescript/` - Shared types
 
@@ -557,7 +557,7 @@ app = FastAPI(
 
 1. **Always check existing code first** - Many services may have partial implementations
 2. **Follow the patterns** - If one service has a pattern, replicate it
-3. **Use the shared library** - Don't redefine types that exist in solidity-security-shared
+3. **Use the shared library** - Don't redefine types that exist in blocksecops-shared
 4. **Security first** - Never commit secrets, always use Vault
 5. **Test before deploy** - Run unit tests and integration tests
 6. **Document as you go** - Update CLAUDE.md with decisions and gotchas

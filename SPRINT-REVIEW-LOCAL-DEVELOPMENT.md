@@ -210,7 +210,7 @@ This document reviews the implementation status of all 18 Sprints for the **loca
 - ✅ TanStack Query for API caching
 
 **Evidence**:
-- Repository: `solidity-security-dashboard`
+- Repository: `blocksecops-dashboard`
 - Components: `src/components/contracts/`, `src/components/findings/`
 - WebSocket: `src/hooks/useWebSocket.ts`
 - Documentation: `SPRINT-5-SCANNER-EXECUTION-VALIDATION.md`
@@ -345,7 +345,7 @@ This document reviews the implementation status of all 18 Sprints for the **loca
 - ✅ Authentication flow complete
 
 **Evidence**:
-- Repository: `solidity-security-dashboard`
+- Repository: `blocksecops-dashboard`
 - Commit: "Security Fixes & Sprint 9/10 Features - Production Ready"
 - Documentation: `SPRINT-9-10-FRONTEND-MVP-COMPLETE.md`
 

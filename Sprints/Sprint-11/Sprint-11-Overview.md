@@ -8,7 +8,7 @@
 
 ## Overview
 
-Sprint 11 successfully delivered two critical enhancements to the Solidity Security Platform, diverging from the originally planned "Advanced Analytics & Intelligence" to address immediate production needs:
+Sprint 11 successfully delivered two critical enhancements to the BlockSecOps Platform, diverging from the originally planned "Advanced Analytics & Intelligence" to address immediate production needs:
 
 1. **Multi-file Contract Upload Support** - Enable users to upload complete Solidity projects with dependencies
 2. **Argon2id Password Hashing Migration** - Replace bcrypt with OWASP-recommended Argon2id for modern password security
@@ -324,7 +324,7 @@ Update scanner service to handle multi-file contracts via ConfigMaps.
 
 **Implementation**:
 ```python
-# solidity-security-tool-integration/src/scanners/kubernetes_job_manager.py
+# blocksecops-tool-integration/src/scanners/kubernetes_job_manager.py
 def create_configmap_for_contract(contract_id: UUID, files: List[ContractFile]):
     config_data = {}
 

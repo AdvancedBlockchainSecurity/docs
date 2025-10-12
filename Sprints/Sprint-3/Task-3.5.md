@@ -1094,4 +1094,4 @@ data-service/src/infrastructure/external_services/
 - [ ] Connection reuse reduces overhead for frequent service calls
 - [ ] Performance metrics available for all service communication patterns
 
-This inter-service communication implementation ensures robust, secure, and observable communication between all backend microservices in the Solidity Security Platform.
+This inter-service communication implementation ensures robust, secure, and observable communication between all backend microservices in the BlockSecOps Platform.

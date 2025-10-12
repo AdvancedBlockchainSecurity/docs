@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines security recommendations for the authentication system in the Solidity Security Platform. The current implementation uses JWT tokens stored in browser localStorage, which is suitable for development but requires enhancements for production deployment.
+This document outlines security recommendations for the authentication system in the BlockSecOps Platform. The current implementation uses JWT tokens stored in browser localStorage, which is suitable for development but requires enhancements for production deployment.
 
 ## Current Implementation
 
@@ -13,10 +13,10 @@ This document outlines security recommendations for the authentication system in
 - **Token Types:** Access token (30 min) + Refresh token (7 days)
 
 ### Files
-- `solidity-security-dashboard/src/lib/api/auth.ts` - Auth API methods
-- `solidity-security-dashboard/src/lib/api/client.ts` - Axios interceptors
-- `solidity-security-dashboard/src/contexts/AuthContext.tsx` - React context
-- `solidity-security-api-service/src/infrastructure/security/jwt.py` - JWT creation
+- `blocksecops-dashboard/src/lib/api/auth.ts` - Auth API methods
+- `blocksecops-dashboard/src/lib/api/client.ts` - Axios interceptors
+- `blocksecops-dashboard/src/contexts/AuthContext.tsx` - React context
+- `blocksecops-api-service/src/infrastructure/security/jwt.py` - JWT creation
 
 ## Security Recommendations for Production
 

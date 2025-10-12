@@ -84,7 +84,7 @@ scoop install act
 
 ```bash
 # Navigate to project root
-cd /Users/pwner/Git/ABS/solidity-security-api-service
+cd /Users/pwner/Git/ABS/blocksecops-api-service
 
 # List all workflows
 act -l
@@ -198,7 +198,7 @@ cat > .github/workflows/event.json <<EOF
 {
   "ref": "refs/heads/main",
   "repository": {
-    "name": "solidity-security-api-service",
+    "name": "blocksecops-api-service",
     "owner": {
       "login": "your-username"
     }
@@ -215,7 +215,7 @@ act -e .github/workflows/event.json
 ```bash
 # Pass environment variables
 act -j test \
-  --env DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/solidity_security_test \
+  --env DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/blocksecops_test \
   --env REDIS_URL=redis://localhost:6379/0 \
   --env JWT_SECRET_KEY=test-secret
 
@@ -297,13 +297,13 @@ Create `.env.test` for local workflow testing:
 
 ```bash
 # .env.test
-DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/solidity_security_test
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/blocksecops_test
 REDIS_URL=redis://localhost:6379/0
 JWT_SECRET_KEY=test-secret-key-for-local-act
 SESSION_SECRET=test-session-secret-for-local-act
 DEBUG=true
 ENVIRONMENT=test
-PYTHONPATH=/Users/pwner/Git/ABS/solidity-security-api-service/src
+PYTHONPATH=/Users/pwner/Git/ABS/blocksecops-api-service/src
 ```
 
 ---
@@ -546,7 +546,7 @@ cat > .github/workflows/event.json <<EOF
   "ref": "refs/heads/main",
   "sha": "abc123",
   "repository": {
-    "name": "solidity-security-api-service"
+    "name": "blocksecops-api-service"
   }
 }
 EOF

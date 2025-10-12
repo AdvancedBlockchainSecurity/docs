@@ -699,7 +699,7 @@ Resources:
   WebACL:
     Type: AWS::WAFv2::WebACL
     Properties:
-      Name: solidity-security-waf
+      Name: blocksecops-waf
       Scope: REGIONAL
       DefaultAction:
         Allow: {}

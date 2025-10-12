@@ -172,7 +172,7 @@ The Grafana pod has a sidecar container (`grafana-sc-datasources`) that watches 
 ## Next Steps
 
 ### For Production Deployment
-1. Save dashboard JSONs to Git repository (solidity-security-monitoring)
+1. Save dashboard JSONs to Git repository (blocksecops-monitoring)
 2. Create Kustomize base/overlays for staging/production
 3. Configure real AlertManager receivers (Slack, PagerDuty, email)
 4. Add application-specific dashboards for 17 services

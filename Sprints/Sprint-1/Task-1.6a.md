@@ -1,6 +1,6 @@
 # Task 1.6a: DNS Service Configuration - Objectives & Implementation Details
 
-## Repository: `solidity-security-aws-infrastructure`
+## Repository: `blocksecops-aws-infrastructure`
 
 AWS Infrastructure as Code repository containing all cloud infrastructure configurations. This task focuses on configuring DNS service records using AWS Application Load Balancer (ALB) targets for staging/production environments, while local development uses NGINX Ingress Controller.
 
@@ -20,7 +20,7 @@ Configure DNS service records in Cloudflare to point to AWS Application Load Bal
 ## Directory Structure Requirements
 
 ```
-solidity-security-aws-infrastructure/
+blocksecops-aws-infrastructure/
 ├── cloudflare/
 │   ├── dns-records/               # Service DNS record configurations
 │   └── service-routing/           # Service-specific routing configs

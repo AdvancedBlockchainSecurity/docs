@@ -3,13 +3,13 @@
 ## Repositories: Backend Service Repositories
 
 This task creates Kubernetes templates for all backend service repositories:
-- `solidity-security-api-service` (FastAPI authentication and API gateway)
-- `solidity-security-tool-integration` (Security tool adapters, Hybrid Python/Rust)
-- `solidity-security-intelligence-engine` (~Risk scoring and ML analysis, Hybrid Python/Rust)
-- `solidity-security-orchestration` (Workflow management, Python Celery)
-- `solidity-security-data-service` (Database and caching, Hybrid Python/Rust)
-- `solidity-security-notification` (Real-time notifications, Node.js/TypeScript)
-- `solidity-security-contract-parser` (High-performance parsing, Pure Rust)
+- `blocksecops-api-service` (FastAPI authentication and API gateway)
+- `blocksecops-tool-integration` (Security tool adapters, Hybrid Python/Rust)
+- `blocksecops-intelligence-engine` (~Risk scoring and ML analysis, Hybrid Python/Rust)
+- `blocksecops-orchestration` (Workflow management, Python Celery)
+- `blocksecops-data-service` (Database and caching, Hybrid Python/Rust)
+- `blocksecops-notification` (Real-time notifications, Node.js/TypeScript)
+- `blocksecops-contract-parser` (High-performance parsing, Pure Rust)
 
 **✅ ALIGNMENT CHECK**: This implementation creates production-ready Kubernetes deployment templates for all 6 backend services plus the contract parser service with External Secrets integration, IRSA configuration, and comprehensive monitoring as specified in Sprint 1 documentation.
 

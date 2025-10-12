@@ -23,7 +23,7 @@ Deploy and configure ArgoCD for GitOps workflow management in argocd-local, argo
 ArgoCD configuration will be integrated into the existing infrastructure repository:
 
 ```
-solidity-security-aws-infrastructure/
+blocksecops-aws-infrastructure/
 ├── argocd/
 │   ├── base/
 │   │   ├── kustomization.yaml      # Base ArgoCD configuration
@@ -138,7 +138,7 @@ solidity-security-aws-infrastructure/
 ## Implementation Priority
 
 ### Phase 1: Core ArgoCD Deployment (2 hours)
-1. Create ArgoCD Kustomize base configuration in `solidity-security-aws-infrastructure/argocd/base/`
+1. Create ArgoCD Kustomize base configuration in `blocksecops-aws-infrastructure/argocd/base/`
 2. Deploy ArgoCD server components in argocd-local namespace using Kustomize overlay in `argocd/overlays/local/`
 3. Deploy ArgoCD server components in argocd-staging namespace using Kustomize overlay in `argocd/overlays/staging/`
 4. Deploy ArgoCD server components in argocd-production namespace using Kustomize overlay in `argocd/overlays/production/`

@@ -1,6 +1,6 @@
 # Task 1.2: AWS VPC and Networking Infrastructure - Objectives & Implementation Details
 
-## Repository: `solidity-security-aws-infrastructure`
+## Repository: `blocksecops-aws-infrastructure`
 
 AWS Infrastructure as Code repository containing all cloud infrastructure configurations, including VPC, EKS, PostgreSQL in Kubernetes, ElastiCache, IAM, and Vault Community configurations. This task focuses on the networking module providing secure foundation for all AWS services.
 
@@ -26,7 +26,7 @@ Create secure and scalable VPC infrastructure with single-AZ for staging and mul
 ## Directory Structure Requirements
 
 ```
-solidity-security-aws-infrastructure/
+blocksecops-aws-infrastructure/
 ├── terraform/
 │   ├── modules/
 │   │   ├── networking/            # VPC, subnets, security groups

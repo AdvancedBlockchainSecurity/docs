@@ -62,7 +62,7 @@ ArgoCD Applications (18 total):
    spec:
      project: infrastructure
      source:
-       repoURL: https://github.com/your-org/solidity-security-aws-infrastructure
+       repoURL: https://github.com/your-org/blocksecops-aws-infrastructure
        targetRevision: main
        path: k8s/istio/overlays/staging
      destination:
@@ -96,7 +96,7 @@ ArgoCD Applications (18 total):
    spec:
      project: infrastructure
      source:
-       repoURL: https://github.com/your-org/solidity-security-aws-infrastructure
+       repoURL: https://github.com/your-org/blocksecops-aws-infrastructure
        targetRevision: main
        path: k8s/cert-manager/overlays/staging
      destination:
@@ -129,7 +129,7 @@ ArgoCD Applications (18 total):
    spec:
      project: infrastructure
      source:
-       repoURL: https://github.com/your-org/solidity-security-aws-infrastructure
+       repoURL: https://github.com/your-org/blocksecops-aws-infrastructure
        targetRevision: main
        path: k8s/external-secrets/overlays/staging
      destination:
@@ -162,7 +162,7 @@ ArgoCD Applications (18 total):
    spec:
      project: infrastructure
      source:
-       repoURL: https://github.com/your-org/solidity-security-monitoring
+       repoURL: https://github.com/your-org/blocksecops-monitoring
        targetRevision: main
        path: k8s/monitoring/overlays/staging
      destination:
@@ -196,7 +196,7 @@ ArgoCD Applications (18 total):
    spec:
      project: backend-services
      source:
-       repoURL: https://github.com/your-org/solidity-security-api-service
+       repoURL: https://github.com/your-org/blocksecops-api-service
        targetRevision: main
        path: k8s/overlays/staging
      destination:
@@ -234,7 +234,7 @@ ArgoCD Applications (18 total):
    spec:
      project: backend-services
      source:
-       repoURL: https://github.com/your-org/solidity-security-tool-integration
+       repoURL: https://github.com/your-org/blocksecops-tool-integration
        targetRevision: main
        path: k8s/overlays/staging
      destination:
@@ -274,7 +274,7 @@ ArgoCD Applications (18 total):
    spec:
      project: frontend-services
      source:
-       repoURL: https://github.com/your-org/solidity-security-dashboard
+       repoURL: https://github.com/your-org/blocksecops-dashboard
        targetRevision: main
        path: k8s/overlays/staging
      destination:

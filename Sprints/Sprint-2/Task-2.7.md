@@ -8,7 +8,7 @@
 
 ## Objective
 
-Deploy ArgoCD for comprehensive GitOps workflow management across all environments, enabling automated application deployment and configuration management for the entire Solidity Security Platform.
+Deploy ArgoCD for comprehensive GitOps workflow management across all environments, enabling automated application deployment and configuration management for the entire BlockSecOps Platform.
 
 ## Technical Requirements
 
@@ -150,13 +150,13 @@ argocd/
      namespace: argocd-staging
    data:
      repositories: |
-       - url: https://github.com/your-org/solidity-security-api-service
+       - url: https://github.com/your-org/blocksecops-api-service
          name: api-service
          type: git
-       - url: https://github.com/your-org/solidity-security-tool-integration
+       - url: https://github.com/your-org/blocksecops-tool-integration
          name: tool-integration
          type: git
-       - url: https://github.com/your-org/solidity-security-intelligence-engine
+       - url: https://github.com/your-org/blocksecops-intelligence-engine
          name: intelligence-engine
          type: git
        # Additional repositories...
@@ -179,8 +179,8 @@ argocd/
    spec:
      description: Infrastructure components
      sourceRepos:
-     - 'https://github.com/your-org/solidity-security-aws-infrastructure'
-     - 'https://github.com/your-org/solidity-security-monitoring'
+     - 'https://github.com/your-org/blocksecops-aws-infrastructure'
+     - 'https://github.com/your-org/blocksecops-monitoring'
      destinations:
      - namespace: 'istio-system'
        server: https://kubernetes.default.svc
@@ -211,13 +211,13 @@ argocd/
    spec:
      description: Backend microservices
      sourceRepos:
-     - 'https://github.com/your-org/solidity-security-api-service'
-     - 'https://github.com/your-org/solidity-security-tool-integration'
-     - 'https://github.com/your-org/solidity-security-intelligence-engine'
-     - 'https://github.com/your-org/solidity-security-orchestration'
-     - 'https://github.com/your-org/solidity-security-data-service'
-     - 'https://github.com/your-org/solidity-security-notification'
-     - 'https://github.com/your-org/solidity-security-contract-parser'
+     - 'https://github.com/your-org/blocksecops-api-service'
+     - 'https://github.com/your-org/blocksecops-tool-integration'
+     - 'https://github.com/your-org/blocksecops-intelligence-engine'
+     - 'https://github.com/your-org/blocksecops-orchestration'
+     - 'https://github.com/your-org/blocksecops-data-service'
+     - 'https://github.com/your-org/blocksecops-notification'
+     - 'https://github.com/your-org/blocksecops-contract-parser'
      destinations:
      - namespace: 'api-service'
        server: https://kubernetes.default.svc
@@ -260,10 +260,10 @@ argocd/
    spec:
      description: Frontend applications
      sourceRepos:
-     - 'https://github.com/your-org/solidity-security-ui-core'
-     - 'https://github.com/your-org/solidity-security-dashboard'
-     - 'https://github.com/your-org/solidity-security-findings'
-     - 'https://github.com/your-org/solidity-security-analysis'
+     - 'https://github.com/your-org/blocksecops-ui-core'
+     - 'https://github.com/your-org/blocksecops-dashboard'
+     - 'https://github.com/your-org/blocksecops-findings'
+     - 'https://github.com/your-org/blocksecops-analysis'
      destinations:
      - namespace: 'ui-core'
        server: https://kubernetes.default.svc
@@ -387,7 +387,7 @@ argocd/
 2. **Repository Connectivity**:
    ```bash
    argocd repo list
-   argocd repo get https://github.com/your-org/solidity-security-api-service
+   argocd repo get https://github.com/your-org/blocksecops-api-service
    kubectl get configmap argocd-repositories -n argocd-staging -o yaml
    ```
 
@@ -469,7 +469,7 @@ metadata:
     argocd.argoproj.io/secret-type: repository
 stringData:
   type: git
-  url: https://github.com/your-org/solidity-security-api-service
+  url: https://github.com/your-org/blocksecops-api-service
   password: $github-token
   username: git
 ```

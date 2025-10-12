@@ -21,7 +21,7 @@ Deploy comprehensive monitoring and observability stack with Prometheus metrics 
 ## Directory Structure Requirements
 
 ```
-solidity-security-monitoring/
+blocksecops-monitoring/
 └── k8s/
     ├── base/                      # Kustomize base configurations
     │   ├── prometheus/

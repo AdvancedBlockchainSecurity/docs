@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide covers the deployment of `solidity-security-api-service` to the local minikube environment. The API service is a FastAPI application that provides authentication, API gateway functionality, and serves as the entry point for the platform.
+This guide covers the deployment of `blocksecops-api-service` to the local minikube environment. The API service is a FastAPI application that provides authentication, API gateway functionality, and serves as the entry point for the platform.
 
 ## Architecture
 
@@ -35,21 +35,21 @@ The API service requires a dedicated PostgreSQL database:
 POD_NAME=$(kubectl get pods -n postgresql-local -l app.kubernetes.io/name=postgresql -o jsonpath='{.items[0].metadata.name}')
 
 # Create database
-kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "CREATE DATABASE solidity_security;"
+kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "CREATE DATABASE blocksecops;"
 
 # Create user
 kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "CREATE USER solidity WITH PASSWORD 'solidity-local-password';"
 
 # Grant privileges
-kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "GRANT ALL PRIVILEGES ON DATABASE solidity_security TO solidity;"
-kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -d solidity_security -c "GRANT ALL ON SCHEMA public TO solidity;"
+kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -c "GRANT ALL PRIVILEGES ON DATABASE blocksecops TO solidity;"
+kubectl exec -n postgresql-local $POD_NAME -- psql -U harbor -d blocksecops -c "GRANT ALL ON SCHEMA public TO solidity;"
 
 # Verify
-kubectl exec -n postgresql-local $POD_NAME -- psql -U solidity -d solidity_security -c "\dt"
+kubectl exec -n postgresql-local $POD_NAME -- psql -U solidity -d blocksecops -c "\dt"
 ```
 
 **Database Credentials:**
-- Database: `solidity_security`
+- Database: `blocksecops`
 - User: `solidity`
 - Password: `solidity-local-password`
 - Host: `postgresql.postgresql-local.svc.cluster.local:5432`
@@ -62,7 +62,7 @@ Create the secret with database and authentication configuration:
 
 ```bash
 kubectl create secret generic api-service-secret -n api-service-local \
-  --from-literal=DATABASE_URL='postgresql+asyncpg://solidity:solidity-local-password@postgresql.postgresql-local.svc.cluster.local:5432/solidity_security' \
+  --from-literal=DATABASE_URL='postgresql+asyncpg://solidity:solidity-local-password@postgresql.postgresql-local.svc.cluster.local:5432/blocksecops' \
   --from-literal=REDIS_URL='redis://redis-master.redis-local.svc.cluster.local:6379/0' \
   --from-literal=JWT_SECRET_KEY='local-dev-jwt-secret-key-change-in-production' \
   --from-literal=SESSION_SECRET='local-dev-session-secret-change-in-production'
@@ -89,7 +89,7 @@ Key configuration values:
 
 ```bash
 # Navigate to api-service repository
-cd /Users/pwner/Git/ABS/solidity-security-api-service
+cd /Users/pwner/Git/ABS/blocksecops-api-service
 
 # Build Docker image
 docker build -t localhost:8080/library/api-service:latest .
@@ -132,7 +132,7 @@ The application automatically creates tables on startup:
 
 ```bash
 # Verify tables exist
-kubectl exec -n postgresql-local postgresql-0 -- psql -U solidity -d solidity_security -c "\dt"
+kubectl exec -n postgresql-local postgresql-0 -- psql -U solidity -d blocksecops -c "\dt"
 
 # Expected tables:
 # - users
@@ -234,7 +234,7 @@ kubectl patch deployment api-service -n api-service-local --type='json' -p='[
 **Test database connectivity:**
 ```bash
 # From PostgreSQL pod
-kubectl exec -n postgresql-local postgresql-0 -- psql -U solidity -d solidity_security -c "SELECT 1;"
+kubectl exec -n postgresql-local postgresql-0 -- psql -U solidity -d blocksecops -c "SELECT 1;"
 
 # Verify connection string in secret
 kubectl get secret api-service-secret -n api-service-local -o jsonpath='{.data.DATABASE_URL}' | base64 -d
@@ -244,7 +244,7 @@ kubectl get secret api-service-secret -n api-service-local -o jsonpath='{.data.D
 ```bash
 kubectl delete secret api-service-secret -n api-service-local
 kubectl create secret generic api-service-secret -n api-service-local \
-  --from-literal=DATABASE_URL='postgresql+asyncpg://solidity:solidity-local-password@postgresql.postgresql-local.svc.cluster.local:5432/solidity_security' \
+  --from-literal=DATABASE_URL='postgresql+asyncpg://solidity:solidity-local-password@postgresql.postgresql-local.svc.cluster.local:5432/blocksecops' \
   --from-literal=REDIS_URL='redis://redis-master.redis-local.svc.cluster.local:6379/0' \
   --from-literal=JWT_SECRET_KEY='local-dev-jwt-secret-key-change-in-production' \
   --from-literal=SESSION_SECRET='local-dev-session-secret-change-in-production'
@@ -287,7 +287,7 @@ kubectl logs -f -n api-service-local <pod-name>
 
 ```bash
 # Rebuild image
-cd /Users/pwner/Git/ABS/solidity-security-api-service
+cd /Users/pwner/Git/ABS/blocksecops-api-service
 docker build -t localhost:8080/library/api-service:latest .
 minikube image load localhost:8080/library/api-service:latest
 
