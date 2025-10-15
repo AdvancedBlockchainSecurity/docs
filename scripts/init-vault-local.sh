@@ -69,7 +69,8 @@ vault_kv_put "secret/kv/postgresql/local" \
     password="postgres"
 
 # PostgreSQL (used by postgresql-local ExternalSecret)
-vault_kv_put "secret/data/postgresql" \
+# Note: Write to secret/postgresql, Vault KV v2 stores at secret/data/postgresql
+vault_kv_put "secret/postgresql" \
     POSTGRES_DB="solidity_security" \
     POSTGRES_USER="postgres" \
     POSTGRES_PASSWORD="postgres" \
@@ -81,7 +82,8 @@ vault_kv_put "secret/kv/redis/local" \
     password="redis-local-password"
 
 # Redis (used by redis-local ExternalSecret)
-vault_kv_put "secret/data/redis" \
+# Note: Write to secret/redis, Vault KV v2 stores at secret/data/redis
+vault_kv_put "secret/redis" \
     password="redis-local-password"
 
 echo -e "${GREEN}✓ Infrastructure secrets populated${NC}"
@@ -181,7 +183,9 @@ vault_kv_put "secret/local/notification/smtp" \
 
 vault_kv_put "secret/local/notification/webhooks" \
     slack_url="" \
-    teams_url=""
+    teams_url="" \
+    discord_url="" \
+    webhook_secret=""
 
 echo -e "${GREEN}✓ Notification Service secrets populated${NC}"
 echo
@@ -236,8 +240,8 @@ SECRET_PATHS=(
     "secret/kv/postgresql/local"
     "secret/kv/redis/local"
     "secret/kv/api-service/local"
-    "secret/data/postgresql"
-    "secret/data/redis"
+    "secret/postgresql"
+    "secret/redis"
     "secret/local/data-service/database"
     "secret/local/tool-integration/database"
     "secret/local/notification/database"
