@@ -27,7 +27,7 @@ Database: SQLAlchemy 2.0+ with async support
 Authentication: JWT with refresh token rotation
 Documentation: OpenAPI 3.0 with Swagger UI
 Monitoring: Prometheus metrics integration
-Caching: Redis integration for session management
+Caching: Redis integration for WebSocket pub/sub, caching, and rate limiting
 ```
 
 ### Development Standards
