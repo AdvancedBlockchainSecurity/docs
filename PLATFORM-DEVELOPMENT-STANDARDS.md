@@ -105,6 +105,86 @@ app.add_middleware(
 - **Performance:** Bypasses DNS lookups
 - **CORS Clarity:** Explicit IP-based origin
 
+### Rule 3: Restart Pods After Code Changes
+
+**MANDATORY:** After merging code changes or pulling latest code, pods must be restarted to pick up the new changes.
+
+```
+✅ CORRECT WORKFLOW:
+1. Merge PR with code changes to main branch
+2. Pull latest code: git pull origin main
+3. Build and push new Docker image (if image-based deployment)
+4. Restart deployment: kubectl rollout restart deployment/<service> -n <namespace>
+5. Wait for rollout: kubectl rollout status deployment/<service> -n <namespace>
+6. Verify changes are active
+
+❌ INCORRECT WORKFLOW:
+1. Merge PR with code changes
+2. Pull latest code
+3. Assume running pods will pick up changes automatically
+4. Wonder why new features don't work
+```
+
+**When Pod Restarts Are Required:**
+- After merging code changes (API service, workers, etc.)
+- After pulling latest code from main branch
+- After configuration changes in ConfigMaps or Secrets
+- After updating environment variables
+- After dependency updates (requirements.txt, package.json, etc.)
+
+**Example - Restarting Services After Code Merge:**
+
+```bash
+# 1. Pull latest code
+cd /Users/pwner/Git/ABS/blocksecops-api-service
+git checkout main
+git pull
+
+# 2. Restart the API service pod to pick up changes
+kubectl rollout restart deployment/api-service -n api-service-local
+
+# 3. Wait for rollout to complete
+kubectl rollout status deployment/api-service -n api-service-local
+
+# 4. Verify new code is running
+kubectl logs -n api-service-local -l app.kubernetes.io/name=api-service --tail=20
+
+# 5. Verify API health
+curl -s http://127.0.0.1:8000/api/v1/health/ready | jq '.'
+```
+
+**Common Services That Need Restart:**
+
+```bash
+# API Service (after backend code changes)
+kubectl rollout restart deployment/api-service -n api-service-local
+
+# Data Service (after data processing code changes)
+kubectl rollout restart deployment/data-service -n data-service-local
+
+# Tool Integration (after scanner integration changes)
+kubectl rollout restart deployment/tool-integration -n tool-integration-local
+
+# Workers (after background job code changes)
+kubectl rollout restart deployment/celery-worker -n workers-local
+```
+
+**Why This Matters:**
+- **Stale Code:** Running pods continue using old code until restarted
+- **Testing Failures:** New features won't work if pods aren't restarted
+- **Confusing Bugs:** Seeing old behavior when expecting new fixes
+- **Wasted Time:** Debugging issues that don't exist in the new code
+
+**Port Forward Note:** After restarting API service, you may need to restart the port-forward:
+
+```bash
+# Kill old port-forward
+ps aux | grep "port-forward.*svc/api-service" | grep -v grep | awk '{print $2}' | xargs kill
+
+# Start new port-forward
+kubectl port-forward -n api-service-local svc/api-service 8000:8000 > /tmp/pf-api-service.log 2>&1 &
+```
+
 ---
 
 ## Codebase-First Development
