@@ -42,7 +42,7 @@ This document defines mandatory development standards for the BlockSecOps Platfo
 
 ```
 ✅ CORRECT WORKFLOW:
-1. Update configuration files in Git repo folder
+1. Create Branch and Update configuration files in Git repo folder
 2. Commit changes to version control
 3. Apply changes to Kubernetes/platform
 4. Verify changes work as expected
