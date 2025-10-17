@@ -1,6 +1,6 @@
 # Platform Development Standards
 
-**Version:** 1.3.0
+**Version:** 1.5.0
 **Last Updated:** October 17, 2025
 **Status:** Active
 
@@ -42,11 +42,14 @@ This document defines mandatory development standards for the BlockSecOps Platfo
 
 ```
 ✅ CORRECT WORKFLOW:
-1. Create Branch and Update configuration files in Git repo folder
-2. Commit changes to version control
-3. Apply changes to Kubernetes/platform
-4. Verify changes work as expected
-5. Document changes in relevant docs
+1. Create feature branch from main
+2. Update configuration files in Git repo folder
+3. Commit changes to version control
+4. Push feature branch and create pull request
+5. Review and merge PR (user account only)
+6. Apply changes to Kubernetes/platform
+7. Verify changes work as expected
+8. Document changes in relevant docs
 
 ❌ INCORRECT WORKFLOW:
 1. Make ad-hoc changes via kubectl
@@ -112,18 +115,22 @@ app.add_middleware(
 
 ```
 ✅ CORRECT WORKFLOW:
-1. Merge PR with code changes to main branch
-2. Pull latest code: git pull origin main
-3. Build and push new Docker image (if image-based deployment)
-4. Restart deployment: kubectl rollout restart deployment/<service> -n <namespace>
-5. Wait for rollout: kubectl rollout status deployment/<service> -n <namespace>
-6. Verify changes are active
+1. Create feature branch from main
+2. Make code changes and commit to feature branch
+3. Push feature branch and create pull request
+4. Review and merge PR (user account only)
+5. Pull latest code: git pull origin main
+6. Build and push new Docker image (if image-based deployment)
+7. Restart deployment: kubectl rollout restart deployment/<service> -n <namespace>
+8. Wait for rollout: kubectl rollout status deployment/<service> -n <namespace>
+9. Verify changes are active
 
 ❌ INCORRECT WORKFLOW:
-1. Merge PR with code changes
-2. Pull latest code
-3. Assume running pods will pick up changes automatically
-4. Wonder why new features don't work
+1. Make changes directly on main branch
+2. Commit and push to main
+3. Pull latest code
+4. Assume running pods will pick up changes automatically
+5. Wonder why new features don't work
 ```
 
 **When Pod Restarts Are Required:**
@@ -1607,20 +1614,295 @@ Examples:
 - hotfix/memory-leak-api-service
 ```
 
+### Git Workflow - Feature Branch Model
+
+**CRITICAL:** NEVER commit directly to main branch. ALL changes MUST go through feature branches and pull requests.
+
+```
+✅ CORRECT WORKFLOW:
+1. Create feature branch from main
+2. Make changes and commit to feature branch
+3. Push feature branch to remote
+4. Create pull request
+5. Review and merge PR (user account only, NEVER as Claude)
+6. Delete feature branch after merge
+
+❌ INCORRECT WORKFLOW:
+1. Make changes directly on main branch
+2. Commit to main branch
+3. Push directly to main
+```
+
+**Why this matters:**
+- **Code Review:** All changes reviewed before merging to main
+- **Quality Control:** Prevents broken code from reaching main
+- **Audit Trail:** Clear history of what changed and why
+- **Collaboration:** Team members can review and discuss changes
+- **Rollback Safety:** Easy to revert problematic changes
+- **CI/CD Integration:** Automated tests run before merge
+
+**MANDATORY: This is the standard git workflow. Violations are unacceptable.**
+
+#### Step-by-Step Feature Branch Workflow
+
+**1. Start New Feature/Fix:**
+
+```bash
+# Ensure you're on main and up to date
+git checkout main
+git pull origin main
+
+# Create and switch to feature branch
+git checkout -b feat/add-scan-filtering
+# or
+git checkout -b fix/vulnerability-status-update
+# or
+git checkout -b docs/update-api-guide
+```
+
+**2. Make Changes and Commit:**
+
+```bash
+# Make your code changes
+vim src/api/endpoints/scans.py
+
+# Stage changes
+git add src/api/endpoints/scans.py
+
+# Commit with descriptive message
+git commit -m "feat: Add filtering by severity to scan endpoint
+
+- Add severity query parameter to /api/v1/scans
+- Support multiple severity filters (e.g., ?severity=high,critical)
+- Add validation for severity values
+- Update API documentation
+
+Allows users to filter scans by vulnerability severity.
+
+Refs: #234"
+
+# Continue making changes as needed
+# Commit frequently with clear messages
+```
+
+**3. Push Feature Branch:**
+
+```bash
+# Push branch to remote (first time)
+git push -u origin feat/add-scan-filtering
+
+# Subsequent pushes
+git push
+```
+
+**4. Create Pull Request:**
+
+```bash
+# Option 1: Using GitHub CLI
+gh pr create \
+  --title "feat: Add filtering by severity to scan endpoint" \
+  --body "## Summary
+- Adds severity filtering to scan list endpoint
+- Supports multiple severity values
+- Includes validation and tests
+
+## Testing
+- Unit tests added for filter logic
+- Integration tests verify API behavior
+- Manual testing with curl commands
+
+## Breaking Changes
+None - backwards compatible addition"
+
+# Option 2: Via GitHub web interface
+# Navigate to repository and click "Create Pull Request"
+```
+
+**5. Code Review and Merge:**
+
+```bash
+# CRITICAL: User (not Claude) reviews and merges PR
+# - Review code changes in GitHub
+# - Check CI/CD tests passed
+# - Verify no merge conflicts
+# - Click "Merge pull request" (as user, NOT as Claude)
+# - Delete feature branch after merge
+```
+
+**6. Clean Up:**
+
+```bash
+# After PR is merged, delete local branch
+git checkout main
+git pull origin main
+git branch -d feat/add-scan-filtering
+
+# Remote branch is automatically deleted if "Delete branch" was clicked
+```
+
+#### Branch Protection Rules
+
+**MANDATORY settings for main branch:**
+
+1. **Require pull request reviews** - At least 1 approval (in team environments)
+2. **Require status checks** - Tests must pass before merge
+3. **No direct commits to main** - All changes via PR
+4. **Include administrators** - Even admins must follow workflow
+
+**GitHub Settings Path:**
+Repository → Settings → Branches → Branch protection rules → main
+
+#### Common Git Workflow Scenarios
+
+**Scenario 1: Need to update feature branch with latest main:**
+
+```bash
+# Switch to your feature branch
+git checkout feat/add-scan-filtering
+
+# Fetch latest from remote
+git fetch origin
+
+# Rebase on top of latest main (preferred)
+git rebase origin/main
+
+# OR merge main into feature branch (alternative)
+git merge origin/main
+
+# Push updated feature branch
+git push --force-with-lease  # If rebased
+# or
+git push  # If merged
+```
+
+**Scenario 2: Multiple commits in feature branch, want to squash:**
+
+```bash
+# Interactive rebase to squash commits
+git rebase -i HEAD~3  # Last 3 commits
+
+# In editor, change "pick" to "squash" for commits to combine
+# Save and edit combined commit message
+
+# Push squashed commits
+git push --force-with-lease
+```
+
+**Scenario 3: Accidentally committed to main:**
+
+```bash
+# Create feature branch from current main state
+git branch fix/accidental-commit
+
+# Reset main to remote state (removes local commits)
+git reset --hard origin/main
+
+# Switch to feature branch (commits are preserved here)
+git checkout fix/accidental-commit
+
+# Push feature branch and create PR
+git push -u origin fix/accidental-commit
+gh pr create --title "fix: [description]" --body "[details]"
+```
+
+**Scenario 4: Need to make hotfix to production:**
+
+```bash
+# Create hotfix branch from main
+git checkout main
+git pull origin main
+git checkout -b hotfix/critical-security-patch
+
+# Make minimal changes to fix issue
+vim src/security/auth.py
+git add src/security/auth.py
+git commit -m "hotfix: Patch critical security vulnerability
+
+- Fix SQL injection in login endpoint
+- Add input validation for email parameter
+- Backport to stable branches
+
+CRITICAL: Deploy immediately
+
+Refs: SEC-001"
+
+# Push and create PR marked as urgent
+git push -u origin hotfix/critical-security-patch
+gh pr create --title "HOTFIX: Critical security patch" --body "..."
+
+# After review and merge, tag for deployment
+git checkout main
+git pull origin main
+git tag -a v1.2.3 -m "Hotfix release v1.2.3 - Security patch"
+git push origin v1.2.3
+```
+
 ### Pull Request Requirements
 
 **Every PR MUST include:**
 
-1. Clear title describing the change, never mention Claude or Claude Code
-2. Description with:
+1. **Clear title** describing the change (never mention Claude or Claude Code)
+2. **Description** with:
    - What changed
    - Why it changed
    - How to test
    - Any breaking changes
-3. Updated documentation (if applicable)
-4. Tests passing (if applicable)
-5. No merge conflicts
-6. Commit, open PR and merge with user account, not claude. 
+3. **Updated documentation** (if applicable)
+4. **Tests passing** (all CI/CD checks green)
+5. **No merge conflicts** with main branch
+6. **Commits merged by user account** (NEVER by Claude or automated tools)
+
+**PR Title Format:**
+```
+<type>: <brief description>
+
+Examples:
+feat: Add severity filtering to scan endpoint
+fix: Correct vulnerability status update logic
+docs: Update API authentication guide
+refactor: Simplify scan result processing
+test: Add integration tests for scan workflow
+```
+
+**PR Description Template:**
+
+```markdown
+## Summary
+Brief description of what this PR does (2-3 sentences).
+
+## Changes
+- Specific change 1
+- Specific change 2
+- Specific change 3
+
+## Testing
+- [ ] Unit tests added/updated
+- [ ] Integration tests passing
+- [ ] Manual testing completed
+- [ ] Tested in local environment
+
+## Breaking Changes
+Yes/No - If yes, describe what breaks and migration path.
+
+## Checklist
+- [ ] Code follows project style guidelines
+- [ ] Documentation updated
+- [ ] Tests passing
+- [ ] No merge conflicts
+- [ ] Ready for review
+```
+
+**PR Review Checklist:**
+
+Before merging any PR:
+- [ ] All CI/CD checks passing (tests, linting, build)
+- [ ] Code reviewed for quality and correctness
+- [ ] No security vulnerabilities introduced
+- [ ] Documentation updated if needed
+- [ ] No merge conflicts with main
+- [ ] Commit messages follow standards
+- [ ] Breaking changes documented
+- [ ] User (not Claude) performs the merge
 
 ---
 
@@ -2011,6 +2293,7 @@ This document establishes standards for:
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
+| 1.5.0 | 2025-10-17 | **CRITICAL:** Added comprehensive Git Workflow Standards section mandating feature branch model, prohibiting direct commits to main, documenting PR requirements, branch protection rules, and common workflow scenarios. All changes MUST now go through feature branches and pull requests. | BlockSecOps Team |
 | 1.4.0 | 2025-10-17 | Added comprehensive Dashboard Development Setup section documenting Python 3.13 greenlet issue, proper startup procedures, port-forward best practices (deployment vs service), troubleshooting steps, and development workflow | BlockSecOps Team |
 | 1.3.0 | 2025-10-17 | Added Docker Image Versioning Standards section with Semantic Versioning 2.0.0 specification, version increment rules, image tagging workflow, and version tracking procedures | BlockSecOps Team |
 | 1.2.0 | 2025-10-17 | Added Port Number Consistency Standards and Kubernetes Service Selector Standards sections with includeSelectors best practices and troubleshooting | BlockSecOps Team |
