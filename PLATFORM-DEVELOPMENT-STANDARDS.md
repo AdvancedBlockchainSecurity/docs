@@ -1,7 +1,7 @@
 # Platform Development Standards
 
-**Version:** 1.1.0
-**Last Updated:** October 16, 2025
+**Version:** 1.3.0
+**Last Updated:** October 17, 2025
 **Status:** Active
 
 ## Table of Contents
@@ -16,6 +16,7 @@
 8. [Testing Standards](#testing-standards)
 9. [Deployment Workflow](#deployment-workflow)
 10. [Compliance Checklist](#compliance-checklist)
+11. [Docker Image Versioning Standards](#docker-image-versioning-standards)
 
 ---
 
@@ -403,6 +404,309 @@ echo ""
 echo "All port forwards active. Use 127.0.0.1 for all connections."
 ```
 
+### Port Number Consistency Standards
+
+**CRITICAL:** Never change port numbers without updating all dependent configurations.
+
+**Why this matters:**
+- **Platform Consistency:** Changing port numbers breaks integrations across the platform
+- **CORS Configuration:** Backend services whitelist specific ports
+- **Documentation Accuracy:** All docs reference standard ports
+- **Team Coordination:** Other developers expect services on standard ports
+- **Testing Scripts:** Automated tests hardcode port numbers
+
+**Standard Port Assignments:**
+
+| Service | Port | Purpose | Notes |
+|---------|------|---------|-------|
+| Dashboard | 3000 | Frontend UI | Primary user interface |
+| API Service | 8000 | Backend API | FastAPI application |
+| Notification | 8003 | WebSocket | Real-time notifications |
+| Grafana | 3001 | Monitoring | Metrics dashboard |
+| PostgreSQL | 5432 | Database | Port-forwarded only |
+| Redis | 6379 | Cache | Port-forwarded only |
+
+**If a port is occupied:**
+
+```bash
+# ❌ INCORRECT: Let service pick next available port
+npm run dev  # Picks port 3002, 3003, etc.
+
+# ✅ CORRECT: Free up the standard port
+lsof -ti:3000 | xargs kill -9  # Kill process using port 3000
+npm run dev  # Now uses port 3000
+```
+
+**When ports conflict during development:**
+
+```bash
+# 1. Identify what's using the port
+lsof -i:3000
+
+# 2. If it's an old/stale process, kill it
+kill -9 <PID>
+
+# 3. If it's a legitimate service, check if it should be running
+ps aux | grep <process-name>
+
+# 4. Restart the service on the correct port
+# (Example for dashboard)
+cd /Users/pwner/Git/ABS/blocksecops-dashboard
+npm run dev
+```
+
+### Kubernetes Service Selector Standards
+
+**CRITICAL:** Service selectors must match pod labels, or services will have no endpoints.
+
+#### The includeSelectors Problem
+
+**Issue:** Kustomize `includeSelectors: true` adds ALL common labels to service selectors, creating mismatches.
+
+**Example of the problem:**
+
+```yaml
+# kustomization.yaml with includeSelectors: true
+labels:
+- includeSelectors: true  # ❌ DANGEROUS
+  pairs:
+    app.kubernetes.io/name: api-service
+    app.kubernetes.io/instance: local-api-service
+    app.kubernetes.io/version: 0.3.12
+    app.kubernetes.io/component: backend-api
+    app.kubernetes.io/part-of: blocksecops-platform
+    app.kubernetes.io/managed-by: kustomize
+    environment: local
+    team: backend
+```
+
+**Result:** Service selector gets 8 labels, but deployment only adds 3 labels to pod template:
+
+```yaml
+# Service selector (8 labels)
+selector:
+  app.kubernetes.io/name: api-service
+  app.kubernetes.io/instance: local-api-service
+  app.kubernetes.io/version: 0.3.12
+  app.kubernetes.io/component: backend-api
+  app.kubernetes.io/part-of: blocksecops-platform
+  app.kubernetes.io/managed-by: kustomize
+  environment: local
+  team: backend
+
+# Pod labels (only 3 labels)
+labels:
+  app.kubernetes.io/name: api-service
+  app.kubernetes.io/component: backend
+  app.kubernetes.io/part-of: blocksecops-platform
+```
+
+**Result:** Service has NO ENDPOINTS because selector doesn't match pods.
+
+```bash
+$ kubectl get endpoints -n api-service-local api-service
+NAME          ENDPOINTS   AGE
+api-service   <none>      10d
+```
+
+#### The Solution: includeSelectors: false
+
+**MANDATORY:** Always set `includeSelectors: false` in Kustomize overlays.
+
+```yaml
+# ✅ CORRECT: includeSelectors: false
+labels:
+- includeSelectors: false  # Only adds labels to metadata, not selectors
+  pairs:
+    app.kubernetes.io/name: api-service
+    app.kubernetes.io/instance: local-api-service
+    app.kubernetes.io/version: 0.3.12
+    app.kubernetes.io/component: backend-api
+    app.kubernetes.io/part-of: blocksecops-platform
+    app.kubernetes.io/managed-by: kustomize
+    environment: local
+    team: backend
+```
+
+**Result:** Service selector uses only the labels defined in base service manifest:
+
+```yaml
+# Service selector (minimal, matches pods)
+selector:
+  app.kubernetes.io/name: api-service
+
+# Pod labels (matches selector)
+labels:
+  app.kubernetes.io/name: api-service
+  app.kubernetes.io/component: backend
+  app.kubernetes.io/part-of: blocksecops-platform
+```
+
+**Verification:**
+
+```bash
+# 1. Check service selector
+kubectl get svc -n api-service-local api-service -o jsonpath='{.spec.selector}' | jq .
+
+# 2. Check pod labels
+kubectl get pods -n api-service-local -l app.kubernetes.io/name=api-service -o jsonpath='{.items[0].metadata.labels}' | jq .
+
+# 3. Verify service has endpoints
+kubectl get endpoints -n api-service-local api-service
+
+# ✅ GOOD: Shows IP addresses and ports
+# NAME          ENDPOINTS                           AGE
+# api-service   10.244.4.14:9090,10.244.4.14:8000   10d
+
+# ❌ BAD: No endpoints (selector mismatch)
+# NAME          ENDPOINTS   AGE
+# api-service   <none>      10d
+```
+
+#### Service Selector Best Practices
+
+**1. Keep selectors minimal** - Only use labels that uniquely identify the pod:
+
+```yaml
+# ✅ GOOD: Minimal, specific selector
+selector:
+  app.kubernetes.io/name: api-service
+
+# ❌ BAD: Too many labels
+selector:
+  app.kubernetes.io/name: api-service
+  app.kubernetes.io/version: 0.3.12  # Version changes with each release!
+  environment: local
+  team: backend
+```
+
+**2. Base service defines selector** - Overlay only patches if absolutely necessary:
+
+```yaml
+# base/api-service/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+spec:
+  selector:
+    app.kubernetes.io/name: api-service  # ✅ Simple, stable selector
+  ports:
+  - name: http
+    port: 8000
+    targetPort: http
+```
+
+**3. Never change selectors in overlays** - Use service-patch.yaml only for ports/annotations:
+
+```yaml
+# overlays/local/service-patch.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  annotations:
+    prometheus.io/scrape: "true"
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+    nodePort: 30800
+  # ✅ NO selector override - uses base service selector
+```
+
+#### Troubleshooting Service Endpoints
+
+**Symptom:** Service has no endpoints, port-forward fails, API not accessible
+
+**Diagnosis:**
+
+```bash
+# 1. Check if service has endpoints
+kubectl get endpoints -n <namespace> <service-name>
+
+# 2. If no endpoints, check selector vs pod labels
+kubectl get svc -n <namespace> <service-name> -o yaml | grep -A 10 "selector:"
+kubectl get pods -n <namespace> -o yaml | grep -A 10 "labels:"
+
+# 3. Check kustomization.yaml for includeSelectors
+cat k8s/overlays/local/kustomization.yaml | grep -A 2 "includeSelectors"
+```
+
+**Fix:**
+
+```bash
+# 1. Update kustomization.yaml
+cd /Users/pwner/Git/ABS/blocksecops-<service>/k8s/overlays/local
+vim kustomization.yaml
+
+# Change:
+# includeSelectors: true
+# To:
+# includeSelectors: false
+
+# 2. Apply changes
+kubectl apply -k .
+
+# 3. Verify endpoints now exist
+kubectl get endpoints -n <namespace> <service-name>
+
+# 4. Test connectivity
+kubectl port-forward -n <namespace> svc/<service-name> <port>:<port> &
+sleep 2
+curl http://localhost:<port>/health
+```
+
+#### Standard Kustomization Pattern
+
+**Use this pattern for ALL service overlays:**
+
+```yaml
+# k8s/overlays/local/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- namespace.yaml
+- ../../base/
+
+namespace: <service>-local
+
+patches:
+- path: deployment-patch.yaml
+  target:
+    kind: Deployment
+    name: <service>
+- path: configmap-patch.yaml
+  target:
+    kind: ConfigMap
+    name: <service>-config
+- path: service-patch.yaml
+  target:
+    kind: Service
+    name: <service>
+
+images:
+- name: PLACEHOLDER_REGISTRY/<service>
+  newName: <service>
+  newTag: 0.1.0
+
+# ✅ CRITICAL: includeSelectors MUST be false
+labels:
+- includeSelectors: false  # Never change this to true!
+  pairs:
+    app.kubernetes.io/name: <service>
+    app.kubernetes.io/instance: local-<service>
+    app.kubernetes.io/version: 0.1.0
+    app.kubernetes.io/component: backend-api
+    app.kubernetes.io/part-of: blocksecops-platform
+    app.kubernetes.io/managed-by: kustomize
+    environment: local
+    team: backend
+```
+
 ### Environment Configuration
 
 **Required `.env.local` for dashboard** (never commit this file):
@@ -459,8 +763,11 @@ Before starting development work:
 - [ ] Minikube cluster is running
 - [ ] All required services deployed
 - [ ] Port forwards configured to use `127.0.0.1`
+- [ ] Dashboard running on correct port 3000 (not 3002 or other)
+- [ ] API service running on correct port 8000
 - [ ] Dashboard `.env.local` uses `127.0.0.1` endpoints
 - [ ] Backend CORS includes `127.0.0.1:3000`
+- [ ] All services have endpoints: `kubectl get endpoints -n <namespace>`
 - [ ] Can access dashboard at `http://127.0.0.1:3000`
 - [ ] Can access API docs at `http://127.0.0.1:8000/docs`
 
@@ -1032,6 +1339,8 @@ After deploying:
 - [ ] Tests passing before deployment
 - [ ] Rollback plan documented
 - [ ] **Database backup created** (if changes affect database config)
+- [ ] **includeSelectors: false** verified in all kustomization.yaml files
+- [ ] Service endpoints verified after applying changes
 
 ### Database Configuration Changes
 
@@ -1053,12 +1362,215 @@ After deploying:
 
 ---
 
+## Docker Image Versioning Standards
+
+### Semantic Versioning for Docker Images
+
+**MANDATORY:** All Docker images MUST follow [Semantic Versioning 2.0.0](https://semver.org/) specification.
+
+**Format:** `MAJOR.MINOR.PATCH`
+
+Where:
+- **MAJOR** version = Breaking changes (incompatible API changes)
+- **MINOR** version = New features (backwards-compatible functionality)
+- **PATCH** version = Bug fixes (backwards-compatible fixes)
+
+**Examples:**
+
+```bash
+# Bug fix (scanner import error) - increment PATCH
+api-service:0.3.12 → api-service:0.3.13
+
+# New feature (custom scanner selection) - increment MINOR
+api-service:0.3.13 → api-service:0.4.0
+
+# Breaking change (new authentication system) - increment MAJOR
+api-service:0.4.0 → api-service:1.0.0
+```
+
+### Version Increment Rules
+
+**When to increment PATCH (0.3.12 → 0.3.13):**
+- Bug fixes
+- Security patches
+- Performance improvements (no API changes)
+- Documentation updates
+- Dependency updates (no behavior change)
+
+**When to increment MINOR (0.3.13 → 0.4.0):**
+- New features (backwards-compatible)
+- New API endpoints
+- New configuration options
+- Deprecated features (not removed)
+- Internal refactoring with new capabilities
+
+**When to increment MAJOR (0.4.0 → 1.0.0):**
+- Breaking API changes
+- Removed endpoints or features
+- Changed authentication/authorization
+- Database schema changes requiring migration
+- Configuration format changes
+- Removed or changed environment variables
+
+### Pre-1.0 Development
+
+**Current Status:** All services are in `0.x.x` (pre-release/development)
+
+During `0.x.x` versions:
+- **MINOR** versions MAY introduce breaking changes
+- **PATCH** versions MUST be backwards-compatible
+- Version `1.0.0` signals production-ready, stable API
+
+**When to release 1.0.0:**
+- API is stable and well-tested
+- All critical features implemented
+- Comprehensive test coverage
+- Security hardening complete
+- Documentation complete
+- Ready for production use
+
+### Image Tagging Workflow
+
+**Building and tagging images:**
+
+```bash
+# 1. Determine version increment based on changes
+# Bug fix example: 0.3.12 → 0.3.13
+
+# 2. Build image with new version
+eval $(minikube docker-env)
+docker build -t api-service:0.3.13 -f Dockerfile .
+
+# 3. Also tag as 'latest' for local development
+docker tag api-service:0.3.13 api-service:latest
+
+# 4. Verify image exists
+docker images | grep api-service
+```
+
+### Updating Kustomize Configuration
+
+**After building new image version, update ALL relevant files:**
+
+```yaml
+# k8s/overlays/local/kustomization.yaml
+images:
+- name: PLACEHOLDER_REGISTRY/blocksecops-api-service
+  newName: api-service
+  newTag: 0.3.13  # ← Update version
+
+labels:
+- includeSelectors: false
+  pairs:
+    app.kubernetes.io/version: 0.3.13  # ← Update version label
+```
+
+**Critical:** Update BOTH `newTag` AND `app.kubernetes.io/version` to match!
+
+### Version Tracking
+
+**Track image versions in multiple locations:**
+
+1. **Docker Image Tag:** Actual image version
+2. **Kustomization:** Kubernetes deployment version
+3. **Git Tag:** Code version matching image
+
+**Creating git tags for releases:**
+
+```bash
+# Tag the commit that matches the Docker image
+git tag -a api-service-v0.3.13 -m "Release API Service v0.3.13
+
+- Fix: Scanner endpoint import error
+- Allows scanner metadata to be retrieved via API
+- Resolves blocking issue for custom scanner selection feature"
+
+# Push tag to remote
+git push origin api-service-v0.3.13
+```
+
+### Version Documentation
+
+**Document version changes in CHANGELOG:**
+
+```markdown
+# CHANGELOG - API Service
+
+## [0.3.13] - 2025-10-17
+
+### Fixed
+- Scanner endpoint import error preventing scanner metadata retrieval
+- Corrected import path from non-existent ScannerService to ToolIntegrationClient
+
+## [0.3.12] - 2025-10-17
+
+### Fixed
+- Kubernetes service endpoint issue with includeSelectors
+- Service selector mismatch causing zero endpoints
+
+## [0.3.11] - 2025-10-16
+
+### Added
+- TypeScript build fixes for ui-core package
+- Scan modal UX improvements with loading states
+```
+
+### Rollback Considerations
+
+**Version tracking enables easy rollbacks:**
+
+```bash
+# Rollback to previous version
+kubectl set image deployment/api-service \
+  api-service=api-service:0.3.12 \
+  -n api-service-local
+
+# Or update kustomization and reapply
+vim k8s/overlays/local/kustomization.yaml
+# Change newTag: 0.3.13 back to newTag: 0.3.12
+kubectl apply -k k8s/overlays/local/
+```
+
+### Version Checklist
+
+Before incrementing version:
+
+- [ ] Determine correct increment type (MAJOR/MINOR/PATCH)
+- [ ] Build Docker image with new version tag
+- [ ] Update kustomization.yaml (newTag + version label)
+- [ ] Create git tag matching version
+- [ ] Update CHANGELOG with changes
+- [ ] Document breaking changes (if MAJOR/MINOR increment)
+- [ ] Test deployment with new version
+- [ ] Verify rollback procedure works
+
+**Example Version History:**
+
+```
+0.1.0 - Initial development version
+0.2.0 - Added scan functionality
+0.3.0 - Added vulnerability management
+0.3.1 - Fixed vulnerability status bug
+0.3.2 - Performance improvements
+...
+0.3.12 - Fixed service endpoint issue
+0.3.13 - Fixed scanner import error
+0.4.0 - Added custom scanner selection (next)
+1.0.0 - Production release (future)
+```
+
+---
+
 ## Standards Reference
 
 This document establishes standards for:
 - **Codebase-First Development:** All changes in Git first
 - **Local Development:** Use `127.0.0.1` consistently
+- **Port Number Consistency:** Maintain standard port assignments
+- **Kubernetes Service Selectors:** Use `includeSelectors: false` in Kustomize
+- **Docker Image Versioning:** Semantic Versioning 2.0.0 for all images
 - **CORS Configuration:** Include all required origins
+- **Database Safety:** Always backup before configuration changes
 - **Version Control:** Proper commit messages and workflow
 - **Testing:** Test before deploy, rollback if needed
 - **Documentation:** Keep docs synchronized with code
@@ -1075,6 +1587,8 @@ This document establishes standards for:
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
+| 1.3.0 | 2025-10-17 | Added Docker Image Versioning Standards section with Semantic Versioning 2.0.0 specification, version increment rules, image tagging workflow, and version tracking procedures | BlockSecOps Team |
+| 1.2.0 | 2025-10-17 | Added Port Number Consistency Standards and Kubernetes Service Selector Standards sections with includeSelectors best practices and troubleshooting | BlockSecOps Team |
 | 1.1.0 | 2025-10-16 | Added Database Management and Recovery section with backup procedures, recovery steps, and cautionary example | BlockSecOps Team |
 | 1.0.0 | 2025-10-16 | Initial standards document | BlockSecOps Team |
 
