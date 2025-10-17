@@ -915,6 +915,558 @@ tool-integration-local      tool-integration-5ff7c795cd-chkt5     1/1     Runnin
 ---
 
 **Document Status**: ✅ Complete
-**Last Updated**: October 15, 2025
+**Last Updated**: October 16, 2025
 **Verified By**: Local deployment testing
 **Next Review**: When deploying to staging/production environments
+
+---
+
+## Issue 5: Stale Docker Image Causing CORS/500 Errors (October 16, 2025)
+
+### Symptoms
+
+```
+Browser Console Error:
+Access to XMLHttpRequest at 'http://127.0.0.1:8000/api/v1/contracts?skip=0&limit=100'
+from origin 'http://127.0.0.1:3000' has been blocked by CORS policy:
+No 'Access-Control-Allow-Origin' header is present on the requested resource.
+
+GET http://127.0.0.1:8000/api/v1/contracts?skip=0&limit=100
+net::ERR_FAILED 500 (Internal Server Error)
+```
+
+**Impact**: Dashboard unable to load contracts page, appearing as CORS error
+
+### Error Details
+
+**API Pod Logs**:
+```
+LookupError: 'uploaded' is not among the defined enum values.
+Enum name: contract_status.
+Possible values: pending, scanning, scanned, failed
+
+ModuleNotFoundError: No module named 'src.infrastructure.config.scanners';
+'src.infrastructure.config' is not a package
+```
+
+### Root Cause Analysis
+
+#### 1. Stale Docker Image (5 Days Old)
+
+**Timeline**:
+```bash
+# Docker image build date
+$ eval $(minikube docker-env)
+$ docker images blocksecops-api-service:0.1.0 --format "{{.CreatedAt}}"
+2025-10-11 16:18:32 -0600 MDT  # 5 days old!
+
+# API pod age
+$ kubectl get pods -n api-service-local -l app.kubernetes.io/name=api-service
+NAME                           READY   STATUS    RESTARTS   AGE
+api-service-56ffd5bb6d-6jnb2   1/1     Running   0          110m  # Restarted but using old image
+```
+
+**Code vs Image Mismatch**:
+- October 11: Docker image built
+- October 12-15: Multiple PRs merged
+  - Added "uploaded" status to ContractStatus enum
+  - Added scanner selection endpoints
+  - Updated database migration
+- October 16: Pod restart still used 5-day-old image
+- **Result**: Code had "uploaded" status, Docker image didn't
+
+#### 2. Scanner Import Path Error
+
+**Incorrect Path** (in code merged after image build):
+```python
+# src/presentation/api/v1/endpoints/scanners.py
+from src.infrastructure.config.scanners import (  # ❌ Wrong path
+    get_all_scanners,
+    ...
+)
+```
+
+**Actual Location**:
+```bash
+$ find . -name "scanners.py"
+./src/infrastructure/scanner_config/scanners.py  # ✅ Correct path
+```
+
+**Error**: `src.infrastructure.config` is a single file (`config.py`), not a package directory, causing `ModuleNotFoundError`.
+
+#### 3. Why CORS Headers Were Missing
+
+**Normal Flow**:
+1. Request → API endpoint
+2. Process request
+3. Return response
+4. **CORS middleware adds headers to response**
+
+**With Unhandled Exception**:
+1. Request → API endpoint
+2. SQLAlchemy encounters unknown enum value "uploaded"
+3. Raises `LookupError` **before** response is created
+4. **Exception handler returns 500 without response object**
+5. **CORS middleware never runs** (no response to add headers to)
+6. Browser sees 500 with no CORS headers → "CORS policy error"
+
+**Key Insight**: CORS works fine - the 500 error prevents CORS middleware from running!
+
+### Investigation Steps
+
+```bash
+# 1. Test CORS on 401 error (before exception)
+$ curl -v -H "Origin: http://127.0.0.1:3000" \
+  "http://127.0.0.1:8000/api/v1/contracts?skip=0&limit=100" 2>&1 | grep -i "access-control"
+< access-control-allow-credentials: true  # ✅ Headers present on 401
+< access-control-allow-origin: http://127.0.0.1:3000
+
+# 2. Check API logs for actual error
+$ kubectl logs -n api-service-local deployment/api-service --tail=50 | grep -E "LookupError|uploaded"
+LookupError: 'uploaded' is not among the defined enum values
+
+# 3. Verify contract has "uploaded" status in database
+$ kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U postgres -d solidity_security \
+  -c "SELECT id, name, status FROM contracts WHERE name = 'Denial of Service';"
+fc783138-6c5a-4dce-b469-9fdf46020f14 | Denial of Service | uploaded
+
+# 4. Check if local code has "uploaded" enum
+$ grep -n "uploaded" blocksecops-api-service/src/infrastructure/database/models.py
+232:    Enum("uploaded", "pending", "scanning", "scanned", "failed", name="contract_status"),
+# ✅ Code has it!
+
+# 5. Check Docker image age
+$ eval $(minikube docker-env)
+$ docker images blocksecops-api-service:0.1.0 --format "{{.CreatedAt}}"
+2025-10-11 16:18:32 -0600 MDT
+# ❌ 5 days old - predates enum change!
+```
+
+### Solution Applied
+
+#### 1. Fixed Scanner Import Path
+
+**File**: `blocksecops-api-service/src/presentation/api/v1/endpoints/scanners.py`
+
+```python
+# Before (line 5):
+from src.infrastructure.config.scanners import (  # ❌
+    get_all_scanners,
+    get_scanner,
+    get_scanners_by_language,
+    get_preset,
+    get_presets_by_language,
+)
+
+# After (line 5):
+from src.infrastructure.scanner_config.scanners import (  # ✅
+    get_all_scanners,
+    get_scanner,
+    get_scanners_by_language,
+    get_preset,
+    get_presets_by_language,
+)
+```
+
+#### 2. Rebuilt Docker Image with Latest Code
+
+```bash
+# Set Minikube Docker environment
+export DOCKER_TLS_VERIFY="1"
+export DOCKER_HOST="tcp://127.0.0.1:49632"
+export DOCKER_CERT_PATH="/Users/pwner/.minikube/certs"
+export MINIKUBE_ACTIVE_DOCKERD="minikube"
+
+# Navigate to API service
+cd /Users/pwner/Git/ABS/blocksecops-api-service
+
+# Rebuild image
+docker build -t blocksecops-api-service:0.1.0 -f Dockerfile . \
+  > /tmp/docker-build-api-2.log 2>&1
+
+# Verify build success
+tail -15 /tmp/docker-build-api-2.log
+```
+
+**Build Result**:
+```
+#19 exporting to image
+#19 writing image sha256:2f9d112a4450541ee7ee81c3ae7921ad72704d0cd81dbf126c3bdef901ced04a done
+#19 naming to docker.io/library/blocksecops-api-service:0.1.0 done
+#19 DONE 0.2s
+```
+
+**What This Fixed**:
+- ✅ Included "uploaded" status in ContractStatus enum
+- ✅ Included corrected scanner import paths
+- ✅ Included all merged code from past 5 days
+
+#### 3. Deleted Pod to Force New Image Usage
+
+```bash
+# Delete old pod
+kubectl delete pod -n api-service-local -l app.kubernetes.io/name=api-service
+
+# Wait for new pod with new image
+kubectl wait --for=condition=ready pod -n api-service-local \
+  -l app.kubernetes.io/name=api-service --timeout=90s
+```
+
+**Result**:
+```
+pod "api-service-56ffd5bb6d-cv5lr" deleted
+pod/api-service-56ffd5bb6d-flh86 condition met
+```
+
+#### 4. Restarted Port-Forward
+
+**Why Needed**: Port-forwards are tied to specific pod instances; deleting pod breaks connection.
+
+```bash
+# Kill old port-forward (broken after pod deletion)
+ps aux | grep "port-forward.*svc/api-service" | grep -v grep | awk '{print $2}' | xargs kill
+
+# Start new port-forward to new pod
+kubectl port-forward -n api-service-local svc/api-service 8000:8000 \
+  > /tmp/pf-api-service-new2.log 2>&1 &
+```
+
+### Verification
+
+#### Test 1: Login Successful with HTTP-Only Cookies
+
+```bash
+$ curl -v -X POST http://127.0.0.1:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "test-rebrand@blocksecops.com", "password": "TestPass123"}' \
+  2>&1 | grep -i "set-cookie"
+
+< set-cookie: access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Path=/api
+< set-cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Path=/api/v1/auth/refresh
+```
+
+**Response Body**:
+```json
+{
+  "message": "Login successful",
+  "user_id": "ab45210a-44a1-490e-bd5f-18135cdc3c91",
+  "email": "test-rebrand@blocksecops.com"
+}
+```
+
+#### Test 2: CORS Headers Now Present
+
+```bash
+$ curl -v -H "Origin: http://127.0.0.1:3000" \
+  "http://127.0.0.1:8000/api/v1/contracts?skip=0&limit=100" 2>&1 | grep -i "access-control"
+
+< access-control-allow-credentials: true
+< access-control-allow-origin: http://127.0.0.1:3000
+```
+
+#### Test 3: Contract with "uploaded" Status Loads Successfully
+
+**Database State**:
+```sql
+SELECT id, name, status, created_at
+FROM contracts
+WHERE name = 'Denial of Service';
+```
+
+**Result**:
+```
+id                                   | name              | status   | created_at
+-------------------------------------|-------------------|----------|---------------------------
+fc783138-6c5a-4dce-b469-9fdf46020f14 | Denial of Service | uploaded | 2025-10-16 23:33:46.167994+00
+```
+
+**API Response**: ✅ No more LookupError - enum now includes "uploaded"
+
+#### Test 4: Scanner Endpoints Load Successfully
+
+```bash
+$ kubectl logs -n api-service-local deployment/api-service --tail=20
+
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+```
+
+✅ No more `ModuleNotFoundError` - scanner imports now work correctly
+
+#### Test 5: Dashboard Access Works
+
+**Steps**:
+1. Navigate to http://127.0.0.1:3000/login
+2. Login with `test-rebrand@blocksecops.com` / `TestPass123`
+3. Navigate to http://127.0.0.1:3000/contracts
+4. ✅ Contracts page loads successfully
+5. ✅ "Denial of Service" contract visible
+6. ✅ No CORS errors
+7. ✅ No 500 errors
+
+### Why This Kept Happening
+
+**Problem**: Same issue reported "5 times a day"
+
+**Root Cause**: Missing Docker rebuild step in development workflow
+
+**Before** (incorrect workflow):
+```bash
+# 1. Merge PR with code changes
+git pull origin main
+
+# 2. Restart pod
+kubectl rollout restart deployment/api-service -n api-service-local
+# ❌ Pod restarts with SAME OLD IMAGE
+```
+
+**After** (correct workflow):
+```bash
+# 1. Merge PR with code changes
+git pull origin main
+
+# 2. Rebuild Docker image (NEW!)
+eval $(minikube docker-env)
+docker build -t blocksecops-api-service:0.1.0 -f Dockerfile .
+
+# 3. Restart pod
+kubectl rollout restart deployment/api-service -n api-service-local
+
+# 4. Restart port-forward if needed
+ps aux | grep "port-forward.*svc/api-service" | grep -v grep | awk '{print $2}' | xargs kill
+kubectl port-forward -n api-service-local svc/api-service 8000:8000 > /tmp/pf-api.log 2>&1 &
+```
+
+### Prevention Strategy
+
+#### 1. Updated PLATFORM-DEVELOPMENT-STANDARDS.md
+
+**File**: `/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPMENT-STANDARDS.md`
+
+**Added Rule 3: Restart Pods After Code Changes**:
+
+```markdown
+### Rule 3: Restart Pods After Code Changes
+
+**MANDATORY:** After merging code changes or pulling latest code, pods must be restarted to pick up the new changes.
+
+✅ CORRECT WORKFLOW:
+1. Merge PR with code changes to main branch
+2. Pull latest code: git pull origin main
+3. Build Docker image: eval $(minikube docker-env) && docker build -t <service>:0.1.0 .
+4. Restart deployment: kubectl rollout restart deployment/<service> -n <namespace>
+5. Wait for rollout: kubectl rollout status deployment/<service> -n <namespace>
+6. Restart port-forward if needed
+7. Verify changes are active
+
+**Example - Restarting API Service After Code Merge:**
+
+```bash
+# 1. Pull latest code
+cd /Users/pwner/Git/ABS/blocksecops-api-service
+git checkout main
+git pull
+
+# 2. Rebuild Docker image
+eval $(minikube docker-env)
+docker build -t blocksecops-api-service:0.1.0 -f Dockerfile .
+
+# 3. Restart the API service pod to pick up changes
+kubectl rollout restart deployment/api-service -n api-service-local
+
+# 4. Wait for rollout to complete
+kubectl rollout status deployment/api-service -n api-service-local
+
+# 5. Restart port-forward
+ps aux | grep "port-forward.*svc/api-service" | grep -v grep | awk '{print $2}' | xargs kill
+kubectl port-forward -n api-service-local svc/api-service 8000:8000 > /tmp/pf-api-service.log 2>&1 &
+
+# 6. Verify API health
+curl -s http://127.0.0.1:8000/api/v1/health/ready | jq '.'
+```
+
+**Why It Matters**:
+- Kubernetes pods don't automatically pick up code changes
+- Docker images are cached and reused unless rebuilt
+- Stale code → enum mismatches, import errors, security vulnerabilities
+- Testing fails if code in files doesn't match code in running pods
+```
+
+#### 2. Created Monitoring Script
+
+**File**: `/Users/pwner/Git/ABS/scripts/monitor-workflow.sh`
+
+Monitors contracts, scans, vulnerabilities, and service status in real-time or single snapshot mode.
+
+**Usage**:
+```bash
+# Single snapshot
+./scripts/monitor-workflow.sh
+
+# Live monitoring (refreshes every 5s)
+./scripts/monitor-workflow.sh watch
+```
+
+#### 3. Committed Changes
+
+**Files Committed**:
+- `docs/PLATFORM-DEVELOPMENT-STANDARDS.md` (updated with Rule 3)
+- `scripts/monitor-workflow.sh` (new monitoring script)
+- `src/presentation/api/v1/endpoints/scanners.py` (fixed import path)
+
+**Commit**: `08b53d1` to `docs` repository
+
+### Lessons Learned
+
+#### What Went Wrong
+
+1. **No Automated Image Rebuilds**: Manual rebuild required after every code merge
+2. **No Image Version Tracking**: Same tag (`0.1.0`) reused for different builds
+3. **No Build Date Verification**: No check to ensure image matches current code
+4. **Silent Failures**: CORS error message misleading (real issue was 500 error)
+
+#### What Went Right
+
+1. **Comprehensive Logging**: API logs clearly showed `LookupError` and import errors
+2. **Quick Diagnosis**: Checking Docker image age immediately revealed root cause
+3. **Minikube Setup**: Easy to rebuild and test locally without affecting production
+
+#### Recommendations
+
+**Short-term (Immediate)**:
+- ✅ **DONE**: Document Docker rebuild workflow in PLATFORM-DEVELOPMENT-STANDARDS.md
+- ✅ **DONE**: Create monitoring script for workflow testing
+- ⏳ **TODO**: Add pre-commit hook reminder about Docker rebuild
+
+**Medium-term (Next Sprint)**:
+- ⏳ **TODO**: Create `rebuild-all-images.sh` script for all services
+- ⏳ **TODO**: Add image build timestamp to API health endpoint response
+- ⏳ **TODO**: Implement git commit hash in Docker image labels for tracking
+
+**Long-term (Future)**:
+- ⏳ **TODO**: Set up CI/CD pipeline to auto-rebuild images on merge
+- ⏳ **TODO**: Use semantic versioning for Docker tags (0.1.0 → 0.1.1, 0.1.2, etc.)
+- ⏳ **TODO**: Health check compares git commit hash vs running code version
+
+### Quick Reference Commands
+
+#### Check if Image Needs Rebuild
+
+```bash
+# 1. Check when Docker image was built
+eval $(minikube docker-env)
+docker images blocksecops-api-service:0.1.0 --format "{{.Repository}}:{{.Tag}} - Created: {{.CreatedAt}}"
+
+# 2. Check when code was last changed
+cd /Users/pwner/Git/ABS/blocksecops-api-service
+git log -1 --format="%H %ci"
+
+# 3. Compare dates - if code is newer than image, rebuild!
+```
+
+#### Rebuild Single Service Image
+
+```bash
+# Set Minikube Docker environment
+eval $(minikube docker-env)
+
+# Navigate to service directory
+cd /Users/pwner/Git/ABS/blocksecops-api-service
+
+# Rebuild image
+docker build -t blocksecops-api-service:0.1.0 -f Dockerfile .
+
+# Restart pod
+kubectl delete pod -n api-service-local -l app.kubernetes.io/name=api-service
+
+# Wait for ready
+kubectl wait --for=condition=ready pod -n api-service-local \
+  -l app.kubernetes.io/name=api-service --timeout=90s
+```
+
+#### Rebuild All Service Images (Recommended Script)
+
+**Create**: `/Users/pwner/Git/ABS/scripts/rebuild-all-images.sh`
+
+```bash
+#!/bin/bash
+# Rebuild all BlockSecOps service Docker images
+
+eval $(minikube docker-env)
+
+services=(
+  "api-service"
+  "data-service"
+  "contract-parser"
+  "tool-integration"
+  "orchestration"
+  "intelligence-engine"
+  "notification"
+  "analysis"
+)
+
+for service in "${services[@]}"; do
+  echo "=== Rebuilding blocksecops-$service ==="
+  cd "/Users/pwner/Git/ABS/blocksecops-$service"
+  docker build -t "blocksecops-$service:0.1.0" -f Dockerfile .
+  echo "✅ blocksecops-$service rebuilt"
+  echo ""
+done
+
+echo "All images rebuilt successfully!"
+```
+
+### Timeline of Events
+
+**October 11, 2025 16:18:32 MDT**
+- Docker image `blocksecops-api-service:0.1.0` built
+- Included old code without "uploaded" status enum
+
+**October 12-15, 2025**
+- Multiple PRs merged:
+  - Database migration adding "uploaded" status
+  - Scanner selection endpoints
+  - Multi-language support enhancements
+- **Docker image NOT rebuilt** ❌
+
+**October 16, 2025 23:33:46 UTC**
+- User uploaded "Denial of Service" contract
+- Contract saved with `status='uploaded'`
+
+**October 16, 2025 23:36:24 UTC**
+- API pod restarted (routine restart)
+- **Still using 5-day-old Docker image** ❌
+
+**October 17, 2025 00:00:00 UTC**
+- User attempted to access contracts page
+- API threw `LookupError` for "uploaded" status
+- 500 error → no CORS headers → CORS policy error
+- User frustrated: "why do we experience this 5 times a day?"
+
+**October 17, 2025 00:15:00 UTC**
+- Investigation began
+- Root cause identified: stale Docker image (5 days old)
+- Scanner import path error also found
+
+**October 17, 2025 00:45:00 UTC**
+- Fixed scanner import path
+- Docker image rebuilt with latest code
+- API pod restarted with new image
+- Port-forward restarted
+- Documentation updated
+- Monitoring script created
+- ✅ **Issue resolved permanently**
+
+### Related Documentation
+
+- **PLATFORM-DEVELOPMENT-STANDARDS.md**: Development workflow rules (Rule 3 added)
+- **API-SERVICE-DATABASE-AUTH-FIX-2025-10-16.md**: Authentication setup
+- **monitor-workflow.sh**: Workflow monitoring script
+- **INFRASTRUCTURE-FIXES-2025-10-15.md**: This document (Issues 1-5)
+
+---
+
+**Status**: ✅ All 5 issues resolved
+**Last Resolved**: Issue 5 - October 16, 2025
+**Prevention**: Docker rebuild workflow documented and enforced
