@@ -2328,12 +2328,15 @@ api-service:0.4.0 → api-service:1.0.0
 
 ### Version Increment Rules
 
+**MANDATORY:** Docker image version MUST be incremented whenever code changes are made to the service.
+
 **When to increment PATCH (0.3.12 → 0.3.13):**
 - Bug fixes
 - Security patches
 - Performance improvements (no API changes)
 - Documentation updates
 - Dependency updates (no behavior change)
+- Code changes (any source code modifications)
 
 **When to increment MINOR (0.3.13 → 0.4.0):**
 - New features (backwards-compatible)
