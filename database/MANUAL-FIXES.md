@@ -156,6 +156,165 @@ This endpoint updates both the scan status and contract status. If this endpoint
 
 ---
 
+## October 18, 2025 - Populate scanner_id for Scanner Comparison Feature
+
+### Issue
+Scanner comparison page (`/scanners`) displayed zero data for all scanners despite having 43 vulnerabilities across 4 contracts. The `vulnerabilities.scanner_id` field was NULL for all vulnerabilities.
+
+**Symptom:** Analytics query filtering by `scanner_id` returned zero results, showing all scanner statistics as 0.
+
+### Root Cause
+- Migration 004 added `scanner_id` field to vulnerabilities table
+- Field was added as optional (nullable) to support backward compatibility
+- Scan service was not updated to populate `scanner_id` when creating vulnerabilities
+- All 43 existing vulnerabilities had `scanner_id = NULL`
+- Analytics endpoint filtered by `scanner_id`, which matched nothing when NULL
+
+**Technical Details:**
+```python
+# From analytics.py:478-485
+stats_query = (
+    select(...)
+    .where(
+        and_(
+            ContractModel.user_id == user_id,
+            VulnerabilityModel.scanner_id == scanner_id,  # NULL matched nothing
+        )
+    )
+)
+```
+
+### Fix Applied
+```sql
+-- Backup created first
+-- File: /Users/pwner/Git/ABS/backups/solidity_security_backup_20251018_114701.sql
+-- Size: 135KB
+-- Contains: 12 contracts, 31 scans, 43 vulnerabilities, 5 users
+
+-- Populate scanner_id for all existing vulnerabilities
+-- All vulnerabilities were detected by Slither scanner
+UPDATE vulnerabilities SET scanner_id = 'slither' WHERE scanner_id IS NULL;
+-- Updated 43 rows
+```
+
+### Verification
+```sql
+-- Check scanner_id distribution
+SELECT scanner_id, COUNT(*) as count
+FROM vulnerabilities
+GROUP BY scanner_id
+ORDER BY scanner_id NULLS FIRST;
+
+-- Expected result:
+-- scanner_id | count
+-- -----------+-------
+-- slither    |    43
+
+-- Verify sample vulnerabilities
+SELECT id, category, severity, scanner_id, scan_id
+FROM vulnerabilities
+LIMIT 5;
+
+-- All rows should show scanner_id = 'slither'
+```
+
+### How to Reproduce Fix
+If vulnerabilities have NULL scanner_id after database recreation:
+
+```bash
+# 1. Create backup first
+BACKUP_FILE="solidity_security_backup_$(date +%Y%m%d_%H%M%S).sql"
+kubectl exec -n postgresql-local postgresql-0 -- \
+  pg_dump -U postgres -d solidity_security --clean --if-exists \
+  > "/Users/pwner/Git/ABS/backups/${BACKUP_FILE}"
+
+# 2. Verify backup
+ls -lh "/Users/pwner/Git/ABS/backups/${BACKUP_FILE}"
+
+# 3. Check current scanner_id status
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U postgres -d solidity_security \
+  -c "SELECT scanner_id, COUNT(*) FROM vulnerabilities GROUP BY scanner_id;"
+
+# 4. Populate scanner_id (adjust scanner based on actual scanner used)
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U postgres -d solidity_security \
+  -c "UPDATE vulnerabilities SET scanner_id = 'slither' WHERE scanner_id IS NULL;"
+
+# 5. Verify the fix
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U postgres -d solidity_security \
+  -c "SELECT scanner_id, COUNT(*) FROM vulnerabilities GROUP BY scanner_id;"
+```
+
+### Related Files
+- Migration: `/Users/pwner/Git/ABS/blocksecops-api-service/alembic/versions/004_add_scanner_tracking.py`
+- Analytics endpoint: `/Users/pwner/Git/ABS/blocksecops-api-service/src/presentation/api/v1/endpoints/analytics.py` (lines 478-485)
+- Scanner comparison page: `/Users/pwner/Git/ABS/blocksecops-dashboard/src/pages/ScannerComparison.tsx`
+- Documentation: `/Users/pwner/Git/ABS/docs/SCANNER-COMPARISON-FIX-2025-10-18.md`
+
+### Impact
+- **Before Fix:** Scanner comparison showed all zeros (0 vulnerabilities for all scanners)
+- **After Fix:** Scanner comparison displays actual vulnerability counts by scanner
+- **Data Integrity:** All 43 vulnerabilities now properly attributed to Slither scanner
+
+### Prevention
+For future operations:
+1. Update scan service to populate `scanner_id` when creating vulnerabilities
+2. Add database constraint to make `scanner_id` NOT NULL (after fixing scan service)
+3. Create Alembic migration to document this data fix
+4. Add integration test to verify scanner_id is populated during scans
+5. Consider adding a database trigger to prevent NULL scanner_id insertions
+
+### Backup Information
+**Location:** `/Users/pwner/Git/ABS/backups/solidity_security_backup_20251018_114701.sql`
+**Size:** 135KB
+**Created:** October 18, 2025 11:47:01 MDT
+**Contents:**
+- 12 contracts
+- 31 scans
+- 43 vulnerabilities
+- 5 users
+
+**Restore Command:**
+```bash
+# If rollback is needed
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U postgres -d solidity_security \
+  < /Users/pwner/Git/ABS/backups/solidity_security_backup_20251018_114701.sql
+```
+
+### Future Work
+1. **Scan Service Update Required:**
+   File: `blocksecops-scan-service/src/domain/services/scan_orchestrator.py`
+
+   Add scanner_id to vulnerability creation:
+   ```python
+   vulnerability = VulnerabilityModel(
+       contract_id=contract_id,
+       scan_id=scan.id,
+       scanner_id=scanner.id,  # ADD THIS
+       category=result.category,
+       severity=result.severity,
+       # ... other fields
+   )
+   ```
+
+2. **Create Migration Script:**
+   Create Alembic migration to document this fix:
+   ```bash
+   cd /Users/pwner/Git/ABS/blocksecops-api-service
+   alembic revision -m "populate_scanner_id_for_existing_vulnerabilities"
+   ```
+
+3. **Add NOT NULL Constraint:**
+   After scan service is updated, add constraint:
+   ```sql
+   ALTER TABLE vulnerabilities ALTER COLUMN scanner_id SET NOT NULL;
+   ```
+
+---
+
 ## Template for Future Manual Fixes
 
 ### [Date] - [Brief Description]
