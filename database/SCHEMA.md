@@ -1,9 +1,9 @@
 # BlockSecOps Database Schema
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Database:** PostgreSQL 15.4
-**Last Updated:** October 16, 2025
-**Migration Version:** 003
+**Last Updated:** October 18, 2025
+**Migration Version:** 004 (08bf8921767b)
 
 ## Table of Contents
 
@@ -25,7 +25,11 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Multi-file contracts:** Support for complex projects with multiple source files
 - **Project organization:** Group related contracts into projects
 - **User authentication:** Session-based authentication with JWT tokens
-- **Security scanning:** Vulnerability detection with severity classification
+- **Security scanning:** Vulnerability detection with severity classification and multi-scanner support
+- **Scanner tracking:** Attribution and categorization of vulnerabilities by detection tool (Migration 004)
+- **Saved searches:** User-saved search queries with JSONB parameters (Migration 004)
+- **User preferences:** Customizable notification settings and UI preferences (Migration 004)
+- **Performance optimization:** 13+ specialized indexes including GIN, composite, and partial indexes (Migration 004)
 - **Audit tracking:** Full timestamps and status tracking
 
 **Database Name:** `solidity_security`
@@ -37,38 +41,38 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 ## Entity Relationship Diagram
 
 ```
-┌─────────────┐
-│    users    │
-└──────┬──────┘
-       │
-       │ 1:N
-       ├──────────────────────────────────────────────┐
-       │                                              │
-       │                                              │
-┌──────▼──────┐                                ┌─────▼──────┐
-│  sessions   │                                │  projects  │
-└─────────────┘                                └──────┬─────┘
-                                                      │
-                                                      │ M:N
-       ┌──────────────────────────────────────────────┤
-       │                                              │
-       │ 1:N                                   ┌──────▼────────────┐
-┌──────▼──────┐                                │project_contracts│
-│  contracts  │◄───────────────────────────────┤                 │
-└──────┬──────┘                                └─────────────────┘
-       │
-       │ 1:N
-       ├─────────────────┬──────────────────┐
-       │                 │                  │
-┌──────▼──────────┐ ┌────▼─────┐  ┌────────▼──────────┐
-│ contract_files  │ │  scans   │  │ vulnerabilities   │
-└─────────────────┘ └────┬─────┘  └───────────────────┘
-                         │
-                         │ 1:N
-                         │
-                    ┌────▼──────────────┐
-                    │ vulnerabilities   │
-                    └───────────────────┘
+┌─────────────────┐
+│     users       │
+└────────┬────────┘
+         │
+         │ 1:N
+         ├──────────────────────────────────────────────────────┬─────────────────┬──────────────────┐
+         │                                                      │                 │                  │
+         │                                                      │                 │                  │
+┌────────▼─────────┐                                  ┌─────────▼──────┐  ┌───────▼────────┐  ┌────▼──────────────┐
+│    sessions      │                                  │   projects     │  │saved_searches  │  │user_preferences   │
+└──────────────────┘                                  └────────┬───────┘  └────────────────┘  └───────────────────┘
+                                                               │                                   (1:1 with users)
+                                                               │ M:N
+         ┌─────────────────────────────────────────────────────┤
+         │                                                     │
+         │ 1:N                                        ┌────────▼──────────────┐
+┌────────▼─────────┐                                  │ project_contracts     │
+│    contracts     │◄─────────────────────────────────┤                       │
+└────────┬─────────┘                                  └───────────────────────┘
+         │
+         │ 1:N
+         ├─────────────────┬──────────────────┐
+         │                 │                  │
+┌────────▼──────────┐ ┌────▼──────┐  ┌───────▼──────────────┐
+│ contract_files    │ │   scans   │  │  vulnerabilities     │
+└───────────────────┘ └─────┬─────┘  └──────────────────────┘
+                            │
+                            │ 1:N
+                            │
+                      ┌─────▼──────────────┐
+                      │  vulnerabilities   │
+                      └────────────────────┘
 ```
 
 ---
@@ -251,6 +255,9 @@ Security scan execution records.
 | `high_count` | INTEGER | NOT NULL | Count of high severity issues |
 | `medium_count` | INTEGER | NOT NULL | Count of medium severity issues |
 | `low_count` | INTEGER | NOT NULL | Count of low severity issues |
+| `scanners_used` | ARRAY(VARCHAR(50)) | NULLABLE | Array of scanner IDs used in this scan |
+| `scan_config` | JSONB | NULLABLE, DEFAULT '{}' | Scanner configuration parameters |
+| `duration_seconds` | INTEGER | NULLABLE | Scan duration in seconds |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Scan queue time |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last status update |
 
@@ -282,6 +289,9 @@ Detected security vulnerabilities and code issues.
 | `line_number` | INTEGER | NULLABLE | Line number in source |
 | `code_snippet` | TEXT | NULLABLE | Relevant code excerpt |
 | `recommendation` | TEXT | NULLABLE | Remediation guidance |
+| `scanner_id` | VARCHAR(50) | NULLABLE | Scanner tool that detected this (e.g., slither, mythril, aderyn) |
+| `category` | VARCHAR(100) | NULLABLE | Vulnerability type category (e.g., reentrancy, access_control) |
+| `confidence` | NUMERIC(3,2) | NULLABLE | Scanner confidence score (0.0 to 1.0) |
 | `detected_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Detection timestamp |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last status update |
 
@@ -293,6 +303,54 @@ Detected security vulnerabilities and code issues.
 **Relationships:**
 - Many-to-one with `scans` (scan_id)
 - Many-to-one with `contracts` (contract_id)
+
+---
+
+### `saved_searches`
+
+User-saved search queries for quick re-execution.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique search identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE | Search owner |
+| `name` | VARCHAR(255) | NOT NULL | Search name |
+| `description` | TEXT | NULLABLE | Search description |
+| `search_params` | JSONB | NOT NULL | JSON object containing SearchRequest parameters |
+| `last_executed_at` | TIMESTAMPTZ | NULLABLE | Last execution timestamp |
+| `execution_count` | INTEGER | NOT NULL, DEFAULT 0 | Number of times executed |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_saved_searches_user_id` on `user_id`
+- `ix_saved_searches_created_at` on `created_at DESC`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+
+---
+
+### `user_preferences`
+
+User-specific settings and preferences.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `user_id` | UUID | PRIMARY KEY, FK → users.id ON DELETE CASCADE | User identifier (1:1 relationship) |
+| `email_notifications` | BOOLEAN | NOT NULL, DEFAULT true | Enable email notifications |
+| `scan_completion_notifications` | BOOLEAN | NOT NULL, DEFAULT true | Notify on scan completion |
+| `critical_vulnerability_alerts` | BOOLEAN | NOT NULL, DEFAULT true | Alert on critical vulnerabilities |
+| `weekly_digest` | BOOLEAN | NOT NULL, DEFAULT false | Send weekly summary email |
+| `theme` | VARCHAR(20) | NOT NULL, DEFAULT 'light' | UI theme (light/dark) |
+| `timezone` | VARCHAR(50) | NOT NULL, DEFAULT 'UTC' | User timezone |
+| `language` | VARCHAR(10) | NOT NULL, DEFAULT 'en' | UI language code |
+| `preferences` | JSONB | NULLABLE, DEFAULT '{}' | Additional preferences as JSON |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Relationships:**
+- One-to-one with `users` (user_id, CASCADE DELETE)
 
 ---
 
@@ -434,11 +492,30 @@ All indexes are created for query optimization based on common access patterns:
 **Scans:**
 - `ix_scans_contract_id` - Contract scan history
 - `ix_scans_user_id` - User's scan activity
+- `ix_scans_scanners_used` (GIN) - Scanner filtering on array
 
 **Vulnerabilities:**
 - `ix_vulnerabilities_scan_id` - Vulnerabilities in scan
 - `ix_vulnerabilities_contract_id` - Contract vulnerability history
 - `ix_vulnerabilities_severity` - Filter/sort by severity
+- `ix_vulnerabilities_scanner_id` - Filter by scanner
+- `ix_vulnerabilities_category` - Filter by category
+
+**Saved Searches:**
+- `ix_saved_searches_user_id` - User's saved searches
+- `ix_saved_searches_created_at` - Recent searches sorting
+
+**Composite Indexes:**
+- `ix_vulns_contract_severity_status` on `vulnerabilities(contract_id, severity, status)`
+- `ix_scans_user_status_created` on `scans(user_id, status, created_at DESC)`
+- `ix_contracts_user_language_created` on `contracts(user_id, language, created_at DESC)`
+- `ix_vulnerabilities_scan_severity` on `vulnerabilities(scan_id, severity)`
+- `ix_project_contracts_added` on `project_contracts(project_id, added_at DESC)`
+
+**Partial Indexes:**
+- `ix_scans_user_completed` on `scans(user_id, completed_at DESC) WHERE status = 'completed'`
+- `ix_vulnerabilities_open` on `vulnerabilities(contract_id, severity) WHERE status = 'open'`
+- `ix_scans_failed` on `scans(user_id, created_at DESC) WHERE status = 'failed'`
 
 ---
 
@@ -469,6 +546,7 @@ All indexes are created for query optimization based on common access patterns:
 | **001** | 2025-10-12 | Initial database schema with users, contracts, scans, vulnerabilities, multi-language and multi-file support | `20251012_1500-001_initial_schema.py` |
 | **002** | 2025-10-14 | Add 'uploaded' status to contract_status enum | `20251014_1400-002_add_uploaded_status.py` |
 | **003** | 2025-10-15 | Add projects table and project_contracts junction table for project organization | `20251015_1000-003_add_projects_table.py` |
+| **004** | 2025-10-18 | Comprehensive production enhancements: scanner tracking, vulnerability categorization, saved searches, user preferences, and 13 performance indexes | `20251017_2112-08bf8921767b_comprehensive_production_enhancements_.py` |
 
 **Note:** After October 16, 2025 database recovery, migration 002 required manual application. See [MANUAL-FIXES.md](./MANUAL-FIXES.md) for details on any required manual fixes when recreating the database.
 
@@ -566,6 +644,6 @@ See [Platform Development Standards](/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPM
 
 ---
 
-**Document Version:** 1.0.0
-**Last Updated:** October 16, 2025
+**Document Version:** 1.1.0
+**Last Updated:** October 18, 2025
 **Maintained By:** BlockSecOps Team
