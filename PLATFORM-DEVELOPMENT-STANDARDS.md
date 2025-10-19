@@ -1,6 +1,6 @@
 # Platform Development Standards
 
-**Version:** 1.6.0
+**Version:** 1.6.1
 **Last Updated:** October 19, 2025
 **Status:** Active
 
@@ -2608,6 +2608,56 @@ Before incrementing version:
 - Deployment overhead (Docker rebuild and push for simple version changes)
 - No audit trail (can't track which versions ran when)
 
+### Version Selection Policy
+
+**MANDATORY:** All third-party tools and dependencies MUST use the latest stable version unless explicitly exempted.
+
+**Policy:**
+1. **Default: Latest Stable**
+   - Always use the most recent stable release of all third-party tools
+   - Applies to security scanners, libraries, frameworks, and all external dependencies
+   - "Stable" means non-beta, non-RC, non-preview releases (e.g., `v1.2.3` not `v1.2.3-beta`)
+
+2. **Exception Process**
+   - Exceptions ONLY permitted when a major bug is discovered in the latest version
+   - Exception decisions made at time of discovery through team review
+   - Exceptions must be documented with:
+     - Bug description and impact
+     - Link to upstream issue/PR
+     - Target date for upgrading to fixed version
+     - Name of reviewer who approved exception
+
+3. **Rationale**
+   - **Security:** Latest versions include critical security patches
+   - **Bug Fixes:** Benefit from upstream bug fixes immediately
+   - **Performance:** Access to performance improvements and optimizations
+   - **Compatibility:** Avoid technical debt from outdated dependencies
+   - **Support:** Upstream projects typically only support recent versions
+
+**Example Exception Documentation:**
+
+```yaml
+# ConfigMap with version exception
+data:
+  SCANNER_METADATA: |
+    {
+      "slither": {
+        "version": "0.10.3",  # NOT latest (0.10.4)
+        "exception_reason": "v0.10.4 has critical bug causing false positives on delegatecall patterns",
+        "exception_issue": "https://github.com/crytic/slither/issues/12345",
+        "exception_approved_by": "security-team",
+        "exception_approved_date": "2024-10-15",
+        "exception_target_upgrade": "v0.10.5 (when released)"
+      }
+    }
+```
+
+**Enforcement:**
+- Weekly dependency update reviews (automated PR via Dependabot/Renovate recommended)
+- CI pipeline warnings for outdated versions (> 30 days old)
+- Quarterly security audit of all tool versions
+- Dashboard visibility of version status (current vs latest)
+
 ### The Problem with Hardcoded Versions
 
 **Anti-Pattern Example** (DO NOT DO THIS):
@@ -3115,6 +3165,7 @@ This document establishes standards for:
 - **Kubernetes Service Selectors:** Use `includeSelectors: false` in Kustomize
 - **Docker Image Versioning:** Semantic Versioning 2.0.0 for all images
 - **Tool Metadata Management:** Use ConfigMaps for third-party tool versions
+- **Tool Version Policy:** Always use latest stable versions unless critical bugs discovered
 - **CORS Configuration:** Include all required origins
 - **Database Safety:** Always backup before configuration changes
 - **Version Control:** Proper commit messages and workflow
@@ -3133,6 +3184,7 @@ This document establishes standards for:
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
+| 1.6.1 | 2025-10-19 | **MANDATORY:** Added Version Selection Policy subsection to Tool Metadata Management establishing that all third-party tools MUST use latest stable versions unless critical bugs discovered. Exceptions require team review, documentation of bug/impact, upstream issue link, and target upgrade timeline. Added enforcement mechanisms (weekly reviews, CI warnings, quarterly audits, dashboard visibility). | BlockSecOps Team |
 | 1.6.0 | 2025-10-19 | **MANDATORY:** Added Tool Metadata Management via ConfigMaps section establishing pattern for managing third-party tool versions, developer info, and configuration. Eliminates hardcoded versions, enables updates without code changes, provides single source of truth via Kubernetes ConfigMaps with JSON metadata loaded at runtime. | BlockSecOps Team |
 | 1.5.0 | 2025-10-17 | **CRITICAL:** Added comprehensive Git Workflow Standards section mandating feature branch model, prohibiting direct commits to main, documenting PR requirements, branch protection rules, and common workflow scenarios. All changes MUST now go through feature branches and pull requests. | BlockSecOps Team |
 | 1.4.0 | 2025-10-17 | Added comprehensive Dashboard Development Setup section documenting Python 3.13 greenlet issue, proper startup procedures, port-forward best practices (deployment vs service), troubleshooting steps, and development workflow | BlockSecOps Team |
