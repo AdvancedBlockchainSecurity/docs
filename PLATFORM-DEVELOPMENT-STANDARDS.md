@@ -1078,6 +1078,92 @@ kubectl port-forward -n api-service-local pod/api-service-xxxxx 8000:8000 &
 kubectl port-forward -n api-service-local deployment/api-service 8000:8000 &
 ```
 
+#### Issue: Port-forward dies after pod restart/rollout
+
+**Symptom:**
+```bash
+# Port-forward process exists but API not responding
+ps aux | grep "port-forward.*8000"
+# Shows port-forward process running
+
+curl http://127.0.0.1:8000/api/v1/health/live
+# Connection refused or timeout
+
+# Check port-forward logs
+lsof -ti:8000 | xargs ps -p 2>/dev/null
+# Shows error: "container not running" or "lost connection to pod"
+```
+
+**Root Cause:** Port-forward process remains running but points to old pod that was deleted during deployment rollout or pod restart. When you restart a deployment (e.g., after CORS config changes or code updates), Kubernetes creates a new pod and deletes the old one. Any port-forward to the old pod loses connection but the process stays alive, making it appear working.
+
+**Diagnosis:**
+```bash
+# 1. Check if pod changed recently
+kubectl get pods -n api-service-local -o wide
+# Look at AGE column - if pod is very new, port-forwards may be stale
+
+# 2. Check port-forward process details
+ps aux | grep "port-forward.*8000" | grep -v grep
+# Look for the pod ID in the command - does it match current pod?
+
+# 3. Check for "container not running" errors
+lsof -ti:8000 | xargs ps -p 2>/dev/null
+# or check /tmp/pf-*.log files if you logged port-forward output
+```
+
+**Solution:**
+```bash
+# 1. Kill ALL stale port-forwards on port 8000
+ps aux | grep "kubectl port-forward" | grep "8000:8000" | grep -v grep | awk '{print $2}' | xargs kill -9 2>/dev/null
+
+# Alternative: Kill by port
+lsof -ti:8000 | xargs kill -9 2>/dev/null
+
+# 2. Wait for processes to die
+sleep 2
+
+# 3. Start fresh port-forward to DEPLOYMENT (not service/pod)
+kubectl port-forward -n api-service-local deployment/api-service 8000:8000 --address=127.0.0.1 > /tmp/pf-api.log 2>&1 &
+
+# 4. Verify working
+sleep 2
+curl -s http://127.0.0.1:8000/api/v1/health/live
+# Should return: {"status":"healthy","service":"BlockSecOps API Service"...}
+```
+
+**Prevention:**
+- **Use deployment-based port-forwards** instead of service/pod port-forwards
+- Deployment port-forwards automatically reconnect when pods are replaced
+- After any `kubectl rollout restart` or config change, restart port-forwards
+- Consider adding port-forward health checks to startup scripts
+
+**Example - After Config Changes:**
+```bash
+# Scenario: Updated CORS configuration in configmap
+
+# 1. Apply config changes
+kubectl apply -k k8s/overlays/local/api-service
+
+# 2. Restart deployment to pick up changes
+kubectl rollout restart deployment/api-service -n api-service-local
+kubectl rollout status deployment/api-service -n api-service-local
+
+# 3. IMMEDIATELY restart port-forwards (pod has been replaced)
+lsof -ti:8000 | xargs kill -9 2>/dev/null
+sleep 2
+kubectl port-forward -n api-service-local deployment/api-service 8000:8000 --address=127.0.0.1 &
+
+# 4. Verify API is accessible
+curl -s http://127.0.0.1:8000/api/v1/health/live
+```
+
+**Why deployment port-forward is better:**
+- Service port-forward: Goes through service → endpoint → pod (breaks when pod changes)
+- Pod port-forward: Direct to specific pod (breaks when that pod is deleted)
+- Deployment port-forward: Follows deployment's current pod (auto-reconnects on pod replacement)
+
+**Related:** See [Dashboard Development Setup](#dashboard-development-setup) for complete port-forward startup procedures.
+
 #### Issue: "MissingGreenlet" error when creating scans
 
 **Root Cause:** Endpoint uses direct `model_validate()` instead of helper functions.
