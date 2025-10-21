@@ -1,9 +1,9 @@
 # BlockSecOps Database Schema
 
-**Version:** 1.1.0
+**Version:** 1.1.1
 **Database:** PostgreSQL 15.4
-**Last Updated:** October 18, 2025
-**Migration Version:** 004 (08bf8921767b)
+**Last Updated:** October 20, 2025
+**Migration Version:** 004 (08bf8921767b) + Manual Fix (is_project column)
 
 ## Table of Contents
 
@@ -191,6 +191,7 @@ Smart contract source code and metadata.
 | `bytecode` | TEXT | NULLABLE | Compiled bytecode |
 | `lines_of_code` | INTEGER | NOT NULL | LOC for main file |
 | `is_multi_file` | BOOLEAN | NOT NULL, DEFAULT false | Multi-file project flag |
+| `is_project` | BOOLEAN | NOT NULL, DEFAULT false | Full project structure flag (for scanner compatibility) |
 | `main_file_path` | VARCHAR(500) | NULLABLE | Path to main contract file |
 | `file_count` | INTEGER | NOT NULL, DEFAULT 1 | Number of source files |
 | `total_lines_of_code` | INTEGER | NOT NULL, DEFAULT 0 | Total LOC across all files |

@@ -107,9 +107,9 @@ BlockSecOps offers four preset scan profiles to match different use cases:
 
 **What it includes**:
 - All Standard Scan tools
-- Symbolic execution (Halmos, Manticore)
+- Symbolic execution (Halmos)
 - Formal verification (Certora, Move Prover)
-- **All 21 available tools** for your contract's language
+- **All 20 available tools** for your contract's language
 
 **Coverage**:
 - Everything in Standard Scan
@@ -136,9 +136,9 @@ BlockSecOps offers four preset scan profiles to match different use cases:
 
 ## Available Scanners
 
-The platform provides **21 security scanners** across 5 smart contract languages:
+The platform provides **20 security scanners** across 5 smart contract languages:
 
-### Solidity (10 scanners)
+### Solidity (9 scanners)
 
 | Scanner | Type | Runtime | Best For |
 |---------|------|---------|----------|
@@ -150,7 +150,6 @@ The platform provides **21 security scanners** across 5 smart contract languages
 | **4naly3er** | Static Analysis | ~12s | Gas optimization and efficiency analysis |
 | **Halmos** | Symbolic Execution | ~2min | Formal verification of contract properties |
 | **Echidna** | Fuzzing | ~3min | Property-based fuzzing for edge cases |
-| **Manticore** | Symbolic Execution | ~4min | Deep symbolic execution analysis |
 | **Certora** | Formal Verification | ~5min | Mathematical proof of contract correctness |
 
 ### Vyper (2 scanners)
@@ -235,7 +234,7 @@ Use custom scanner selection when you:
 - Focus: Gas costs and optimization opportunities
 
 **For Deep Security (10+ minutes)**:
-- Select: All static analyzers + Echidna + Manticore
+- Select: All static analyzers + Echidna + Halmos
 - Focus: Comprehensive vulnerability coverage
 
 **For Reentrancy Detection**:
@@ -426,7 +425,7 @@ A: Review the finding details carefully. You can mark findings as "False Positiv
 ### Troubleshooting
 
 **Q: The scan is taking longer than expected**
-A: Deep scans with symbolic execution tools (Manticore, Halmos) can take 10-20 minutes for complex contracts. This is normal.
+A: Deep scans with symbolic execution tools (Halmos, Mythril) can take 10-20 minutes for complex contracts. This is normal.
 
 **Q: A scanner failed with an error**
 A: This can happen if the contract has syntax errors or is too complex. Check the error message for details. Other scanners will still complete.

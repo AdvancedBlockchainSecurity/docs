@@ -15,7 +15,7 @@ BlockSecOps provides comprehensive smart contract analysis through multiple spec
 **When to use**: Always check vulnerabilities first - these represent security risks that could lead to loss of funds or contract compromise.
 
 **Scanners that provide this**:
-- **Solidity**: slither, mythril, aderyn, semgrep, manticore
+- **Solidity**: slither, mythril, aderyn, semgrep
 - **Vyper**: vyper
 - **Solana/Rust**: sol-azy, sec3-xray
 - **Move**: (detected by move-prover side effects)
@@ -123,7 +123,6 @@ BlockSecOps provides comprehensive smart contract analysis through multiple spec
 **Scanners that provide this**:
 - certora (Certora Prover)
 - halmos (Symbolic testing for Foundry)
-- manticore (Symbolic execution)
 - move-prover (Move language formal verification)
 
 **What gets verified**:
@@ -213,10 +212,10 @@ BlockSecOps provides comprehensive smart contract analysis through multiple spec
 
 | Result Type | Available Scanners |
 |------------|-------------------|
-| Vulnerabilities | slither, mythril, aderyn, semgrep, manticore |
+| Vulnerabilities | slither, mythril, aderyn, semgrep |
 | Code Quality | solhint, semgrep, 4naly3er |
 | Gas Analysis | slither |
-| Formal Verification | certora, halmos, manticore |
+| Formal Verification | certora, halmos |
 | Fuzzing | echidna, foundry-fuzz, medusa, moccasin |
 
 ### Vyper Contracts

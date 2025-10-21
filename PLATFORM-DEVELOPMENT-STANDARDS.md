@@ -2026,6 +2026,101 @@ git push -u origin feat/add-scan-filtering
 git push
 ```
 
+**3.5. Test Changes (User Testing & API Testing):**
+
+```bash
+# Deploy to local environment
+make deploy-local
+
+# Perform API testing with actual endpoints
+curl -X POST http://localhost:8001/api/v1/scans?severity=high,critical
+
+# User testing - verify functionality works as expected
+# - Test through UI if applicable
+# - Verify error handling
+# - Check edge cases
+# - Validate responses
+```
+
+**3.6. Update Documentation (MANDATORY):**
+
+**CRITICAL: Documentation MUST be updated AFTER user/API testing but BEFORE creating pull request.**
+
+Documentation should be updated in the following locations based on change type:
+
+```bash
+# General documentation (architecture, standards, processes)
+/Users/pwner/Git/ABS/docs/*
+
+# Task-specific documentation (sprint tasks, implementation plans)
+/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/*
+
+# Technical documentation (API guides, deployment, development guides)
+/Users/pwner/Git/ABS/blocksecops-docs/*
+```
+
+**Documentation Update Requirements:**
+
+1. **API Changes** - Update relevant files in:
+   - `blocksecops-docs/api/endpoints-reference.md` (endpoint documentation)
+   - `blocksecops-docs/api/dashboard-integration.md` (if affects frontend)
+   - Include request/response examples from actual testing
+
+2. **Architecture Changes** - Update:
+   - `blocksecops-docs/architecture/` (system architecture)
+   - `docs/architecture-templates/` (if templates affected)
+   - Add diagrams if needed
+
+3. **Deployment Changes** - Update:
+   - `blocksecops-docs/deployment/` (deployment guides)
+   - `blocksecops-docs/local-development/` (local setup)
+   - Include configuration examples
+
+4. **Feature Implementation** - Document in:
+   - `TaskDocs-BlockSecOps/blocksecops/` (implementation summary)
+   - Create completion report for significant features
+   - Update relevant phase/sprint documentation
+
+5. **Development Process Changes** - Update:
+   - `docs/PLATFORM-DEVELOPMENT-STANDARDS.md` (this file)
+   - `blocksecops-docs/development/` (development guides)
+
+**Documentation Checklist:**
+
+```bash
+✅ Code changes implemented
+✅ User testing completed successfully
+✅ API testing verified (actual curl/HTTP requests)
+✅ Relevant documentation files identified
+✅ Documentation updated with:
+   - What changed and why
+   - How to use new/changed functionality
+   - Examples and code snippets (from actual testing)
+   - Configuration changes
+   - Breaking changes (if any)
+✅ Documentation committed to feature branch
+✅ Ready to create pull request
+```
+
+**Example Documentation Update:**
+
+```bash
+# After user/API testing scan filtering feature, update docs:
+vim blocksecops-docs/api/endpoints-reference.md
+# Add severity parameter documentation with tested examples
+
+vim TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/scan-filtering-implementation.md
+# Document implementation details and test results
+
+# Commit documentation updates
+git add blocksecops-docs/api/endpoints-reference.md
+git add TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/scan-filtering-implementation.md
+git commit -m "docs: Update API and implementation docs for scan filtering"
+
+# Push documentation updates with code changes
+git push
+```
+
 **4. Create Pull Request:**
 
 ```bash

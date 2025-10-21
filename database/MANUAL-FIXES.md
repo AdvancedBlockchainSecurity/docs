@@ -315,6 +315,174 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 
 ---
 
+## October 20, 2025 - Add is_project Column to Contracts Table
+
+### Issue
+Scanner compatibility with single-file contracts vs full project structures. Aderyn scanner requires a full Foundry/Hardhat project directory and cannot analyze single .sol files. Without a way to distinguish contract types, Aderyn would fail on all single-file contracts with "Not a directory" errors.
+
+**Symptom:** Aderyn scans failing with "Error making context: Not a directory (os error 20)" for single-file contracts.
+
+### Root Cause
+- All contracts in the system are currently single Solidity files
+- Aderyn scanner requires full project structure (foundry.toml, src/, etc.)
+- No database field to indicate whether a contract is a single file or a project
+- Scanner orchestrator had no way to filter out incompatible scanners
+- Future feature will support uploading full projects (Foundry/Hardhat)
+
+### Fix Applied
+```sql
+-- Add is_project column to differentiate single-file contracts from projects
+ALTER TABLE contracts
+ADD COLUMN IF NOT EXISTS is_project BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- All existing contracts are single files, so they default to FALSE
+-- Future project-based contracts will set this to TRUE when created
+```
+
+### Verification
+```sql
+-- Check column exists
+SELECT column_name, data_type, is_nullable, column_default
+FROM information_schema.columns
+WHERE table_name = 'contracts' AND column_name = 'is_project';
+
+-- Expected result:
+-- column_name | data_type | is_nullable | column_default
+-- ------------+-----------+-------------+----------------
+-- is_project  | boolean   | NO          | false
+
+-- Verify all existing contracts are marked as single-file
+SELECT is_project, COUNT(*) as count
+FROM contracts
+GROUP BY is_project;
+
+-- Expected result (all existing contracts should be FALSE):
+-- is_project | count
+-- -----------+------
+-- false      |   [N]
+```
+
+### How to Reproduce Fix
+If is_project column is missing after database recreation:
+
+```bash
+# 1. Add the column
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U postgres -d solidity_security \
+  -c "ALTER TABLE contracts ADD COLUMN IF NOT EXISTS is_project BOOLEAN NOT NULL DEFAULT FALSE;"
+
+# 2. Verify the column
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U postgres -d solidity_security \
+  -c "SELECT column_name, data_type, is_nullable, column_default FROM information_schema.columns WHERE table_name = 'contracts' AND column_name = 'is_project';"
+
+# 3. Check distribution
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U postgres -d solidity_security \
+  -c "SELECT is_project, COUNT(*) FROM contracts GROUP BY is_project;"
+```
+
+### Related Files
+- **Model Definition:**
+  - `blocksecops-orchestration/src/blocksecops_orchestration/models/models.py` (line 86-88)
+
+- **Scanner Base Class:**
+  - `blocksecops-orchestration/src/blocksecops_orchestration/scanners/base.py` (line 36-39)
+  - Added `requires_project` parameter to `ScannerExecutor`
+
+- **Aderyn Scanner:**
+  - `blocksecops-orchestration/src/blocksecops_orchestration/scanners/solidity_scanners.py` (line 366-376)
+  - Marked with `requires_project=True`
+
+- **Scanner Filtering Logic:**
+  - `blocksecops-orchestration/src/blocksecops_orchestration/tasks/scan_tasks_sync.py` (line 181-201)
+  - Filters scanners based on `contract.is_project`
+
+- **API Schema:**
+  - `blocksecops-orchestration/src/blocksecops_orchestration/api/schemas/scanner.py` (line 15)
+  - `blocksecops-orchestration/src/blocksecops_orchestration/api/routes/scanners.py` (line 110, 151)
+
+- **Dashboard:**
+  - `blocksecops-dashboard/src/components/contract/CodeQualityPanel.tsx` (line 1)
+
+### Impact
+- **Before Fix:**
+  - Aderyn attempted to scan single-file contracts
+  - Scans failed with "Not a directory" error
+  - Failed scan pods left in Error state
+  - Confusing user experience
+
+- **After Fix:**
+  - Aderyn automatically excluded from single-file contracts
+  - Only compatible scanners execute on single-file contracts
+  - When project upload feature is added, Aderyn will be included for projects
+  - Clean scanner filtering with proper logging
+
+- **Scanner Behavior:**
+  - Single-file contracts (`is_project=false`): Slither, Solhint, Echidna
+  - Project contracts (`is_project=true`): All scanners including Aderyn
+
+### Prevention
+For future operations:
+1. Set `is_project=true` when uploading full project directories
+2. API endpoint should validate project structure before setting flag
+3. Dashboard should show which scanners are compatible with each contract type
+4. Scanner requirements documented in API schema (`requires_project` field)
+
+### Technical Details
+
+**Scanner Capability Declaration:**
+```python
+# base.py
+class ScannerExecutor(ABC):
+    def __init__(self, scanner_id: str, timeout: int = 300, requires_project: bool = False):
+        self.requires_project = requires_project  # True if scanner needs full project structure
+```
+
+**Runtime Filtering:**
+```python
+# scan_tasks_sync.py (lines 186-198)
+if not contract.is_project:
+    for scanner_id in requested_scanners:
+        executor = registry.get(scanner_id)
+        if executor and not executor.requires_project:
+            scanner_ids.append(scanner_id)
+        elif executor and executor.requires_project:
+            logger.info("scanner_skipped_single_file", ...)
+else:
+    # For project-based contracts, all scanners are available
+    scanner_ids = requested_scanners
+```
+
+**API Exposure:**
+The `requires_project` property is exposed via the REST API at `/api/v1/scanners`, allowing the dashboard to:
+- Show compatibility warnings
+- Disable incompatible scanners in UI
+- Provide user guidance on scanner selection
+
+### Future Work
+1. **Project Upload Feature:**
+   - Add endpoint to upload full project directories (zip/tar.gz)
+   - Validate project structure (foundry.toml, hardhat.config.js, etc.)
+   - Set `is_project=true` for uploaded projects
+   - Store project files appropriately
+
+2. **Dashboard Updates:**
+   - Show scanner compatibility badges
+   - Filter scanner list based on contract type
+   - Display tooltip explaining why certain scanners are unavailable
+
+3. **Migration Script:**
+   - Create proper Alembic migration for this column
+   - Document in migration history
+
+4. **Additional Scanners:**
+   - Identify other scanners that require project structure
+   - Mark them with `requires_project=True`
+   - Update documentation
+
+---
+
 ## Template for Future Manual Fixes
 
 ### [Date] - [Brief Description]

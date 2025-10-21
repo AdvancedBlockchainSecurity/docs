@@ -76,7 +76,7 @@ Your selection is automatically saved for next time!
 Scanners are automatically filtered based on your contract's detected language. Only compatible scanners are shown.
 
 **Example**:
-- Solidity contracts see: Slither, Mythril, Echidna, Manticore, etc.
+- Solidity contracts see: Slither, Mythril, Echidna, etc.
 - Rust contracts see: cargo-audit, cargo-clippy, etc.
 
 ### 2. Category Grouping
@@ -87,7 +87,7 @@ Scanners are organized into 5 categories for easy navigation:
 |----------|-------------|--------------|---------------|
 | **Static Analysis** 🔍 | Code analysis without execution | ~30 seconds | Slither, Semgrep |
 | **Fuzzing** 🎲 | Property-based testing with random inputs | ~5 minutes | Echidna, Foundry |
-| **Symbolic Execution** 🧮 | Path exploration and constraint solving | ~10 minutes | Manticore, Mythril |
+| **Symbolic Execution** 🧮 | Path exploration and constraint solving | ~10 minutes | Mythril |
 | **Formal Verification** ✓ | Mathematical proof of correctness | ~15 minutes | Certora, K Framework |
 | **Linting** 📝 | Style and best practice checks | ~10 seconds | Solhint, cargo-clippy |
 
@@ -252,7 +252,7 @@ Presets are recommended scanner combinations optimized for different use cases.
 **Scanners Included**:
 - All Static Analysis tools
 - All Fuzzing tools
-- Symbolic Execution (Manticore, Mythril)
+- Symbolic Execution (Mythril)
 - Formal Verification (where available)
 - All Linters
 
@@ -288,7 +288,6 @@ Many scanners support configuration options to customize their behavior.
 | Scanner | Configurable Options | Common Use Cases |
 |---------|---------------------|------------------|
 | **Echidna** | Test limit, timeout, coverage-guided, corpus directory | Increase iterations for complex properties |
-| **Manticore** | Max depth, timeout, workers | Control symbolic exploration depth |
 | **Semgrep** | Rule sets, severity threshold | Enable/disable specific rule categories |
 | **Mythril** | Max depth, solver timeout, execution timeout | Adjust for contract complexity |
 | **Slither** | Detectors to exclude, optimization level | Skip known false positives |
@@ -552,11 +551,6 @@ type ScannerLanguage =
 - Default: 50,000 iterations (good for most cases)
 - Complex properties: Increase to 100,000-500,000
 - Time-constrained: Decrease to 10,000-25,000
-
-**Manticore (Symbolic Execution)**:
-- Default: Max depth 10 (good balance)
-- Simple contracts: Increase to 15-20
-- Complex contracts: May timeout, consider decreasing to 5-8
 
 **Mythril (Symbolic Execution)**:
 - Default: 300s timeout (5 minutes)
