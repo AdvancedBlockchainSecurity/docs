@@ -15,10 +15,9 @@ BlockSecOps provides comprehensive smart contract analysis through multiple spec
 **When to use**: Always check vulnerabilities first - these represent security risks that could lead to loss of funds or contract compromise.
 
 **Scanners that provide this**:
-- **Solidity**: slither, mythril, aderyn, semgrep
+- **Solidity**: slither, aderyn, semgrep
 - **Vyper**: vyper
 - **Solana/Rust**: sol-azy, sec3-xray
-- **Move**: (detected by move-prover side effects)
 - **Cairo/StarkNet**: tayt, caracal, starknet-foundry
 
 **Example findings**:
@@ -123,7 +122,6 @@ BlockSecOps provides comprehensive smart contract analysis through multiple spec
 **Scanners that provide this**:
 - certora (Certora Prover)
 - halmos (Symbolic testing for Foundry)
-- move-prover (Move language formal verification)
 
 **What gets verified**:
 - **Invariants**: Properties that should always be true
@@ -167,7 +165,6 @@ BlockSecOps provides comprehensive smart contract analysis through multiple spec
 **Scanners that provide this**:
 - **Solidity**: echidna, foundry-fuzz, medusa, moccasin
 - **Solana/Rust**: trident, cargo-fuzz-solana
-- **Move**: cargo-fuzz-move
 - **Cairo/StarkNet**: starknet-foundry
 
 **What gets tested**:
@@ -237,16 +234,6 @@ BlockSecOps provides comprehensive smart contract analysis through multiple spec
 | Gas Analysis | N/A |
 | Formal Verification | N/A |
 | Fuzzing | trident, cargo-fuzz-solana |
-
-### Move Smart Contracts (Aptos/Sui)
-
-| Result Type | Available Scanners |
-|------------|-------------------|
-| Vulnerabilities | (via move-prover) |
-| Code Quality | N/A |
-| Gas Analysis | N/A |
-| Formal Verification | move-prover |
-| Fuzzing | cargo-fuzz-move |
 
 ### Cairo/StarkNet Contracts
 
