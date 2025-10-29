@@ -213,17 +213,19 @@ Think of it like:
 - **Sprint 18**: Premium enterprise features and vulnerability database API
 
 ### **SaaS Subscription Revenue (Sprint 6+ Enabled)**
-- **Starter**: $10k/year (small teams, 5 projects) - Sprint 6 capabilities
-- **Professional**: $50k/year (enterprise teams, unlimited projects) - Sprint 12 capabilities
-- **Enterprise**: $150k/year (large organizations, advanced compliance) - Sprint 18 capabilities
+- **Developer**: $3,500/year (indie developers, 2 seats, 3 mainnet projects) - Sprint 6 capabilities
+- **Startup**: $12,000/year (growing teams, 5 seats, 10 mainnet projects) - Sprint 9 capabilities
+- **Professional**: $50,000/year (enterprise teams, 20 seats, unlimited projects) - Sprint 12 capabilities
+- **Enterprise**: $150,000/year (large organizations, 50 seats, advanced compliance, CSM) - Sprint 18 capabilities
+- **Enterprise Plus**: $300,000+/year (strategic partnerships, unlimited seats, dedicated security engineers) - Sprint 18+ capabilities
 
 ### **Target Unit Economics (Year 2, Sprint 18+ Operations)**
-- **Average Contract Value**: $75,000 (justified by comprehensive Sprint 1-18 capabilities)
+- **Average Contract Value**: $71,000 (blended across 5 tiers: 5% Developer, 25% Startup, 45% Professional, 20% Enterprise, 5% Enterprise Plus)
 - **Customer Acquisition Cost**: $6,000 (reduced by Sprint 15 operational efficiency)
-- **Customer Lifetime Value**: $300,000 (increased by Sprint 8 collaboration retention)
-- **LTV/CAC Ratio**: 50x (exceptional due to Sprint-enabled platform superiority)
+- **Customer Lifetime Value**: $310,000 (increased by Sprint 8 collaboration retention + 120% NRR)
+- **LTV/CAC Ratio**: 52x (exceptional due to Sprint-enabled platform superiority)
 - **Gross Margin**: 92% (minimal labor costs due to Sprint 1-18 automation)
-- **Net Revenue Retention**: 120% (upselling enabled by Sprint 10-13 advanced features)
+- **Net Revenue Retention**: 120% (upselling enabled by Sprint 10-13 advanced features across tier upgrades)
 
 ### **Additional Revenue Streams**
 - **Vulnerability Database API**: Tiered access to threat intelligence (Sprint 7-17 data collection, Month 12+ monetization)
@@ -257,9 +259,9 @@ Think of it like:
 ## **Traction & Validation**
 
 ### **Market Validation (Sprint-Synchronized)**
-- **10 enterprise prospects** identified for Sprint 6 alpha testing
-- **2 LOIs signed** from DeFi protocols for Sprint 12 beta programs
-- **$500k in pipeline** for Sprint 18 production launch
+- **15 enterprise prospects** identified for Sprint 6 alpha testing
+- **3 LOIs signed** from DeFi protocols for Sprint 12 beta programs ($150k pipeline)
+- **$800k in pipeline** for Sprint 18 production launch
 - **Industry expert advisors** validating Sprint 14 compliance approach
 
 ### **Technical Validation (Sprint-Delivered)**
@@ -280,20 +282,20 @@ Think of it like:
 ### **Sprint-Synchronized Revenue Growth**
 ```
 Sprint 6 (Month 3):   $0 ARR        (Alpha launch with pilot customers)
-Sprint 12 (Month 6):  $50k ARR      (10 customers, beta platform capabilities)
-Sprint 18 (Month 9):  $200k ARR     (20 customers, production platform)
-Month 12:             $400k ARR     (30 customers + vulnerability database API)
-Month 18:             $1.2M ARR     (50 customers + database subscriptions)
-Month 24:             $3M ARR       (100 customers + scaled operations)
-Month 30:             $4M ARR       (125 customers + market expansion)
-Month 36:             $8M ARR       (200 customers + international growth)
+Sprint 12 (Month 6):  $85k ARR      (12 customers: 6 Developer, 6 Startup)
+Sprint 18 (Month 9):  $280k ARR     (25 customers: 10 Developer, 12 Startup, 3 Professional)
+Month 12:             $625k ARR     (38 customers: 12 Developer, 20 Startup, 5 Professional, 1 Enterprise)
+Month 18:             $1.6M ARR     (65 customers: mix across all tiers + vulnerability database API)
+Month 24:             $4.2M ARR     (110 customers: enterprise-focused mix + scaled operations)
+Month 30:             $6.5M ARR     (145 customers: mature customer base + market expansion)
+Month 36:             $11M ARR      (220 customers: optimized tier mix + international growth)
 ```
 
 ### **Sprint-Enabled Profit Margins**
 ```
-Year 1:  87% profit margin  ($350k profit on $400k revenue)
-Year 2:  60% profit margin  ($1.8M profit on $3M revenue)
-Year 3:  37% profit margin  ($3M profit on $8M revenue)
+Year 1:  76% profit margin  ($475k profit on $625k revenue)
+Year 2:  56% profit margin  ($2.4M profit on $4.2M revenue)
+Year 3:  47% profit margin  ($5.2M profit on $11M revenue)
 ```
 
 ### **Sprint-Validated Key Metrics**
@@ -321,15 +323,15 @@ Year 3:  37% profit margin  ($3M profit on $8M revenue)
 - **Target**: Top 30 DeFi protocols and L1/L2 blockchains
 - **Approach**: Technical credibility through Sprint demonstrations, conference networking
 - **Sales Cycle**: 2-4 months with Sprint-based proof-of-concept (shortened by platform reliability)
-- **Goal**: 30 enterprise customers, $400k ARR (supported by Sprint 18 production capabilities)
+- **Goal**: 38 customers (mix of Developer, Startup, Professional, Enterprise tiers), $625k ARR (supported by Sprint 18 production capabilities)
 
 ### **Phase 2: Team-Enabled Sales (Months 13-24, Post-Sprint 18)**
 **Scalable Foundation**: Sprint 15-18 operational readiness enables team expansion
 **Sales Approach**:
-- **First Hire**: Sales rep at $400k ARR milestone (operational foundation from Sprint 15)
+- **First Hire**: Sales rep at $625k ARR milestone (Month 12, operational foundation from Sprint 15)
 - **System Integrator Channel**: Partner with blockchain consultancies (enterprise integrations from Sprint 10)
 - **Tool Vendor Partnerships**: Co-marketing with security tool companies (plugin architecture from Sprint 13)
-- **Goal**: 100 customers, $3M ARR (scalable platform from Sprint 1-18)
+- **Goal**: 110 customers, $4.2M ARR (scalable platform from Sprint 1-18)
 
 ### **Phase 3: Channel Expansion (Months 25-36)**
 **Market Leadership**: Proven platform capabilities enable channel partnerships
@@ -337,7 +339,7 @@ Year 3:  37% profit margin  ($3M profit on $8M revenue)
 - **Audit Firm Partnerships**: Joint go-to-market (comprehensive APIs from Sprint 17)
 - **International Expansion**: European and Asian markets (global deployment from Sprint 12)
 - **Product-Led Growth**: Self-service tier for mid-market (customer onboarding from Sprint 15)
-- **Goal**: 200 customers, $8M ARR (comprehensive platform ecosystem)
+- **Goal**: 220 customers, $11M ARR (comprehensive platform ecosystem with mature tier mix)
 
 ---
 
@@ -372,13 +374,13 @@ Year 3:  37% profit margin  ($3M profit on $8M revenue)
 
 **Series A (Month 24+): $1-3M**
 - **Purpose**: Faster market capture leveraging Sprint 1-18 foundation
-- **Use**: Accelerated hiring to reach $20M ARR faster
-- **Alternative**: Continue profitable Sprint-based bootstrap growth
+- **Use**: Accelerated hiring to reach $25M ARR faster
+- **Alternative**: Continue profitable Sprint-based bootstrap growth (currently at $4.2M ARR)
 
 **Series B (Month 36+): $5-15M**
 - **Purpose**: International expansion and adjacent markets
 - **Use**: Geographic expansion, M&A opportunities
-- **Alternative**: Expand organically with $3M annual cash flow from Sprint-built platform
+- **Alternative**: Expand organically with $5M+ annual cash flow from Sprint-built platform (currently at $11M ARR)
 
 ---
 
@@ -466,13 +468,13 @@ Year 3:  37% profit margin  ($3M profit on $8M revenue)
 - **Sprint 11-12 (Months 6)**: Complete advanced analytics and global deployment
 
 ### **12-Month Goals (Through Sprint 18+)**
-- **$400k ARR** with 30 enterprise customers (Sprint 18 production launch)
+- **$625k ARR** with 38 customers across all pricing tiers (Sprint 18 production launch)
 - **Vulnerability Database Launch** with customer data patterns (Sprint 7-17 collection)
 - **First Team Member** hired with revenue funding (Sprint 15 operational foundation)
 - **Market Leadership** position in unified security operations
 
 ### **36-Month Vision (Sprint Foundation + Growth)**
-- **$8M ARR** with 200 enterprise customers (scalable Sprint-built platform)
+- **$11M ARR** with 220 customers across optimized tier mix (scalable Sprint-built platform)
 - **Market Standard** for enterprise security operations (Sprint-enabled technical leadership)
 - **International Presence** in 5+ countries (Sprint 12 global architecture)
 - **Category-Defining Company** in Web3 security (Sprint methodology competitive advantage)
