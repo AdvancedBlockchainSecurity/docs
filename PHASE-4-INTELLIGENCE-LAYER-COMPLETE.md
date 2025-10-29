@@ -38,8 +38,8 @@ The Phase 4 Vulnerability Intelligence Layer has been successfully implemented, 
 - **File**: `pattern_matcher.py`
 - **Capability**: Maps scanner detectors to vulnerability patterns
 - **Database**: Integrates with `pattern_tool_mappings` table
-- **Coverage**: 80 scanner-to-pattern mappings across 4 tools (Slither, Aderyn, Semgrep, Solhint)
-- **Updated**: 2025-10-28 - Added 59 new mappings from Semgrep (43) and Solhint (16) integration
+- **Coverage**: 152 scanner-to-pattern mappings across 4 tools (Slither, Aderyn, Semgrep, Solhint)
+- **Updated**: 2025-10-29 - Added 48 new mappings from Aderyn low-severity integration (73/87 detectors, 83.9%)
 
 ### 5. Finding Enrichment Service (✅ Complete)
 - **File**: `enrichment_service.py`
@@ -64,7 +64,7 @@ The Phase 4 Vulnerability Intelligence Layer has been successfully implemented, 
 | Code Hash | ~0.11ms | Negligible |
 | AST Hash | ~0.60ms | ~2MB (cached) |
 | Location Hash | ~0.02ms | Negligible |
-| Pattern Match | ~0.01ms | ~190KB (80 mappings) |
+| Pattern Match | ~0.01ms | ~365KB (152 mappings) |
 | **Total** | **~0.74ms** | **~2MB** |
 
 ### Batch Processing
