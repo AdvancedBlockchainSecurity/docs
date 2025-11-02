@@ -451,10 +451,9 @@ Update these files to reflect the scanner removal:
 |----------|---------------|---------------|-------------|
 | **Mythx** | Fixed set (Mythril, Maru, Harvey) | ❌ No | ❌ No |
 | **Slither Cloud** | Single scanner (Slither) | ⚙️ Rule config only | ❌ No |
-| **Certora** | Single scanner (Prover) | ⚙️ CVL specs | ❌ No |
 | **OpenZeppelin Defender** | Fixed set (Forta, Slither) | ❌ No | ❌ No |
 | **Cyfrin Aderyn** | Single scanner (Aderyn) | ❌ No | ❌ No |
-| **BlockSecOps (Current)** | Fixed set (20 scanners) | ⚙️ Per-project selection | ❌ No |
+| **BlockSecOps (Current)** | Fixed set (15 scanners) | ⚙️ Per-project selection | ❌ No |
 | **BlockSecOps (Planned)** | **User-defined + marketplace** | ✅ **Full plugin system** | ✅ **Public marketplace** |
 
 **Key Differentiator:** We will be the **only platform** where users can:

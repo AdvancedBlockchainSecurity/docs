@@ -108,8 +108,8 @@ BlockSecOps offers four preset scan profiles to match different use cases:
 **What it includes**:
 - All Standard Scan tools
 - Symbolic execution (Halmos)
-- Formal verification (Certora, Move Prover)
-- **All 20 available tools** for your contract's language
+- Formal verification (Move Prover for Move contracts)
+- **All available tools** for your contract's language
 
 **Coverage**:
 - Everything in Standard Scan
@@ -136,9 +136,9 @@ BlockSecOps offers four preset scan profiles to match different use cases:
 
 ## Available Scanners
 
-The platform provides **20 security scanners** across 5 smart contract languages:
+The platform provides security scanners across 5 smart contract languages:
 
-### Solidity (9 scanners)
+### Solidity (8 scanners)
 
 | Scanner | Type | Runtime | Best For |
 |---------|------|---------|----------|
@@ -148,9 +148,8 @@ The platform provides **20 security scanners** across 5 smart contract languages
 | **Semgrep** | Static Analysis | ~10s | Pattern-based detection with custom rules |
 | **Solhint** | Linting | ~5s | Code style and best practices |
 | **4naly3er** | Static Analysis | ~12s | Gas optimization and efficiency analysis |
-| **Halmos** | Symbolic Execution | ~2min | Formal verification of contract properties |
+| **Halmos** | Symbolic Execution | ~2min | Symbolic testing of contract properties |
 | **Echidna** | Fuzzing | ~3min | Property-based fuzzing for edge cases |
-| **Certora** | Formal Verification | ~5min | Mathematical proof of contract correctness |
 
 ### Vyper (2 scanners)
 
