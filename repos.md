@@ -763,20 +763,106 @@ Contains: UI components, layouts, auth components, design tokens, utilities
 Integration: WASM-enabled TypeScript package with JavaScript fallbacks (8x performance boost)
 ```
 
-### 8. **`blocksecops-dashboard`** (~12K LOC) ✅ **MVP COMPLETE - PRODUCTION READY**
-**Full-featured security dashboard with real-time updates**
+### 8. **`blocksecops-dashboard`** (~14K LOC) ✅ **MVP COMPLETE - PRODUCTION READY** + **INTELLIGENCE LAYER INTEGRATED**
+**Full-featured security dashboard with AI-powered intelligence and real-time updates**
 ```
-Purpose: Complete security scanning interface (MVP)
-Tech Stack: React 18, TypeScript, Recharts, TanStack Query, Socket.IO, DOMPurify, Zod
-Contains: Auth pages, contract management, scan results, real-time WebSocket updates
-Status: Production-ready with comprehensive security fixes
+Purpose: Complete security scanning interface with advanced intelligence features
+Tech Stack: React 18, TypeScript, Recharts, TanStack Query, Socket.IO, DOMPurify, Zod, Vitest
+Contains: Auth, contract management, scan results, real-time updates, intelligence components
+Status: Production-ready with comprehensive security fixes + Intelligence Layer integration
 Security: OWASP Top 10 compliant, 21/21 security tests passing
-Features:
+Testing: 31 component tests, 100% success rate
+Latest Update: Phase 6 Intelligence Layer (Nov 2025)
+
+Core Features:
   - Authentication (Login/Register pages with JWT)
   - Contract Management (Upload, list, detail, source viewer)
   - Scan Results (Vulnerability viewer, severity filtering, real-time updates)
   - WebSocket Integration (Live scan progress, instant notifications)
   - Security Hardening (CSP, DOMPurify sanitization, token validation)
+
+Intelligence Layer Features (Phase 6):
+  - Pattern Classification Badges (14 color-coded vulnerability categories)
+  - Cross-Scanner Deduplication Indicators (consensus visualization)
+  - Classification Confidence Meters (visual confidence scoring 0-100%)
+  - Fingerprint Debug Panels (4 hash types for developers)
+  - Scanner Comparison Views (side-by-side multi-scanner analysis)
+  - Advanced Filtering (pattern code, confidence, scanner count, canonical findings)
+  - Deduplication Groups (reduce noise, increase signal)
+  - Pattern Library (397 vulnerability patterns, 4 ecosystems)
+```
+
+**Intelligence Components** (Phase 6.3 - 8 components, 1,236 lines):
+```typescript
+src/components/intelligence/
+├── PatternCodeBadge.tsx           # BVD pattern codes with 14 category colors
+├── DeduplicationIndicator.tsx     # Multi-scanner consensus badges
+├── ClassificationConfidenceMeter.tsx  # Visual 0-100% confidence
+├── FingerprintDebugPanel.tsx      # 4 fingerprint hashes with copy-to-clipboard
+├── DeduplicationGroupCard.tsx     # Group summary cards
+├── DeduplicationGroupList.tsx     # Filterable/sortable group list
+├── ScannerComparisonView.tsx      # Side-by-side scanner comparison
+├── VulnerabilityCard.tsx          # Enhanced vulnerability display
+└── index.ts                       # Component exports
+```
+
+**TypeScript Types** (Phase 6.2 - Full IntelliSense):
+```typescript
+src/lib/api/
+├── vulnerabilities.ts             # Updated with 13 intelligence fields
+├── deduplication.ts               # Deduplication group types
+├── patterns.ts                    # Vulnerability pattern types
+├── deduplicationApi.ts            # Deduplication API client methods
+└── index.ts                       # Type exports
+```
+
+**Intelligence Fields Integrated** (13 fields):
+```typescript
+interface Vulnerability {
+  // Pattern Classification (4 fields)
+  pattern_id?: string;
+  pattern_code?: string;                    // BVD-EVM-REE-001
+  classification_confidence?: number;       // 0.0-1.0
+  classification_method?: 'rule_based' | 'ml_based' | 'hybrid';
+
+  // Fingerprints (4 fields)
+  fingerprint_code?: string;                // SHA-256 of normalized code
+  fingerprint_location?: string;            // SHA-256 of file:line:function
+  fingerprint_ast?: string;                 // SHA-256 of AST structure
+  fingerprint_location_fuzzy?: string;      // Fuzzy location hash (±3 lines)
+
+  // Deduplication (5 fields)
+  deduplication_group_id?: string;
+  is_canonical?: boolean;
+  duplicate_count?: number;
+  scanner_count?: number;                   // Number of scanners detecting this
+  scanners?: string[];                      // List of scanner IDs
+}
+```
+
+**Optional Pages** (Phase 6.3.9-6.3.15 - Planned):
+```
+Detailed implementation plan available (1,790+ lines):
+  - /vulnerabilities/:id - Enhanced vulnerability detail page
+  - /deduplication - Browse deduplication groups
+  - /deduplication/:id - Detailed group comparison
+  - /patterns - Vulnerability pattern library
+  - /patterns/:id - Individual pattern details
+  - Advanced intelligence filters
+  - UI polish (loading, errors, responsive)
+```
+
+**Testing** (Phase 6.4):
+```
+Component Tests:
+  - 31 tests (PatternCodeBadge, DeduplicationIndicator, etc.)
+  - 100% success rate
+  - Framework: Vitest + React Testing Library
+
+Integration:
+  - Full TypeScript type coverage
+  - Backward compatible (all fields optional)
+  - Zero breaking changes
 ```
 
 ### 9. **`blocksecops-findings`** (~8K LOC)

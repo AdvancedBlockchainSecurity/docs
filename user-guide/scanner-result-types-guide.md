@@ -120,8 +120,8 @@ BlockSecOps provides comprehensive smart contract analysis through multiple spec
 **When to use**: For high-value contracts or critical business logic where mathematical certainty is required.
 
 **Scanners that provide this**:
-- certora (Certora Prover)
 - halmos (Symbolic testing for Foundry)
+- move-prover (Formal verification for Move contracts)
 
 **What gets verified**:
 - **Invariants**: Properties that should always be true
@@ -212,7 +212,7 @@ BlockSecOps provides comprehensive smart contract analysis through multiple spec
 | Vulnerabilities | slither, mythril, aderyn, semgrep |
 | Code Quality | solhint, semgrep, 4naly3er |
 | Gas Analysis | slither |
-| Formal Verification | certora, halmos |
+| Formal Verification | halmos |
 | Fuzzing | echidna, foundry-fuzz, medusa, moccasin |
 
 ### Vyper Contracts
@@ -263,8 +263,8 @@ For contracts approaching deployment:
 
 ### 3. Pre-Deployment Verification (hours to days)
 For high-value contracts:
-- **Certora** or **Halmos** (formal verification of critical properties)
-- **Manticore** (symbolic execution for complex state exploration)
+- **Halmos** (symbolic testing of critical properties)
+- **Move Prover** (formal verification for Move contracts)
 - **Extended fuzzing** (100,000+ runs with custom invariants)
 
 ### 4. Continuous Monitoring
