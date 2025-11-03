@@ -49,7 +49,8 @@ Tech Stack: Python 3.13, FastAPI, SQLAlchemy, Pydantic, JWT
 Architecture: Domain-Driven Design (DDD) + Clean Architecture + CQRS
 Contains: Domain entities, application use cases, infrastructure adapters, API interfaces
 Integration: Docker multi-stage build with PyO3 v0.22 bindings (10x performance boost)
-Current Version: 0.3.4 (Sprint 14 Security Hardening)
+Current Version: 0.2.3 (Multi-Scanner Execution Fix - November 3, 2025)
+Features: Multi-scanner job triggering, rate limiting, consecutive failure tracking
 Security: HttpOnly cookies (XSS protection), CORS hardening (origin validation), OWASP 2025 compliant
 ```
 
@@ -342,10 +343,11 @@ blocksecops-api-service/
 └── README.md                  # Service documentation
 ```
 
-### 2. **`blocksecops-tool-integration`** (~12K LOC) ✅ **MVP COMPLETE - SPRINT 8**
+### 2. **`blocksecops-tool-integration`** (~12K LOC) ✅ **MVP COMPLETE - SPRINT 8** + **MULTI-SCANNER SUPPORT**
 **Security tool adapters and integrations - Kubernetes Jobs-based scanner execution**
 ```
-Purpose: Multi-scanner orchestration (Slither, Mythril, Aderyn) via Kubernetes Jobs
+Purpose: Multi-scanner orchestration (9 scanners: Slither, Mythril, Aderyn, Semgrep, Solhint, Halmos, Echidna, Wake, Medusa) via Kubernetes Jobs
+Current Version: 0.2.2 (Multi-Scanner Whitelist Expansion - November 3, 2025)
 Tech Stack: Python 3.13, FastAPI, Kubernetes Python Client, asyncio
 Architecture: Job Manager + Result Collector with ConfigMap-based source delivery
 Features: Real scanner execution, ConfigMap volume mounting, automatic cleanup, result parsing
