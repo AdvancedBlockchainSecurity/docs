@@ -203,6 +203,7 @@ Each service gets its own namespace for:
 - **Certificates**: Self-signed certificates via cert-manager
 - **Service Mesh**: Optional (can be disabled for resource savings)
 - **Database**: Lightweight PostgreSQL and Redis configurations
+- **Image Tags**: Use `latest` tag in kustomization (see `/Users/pwner/Git/ABS/docs/standards/docker-image-versioning.md`)
 
 ### Staging Environment
 - **Namespace per service**: `<service>-staging`
@@ -523,7 +524,7 @@ spec:
 - Bypass Vault for secret storage (all secrets must go through Vault)
 - Run production without PodDisruptionBudgets
 - Skip backup strategies for stateful services
-- Use `latest` image tags
+- Use `latest` image tags in production (local development uses `latest` - see docker-image-versioning.md)
 - Run containers as root
 - Deploy without resource limits
 - Skip network policies

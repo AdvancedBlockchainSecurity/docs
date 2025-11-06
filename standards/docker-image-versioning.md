@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 1.8.0
-**Last Updated:** October 20, 2025
+**Version:** 1.9.0
+**Last Updated:** November 5, 2025
 **Status:** Active
 
 ## Semantic Versioning for Docker Images
@@ -91,24 +91,72 @@ docker tag api-service:0.3.13 api-service:latest
 docker images | grep api-service
 ```
 
-## Updating Kustomize Configuration
+## Kustomize Configuration Strategy
 
-**After building new image version, update ALL relevant files:**
+**IMPORTANT:** Kustomize configuration differs between local development and production environments.
+
+### Local Development (k8s/overlays/local/)
+
+**For local development, use `latest` tag to avoid manual updates:**
 
 ```yaml
 # k8s/overlays/local/kustomization.yaml
 images:
 - name: PLACEHOLDER_REGISTRY/blocksecops-api-service
   newName: api-service
-  newTag: 0.3.13  # ← Update version
+  newTag: latest  # ← Always use 'latest' for local development
 
 labels:
 - includeSelectors: false
   pairs:
-    app.kubernetes.io/version: 0.3.13  # ← Update version label
+    app.kubernetes.io/version: latest  # ← Use 'latest' for local dev
 ```
 
-**Critical:** Update BOTH `newTag` AND `app.kubernetes.io/version` to match!
+**Benefits:**
+- No need to update kustomization.yaml after each image build
+- Kubernetes automatically pulls the latest local image
+- Faster development iteration
+- Reduces configuration drift between code and deployment
+
+**Deployment workflow:**
+```bash
+# 1. Build versioned image
+docker build -t api-service:0.3.13 -f Dockerfile .
+
+# 2. Tag as latest
+docker tag api-service:0.3.13 api-service:latest
+
+# 3. Apply kustomization (no changes needed)
+kubectl apply -k k8s/overlays/local/
+
+# 4. Restart deployment to pick up new image
+kubectl rollout restart deployment/api-service -n api-service-local
+```
+
+### Production/Staging (k8s/overlays/prod/, k8s/overlays/staging/)
+
+**For production deployments, use specific version tags:**
+
+```yaml
+# k8s/overlays/prod/kustomization.yaml
+images:
+- name: PLACEHOLDER_REGISTRY/blocksecops-api-service
+  newName: registry.example.com/api-service
+  newTag: 0.3.13  # ← Specific version for reproducibility
+
+labels:
+- includeSelectors: false
+  pairs:
+    app.kubernetes.io/version: 0.3.13  # ← Match image version
+```
+
+**Benefits:**
+- Reproducible deployments
+- Easy rollbacks to known versions
+- Clear audit trail of deployed versions
+- Prevents accidental deployments
+
+**Critical:** Update BOTH `newTag` AND `app.kubernetes.io/version` to match for production!
 
 ## Version Tracking
 
@@ -162,30 +210,54 @@ git push origin api-service-v0.3.13
 
 **Version tracking enables easy rollbacks:**
 
-```bash
-# Rollback to previous version
-kubectl set image deployment/api-service \
-  api-service=api-service:0.3.12 \
-  -n api-service-local
+### Local Development Rollback
 
-# Or update kustomization and reapply
-vim k8s/overlays/local/kustomization.yaml
+```bash
+# For local development, rollback by re-tagging older version as latest
+eval $(minikube docker-env)
+docker tag api-service:0.3.12 api-service:latest
+kubectl rollout restart deployment/api-service -n api-service-local
+```
+
+### Production Rollback
+
+```bash
+# Update kustomization with previous version
+vim k8s/overlays/prod/kustomization.yaml
 # Change newTag: 0.3.13 back to newTag: 0.3.12
-kubectl apply -k k8s/overlays/local/
+# Change app.kubernetes.io/version: 0.3.13 to 0.3.12
+
+kubectl apply -k k8s/overlays/prod/
 ```
 
 ## Version Checklist
 
-Before incrementing version:
+### Local Development Checklist
+
+Before deploying locally:
 
 - [ ] Determine correct increment type (MAJOR/MINOR/PATCH)
 - [ ] Build Docker image with new version tag
-- [ ] Update kustomization.yaml (newTag + version label)
+- [ ] Tag image as `latest`
+- [ ] **No kustomization.yaml changes needed** (uses `latest`)
+- [ ] Restart deployment to pick up new image
+- [ ] Test new functionality
+- [ ] Create git tag matching version (for tracking)
+- [ ] Update CHANGELOG with changes
+
+### Production Deployment Checklist
+
+Before deploying to production:
+
+- [ ] Ensure version is tested in local environment
+- [ ] Build and push Docker image to registry with version tag
+- [ ] Update production kustomization.yaml (newTag + version label)
 - [ ] Create git tag matching version
 - [ ] Update CHANGELOG with changes
 - [ ] Document breaking changes (if MAJOR/MINOR increment)
-- [ ] Test deployment with new version
+- [ ] Test deployment in staging environment
 - [ ] Verify rollback procedure works
+- [ ] Deploy to production
 
 **Example Version History:**
 
