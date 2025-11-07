@@ -1,10 +1,55 @@
 # Scanner Result Types Guide
 
-**Last Updated**: 2025-10-19
+**Last Updated**: 2025-11-06
 
 ## Overview
 
 BlockSecOps provides comprehensive smart contract analysis through multiple specialized scanners. Each scanner produces different types of results beyond traditional security vulnerabilities. This guide explains the different result types and how to interpret them.
+
+## Understanding Result Sources: Scanner vs Intelligence Layer
+
+**NEW (v0.3.0)**: BlockSecOps now clearly distinguishes between two sources of vulnerability findings:
+
+### Scanner Results (Direct Detection)
+Vulnerabilities directly detected by the scanner tool you selected. These are findings from the scanner's own analysis algorithms.
+
+**Characteristics**:
+- **Source**: Specific scanner tool (e.g., Slither, Aderyn, Semgrep)
+- **How detected**: Scanner's built-in detectors and algorithms
+- **Example**: Slither's reentrancy detector finds a reentrancy vulnerability
+
+### Intelligence Layer (Pattern Analysis)
+Vulnerabilities identified by BlockSecOps' intelligence layer through pattern matching against our vulnerability knowledge base.
+
+**Characteristics**:
+- **Source**: BlockSecOps Intelligence Engine
+- **How detected**: Pattern matching against known vulnerability patterns
+- **Example**: Code pattern matches a known vulnerability signature in our database
+
+### Why This Matters
+
+**Wake Scanner Example**:
+- Wake scan shows "0 scanner results, 2 intelligence findings"
+- This means: Wake itself found nothing, but our intelligence layer detected 2 potential issues
+- Previously, this was confusing: "Wake found 2 vulnerabilities" when Wake actually found 0
+
+**How to Use This Information**:
+- **Scanner Results**: Trust these as direct detections from the tool
+- **Intelligence Results**: Review these as pattern-based detections from our knowledge base
+- **Both are important**: Both sources help identify potential vulnerabilities
+
+### Viewing Separated Results
+
+Use the new API endpoint to get separated results:
+```
+GET /api/v1/scans/{scan_id}/vulnerabilities/breakdown
+```
+
+This returns:
+- `scanner_results`: Vulnerabilities from the scanner tool
+- `intelligence_results`: Vulnerabilities from intelligence layer
+- `scanner_counts`: Count by severity for scanner results
+- `intelligence_counts`: Count by severity for intelligence results
 
 ## Result Type Categories
 
