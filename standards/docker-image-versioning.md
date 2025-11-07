@@ -1,6 +1,6 @@
 # Docker Image Versioning Standards
 
-**Version:** 1.9.0
+**Version:** 1.11.0
 **Last Updated:** November 5, 2025
 **Status:** Active
 
@@ -157,6 +157,231 @@ labels:
 - Prevents accidental deployments
 
 **Critical:** Update BOTH `newTag` AND `app.kubernetes.io/version` to match for production!
+
+## Scanner Image Versioning Strategy
+
+**IMPORTANT:** Scanner image versioning differs between local development and production environments, following the same philosophy as service images.
+
+### Local Development Scanner Configuration
+
+**For local development, use `latest` tag for fast iteration:**
+
+**Scanner Image ConfigMap** (`k8s/base/scanner-versions-configmap.yaml`):
+
+```yaml
+data:
+  # Solidity Static Analysis Scanners
+  SCANNER_IMAGE_SLITHER: "scanner-slither:latest"
+  SCANNER_IMAGE_ADERYN: "scanner-aderyn:latest"
+  SCANNER_IMAGE_SEMGREP: "scanner-semgrep:latest"
+  SCANNER_IMAGE_SOLHINT: "scanner-solhint:latest"
+
+  # Fuzzing Tools
+  SCANNER_IMAGE_ECHIDNA: "scanner-echidna:latest"
+  SCANNER_IMAGE_MEDUSA: "scanner-medusa:latest"
+
+  # ... all other scanners use :latest
+```
+
+**Benefits:**
+- No ConfigMap updates needed after rebuilding scanner images
+- Kubernetes automatically uses latest local image
+- Faster development iteration
+- Consistent with service image local development strategy
+- Reduces configuration drift between code and deployment
+
+**Scanner Image Update Workflow (Local Development):**
+
+```bash
+# 1. Update scanner Dockerfile version label
+# Edit scanner-images/semgrep/Dockerfile
+LABEL version="0.2.4"
+
+# 2. Build new scanner image with semantic version
+eval $(minikube docker-env)
+docker build --no-cache -t scanner-semgrep:0.2.4 -f Dockerfile .
+
+# 3. Tag as latest for local development
+docker tag scanner-semgrep:0.2.4 scanner-semgrep:latest
+
+# 4. Rebuild tool-integration service (if needed)
+docker build --no-cache -t tool-integration:latest -f Dockerfile .
+
+# 5. Apply ConfigMap (no version changes needed - uses :latest)
+kubectl apply -k k8s/base/
+
+# 6. Restart tool-integration deployment to pick up changes
+kubectl rollout restart deployment/tool-integration -n tool-integration-local
+kubectl rollout status deployment/tool-integration -n tool-integration-local
+```
+
+**How Scanner Image Selection Works:**
+
+The `kubernetes_job_manager.py` reads scanner images using this priority:
+
+1. **ConfigMap Environment Variables** (preferred for local dev):
+   ```python
+   # Reads SCANNER_IMAGE_SEMGREP from ConfigMap
+   env_var_name = f"SCANNER_IMAGE_{scanner.upper().replace('-', '_')}"
+   image_from_env = os.getenv(env_var_name)
+   if image_from_env:
+       return image_from_env  # Returns "scanner-semgrep:latest"
+   ```
+
+2. **Hardcoded Defaults** (fallback, deprecated):
+   ```python
+   # Only used if ConfigMap env var not found
+   default_images = {
+       "semgrep": "scanner-semgrep:0.2.3",
+   }
+   ```
+
+**Best Practice:** Use ConfigMap with `:latest` for local development. The hardcoded defaults are only for backward compatibility.
+
+### Production/Staging Scanner Configuration
+
+**For production deployments, use specific version tags:**
+
+**Scanner Image ConfigMap** (`k8s/overlays/prod/scanner-versions-configmap.yaml`):
+
+```yaml
+data:
+  # Solidity Static Analysis Scanners (explicit versions)
+  SCANNER_IMAGE_SLITHER: "registry.example.com/scanner-slither:0.2.1"
+  SCANNER_IMAGE_ADERYN: "registry.example.com/scanner-aderyn:0.2.0"
+  SCANNER_IMAGE_SEMGREP: "registry.example.com/scanner-semgrep:0.2.4"
+  SCANNER_IMAGE_SOLHINT: "registry.example.com/scanner-solhint:0.2.0"
+```
+
+**Benefits:**
+- Reproducible deployments - exact scanner version known
+- Easy rollbacks to previous scanner versions
+- Clear audit trail of which scanner versions were used
+- Debugging is straightforward - logs show exact version
+- No Kubernetes caching ambiguity
+
+**Production Scanner Update Workflow:**
+
+```bash
+# 1. Test new scanner version in local environment first
+docker build --no-cache -t scanner-semgrep:0.2.4 -f Dockerfile .
+docker tag scanner-semgrep:0.2.4 scanner-semgrep:latest
+# Test locally...
+
+# 2. Build and push to production registry with explicit version
+docker build --no-cache -t scanner-semgrep:0.2.4 -f Dockerfile .
+docker tag scanner-semgrep:0.2.4 registry.example.com/scanner-semgrep:0.2.4
+docker push registry.example.com/scanner-semgrep:0.2.4
+
+# 3. Update production ConfigMap overlay
+vim k8s/overlays/prod/scanner-versions-configmap.yaml
+# Change SCANNER_IMAGE_SEMGREP: "registry.example.com/scanner-semgrep:0.2.4"
+
+# 4. Apply production configuration
+kubectl apply -k k8s/overlays/prod/
+
+# 5. Monitor rollout
+kubectl rollout status deployment/tool-integration -n tool-integration-prod
+```
+
+### Debugging Scanner Version Issues
+
+**Check which scanner version a job actually used:**
+
+```bash
+# Find the job for a specific scan
+kubectl get jobs -n tool-integration-local | grep <scan-id>
+
+# Check the image used by the job
+kubectl get job <job-name> -n tool-integration-local \
+  -o jsonpath='{.spec.template.spec.containers[0].image}'
+
+# Example output: scanner-semgrep:latest or scanner-semgrep:0.2.3
+
+# Check job logs for actual tool version
+kubectl logs -n tool-integration-local job/<job-name>
+```
+
+**Verify scanner image exists in minikube:**
+
+```bash
+eval $(minikube docker-env)
+docker images | grep scanner-semgrep
+
+# Should show both versioned and latest:
+# scanner-semgrep  latest   f472bb2c7b0a   ...
+# scanner-semgrep  0.2.4    f472bb2c7b0a   ...  (same image ID as latest)
+# scanner-semgrep  0.2.3    96cc46be1de6   ...
+```
+
+**Verify ConfigMap environment variables:**
+
+```bash
+# Check ConfigMap values
+kubectl get configmap scanner-versions -n tool-integration-local -o yaml
+
+# Check what environment variables tool-integration pod sees
+kubectl exec -n tool-integration-local deployment/tool-integration -- env | grep SCANNER_IMAGE
+
+# Should show:
+# SCANNER_IMAGE_SEMGREP=scanner-semgrep:latest
+# SCANNER_IMAGE_SLITHER=scanner-slither:latest
+```
+
+### Common Pitfalls
+
+**Pitfall 1: Forgetting to tag as :latest for local development**
+```bash
+# ❌ Built new version but didn't tag as latest
+docker build -t scanner-semgrep:0.2.4 -f Dockerfile .
+# ConfigMap still references :latest, but :latest points to old 0.2.3
+```
+
+**Solution:** Always tag new version as latest for local dev
+```bash
+# ✅ Build and tag as latest
+docker build --no-cache -t scanner-semgrep:0.2.4 -f Dockerfile .
+docker tag scanner-semgrep:0.2.4 scanner-semgrep:latest
+```
+
+**Pitfall 2: Using :latest in production**
+```yaml
+# ❌ NEVER do this in production ConfigMap
+SCANNER_IMAGE_SEMGREP: "scanner-semgrep:latest"
+```
+
+**Solution:** Always use explicit versions in production
+```yaml
+# ✅ Explicit version for reproducibility
+SCANNER_IMAGE_SEMGREP: "registry.example.com/scanner-semgrep:0.2.4"
+```
+
+**Pitfall 3: Forgetting to restart deployment after ConfigMap changes**
+```bash
+# After updating ConfigMap, pods still use old environment variables
+kubectl apply -k k8s/base/
+# Jobs created now still use old scanner image!
+```
+
+**Solution:** Always restart deployment after ConfigMap updates
+```bash
+# ✅ Force pods to reload ConfigMap
+kubectl apply -k k8s/base/
+kubectl rollout restart deployment/tool-integration -n tool-integration-local
+```
+
+**Pitfall 4: Docker cache preventing image updates**
+```bash
+# ❌ Built image but Docker used cached layers
+docker build -t scanner-semgrep:0.2.4 -f Dockerfile .
+# Image still contains old code due to layer caching
+```
+
+**Solution:** Always use --no-cache flag per platform standards
+```bash
+# ✅ Force fresh build without cache
+docker build --no-cache -t scanner-semgrep:0.2.4 -f Dockerfile .
+```
 
 ## Version Tracking
 
