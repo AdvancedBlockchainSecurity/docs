@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 1.11.0
-**Last Updated:** November 5, 2025
+**Version:** 1.12.0
+**Last Updated:** November 6, 2025
 **Status:** Active
 
 ## Semantic Versioning for Docker Images
@@ -454,6 +454,94 @@ vim k8s/overlays/prod/kustomization.yaml
 
 kubectl apply -k k8s/overlays/prod/
 ```
+
+## Files to Update When Changing Versions
+
+**CRITICAL:** When incrementing a service version, multiple files may contain hardcoded version references that need to be updated.
+
+### API Service (blocksecops-api-service)
+
+When updating from version `X.Y.Z` to `X.Y.Z+1`:
+
+1. **k8s/overlays/local/kustomization.yaml**
+   ```yaml
+   labels:
+   - includeSelectors: false
+     pairs:
+       app.kubernetes.io/version: 0.3.0  # ← Update this
+   ```
+
+2. **k8s/overlays/local/deployment-patch.yaml**
+   ```yaml
+   containers:
+   - name: api-service
+     image: blocksecops-api-service:0.3.0  # ← Update this
+   ```
+   **Note:** This should ideally be removed in favor of the kustomization images section, but currently exists and must be updated.
+
+3. **k8s/base/api-service/deployment.yaml**
+   ```yaml
+   containers:
+   - name: api-service
+     image: api-service:0.3.0  # ← Update this
+   ```
+
+4. **k8s/overlays/local/api-service/kustomization.yaml** (if using nested structure)
+   ```yaml
+   images:
+   - name: api-service
+     newName: api-service
+     newTag: 0.3.0  # ← Update this
+   ```
+
+### Dashboard Service (blocksecops-dashboard)
+
+When updating from version `X.Y.Z` to `X.Y.Z+1`:
+
+1. **k8s/overlays/local/kustomization.yaml**
+   - Update `app.kubernetes.io/version` label
+   - Update image tag (if not using `latest`)
+
+2. **k8s/overlays/local/deployment-patch.yaml**
+   - Update `image:` field if present
+
+3. **k8s/base/deployment.yaml**
+   - Update base image version
+
+### Other Services
+
+Follow the same pattern as API Service for:
+- `tool-integration-service`
+- `intelligence-engine`
+- `orchestration-service`
+- `data-service`
+- `notification-service`
+
+### Quick Search for Version References
+
+To find all version references in Kubernetes manifests:
+
+```bash
+# Search for semantic version patterns
+cd /path/to/service
+grep -r "0\.[0-9]\.[0-9]" k8s/
+
+# Search for specific version
+grep -r "0.2.4" k8s/
+```
+
+### Future Improvement: Centralized Version Management
+
+**RECOMMENDATION:** The current approach of hardcoded versions in multiple files is error-prone. Consider:
+
+1. **Use Kustomize image transformation only** - Remove hardcoded image references from deployment patches
+2. **Single source of truth** - Define image version in kustomization.yaml only
+3. **Automated version updates** - Create a script to update all necessary files
+
+**Current Reality vs. Standard:**
+- **Standard says:** Use `:latest` for local development (no updates needed)
+- **Current reality:** Multiple files have hardcoded versions that must be manually updated
+- **Action needed:** Either migrate all local overlays to use `:latest`, or accept the maintenance burden of updating multiple files
 
 ## Version Checklist
 
