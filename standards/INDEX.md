@@ -89,19 +89,28 @@ These standards help you set up and maintain your local development environment:
    - Dashboard development workflow
    - Daily development checklist
 
+9. **[Frontend Development](./frontend-development.md)**
+   - React + TypeScript + Vite frontend setup
+   - Supabase authentication integration
+   - Proper frontend startup procedure
+   - Port assignments and port-forward standards
+   - Kubernetes deployment and access
+   - Troubleshooting frontend issues (CORS, auth, networking)
+   - Frontend architecture and project structure
+
 ### 🔵 Configuration & Versioning Standards
 
 These standards ensure proper versioning and configuration management:
 
-9. **[Docker Image Versioning](./docker-image-versioning.md)**
-   - Semantic versioning for Docker images (MAJOR.MINOR.PATCH)
-   - Version increment rules
-   - Image tagging workflow
-   - Updating Kustomize configuration
-   - Version tracking and documentation
-   - Rollback considerations
+10. **[Docker Image Versioning](./docker-image-versioning.md)**
+    - Semantic versioning for Docker images (MAJOR.MINOR.PATCH)
+    - Version increment rules
+    - Image tagging workflow
+    - Updating Kustomize configuration
+    - Version tracking and documentation
+    - Rollback considerations
 
-10. **[Tool Metadata ConfigMaps](./tool-metadata-configmaps.md)**
+11. **[Tool Metadata ConfigMaps](./tool-metadata-configmaps.md)**
     - Managing third-party tool versions via ConfigMaps
     - Version selection policy (latest stable)
     - ConfigMap solution vs. hardcoded versions
@@ -110,7 +119,7 @@ These standards ensure proper versioning and configuration management:
     - Multi-environment support
     - Real-world example: Scanner metadata refactoring
 
-11. **[Dependency Management](./dependency-management.md)**
+12. **[Dependency Management](./dependency-management.md)**
     - Latest stable version policy
     - Prohibited dependencies (deprecated, retired, unmaintained)
     - Dependency health monitoring (monthly/quarterly audits)
@@ -121,7 +130,7 @@ These standards ensure proper versioning and configuration management:
 
 ### ✅ Compliance & Verification
 
-12. **[Compliance Checklist](./compliance-checklist.md)**
+13. **[Compliance Checklist](./compliance-checklist.md)**
     - Daily development checklist
     - Making changes checklist
     - Database configuration changes checklist
@@ -156,6 +165,7 @@ docs/standards/
 ├── secrets-management.md
 ├── local-development-setup.md
 ├── dashboard-development.md
+├── frontend-development.md
 ├── database-management.md
 ├── documentation-standards.md
 ├── version-control-standards.md

@@ -10,7 +10,7 @@
 
 | Service | Endpoint | Notes |
 |---------|----------|-------|
-| Dashboard | `http://127.0.0.1:3000` | Frontend React app |
+| Dashboard | `http://127.0.0.1:3000` | Main dashboard with Supabase Auth (blocksecops-dashboard) |
 | API Service | `http://127.0.0.1:8000` | FastAPI backend |
 | API Docs | `http://127.0.0.1:8000/docs` | Swagger UI |
 | Notification | `http://127.0.0.1:8003` | WebSocket server |
@@ -28,11 +28,10 @@
 echo "Starting port forwards for local development..."
 
 # Kill existing port forwards
-lsof -ti:3000,8000,8003,3001 | xargs kill -9 2>/dev/null
+lsof -ti:8000,8003,3001 | xargs kill -9 2>/dev/null
 
-# Dashboard
-kubectl port-forward -n dashboard-local svc/dashboard 3000:80 &
-echo "✅ Dashboard: http://127.0.0.1:3000"
+# Note: Dashboard runs via npm run dev (see dashboard-development.md)
+# Runs directly on port 3000 - no port-forward needed
 
 # API Service
 kubectl port-forward -n api-service-local svc/api-service 8000:8000 &
@@ -65,7 +64,7 @@ echo "All port forwards active. Use 127.0.0.1 for all connections."
 
 | Service | Port | Purpose | Notes |
 |---------|------|---------|-------|
-| Dashboard | 3000 | Frontend UI | Primary user interface |
+| Dashboard | 3000 | Main Dashboard UI | Primary user interface with Supabase Auth (blocksecops-dashboard) |
 | API Service | 8000 | Backend API | FastAPI application |
 | Notification | 8003 | WebSocket | Real-time notifications |
 | Grafana | 3001 | Monitoring | Metrics dashboard |
@@ -76,7 +75,7 @@ echo "All port forwards active. Use 127.0.0.1 for all connections."
 
 ```bash
 # ❌ INCORRECT: Let service pick next available port
-npm run dev  # Picks port 3002, 3003, etc.
+npm run dev  # Picks port 3001, 3004, etc. when 3000 is occupied
 
 # ✅ CORRECT: Free up the standard port
 lsof -ti:3000 | xargs kill -9  # Kill process using port 3000
@@ -96,7 +95,7 @@ kill -9 <PID>
 ps aux | grep <process-name>
 
 # 4. Restart the service on the correct port
-# (Example for dashboard)
+# (Example for dashboard on 3000)
 cd /Users/pwner/Git/ABS/blocksecops-dashboard
 npm run dev
 ```
@@ -383,7 +382,7 @@ def configure_cors(app):
 
     # Base origins (always allowed)
     origins = [
-        "http://127.0.0.1:3000",  # MANDATORY: Local development
+        "http://127.0.0.1:3000",  # Dashboard (blocksecops-dashboard)
         "http://localhost:3000",   # Optional: Compatibility
     ]
 
@@ -409,7 +408,7 @@ Before starting development work:
 - [ ] Minikube cluster is running
 - [ ] All required services deployed
 - [ ] Port forwards configured to use `127.0.0.1`
-- [ ] Dashboard running on correct port 3000 (not 3002 or other)
+- [ ] Dashboard running on correct port 3000 (via `npm run dev`)
 - [ ] API service running on correct port 8000
 - [ ] Dashboard `.env.local` uses `127.0.0.1` endpoints
 - [ ] Backend CORS includes `127.0.0.1:3000`

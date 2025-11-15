@@ -1,0 +1,16 @@
+Database Backup Manifest
+Date: November 5, 2025
+Purpose: Pre-database reset backup (clean slate for strict scanner selection)
+
+Files:
+- solidity_security_full_backup.sql (723KB) - Full database dump (data + schema)
+- schema_only.sql (71KB) - Schema-only DDL
+
+Reason for Reset:
+- All 57 scans have scanner_ids: null (stale test data from before strict scanner selection)
+- User wants clean slate for testing with no old data
+- Following database-management.md standards: MANDATORY backup before ANY changes
+
+Note: API exports skipped - user does not want old data restored.
+
+This backup follows /Users/pwner/Git/ABS/docs/standards/database-management.md
