@@ -499,7 +499,7 @@ curl -s http://127.0.0.1:3002/health
 - **Vite 5.0** - Build tool and dev server with hot module replacement
 - **React Router 6.20** - Client-side routing
 - **Zustand 4.4** - Lightweight state management
-- **Supabase 2.39** - Authentication provider (JWT RS256)
+- **Supabase 2.39** - Authentication provider (JWT ES256)
 - **Axios 1.6** - HTTP client with interceptors
 - **Tailwind CSS 3.3** - Utility-first CSS framework
 

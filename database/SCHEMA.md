@@ -31,7 +31,7 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Multi-language support:** 21+ blockchain languages including Solidity, Vyper, Rust, Move, Cairo, and more
 - **Multi-file contracts:** Support for complex projects with multiple source files
 - **Project organization:** Group related contracts into projects
-- **User authentication:** ✅ **Supabase Auth** with RS256 JWT tokens and JWKS verification (migrated November 13, 2025)
+- **User authentication:** ✅ **Supabase Auth** with ES256 JWT tokens and JWKS verification (migrated November 13, 2025)
 - **Security scanning:** Vulnerability detection with severity classification and multi-scanner support
 - **Scanner tracking:** Attribution and categorization of vulnerabilities by detection tool (Migration 004)
 - **Saved searches:** User-saved search queries with JSONB parameters (Migration 004)
@@ -125,7 +125,7 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 
 User accounts with Supabase authentication and tier tracking (Phase 3.1a - Migration Complete, November 13, 2025).
 
-**Authentication**: ✅ Migrated to Supabase Auth (RS256 JWT with JWKS verification)
+**Authentication**: ✅ Migrated to Supabase Auth (ES256 JWT with JWKS verification)
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
