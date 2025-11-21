@@ -1,6 +1,6 @@
 # Authentication Documentation Index
 
-**Last Updated:** November 20, 2025
+**Last Updated:** November 21, 2025
 
 ## Overview
 
@@ -10,7 +10,7 @@ This document provides a comprehensive index of all authentication-related docum
 
 ### Latest Updates (November 2025)
 - **[Dashboard Authentication Production Optimization](./DASHBOARD-AUTH-PRODUCTION-OPTIMIZATION-2025-11-20.md)** - Latest optimizations (10x performance improvement)
-- **[Dashboard Auth Changelog](./CHANGELOG-DASHBOARD-AUTH-2025-11-20.md)** - Recent changes and fixes
+- **[Dashboard Auth Changelog](./changelogs/dashboard-authentication.md)** - Recent changes and fixes (v1.0.0 - v1.1.1)
 
 ### Core Documentation
 - **[Authentication System Architecture](../blocksecops-docs/architecture/authentication-system.md)** - Overall system design
@@ -52,17 +52,19 @@ This document provides a comprehensive index of all authentication-related docum
 
 ### 2. Changelog & History
 
-**[Dashboard Auth Changelog (Nov 20)](./CHANGELOG-DASHBOARD-AUTH-2025-11-20.md)**
+**[Dashboard Auth Changelog](./changelogs/dashboard-authentication.md)**
 
 **What's Covered:**
-- Issues resolved (4 major issues)
-- Performance metrics
-- Testing results
+- v1.1.1 (Nov 21): React Hooks violation fix
+- v1.1.0 (Nov 20): Production-ready optimization
+- v1.0.0 (Nov): Supabase Auth migration
+- Performance metrics and testing results
 - Breaking changes (none)
 - Migration notes
 
 **Summary:**
-- Fixed slow page loads (10-13 seconds)
+- Fixed React Hooks violation causing blank screen
+- Fixed slow page loads (10-13 seconds → < 1s)
 - Eliminated login form flash
 - Preserved navigation context on refresh
 - Fixed spinning sign-in button bug
@@ -165,7 +167,7 @@ This document provides a comprehensive index of all authentication-related docum
 
 **Documentation:**
 - [Production Optimization](./DASHBOARD-AUTH-PRODUCTION-OPTIMIZATION-2025-11-20.md)
-- [Changelog](./CHANGELOG-DASHBOARD-AUTH-2025-11-20.md)
+- [Changelog](./changelogs/dashboard-authentication.md)
 
 ### API Service (Python FastAPI Backend)
 

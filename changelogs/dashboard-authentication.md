@@ -270,7 +270,120 @@ Created comprehensive documentation:
 
 ---
 
+## v1.1.1 - React Hooks Violation Fix - November 21, 2025
+
+**Date:** November 21, 2025
+**Component:** blocksecops-dashboard (Login page)
+**Type:** Bug Fix - Critical
+**Priority:** High
+**Status:** ✅ Completed
+
+### Summary
+
+Fixed a critical React Hooks violation in the Login component that was causing the dashboard to display a blank screen with the error "Rendered more hooks than during the previous render."
+
+### Issue Details
+
+**Problem:**
+- Dashboard failed to load, showing blank screen
+- React error: "React has detected a change in the order of Hooks called by Login"
+- Error indicated hook count changed from 13 to 14 hooks between renders
+- `useState` hooks were being called conditionally, violating React's Rules of Hooks
+
+**Root Cause:**
+The `useState` hook declarations were placed AFTER an early return statement (`if (isInitializing)`), causing them to be called conditionally:
+- When `isInitializing = false`: All 14 hooks were called (including useState)
+- When `isInitializing = true`: Only 13 hooks were called (early return before useState)
+- This variable hook count violated React's fundamental requirement that hooks must be called in the same order on every render
+
+### Solution
+
+Moved all `useState` hook declarations to the top of the Login component, before any conditional logic or early returns.
+
+**File Modified:** `src/pages/Login.tsx`
+
+**Changes:**
+```typescript
+// Before (Lines 12-47) - BROKEN:
+export default function Login() {
+  const navigate = useNavigate();
+  const { user, login, ... } = useAuth();
+
+  useEffect(() => { ... }, [user, navigate]);
+
+  if (isInitializing) {  // ❌ Early return BEFORE useState
+    return <LoadingScreen />;
+  }
+
+  const [formData, setFormData] = useState({ ... });  // ❌ After conditional
+  const [validationErrors, setValidationErrors] = useState({ ... });
+  ...
+}
+
+// After (Lines 12-48) - FIXED:
+export default function Login() {
+  const navigate = useNavigate();
+  const { user, login, ... } = useAuth();
+
+  // IMPORTANT: All useState hooks BEFORE any conditional returns
+  const [formData, setFormData] = useState({ ... });  // ✅ Before conditional
+  const [validationErrors, setValidationErrors] = useState({ ... });
+
+  useEffect(() => { ... }, [user, navigate]);
+
+  if (isInitializing) {  // ✅ Early return AFTER all hooks
+    return <LoadingScreen />;
+  }
+  ...
+}
+```
+
+**Lines Changed:** Moved lines 42-47 → 17-22 (6 lines moved)
+
+### React Rules of Hooks Compliance
+
+This fix ensures compliance with React's Rules of Hooks:
+1. ✅ Only call hooks at the top level (not inside conditionals, loops, or nested functions)
+2. ✅ Call hooks in the same order on every render
+3. ✅ Only call hooks from React function components or custom hooks
+
+### Testing
+
+**Verified:**
+- ✅ Dashboard loads successfully at http://127.0.0.1:3000
+- ✅ No React Hooks violation errors in console
+- ✅ Login page renders correctly
+- ✅ Authentication flow works as expected
+- ✅ No regression in v1.1.0 optimizations (fast load times maintained)
+
+### Impact
+
+**Severity:** Critical - Dashboard completely unusable
+**User Impact:** All users unable to access dashboard
+**Fix Time:** < 5 minutes
+**Deployment:** Immediate (hot reload via Vite dev server)
+
+### Related Documentation
+
+- **Fix Details:** `/Users/pwner/Git/ABS/docs/fixes/login-react-hooks-violation-fix-2025-11-21.md`
+- **React Rules of Hooks:** https://react.dev/reference/rules/rules-of-hooks
+
+### Lessons Learned
+
+1. **Hook Order Matters:** Always declare all hooks at the top of components before any conditional logic
+2. **Early Returns After Hooks:** Any early returns must come after all hook declarations
+3. **Loading State Patterns:** When using loading states with early returns, ensure hooks are declared first
+4. **Testing:** Test component re-renders with different state values to catch hook ordering issues
+
+---
+
 ## Version History
+
+### v1.1.1 - November 21, 2025
+**React Hooks Violation Fix**
+- Fixed critical blank screen issue
+- Moved useState hooks before conditional returns
+- Ensured React Rules of Hooks compliance
 
 ### v1.1.0 - November 20, 2025
 **Production Ready Authentication Optimization**
@@ -288,5 +401,5 @@ Created comprehensive documentation:
 ---
 
 **Changelog Status:** Current
-**Last Updated:** November 20, 2025
+**Last Updated:** November 21, 2025
 **Next Review:** Before production deployment
