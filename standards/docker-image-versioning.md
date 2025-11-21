@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 1.12.0
-**Last Updated:** November 6, 2025
+**Version:** 1.13.0
+**Last Updated:** November 20, 2025
 **Status:** Active
 
 ## Semantic Versioning for Docker Images
@@ -19,13 +19,13 @@ Where:
 
 ```bash
 # Bug fix (scanner import error) - increment PATCH
-api-service:0.3.12 → api-service:0.3.13
+blocksecops-api-service:0.3.12 → blocksecops-api-service:0.3.13
 
 # New feature (custom scanner selection) - increment MINOR
-api-service:0.3.13 → api-service:0.4.0
+blocksecops-api-service:0.3.13 → blocksecops-api-service:0.4.0
 
 # Breaking change (new authentication system) - increment MAJOR
-api-service:0.4.0 → api-service:1.0.0
+blocksecops-api-service:0.4.0 → blocksecops-api-service:1.0.0
 ```
 
 ## Version Increment Rules
@@ -82,13 +82,13 @@ During `0.x.x` versions:
 
 # 2. Build image with new version
 eval $(minikube docker-env)
-docker build -t api-service:0.3.13 -f Dockerfile .
+docker build -t blocksecops-api-service:0.3.13 -f Dockerfile .
 
 # 3. Also tag as 'latest' for local development
-docker tag api-service:0.3.13 api-service:latest
+docker tag blocksecops-api-service:0.3.13 blocksecops-api-service:latest
 
 # 4. Verify image exists
-docker images | grep api-service
+docker images | grep blocksecops-api-service
 ```
 
 ## Kustomize Configuration Strategy
@@ -103,7 +103,7 @@ docker images | grep api-service
 # k8s/overlays/local/kustomization.yaml
 images:
 - name: PLACEHOLDER_REGISTRY/blocksecops-api-service
-  newName: api-service
+  newName: blocksecops-api-service
   newTag: latest  # ← Always use 'latest' for local development
 
 labels:
@@ -121,10 +121,10 @@ labels:
 **Deployment workflow:**
 ```bash
 # 1. Build versioned image
-docker build -t api-service:0.3.13 -f Dockerfile .
+docker build -t blocksecops-api-service:0.3.13 -f Dockerfile .
 
 # 2. Tag as latest
-docker tag api-service:0.3.13 api-service:latest
+docker tag blocksecops-api-service:0.3.13 blocksecops-api-service:latest
 
 # 3. Apply kustomization (no changes needed)
 kubectl apply -k k8s/overlays/local/
@@ -141,7 +141,7 @@ kubectl rollout restart deployment/api-service -n api-service-local
 # k8s/overlays/prod/kustomization.yaml
 images:
 - name: PLACEHOLDER_REGISTRY/blocksecops-api-service
-  newName: registry.example.com/api-service
+  newName: registry.example.com/blocksecops-api-service
   newTag: 0.3.13  # ← Specific version for reproducibility
 
 labels:
@@ -395,14 +395,14 @@ docker build --no-cache -t scanner-semgrep:0.2.4 -f Dockerfile .
 
 ```bash
 # Tag the commit that matches the Docker image
-git tag -a api-service-v0.3.13 -m "Release API Service v0.3.13
+git tag -a blocksecops-api-service-v0.3.13 -m "Release API Service v0.3.13
 
 - Fix: Scanner endpoint import error
 - Allows scanner metadata to be retrieved via API
 - Resolves blocking issue for custom scanner selection feature"
 
 # Push tag to remote
-git push origin api-service-v0.3.13
+git push origin blocksecops-api-service-v0.3.13
 ```
 
 ## Version Documentation
@@ -440,7 +440,7 @@ git push origin api-service-v0.3.13
 ```bash
 # For local development, rollback by re-tagging older version as latest
 eval $(minikube docker-env)
-docker tag api-service:0.3.12 api-service:latest
+docker tag blocksecops-api-service:0.3.12 blocksecops-api-service:latest
 kubectl rollout restart deployment/api-service -n api-service-local
 ```
 
@@ -483,14 +483,14 @@ When updating from version `X.Y.Z` to `X.Y.Z+1`:
    ```yaml
    containers:
    - name: api-service
-     image: api-service:0.3.0  # ← Update this
+     image: blocksecops-api-service:0.3.0  # ← Update this
    ```
 
 4. **k8s/overlays/local/api-service/kustomization.yaml** (if using nested structure)
    ```yaml
    images:
-   - name: api-service
-     newName: api-service
+   - name: blocksecops-api-service
+     newName: blocksecops-api-service
      newTag: 0.3.0  # ← Update this
    ```
 
