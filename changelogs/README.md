@@ -1,0 +1,583 @@
+# BlockSecOps Changelogs
+
+**Purpose:** Centralized changelog directory for all BlockSecOps platform changes
+**Last Updated:** November 21, 2025
+**Status:** Active
+
+---
+
+## Overview
+
+This directory contains comprehensive changelogs for the BlockSecOps platform. All significant changes, bug fixes, feature additions, and deployments are documented here.
+
+### Organization
+
+Changelogs are organized by component and maintained chronologically. Each changelog follows a consistent format with version numbers, dates, and categorized changes.
+
+---
+
+## Available Changelogs
+
+### 1. Dashboard Authentication (`dashboard-authentication.md`)
+
+**Component:** blocksecops-dashboard
+**Scope:** Authentication system changes and optimizations
+**Versions Covered:** v1.0.0 - v1.1.1
+**Date Range:** November 2025
+
+**Key Changes:**
+- v1.1.1 (Nov 21, 2025): React Hooks violation fix
+- v1.1.0 (Nov 20, 2025): Production-ready authentication optimization
+- v1.0.0 (Nov 2025): Supabase Auth migration
+
+**Use When:**
+- Understanding dashboard authentication evolution
+- Debugging authentication-related issues
+- Reviewing performance optimizations
+- Learning from React Hooks fix
+
+### 2. API Service JWT ES256 (`api-service-jwt-es256.md`)
+
+**Component:** blocksecops-api-service
+**Scope:** JWT verification and Supabase authentication integration
+**Version:** 0.3.1
+**Date:** November 19, 2025
+
+**Key Changes:**
+- Fixed JWT verification with ES256 algorithm support
+- Updated JWKS endpoint to RFC 8414 compliant path
+- Added Supabase credentials to Kubernetes configmap
+- Removed component-specific CHANGELOG.md per platform standards
+
+**Use When:**
+- Understanding JWT verification implementation
+- Debugging authentication 401 errors
+- Reviewing ES256 vs RS256 differences
+- Setting up Supabase integration
+
+### 3. Orchestration Deployment (`orchestration-deployment.md`)
+
+**Component:** blocksecops-orchestration
+**Scope:** Deployment history and service updates
+**Versions Covered:** 0.7.12 - 0.7.14, Intelligence Integration Phase 2
+**Date Range:** October 2025
+
+**Key Changes:**
+- Intelligence Integration Phase 2 (Semgrep & Solhint)
+- Parser fixes for enrichment service (v0.7.14)
+- Tree-sitter API compatibility (v0.7.13)
+- Vulnerability pattern library expansion (30 → 69 patterns)
+
+**Use When:**
+- Tracking orchestration service deployments
+- Understanding intelligence integration progress
+- Reviewing parser updates
+- Planning rollback procedures
+
+---
+
+## Changelog Standards
+
+### Format Requirements
+
+All changelogs must include:
+
+1. **Version Information**
+   - Version number (semantic versioning)
+   - Release date
+   - Status (Complete, In Progress, Deprecated)
+
+2. **Change Categories**
+   - ✅ Added: New features
+   - 🔧 Changed: Modifications to existing features
+   - 🐛 Fixed: Bug fixes
+   - ❌ Removed: Deprecated features
+   - 🔒 Security: Security-related changes
+   - ⚡ Performance: Performance improvements
+
+3. **Technical Details**
+   - Files modified with line numbers
+   - Code examples for significant changes
+   - Testing verification steps
+   - Deployment instructions
+
+4. **Impact Assessment**
+   - Severity level (Critical, High, Medium, Low)
+   - User impact description
+   - Breaking changes highlighted
+   - Migration notes if applicable
+
+5. **References**
+   - Related PRs and issues
+   - Related documentation
+   - External references
+
+### Template Structure
+
+```markdown
+# Component Changelog - Title
+
+## Version X.Y.Z - Feature Name - Date
+
+**Date:** YYYY-MM-DD
+**Component:** component-name
+**Type:** Feature/Bug Fix/Performance/Security
+**Priority:** Critical/High/Medium/Low
+**Status:** ✅ Complete/⏳ In Progress
+
+### Summary
+Brief description of changes
+
+### Issues Resolved
+List of problems fixed
+
+### Added ✅
+- New features added
+
+### Changed 🔧
+- Modifications made
+
+### Fixed 🐛
+- Bugs fixed
+
+### Removed ❌
+- Deprecated features
+
+### Code Changes
+**Files Modified:**
+- path/to/file.ext (lines X-Y)
+
+**Key Changes:**
+```code examples```
+
+### Testing
+- Test scenarios
+- Verification steps
+
+### Impact
+- User impact
+- Performance metrics
+- Breaking changes
+
+### Related Documentation
+- Links to related docs
+```
+
+---
+
+## Changelog Location Rules
+
+### Platform-Wide Changelogs (This Directory)
+
+**Location:** `/Users/pwner/Git/ABS/docs/changelogs/`
+
+**Contents:**
+- Cross-component changes
+- Major platform updates
+- Authentication/authorization changes
+- Database migrations affecting multiple services
+- Deployment procedures
+- Integration changes
+
+**Examples:**
+- Dashboard authentication changes
+- API service authentication changes
+- Multi-service deployments
+- Platform-wide security updates
+
+### Component-Specific Changelogs (Component Directories)
+
+**Location:** `<component-root>/CHANGELOG.md`
+
+**Contents:**
+- Component-internal changes
+- Library version updates
+- Minor bug fixes
+- Component-specific features
+- Dependency updates
+
+**Examples:**
+- `blocksecops-orchestration/CHANGELOG.md`
+- `blocksecops-frontend/CHANGELOG.md`
+- `SolidityDefend/CHANGELOG.md`
+
+**Note:** Per platform standards, consider whether component changelogs should exist or if all changes should be tracked in this centralized location.
+
+### Task-Specific Changelogs (TaskDocs)
+
+**Location:** `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/`
+
+**Contents:**
+- Temporary task tracking
+- Work-in-progress changes
+- Implementation details during development
+- Phase-specific progress
+
+**Migration Rule:** Once tasks are complete and deployed, migrate relevant changelog entries to this centralized directory.
+
+---
+
+## Changelog Naming Conventions
+
+### File Naming
+
+**Format:** `<component>-<scope>-<optional-date>.md`
+
+**Examples:**
+- `dashboard-authentication.md` - Ongoing changelog for dashboard auth
+- `api-service-jwt-es256.md` - Specific feature implementation
+- `orchestration-deployment.md` - Deployment tracking
+- `database-migrations-2025-q4.md` - Quarterly migration log
+
+**Guidelines:**
+- Use lowercase with hyphens
+- Be descriptive but concise
+- Include date only for historical/archived changelogs
+- Avoid version numbers in filename (versions go inside the file)
+
+### Section Naming
+
+Within changelog files:
+- `## Version X.Y.Z - Feature Name - Date`
+- Use semantic versioning (MAJOR.MINOR.PATCH)
+- Include descriptive feature name
+- Always include full date (YYYY-MM-DD)
+
+---
+
+## Changelog Workflow
+
+### Creating a New Changelog
+
+1. **Determine Scope**
+   - Is this platform-wide or component-specific?
+   - Does it affect multiple services?
+   - Is it significant enough to warrant documentation?
+
+2. **Choose Location**
+   - Platform-wide: `/docs/changelogs/`
+   - Component-specific: `<component>/CHANGELOG.md`
+   - Task-specific: `TaskDocs-BlockSecOps/phases/`
+
+3. **Use Template**
+   - Copy template structure from this README
+   - Fill in all required sections
+   - Include code examples for significant changes
+
+4. **Link Related Docs**
+   - Update main README if applicable
+   - Link to technical documentation
+   - Reference related changelogs
+
+### Updating Existing Changelog
+
+1. **Add New Entry at Top**
+   - Most recent changes should appear first
+   - Keep version history section at bottom
+
+2. **Update Summary**
+   - Update "Last Updated" date
+   - Increment version numbers
+   - Update status indicators
+
+3. **Maintain Consistency**
+   - Follow existing format
+   - Use same change categories
+   - Keep similar level of detail
+
+### Archiving Old Changelogs
+
+When a changelog becomes too large or covers a completed phase:
+
+1. **Create Archive**
+   - Move to `changelogs/archive/YYYY/`
+   - Rename with full date range: `component-YYYY-MM-DD-to-YYYY-MM-DD.md`
+
+2. **Update Index**
+   - Add entry to "Archived Changelogs" section below
+   - Keep link active for reference
+
+3. **Start New Changelog**
+   - Create fresh changelog for new period
+   - Link to archived version in preamble
+
+---
+
+## Quick Reference
+
+### Finding the Right Changelog
+
+**I need to understand authentication changes:**
+→ `dashboard-authentication.md` for frontend
+→ `api-service-jwt-es256.md` for backend
+
+**I need deployment history:**
+→ `orchestration-deployment.md`
+
+**I need to see what changed in a specific version:**
+→ Search all changelogs for version number
+
+**I need to understand a bug fix:**
+→ Check `dashboard-authentication.md` or component-specific changelog
+→ Also check `/docs/fixes/` directory for detailed fix documentation
+
+### Changelog Search Commands
+
+```bash
+# Find all changelogs
+ls /Users/pwner/Git/ABS/docs/changelogs/
+
+# Search for specific version
+grep -r "v1.1.1" /Users/pwner/Git/ABS/docs/changelogs/
+
+# Find recent changes (last 7 days)
+find /Users/pwner/Git/ABS/docs/changelogs -type f -mtime -7
+
+# Search for specific feature
+grep -r "React Hooks" /Users/pwner/Git/ABS/docs/changelogs/
+```
+
+---
+
+## Related Documentation
+
+### Documentation Hierarchy
+
+```
+/Users/pwner/Git/ABS/docs/
+├── changelogs/               ← You are here
+│   ├── README.md            ← This file
+│   ├── dashboard-authentication.md
+│   ├── api-service-jwt-es256.md
+│   └── orchestration-deployment.md
+├── fixes/                   ← Detailed fix documentation
+│   ├── login-react-hooks-violation-fix-2025-11-21.md
+│   └── ...
+├── database/                ← Database-specific docs
+│   ├── migrations/
+│   └── SCHEMA.md
+└── standards/               ← Platform standards
+
+/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/
+└── phases/                  ← Task-specific changelogs (work in progress)
+
+/Users/pwner/Git/ABS/blocksecops-docs/
+├── architecture/            ← System architecture docs
+├── deployment/              ← Deployment guides (includes old changelog)
+└── development/             ← Development guides
+```
+
+### Documentation Cross-References
+
+**Changelog** → **Fix Documentation**
+- Changelogs provide high-level overview
+- Fix docs provide detailed analysis
+- Always cross-reference between them
+
+**Example:**
+- `dashboard-authentication.md` (v1.1.1 entry)
+- Links to → `/docs/fixes/login-react-hooks-violation-fix-2025-11-21.md`
+
+**Changelog** → **Technical Documentation**
+- Changelogs track what changed
+- Technical docs explain how it works
+- Link to architecture docs for context
+
+**Example:**
+- `api-service-jwt-es256.md` (JWT verification)
+- Links to → `/blocksecops-docs/architecture/authentication-system.md`
+
+---
+
+## Archived Changelogs
+
+### Q4 2025 Archives
+
+*No archived changelogs yet. Archives will appear here when created.*
+
+### Archive Structure
+
+When creating archives:
+```
+changelogs/
+├── README.md (this file)
+├── archive/
+│   ├── 2025/
+│   │   ├── Q4/
+│   │   │   └── [archived-changelog].md
+│   │   └── Q3/
+│   └── 2024/
+└── [active-changelogs].md
+```
+
+---
+
+## Maintenance
+
+### Changelog Maintenance Schedule
+
+**Weekly:**
+- Review TaskDocs for completed changes
+- Move stable changes to appropriate changelogs
+- Update version numbers
+
+**Monthly:**
+- Review changelog sizes
+- Consider archiving large changelogs
+- Update this README with new entries
+- Verify all links are working
+
+**Quarterly:**
+- Archive completed phase changelogs
+- Create quarterly summary
+- Review and update standards
+
+### Changelog Quality Checklist
+
+Before committing changelog updates:
+
+- [ ] All sections filled out (no placeholders)
+- [ ] Version number follows semantic versioning
+- [ ] Date is accurate (YYYY-MM-DD format)
+- [ ] Status indicator is correct (✅/⏳/❌)
+- [ ] Change categories used consistently
+- [ ] Code examples are accurate and tested
+- [ ] Testing verification steps included
+- [ ] Impact assessment completed
+- [ ] Related documentation linked
+- [ ] File modified lists include line numbers
+- [ ] Breaking changes clearly marked
+- [ ] Migration notes provided if needed
+
+---
+
+## Contributing to Changelogs
+
+### Who Should Update Changelogs?
+
+**Developers:**
+- Add entries for features they implement
+- Document bug fixes
+- Record breaking changes
+
+**DevOps:**
+- Document deployments
+- Record infrastructure changes
+- Track version updates
+
+**Documentation Team:**
+- Maintain changelog format
+- Ensure consistency
+- Archive old changelogs
+
+### How to Contribute
+
+1. **Before Making Changes:**
+   - Read this README
+   - Review existing changelog format
+   - Determine correct changelog file
+
+2. **Writing the Entry:**
+   - Use the template structure
+   - Be clear and concise
+   - Include all required information
+   - Add code examples for clarity
+
+3. **Submitting Changes:**
+   - Update appropriate changelog(s)
+   - Update "Last Updated" date
+   - Link to related documentation
+   - Submit PR with changelog in same commit as code changes
+
+4. **Review Process:**
+   - Self-review using quality checklist
+   - Verify all links work
+   - Test code examples
+   - Request peer review
+
+---
+
+## FAQ
+
+### Q: Should every change have a changelog entry?
+
+**A:** Not necessarily. Use these guidelines:
+- ✅ Yes: User-facing changes, bug fixes, new features, breaking changes
+- ✅ Yes: Performance improvements, security updates, API changes
+- ⚠️ Maybe: Internal refactoring, minor optimizations, dependency updates
+- ❌ No: Typo fixes, comment updates, non-functional changes
+
+### Q: Where do I document a change that affects multiple components?
+
+**A:** Create an entry in the most relevant changelog in `/docs/changelogs/`. If it's truly cross-cutting, consider creating a new dedicated changelog file.
+
+### Q: How detailed should changelog entries be?
+
+**A:** Include enough detail that someone unfamiliar with the change can understand:
+- What changed
+- Why it changed
+- How to use the new feature or adapt to the change
+- What was fixed or improved
+
+### Q: Should I include code examples?
+
+**A:** Yes, for:
+- API changes
+- Breaking changes
+- Complex features
+- Bug fixes that might reoccur
+
+### Q: How do I handle breaking changes?
+
+**A:**
+1. Mark clearly with 🔴 or "BREAKING CHANGE" label
+2. Explain what breaks
+3. Provide migration guide
+4. Include before/after code examples
+5. Link to migration documentation
+
+### Q: What's the difference between a changelog and fix documentation?
+
+**A:**
+- **Changelog**: High-level overview, what changed, brief why
+- **Fix Documentation**: Deep dive, root cause analysis, prevention measures
+
+Always create both for significant bug fixes.
+
+---
+
+## Support
+
+### Questions or Issues?
+
+- **Changelog Format Questions**: Review this README
+- **Where to Document**: See "Changelog Location Rules" section
+- **Missing Information**: Check related documentation in `/docs/` or `/blocksecops-docs/`
+- **Unclear Standards**: Refer to `/docs/standards/`
+
+### Changelog Updates Needed?
+
+If you notice:
+- Missing changelog entry
+- Incorrect information
+- Broken links
+- Outdated content
+
+Create an issue or submit a PR with corrections.
+
+---
+
+## Version History
+
+### This README
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2025-11-21 | Initial creation of centralized changelog directory |
+
+---
+
+**Maintained By:** BlockSecOps Documentation Team
+**Location:** `/Users/pwner/Git/ABS/docs/changelogs/README.md`
+**Last Updated:** November 21, 2025
+**Status:** ✅ Active
