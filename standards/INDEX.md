@@ -74,14 +74,21 @@ These standards help you set up and maintain your local development environment:
 
 7. **[Local Development Setup](./local-development-setup.md)**
    - Access endpoints (use 127.0.0.1)
-   - Port forward standards and scripts
-   - Port number consistency requirements
    - Kubernetes service selector standards (includeSelectors: false)
    - Environment configuration (.env.local)
    - Troubleshooting service endpoints
    - Local development checklist
 
-8. **[Dashboard Development](./dashboard-development.md)**
+8. **[Port-Forwarding Standards](./port-forwarding.md)**
+   - Standard port mappings for all services
+   - Port-forward setup commands and scripts
+   - Port assignment rules and range allocation
+   - Service configuration and access URLs
+   - Troubleshooting port-forward issues
+   - Monitoring and health check scripts
+   - Best practices for port-forward management
+
+9. **[Dashboard Development](./dashboard-development.md)**
    - Python 3.13 compatibility issue (MissingGreenlet)
    - Proper dashboard startup procedure (7 steps)
    - Port-forward best practices (deployment vs service)
@@ -89,20 +96,20 @@ These standards help you set up and maintain your local development environment:
    - Dashboard development workflow
    - Daily development checklist
 
-9. **[Frontend Development](./frontend-development.md)**
-   - React + TypeScript + Vite frontend setup
-   - Supabase authentication integration
-   - Proper frontend startup procedure
-   - Port assignments and port-forward standards
-   - Kubernetes deployment and access
-   - Troubleshooting frontend issues (CORS, auth, networking)
-   - Frontend architecture and project structure
+10. **[Frontend Development](./frontend-development.md)**
+    - React + TypeScript + Vite frontend setup
+    - Supabase authentication integration
+    - Proper frontend startup procedure
+    - Port assignments and port-forward standards
+    - Kubernetes deployment and access
+    - Troubleshooting frontend issues (CORS, auth, networking)
+    - Frontend architecture and project structure
 
 ### 🔵 Configuration & Versioning Standards
 
 These standards ensure proper versioning and configuration management:
 
-10. **[Docker Image Versioning](./docker-image-versioning.md)**
+11. **[Docker Image Versioning](./docker-image-versioning.md)**
     - Semantic versioning for Docker images (MAJOR.MINOR.PATCH)
     - Version increment rules
     - Image tagging workflow
@@ -110,7 +117,7 @@ These standards ensure proper versioning and configuration management:
     - Version tracking and documentation
     - Rollback considerations
 
-11. **[Tool Metadata ConfigMaps](./tool-metadata-configmaps.md)**
+12. **[Tool Metadata ConfigMaps](./tool-metadata-configmaps.md)**
     - Managing third-party tool versions via ConfigMaps
     - Version selection policy (latest stable)
     - ConfigMap solution vs. hardcoded versions
@@ -119,7 +126,7 @@ These standards ensure proper versioning and configuration management:
     - Multi-environment support
     - Real-world example: Scanner metadata refactoring
 
-12. **[Dependency Management](./dependency-management.md)**
+13. **[Dependency Management](./dependency-management.md)**
     - Latest stable version policy
     - Prohibited dependencies (deprecated, retired, unmaintained)
     - Dependency health monitoring (monthly/quarterly audits)
@@ -130,7 +137,7 @@ These standards ensure proper versioning and configuration management:
 
 ### ✅ Compliance & Verification
 
-13. **[Compliance Checklist](./compliance-checklist.md)**
+14. **[Compliance Checklist](./compliance-checklist.md)**
     - Daily development checklist
     - Making changes checklist
     - Database configuration changes checklist
@@ -164,6 +171,7 @@ docs/standards/
 ├── core-development-rules.md
 ├── secrets-management.md
 ├── local-development-setup.md
+├── port-forwarding.md
 ├── dashboard-development.md
 ├── frontend-development.md
 ├── database-management.md
@@ -183,6 +191,9 @@ When working with Claude Code, you can reference specific standards documents:
 ```markdown
 # For local development questions
 @docs/standards/local-development-setup.md
+
+# For port-forwarding and service access
+@docs/standards/port-forwarding.md
 
 # For Git workflow questions
 @docs/standards/version-control-standards.md

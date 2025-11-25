@@ -99,12 +99,16 @@ This document provides a comprehensive index of all authentication-related docum
 **Last Updated:** October 6, 2025
 
 **What's Covered:**
-- HttpOnly cookies (recommended)
+- HttpOnly cookies (DEPRECATED - see current Supabase Auth implementation)
 - Refresh token rotation
 - HTTPS enforcement
 - Token encryption
 - Rate limiting
 - Session management
+
+**⚠️ Note**: This document references legacy HttpOnly cookie implementation (v0.3.4, October 2025). For current security best practices with Supabase Auth (v0.4.0+), see:
+- [Authentication System Architecture](../blocksecops-docs/architecture/authentication-system.md)
+- [Supabase Auth Security](https://supabase.com/docs/guides/auth/security)
 
 **Implementation Roadmap:**
 - Phase 1: Critical Security (Before Production)

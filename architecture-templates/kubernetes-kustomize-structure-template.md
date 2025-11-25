@@ -22,6 +22,9 @@ k8s/
 │       ├── [optional] secret.yaml
 │       ├── [optional] serviceaccount.yaml
 │       ├── [optional] ingress.yaml
+│       ├── [optional] ingressroute.yaml (Traefik HTTP routing)
+│       ├── [optional] ingressroute-tcp.yaml (Traefik TCP routing)
+│       └── [optional] middleware-*.yaml (Traefik middlewares)
 │       └── [optional] rbac files (clusterrole.yaml, clusterrolebinding.yaml, rolebinding.yaml)
 │
 └── overlays/
@@ -34,6 +37,10 @@ k8s/
     │       ├── configmap-patch.yaml
     │       ├── [optional] service-patch.yaml
     │       ├── [optional] ingress-patch.yaml
+    │       ├── [optional] ingressroute.yaml (Traefik HTTP routing)
+    │       ├── [optional] ingressroute-tcp.yaml (Traefik TCP routing)
+    │       ├── [optional] middleware-cors.yaml (Traefik CORS)
+    │       ├── [optional] middleware-*.yaml (other Traefik middlewares)
     │       └── [optional] pvc-patch.yaml
     │
     ├── staging/
@@ -45,6 +52,10 @@ k8s/
     │       ├── configmap-patch.yaml
     │       ├── [optional] service-patch.yaml
     │       ├── [optional] ingress-patch.yaml
+    │       ├── [optional] ingressroute.yaml (Traefik HTTP routing)
+    │       ├── [optional] ingressroute-tcp.yaml (Traefik TCP routing)
+    │       ├── [optional] middleware-cors.yaml (Traefik CORS)
+    │       ├── [optional] middleware-*.yaml (other Traefik middlewares)
     │       └── [optional] pvc-patch.yaml
     │
     └── production/
@@ -198,7 +209,7 @@ Each service gets its own namespace for:
 - **HPA**: Disabled
 - **PDB**: Not required
 - **Network Policies**: Optional
-- **Ingress**: Nginx ingress controller
+- **Ingress**: Traefik v3.6+ ingress controller
 - **Secret Management**: Vault Community Edition (single replica)
 - **Certificates**: Self-signed certificates via cert-manager
 - **Service Mesh**: Optional (can be disabled for resource savings)
@@ -478,7 +489,7 @@ Production-ready structure must have:
 
 **Required Components for Local Development:**
 - Minikube with adequate resources (8GB+ RAM, 4+ CPU cores)
-- Nginx Ingress Controller (instead of Istio for simplicity)
+- Traefik v3.6+ Ingress Controller (modern, production-ready)
 - Vault Community Edition (single replica)
 - Prometheus and Grafana (lightweight monitoring)
 - PostgreSQL and Redis (development configurations)

@@ -19,6 +19,8 @@
 
 ## Port Forward Standards
 
+> **📖 Comprehensive Documentation:** See [Port-Forwarding Standards](./port-forwarding.md) for complete port mapping tables, troubleshooting guides, and best practices for all platform services.
+
 **Standard port-forward script** (save as `scripts/port-forward-local.sh`):
 
 ```bash
