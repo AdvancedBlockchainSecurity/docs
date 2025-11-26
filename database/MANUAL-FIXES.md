@@ -483,6 +483,101 @@ The `requires_project` property is exposed via the REST API at `/api/v1/scanners
 
 ---
 
+## November 25, 2025 - Fix Contract Status Stuck at 'scanning' (Quota Error)
+
+### Issue
+Contract status remained at "scanning" after triggering a scan that failed with HTTP 402 (Payment Required / Quota Exceeded). The QuotaExceededModal crashed due to a React Router context error, preventing proper error handling.
+
+**Symptom:** Contract detail page shows status as "scanning" indefinitely, browser console shows Router context error, scan shows status "failed" with quota-related error.
+
+### Root Cause
+- User triggered scan when quota was exceeded
+- API returned 402 Payment Required
+- Dashboard's QuotaExceededModal attempted to use `useNavigate()` but was outside Router context
+- Error prevented proper UI feedback and status update
+- Contract remained stuck in "scanning" status while scan was marked "failed"
+- This is a data consistency issue where scan failure doesn't propagate to contract status
+
+### Fix Applied
+```sql
+-- Check contract and scan status first
+SELECT c.id, c.name, c.status, s.status as scan_status, s.error_message
+FROM contracts c
+LEFT JOIN scans s ON c.id = s.contract_id
+WHERE c.id = 'e8efabc4-bcc8-4d05-a11d-4bff8add0f8d';
+
+-- Result showed:
+-- contract status: scanning
+-- scan status: failed
+
+-- Update contract to appropriate status
+UPDATE contracts SET status = 'scanned'
+WHERE id = 'e8efabc4-bcc8-4d05-a11d-4bff8add0f8d';
+```
+
+### Verification
+```sql
+-- Verify contract status updated
+SELECT id, name, status FROM contracts
+WHERE id = 'e8efabc4-bcc8-4d05-a11d-4bff8add0f8d';
+
+-- Expected: status = 'scanned'
+
+-- Verify associated scans
+SELECT id, status, error_message
+FROM scans
+WHERE contract_id = 'e8efabc4-bcc8-4d05-a11d-4bff8add0f8d';
+```
+
+### How to Reproduce Fix
+If contract status is stuck at "scanning" after quota error:
+
+```bash
+# 1. Identify contracts stuck in scanning status
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U harbor -d blocksecops \
+  -c "SELECT c.id, c.name, c.status, COUNT(s.id) as scan_count
+      FROM contracts c
+      LEFT JOIN scans s ON c.id = s.contract_id
+      WHERE c.status = 'scanning'
+      GROUP BY c.id;"
+
+# 2. Check if scans failed with quota error
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U harbor -d blocksecops \
+  -c "SELECT id, status, error_message FROM scans
+      WHERE contract_id = '<CONTRACT_ID>' AND status = 'failed';"
+
+# 3. Update contract status
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U harbor -d blocksecops \
+  -c "UPDATE contracts SET status = 'scanned'
+      WHERE id = '<CONTRACT_ID>'
+      RETURNING id, name, status;"
+```
+
+### Related Files
+- Dashboard App.tsx fix: `/Users/pwner/Git/ABS/blocksecops-dashboard/src/App.tsx` (Router context order)
+- QuotaExceededModal: `/Users/pwner/Git/ABS/blocksecops-dashboard/src/components/quota/QuotaExceededModal.tsx`
+- QuotaContext: `/Users/pwner/Git/ABS/blocksecops-dashboard/src/contexts/QuotaContext.tsx`
+- Troubleshooting guide: `/Users/pwner/Git/ABS/blocksecops-docs/local-development/troubleshooting-guide.md`
+
+### Impact
+- **Before Fix:** Contract stuck at "scanning" status indefinitely
+- **After Fix:** Contract correctly shows "scanned" status (scan exists, even if failed)
+- **UI Fix Applied:** QuotaProvider moved inside Router in App.tsx to prevent modal crash
+
+### Prevention
+1. **App.tsx component order:** Ensure any provider using React Router hooks is inside `<Router>`
+2. **Scan failure handling:** Orchestration service should update contract status when scan fails
+3. **Quota pre-check:** Consider checking quota before initiating scan to provide early warning
+
+### Related Issues
+- See October 16, 2025 entry for original "scanning" stuck issue
+- Different root cause (quota error vs missing callback) but same database fix approach
+
+---
+
 ## Template for Future Manual Fixes
 
 ### [Date] - [Brief Description]

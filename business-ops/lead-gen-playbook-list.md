@@ -12,11 +12,6 @@
   - 6,696 companies organized by vertical (2,583 Web3, 779 DeFi, 550 services)
   - Completely free browsing
   - Export company data to spreadsheet
-  
-- **CryptoValley Directory** - https://cryptovalley.directory/
-  - Swiss blockchain ecosystem companies
-  - High regulatory compliance standards
-  - Free access to company profiles
 
 ### DeFi Protocol Tracking
 - **DeFiLlama** - https://defillama.com
@@ -25,11 +20,7 @@
   - Sort by recent growth to find emerging protocols
   - Check "Recently Listed" section weekly
   - 100% free with no limits
-  
-- **DeFi Pulse** - https://www.defipulse.com
-  - Top DeFi protocols ranked by TVL
-  - Historical charts and trends
-  - Free protocol analytics
+
 
 ### Job Boards as Lead Sources
 - **Web3.career** - https://web3.career

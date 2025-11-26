@@ -37,7 +37,7 @@ The complete security scanning platform is fully operational and production-read
 
 ---
 
-## Core Repositories (17 repos) ✅ **INCLUDING DEPENDENCY MONITORING**
+## Core Repositories (16 repos) ✅ **INCLUDING DEPENDENCY MONITORING**
 
 ### **Backend Service Repositories (6 repos)**
 
@@ -754,18 +754,9 @@ blocksecops-notification/
 └── README.md
 ```
 
-### **Frontend Repositories (4 repos)**
+### **Frontend Repositories (3 repos)**
 
-### 7. **`blocksecops-ui-core`** (~8K LOC) ✅ **SHARED LIBRARY INTEGRATED**
-**Shared UI components and design system**
-```
-Purpose: Reusable components, layouts, authentication, theme system
-Tech Stack: React 18, TypeScript, Tailwind CSS, Storybook
-Contains: UI components, layouts, auth components, design tokens, utilities
-Integration: WASM-enabled TypeScript package with JavaScript fallbacks (8x performance boost)
-```
-
-### 8. **`blocksecops-dashboard`** (~14K LOC) ✅ **MVP COMPLETE - PRODUCTION READY** + **INTELLIGENCE LAYER INTEGRATED**
+### 7. **`blocksecops-dashboard`** (~14K LOC) ✅ **MVP COMPLETE - PRODUCTION READY** + **INTELLIGENCE LAYER INTEGRATED**
 **Full-featured security dashboard with AI-powered intelligence and real-time updates**
 ```
 Purpose: Complete security scanning interface with advanced intelligence features
@@ -867,7 +858,7 @@ Integration:
   - Zero breaking changes
 ```
 
-### 9. **`blocksecops-findings`** (~8K LOC)
+### 8. **`blocksecops-findings`** (~8K LOC)
 **Finding management and analysis results**
 ```
 Purpose: Findings table, detail views, status management, filtering
@@ -875,7 +866,7 @@ Tech Stack: React, TypeScript, TanStack Query, TanStack Table
 Contains: Findings components, filters, detail modals, status management
 ```
 
-### 10. **`blocksecops-analysis`** (~6K LOC) ✅ **SHARED LIBRARY INTEGRATED**
+### 9. **`blocksecops-analysis`** (~6K LOC) ✅ **SHARED LIBRARY INTEGRATED**
 **Contract analysis workflow**
 ```
 Purpose: Contract upload, analysis progress, history management
@@ -884,7 +875,7 @@ Contains: Upload components, progress tracking, analysis history
 Integration: WASM-enabled TypeScript package with JavaScript fallbacks (6x performance boost)
 ```
 
-### 11. **`blocksecops-contract-parser`** (~8K LOC) 🦀
+### 10. **`blocksecops-contract-parser`** (~8K LOC) 🦀
 **High-performance Solidity parsing and AST generation - Pure Rust**
 ```
 Purpose: Contract parsing, AST generation, dependency analysis, source mapping
@@ -966,7 +957,7 @@ blocksecops-contract-parser/
 
 ### **Shared Libraries (1 repo)**
 
-### 12. **`blocksecops-shared`** (~7K LOC) 🦀 ✅ **PRODUCTION DEPLOYED**
+### 11. **`blocksecops-shared`** (~7K LOC) 🦀 ✅ **PRODUCTION DEPLOYED**
 **Common utilities and schemas - Multi-language**
 ```
 Purpose: Shared types, utilities, authentication helpers, validation schemas
@@ -1050,7 +1041,7 @@ blocksecops-shared/
 
 ### **Infrastructure Repositories (2 repos)**
 
-### 13. **`blocksecops-aws-infrastructure`**
+### 12. **`blocksecops-aws-infrastructure`**
 **AWS Infrastructure as Code repository**
 ```
 Purpose: AWS cloud resource provisioning and management
@@ -1060,7 +1051,7 @@ Contains: VPC, EKS, PostgreSQL StatefulSets, ElastiCache, IAM configurations
 
 ### **Monitoring & Operations (1 repo)**
 
-### 14. **`blocksecops-monitoring`** ✅ **DEPENDENCY MONITORING DEPLOYED**
+### 13. **`blocksecops-monitoring`** ✅ **DEPENDENCY MONITORING DEPLOYED**
 **Observability and monitoring configurations + Dependency Monitoring Service**
 ```
 Purpose: Monitoring, alerting, observability setup + Multi-language dependency scanning
@@ -1071,7 +1062,7 @@ Additional: Multi-language dependency collectors (Python, Node.js, Rust), securi
 
 ### **Supporting Repositories (3 repos)**
 
-### 15. **`blocksecops-docs`**
+### 14. **`blocksecops-docs`**
 **Documentation and knowledge base**
 ```
 Purpose: Technical documentation, API docs, user guides
@@ -1079,7 +1070,7 @@ Tech Stack: Markdown, Docusaurus/GitBook
 Contains: Architecture docs, setup guides, API documentation
 ```
 
-### 16. **`blocksecops-tools`**
+### 15. **`blocksecops-tools`**
 **Security tool configurations and utilities**
 ```
 Purpose: Tool installation scripts, configuration templates, test contracts
@@ -1087,7 +1078,7 @@ Tech Stack: Shell scripts, Docker, tool-specific configs
 Contains: Tool installation scripts, test fixtures, tool version management, configuration templates
 ```
 
-### 17. **`blocksecops-vulnerabilities`**
+### 16. **`blocksecops-vulnerabilities`**
 **Vulnerability database and intelligence**
 ```
 Purpose: Vulnerability data, patterns, and threat intelligence
@@ -1108,17 +1099,16 @@ Backend Services:           48,000 LOC  (51%)
 
 Contract Parser:             8,000 LOC  (8%) (🦀 Pure Rust)
 
-Frontend Applications:      30,000 LOC  (32%)
-├── UI Core:                8,000 LOC  (React/TypeScript)
-├── Dashboard:              8,000 LOC  (React/TypeScript) 
+Frontend Applications:      28,000 LOC  (30%)
+├── Dashboard:             14,000 LOC  (React/TypeScript)
 ├── Findings:               8,000 LOC  (React/TypeScript)
 └── Analysis:               6,000 LOC  (React/TypeScript)
 
 Shared Libraries:            7,000 LOC  (7%)  (🦀 Python + TypeScript + Rust)
 Infrastructure & Support:    1,000 LOC  (1%)  (Terraform + K8s)
 
-Total Repositories:         17 repos (including dependency monitoring)
-Total Estimated:           96,000 LOC
+Total Repositories:         16 repos (including dependency monitoring)
+Total Estimated:           91,000 LOC
 Rust Components:           ~35,000 LOC (37% of codebase)
 ```
 

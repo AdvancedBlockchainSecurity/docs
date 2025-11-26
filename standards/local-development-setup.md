@@ -1,8 +1,82 @@
 # Local Development Setup Standards
 
-**Version:** 1.8.0
-**Last Updated:** October 20, 2025
+**Version:** 1.9.0
+**Last Updated:** November 25, 2025
 **Status:** Active
+
+## Minikube Configuration
+
+**MANDATORY resource requirements for local Kubernetes cluster:**
+
+| Resource | Minimum | Recommended | Notes |
+|----------|---------|-------------|-------|
+| Memory | 8GB | 10GB | Required for all platform services |
+| CPU Cores | 4 | 6 | More cores improve build performance |
+| Disk | 40GB | 60GB | For container images and volumes |
+
+### Initial Setup
+
+```bash
+# Configure minikube with required resources
+minikube config set memory 10240
+minikube config set cpus 6
+
+# Start minikube (first time)
+minikube start --memory=10240 --cpus=6
+
+# Verify configuration
+minikube config view
+```
+
+### Important Notes
+
+1. **Resource changes require cluster recreation:**
+   ```bash
+   # Cannot change resources on existing cluster
+   minikube stop
+   minikube delete
+   minikube start --memory=10240 --cpus=6
+   ```
+
+2. **Docker Desktop memory limit:** Ensure Docker Desktop has at least 10GB allocated in Settings → Resources → Advanced. Minikube cannot exceed Docker Desktop's memory allocation.
+
+3. **Verify resources after start:**
+   ```bash
+   kubectl top nodes
+   # Should show ~10GB allocatable memory
+   ```
+
+### Troubleshooting Resource Issues
+
+**Symptom:** Pods stuck in `Pending` state with "Insufficient memory" events
+
+```bash
+# Check pod events
+kubectl describe pod <pod-name> -n <namespace> | tail -20
+
+# Check node allocatable vs requested resources
+kubectl describe node minikube | grep -A 10 "Allocated resources"
+```
+
+**Fix:** Either increase minikube resources (requires cluster recreation) or scale down non-essential services:
+
+```bash
+# Scale down non-essential services to free memory
+kubectl scale deployment notification -n notification-local --replicas=1
+kubectl scale deployment data-service -n data-service-local --replicas=1
+```
+
+### Clean Up Stale Resources
+
+Old failed pods consume memory allocations. Clean them periodically:
+
+```bash
+# Delete failed pods from tool-integration namespace
+kubectl delete pods -n tool-integration-local --field-selector=status.phase=Failed
+
+# Delete old job pods
+kubectl delete pods -n tool-integration-local -l job-name --field-selector=status.phase!=Running
+```
 
 ## Access Endpoints
 
@@ -407,7 +481,7 @@ def configure_cors(app):
 
 Before starting development work:
 
-- [ ] Minikube cluster is running
+- [ ] Minikube cluster is running with adequate resources (10GB memory, 6 CPUs)
 - [ ] All required services deployed
 - [ ] Port forwards configured to use `127.0.0.1`
 - [ ] Dashboard running on correct port 3000 (via `npm run dev`)

@@ -1,0 +1,194 @@
+# Scanning Tests
+
+**Priority**: P0 - Critical
+**Last Tested**: _Not yet tested_
+**Endpoint**: `POST /api/v1/scans`
+
+---
+
+## 1. Trigger Scan
+
+### 1.1 Basic Scan Trigger
+- [ ] Scan triggered on uploaded contract
+- [ ] Scan ID returned in response
+- [ ] Scan status = "queued" initially
+- [ ] Contract status updated to "scanning"
+
+### 1.2 Scan with Scanner Selection
+- [ ] Scan with single scanner specified
+- [ ] Scan with multiple scanners specified
+- [ ] Default scanners used when none specified
+- [ ] Invalid scanner name rejected
+
+### 1.3 Scan Prerequisites
+- [ ] Can't scan non-existent contract (404)
+- [ ] Can't scan without authentication (401)
+- [ ] Can't scan other user's contract (403)
+- [ ] Quota checked before scan starts
+
+---
+
+## 2. Scan Status
+
+### 2.1 Status Transitions
+- [ ] queued → running → completed
+- [ ] queued → running → failed (on error)
+- [ ] Status updates visible via API
+- [ ] Status updates visible in UI
+
+### 2.2 Status Polling
+- [ ] GET /api/v1/scans/{id} returns current status
+- [ ] Progress percentage shown (if available)
+- [ ] Estimated time remaining (if available)
+
+---
+
+## 3. Scanner Selection
+
+### 3.1 Available Scanners
+- [ ] Slither available for Solidity
+- [ ] Aderyn available for Solidity
+- [ ] Mythril available for Solidity
+- [ ] Echidna available for fuzzing
+- [ ] Scanner list matches tier capabilities
+
+### 3.2 Scanner Compatibility
+- [ ] Only compatible scanners shown per language
+- [ ] Solidity scanners for .sol files
+- [ ] Rust scanners for .rs files
+- [ ] Invalid scanner + language combo rejected
+
+---
+
+## 4. Scan Results
+
+### 4.1 Results Availability
+- [ ] Results available after scan completes
+- [ ] GET /api/v1/scans/{id}/results returns findings
+- [ ] Results stored in database
+- [ ] Results associated with correct contract
+
+### 4.2 Finding Structure
+- [ ] Vulnerability type/name
+- [ ] Severity (critical, high, medium, low, info)
+- [ ] File path where found
+- [ ] Line number(s)
+- [ ] Description/message
+- [ ] Recommendation (if available)
+
+### 4.3 Multi-Scanner Results
+- [ ] Results from all scanners combined
+- [ ] Scanner source identified per finding
+- [ ] Duplicate findings deduplicated
+- [ ] Confidence scores shown
+
+---
+
+## 5. Scan Priority Queue
+
+### 5.1 Tier-Based Priority
+- [ ] Enterprise scans: priority 1 (highest)
+- [ ] Pro scans: priority 2
+- [ ] Free scans: priority 3 (lowest)
+- [ ] Higher priority scans processed first
+
+### 5.2 Queue Visibility
+- [ ] Queue position shown to user
+- [ ] Estimated wait time shown
+- [ ] Queue updates in real-time
+
+---
+
+## 6. Multi-File Scanning
+
+### 6.1 Archive Scanning
+- [ ] All files in archive scanned
+- [ ] Main file identified correctly
+- [ ] Import dependencies included
+- [ ] Results reference correct file paths
+
+### 6.2 Framework-Aware Scanning
+- [ ] Foundry projects scanned correctly
+- [ ] Hardhat projects scanned correctly
+- [ ] Remappings applied during scan
+- [ ] Dependencies available to scanner
+
+---
+
+## 7. Scan History
+
+- [ ] Scan history visible per contract
+- [ ] Previous scan results accessible
+- [ ] Scan comparison possible (if implemented)
+- [ ] Scan history sorted by date
+
+---
+
+## 8. Scan Quotas
+
+- [ ] Scan count incremented on trigger
+- [ ] Quota checked before scan
+- [ ] Scan blocked when quota exhausted
+- [ ] Error message shows upgrade path
+
+---
+
+## 9. Scan Errors
+
+### 9.1 Scanner Errors
+- [ ] Scanner timeout handled gracefully
+- [ ] Scanner crash doesn't break system
+- [ ] Partial results saved on failure
+- [ ] Error message shown to user
+
+### 9.2 Contract Errors
+- [ ] Compilation errors reported
+- [ ] Syntax errors in contract reported
+- [ ] Missing imports reported
+
+---
+
+## 10. UI Integration
+
+### 10.1 Scan Button
+- [ ] Scan button visible on contract page
+- [ ] Scan button disabled while scanning
+- [ ] Scanner selection available
+
+### 10.2 Results Display
+- [ ] Results page loads after scan
+- [ ] Findings grouped by severity
+- [ ] Findings expandable for details
+- [ ] Line numbers clickable (to source)
+
+---
+
+## Test Scenarios
+
+### Quick Scan Test
+1. Upload simple .sol file
+2. Trigger scan with Slither
+3. Wait for completion
+4. Verify results
+
+### Multi-Scanner Test
+1. Upload contract
+2. Trigger scan with Slither + Aderyn
+3. Verify combined results
+4. Check deduplication
+
+### Framework Scan Test
+1. Upload Foundry project with OZ
+2. Trigger scan
+3. Verify all imports resolved
+4. Check scan completes without errors
+
+---
+
+## Test Notes
+
+_Record scanning test results here:_
+
+```
+[Date] | [Scanner] | [Contract Type] | [Result] | [Notes]
+```

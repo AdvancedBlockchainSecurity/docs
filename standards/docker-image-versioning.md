@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 1.13.0
-**Last Updated:** November 20, 2025
+**Version:** 1.14.0
+**Last Updated:** November 25, 2025
 **Status:** Active
 
 ## Semantic Versioning for Docker Images
@@ -72,6 +72,69 @@ During `0.x.x` versions:
 - Documentation complete
 - Ready for production use
 
+## Minikube Docker Daemon Configuration
+
+**IMPORTANT:** When building images for minikube, you must connect to minikube's Docker daemon, not your local Docker daemon.
+
+### Understanding `minikube docker-env`
+
+The `minikube docker-env` command outputs environment variables that point your Docker CLI to minikube's Docker daemon:
+
+```bash
+$ minikube docker-env
+export DOCKER_TLS_VERIFY="1"
+export DOCKER_HOST="tcp://127.0.0.1:58329"  # Port changes on each restart!
+export DOCKER_CERT_PATH="/Users/pwner/.minikube/certs"
+export MINIKUBE_ACTIVE_DOCKERD="minikube"
+```
+
+**CRITICAL:** The `DOCKER_HOST` port number changes every time minikube restarts. Always run `eval $(minikube docker-env)` in each new terminal session or after restarting minikube.
+
+### Using Minikube's Docker Daemon
+
+**Option 1: eval (recommended for interactive sessions)**
+```bash
+# Run this in your terminal session ONCE
+eval $(minikube docker-env)
+
+# Now all docker commands use minikube's daemon
+docker build -t my-image:1.0.0 .
+docker images
+```
+
+**Option 2: Inline environment variables (for scripts)**
+```bash
+# Get current port dynamically
+DOCKER_TLS_VERIFY="1" \
+DOCKER_HOST="$(minikube docker-env | grep DOCKER_HOST | cut -d'"' -f2)" \
+DOCKER_CERT_PATH="/Users/pwner/.minikube/certs" \
+docker build -t my-image:1.0.0 .
+```
+
+**Option 3: One-liner for CI/scripts**
+```bash
+# Build using bash -c with eval
+bash -c 'eval $(minikube docker-env) && docker build -t my-image:1.0.0 .'
+```
+
+### Common Error: Wrong Docker Port
+
+**Symptom:**
+```
+ERROR: Cannot connect to the Docker daemon at tcp://127.0.0.1:55650. Is the docker daemon running?
+```
+
+**Cause:** You're using an old `DOCKER_HOST` port from before minikube was restarted.
+
+**Fix:**
+```bash
+# Re-run eval to get the new port
+eval $(minikube docker-env)
+
+# Or check current port
+minikube docker-env | grep DOCKER_HOST
+```
+
 ## Image Tagging Workflow
 
 **Building and tagging images:**
@@ -80,14 +143,16 @@ During `0.x.x` versions:
 # 1. Determine version increment based on changes
 # Bug fix example: 0.3.12 → 0.3.13
 
-# 2. Build image with new version
+# 2. Connect to minikube's Docker daemon (REQUIRED after each minikube restart)
 eval $(minikube docker-env)
+
+# 3. Build image with new version
 docker build -t blocksecops-api-service:0.3.13 -f Dockerfile .
 
-# 3. Also tag as 'latest' for local development
+# 4. Also tag as 'latest' for local development
 docker tag blocksecops-api-service:0.3.13 blocksecops-api-service:latest
 
-# 4. Verify image exists
+# 5. Verify image exists
 docker images | grep blocksecops-api-service
 ```
 
@@ -427,8 +492,10 @@ git push origin blocksecops-api-service-v0.3.13
 ## [0.3.11] - 2025-10-16
 
 ### Added
-- TypeScript build fixes for ui-core package
+- TypeScript build fixes for dashboard package
 - Scan modal UX improvements with loading states
+
+> **Note:** ui-core package was deprecated on 2025-11-24 and merged into blocksecops-dashboard.
 ```
 
 ## Rollback Considerations
