@@ -2,26 +2,6 @@
 
 **Last Updated:** November 21, 2025
 
-## Overview
-
-This document provides a comprehensive index of all authentication-related documentation across the BlockSecOps platform.
-
-## Quick Links
-
-### Latest Updates (November 2025)
-- **[Dashboard Authentication Production Optimization](./DASHBOARD-AUTH-PRODUCTION-OPTIMIZATION-2025-11-20.md)** - Latest optimizations (10x performance improvement)
-- **[Dashboard Auth Changelog](./changelogs/dashboard-authentication.md)** - Recent changes and fixes (v1.0.0 - v1.1.1)
-
-### Core Documentation
-- **[Authentication System Architecture](../blocksecops-docs/architecture/authentication-system.md)** - Overall system design
-- **[Authentication Security Best Practices](./security/authentication-security.md)** - Security guidelines
-
-### Migration & History
-- **[Dashboard Authentication Fixes (Oct 15)](./DASHBOARD-AUTHENTICATION-FIXES-2025-10-15.md)** - Previous fixes
-- **[API Service Auth Fixes (Oct 16)](./API-SERVICE-DATABASE-AUTH-FIX-2025-10-16.md)** - Backend updates
-
----
-
 ## Documentation by Topic
 
 ### 1. Production Ready (November 20, 2025)
