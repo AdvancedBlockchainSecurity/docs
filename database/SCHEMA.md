@@ -1,16 +1,9 @@
 # BlockSecOps Database Schema
 
-**Version:** 3.1a.1 (Phase 3.1a File Upload Restrictions + Quota Enforcement Complete)
 **Database:** PostgreSQL 15.4
-**Last Updated:** November 15, 2025
-**Migration Version:** 005 (manual) - Intelligence tables + missing vulnerability columns
-**Orchestration Version:** 0.7.17 - SQLAlchemy model fixes for Phase 4D
-**Pattern Code Format:** BVD-[ECOSYSTEM]-[CATEGORY]-[NUMBER] (Multi-Ecosystem Taxonomy - 100% Compliance)
-**Pattern Database Version:** 3.9+ - 🚀 Phase 3.1 Planned (352 → 392-432 patterns, 12 → 13 scanners)
-**Intelligence Layer Status:** ✅ Phase 1-4 Tables Created | 🟢 Phase 3.1 SBOM Tables Planned
-**Scanner Count:** 26 → **27** (adding SolidityDefend)
-**Tool Count:** 27 → **28** (adding SolidityBOM)
-**Detector Count:** 393 → **597** (adding 204 from SolidityDefend)
+**Database Name:** `solidity_security`
+**Schema:** `public`
+**Timezone:** UTC
 
 ## Table of Contents
 
@@ -20,7 +13,6 @@
 4. [ENUM Types](#enum-types)
 5. [Indexes](#indexes)
 6. [Relationships](#relationships)
-7. [Migration History](#migration-history)
 
 ---
 
@@ -28,35 +20,21 @@
 
 The BlockSecOps database supports a comprehensive smart contract security scanning platform with:
 
-- **Multi-language support:** 21+ blockchain languages including Solidity, Vyper, Rust, Move, Cairo, and more
+- **Multi-language support:** 21+ blockchain languages including Solidity, Vyper, Rust, Move, Cairo
 - **Multi-file contracts:** Support for complex projects with multiple source files
 - **Project organization:** Group related contracts into projects
-- **User authentication:** ✅ **Supabase Auth** with ES256 JWT tokens and JWKS verification (migrated November 13, 2025)
+- **User authentication:** Supabase Auth with ES256 JWT tokens and JWKS verification
 - **Security scanning:** Vulnerability detection with severity classification and multi-scanner support
-- **Scanner tracking:** Attribution and categorization of vulnerabilities by detection tool (Migration 004)
-- **Saved searches:** User-saved search queries with JSONB parameters (Migration 004)
-- **User preferences:** Customizable notification settings and UI preferences (Migration 004)
-- **Performance optimization:** 13+ specialized indexes including GIN, composite, and partial indexes (Migration 004)
+- **Scanner tracking:** Attribution and categorization of vulnerabilities by detection tool
+- **Saved searches:** User-saved search queries with JSONB parameters
+- **User preferences:** Customizable notification settings and UI preferences
+- **Performance optimization:** Specialized indexes including GIN, composite, and partial indexes
 - **Audit tracking:** Full timestamps and status tracking
-- **Intelligence layer:** Phase 4D enrichment and fingerprinting for vulnerability deduplication (Migrations 005-006)
-- **Pattern matching:** Vulnerability pattern classification with **352 patterns across 4 ecosystems** (Pattern DB v3.9, 2025-11-02) → **Phase 3.1: 392-432 patterns** (adding 40-80 for SolidityDefend)
-  - **Solidity/EVM**: 171 patterns → **211-251 patterns** (adding 40-80 from SolidityDefend)
-  - **Vyper**: 99 patterns
-  - **Solana**: 68 patterns
-  - **Cairo/Starknet**: 14 patterns
-- **SBOM Support (Phase 3.1):** Software Bill of Materials tables for dependency tracking
-  - **SBOM Formats**: SPDX 2.3, CycloneDX 1.5
-  - **Dependency Scanning**: CVE detection, license compliance
-  - **Supply Chain Security**: Malicious package detection
-- **100% BVD Standard Compliance:** All 352 patterns use BVD-{ECOSYSTEM}-{CATEGORY}-{NUMBER} format 🎯 (Phase 6.7 Migration Complete)
-- **100% Intelligence Coverage:** All 398 detector mappings across 12 scanners point to BVD patterns (Phase 1-4 + 6.7 Complete)
-- **Deduplication:** Cross-scanner finding deduplication with 0% collision rate (Phase 3 Validation)
-- **Ecosystem-based taxonomy:** Multi-ecosystem support with explicit ecosystem identifiers (SOLIDITY, VYPER, SOLANA, **CAIRO**) (Migration 008, v3.8)
-- **Parser enrichment:** Automatic extraction of detector_id, file_path, function_name, contract_name from scanner output (Phase 4D)
-
-**Database Name:** `solidity_security`
-**Schema:** `public` (default)
-**Timezone:** UTC (all timestamps use `timestamp with time zone`)
+- **Intelligence layer:** Enrichment and fingerprinting for vulnerability deduplication
+- **Pattern matching:** Vulnerability pattern classification across 4 ecosystems (Solidity/EVM, Vyper, Solana, Cairo)
+- **Deduplication:** Cross-scanner finding deduplication
+- **Tier-based quotas:** User quotas with monthly scan limits and tier-based priority
+- **Priority queue:** Scan priority system for tier-based queue processing
 
 ---
 
@@ -379,6 +357,8 @@ Smart contract source code and metadata.
 | `language` | contract_language | NOT NULL | Programming language |
 | `compiler_version` | VARCHAR(50) | NULLABLE | Compiler version used |
 | `language_metadata` | JSONB | NULLABLE | Language-specific metadata |
+| `framework` | VARCHAR(50) | NULLABLE, INDEX | Framework type (foundry, hardhat, plain) - Phase 3.2 |
+| `framework_config` | JSONB | NULLABLE | Parsed framework configuration - Phase 3.2 |
 | `status` | contract_status | NOT NULL | Current processing status |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Upload timestamp |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
@@ -387,6 +367,52 @@ Smart contract source code and metadata.
 - `ix_contracts_user_id` on `user_id`
 - `ix_contracts_address` on `address`
 - `ix_contracts_language` on `language`
+- `idx_contracts_framework` on `framework` (partial, WHERE framework IS NOT NULL) - Phase 3.2
+
+**Framework Support (Phase 3.2 - November 25, 2025)**:
+
+The `framework` and `framework_config` columns enable native support for Foundry and Hardhat projects:
+
+**Framework Types**:
+- `foundry` - Foundry projects (detected by `foundry.toml`)
+- `hardhat` - Hardhat projects (detected by `hardhat.config.js` or `hardhat.config.ts`)
+- `plain` - Plain Solidity/Vyper files without framework
+
+**Framework Config Structure (JSONB)**:
+
+For Foundry projects:
+```json
+{
+  "solc_version": "0.8.20",
+  "src_dir": "src",
+  "test_dir": "test",
+  "out_dir": "out",
+  "libs": ["lib"],
+  "remappings": [
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "forge-std/=lib/forge-std/src/"
+  ],
+  "optimizer_enabled": true,
+  "optimizer_runs": 200,
+  "via_ir": false,
+  "evm_version": "paris"
+}
+```
+
+For Hardhat projects:
+```json
+{
+  "solc_version": "0.8.20",
+  "sources_path": "./contracts",
+  "tests_path": "./test",
+  "optimizer_enabled": true,
+  "optimizer_runs": 200,
+  "evm_version": "paris",
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0"
+  }
+}
+```
 
 **Relationships:**
 - Many-to-one with `users` (user_id)
@@ -437,6 +463,7 @@ Security scan execution records.
 | `high_count` | INTEGER | NOT NULL | Count of high severity issues |
 | `medium_count` | INTEGER | NOT NULL | Count of medium severity issues |
 | `low_count` | INTEGER | NOT NULL | Count of low severity issues |
+| `priority` | INTEGER | NOT NULL, DEFAULT 50, INDEX | Scan priority (lower = higher priority). Enterprise=5, Pro=25, Free=50 |
 | `scanners_used` | ARRAY(VARCHAR(50)) | NULLABLE | Array of scanner IDs used in this scan |
 | `scan_config` | JSONB | NULLABLE, DEFAULT '{}' | Scanner configuration parameters |
 | `duration_seconds` | INTEGER | NULLABLE | Scan duration in seconds |
@@ -446,6 +473,8 @@ Security scan execution records.
 **Indexes:**
 - `ix_scans_contract_id` on `contract_id`
 - `ix_scans_user_id` on `user_id`
+- `ix_scans_priority` on `priority` (for priority queue ordering)
+- `ix_scans_status_priority` on `(status, priority)` (composite index for queue polling)
 
 **Relationships:**
 - Many-to-one with `contracts` (contract_id)
@@ -1231,55 +1260,6 @@ All indexes are created for query optimization based on common access patterns:
 
 ---
 
-## Migration History
-
-| Version | Date | Description | File |
-|---------|------|-------------|------|
-| **001** | 2025-10-12 | Initial database schema with users, contracts, scans, vulnerabilities, multi-language and multi-file support | `20251012_1500-001_initial_schema.py` |
-| **002** | 2025-10-14 | Add 'uploaded' status to contract_status enum | `20251014_1400-002_add_uploaded_status.py` |
-| **003** | 2025-10-15 | Add projects table and project_contracts junction table for project organization | `20251015_1000-003_add_projects_table.py` |
-| **004** | 2025-10-18 | Comprehensive production enhancements: scanner tracking, vulnerability categorization, saved searches, user preferences, enrichment fingerprints, and performance indexes | `20251017_2112-08bf8921767b_comprehensive_production_enhancements_.py` |
-| **005** | 2025-10-24 | **Phase 4D Parser Enrichment** - Add parser enrichment fields to vulnerabilities table (detector_id, file_path, function_name, contract_name) for intelligence layer | `20251024_add_parser_enrichment_fields.sql` |
-| **006** | 2025-10-24 | **Phase 4D Gas Analysis Enrichment** - Add parser enrichment fields to gas_analysis_findings table for consistent enrichment across finding types | `20251024_add_parser_fields_to_gas_analysis.sql` |
-| **012** | 2025-11-02 | **Phase 6.6 Deduplication Groups Fix** - Rename columns in deduplication_groups table (`primary_vulnerability_id` → `canonical_finding_id`, `pattern_id` → `pattern_code` VARCHAR(50)) | `20251102_1251-a2240d8cd745_fix_deduplication_groups_column_names.py` |
-| **013** | 2025-11-12 | **Phase 3.1a Supabase Auth Integration** - Add tier tracking columns to users table (tier, tier_updated_at, supabase_user_id, stripe_customer_id, stripe_subscription_id) | `20251112_1408-cf314965ed8c_add_supabase_tier_tracking_to_users.py` |
-| **014** | 2025-11-12 | **Phase 3.1a User Quotas** - Create user_quotas table with auto-creation trigger for tier-based limits | `20251112_1453-efa3c7c50d04_create_user_quotas_table_with_trigger.py` |
-| **N/A** | 2025-10-24 | **Code Fix** - Removed is_project field references from ORM model and task logic (orchestration v0.7.10-0.7.11) | Field planned for future migration |
-| **N/A** | 2025-10-24 | **Intelligence Layer** - Implemented intelligence modules for Phase 4C/4D enrichment (orchestration v0.7.12-0.7.17) | intelligence/models.py, intelligence/normalizer.py, intelligence/fingerprinting.py |
-| **N/A** | 2025-10-25 | **SQLAlchemy Model Fix** - Added 15 missing field definitions to VulnerabilityModel for Phase 4D fingerprinting (orchestration v0.7.17-fingerprint-model-fix) | src/blocksecops_orchestration/models/models.py |
-| **N/A** | 2025-11-02 | **Phase 6.6 Deduplication API Fix** - Added computed properties to DeduplicationGroupModel (scanner_count, finding_count, first_seen, last_seen, confidence_level) for API compatibility (API service v0.1.12) | `src/infrastructure/database/specialized_models/intelligence.py` |
-
-**Note:** After October 16, 2025 database recovery, migration 002 required manual application. See [MANUAL-FIXES.md](./MANUAL-FIXES.md) for details on any required manual fixes when recreating the database.
-
-**is_project Field Status:** The `is_project` column was documented in the schema but never existed in the actual database. This created a schema mismatch that was resolved in orchestration service v0.7.10 and v0.7.11 by commenting out the ORM field definition and removing conditional logic. The field will be added in a future migration when full project structure support is implemented.
-
-### Running Migrations
-
-**Apply all migrations:**
-```bash
-cd /Users/pwner/Git/ABS/blocksecops-api-service
-source .venv/bin/activate
-export DATABASE_URL="postgresql+asyncpg://postgres:postgres@127.0.0.1:5432/solidity_security"
-alembic upgrade head
-```
-
-**Check current version:**
-```bash
-alembic current
-```
-
-**Generate new migration:**
-```bash
-alembic revision -m "description"
-```
-
-**Rollback last migration:**
-```bash
-alembic downgrade -1
-```
-
----
-
 ## Database Configuration
 
 ### Connection Settings
@@ -1347,8 +1327,8 @@ See [Platform Development Standards](/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPM
 
 ---
 
-**Document Version:** 1.2.1
-**Last Updated:** November 2, 2025 (Phase 6.6 hotfix)
+**Document Version:** 1.3.0
+**Last Updated:** November 25, 2025 (Phase 3.2 - Framework Support)
 **Maintained By:** BlockSecOps Team
 
 ---
