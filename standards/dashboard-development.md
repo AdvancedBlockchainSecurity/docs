@@ -1,8 +1,10 @@
 # Dashboard Development Standards
 
-**Version:** 1.8.0
-**Last Updated:** October 20, 2025
+**Version:** 2.0.0
+**Last Updated:** November 27, 2025
 **Status:** Active
+
+> **Major Update (v2.0.0):** Dashboard now runs inside Minikube and is accessed via Traefik ingress controller. Do NOT run `npm run dev` locally - see [Port-Forwarding Standards](./port-forwarding.md) for the correct setup.
 
 ## CRITICAL: Python 3.13 Compatibility Issue
 
@@ -37,7 +39,7 @@ scans = await to_pydantic_list(db, scan_models, ScanResponse)
 
 ## Proper Dashboard Startup Procedure
 
-**CRITICAL:** Port-forwards can die during pod restarts. Always verify ALL port-forwards are running before testing.
+**CRITICAL:** The dashboard runs inside Minikube and is accessed via Traefik ingress. **DO NOT** run `npm run dev` locally - this will not work correctly with the API routing.
 
 ### Step 1: Start Minikube and Services
 
@@ -49,25 +51,27 @@ minikube status
 minikube start
 
 # 3. Verify all services are deployed and running
-kubectl get pods -A | grep -E "api-service|postgresql|redis|notification"
+kubectl get pods -A | grep -E "api-service|dashboard|postgresql|redis|traefik"
 
 # Expected output - all should show "Running" status:
 # api-service-local       api-service-xxxxx          1/1     Running   0          10m
+# dashboard-local         dashboard-xxxxx            1/1     Running   0          10m
 # postgresql-local        postgresql-xxxxx           1/1     Running   0          2d
 # redis-local             redis-xxxxx                1/1     Running   0          2d
-# notification-local      notification-xxxxx         1/1     Running   0          1d
+# traefik-local           traefik-xxxxx              1/1     Running   0          2d
 ```
 
 ### Step 2: Verify Services Have Endpoints
 
-**CRITICAL:** Services with no endpoints cannot be port-forwarded!
+**CRITICAL:** Services with no endpoints cannot be accessed via Traefik!
 
 ```bash
 # Check all service endpoints
 kubectl get endpoints -n api-service-local api-service
+kubectl get endpoints -n dashboard-local dashboard
 kubectl get endpoints -n postgresql-local postgresql
 kubectl get endpoints -n redis-local redis
-kubectl get endpoints -n notification-local notification
+kubectl get endpoints -n traefik-local traefik
 
 # ✅ GOOD: Shows IP addresses
 # NAME          ENDPOINTS                AGE
@@ -85,39 +89,41 @@ kubectl get endpoints -n notification-local notification
 
 ### Step 3: Start Required Port-Forwards
 
-**MANDATORY order:** Start port-forwards for ALL dependencies BEFORE starting dashboard.
+**IMPORTANT:** With the Traefik migration, you only need the Traefik port-forward for dashboard access. Traefik routes requests to both dashboard and API services.
 
 ```bash
 # Kill any existing port-forwards first
-ps aux | grep "port-forward" | grep -v grep | awk '{print $2}' | xargs kill -9 2>/dev/null
+pkill -f "kubectl port-forward" 2>/dev/null
 
 # Wait for processes to die
 sleep 2
 
-# 1. PostgreSQL (required by API)
+# 1. Traefik Ingress (PRIMARY - routes to dashboard AND API)
+kubectl port-forward -n traefik-local svc/traefik 3000:80 > /tmp/pf-traefik.log 2>&1 &
+echo "Traefik port-forward started on 3000"
+
+# 2. PostgreSQL (required for direct database access/debugging)
 kubectl port-forward -n postgresql-local svc/postgresql 5432:5432 > /tmp/pf-postgresql.log 2>&1 &
 echo "PostgreSQL port-forward started"
 
-# 2. Redis (required by API)
+# 3. Redis (required for direct cache access/debugging)
 kubectl port-forward -n redis-local svc/redis 6379:6379 > /tmp/pf-redis.log 2>&1 &
 echo "Redis port-forward started"
-
-# 3. API Service (required by Dashboard)
-kubectl port-forward -n api-service-local deployment/api-service 8000:8000 > /tmp/pf-api-service.log 2>&1 &
-echo "API Service port-forward started"
-
-# 4. Notification Service (required for WebSocket)
-kubectl port-forward -n notification-local svc/notification 8003:80 > /tmp/pf-notification.log 2>&1 &
-echo "Notification port-forward started"
 
 # Wait for port-forwards to stabilize
 sleep 3
 
-# Verify all port-forwards are active
-lsof -i :5432,6379,8000,8003 | grep LISTEN
+# Verify port-forwards are active
+lsof -i :3000,5432,6379 | grep LISTEN
 ```
 
-**Why use `deployment/api-service` instead of `svc/api-service`?**
+**How Traefik Routing Works:**
+- `http://127.0.0.1:3000` → Dashboard UI (served by dashboard pod)
+- `http://127.0.0.1:3000/api/v1/*` → API Service (routed by Traefik based on path prefix)
+
+This mirrors production architecture where all traffic goes through a single ingress point.
+
+**Why NOT use direct port-forward to API service?**
 - Port-forwarding to a **service** creates a connection to the underlying pods
 - Port-forwarding to a **deployment** automatically handles pod restarts
 - When a pod is replaced (during rollout), deployment port-forward reconnects automatically
@@ -125,19 +131,22 @@ lsof -i :5432,6379,8000,8003 | grep LISTEN
 
 **Expected output:**
 ```
-kubectl  48801  0.0  0.1 35597176  24408   ??  SN    6:21PM   0:00.54 kubectl port-forward... 8000
+kubectl  48801  0.0  0.1 35597176  24408   ??  SN    6:21PM   0:00.54 kubectl port-forward... 3000
 kubectl  48802  0.0  0.1 35597176  24408   ??  SN    6:21PM   0:00.54 kubectl port-forward... 5432
 kubectl  48803  0.0  0.1 35597176  24408   ??  SN    6:21PM   0:00.54 kubectl port-forward... 6379
-kubectl  48804  0.0  0.1 35597176  24408   ??  SN    6:21PM   0:00.54 kubectl port-forward... 8003
 ```
 
-### Step 4: Verify API Health
+### Step 4: Verify Dashboard and API Health
 
-**CRITICAL:** API must be healthy BEFORE starting dashboard.
+**Test that both dashboard and API are accessible via Traefik:**
 
 ```bash
-# Test API health endpoint
-curl -s http://127.0.0.1:8000/api/v1/health/live | jq '.'
+# Test dashboard (should return HTML)
+curl -s http://127.0.0.1:3000 | head -5
+# Expected: <!doctype html>...
+
+# Test API health via Traefik routing
+curl -s http://127.0.0.1:3000/api/v1/health/live | jq '.'
 
 # Expected output:
 # {
@@ -148,7 +157,7 @@ curl -s http://127.0.0.1:8000/api/v1/health/live | jq '.'
 # }
 
 # Test API readiness (checks database connection)
-curl -s http://127.0.0.1:8000/api/v1/health/ready | jq '.'
+curl -s http://127.0.0.1:3000/api/v1/health/ready | jq '.'
 
 # Expected output:
 # {
@@ -161,92 +170,38 @@ curl -s http://127.0.0.1:8000/api/v1/health/ready | jq '.'
 **If health checks fail:**
 
 ```bash
-# 1. Check API logs for errors
+# 1. Check Traefik port-forward is running
+lsof -i :3000 | grep LISTEN
+
+# 2. Check dashboard pod logs
+kubectl logs -n dashboard-local deployment/dashboard --tail=50
+
+# 3. Check API pod logs
 kubectl logs -n api-service-local deployment/api-service --tail=50
 
-# 2. Check port-forward logs
-tail -50 /tmp/pf-api-service.log
+# 4. Verify IngressRoutes are configured
+kubectl get ingressroute -n dashboard-local
+kubectl get ingressroute -n api-service-local
 
-# 3. Common issues:
-#    - Port-forward died during pod restart
-#    - Database connection failed
-#    - Redis connection failed
+# 5. Common issues:
+#    - Traefik port-forward not running
+#    - IngressRoute misconfigured
+#    - Dashboard/API pods not running
 #    - Service has no endpoints
 ```
 
-### Step 5: Configure Dashboard Environment
+### Step 5: Access Dashboard
 
-**Verify dashboard `.env.local` exists and is correct:**
+**Open browser to http://127.0.0.1:3000**
 
-```bash
-# Check if file exists
-cat /Users/pwner/Git/ABS/blocksecops-dashboard/.env.local
+The dashboard runs inside Minikube - you do NOT need to run `npm run dev` locally.
 
-# Expected content:
-# VITE_API_BASE_URL=http://127.0.0.1:8000
-# VITE_WS_URL=ws://127.0.0.1:8003/ws
-# VITE_ENVIRONMENT=local
-# VITE_DEBUG=true
-```
+**⚠️ COMMON MISTAKE:** Do NOT run `npm run dev` on your local machine!
+- The dashboard uses relative URLs (`/api/v1`) for API requests
+- These are routed by Traefik to the API service in the cluster
+- Running locally would require a proxy configuration and defeats the purpose of the production-mirroring setup
 
-**If file is missing or incorrect, create it:**
-
-```bash
-cat > /Users/pwner/Git/ABS/blocksecops-dashboard/.env.local <<'EOF'
-# Dashboard local development environment
-# MANDATORY: Use 127.0.0.1 for local development
-VITE_API_BASE_URL=http://127.0.0.1:8000
-VITE_WS_URL=ws://127.0.0.1:8003/ws
-
-# Optional
-VITE_ENVIRONMENT=local
-VITE_DEBUG=true
-EOF
-
-echo "✅ Dashboard .env.local created"
-```
-
-### Step 6: Start Dashboard
-
-```bash
-# Navigate to dashboard directory
-cd /Users/pwner/Git/ABS/blocksecops-dashboard
-
-# Install dependencies (if not already installed)
-npm install
-
-# Start development server
-npm run dev
-
-# Expected output:
-# VITE v5.0.0  ready in 500 ms
-#
-# ➜  Local:   http://localhost:5173/
-# ➜  Network: use --host to expose
-# ➜  press h to show help
-```
-
-**IMPORTANT:** Vite may assign a different port (5173, 5174, etc.) if 3000 is occupied. This is INCORRECT.
-
-**If dashboard starts on wrong port:**
-
-```bash
-# 1. Stop the dashboard (Ctrl+C)
-
-# 2. Find what's using port 3000
-lsof -i :3000
-
-# 3. Kill the process
-lsof -ti :3000 | xargs kill -9
-
-# 4. Restart dashboard
-npm run dev
-
-# 5. Verify it's on port 3000
-lsof -i :3000 | grep LISTEN
-```
-
-### Step 7: Verify Dashboard Connectivity
+### Step 6: Verify Dashboard Connectivity
 
 ```bash
 # 1. Open browser to http://127.0.0.1:3000
@@ -254,103 +209,92 @@ lsof -i :3000 | grep LISTEN
 # 2. Open browser console (F12)
 
 # 3. Check for connection errors
-#    ✅ GOOD: No errors, dashboard loads
-#    ❌ BAD: "Network Error", "ERR_CONNECTION_REFUSED"
+#    ✅ GOOD: No errors, dashboard loads, user info appears
+#    ❌ BAD: "Network Error", "ERR_CONNECTION_REFUSED", 404 on /api calls
 
-# 4. If errors occur, check:
-curl -s http://127.0.0.1:8000/api/v1/health/live
-
-# 5. Verify WebSocket connection
-#    Browser console should show:
-#    "WebSocket connected to ws://127.0.0.1:8003/ws"
+# 4. If errors occur, check Traefik port-forward:
+curl -s http://127.0.0.1:3000/api/v1/health/live
 ```
 
 ## Troubleshooting Dashboard Issues
 
 ### Issue: "Network Error" or "ERR_CONNECTION_REFUSED"
 
-**Root Cause:** API port-forward is not running.
+**Root Cause:** Traefik port-forward is not running.
 
 **Solution:**
 ```bash
-# 1. Check if API port-forward is running
-ps aux | grep "port-forward.*8000" | grep -v grep
+# 1. Check if Traefik port-forward is running
+lsof -i :3000 | grep LISTEN
 
 # 2. If not running, restart it
-kubectl port-forward -n api-service-local deployment/api-service 8000:8000 > /tmp/pf-api-service.log 2>&1 &
+kubectl port-forward -n traefik-local svc/traefik 3000:80 > /tmp/pf-traefik.log 2>&1 &
 
 # 3. Wait and test
 sleep 3
-curl http://127.0.0.1:8000/api/v1/health/live
+curl http://127.0.0.1:3000/api/v1/health/live
 
 # 4. Refresh dashboard browser page
 ```
 
-### Issue: Port-forward keeps dying
+### Issue: 404 on API calls
 
-**Root Cause:** Port-forwarding to a specific pod that gets replaced during rollouts.
+**Root Cause:** Traefik IngressRoute for API service is not configured or missing.
 
-**Solution:** Use deployment-based port-forward (auto-reconnects):
+**Solution:**
 ```bash
-# ❌ BAD: Port-forward to service or pod
-kubectl port-forward -n api-service-local svc/api-service 8000:8000 &
-kubectl port-forward -n api-service-local pod/api-service-xxxxx 8000:8000 &
+# 1. Check IngressRoute exists
+kubectl get ingressroute -n api-service-local
 
-# ✅ GOOD: Port-forward to deployment
-kubectl port-forward -n api-service-local deployment/api-service 8000:8000 &
+# 2. If missing, apply the API service overlay
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-api-service/k8s/overlays/local/
+
+# 3. Verify IngressRoute has correct path matching
+kubectl get ingressroute -n api-service-local api-service -o yaml | grep -A5 "match:"
+# Should show: (Host(`localhost`) || Host(`127.0.0.1`)) && PathPrefix(`/api`)
 ```
 
-### Issue: Port-forward dies after pod restart/rollout
+### Issue: Port-forward keeps dying
+
+**Root Cause:** Traefik pod restarted or port-forward process died.
+
+**Solution:**
+```bash
+# 1. Check Traefik pod is running
+kubectl get pods -n traefik-local
+
+# 2. Restart Traefik port-forward
+pkill -f "port-forward.*traefik" 2>/dev/null
+sleep 2
+kubectl port-forward -n traefik-local svc/traefik 3000:80 > /tmp/pf-traefik.log 2>&1 &
+
+# 3. Verify working
+sleep 2
+curl -s http://127.0.0.1:3000/api/v1/health/live
+```
+
+### Issue: Dashboard pod not running
 
 **Symptom:**
 ```bash
-# Port-forward process exists but API not responding
-ps aux | grep "port-forward.*8000"
-# Shows port-forward process running
-
-curl http://127.0.0.1:8000/api/v1/health/live
-# Connection refused or timeout
-
-# Check port-forward logs
-lsof -ti:8000 | xargs ps -p 2>/dev/null
-# Shows error: "container not running" or "lost connection to pod"
-```
-
-**Root Cause:** Port-forward process remains running but points to old pod that was deleted during deployment rollout or pod restart. When you restart a deployment (e.g., after CORS config changes or code updates), Kubernetes creates a new pod and deletes the old one. Any port-forward to the old pod loses connection but the process stays alive, making it appear working.
-
-**Diagnosis:**
-```bash
-# 1. Check if pod changed recently
-kubectl get pods -n api-service-local -o wide
-# Look at AGE column - if pod is very new, port-forwards may be stale
-
-# 2. Check port-forward process details
-ps aux | grep "port-forward.*8000" | grep -v grep
-# Look for the pod ID in the command - does it match current pod?
-
-# 3. Check for "container not running" errors
-lsof -ti:8000 | xargs ps -p 2>/dev/null
-# or check /tmp/pf-*.log files if you logged port-forward output
+# Traefik is up but dashboard shows 503/502 error
+curl http://127.0.0.1:3000
+# Returns Traefik error page
 ```
 
 **Solution:**
 ```bash
-# 1. Kill ALL stale port-forwards on port 8000
-ps aux | grep "kubectl port-forward" | grep "8000:8000" | grep -v grep | awk '{print $2}' | xargs kill -9 2>/dev/null
+# 1. Check dashboard pod
+kubectl get pods -n dashboard-local
 
-# Alternative: Kill by port
-lsof -ti:8000 | xargs kill -9 2>/dev/null
+# 2. If not running or crashed, check logs
+kubectl logs -n dashboard-local deployment/dashboard --tail=50
 
-# 2. Wait for processes to die
-sleep 2
+# 3. If pod is missing, deploy it
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-dashboard/k8s/overlays/local/
 
-# 3. Start fresh port-forward to DEPLOYMENT (not service/pod)
-kubectl port-forward -n api-service-local deployment/api-service 8000:8000 --address=127.0.0.1 > /tmp/pf-api.log 2>&1 &
-
-# 4. Verify working
-sleep 2
-curl -s http://127.0.0.1:8000/api/v1/health/live
-# Should return: {"status":"healthy","service":"BlockSecOps API Service"...}
+# 4. Wait for pod to be ready
+kubectl rollout status -n dashboard-local deployment/dashboard
 ```
 
 **Prevention:**
@@ -430,25 +374,24 @@ minikube status
 # 2. Check all services are healthy
 kubectl get pods -A | grep -v "kube-system"
 
-# 3. Start port-forwards (if not already running)
-ps aux | grep "port-forward" | grep -v grep || {
-  kubectl port-forward -n postgresql-local svc/postgresql 5432:5432 > /tmp/pf-postgresql.log 2>&1 &
-  kubectl port-forward -n redis-local svc/redis 6379:6379 > /tmp/pf-redis.log 2>&1 &
-  kubectl port-forward -n api-service-local deployment/api-service 8000:8000 > /tmp/pf-api-service.log 2>&1 &
-  kubectl port-forward -n notification-local svc/notification 8003:80 > /tmp/pf-notification.log 2>&1 &
+# 3. Start Traefik port-forward (if not already running)
+lsof -i :3000 | grep LISTEN || {
+  kubectl port-forward -n traefik-local svc/traefik 3000:80 > /tmp/pf-traefik.log 2>&1 &
   sleep 3
 }
 
-# 4. Verify API is healthy
-curl -s http://127.0.0.1:8000/api/v1/health/ready | jq '.status'
+# 4. Optionally start database/cache port-forwards for direct debugging
+lsof -i :5432 | grep LISTEN || kubectl port-forward -n postgresql-local svc/postgresql 5432:5432 > /tmp/pf-postgresql.log 2>&1 &
+lsof -i :6379 | grep LISTEN || kubectl port-forward -n redis-local svc/redis 6379:6379 > /tmp/pf-redis.log 2>&1 &
 
-# 5. Start dashboard (if not already running)
-cd /Users/pwner/Git/ABS/blocksecops-dashboard
-npm run dev
+# 5. Verify dashboard and API are healthy via Traefik
+curl -s http://127.0.0.1:3000 | head -1  # Should return HTML
+curl -s http://127.0.0.1:3000/api/v1/health/ready | jq '.status'
 
 # 6. Open browser to http://127.0.0.1:3000
 
 # 7. Develop and test features
+#    NOTE: Dashboard runs inside Minikube - do NOT run npm run dev locally!
 ```
 
 **After pulling code changes:**
@@ -461,6 +404,7 @@ git pull
 # 2. Build new Docker image
 eval $(minikube docker-env)
 docker build -t api-service:0.3.20 .
+docker tag api-service:0.3.20 api-service:latest
 
 # 3. Update deployment
 kubectl set image -n api-service-local deployment/api-service api-service=api-service:0.3.20
@@ -468,16 +412,10 @@ kubectl set image -n api-service-local deployment/api-service api-service=api-se
 # 4. Wait for rollout
 kubectl rollout status -n api-service-local deployment/api-service
 
-# 5. Port-forward should auto-reconnect (using deployment)
-#    If using service/pod port-forward, restart it manually:
-ps aux | grep "port-forward.*8000" | grep -v grep || {
-  kubectl port-forward -n api-service-local deployment/api-service 8000:8000 > /tmp/pf-api-service.log 2>&1 &
-}
+# 5. Verify API health via Traefik
+curl -s http://127.0.0.1:3000/api/v1/health/live
 
-# 6. Verify API health
-curl http://127.0.0.1:8000/api/v1/health/live
-
-# 7. Refresh dashboard browser page
+# 6. Refresh dashboard browser page
 ```
 
 ## Dashboard Development Checklist
@@ -487,24 +425,23 @@ curl http://127.0.0.1:8000/api/v1/health/live
 - [ ] Minikube running (`minikube status`)
 - [ ] All services deployed and healthy (`kubectl get pods -A`)
 - [ ] All services have endpoints (`kubectl get endpoints -A | grep -v kube-system`)
-- [ ] PostgreSQL port-forward active on 5432
-- [ ] Redis port-forward active on 6379
-- [ ] API port-forward active on 8000 (use deployment, not service!)
-- [ ] Notification port-forward active on 8003
-- [ ] API health check passing (`curl http://127.0.0.1:8000/api/v1/health/ready`)
-- [ ] Dashboard `.env.local` configured correctly
-- [ ] Dashboard running on port 3000 (not 5173 or other)
+- [ ] Traefik port-forward active on 3000 (`lsof -i :3000 | grep LISTEN`)
+- [ ] PostgreSQL port-forward active on 5432 (optional, for direct DB access)
+- [ ] Redis port-forward active on 6379 (optional, for direct cache access)
+- [ ] Dashboard accessible via Traefik (`curl -s http://127.0.0.1:3000 | head -1`)
+- [ ] API health check passing via Traefik (`curl http://127.0.0.1:3000/api/v1/health/ready`)
 - [ ] Can access dashboard at `http://127.0.0.1:3000`
 - [ ] No console errors in browser (F12 → Console tab)
+- [ ] **NOT running `npm run dev` locally** (dashboard runs inside Minikube!)
 
 **After code changes:**
 
 - [ ] Code changes committed to Git
-- [ ] Docker image built with incremented version
+- [ ] Docker image built with incremented version AND tagged as `:latest`
 - [ ] Deployment updated to new image version
 - [ ] Rollout completed successfully
-- [ ] Port-forwards reconnected (if needed)
-- [ ] API health check passing
+- [ ] Traefik port-forward still active (restart if needed)
+- [ ] API health check passing via Traefik
 - [ ] Dashboard refreshed in browser
 - [ ] Feature tested and verified
 

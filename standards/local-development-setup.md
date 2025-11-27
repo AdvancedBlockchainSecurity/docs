@@ -1,7 +1,7 @@
 # Local Development Setup Standards
 
-**Version:** 1.9.0
-**Last Updated:** November 25, 2025
+**Version:** 2.0.0
+**Last Updated:** November 27, 2025
 **Status:** Active
 
 ## Minikube Configuration
@@ -80,16 +80,20 @@ kubectl delete pods -n tool-integration-local -l job-name --field-selector=statu
 
 ## Access Endpoints
 
+> **IMPORTANT:** With the Traefik migration, the dashboard and API are accessed via a single Traefik ingress on port 3000. See [Dashboard Development Standards](./dashboard-development.md) for the correct startup procedure.
+
 **MANDATORY endpoints for local development:**
 
 | Service | Endpoint | Notes |
 |---------|----------|-------|
-| Dashboard | `http://127.0.0.1:3000` | Main dashboard with Supabase Auth (blocksecops-dashboard) |
-| API Service | `http://127.0.0.1:8000` | FastAPI backend |
-| API Docs | `http://127.0.0.1:8000/docs` | Swagger UI |
-| Notification | `http://127.0.0.1:8003` | WebSocket server |
+| Dashboard | `http://127.0.0.1:3000` | Main dashboard (via Traefik ingress) |
+| API Service | `http://127.0.0.1:3000/api/v1` | FastAPI backend (via Traefik routing) |
+| API Docs | `http://127.0.0.1:3000/api/v1/docs` | Swagger UI (via Traefik) |
+| Notification | `http://127.0.0.1:8003` | WebSocket server (direct port-forward) |
 | Grafana | `http://127.0.0.1:3001` | Monitoring dashboard |
 | Prometheus | `http://127.0.0.1:9090` | Metrics (when forwarded) |
+| PostgreSQL | `127.0.0.1:5432` | Database (direct port-forward, optional) |
+| Redis | `127.0.0.1:6379` | Cache (direct port-forward, optional) |
 
 ## Port Forward Standards
 
@@ -100,29 +104,39 @@ kubectl delete pods -n tool-integration-local -l job-name --field-selector=statu
 ```bash
 #!/bin/bash
 # Port forward all local development services
+# IMPORTANT: Dashboard and API are accessed via Traefik on port 3000
+# See dashboard-development.md for the correct startup procedure
 
 echo "Starting port forwards for local development..."
 
 # Kill existing port forwards
-lsof -ti:8000,8003,3001 | xargs kill -9 2>/dev/null
+pkill -f "kubectl port-forward" 2>/dev/null
+sleep 2
 
-# Note: Dashboard runs via npm run dev (see dashboard-development.md)
-# Runs directly on port 3000 - no port-forward needed
+# PRIMARY: Traefik Ingress (routes to dashboard AND API)
+kubectl port-forward -n traefik-local svc/traefik 3000:80 > /tmp/pf-traefik.log 2>&1 &
+echo "✅ Traefik (Dashboard + API): http://127.0.0.1:3000"
 
-# API Service
-kubectl port-forward -n api-service-local svc/api-service 8000:8000 &
-echo "✅ API Service: http://127.0.0.1:8000"
+# Optional: Direct database access for debugging
+kubectl port-forward -n postgresql-local svc/postgresql 5432:5432 > /tmp/pf-postgresql.log 2>&1 &
+echo "✅ PostgreSQL: 127.0.0.1:5432"
 
-# Notification Service
-kubectl port-forward -n notification-local svc/notification 8003:8003 &
+kubectl port-forward -n redis-local svc/redis 6379:6379 > /tmp/pf-redis.log 2>&1 &
+echo "✅ Redis: 127.0.0.1:6379"
+
+# Notification Service (WebSocket)
+kubectl port-forward -n notification-local svc/notification 8003:8003 > /tmp/pf-notification.log 2>&1 &
 echo "✅ Notification: http://127.0.0.1:8003"
 
 # Grafana
-kubectl port-forward -n monitoring svc/monitoring-grafana 3001:80 &
+kubectl port-forward -n monitoring svc/monitoring-grafana 3001:80 > /tmp/pf-grafana.log 2>&1 &
 echo "✅ Grafana: http://127.0.0.1:3001"
 
+sleep 3
 echo ""
 echo "All port forwards active. Use 127.0.0.1 for all connections."
+echo "Dashboard: http://127.0.0.1:3000"
+echo "API Health: http://127.0.0.1:3000/api/v1/health/live"
 ```
 
 ## Port Number Consistency Standards
@@ -150,12 +164,12 @@ echo "All port forwards active. Use 127.0.0.1 for all connections."
 **If a port is occupied:**
 
 ```bash
-# ❌ INCORRECT: Let service pick next available port
-npm run dev  # Picks port 3001, 3004, etc. when 3000 is occupied
+# ❌ INCORRECT: Run services on alternate ports
+# This breaks relative URL routing through Traefik
 
-# ✅ CORRECT: Free up the standard port
+# ✅ CORRECT: Free up the standard port and restart Traefik port-forward
 lsof -ti:3000 | xargs kill -9  # Kill process using port 3000
-npm run dev  # Now uses port 3000
+kubectl port-forward -n traefik-local svc/traefik 3000:80 &
 ```
 
 **When ports conflict during development:**
@@ -167,14 +181,15 @@ lsof -i:3000
 # 2. If it's an old/stale process, kill it
 kill -9 <PID>
 
-# 3. If it's a legitimate service, check if it should be running
-ps aux | grep <process-name>
+# 3. If it's a legitimate kubectl port-forward, it may have disconnected
+# Kill all port-forwards and restart
+pkill -f "kubectl port-forward"
 
-# 4. Restart the service on the correct port
-# (Example for dashboard on 3000)
-cd /Users/pwner/Git/ABS/blocksecops-dashboard
-npm run dev
+# 4. Restart port-forwards
+kubectl port-forward -n traefik-local svc/traefik 3000:80 &
 ```
+
+> **⚠️ IMPORTANT:** Do NOT run `npm run dev` locally for the dashboard. The dashboard runs inside Minikube and is accessed via Traefik. See [Dashboard Development Standards](./dashboard-development.md).
 
 ## Kubernetes Service Selector Standards
 
@@ -430,19 +445,19 @@ labels:
 
 ## Environment Configuration
 
-**Required `.env.local` for dashboard** (never commit this file):
+> **NOTE:** With the Traefik migration, the dashboard uses **relative URLs** for API calls (`/api/v1`). Traefik routes these requests to the API service. No `VITE_API_BASE_URL` is needed.
 
+**Dashboard environment** (built into container):
+
+The dashboard is built with relative URL configuration and runs inside Minikube. The API client (`src/lib/api/client.ts`) uses:
+```typescript
+const API_PREFIX = '/api/v1';  // Relative URL - routed by Traefik
+```
+
+**WebSocket configuration** (if needed):
 ```bash
-# Dashboard local development environment
-# Location: blocksecops-dashboard/.env.local
-
-# MANDATORY: Use 127.0.0.1 for local development
-VITE_API_BASE_URL=http://127.0.0.1:8000
+# For WebSocket connections that bypass Traefik
 VITE_WS_URL=ws://127.0.0.1:8003
-
-# Optional
-VITE_ENVIRONMENT=local
-VITE_DEBUG=true
 ```
 
 **CORS Configuration Template:**
@@ -482,15 +497,15 @@ def configure_cors(app):
 Before starting development work:
 
 - [ ] Minikube cluster is running with adequate resources (10GB memory, 6 CPUs)
-- [ ] All required services deployed
-- [ ] Port forwards configured to use `127.0.0.1`
-- [ ] Dashboard running on correct port 3000 (via `npm run dev`)
-- [ ] API service running on correct port 8000
-- [ ] Dashboard `.env.local` uses `127.0.0.1` endpoints
-- [ ] Backend CORS includes `127.0.0.1:3000`
-- [ ] All services have endpoints: `kubectl get endpoints -n <namespace>`
+- [ ] All required services deployed and healthy (`kubectl get pods -A`)
+- [ ] All services have endpoints: `kubectl get endpoints -A | grep -v kube-system`
+- [ ] Traefik port-forward active on 3000: `lsof -i :3000 | grep LISTEN`
+- [ ] Dashboard accessible via Traefik: `curl -s http://127.0.0.1:3000 | head -1`
+- [ ] API health passing via Traefik: `curl http://127.0.0.1:3000/api/v1/health/ready`
+- [ ] **NOT running `npm run dev` locally** (dashboard runs inside Minikube!)
 - [ ] Can access dashboard at `http://127.0.0.1:3000`
-- [ ] Can access API docs at `http://127.0.0.1:8000/docs`
+- [ ] Can access API docs at `http://127.0.0.1:3000/api/v1/docs`
+- [ ] No console errors in browser (F12 → Console tab)
 
 ---
 
