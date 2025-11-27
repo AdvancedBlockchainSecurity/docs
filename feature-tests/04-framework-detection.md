@@ -188,22 +188,27 @@ contract Token is ERC20 {
 
 ---
 
-## Test Projects
+## 9. Test Project Upload
 
-### Foundry Sample Location
-`TaskDocs-BlockSecOps/phases/03-phase-3.2-project-structure-support/test-projects/foundry-sample/`
+### 9.1 Foundry Sample Project
+- [ ] Upload foundry-sample.zip from test-projects directory
+- [ ] Framework detected as "foundry"
+- [ ] foundry.toml parsed correctly
+- [ ] remappings.txt applied
+- [ ] Token.sol identified as main file
 
-### Hardhat Sample Location
-`TaskDocs-BlockSecOps/phases/03-phase-3.2-project-structure-support/test-projects/hardhat-sample/`
+### 9.2 Hardhat Sample Project
+- [ ] Upload hardhat-sample.zip from test-projects directory
+- [ ] Framework detected as "hardhat"
+- [ ] hardhat.config.js parsed correctly
+- [ ] package.json dependencies extracted
+- [ ] Token.sol identified as main file
 
-### Create OpenZeppelin Test Project
-```bash
-mkdir oz-test && cd oz-test
-forge init
-forge install OpenZeppelin/openzeppelin-contracts
-# Create Token.sol with OZ imports
-zip -r oz-test.zip .
-```
+### 9.3 Contract URL Import
+- [ ] Import from raw GitHub URL succeeds
+- [ ] Import from Etherscan verified contract URL succeeds
+- [ ] Invalid URL returns appropriate error
+- [ ] Non-Solidity URL rejected
 
 ---
 
