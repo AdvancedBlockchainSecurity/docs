@@ -33,6 +33,7 @@ This directory contains manual testing checklists for all user-facing features o
 | [07-pricing-page.md](./07-pricing-page.md) | Pricing display and upgrade flows | P2 |
 | [08-api-responses.md](./08-api-responses.md) | API response validation | P2 |
 | [09-error-handling.md](./09-error-handling.md) | Error messages and edge cases | P2 |
+| [10-tier-upgrades.md](./10-tier-upgrades.md) | Free to Pro/Enterprise upgrade flows | P1 |
 
 ---
 

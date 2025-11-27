@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 1.14.0
-**Last Updated:** November 25, 2025
+**Version:** 1.15.0
+**Last Updated:** November 27, 2025
 **Status:** Active
 
 ## Semantic Versioning for Docker Images
@@ -653,6 +653,15 @@ Before deploying to production:
 0.4.0 - Added custom scanner selection (next)
 1.0.0 - Production release (future)
 ```
+
+## Current Image Versions (November 27, 2025)
+
+| Service | Version | Description |
+|---------|---------|-------------|
+| blocksecops-api-service | 0.3.x | API service |
+| blocksecops-dashboard | 0.5.8 | Frontend dashboard |
+| blocksecops-orchestration | 0.8.1 | Celery orchestration with multi-file project support |
+| scanner-soliditydefend | 0.2.1 | SolidityDefend scanner |
 
 ---
 
