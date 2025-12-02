@@ -846,164 +846,6 @@ Confidence: exact (all 3 scanners detected identical code at identical location)
 
 ---
 
-### `sboms`
-
-**PLANNED** (Phase 3.1) - Software Bill of Materials records.
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique SBOM identifier |
-| `contract_id` | UUID | NOT NULL, FK → contracts.id ON DELETE CASCADE | Associated contract |
-| `user_id` | UUID | NOT NULL, FK → users.id | SBOM owner |
-| `format` | sbom_format | NOT NULL | SBOM format (spdx_2_3, cyclonedx_1_5) |
-| `output_format` | sbom_output_format | NOT NULL | Output format (json, xml, yaml, rdf) |
-| `spdx_version` | VARCHAR(20) | NULLABLE | SPDX version (e.g., "2.3") |
-| `cyclonedx_version` | VARCHAR(20) | NULLABLE | CycloneDX version (e.g., "1.5") |
-| `document_namespace` | TEXT | NULLABLE | SBOM document namespace URI |
-| `creator` | TEXT | NOT NULL | SBOM creator information |
-| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | SBOM generation timestamp |
-| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
-| `component_count` | INTEGER | NOT NULL, DEFAULT 0 | Total number of components |
-| `vulnerability_count` | INTEGER | NOT NULL, DEFAULT 0 | Total vulnerabilities found |
-| `license_count` | INTEGER | NOT NULL, DEFAULT 0 | Number of unique licenses |
-| `sbom_data` | JSONB | NOT NULL | Full SBOM document (SPDX/CycloneDX JSON) |
-
-**Indexes:**
-- `ix_sboms_contract_id` on `contract_id`
-- `ix_sboms_user_id` on `user_id`
-- `ix_sboms_format` on `format`
-- `ix_sboms_created_at` on `created_at DESC`
-
-**Relationships:**
-- Many-to-one with `contracts` (contract_id, CASCADE DELETE)
-- Many-to-one with `users` (user_id)
-- One-to-many with `sbom_components`
-- One-to-many with `sbom_vulnerabilities`
-
----
-
-### `sbom_components`
-
-**PLANNED** (Phase 3.1) - Individual components/dependencies in SBOM.
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique component identifier |
-| `sbom_id` | UUID | NOT NULL, FK → sboms.id ON DELETE CASCADE | Parent SBOM |
-| `spdx_id` | VARCHAR(255) | NULLABLE | SPDX element identifier |
-| `name` | VARCHAR(255) | NOT NULL | Component name |
-| `version` | VARCHAR(100) | NULLABLE | Component version |
-| `package_manager` | VARCHAR(50) | NULLABLE | Package manager (npm, pip, cargo, etc.) |
-| `license` | VARCHAR(255) | NULLABLE | License identifier |
-| `supplier` | TEXT | NULLABLE | Component supplier/vendor |
-| `download_location` | TEXT | NULLABLE | Package download URL |
-| `homepage` | TEXT | NULLABLE | Component homepage URL |
-| `purl` | TEXT | NULLABLE | Package URL (purl) |
-| `cpe` | TEXT | NULLABLE | Common Platform Enumeration |
-| `type` | component_type | NOT NULL | Component type (library, application, framework, etc.) |
-| `is_direct_dependency` | BOOLEAN | NOT NULL, DEFAULT false | Direct vs transitive dependency |
-| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Discovery timestamp |
-
-**Indexes:**
-- `ix_sbom_components_sbom_id` on `sbom_id`
-- `ix_sbom_components_name` on `name`
-- `ix_sbom_components_package_manager` on `package_manager`
-- `ix_sbom_components_purl` on `purl` (for CVE lookups)
-
-**Relationships:**
-- Many-to-one with `sboms` (sbom_id, CASCADE DELETE)
-- One-to-many with `sbom_vulnerabilities`
-
----
-
-### `sbom_vulnerabilities`
-
-**PLANNED** (Phase 3.1) - Vulnerabilities found in SBOM components.
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique vulnerability identifier |
-| `sbom_id` | UUID | NOT NULL, FK → sboms.id ON DELETE CASCADE | Associated SBOM |
-| `component_id` | UUID | NOT NULL, FK → sbom_components.id ON DELETE CASCADE | Affected component |
-| `cve_id` | VARCHAR(50) | NULLABLE, INDEX | CVE identifier (e.g., CVE-2023-12345) |
-| `ghsa_id` | VARCHAR(50) | NULLABLE, INDEX | GitHub Advisory identifier |
-| `title` | VARCHAR(255) | NOT NULL | Vulnerability title |
-| `description` | TEXT | NOT NULL | Vulnerability description |
-| `severity` | vulnerability_severity | NOT NULL | Severity level |
-| `cvss_score` | NUMERIC(3,1) | NULLABLE | CVSS score (0.0-10.0) |
-| `cvss_vector` | VARCHAR(100) | NULLABLE | CVSS vector string |
-| `affected_versions` | TEXT[] | NULLABLE | Affected version ranges |
-| `fixed_versions` | TEXT[] | NULLABLE | Versions with fix |
-| `references` | JSONB | NULLABLE | Reference URLs (advisories, patches) |
-| `published_at` | TIMESTAMPTZ | NULLABLE | Vulnerability publication date |
-| `discovered_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | When we discovered it |
-
-**Indexes:**
-- `ix_sbom_vulnerabilities_sbom_id` on `sbom_id`
-- `ix_sbom_vulnerabilities_component_id` on `component_id`
-- `ix_sbom_vulnerabilities_cve_id` on `cve_id`
-- `ix_sbom_vulnerabilities_ghsa_id` on `ghsa_id`
-- `ix_sbom_vulnerabilities_severity` on `severity`
-
-**Relationships:**
-- Many-to-one with `sboms` (sbom_id, CASCADE DELETE)
-- Many-to-one with `sbom_components` (component_id, CASCADE DELETE)
-
----
-
-### `sbom_relationships`
-
-**PLANNED** (Phase 3.1) - Relationships between SBOM components.
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique relationship identifier |
-| `sbom_id` | UUID | NOT NULL, FK → sboms.id ON DELETE CASCADE | Associated SBOM |
-| `source_component_id` | UUID | NOT NULL, FK → sbom_components.id ON DELETE CASCADE | Source component |
-| `target_component_id` | UUID | NOT NULL, FK → sbom_components.id ON DELETE CASCADE | Target component |
-| `relationship_type` | relationship_type | NOT NULL | Relationship type (depends_on, contains, etc.) |
-| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Relationship discovery timestamp |
-
-**Indexes:**
-- `ix_sbom_relationships_sbom_id` on `sbom_id`
-- `ix_sbom_relationships_source_component` on `source_component_id`
-- `ix_sbom_relationships_target_component` on `target_component_id`
-
-**Relationships:**
-- Many-to-one with `sboms` (sbom_id, CASCADE DELETE)
-- Many-to-one with `sbom_components` (source_component_id, CASCADE DELETE)
-- Many-to-one with `sbom_components` (target_component_id, CASCADE DELETE)
-
----
-
-### `sbom_licenses`
-
-**PLANNED** (Phase 3.1) - License information from SBOM.
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique license identifier |
-| `sbom_id` | UUID | NOT NULL, FK → sboms.id ON DELETE CASCADE | Associated SBOM |
-| `component_id` | UUID | NULLABLE, FK → sbom_components.id ON DELETE CASCADE | Associated component (nullable for SBOM-level licenses) |
-| `license_id` | VARCHAR(255) | NOT NULL | SPDX license identifier |
-| `license_name` | VARCHAR(255) | NOT NULL | Human-readable license name |
-| `license_text` | TEXT | NULLABLE | Full license text |
-| `is_osi_approved` | BOOLEAN | NOT NULL, DEFAULT false | OSI approved license |
-| `is_copyleft` | BOOLEAN | NOT NULL, DEFAULT false | Copyleft license |
-| `license_url` | TEXT | NULLABLE | License reference URL |
-| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Discovery timestamp |
-
-**Indexes:**
-- `ix_sbom_licenses_sbom_id` on `sbom_id`
-- `ix_sbom_licenses_component_id` on `component_id`
-- `ix_sbom_licenses_license_id` on `license_id`
-
-**Relationships:**
-- Many-to-one with `sboms` (sbom_id, CASCADE DELETE)
-- Many-to-one with `sbom_components` (component_id, CASCADE DELETE, optional)
-
----
-
 ## ENUM Types
 
 ### `contract_language`
@@ -1112,11 +954,24 @@ Vulnerability lifecycle tracking.
 
 **PLANNED** (Phase 3.1) - SBOM format specification.
 
-**Values:**
+**⚠️ STATUS: FULLY REVERTED (November 30, 2025)**
+
+SBOM feature was completely rolled back:
+1. **API Endpoints**: Reverted via `git revert` (commit efd2b6f)
+2. **Database Tables**: Removed via `alembic downgrade 20251128_1600`
+3. **Migration File**: `20251129_1000-add_sbom_tables.py` removed
+4. **Historical Data**: 7 SBOM scans and 3 related vulnerabilities deleted
+
+The `sboms` and `sbom_components` tables no longer exist. SBOM functionality will be reimplemented in a future sprint with:
+- Proper testing against authentication flow
+- Isolated deployment to prevent auth conflicts
+- Full integration with SolidityBOM scanner
+
+**Values (for future reference):**
 - `spdx_2_3` - SPDX version 2.3
 - `cyclonedx_1_5` - CycloneDX version 1.5
 
-**Usage:** `sboms.format`
+**Usage:** N/A - tables removed
 
 ---
 
@@ -1327,8 +1182,8 @@ See [Platform Development Standards](/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPM
 
 ---
 
-**Document Version:** 1.3.0
-**Last Updated:** November 25, 2025 (Phase 3.2 - Framework Support)
+**Document Version:** 1.3.2
+**Last Updated:** November 30, 2025 (SBOM tables removed via alembic downgrade)
 **Maintained By:** BlockSecOps Team
 
 ---

@@ -279,7 +279,7 @@ kubectl apply -k k8s/overlays/local/postgresql/
 |-----------|--------|----------|
 | PostgreSQL running and accepting connections | ✅ | Pod: postgresql-0 (1/1 Ready) |
 | All 15+ tables created via migrations | ✅ | `\dt` shows all tables |
-| Vulnerability patterns loaded (352 patterns) | ⚠️ | Not verified yet |
+| Vulnerability patterns loaded (393 patterns) | ✅ | v3.13, 637 mappings |
 | Clean database (0 scans, 0 old data) | ✅ | Verified via SQL queries |
 | Schema aligns with SCHEMA.md v3.0.2 | ✅ | 100% field alignment verified |
 | Test scan has proper `scanners_used` field | ❌ | **BUG**: Field is NULL |

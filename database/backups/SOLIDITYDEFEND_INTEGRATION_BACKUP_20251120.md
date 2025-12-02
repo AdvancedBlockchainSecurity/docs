@@ -227,5 +227,33 @@ After Integration:
 ---
 
 **Created By:** Advanced Blockchain Security
-**Last Updated:** November 20, 2025 23:10:22 MST
+**Last Updated:** November 28, 2025
 **Status:** ✅ Integration Complete - Database Updated Successfully
+
+---
+
+## Post-Integration Sync (November 28, 2025)
+
+### SolidityDefend v1.4.1 Sync
+
+The SolidityDefend detector list was synced with the official `all_detectors.json` from the CLI tool:
+
+**Changes:**
+- **Removed 8 stale mappings** not in SolidityDefend v1.4.1:
+  - array-bounds-check, default-visibility, division-before-multiplication, invalid-state-transition
+  - missing-access-modifiers, missing-zero-address-check, parameter-consistency, unprotected-initializer
+
+- **Added 6 new ERC-7683 & AA detectors** from v1.4.1:
+  - aa-nonce-management-advanced → BVD-SOLIDITY-AA-001
+  - erc7683-cross-chain-replay → BVD-SOLIDITY-INTENT-001
+  - erc7683-filler-frontrunning → BVD-SOLIDITY-MEV-001
+  - erc7683-oracle-dependency → BVD-SOLIDITY-ORACLE-002
+  - erc7683-settlement-validation → BVD-SOLIDITY-INTENT-001
+  - erc7683-unsafe-permit2 → BVD-SOLIDITY-TOK-004
+
+### Updated Statistics (v3.13)
+- **Version:** v3.13 (was v3.11)
+- **Total Patterns:** 393
+- **Total Mappings:** 637
+- **SolidityDefend Mappings:** 215 (was 204, net -8+6 = 213... corrected to 215)
+- **SolidityDefend Version:** v1.4.1

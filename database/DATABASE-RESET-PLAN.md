@@ -207,7 +207,7 @@ curl -s -b /tmp/cookies.txt "http://127.0.0.1:8000/api/v1/scans?limit=10" | jq '
 
 # Verify vulnerability patterns loaded
 curl -s -b /tmp/cookies.txt "http://127.0.0.1:8000/api/v1/intelligence/patterns?limit=10" | jq '.total'
-# Expected: 352
+# Expected: 393
 
 # Verify user created
 curl -s -b /tmp/cookies.txt "http://127.0.0.1:8000/api/v1/users/me" | jq '.email'
@@ -307,7 +307,7 @@ kubectl scale deployment/api-service -n api-service-local --replicas=1
 1. PostgreSQL is running and accepting connections
 2. All migrations completed successfully
 3. Schema matches SCHEMA.md (migration 013)
-4. Vulnerability patterns loaded (352 patterns)
+4. Vulnerability patterns loaded (393 patterns)
 5. Test scan with Wake has proper `scanner_ids: ["wake"]` (not null)
 6. Dashboard scanner selection works (no auto-loading from localStorage)
 7. No vulnerabilities appear with `scanner_id: null`

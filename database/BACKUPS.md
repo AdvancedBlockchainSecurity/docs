@@ -286,6 +286,85 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 
 ---
 
+## November 28, 2025 - Phase 3.4 Contract Structure Analysis Migration
+
+### Backup Details
+**Filename:** `solidity_security_backup_20251128_231123.sql`
+**Location:** `/Users/pwner/Git/ABS/docs/database/backups/solidity_security_backup_20251128_231123.sql`
+**Created:** November 28, 2025 23:11:23 PST
+**Size:** 1.1MB (1,110,981 bytes)
+**Database Version:** PostgreSQL 15
+**Backup Method:** kubectl exec pg_dump from within cluster
+
+### Database State Before Migration
+**Tables:**
+- `contracts`: Existing contracts with framework support columns
+- `scans`: Existing scan records
+- `vulnerabilities`: Existing vulnerability records
+- `vulnerability_patterns`: 352 patterns (BVD compliant)
+- `pattern_tool_mappings`: 398 mappings
+
+**Schema Version:** Migration `add_framework_support` (Phase 3.2)
+
+### Reason for Backup
+Created before running Phase 3.4 Contract Structure Analysis database migration which adds:
+- `contract_functions` table - Extracted function definitions from Solidity AST
+- `contract_events` table - Extracted event definitions
+- `contract_state_variables` table - Extracted state variable definitions
+- New columns on `contracts` table: `structure_analyzed`, `structure_analyzed_at`, `structure_parse_errors`
+
+### Changes Applied After This Backup
+```sql
+-- Migration 20251128_1600 applied:
+-- Created contract_functions table with indexes
+-- Created contract_events table with indexes
+-- Created contract_state_variables table with indexes
+-- Added structure analysis columns to contracts table
+```
+
+### Database State After Migration
+**New Tables Created:**
+- `contract_functions`: Function definitions (name, selector, visibility, mutability, parameters, etc.)
+- `contract_events`: Event definitions (name, signature, topic0, parameters, anonymous flag)
+- `contract_state_variables`: State variable definitions (name, type, visibility, mutability, storage slot)
+
+**New Indexes:**
+- `idx_functions_contract`, `idx_functions_name`, `idx_functions_selector`, `idx_functions_visibility`
+- `idx_events_contract`, `idx_events_name`, `idx_events_topic0`
+- `idx_variables_contract`, `idx_variables_name`, `idx_variables_type`, `idx_variables_visibility`
+
+**Schema Version:** Migration `20251128_1600` (Phase 3.4)
+
+### Restore Command
+```bash
+# Stop API service to prevent concurrent access
+kubectl scale deployment/api-service -n api-service-local --replicas=0
+
+# Restore database
+kubectl cp /Users/pwner/Git/ABS/docs/database/backups/solidity_security_backup_20251128_231123.sql \
+  postgresql-local/postgresql-0:/tmp/restore.sql
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U postgres -d solidity_security -f /tmp/restore.sql
+
+# Restart API service
+kubectl scale deployment/api-service -n api-service-local --replicas=1
+
+# Verify restoration
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U postgres -d solidity_security \
+  -c "SELECT 'contracts' as table, COUNT(*) FROM contracts
+      UNION ALL SELECT 'contract_functions', COUNT(*) FROM contract_functions
+      UNION ALL SELECT 'contract_events', COUNT(*) FROM contract_events
+      UNION ALL SELECT 'contract_state_variables', COUNT(*) FROM contract_state_variables;"
+```
+
+### Related Documentation
+- [SCHEMA.md](/Users/pwner/Git/ABS/docs/database/SCHEMA.md) - Updated with Phase 3.4 tables
+- [Phase 3.4 Documentation](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/PHASE-3.4-CONTRACT-STRUCTURE-ANALYSIS-COMPLETE.md)
+- [Migration File](/Users/pwner/Git/ABS/blocksecops-api-service/alembic/versions/20251128_1600-add_contract_structure_tables.py)
+
+---
+
 ## Notes
 
 - All backups include `--clean --if-exists` flags to drop existing objects before restore

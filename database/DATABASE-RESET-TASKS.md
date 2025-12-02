@@ -102,7 +102,7 @@
   - Destination: `/Users/pwner/Git/ABS/database/backups/pre-reset-20251105/vulnerability_patterns.json`
   - Command: `cp /Users/pwner/Git/ABS/blocksecops-api-service/data/vulnerability_patterns.json /Users/pwner/Git/ABS/database/backups/pre-reset-20251105/`
   - Verify: `jq '.patterns | length' /Users/pwner/Git/ABS/database/backups/pre-reset-20251105/vulnerability_patterns.json`
-  - Expected: 352 patterns
+  - Expected: 393 patterns
   - Estimated time: 1 minute
 
 - [ ] **TASK-013:** Verify BVD compliance
@@ -229,7 +229,7 @@
   - Check if API service auto-loads patterns on startup
   - Query: `curl -s http://127.0.0.1:8000/api/v1/intelligence/patterns?limit=1 | jq '.total'`
   - If 0, run manual seed: `cd /Users/pwner/Git/ABS/blocksecops-api-service && python3 scripts/seed_vulnerability_patterns.py`
-  - Expected: 352 patterns
+  - Expected: 393 patterns
   - Estimated time: 2 minutes
 
 - [ ] **TASK-031:** Create test user
@@ -294,7 +294,7 @@
 
 - [ ] **TASK-038:** Verify vulnerability patterns loaded
   - Command: `curl -s -b /tmp/cookies.txt "http://127.0.0.1:8000/api/v1/intelligence/patterns?limit=1" | jq '.total'`
-  - Expected: 352
+  - Expected: 393
   - Estimated time: 1 minute
 
 - [ ] **TASK-039:** Verify pattern-tool mappings loaded
@@ -518,7 +518,7 @@
     Changes:
     - Complete PostgreSQL PVC deletion and recreation
     - Migrations re-run via SQLAlchemy auto-migration
-    - Vulnerability patterns re-seeded (352 patterns, 398 mappings)
+    - Vulnerability patterns re-seeded (393 patterns, 637 mappings)
     - Clean slate for testing strict scanner selection
 
     Backup: /Users/pwner/Git/ABS/database/backups/pre-reset-20251105.tar.gz

@@ -1,7 +1,7 @@
 # Port-Forwarding Standards
 
-**Version:** 2.0.0
-**Last Updated:** November 24, 2025
+**Version:** 2.1.0
+**Last Updated:** November 28, 2025
 **Status:** Active
 
 ## Overview
@@ -18,7 +18,7 @@ This document defines the standard port-forwarding configuration for local devel
 | **9090** | API Service | `api-service-local` | 9090 | Prometheus metrics |
 | **8001** | Data Service | `data-service-local` | 8001 | Data aggregation API |
 | **8002** | Intelligence Engine | `intelligence-engine-local` | 80 | ML/AI intelligence API |
-| **8003** | Notification Service | `notification-local` | 8003 | Notification/alert API |
+| **8003** | Notification Service | `notification-local` | 8003 | Notification API + WebSocket |
 | **8004** | Orchestration Service | `orchestration-local` | 8004 | Scan orchestration API |
 | **8005** | Tool Integration | `tool-integration-local` | 8005 | Scanner integration API |
 
@@ -58,7 +58,7 @@ kubectl port-forward -n data-service-local svc/data-service 8001:8001 &
 # Intelligence Engine
 kubectl port-forward -n intelligence-engine-local svc/intelligence-engine 8002:80 &
 
-# Notification Service
+# Notification Service (HTTP API + WebSocket on same port)
 kubectl port-forward -n notification-local svc/notification 8003:8003 &
 
 # Orchestration Service
@@ -84,7 +84,7 @@ echo "  API Service:      http://127.0.0.1:3000/api/v1 (via Traefik)"
 echo "  API Metrics:      http://127.0.0.1:9090"
 echo "  Data Service:     http://127.0.0.1:8001"
 echo "  Intelligence:     http://127.0.0.1:8002"
-echo "  Notifications:    http://127.0.0.1:8003"
+echo "  Notifications:    http://127.0.0.1:8003 (WebSocket: ws://127.0.0.1:8003/ws/)"
 echo "  Orchestration:    http://127.0.0.1:8004"
 echo "  Tool Integration: http://127.0.0.1:8005"
 echo "  PostgreSQL:       postgresql://localhost:5432"
@@ -192,6 +192,49 @@ routes:
 - `http://127.0.0.1:3000` → Dashboard UI
 - `http://127.0.0.1:3000/api/v1/...` → API Service (matches PathPrefix `/api`)
 - This mirrors production where all traffic goes through a single ingress point
+
+### Notification Service Ports
+
+The notification service uses a single port for both HTTP API and WebSocket connections:
+
+**File**: `blocksecops-notification/k8s/base/service.yaml`
+```yaml
+ports:
+- port: 8003
+  targetPort: 8003
+  name: http
+  protocol: TCP
+```
+
+- **Port 8003**: HTTP REST API + WebSocket (at `/ws/` path)
+
+**Endpoints**:
+- `/` - Service status
+- `/api/v1/health/live` - Liveness probe
+- `/api/v1/health/ready` - Readiness probe (includes Redis check)
+- `/api/v1/info` - Service information
+- `/api/v1/notifications` - Notification management
+- `/ws/` - WebSocket endpoint for real-time updates
+- `/docs` - OpenAPI documentation
+
+**Port-Forward Command**:
+```bash
+kubectl port-forward -n notification-local svc/notification 8003:8003
+```
+
+**When to Start Notification Service**:
+
+| Use Case | Required? |
+|----------|-----------|
+| Basic dashboard usage (scans, viewing results) | **No** |
+| Real-time scan status updates in dashboard | Yes |
+| Receiving webhook notifications from CI/CD | Yes |
+| Email/Slack/Teams alerts | Yes |
+| API-triggered notifications | Yes |
+
+**Note**: The Notification Service is **optional** for basic local development. The core workflow (creating scans, viewing vulnerabilities) works without it. Only port-forward when you need:
+- Real-time WebSocket updates in the dashboard (`ws://127.0.0.1:8003/ws/`)
+- Webhook/notification testing for Phase 4.5 features
 
 ### API Service Ports
 

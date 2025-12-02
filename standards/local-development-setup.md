@@ -1,8 +1,38 @@
 # Local Development Setup Standards
 
-**Version:** 2.0.0
-**Last Updated:** November 27, 2025
+**Version:** 2.1.0
+**Last Updated:** November 30, 2025
 **Status:** Active
+
+> **Major Update (v2.1.0):** Added Production Parity Principle. All traffic MUST go through Traefik ingress controller. Port-forward to Traefik, NOT directly to services.
+
+## Production Parity Principle
+
+**CRITICAL REQUIREMENT:** Local development MUST replicate production routing and architecture.
+
+| Aspect | Local Environment | Production Environment | Parity Required |
+|--------|-------------------|------------------------|-----------------|
+| Ingress Controller | Traefik v3.6+ | Traefik v3.6+ | **YES** |
+| API Routing | Traefik routes `/api/*` to API service | Traefik routes `/api/*` to API service | **YES** |
+| Single Entry Point | All traffic through Traefik on port 3000 | All traffic through ingress | **YES** |
+| Container Runtime | Minikube Docker | AWS EKS | Similar |
+| TLS/SSL | Self-signed (optional) | cert-manager | Acceptable deviation |
+
+### Why Production Parity Matters
+
+- **Test real routing**: API routing through Traefik is tested locally the same way it works in production
+- **Single entry point**: All traffic goes through Traefik, just like production
+- **Consistent debugging**: Routing issues are caught during local development, not after deployment
+
+### Deviation Notification Requirement
+
+**If production parity cannot be achieved for any reason:**
+1. **STOP** - Do not proceed with a non-production-like solution
+2. **DOCUMENT** - Create an issue describing the deviation
+3. **NOTIFY** - Alert the team lead before implementing
+4. **DECIDE** - Wait for approval on how to proceed
+
+This ensures we catch production issues during local development, not after deployment.
 
 ## Minikube Configuration
 

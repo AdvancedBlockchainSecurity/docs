@@ -1,7 +1,7 @@
 # BlockSecOps Feature Test Checklists
 
 **Created**: November 25, 2025
-**Last Updated**: November 25, 2025
+**Last Updated**: December 1, 2025
 
 ---
 
@@ -34,6 +34,10 @@ This directory contains manual testing checklists for all user-facing features o
 | [08-api-responses.md](./08-api-responses.md) | API response validation | P2 |
 | [09-error-handling.md](./09-error-handling.md) | Error messages and edge cases | P2 |
 | [10-tier-upgrades.md](./10-tier-upgrades.md) | Free to Pro/Enterprise upgrade flows | P1 |
+| [11-wallet-authentication.md](./11-wallet-authentication.md) | MetaMask/WalletConnect auth (Phase 3.3) | P1 |
+| [12-enhanced-contract-details.md](./12-enhanced-contract-details.md) | Contract metadata, security score, dependencies (Phase 3.4) | P2 |
+| [13-vyper-rust-scanners.md](./13-vyper-rust-scanners.md) | Vyper & Solana/Rust scanner integration (Phase 3.5) | P2 |
+| [14-enterprise-features.md](./14-enterprise-features.md) | Webhooks, RBAC, SSO, API Keys, Audit Logs (Phase 4.5) | P1 |
 
 ---
 
@@ -49,11 +53,15 @@ This directory contains manual testing checklists for all user-facing features o
 - Framework detection (Foundry/Hardhat)
 - Smart dependency extraction
 - Projects feature
+- Wallet authentication (MetaMask/WalletConnect)
+- Enterprise features (Webhooks, RBAC, SSO, API Keys)
 
 **P2 - Medium**
 - Pricing page
 - API response validation
 - Error handling
+- Enhanced contract details (metadata, security score, dependencies)
+- Vyper & Solana/Rust scanner integration
 
 ---
 
@@ -86,3 +94,4 @@ _Record test session notes here:_
 - Phase 3.2 README: `TaskDocs-BlockSecOps/phases/03-phase-3.2-project-structure-support/README.md`
 - Quota Spec: `TaskDocs-BlockSecOps/phases/FREEMIUM-MODEL/PRICING-TIERS-SPECIFICATION.md`
 - Framework Support: `blocksecops-docs/features/framework-support.md`
+- ~~SBOM API: `blocksecops-docs/api/sbom-api.md`~~ (ROLLED BACK Nov 30, 2025)

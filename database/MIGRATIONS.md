@@ -137,11 +137,31 @@ Due to database state inconsistencies after the 2025-11-05 database reset, the s
    - Version number may increment even if migration rolled back
    - Always verify table creation, not just alembic version number
 
-## Current Database State (2025-11-06)
+### Migration 20251129_1000: SBOM Tables (REVERTED)
+- **Status**: ⚠️ REVERTED (November 30, 2025)
+- **Revision ID**: `20251129_1000`
+- **Previous Revision**: `20251128_1600`
+- **Description**: Added SBOM (Software Bill of Materials) tables for supply chain security
+- **Tables Created (then removed)**:
+  - `sboms` - SBOM records with CycloneDX/SPDX format support
+  - `sbom_components` - Individual SBOM component details
+- **Reason for Revert**: SBOM implementation caused authentication conflicts (phantom accounts in dashboard)
+- **Rollback Process**:
+  1. API code reverted via `git revert efd2b6f` (reverts commit 47a54aa)
+  2. Migration file restored from git history
+  3. `alembic upgrade 20251129_1000` to recreate tables
+  4. `alembic downgrade 20251128_1600` to properly remove tables
+  5. Migration file removed
+  6. Historical data cleaned: 7 SBOM scans, 3 vulnerabilities deleted
+- **Lesson Learned**: Always run `alembic downgrade` BEFORE `git revert` when rolling back features with migrations
+
+---
+
+## Current Database State (2025-11-30)
 
 ### Alembic Version
 ```
-version_num: 005
+version_num: 20251128_1600
 ```
 
 ### Existing Tables
@@ -235,6 +255,45 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 2. Use: `kubectl exec -n api-service-local <pod-name> -- alembic upgrade head`
 3. Do NOT run migrations from local machine unless development environment is fully configured
 
+## Pending Migrations: Phase 4.5 Enterprise Features
+
+### Migration 013: Wallet Authentication (Phase 3.3)
+- **Status**: ⏳ Pending
+- **Description**: Add wallet authentication fields to users table
+- **Changes**:
+  - Add `wallet_address` VARCHAR(42) column to users table
+  - Add `wallet_nonce` VARCHAR(255) column
+  - Add `wallet_linked_at` TIMESTAMP column
+  - Add `ens_name` VARCHAR(255) column
+  - Add unique constraint on wallet_address
+  - Add index on wallet_address
+
+### Migration 014: Enterprise Features (Phase 4.5)
+- **Status**: ⏳ Pending
+- **Description**: Enterprise webhook, RBAC, SSO, API key, and audit log tables
+- **Tables to Create**:
+  - `webhooks` - Webhook configuration with HMAC signing
+  - `webhook_deliveries` - Webhook delivery history and retry tracking
+  - `organizations` - Multi-tenant organization support
+  - `roles` - RBAC role definitions with permissions
+  - `organization_members` - Organization membership and role assignments
+  - `api_keys` - Scoped API key management with rate limits
+  - `audit_logs` - Comprehensive audit trail for compliance
+- **Model Reference**: `/Users/pwner/Git/ABS/blocksecops-api-service/src/infrastructure/database/models.py`
+- **Feature Documentation**: `/Users/pwner/Git/ABS/docs/features/PHASE-4.5-ENTERPRISE-FEATURES.md`
+
+### Creating Phase 4.5 Migration
+```bash
+# Generate migration from models
+cd /Users/pwner/Git/ABS/blocksecops-api-service
+alembic revision --autogenerate -m "add_enterprise_features_tables"
+
+# Or create manually
+alembic revision -m "add_enterprise_features_tables"
+```
+
+---
+
 ## Next Steps
 
 1. ✅ Migration 005 completed (manual SQL execution)
@@ -242,3 +301,5 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 3. ⏳ Apply migrations 006-013 to complete intelligence layer
 4. ⏳ Load vulnerability pattern data into `vulnerability_patterns` table
 5. ⏳ Populate `pattern_tool_mappings` with scanner detector mappings
+6. ⏳ Create and apply Migration 013 for wallet authentication (Phase 3.3)
+7. ⏳ Create and apply Migration 014 for enterprise features (Phase 4.5)

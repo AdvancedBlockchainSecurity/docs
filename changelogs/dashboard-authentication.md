@@ -379,6 +379,35 @@ This fix ensures compliance with React's Rules of Hooks:
 
 ## Version History
 
+### v0.5.11 - November 29, 2025
+**Project Contract Association - Add Existing Contracts**
+- Added ContractSelectorModal component for selecting existing contracts
+- Added "Add Existing" button to ProjectDetail page
+- Integrated with `POST /projects/{id}/contracts` API endpoint
+- Multi-select with checkboxes and search filtering
+- Updated empty state to show both "Add Existing" and "Upload New" options
+- Documentation: `/Users/pwner/Git/ABS/blocksecops-docs/frontend/project-contracts-frontend.md`
+
+### v0.5.10 - November 29, 2025
+**Project Detail Add Contract Button Fix**
+- Fixed "Add Contract" button on ProjectDetail page (was non-functional)
+- Added ContractUploadModal import and integration
+- Added `showContractModal` state management
+- Added `refetch` from useProject hook for data refresh after upload
+- Buttons now open ContractUploadModal for new contract uploads
+
+### v0.5.9 - November 29, 2025
+**Real-Time Notifications & Auto-Refresh**
+- Added ToastContext for global notification state management
+- Added ToastContainer component with animated UI
+- Added useNotifications hook for WebSocket-to-toast integration
+- Added useNotify hook for manual notifications
+- Added NotificationHandler component (global WebSocket subscriber)
+- Added auto-refresh toggle to Analytics dashboard (30-second interval)
+- Added "Live" indicator and "Last updated" timestamp
+- Added visibility-based data refresh when tab becomes visible
+- Documentation: `/Users/pwner/Git/ABS/blocksecops-docs/frontend/notification-frontend.md`
+
 ### v1.1.1 - November 21, 2025
 **React Hooks Violation Fix**
 - Fixed critical blank screen issue
@@ -401,5 +430,5 @@ This fix ensures compliance with React's Rules of Hooks:
 ---
 
 **Changelog Status:** Current
-**Last Updated:** November 21, 2025
+**Last Updated:** November 29, 2025
 **Next Review:** Before production deployment

@@ -1,10 +1,45 @@
 # Dashboard Development Standards
 
-**Version:** 2.0.0
-**Last Updated:** November 27, 2025
+**Version:** 2.3.0
+**Last Updated:** November 30, 2025
 **Status:** Active
 
-> **Major Update (v2.0.0):** Dashboard now runs inside Minikube and is accessed via Traefik ingress controller. Do NOT run `npm run dev` locally - see [Port-Forwarding Standards](./port-forwarding.md) for the correct setup.
+> **Major Update (v2.3.0):** All traffic MUST go through Traefik ingress controller. Port-forward to Traefik, NOT directly to services. This ensures API routing works correctly.
+
+## Production Parity Principle
+
+**CRITICAL REQUIREMENT:** Local development MUST replicate production routing and architecture.
+
+| Aspect | Local Environment | Production Environment | Parity Required |
+|--------|-------------------|------------------------|-----------------|
+| Ingress Controller | Traefik v3.6+ | Traefik v3.6+ | **YES** |
+| API Routing | Traefik routes `/api/*` to API service | Traefik routes `/api/*` to API service | **YES** |
+| Single Entry Point | All traffic through Traefik on port 3000 | All traffic through ingress | **YES** |
+| Container Runtime | Minikube Docker | AWS EKS | Similar |
+| TLS/SSL | Self-signed (optional) | cert-manager | Acceptable deviation |
+
+### Deviation Notification Requirement
+
+**If production parity cannot be achieved for any reason:**
+1. **STOP** - Do not proceed with a non-production-like solution
+2. **DOCUMENT** - Create an issue describing the deviation
+3. **NOTIFY** - Alert the team lead before implementing
+4. **DECIDE** - Wait for approval on how to proceed
+
+This ensures we catch production issues during local development, not after deployment.
+
+## Anti-Patterns - DO NOT
+
+| Anti-Pattern | Why It's Wrong | Correct Approach |
+|--------------|----------------|------------------|
+| Running `npm run dev` in container | Development server differs from production | Use production build with `serve -s dist` |
+| Running `npm run dev` locally | Dashboard must run in cluster to match production architecture | Access via Traefik port-forward |
+| Port-forward directly to dashboard | Bypasses Traefik, breaks API routing | Port-forward to Traefik: `kubectl port-forward -n traefik-local svc/traefik 3000:80` |
+| Port-forward directly to API on separate port | Doesn't test production routing paths | Access API through Traefik at `localhost:3000/api/v1/*` |
+| Direct API calls from localhost | Bypasses Traefik routing, doesn't test ingress paths | Access API through Traefik at `localhost:3000/api/v1/*` |
+| Building dashboard outside cluster | Images must be built in Minikube Docker context | Use `eval $(minikube docker-env)` before `docker build` |
+
+**The dashboard is NEVER started locally. It ALWAYS runs inside the Kubernetes cluster with a PRODUCTION BUILD.**
 
 ## CRITICAL: Python 3.13 Compatibility Issue
 
@@ -89,7 +124,7 @@ kubectl get endpoints -n traefik-local traefik
 
 ### Step 3: Start Required Port-Forwards
 
-**IMPORTANT:** With the Traefik migration, you only need the Traefik port-forward for dashboard access. Traefik routes requests to both dashboard and API services.
+**CRITICAL:** You MUST port-forward to **Traefik**, NOT directly to dashboard or API services. Direct port-forwards break API routing and don't test the production ingress path.
 
 ```bash
 # Kill any existing port-forwards first
@@ -98,7 +133,8 @@ pkill -f "kubectl port-forward" 2>/dev/null
 # Wait for processes to die
 sleep 2
 
-# 1. Traefik Ingress (PRIMARY - routes to dashboard AND API)
+# 1. Traefik Ingress (PRIMARY - routes to BOTH dashboard AND API)
+#    This is the ONLY way to access the dashboard correctly!
 kubectl port-forward -n traefik-local svc/traefik 3000:80 > /tmp/pf-traefik.log 2>&1 &
 echo "Traefik port-forward started on 3000"
 
@@ -118,16 +154,31 @@ lsof -i :3000,5432,6379 | grep LISTEN
 ```
 
 **How Traefik Routing Works:**
-- `http://127.0.0.1:3000` → Dashboard UI (served by dashboard pod)
+- `http://127.0.0.1:3000/` → Dashboard UI (served by dashboard pod)
 - `http://127.0.0.1:3000/api/v1/*` → API Service (routed by Traefik based on path prefix)
 
 This mirrors production architecture where all traffic goes through a single ingress point.
 
-**Why NOT use direct port-forward to API service?**
-- Port-forwarding to a **service** creates a connection to the underlying pods
-- Port-forwarding to a **deployment** automatically handles pod restarts
-- When a pod is replaced (during rollout), deployment port-forward reconnects automatically
-- Service port-forward will die when the old pod terminates
+**INCORRECT Port-Forward Setup (DO NOT USE):**
+```bash
+# ❌ WRONG - Direct port-forward to dashboard
+kubectl port-forward -n dashboard-local svc/dashboard 3000:3000
+
+# ❌ WRONG - Direct port-forward to API on separate port
+kubectl port-forward -n api-service-local svc/api-service 8000:8000
+```
+
+**Why direct port-forwards are WRONG:**
+- Dashboard makes API calls to `/api/v1/*` (relative URL)
+- With direct dashboard port-forward, these requests go to the dashboard container
+- Dashboard container has no API - requests fail
+- This causes auth failures, missing contracts, and other routing issues
+
+**CORRECT Port-Forward Setup (ALWAYS USE):**
+```bash
+# ✅ CORRECT - Port-forward to Traefik which routes both services
+kubectl port-forward -n traefik-local svc/traefik 3000:80
+```
 
 **Expected output:**
 ```
@@ -447,7 +498,216 @@ curl -s http://127.0.0.1:3000/api/v1/health/live
 
 ---
 
+## Real-Time Updates and Notifications (v2.1.0)
+
+**Added:** November 29, 2025
+
+The dashboard includes a real-time notification system that integrates with WebSocket events for live scan updates and toast notifications.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                 Notification Service (8003)                 │
+│  WebSocket: ws://127.0.0.1:8003/ws/                         │
+└─────────────────┬───────────────────────────────────────────┘
+                  │ WebSocket Events
+                  ▼
+┌─────────────────────────────────────────────────────────────┐
+│               WebSocketManager (Singleton)                  │
+│  Location: src/lib/websocket/WebSocketManager.ts            │
+│  Events: scan_progress, scan_completed, vulnerability_found │
+└─────────────────┬───────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────┐
+│                useNotifications Hook                        │
+│  Location: src/hooks/useNotifications.ts                    │
+│  Subscribes to WebSocket events and triggers toasts         │
+└─────────────────┬───────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   ToastContext                              │
+│  Location: src/contexts/ToastContext.tsx                    │
+│  Manages toast state, auto-dismiss, actions                 │
+└─────────────────┬───────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  ToastContainer                             │
+│  Location: src/components/common/ToastContainer.tsx         │
+│  Renders toast notifications UI                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Key Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `ToastContext` | `src/contexts/ToastContext.tsx` | Toast state management and provider |
+| `ToastContainer` | `src/components/common/ToastContainer.tsx` | Toast UI rendering |
+| `useNotifications` | `src/hooks/useNotifications.ts` | WebSocket-to-toast integration |
+| `useNotify` | `src/hooks/useNotifications.ts` | Manual notification helper |
+| `NotificationHandler` | `src/components/common/NotificationHandler.tsx` | Global notification subscriber |
+
+### Toast Types
+
+| Type | Color | Duration | Use Case |
+|------|-------|----------|----------|
+| `success` | Green | 4s | Scan completed, export successful |
+| `error` | Red | 6s | Scan failed, API errors |
+| `warning` | Yellow | 5s | Quota near limit, issues found |
+| `info` | Blue | 4s | Scan started, general info |
+
+### WebSocket Events
+
+The notification system subscribes to these events from `WebSocketManager`:
+
+| Event | Handler | Toast Type |
+|-------|---------|------------|
+| `connection_status` | Connection state changes | success/warning |
+| `scan_progress` | Scan milestone updates (25%, 50%, 75%, 100%) | info |
+| `scan_completed` | Scan finished with results | success/warning/error |
+| `vulnerability_found` | New vulnerability detected | severity-based |
+
+### Notification Settings
+
+```typescript
+interface NotificationSettings {
+  scanProgress: boolean;      // Show progress milestones (default: false - too noisy)
+  scanCompletion: boolean;    // Show scan completion (default: true)
+  vulnerabilities: boolean;   // Show vulnerability alerts (default: true)
+  criticalOnly: boolean;      // Only high/critical severity (default: false)
+  connectionStatus: boolean;  // Show connection changes (default: true)
+}
+```
+
+### Usage Examples
+
+**Using useNotify for manual notifications:**
+
+```typescript
+import { useNotify } from '@/hooks/useNotifications';
+
+function MyScanComponent() {
+  const notify = useNotify();
+
+  const handleScanStart = async () => {
+    notify.scanStarted(scanId, 'MyContract.sol');
+    try {
+      await startScan(scanId);
+    } catch (error) {
+      notify.scanFailed(error.message);
+    }
+  };
+
+  return <button onClick={handleScanStart}>Start Scan</button>;
+}
+```
+
+**Using useNotifications for WebSocket integration:**
+
+```typescript
+import { useNotifications } from '@/hooks/useNotifications';
+
+function MyDashboard() {
+  // Automatically subscribes to WebSocket events
+  const notifications = useNotifications({
+    scanCompletion: true,
+    vulnerabilities: true,
+    criticalOnly: false,
+  });
+
+  return <div>Dashboard with live notifications</div>;
+}
+```
+
+### Auto-Refresh Feature
+
+The Analytics dashboard includes auto-refresh functionality:
+
+| Feature | Location | Behavior |
+|---------|----------|----------|
+| Auto-refresh toggle | `DashboardAnalytics.tsx` | Toggle on/off in header |
+| Refresh interval | 30 seconds | Configurable via `AUTO_REFRESH_INTERVAL` |
+| Live indicator | Header | Green dot when auto-refresh enabled |
+| Last updated | Header | Shows time since last data fetch |
+| Visibility refresh | `useEffect` | Refreshes data when tab becomes visible |
+
+**Implementation:**
+
+```typescript
+// Auto-refresh with React Query
+const { data, refetch } = useQuery({
+  queryKey: ['analytics'],
+  queryFn: fetchAnalytics,
+  refetchInterval: autoRefreshEnabled ? 30000 : false,
+  refetchIntervalInBackground: false,
+});
+
+// Refresh on tab visibility change
+useEffect(() => {
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible' && autoRefreshEnabled) {
+      refetch();
+    }
+  };
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+}, [autoRefreshEnabled, refetch]);
+```
+
+### Notification Service Port-Forward
+
+For real-time WebSocket notifications, port-forward the notification service:
+
+```bash
+# Required for WebSocket notifications
+kubectl port-forward -n notification-local svc/notification 8003:8003 &
+
+# Test WebSocket endpoint
+curl http://127.0.0.1:8003/
+# Expected: {"message":"Solidity Security Notification Service","status":"running",...}
+```
+
+**Note:** The Notification Service is **optional** for basic dashboard usage. Only required for:
+- Real-time scan status updates
+- Live vulnerability alerts
+- WebSocket-based notifications
+
+### Troubleshooting Notifications
+
+**Issue: Toasts not appearing**
+
+1. Check `NotificationHandler` is in component tree (App.tsx)
+2. Verify `ToastProvider` wraps the app
+3. Check `ToastContainer` is rendered
+4. Verify WebSocket connection in browser console
+
+**Issue: WebSocket not connecting**
+
+```bash
+# Check notification service is running
+kubectl get pods -n notification-local
+
+# Check port-forward is active
+lsof -i :8003 | grep LISTEN
+
+# Restart port-forward
+kubectl port-forward -n notification-local svc/notification 8003:8003 &
+```
+
+**Issue: Duplicate notifications**
+
+The `useNotifications` hook tracks shown notifications in a `Set` to prevent duplicates. If duplicates appear, check:
+1. Component is not mounted multiple times
+2. WebSocket is not reconnecting rapidly
+
+---
+
 **See Also:**
 - [Core Development Rules](./core-development-rules.md) - Critical development workflow rules
 - [Local Development Setup](./local-development-setup.md) - Local development standards and setup
 - [Testing & Deployment](./testing-deployment.md) - Testing and deployment workflows
+- [Notification Frontend](/Users/pwner/Git/ABS/blocksecops-docs/frontend/notification-frontend.md) - Detailed notification system documentation
