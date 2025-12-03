@@ -35,6 +35,9 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Deduplication:** Cross-scanner finding deduplication
 - **Tier-based quotas:** User quotas with monthly scan limits and tier-based priority
 - **Priority queue:** Scan priority system for tier-based queue processing
+- **Wallet authentication:** MetaMask/WalletConnect SIWE authentication (Phase 3.3)
+- **Enterprise features:** Organizations, RBAC, webhooks, API keys, audit logs (Phase 4.5)
+- **x402 payments:** Pay-per-scan with USDC, scan credits, payment transactions (Phase 3.4)
 
 ---
 
@@ -119,11 +122,17 @@ User accounts with Supabase authentication and tier tracking (Phase 3.1a - Migra
 | `supabase_user_id` | UUID | NULLABLE, UNIQUE, INDEX | **Supabase Auth user identifier (PRIMARY auth key)** |
 | `stripe_customer_id` | VARCHAR(255) | NULLABLE | Stripe customer identifier for billing |
 | `stripe_subscription_id` | VARCHAR(255) | NULLABLE | Stripe subscription identifier |
+| `wallet_address` | VARCHAR(42) | NULLABLE, UNIQUE, INDEX | Ethereum wallet address (Phase 3.3) |
+| `wallet_nonce` | VARCHAR(64) | NULLABLE | SIWE nonce for signature verification |
+| `wallet_linked_at` | TIMESTAMPTZ | NULLABLE | Timestamp when wallet was linked |
+| `ens_name` | VARCHAR(255) | NULLABLE, INDEX | ENS domain name (e.g., vitalik.eth) |
 
 **Indexes:**
 - `ix_users_email` (UNIQUE) on `email`
 - `ix_users_tier` on `tier`
 - `ix_users_supabase_user_id` (UNIQUE) on `supabase_user_id`
+- `ix_users_wallet_address` (UNIQUE) on `wallet_address`
+- `ix_users_ens_name` on `ens_name`
 
 **Relationships:**
 - One-to-many with `sessions`
@@ -131,6 +140,12 @@ User accounts with Supabase authentication and tier tracking (Phase 3.1a - Migra
 - One-to-many with `scans`
 - One-to-many with `projects`
 - One-to-one with `user_quotas`
+- One-to-one with `scan_credits` (Phase 3.4)
+- One-to-many with `payment_transactions` (Phase 3.4)
+- One-to-many with `organization_members` (Phase 4.5)
+- One-to-many with `webhooks` (Phase 4.5)
+- One-to-many with `api_keys` (Phase 4.5)
+- One-to-many with `audit_logs` (Phase 4.5)
 
 ---
 
@@ -846,6 +861,394 @@ Confidence: exact (all 3 scanners detected identical code at identical location)
 
 ---
 
+### `organizations`
+
+Multi-tenant organization support for enterprise features (Phase 4.5).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique organization identifier |
+| `name` | VARCHAR(255) | NOT NULL | Organization display name |
+| `slug` | VARCHAR(100) | NOT NULL, UNIQUE, INDEX | URL-friendly identifier |
+| `description` | TEXT | NULLABLE | Organization description |
+| `logo_url` | VARCHAR(2048) | NULLABLE | Logo URL |
+| `tier` | VARCHAR(50) | NOT NULL, DEFAULT 'free' | Organization tier (free, pro, enterprise) |
+| `stripe_customer_id` | VARCHAR(255) | NULLABLE, UNIQUE | Stripe customer ID for billing |
+| `stripe_subscription_id` | VARCHAR(255) | NULLABLE | Stripe subscription ID |
+| `sso_enabled` | BOOLEAN | NOT NULL, DEFAULT false | SSO enabled flag |
+| `sso_provider` | VARCHAR(50) | NULLABLE | SSO provider (saml, oidc) |
+| `sso_config` | JSONB | NULLABLE | SSO configuration JSON |
+| `sso_domain` | VARCHAR(255) | NULLABLE, INDEX | Domain for SSO authentication |
+| `settings` | JSONB | NULLABLE, DEFAULT '{}' | Organization settings |
+| `owner_id` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | Organization owner |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT true | Active status |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_organizations_slug` (UNIQUE) on `slug`
+- `ix_organizations_sso_domain` on `sso_domain`
+- `ix_organizations_owner_id` on `owner_id`
+
+**Relationships:**
+- One-to-many with `organization_members`
+- One-to-many with `roles`
+- One-to-many with `webhooks`
+- One-to-many with `api_keys`
+- One-to-many with `audit_logs`
+
+---
+
+### `roles`
+
+RBAC role definitions for organization access control (Phase 4.5).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique role identifier |
+| `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE CASCADE | Associated organization (NULL for system roles) |
+| `name` | VARCHAR(100) | NOT NULL | Role name (e.g., 'admin', 'member') |
+| `display_name` | VARCHAR(255) | NOT NULL | Human-readable name |
+| `description` | TEXT | NULLABLE | Role description |
+| `permissions` | JSONB | NOT NULL, DEFAULT '[]' | Permission array (e.g., ['scan:read', 'scan:write']) |
+| `is_system_role` | BOOLEAN | NOT NULL, DEFAULT false | System roles cannot be modified |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_roles_organization_id` on `organization_id`
+- `uq_roles_org_name` (UNIQUE) on `(organization_id, name)`
+
+**Relationships:**
+- Many-to-one with `organizations` (organization_id, CASCADE DELETE)
+- One-to-many with `organization_members`
+
+**System Roles (seeded):**
+- `owner` - Full access, can manage organization
+- `admin` - Full access except billing/deletion
+- `member` - Read access, limited write
+- `viewer` - Read-only access
+
+---
+
+### `organization_members`
+
+Organization membership with role assignment (Phase 4.5).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique membership identifier |
+| `organization_id` | UUID | NOT NULL, FK → organizations.id ON DELETE CASCADE | Organization reference |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE | User reference |
+| `role_id` | UUID | NOT NULL, FK → roles.id ON DELETE RESTRICT | Assigned role |
+| `invited_by` | UUID | NULLABLE | User who sent the invitation |
+| `invited_at` | TIMESTAMPTZ | NULLABLE | Invitation timestamp |
+| `joined_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Join timestamp |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT true | Active membership status |
+
+**Indexes:**
+- `ix_org_members_organization_id` on `organization_id`
+- `ix_org_members_user_id` on `user_id`
+- `ix_org_members_role_id` on `role_id`
+- `uq_org_members_org_user` (UNIQUE) on `(organization_id, user_id)`
+
+**Relationships:**
+- Many-to-one with `organizations` (organization_id, CASCADE DELETE)
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `roles` (role_id, RESTRICT DELETE)
+
+---
+
+### `webhooks`
+
+Webhook configuration for event notifications (Phase 4.5).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique webhook identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE | Owner user |
+| `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE CASCADE | Associated organization |
+| `name` | VARCHAR(255) | NOT NULL | Webhook name |
+| `url` | VARCHAR(2048) | NOT NULL | Delivery endpoint URL |
+| `secret` | VARCHAR(255) | NOT NULL | HMAC-SHA256 signing secret |
+| `events` | JSONB | NOT NULL | Array of event types to subscribe |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT true | Active status |
+| `retry_count` | INTEGER | NOT NULL, DEFAULT 3 | Max delivery retries |
+| `timeout_seconds` | INTEGER | NOT NULL, DEFAULT 30 | Request timeout |
+| `total_deliveries` | INTEGER | NOT NULL, DEFAULT 0 | Total delivery attempts |
+| `successful_deliveries` | INTEGER | NOT NULL, DEFAULT 0 | Successful deliveries |
+| `failed_deliveries` | INTEGER | NOT NULL, DEFAULT 0 | Failed deliveries |
+| `last_triggered_at` | TIMESTAMPTZ | NULLABLE | Last trigger timestamp |
+| `last_success_at` | TIMESTAMPTZ | NULLABLE | Last successful delivery |
+| `last_failure_at` | TIMESTAMPTZ | NULLABLE | Last failed delivery |
+| `last_error` | TEXT | NULLABLE | Last error message |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_webhooks_user_id` on `user_id`
+- `ix_webhooks_organization_id` on `organization_id`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `organizations` (organization_id, CASCADE DELETE)
+- One-to-many with `webhook_deliveries`
+
+**Event Types:**
+- `scan.started` - Scan has begun processing
+- `scan.completed` - Scan finished successfully
+- `scan.failed` - Scan encountered an error
+- `vulnerability.detected` - New vulnerability found
+- `vulnerability.resolved` - Vulnerability marked as resolved
+
+---
+
+### `webhook_deliveries`
+
+Webhook delivery history and retry tracking (Phase 4.5).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique delivery identifier |
+| `webhook_id` | UUID | NOT NULL, FK → webhooks.id ON DELETE CASCADE | Parent webhook |
+| `event_type` | VARCHAR(50) | NOT NULL, INDEX | Event type delivered |
+| `event_id` | VARCHAR(100) | NOT NULL, INDEX | Unique event identifier |
+| `payload` | JSONB | NOT NULL | Request payload |
+| `headers` | JSONB | NULLABLE | Request headers |
+| `status_code` | INTEGER | NULLABLE | Response status code |
+| `response_body` | TEXT | NULLABLE | Response body |
+| `response_headers` | JSONB | NULLABLE | Response headers |
+| `attempt_number` | INTEGER | NOT NULL, DEFAULT 1 | Delivery attempt number |
+| `success` | BOOLEAN | NOT NULL, DEFAULT false | Delivery success status |
+| `error_message` | TEXT | NULLABLE | Error message if failed |
+| `duration_ms` | INTEGER | NULLABLE | Request duration in milliseconds |
+| `triggered_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Trigger timestamp |
+| `delivered_at` | TIMESTAMPTZ | NULLABLE | Successful delivery timestamp |
+
+**Indexes:**
+- `ix_webhook_deliveries_webhook_id` on `webhook_id`
+- `ix_webhook_deliveries_event_type` on `event_type`
+- `ix_webhook_deliveries_event_id` on `event_id`
+- `ix_webhook_deliveries_triggered_at` on `triggered_at`
+
+**Relationships:**
+- Many-to-one with `webhooks` (webhook_id, CASCADE DELETE)
+
+---
+
+### `api_keys`
+
+API keys for programmatic access (Phase 4.5).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique API key identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE | Owner user |
+| `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE CASCADE | Associated organization |
+| `name` | VARCHAR(255) | NOT NULL | Key name/description |
+| `key_prefix` | VARCHAR(10) | NOT NULL, INDEX | First 8 chars for identification |
+| `key_hash` | VARCHAR(255) | NOT NULL | SHA-256 hash of full key |
+| `scopes` | JSONB | NOT NULL, DEFAULT '[]' | Permission scopes |
+| `rate_limit_per_minute` | INTEGER | NOT NULL, DEFAULT 60 | Requests per minute limit |
+| `rate_limit_per_hour` | INTEGER | NOT NULL, DEFAULT 1000 | Requests per hour limit |
+| `last_used_at` | TIMESTAMPTZ | NULLABLE | Last usage timestamp |
+| `total_requests` | INTEGER | NOT NULL, DEFAULT 0 | Total API requests made |
+| `expires_at` | TIMESTAMPTZ | NULLABLE | Key expiration timestamp |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT true | Active status |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `revoked_at` | TIMESTAMPTZ | NULLABLE | Revocation timestamp |
+
+**Indexes:**
+- `ix_api_keys_user_id` on `user_id`
+- `ix_api_keys_organization_id` on `organization_id`
+- `ix_api_keys_key_prefix` on `key_prefix`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `organizations` (organization_id, CASCADE DELETE)
+
+**API Key Scopes:**
+- `scan:read` - Read scan results
+- `scan:write` - Create scans
+- `contract:read` - Read contracts
+- `contract:write` - Upload contracts
+- `vulnerability:read` - Read vulnerabilities
+- `webhook:manage` - Manage webhooks
+
+---
+
+### `audit_logs`
+
+Comprehensive audit trail for security and compliance (Phase 4.5).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique log entry identifier |
+| `user_id` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | Acting user (NULL for system) |
+| `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE SET NULL | Organization context |
+| `action` | VARCHAR(100) | NOT NULL, INDEX | Action name (e.g., 'user.login', 'scan.create') |
+| `resource_type` | VARCHAR(50) | NULLABLE, INDEX | Resource type affected |
+| `resource_id` | UUID | NULLABLE, INDEX | Resource identifier |
+| `ip_address` | VARCHAR(45) | NULLABLE | Client IP address (IPv6 max) |
+| `user_agent` | VARCHAR(500) | NULLABLE | Client user agent |
+| `request_id` | VARCHAR(100) | NULLABLE, INDEX | Request correlation ID |
+| `old_values` | JSONB | NULLABLE | Previous values (for updates) |
+| `new_values` | JSONB | NULLABLE | New values (for creates/updates) |
+| `event_metadata` | JSONB | NULLABLE | Additional event metadata |
+| `success` | BOOLEAN | NOT NULL, DEFAULT true | Action success status |
+| `error_message` | TEXT | NULLABLE | Error message if failed |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Log entry timestamp |
+
+**Indexes:**
+- `ix_audit_logs_user_id` on `user_id`
+- `ix_audit_logs_organization_id` on `organization_id`
+- `ix_audit_logs_action` on `action`
+- `ix_audit_logs_resource_type` on `resource_type`
+- `ix_audit_logs_resource_id` on `resource_id`
+- `ix_audit_logs_request_id` on `request_id`
+- `ix_audit_logs_created_at` on `created_at`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, SET NULL on DELETE)
+- Many-to-one with `organizations` (organization_id, SET NULL on DELETE)
+
+**Audit Actions:**
+- `user.login`, `user.logout`, `user.create`, `user.update`
+- `scan.create`, `scan.complete`, `scan.fail`
+- `contract.upload`, `contract.delete`
+- `webhook.create`, `webhook.delete`, `webhook.trigger`
+- `api_key.create`, `api_key.revoke`
+- `organization.create`, `organization.update`, `organization.delete`
+- `member.invite`, `member.join`, `member.remove`
+
+---
+
+### `credit_packages`
+
+Credit packages available for purchase (Phase 3.4 - x402 Pay-Per-Scan).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique package identifier |
+| `name` | VARCHAR(50) | NOT NULL | Package name (e.g., 'Starter', 'Pro', 'Enterprise') |
+| `credits` | INTEGER | NOT NULL | Number of scan credits included |
+| `price_usd` | NUMERIC(10,2) | NOT NULL | Price in USD |
+| `discount_percent` | INTEGER | NOT NULL, DEFAULT 0 | Discount percentage (0-100) |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT true | Available for purchase |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+
+**Indexes:**
+- `ix_credit_packages_is_active` on `is_active`
+
+**Relationships:**
+- One-to-many with `payment_transactions`
+
+**Seed Data:**
+| Name | Credits | Price USD | Discount |
+|------|---------|-----------|----------|
+| Starter | 10 | $8.00 | 20% |
+| Pro | 50 | $35.00 | 30% |
+| Enterprise | 200 | $120.00 | 40% |
+
+---
+
+### `scan_credits`
+
+User's scan credit balance (Phase 3.4 - x402 Pay-Per-Scan).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique credit record identifier |
+| `user_id` | UUID | NOT NULL, UNIQUE, FK → users.id ON DELETE CASCADE | User reference |
+| `balance` | INTEGER | NOT NULL, DEFAULT 0 | Current credit balance |
+| `total_purchased` | INTEGER | NOT NULL, DEFAULT 0 | Total credits ever purchased |
+| `total_used` | INTEGER | NOT NULL, DEFAULT 0 | Total credits ever used |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_scan_credits_user_id` (UNIQUE) on `user_id`
+
+**Relationships:**
+- One-to-one with `users` (user_id, CASCADE DELETE)
+- One-to-many with `credit_transactions`
+
+---
+
+### `payment_transactions`
+
+x402 payment transactions for credits and per-scan payments (Phase 3.4).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique transaction identifier |
+| `user_id` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | Paying user |
+| `payment_type` | VARCHAR(20) | NOT NULL | Payment type ('per_scan', 'credits') |
+| `amount_usd` | NUMERIC(10,4) | NOT NULL | Amount in USD |
+| `token` | VARCHAR(10) | NOT NULL, DEFAULT 'USDC' | Payment token (USDC) |
+| `network` | VARCHAR(20) | NOT NULL, DEFAULT 'base' | Blockchain network |
+| `tx_hash` | VARCHAR(66) | NULLABLE, INDEX | Blockchain transaction hash |
+| `from_address` | VARCHAR(42) | NULLABLE | Sender wallet address |
+| `to_address` | VARCHAR(42) | NULLABLE | Recipient wallet address |
+| `block_number` | INTEGER | NULLABLE | Blockchain block number |
+| `x402_payment_id` | VARCHAR(255) | NULLABLE | x402 protocol payment ID |
+| `facilitator_response` | JSONB | NULLABLE | x402 facilitator response |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT 'pending', INDEX | Status (pending, verified, failed, refunded) |
+| `verified_at` | TIMESTAMPTZ | NULLABLE | Verification timestamp |
+| `credits_purchased` | INTEGER | NULLABLE | Credits purchased (for credit purchases) |
+| `package_id` | UUID | NULLABLE, FK → credit_packages.id ON DELETE SET NULL | Credit package purchased |
+| `scan_id` | UUID | NULLABLE, FK → scans.id ON DELETE SET NULL | Associated scan (for per-scan) |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_payment_transactions_user_id` on `user_id`
+- `ix_payment_transactions_tx_hash` on `tx_hash`
+- `ix_payment_transactions_status` on `status`
+- `ix_payment_transactions_created_at` on `created_at`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, SET NULL on DELETE)
+- Many-to-one with `credit_packages` (package_id, SET NULL on DELETE)
+- One-to-one with `scans` (scan_id, SET NULL on DELETE)
+- One-to-many with `credit_transactions`
+
+---
+
+### `credit_transactions`
+
+Credit usage and purchase history (Phase 3.4 - x402 Pay-Per-Scan).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique transaction identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | User reference |
+| `credits` | INTEGER | NOT NULL | Credit change (positive=purchase, negative=usage) |
+| `balance_after` | INTEGER | NOT NULL | Balance after transaction |
+| `transaction_type` | VARCHAR(20) | NOT NULL, INDEX | Type (purchase, scan_usage, refund, gift) |
+| `payment_transaction_id` | UUID | NULLABLE, FK → payment_transactions.id ON DELETE SET NULL | Associated payment |
+| `scan_id` | UUID | NULLABLE, FK → scans.id ON DELETE SET NULL | Associated scan |
+| `description` | VARCHAR(255) | NULLABLE | Transaction description |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Transaction timestamp |
+
+**Indexes:**
+- `ix_credit_transactions_user_id` on `user_id`
+- `ix_credit_transactions_transaction_type` on `transaction_type`
+- `ix_credit_transactions_created_at` on `created_at`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `payment_transactions` (payment_transaction_id, SET NULL on DELETE)
+- Many-to-one with `scans` (scan_id, SET NULL on DELETE)
+
+**Transaction Types:**
+- `purchase` - Credits purchased via x402 payment
+- `scan_usage` - Credits used for a scan
+- `refund` - Credits refunded (e.g., failed scan)
+- `gift` - Credits granted by admin
+
+---
+
 ## ENUM Types
 
 ### `contract_language`
@@ -1182,8 +1585,8 @@ See [Platform Development Standards](/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPM
 
 ---
 
-**Document Version:** 1.3.2
-**Last Updated:** November 30, 2025 (SBOM tables removed via alembic downgrade)
+**Document Version:** 1.4.0
+**Last Updated:** December 1, 2025 (Added Phase 3.3/3.4/4.5 tables)
 **Maintained By:** BlockSecOps Team
 
 ---

@@ -4,6 +4,77 @@ This document tracks all deployments and updates to the BlockSecOps Orchestratio
 
 ---
 
+## x402 Pay-Per-Scan Integration - Phase 3.4 (December 1, 2025)
+
+**Status**: ✅ Backend Complete
+**Priority**: HIGH - Monetization without subscription friction
+
+### Achievement
+
+Complete x402 payment backend implementation enabling USDC micropayments on Base blockchain for pay-per-scan functionality.
+
+### Key Changes
+
+**Database Models** (4 new tables):
+- `credit_packages` - Credit packages with volume discounts
+- `scan_credits` - User credit balance tracking
+- `payment_transactions` - x402 payment transactions
+- `credit_transactions` - Credit usage history
+
+**Services**:
+- `PaymentService` - x402 payment processing and verification
+- `CreditService` - Credit balance management
+- `PricingService` - Scan pricing tiers
+
+**API Endpoints** (10 new endpoints):
+- `GET /api/v1/payments/credits` - Credit balance
+- `POST /api/v1/payments/credits/use` - Use credit for scan
+- `GET /api/v1/payments/credits/history` - Credit transaction history
+- `GET /api/v1/payments/packages` - Credit packages (public)
+- `GET /api/v1/payments/prices` - Scan pricing (public)
+- `POST /api/v1/payments/initiate` - Initiate credit purchase
+- `POST /api/v1/payments/verify` - Verify blockchain payment
+- `GET /api/v1/payments/history` - Payment transaction history
+- `POST /api/v1/payments/admin/gift` - Admin gift credits
+- `GET /api/v1/payments/admin/stats` - Admin payment stats
+
+### Pricing Structure
+
+**Per-Scan Pricing**:
+| Complexity | Files | Price USD |
+|------------|-------|-----------|
+| Simple | 1-5 | $0.50 |
+| Standard | 6-25 | $1.00 |
+| Complex | 26-100 | $2.00 |
+| Large | 100+ | $5.00 |
+
+**Credit Packages**:
+| Package | Credits | Price | Discount |
+|---------|---------|-------|----------|
+| Starter | 10 | $8.00 | 20% |
+| Pro | 50 | $35.00 | 30% |
+| Enterprise | 200 | $120.00 | 40% |
+
+### Files Modified
+
+- `src/infrastructure/database/models.py` - Added 4 x402 payment models + relationships
+- `src/presentation/schemas/payments.py` - Complete Pydantic schemas
+- `src/application/services/payment_service.py` - x402 payment processing (NEW)
+- `src/application/services/credit_service.py` - Credit management (NEW)
+- `src/application/services/pricing_service.py` - Pricing service (NEW)
+- `src/presentation/api/v1/endpoints/payments.py` - Payment endpoints (NEW)
+- `src/main.py` - Router registration
+- `requirements.txt` - Added eth-account, web3, httpx
+
+### Next Steps
+
+1. Generate and apply Alembic migrations
+2. Seed credit packages with default pricing
+3. Write unit and integration tests
+4. Implement frontend payment UI (Phase 3.4 Week 2)
+
+---
+
 ## Intelligence Integration Update - Phase 2 (October 28, 2025)
 
 **Status**: ✅ Complete - Stories 2.1 & 2.2

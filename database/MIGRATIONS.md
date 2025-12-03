@@ -155,13 +155,51 @@ Due to database state inconsistencies after the 2025-11-05 database reset, the s
   6. Historical data cleaned: 7 SBOM scans, 3 vulnerabilities deleted
 - **Lesson Learned**: Always run `alembic downgrade` BEFORE `git revert` when rolling back features with migrations
 
+### Migration 014_x402_payments: x402 Pay-Per-Scan Tables (Phase 3.4)
+- **Status**: ✅ Completed (December 1, 2025)
+- **Revision ID**: `014_x402_payments`
+- **Previous Revision**: `20251128_1600`
+- **Description**: x402 payment integration for pay-per-scan with USDC on Base blockchain
+- **Tables Created**:
+  - `credit_packages` - Pre-defined credit bundles with pricing and discounts
+  - `scan_credits` - Per-user credit balance tracking (1:1 with users)
+  - `payment_transactions` - USDC payment records with blockchain verification
+  - `credit_transactions` - Credit purchase/usage audit trail
+- **Default Data Seeded**:
+  - Starter package: 5 credits @ $4.50 (10% discount)
+  - Standard package: 10 credits @ $8.00 (20% discount)
+  - Professional package: 25 credits @ $17.50 (30% discount)
+  - Enterprise package: 50 credits @ $30.00 (40% discount)
+- **API Endpoints Added**:
+  - `GET /api/v1/payments/packages` - List credit packages
+  - `GET /api/v1/payments/prices` - Get current pricing
+  - `GET /api/v1/payments/credits` - Get user credit balance
+  - `POST /api/v1/payments/credits/use` - Consume credits for scan
+  - `GET /api/v1/payments/credits/history` - Credit transaction history
+  - `POST /api/v1/payments/initiate` - Initiate x402 payment
+- **Related Files**:
+  - Models: `src/infrastructure/database/models.py` (CreditPackageModel, ScanCreditModel, PaymentTransactionModel, CreditTransactionModel)
+  - Schemas: `src/presentation/schemas/payments.py`
+  - Services: `src/application/services/payment_service.py`, `credit_service.py`, `pricing_service.py`
+  - Endpoints: `src/presentation/api/v1/endpoints/payments.py`
+
+### Migration Model Relationship Fix (December 2, 2025)
+- **Status**: ✅ Completed
+- **Description**: Fixed SQLAlchemy ORM relationship mapping errors for x402 models
+- **Issue**: `ScanCreditModel` had invalid `credit_transactions` relationship (no FK existed)
+- **Resolution**:
+  - Removed invalid relationship from `ScanCreditModel`
+  - Added `credit_transactions` relationship to `UserModel`
+  - Updated `CreditTransactionModel` to reference user instead of user_credits
+- **PR**: blocksecops-api-service#107
+
 ---
 
-## Current Database State (2025-11-30)
+## Current Database State (2025-12-02)
 
 ### Alembic Version
 ```
-version_num: 20251128_1600
+version_num: 014_x402_payments
 ```
 
 ### Existing Tables
@@ -171,6 +209,10 @@ version_num: 20251128_1600
 - ✅ `vulnerabilities` (with `pattern_id` column)
 - ✅ `vulnerability_patterns` (manually created)
 - ✅ `pattern_tool_mappings` (manually created)
+- ✅ `credit_packages` (Phase 3.4 x402)
+- ✅ `scan_credits` (Phase 3.4 x402)
+- ✅ `payment_transactions` (Phase 3.4 x402)
+- ✅ `credit_transactions` (Phase 3.4 x402)
 - ❌ `deduplication_groups` (pending)
 - ❌ `vulnerability_classifications` (pending)
 - ❌ `vulnerability_trends` (pending)
@@ -257,39 +299,66 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 
 ## Pending Migrations: Phase 4.5 Enterprise Features
 
-### Migration 013: Wallet Authentication (Phase 3.3)
-- **Status**: ⏳ Pending
-- **Description**: Add wallet authentication fields to users table
+### Migration 012: Wallet Authentication (Phase 3.3) - MODELS COMPLETE
+- **Status**: ✅ Models Complete (December 1, 2025)
+- **Description**: Add wallet authentication fields to users table for MetaMask/WalletConnect SIWE
 - **Changes**:
   - Add `wallet_address` VARCHAR(42) column to users table
-  - Add `wallet_nonce` VARCHAR(255) column
+  - Add `wallet_nonce` VARCHAR(64) column for SIWE signature verification
   - Add `wallet_linked_at` TIMESTAMP column
-  - Add `ens_name` VARCHAR(255) column
+  - Add `ens_name` VARCHAR(255) column for ENS domain resolution
   - Add unique constraint on wallet_address
-  - Add index on wallet_address
+  - Add indexes on wallet_address and ens_name
+- **Model Reference**: `UserModel` in `/Users/pwner/Git/ABS/blocksecops-api-service/src/infrastructure/database/models.py`
 
-### Migration 014: Enterprise Features (Phase 4.5)
-- **Status**: ⏳ Pending
+### Migration 013: Enterprise Features (Phase 4.5) - MODELS COMPLETE
+- **Status**: ✅ Models Complete (December 1, 2025)
 - **Description**: Enterprise webhook, RBAC, SSO, API key, and audit log tables
-- **Tables to Create**:
-  - `webhooks` - Webhook configuration with HMAC signing
-  - `webhook_deliveries` - Webhook delivery history and retry tracking
-  - `organizations` - Multi-tenant organization support
-  - `roles` - RBAC role definitions with permissions
+- **Tables Created**:
+  - `organizations` - Multi-tenant organization support with SSO
+  - `roles` - RBAC role definitions with JSON permissions
   - `organization_members` - Organization membership and role assignments
+  - `webhooks` - Webhook configuration with HMAC-SHA256 signing
+  - `webhook_deliveries` - Webhook delivery history and retry tracking
   - `api_keys` - Scoped API key management with rate limits
   - `audit_logs` - Comprehensive audit trail for compliance
 - **Model Reference**: `/Users/pwner/Git/ABS/blocksecops-api-service/src/infrastructure/database/models.py`
 - **Feature Documentation**: `/Users/pwner/Git/ABS/docs/features/PHASE-4.5-ENTERPRISE-FEATURES.md`
 
-### Creating Phase 4.5 Migration
+### Migration 014: x402 Pay-Per-Scan (Phase 3.4) - MODELS COMPLETE
+- **Status**: ✅ Models Complete (December 1, 2025)
+- **Description**: x402 payment integration for pay-per-scan with USDC on Base
+- **Tables Created**:
+  - `credit_packages` - Credit packages available for purchase (Starter/Pro/Enterprise)
+  - `scan_credits` - User's scan credit balance tracking
+  - `payment_transactions` - x402 payment transactions with blockchain verification
+  - `credit_transactions` - Credit usage and purchase history
+- **Features**:
+  - USDC payments on Base blockchain (chain ID 8453)
+  - x402 protocol integration with facilitator verification
+  - Credit packages with volume discounts (20-40%)
+  - Per-scan pricing tiers ($0.50-$5.00 based on complexity)
+  - Credit balance tracking and transaction history
+  - Admin credit gifting for promotions/support
+- **Model Reference**: `/Users/pwner/Git/ABS/blocksecops-api-service/src/infrastructure/database/models.py`
+- **Service Layer**:
+  - `PaymentService` - x402 payment processing
+  - `CreditService` - Credit balance management
+  - `PricingService` - Scan pricing and packages
+- **API Endpoints**: `GET/POST /api/v1/payments/*`
+
+### Creating Migrations
 ```bash
 # Generate migration from models
 cd /Users/pwner/Git/ABS/blocksecops-api-service
+alembic revision --autogenerate -m "add_wallet_authentication_fields"
 alembic revision --autogenerate -m "add_enterprise_features_tables"
+alembic revision --autogenerate -m "add_x402_payment_tables"
 
 # Or create manually
+alembic revision -m "add_wallet_authentication_fields"
 alembic revision -m "add_enterprise_features_tables"
+alembic revision -m "add_x402_payment_tables"
 ```
 
 ---
@@ -297,9 +366,12 @@ alembic revision -m "add_enterprise_features_tables"
 ## Next Steps
 
 1. ✅ Migration 005 completed (manual SQL execution)
-2. ⏳ Test scans to verify fix (in progress)
-3. ⏳ Apply migrations 006-013 to complete intelligence layer
-4. ⏳ Load vulnerability pattern data into `vulnerability_patterns` table
-5. ⏳ Populate `pattern_tool_mappings` with scanner detector mappings
-6. ⏳ Create and apply Migration 013 for wallet authentication (Phase 3.3)
-7. ⏳ Create and apply Migration 014 for enterprise features (Phase 4.5)
+2. ✅ Test scans to verify fix - all working
+3. ✅ Intelligence layer complete - 397 patterns, 397 mappings
+4. ✅ Load vulnerability pattern data into `vulnerability_patterns` table
+5. ✅ Populate `pattern_tool_mappings` with scanner detector mappings
+6. ✅ Migration 012 - Wallet authentication models complete (Phase 3.3)
+7. ✅ Migration 013 - Enterprise features models complete (Phase 4.5)
+8. ✅ Migration 014 - x402 payment models complete (Phase 3.4)
+9. ⏳ Generate and apply alembic migrations for new tables
+10. ⏳ Seed credit packages with default pricing

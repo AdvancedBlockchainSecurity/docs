@@ -73,7 +73,8 @@
 
 ### 3.1 Feature Matrix (if present)
 - [ ] All features listed in rows
-- [ ] Tiers in columns
+- [ ] Tiers in columns (Free, Pro, Enterprise, Enterprise Broker, x402 Pay-Per-Scan)
+- [ ] x402 Pay-Per-Scan column with green styling
 - [ ] Checkmarks/values accurate
 - [ ] Tooltips explain features
 
@@ -99,9 +100,30 @@
 
 ---
 
-## 5. Navigation
+## 5. x402 Pay-Per-Scan Section
+
+### 5.1 x402 Banner Display
+- [ ] x402 Pay-Per-Scan section visible below subscription cards
+- [ ] Green gradient background styling
+- [ ] USDC coin icon displayed
+- [ ] "Buy Credits with USDC" button present
+
+### 5.2 Pricing Tiers Display
+- [ ] Simple tier shown ($0.50 for 1-5 files)
+- [ ] Standard tier shown ($1.00 for 6-25 files)
+- [ ] Complex tier shown ($2.00 for 26-100 files)
+- [ ] Large tier shown ($5.00 for 100+ files)
+
+### 5.3 Navigation
+- [ ] "Buy Credits with USDC" button navigates to /credits
+- [ ] Button responsive on mobile
+
+---
+
+## 6. Navigation
 
 - [ ] Link to pricing in header/footer
+- [ ] Link to pricing in sidebar (BILLING section)
 - [ ] Back navigation works
 - [ ] Deep link to /pricing works
 
