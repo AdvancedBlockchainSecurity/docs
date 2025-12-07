@@ -38,6 +38,10 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Wallet authentication:** MetaMask/WalletConnect SIWE authentication (Phase 3.3)
 - **Enterprise features:** Organizations, RBAC, webhooks, API keys, audit logs (Phase 4.5)
 - **x402 payments:** Pay-per-scan with USDC, scan credits, payment transactions (Phase 3.4)
+- **Scanner results:** Specialized result tables for gas analysis, fuzzing, formal verification, code quality (Phase 3)
+- **Contract analysis:** Parsed function, event, and state variable definitions from contracts
+
+**Total Tables:** 32 (excluding alembic_version)
 
 ---
 
@@ -578,6 +582,217 @@ Detected security vulnerabilities and code issues.
 **Relationships:**
 - Many-to-one with `scans` (scan_id)
 - Many-to-one with `contracts` (contract_id)
+
+---
+
+### `gas_analysis_findings`
+
+Gas optimization findings from scanner analysis (Phase 3 - Advanced Scanners).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique finding identifier |
+| `scan_id` | UUID | NOT NULL, FK → scans.id ON DELETE CASCADE | Associated scan |
+| `scanner_id` | VARCHAR(50) | NOT NULL | Scanner that detected this (e.g., "4naly3er") |
+| `function_name` | VARCHAR(255) | NOT NULL | Function with gas issue |
+| `gas_cost` | INTEGER | NOT NULL | Current gas cost |
+| `optimization_level` | VARCHAR(20) | NOT NULL | Optimization priority (low, medium, high) |
+| `optimization_suggestion` | TEXT | NOT NULL | Suggested optimization |
+| `potential_savings` | INTEGER | NOT NULL | Potential gas savings |
+| `location` | JSONB | NOT NULL | Location information (file, line, column) |
+| `code_example` | TEXT | NULLABLE | Example code for optimization |
+| `contract_id` | UUID | NULLABLE, FK → contracts.id ON DELETE CASCADE | Associated contract |
+| `detector_id` | VARCHAR(200) | NULLABLE | Tool-specific detector ID |
+| `file_path` | VARCHAR(500) | NULLABLE | Source file path |
+| `contract_name` | VARCHAR(200) | NULLABLE | Contract name |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+
+**Indexes:**
+- `ix_gas_analysis_findings_scan_id` on `scan_id`
+- `ix_gas_analysis_findings_scanner_id` on `scanner_id`
+- `ix_gas_analysis_findings_function_name` on `function_name`
+- `ix_gas_analysis_findings_optimization_level` on `optimization_level`
+
+**Relationships:**
+- Many-to-one with `scans` (scan_id, CASCADE DELETE)
+- Many-to-one with `contracts` (contract_id, CASCADE DELETE)
+
+---
+
+### `code_quality_findings`
+
+Code quality and linting results from tools like Solhint (Phase 3 - Scanner Integration).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique finding identifier |
+| `scan_id` | UUID | NOT NULL, FK → scans.id ON DELETE CASCADE | Associated scan |
+| `scanner_id` | VARCHAR(50) | NOT NULL | Scanner (e.g., "solhint") |
+| `severity` | VARCHAR(20) | NOT NULL | Severity level |
+| `category` | VARCHAR(50) | NOT NULL | Finding category |
+| `title` | TEXT | NOT NULL | Finding title |
+| `description` | TEXT | NOT NULL | Finding description |
+| `location` | JSONB | NOT NULL | Location information |
+| `fix_suggestion` | TEXT | NULLABLE | Suggested fix |
+| `rule_id` | VARCHAR(100) | NOT NULL | Linter rule ID |
+| `rule_url` | TEXT | NULLABLE | Link to rule documentation |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+
+**Indexes:**
+- `ix_code_quality_findings_scan_id` on `scan_id`
+- `ix_code_quality_findings_scanner_id` on `scanner_id`
+- `ix_code_quality_findings_severity` on `severity`
+- `ix_code_quality_findings_category` on `category`
+
+**Relationships:**
+- Many-to-one with `scans` (scan_id, CASCADE DELETE)
+
+---
+
+### `fuzzing_results`
+
+Fuzzing test results from Echidna, Medusa, and other fuzz testers (Phase 3 - Advanced Tools).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique result identifier |
+| `scan_id` | UUID | NOT NULL, FK → scans.id ON DELETE CASCADE | Associated scan |
+| `scanner_id` | VARCHAR(50) | NOT NULL | Scanner (e.g., "echidna", "medusa") |
+| `test_name` | VARCHAR(255) | NOT NULL | Fuzz test name |
+| `status` | VARCHAR(20) | NOT NULL | Test status (passed, failed, timeout) |
+| `executions` | INTEGER | NOT NULL | Number of test executions |
+| `coverage_percentage` | DOUBLE PRECISION | NOT NULL | Code coverage percentage |
+| `edge_cases_found` | JSONB | NOT NULL, DEFAULT '[]' | Array of edge cases found |
+| `failure_trace` | TEXT | NULLABLE | Failure trace if test failed |
+| `seed` | INTEGER | NULLABLE | Random seed used |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+
+**Indexes:**
+- `ix_fuzzing_results_scan_id` on `scan_id`
+- `ix_fuzzing_results_scanner_id` on `scanner_id`
+- `ix_fuzzing_results_status` on `status`
+- `ix_fuzzing_results_test_name` on `test_name`
+
+**Relationships:**
+- Many-to-one with `scans` (scan_id, CASCADE DELETE)
+
+---
+
+### `formal_verification_results`
+
+Formal verification proof results from Halmos, Certora (Phase 3 - Formal Verification).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique result identifier |
+| `scan_id` | UUID | NOT NULL, FK → scans.id ON DELETE CASCADE | Associated scan |
+| `scanner_id` | VARCHAR(50) | NOT NULL | Scanner (e.g., "halmos", "certora") |
+| `property_name` | VARCHAR(255) | NOT NULL | Property being verified |
+| `status` | VARCHAR(20) | NOT NULL | Verification status (proved, violated, timeout) |
+| `proof_type` | VARCHAR(50) | NOT NULL | Type of proof (invariant, assertion, etc.) |
+| `description` | TEXT | NOT NULL | Property description |
+| `counterexample` | TEXT | NULLABLE | Counterexample if property violated |
+| `verification_time` | DOUBLE PRECISION | NOT NULL | Verification time in seconds |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+
+**Indexes:**
+- `ix_formal_verification_results_scan_id` on `scan_id`
+- `ix_formal_verification_results_scanner_id` on `scanner_id`
+- `ix_formal_verification_results_status` on `status`
+- `ix_formal_verification_results_proof_type` on `proof_type`
+
+**Relationships:**
+- Many-to-one with `scans` (scan_id, CASCADE DELETE)
+
+---
+
+### `contract_functions`
+
+Parsed function definitions from smart contracts (Contract Analysis).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique function identifier |
+| `contract_id` | UUID | NOT NULL, FK → contracts.id ON DELETE CASCADE | Parent contract |
+| `name` | VARCHAR(255) | NOT NULL | Function name |
+| `selector` | VARCHAR(10) | NULLABLE | Function selector (4 bytes) |
+| `visibility` | VARCHAR(20) | NOT NULL | Visibility (public, private, internal, external) |
+| `state_mutability` | VARCHAR(20) | NULLABLE | Mutability (pure, view, payable, nonpayable) |
+| `is_constructor` | BOOLEAN | NOT NULL, DEFAULT false | Is constructor |
+| `is_fallback` | BOOLEAN | NOT NULL, DEFAULT false | Is fallback function |
+| `is_receive` | BOOLEAN | NOT NULL, DEFAULT false | Is receive function |
+| `parameters` | JSONB | NULLABLE | Function parameters |
+| `return_types` | JSONB | NULLABLE | Return types |
+| `modifiers` | JSONB | NULLABLE | Applied modifiers |
+| `start_line` | INTEGER | NULLABLE | Start line number |
+| `end_line` | INTEGER | NULLABLE | End line number |
+| `natspec` | JSONB | NULLABLE | NatSpec documentation |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+
+**Indexes:**
+- `idx_functions_contract` on `contract_id`
+- `idx_functions_name` on `name`
+- `idx_functions_selector` on `selector`
+- `idx_functions_visibility` on `visibility`
+
+**Relationships:**
+- Many-to-one with `contracts` (contract_id, CASCADE DELETE)
+
+---
+
+### `contract_events`
+
+Parsed event definitions from smart contracts (Contract Analysis).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique event identifier |
+| `contract_id` | UUID | NOT NULL, FK → contracts.id ON DELETE CASCADE | Parent contract |
+| `name` | VARCHAR(255) | NOT NULL | Event name |
+| `signature` | VARCHAR(500) | NULLABLE | Event signature |
+| `topic0` | VARCHAR(66) | NULLABLE | Event topic0 (keccak256 hash) |
+| `parameters` | JSONB | NOT NULL | Event parameters |
+| `anonymous` | BOOLEAN | NOT NULL, DEFAULT false | Is anonymous event |
+| `start_line` | INTEGER | NULLABLE | Line number |
+| `natspec` | JSONB | NULLABLE | NatSpec documentation |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+
+**Indexes:**
+- `idx_events_contract` on `contract_id`
+- `idx_events_name` on `name`
+- `idx_events_topic0` on `topic0`
+
+**Relationships:**
+- Many-to-one with `contracts` (contract_id, CASCADE DELETE)
+
+---
+
+### `contract_state_variables`
+
+Parsed state variable definitions from smart contracts (Contract Analysis).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique variable identifier |
+| `contract_id` | UUID | NOT NULL, FK → contracts.id ON DELETE CASCADE | Parent contract |
+| `name` | VARCHAR(255) | NOT NULL | Variable name |
+| `type_name` | VARCHAR(500) | NOT NULL | Solidity type (uint256, address, etc.) |
+| `visibility` | VARCHAR(20) | NOT NULL | Visibility (public, private, internal) |
+| `mutability` | VARCHAR(20) | NULLABLE | Mutability (constant, immutable) |
+| `storage_slot` | INTEGER | NULLABLE | Storage slot position |
+| `initial_value` | TEXT | NULLABLE | Initial value if set |
+| `start_line` | INTEGER | NULLABLE | Line number |
+| `natspec` | JSONB | NULLABLE | NatSpec documentation |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+
+**Indexes:**
+- `idx_variables_contract` on `contract_id`
+- `idx_variables_name` on `name`
+- `idx_variables_type` on `type_name`
+- `idx_variables_visibility` on `visibility`
+
+**Relationships:**
+- Many-to-one with `contracts` (contract_id, CASCADE DELETE)
 
 ---
 
@@ -1585,8 +1800,8 @@ See [Platform Development Standards](/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPM
 
 ---
 
-**Document Version:** 1.4.0
-**Last Updated:** December 1, 2025 (Added Phase 3.3/3.4/4.5 tables)
+**Document Version:** 1.6.0
+**Last Updated:** December 7, 2025 (Added 7 missing scanner result tables, 32 total tables)
 **Maintained By:** BlockSecOps Team
 
 ---

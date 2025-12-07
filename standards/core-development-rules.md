@@ -1,8 +1,8 @@
 # Core Development Rules
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 1.8.0
-**Last Updated:** October 20, 2025
+**Version:** 1.9.0
+**Last Updated:** December 4, 2025
 **Status:** Active
 
 ## Overview
@@ -15,21 +15,21 @@ This document defines the critical rules and codebase-first development workflow
 
 ### Rule 1: Codebase-First Development
 
-**MANDATORY:** Never make changes to the platform or Kubernetes without updating the codebase first.
+**MANDATORY:** All changes must exist in the codebase. Always test locally before committing.
 
 ```
 ✅ CORRECT WORKFLOW:
-1. Create feature branch from main
-2. Update configuration files in Git repo folder
-3. Commit changes to version control
-4. Push feature branch and create pull request
-5. Review and merge PR (user account only)
-6. Apply changes to Kubernetes/platform
-7. Verify changes work as expected
+1. Create/update configuration files in Git repo folder
+2. Apply changes to local Kubernetes cluster (minikube)
+3. Test and verify changes work as expected
+4. Fix any issues, repeat steps 2-3 until working
+5. Commit changes to version control
+6. Push and create pull request
+7. Review and merge PR (user account only)
 8. Document changes in relevant docs
 
 ❌ INCORRECT WORKFLOW:
-1. Make ad-hoc changes via kubectl
+1. Make ad-hoc changes via kubectl edit/patch
 2. Test changes in cluster
 3. Forget to update codebase
 4. Changes lost on next deployment

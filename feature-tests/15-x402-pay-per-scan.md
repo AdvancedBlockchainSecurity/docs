@@ -1,21 +1,25 @@
 # x402 Pay-Per-Scan Tests (Phase 3.4)
 
 **Priority**: P1 - High
-**Last Tested**: 2025-12-02
+**Last Tested**: 2025-12-03
 **Feature**: USDC Micropayments on Base Blockchain
 **Automated Tests**: 59 tests (30 unit + 29 integration)
 
 ## Test Coverage
 
 ### Automated Tests
-- **Unit Tests**: `tests/unit/services/test_payment_services.py` (30 tests)
-  - `TestPricingService` - 11 tests
-  - `TestCreditService` - 11 tests
-  - `TestPaymentService` - 8 tests
+- **Unit Tests**: `tests/unit/services/test_payment_services.py` (32 tests) ✅ ALL PASSING
+  - `TestPricingService` - 11 tests ✅
+  - `TestCreditService` - 10 tests ✅
+  - `TestPaymentService` - 11 tests ✅
 - **Integration Tests**: `tests/integration/test_payment_api.py` (29 tests)
   - `TestPaymentEndpoints` - 20 tests
   - `TestCreditPackageDetails` - 5 tests
   - `TestPricingTiers` - 4 tests
+
+### API Endpoint Verification (2025-12-03)
+- `GET /api/v1/payments/packages` - ✅ Verified (4 packages returned)
+- `GET /api/v1/payments/prices` - ✅ Verified (4 pricing tiers returned)
 
 ---
 
@@ -267,12 +271,23 @@ Use Base Sepolia testnet for realistic blockchain testing:
 PAYMENT_CHAIN_ID=84532                                    # Base Sepolia
 PAYMENT_USDC_ADDRESS=0x036CbD53842c5426634e7929541eC2318f3dCF7e  # Testnet USDC
 PAYMENT_RECIPIENT_ADDRESS=YOUR_TEST_WALLET_ADDRESS
+
+# Dashboard environment variable
+VITE_USE_TESTNET=true
 ```
 
 **Get Testnet USDC:**
 1. Get Base Sepolia ETH: https://faucet.base.org
 2. Swap for testnet USDC: https://app.uniswap.org (connect to Base Sepolia)
 3. Or use Coinbase Wallet faucet
+
+**Sepolia Tests:**
+- [ ] TESTNET badge displays in PaymentModal
+- [ ] Chain switches to Base Sepolia (84532) on wallet connect
+- [ ] USDC balance fetched from Base Sepolia
+- [ ] Transaction sent to correct Sepolia USDC contract
+- [ ] Block explorer links point to sepolia.basescan.org
+- [ ] Payment verification works with Sepolia transaction hash
 
 **Test Steps:**
 - [ ] Connect wallet to Base Sepolia network

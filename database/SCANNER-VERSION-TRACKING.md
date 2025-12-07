@@ -389,17 +389,19 @@ The database provides the **history** and **analytics** that ConfigMap cannot.
 
 ---
 
-## Data Current as of 2025-10-31
+## Data Current as of 2025-12-05
 
-### Scanners Loaded
+### Scanners Loaded (Docker Images Updated December 5, 2025)
 
 **EVM/Solidity Scanners:**
-- slither (0.11.3) - 101/101 detectors (100%) - All 6 Phases Complete ✅
-- aderyn (0.6.5) - 87/87 detectors (100%) ✅
-- semgrep (1.141.0) - 43/47 detectors (91.5%)
-- solhint (6.0.1) - 16/20 detectors (80%)
-- echidna (2.2.7) - fuzzer
-- halmos (0.3.3) - formal verification
+- slither (0.11.3, solc-select 1.1.0) - scanner-slither:0.2.0 - 101/101 detectors (100%) ✅
+- aderyn (0.6.5) - scanner-aderyn:0.6.5 (pre-built binary) - 87/87 detectors (100%) ✅
+- wake (eth-wake 4.21.0) - scanner-wake:0.3.0 ✅
+- semgrep (1.144.0) - scanner-semgrep:0.3.0 - 43/47 detectors (91.5%)
+- solhint (5.1.0) - scanner-solhint:0.2.0 - 16/20 detectors (80%)
+- echidna (2.2.7, solc-select 1.1.0) - scanner-echidna:0.2.0 - fuzzer
+- medusa (1.3.1) - scanner-medusa:0.2.0 - fuzzer
+- halmos (0.3.3) - scanner-halmos:0.2.0 - formal verification
 - certora (8.3.1) - 0/5 rules integrated
 
 **EVM/Vyper Scanners:**
@@ -419,6 +421,13 @@ The database provides the **history** and **analytics** that ConfigMap cannot.
 
 ### Recent Updates Recorded
 
+- **2025-12-05**: Scanner image updates - 8 images built with latest tool versions
+  - Wake: eth-wake 4.13.1 → 4.21.0
+  - Semgrep: 1.141.0 → 1.144.0
+  - Solhint: 5.0.3 → 5.1.0
+  - Halmos: 0.2.1 → 0.3.3
+  - Medusa: pinned to v1.3.1
+  - All: solc-select updated to 1.1.0
 - **2025-10-31**: Slither Phase 5 & 6 Complete - 101/101 detectors (100%) ✅
 - **2025-10-30**: Aderyn 0.6.4 → 0.6.5
 - **2025-10-30**: Semgrep 1.122.0 → 1.141.0 (19-version jump)
@@ -565,5 +574,5 @@ SELECT record_scanner_update('scanner_name', 'new_version', 'new_image_tag');
 ---
 
 **Created**: 2025-10-30
-**Last Updated**: 2025-10-31
+**Last Updated**: 2025-12-05
 **Maintained By**: BlockSecOps Platform Team

@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 1.15.0
-**Last Updated:** November 27, 2025
+**Version:** 1.16.0
+**Last Updated:** December 7, 2025
 **Status:** Active
 
 ## Semantic Versioning for Docker Images
@@ -654,14 +654,27 @@ Before deploying to production:
 1.0.0 - Production release (future)
 ```
 
-## Current Image Versions (November 27, 2025)
+## Current Image Versions (December 7, 2025)
 
 | Service | Version | Description |
 |---------|---------|-------------|
 | blocksecops-api-service | 0.3.x | API service |
-| blocksecops-dashboard | 0.5.8 | Frontend dashboard |
+| blocksecops-dashboard | 0.8.0 | Frontend dashboard - real API data (no mock data) |
 | blocksecops-orchestration | 0.8.1 | Celery orchestration with multi-file project support |
-| scanner-soliditydefend | 0.2.1 | SolidityDefend scanner |
+
+### Scanner Images (Updated December 5, 2025)
+
+| Scanner | Image Version | Tool Version | Notes |
+|---------|--------------|--------------|-------|
+| scanner-slither | 0.2.0 | slither 0.11.3, solc-select 1.1.0 | Static analyzer |
+| scanner-aderyn | 0.6.5 | aderyn 0.6.5 | Pre-built binary |
+| scanner-wake | 0.3.0 | eth-wake 4.21.0 | Static analyzer |
+| scanner-semgrep | 0.3.0 | semgrep 1.144.0 | Pattern matcher |
+| scanner-solhint | 0.2.0 | solhint 5.1.0 | Linter |
+| scanner-echidna | 0.2.0 | echidna 2.2.7, solc-select 1.1.0 | Fuzzer |
+| scanner-medusa | 0.2.0 | medusa 1.3.1 | Parallelized fuzzer |
+| scanner-halmos | 0.2.0 | halmos 0.3.3, z3-solver 4.12.6.0 | Symbolic testing |
+| scanner-soliditydefend | latest | SolidityDefend | Commercial scanner |
 
 ---
 
