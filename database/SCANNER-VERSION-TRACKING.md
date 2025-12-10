@@ -389,9 +389,9 @@ The database provides the **history** and **analytics** that ConfigMap cannot.
 
 ---
 
-## Data Current as of 2025-12-05
+## Data Current as of 2025-12-08
 
-### Scanners Loaded (Docker Images Updated December 5, 2025)
+### Scanners Loaded (Docker Images Updated December 8, 2025)
 
 **EVM/Solidity Scanners:**
 - slither (0.11.3, solc-select 1.1.0) - scanner-slither:0.2.0 - 101/101 detectors (100%) ✅
@@ -405,14 +405,14 @@ The database provides the **history** and **analytics** that ConfigMap cannot.
 - certora (8.3.1) - 0/5 rules integrated
 
 **EVM/Vyper Scanners:**
-- vyper (0.11.3) - 0/99 detectors
-- moccasin (0.3.6) - fuzzer
+- vyper (0.4.3) - scanner-vyper:0.2.0 - uses slither 0.11.3 for analysis ✅
+- moccasin (latest, vyper 0.4.3) - scanner-moccasin:0.2.0 - fuzzer ✅
 
 **Solana Scanners:**
-- sol-azy (0.2.0) - 0/14 detectors
-- sec3-xray (0.0.6) - 0/11 detectors
-- trident (0.11.0) - fuzzer
-- cargo-fuzz-solana (0.13.1) - fuzzer
+- sol-azy (latest) - scanner-sol-azy:latest - built from source ✅
+- sec3-xray (0.0.6) - scanner-sec3-xray:latest - official GHCR image ✅
+- trident (0.12.0) - scanner-trident:latest - fuzzer ✅
+- cargo-fuzz-solana (0.13.1) - scanner-cargo-fuzz-solana:latest - fuzzer ✅
 
 **Cairo/StarkNet Scanners:**
 - caracal (0.2.3) - 0/14 detectors
@@ -421,6 +421,14 @@ The database provides the **history** and **analytics** that ConfigMap cannot.
 
 ### Recent Updates Recorded
 
+- **2025-12-08**: Phase 3.5 Vyper/Rust scanner images built and tested
+  - Vyper: scanner-vyper:0.2.0 with vyper 0.4.3, slither 0.11.3
+  - Moccasin: scanner-moccasin:0.2.0 with vyper 0.4.3
+  - Sol-azy: scanner-sol-azy:latest (146MB)
+  - Sec3 X-Ray: scanner-sec3-xray:latest (238MB)
+  - Trident: scanner-trident:latest with trident 0.12.0 (2.09GB)
+  - cargo-fuzz-solana: scanner-cargo-fuzz-solana:latest (1.69GB)
+  - All images use stable Rust (not nightly)
 - **2025-12-05**: Scanner image updates - 8 images built with latest tool versions
   - Wake: eth-wake 4.13.1 → 4.21.0
   - Semgrep: 1.141.0 → 1.144.0
@@ -574,5 +582,5 @@ SELECT record_scanner_update('scanner_name', 'new_version', 'new_image_tag');
 ---
 
 **Created**: 2025-10-30
-**Last Updated**: 2025-12-05
+**Last Updated**: 2025-12-08
 **Maintained By**: BlockSecOps Platform Team

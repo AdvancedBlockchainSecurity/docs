@@ -3,6 +3,104 @@
 **Priority**: P2 - Medium
 **Last Tested**: _Not yet tested_
 **Feature**: Vyper Scanner Integration, Solana/Rust Scanner Integration
+**Docker Images**: Built and verified (December 8, 2025)
+
+---
+
+## 0. Quick Start - Docker Image Testing
+
+Run these tests immediately after platform build to verify scanner images work:
+
+### 0.1 Verify Scanner Images Exist
+```bash
+# In minikube Docker context
+eval $(minikube docker-env)
+docker images | grep -E "^scanner-(vyper|moccasin|sol-azy|sec3|trident|cargo-fuzz)"
+```
+- [ ] scanner-vyper:latest exists (221MB)
+- [ ] scanner-moccasin:latest exists (773MB)
+- [ ] scanner-sol-azy:latest exists (146MB)
+- [ ] scanner-sec3-xray:latest exists (238MB)
+- [ ] scanner-trident:latest exists (2.09GB)
+- [ ] scanner-cargo-fuzz-solana:latest exists (1.69GB)
+
+### 0.2 Test Scanner Help Commands
+```bash
+# Vyper (uses slither entrypoint)
+docker run --rm scanner-vyper:latest --help
+
+# Moccasin
+docker run --rm scanner-moccasin:latest
+
+# Sol-azy
+docker run --rm scanner-sol-azy:latest --help
+
+# Sec3 X-Ray
+docker run --rm scanner-sec3-xray:latest "x-ray-scan --help"
+
+# Trident
+docker run --rm scanner-trident:latest trident --help
+
+# Cargo Fuzz
+docker run --rm scanner-cargo-fuzz-solana:latest cargo fuzz --help
+```
+- [ ] scanner-vyper shows slither help
+- [ ] scanner-moccasin shows fuzzing banner
+- [ ] scanner-sol-azy shows sol-azy SAST help
+- [ ] scanner-sec3-xray shows X-Ray help
+- [ ] scanner-trident shows trident fuzzer help
+- [ ] scanner-cargo-fuzz-solana shows cargo fuzz help
+
+### 0.3 Verify Tool Versions
+```bash
+# Vyper compiler version
+docker run --rm --entrypoint vyper scanner-vyper:latest --version
+# Expected: 0.4.3+commit.bff19ea2
+
+# Slither version (in vyper scanner)
+docker run --rm scanner-vyper:latest --version
+# Expected: 0.11.3
+
+# Moccasin vyper version
+docker run --rm --entrypoint vyper scanner-moccasin:latest --version
+# Expected: 0.4.3+commit.bff19ea2
+```
+- [ ] Vyper version is 0.4.3
+- [ ] Slither version is 0.11.3
+- [ ] Moccasin has vyper 0.4.3
+
+### 0.4 Test Basic Vyper Analysis
+```bash
+# Create test Vyper contract
+cat > /tmp/test.vy << 'EOF'
+# @version ^0.4.0
+owner: public(address)
+
+@deploy
+def __init__():
+    self.owner = msg.sender
+
+@external
+def withdraw():
+    send(msg.sender, self.balance)
+EOF
+
+# Run slither analysis
+docker run --rm -v /tmp:/contracts scanner-vyper:latest /contracts/test.vy --json -
+```
+- [ ] Scanner executes without error
+- [ ] JSON output returned
+- [ ] Detects potential issues (unchecked send)
+
+### 0.5 Test ConfigMap Scanner Metadata
+```bash
+kubectl get configmap scanner-versions -n tool-integration-local -o yaml | grep -A5 "vyper\|moccasin\|sol-azy\|sec3\|trident"
+```
+- [ ] vyper version shows 0.4.3
+- [ ] moccasin entry exists
+- [ ] sol-azy entry exists
+- [ ] sec3-xray entry exists
+- [ ] trident version shows 0.12.0
 
 ---
 

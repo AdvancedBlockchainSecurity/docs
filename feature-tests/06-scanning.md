@@ -124,6 +124,40 @@
 
 ---
 
+## 7.5 Scan Deletion
+
+### 7.5.1 Single Scan Deletion (ScanResults page)
+- [ ] "Delete Scan" button visible on scan results page
+- [ ] Confirmation dialog appears before deletion
+- [ ] Dialog shows warning about cascade deletion (vulnerabilities, specialized results)
+- [ ] Scan deleted from database after confirmation
+- [ ] Associated vulnerabilities deleted (cascade)
+- [ ] User redirected to contract page after deletion
+- [ ] Scan no longer appears in contract's scan history
+
+### 7.5.2 Batch Scan Deletion (ContractDetail page)
+- [ ] Checkboxes visible in Recent Scans table
+- [ ] "Select All" checkbox works correctly
+- [ ] Indeterminate state shown when some selected
+- [ ] "Delete Selected" button appears when scans selected
+- [ ] Confirmation dialog shows count of scans to delete
+- [ ] All selected scans deleted from database
+- [ ] Table refreshes after deletion
+- [ ] Selection cleared after deletion
+
+### 7.5.3 Deletion Authorization
+- [ ] Can only delete own scans (403 for others)
+- [ ] Non-existent scan returns 404
+- [ ] Unauthenticated request returns 401
+
+### 7.5.4 Database Verification
+- [ ] Scan record removed from `scans` table
+- [ ] Related vulnerabilities removed from `vulnerabilities` table
+- [ ] Specialized results removed (code_quality, gas_analysis, etc.)
+- [ ] Payment/credit transactions preserved (scan_id set to NULL)
+
+---
+
 ## 8. Scan Quotas
 
 - [ ] Scan count incremented on trigger

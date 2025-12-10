@@ -1,10 +1,85 @@
 # Local Development Setup Standards
 
-**Version:** 2.1.0
-**Last Updated:** November 30, 2025
+**Version:** 2.2.0
+**Last Updated:** December 9, 2025
 **Status:** Active
 
-> **Major Update (v2.1.0):** Added Production Parity Principle. All traffic MUST go through Traefik ingress controller. Port-forward to Traefik, NOT directly to services.
+> **Major Update (v2.2.0):** Added Local Overlay First Principle. All Kubernetes code MUST be developed and tested in the local overlay.
+>
+> **Previous (v2.1.0):** Added Production Parity Principle. All traffic MUST go through Traefik ingress controller.
+
+## Local Overlay First Principle
+
+**CRITICAL REQUIREMENT:** All Kubernetes development targets the `local` overlay. This is our primary development and testing environment.
+
+### Target Environment
+
+| Aspect | Value |
+|--------|-------|
+| **Active Overlay** | `k8s/overlays/local/` |
+| **Namespace Suffix** | `-local` (e.g., `api-service-local`) |
+| **Deployment Target** | Minikube |
+
+### Development Rules
+
+1. **All new k8s code goes to local overlay first**
+   - New services, patches, and configurations start in `k8s/overlays/local/`
+   - Test thoroughly in local before considering other overlays
+   - Local overlay is the source of truth for active development
+
+2. **Deploy and test using local overlay**
+   ```bash
+   # Always deploy from local overlay
+   kubectl apply -k k8s/overlays/local/
+
+   # NOT from base or other overlays during development
+   ```
+
+3. **If something is missing, check other overlays**
+   - Code may have been mistakenly placed in `staging/` or `production/` overlays
+   - Common mistakes:
+     - IngressRoutes in wrong overlay
+     - ConfigMap patches in staging instead of local
+     - Service patches missing from local
+   - When found, copy/move the code to local overlay
+
+### Overlay Recovery Checklist
+
+If a resource is missing from local, check these locations:
+
+```bash
+# Check if resource exists in other overlays
+ls k8s/overlays/staging/<service>/
+ls k8s/overlays/production/<service>/
+
+# Compare overlays to find missing files
+diff -r k8s/overlays/local/<service>/ k8s/overlays/staging/<service>/
+```
+
+**Common misplaced resources:**
+- `ingressroute.yaml` - Often created in staging first
+- `configmap-patch.yaml` - Environment-specific values in wrong overlay
+- `deployment-patch.yaml` - Resource limits may differ
+- `middleware-*.yaml` - Traefik middlewares
+
+### Overlay Structure Reference
+
+```
+k8s/
+├── base/                    # Shared base manifests
+│   └── <service>/
+└── overlays/
+    ├── local/               # ← PRIMARY DEVELOPMENT TARGET
+    │   └── <service>/
+    │       ├── kustomization.yaml
+    │       ├── namespace.yaml
+    │       ├── deployment-patch.yaml
+    │       ├── configmap-patch.yaml
+    │       ├── service-patch.yaml
+    │       └── ingressroute.yaml
+    ├── staging/             # Check here if local is missing resources
+    └── production/          # Check here if local is missing resources
+```
 
 ## Production Parity Principle
 

@@ -498,7 +498,19 @@ Security scan execution records.
 **Relationships:**
 - Many-to-one with `contracts` (contract_id)
 - Many-to-one with `users` (user_id)
-- One-to-many with `vulnerabilities`
+- One-to-many with `vulnerabilities` (CASCADE DELETE)
+- One-to-many with `code_quality_findings` (CASCADE DELETE)
+- One-to-many with `gas_analysis_findings` (CASCADE DELETE)
+- One-to-many with `formal_verification_results` (CASCADE DELETE)
+- One-to-many with `fuzzing_results` (CASCADE DELETE)
+- One-to-many with `payment_transactions` (SET NULL on delete)
+- One-to-many with `credit_transactions` (SET NULL on delete)
+
+**Cascade Delete Behavior** (December 9, 2025):
+When a scan is deleted via `DELETE /api/v1/scans/{scan_id}` or batch delete:
+- All associated `vulnerabilities` records are automatically deleted
+- All associated specialized result records (`code_quality_findings`, `gas_analysis_findings`, `formal_verification_results`, `fuzzing_results`) are automatically deleted
+- `payment_transactions.scan_id` and `credit_transactions.scan_id` are set to NULL (preserving billing/credit history)
 
 ---
 
@@ -580,7 +592,7 @@ Detected security vulnerabilities and code issues.
 - `ix_vulnerabilities_deduplication_group_id` on `deduplication_group_id` (Phase 4D)
 
 **Relationships:**
-- Many-to-one with `scans` (scan_id)
+- Many-to-one with `scans` (scan_id, CASCADE DELETE - vulnerabilities are deleted when parent scan is deleted)
 - Many-to-one with `contracts` (contract_id)
 
 ---

@@ -668,7 +668,7 @@ Before deploying to production:
 |---------|--------------|--------------|-------|
 | scanner-slither | 0.2.0 | slither 0.11.3, solc-select 1.1.0 | Static analyzer |
 | scanner-aderyn | 0.6.5 | aderyn 0.6.5 | Pre-built binary |
-| scanner-wake | 0.3.0 | eth-wake 4.21.0 | Static analyzer |
+| scanner-wake | 0.3.1 | eth-wake 4.21.0 | Static analyzer (added init/compile) |
 | scanner-semgrep | 0.3.0 | semgrep 1.144.0 | Pattern matcher |
 | scanner-solhint | 0.2.0 | solhint 5.1.0 | Linter |
 | scanner-echidna | 0.2.0 | echidna 2.2.7, solc-select 1.1.0 | Fuzzer |
