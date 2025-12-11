@@ -40,8 +40,9 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **x402 payments:** Pay-per-scan with USDC, scan credits, payment transactions (Phase 3.4)
 - **Scanner results:** Specialized result tables for gas analysis, fuzzing, formal verification, code quality (Phase 3)
 - **Contract analysis:** Parsed function, event, and state variable definitions from contracts
+- **Activity logging:** User activity tracking for uploads, scans, payments, and credit usage (Phase 3.1b)
 
-**Total Tables:** 32 (excluding alembic_version)
+**Total Tables:** 33 (excluding alembic_version)
 
 ---
 
@@ -150,6 +151,7 @@ User accounts with Supabase authentication and tier tracking (Phase 3.1a - Migra
 - One-to-many with `webhooks` (Phase 4.5)
 - One-to-many with `api_keys` (Phase 4.5)
 - One-to-many with `audit_logs` (Phase 4.5)
+- One-to-many with `user_activity_logs` (Phase 3.1b)
 
 ---
 
@@ -853,6 +855,53 @@ User-specific settings and preferences.
 
 **Relationships:**
 - One-to-one with `users` (user_id, CASCADE DELETE)
+
+---
+
+### `user_activity_logs`
+
+User activity log entries for tracking uploads, scans, payments, and credit usage (Phase 3.1b - Task 21, December 10, 2025).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique activity identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Associated user |
+| `activity_type` | VARCHAR(50) | NOT NULL, INDEX | Activity type (see enum below) |
+| `description` | VARCHAR(500) | NOT NULL | Human-readable description |
+| `contract_id` | UUID | NULLABLE, FK → contracts.id ON DELETE SET NULL | Related contract (for navigation) |
+| `scan_id` | UUID | NULLABLE, FK → scans.id ON DELETE SET NULL | Related scan (for navigation) |
+| `scanner_type` | VARCHAR(50) | NULLABLE | Scanner tool name (when applicable) |
+| `scan_status` | VARCHAR(20) | NULLABLE | Scan completion status (when applicable) |
+| `credits_used` | INTEGER | NOT NULL, DEFAULT 0 | Credits consumed (positive or negative) |
+| `payment_amount` | NUMERIC(10,2) | NULLABLE | Payment amount (for payment activities) |
+| `payment_currency` | VARCHAR(10) | NULLABLE | Payment currency code (USD, USDC) |
+| `activity_metadata` | JSONB | NULLABLE | Additional context data |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Activity timestamp |
+
+**Activity Types:**
+- `file_upload` - File uploaded to platform
+- `contract_created` - New contract created
+- `contract_deleted` - Contract deleted
+- `scan_started` - Security scan initiated
+- `scan_completed` - Security scan completed successfully
+- `scan_failed` - Security scan failed
+- `payment` - Payment transaction
+- `credit_purchase` - Credits purchased
+- `credit_used` - Credits consumed for scan
+
+**Indexes:**
+- `ix_user_activity_logs_user_id` on `user_id`
+- `ix_user_activity_logs_activity_type` on `activity_type`
+- `ix_user_activity_logs_created_at` on `created_at`
+- `ix_user_activity_logs_user_id_created_at` composite on `(user_id, created_at)` for efficient user queries
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `contracts` (contract_id, SET NULL on delete)
+- Many-to-one with `scans` (scan_id, SET NULL on delete)
+
+**API Endpoint:**
+- `GET /api/v1/users/me/activity` - Returns paginated activity log with summary statistics
 
 ---
 

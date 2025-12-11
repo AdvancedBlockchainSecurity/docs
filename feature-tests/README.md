@@ -1,7 +1,7 @@
 # BlockSecOps Feature Test Checklists
 
 **Created**: November 25, 2025
-**Last Updated**: December 1, 2025 (added x402 tests)
+**Last Updated**: December 10, 2025 (added user activity logging tests)
 
 ---
 
@@ -39,6 +39,7 @@ This directory contains manual testing checklists for all user-facing features o
 | [13-vyper-rust-scanners.md](./13-vyper-rust-scanners.md) | Vyper & Solana/Rust scanner integration (Phase 3.5) | P2 |
 | [14-enterprise-features.md](./14-enterprise-features.md) | Webhooks, RBAC, SSO, API Keys, Audit Logs (Phase 4.5) | P1 |
 | [15-x402-pay-per-scan.md](./15-x402-pay-per-scan.md) | USDC micropayments, credits, pricing (Phase 3.4) | P1 |
+| [16-user-activity-logging.md](./16-user-activity-logging.md) | Activity log API, dashboard UI, activity tracking (Phase 3.1b) | P1 |
 
 ---
 
@@ -57,6 +58,7 @@ This directory contains manual testing checklists for all user-facing features o
 - Wallet authentication (MetaMask/WalletConnect)
 - Enterprise features (Webhooks, RBAC, SSO, API Keys)
 - x402 Pay-Per-Scan (USDC payments, credits)
+- User Activity Logging (activity API, dashboard UI)
 
 **P2 - Medium**
 - Pricing page
