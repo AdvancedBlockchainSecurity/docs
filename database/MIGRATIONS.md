@@ -183,6 +183,45 @@ Due to database state inconsistencies after the 2025-11-05 database reset, the s
   - Services: `src/application/services/payment_service.py`, `credit_service.py`, `pricing_service.py`
   - Endpoints: `src/presentation/api/v1/endpoints/payments.py`
 
+### Migration 015_user_activity_logs: User Activity Logging (Phase 3.1b - Task 21)
+- **Status**: ✅ Completed (December 10, 2025)
+- **Revision ID**: `015_user_activity_logs`
+- **Previous Revision**: `014_x402_payments`
+- **Description**: User activity logging for uploads, scans, payments, and credit usage
+- **Tables Created**:
+  - `user_activity_logs` - User activity entries with timestamps and metadata
+- **Table Schema**:
+  - `id` (UUID) - Primary key
+  - `user_id` (UUID) - FK to users, CASCADE DELETE
+  - `activity_type` (VARCHAR(50)) - Activity type enum (file_upload, contract_created, scan_started, etc.)
+  - `description` (VARCHAR(500)) - Human-readable description
+  - `contract_id` (UUID) - Optional FK to contracts, SET NULL on delete
+  - `scan_id` (UUID) - Optional FK to scans, SET NULL on delete
+  - `scanner_type` (VARCHAR(50)) - Scanner tool name
+  - `scan_status` (VARCHAR(20)) - Scan completion status
+  - `credits_used` (INTEGER) - Credits consumed (default 0)
+  - `payment_amount` (NUMERIC(10,2)) - Payment amount
+  - `payment_currency` (VARCHAR(10)) - Payment currency
+  - `activity_metadata` (JSONB) - Additional context data
+  - `created_at` (TIMESTAMPTZ) - Activity timestamp
+- **Indexes Created**:
+  - `ix_user_activity_logs_user_id` on `user_id`
+  - `ix_user_activity_logs_activity_type` on `activity_type`
+  - `ix_user_activity_logs_created_at` on `created_at`
+  - `ix_user_activity_logs_user_id_created_at` composite for efficient user queries
+- **API Endpoints Added**:
+  - `GET /api/v1/users/me/activity` - Get user activity log with pagination and filtering
+- **Related Files**:
+  - Migration: `alembic/versions/20251210_0100-015_add_user_activity_logs.py`
+  - Models: `src/infrastructure/database/models.py` (UserActivityLogModel)
+  - Schemas: `src/presentation/schemas/users.py` (ActivityType, ActivityLogEntry, UserActivityResponse)
+  - Services: `src/application/services/activity_service.py`
+  - Endpoints: `src/presentation/api/v1/endpoints/users.py`
+- **Dashboard Components**:
+  - Activity Log Page: `blocksecops-dashboard/src/pages/ActivityLog.tsx`
+  - API Client: `blocksecops-dashboard/src/lib/api/users.ts`
+  - Navigation: Added to Sidebar under OVERVIEW section
+
 ### Migration Model Relationship Fix (December 2, 2025)
 - **Status**: ✅ Completed
 - **Description**: Fixed SQLAlchemy ORM relationship mapping errors for x402 models
@@ -195,11 +234,11 @@ Due to database state inconsistencies after the 2025-11-05 database reset, the s
 
 ---
 
-## Current Database State (2025-12-02)
+## Current Database State (2025-12-10)
 
 ### Alembic Version
 ```
-version_num: 014_x402_payments
+version_num: 015_user_activity_logs
 ```
 
 ### Existing Tables
@@ -213,6 +252,7 @@ version_num: 014_x402_payments
 - ✅ `scan_credits` (Phase 3.4 x402)
 - ✅ `payment_transactions` (Phase 3.4 x402)
 - ✅ `credit_transactions` (Phase 3.4 x402)
+- ✅ `user_activity_logs` (Phase 3.1b Task 21)
 - ❌ `deduplication_groups` (pending)
 - ❌ `vulnerability_classifications` (pending)
 - ❌ `vulnerability_trends` (pending)
