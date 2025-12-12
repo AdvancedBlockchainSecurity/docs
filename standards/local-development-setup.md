@@ -1,10 +1,12 @@
 # Local Development Setup Standards
 
-**Version:** 2.2.0
-**Last Updated:** December 9, 2025
+**Version:** 2.4.0
+**Last Updated:** December 12, 2025
 **Status:** Active
 
-> **Major Update (v2.2.0):** Added Local Overlay First Principle. All Kubernetes code MUST be developed and tested in the local overlay.
+> **Major Update (v2.4.0):** Added Harbor registry workflow and Prometheus metrics instrumentation details.
+>
+> **Previous (v2.2.0):** Added Local Overlay First Principle. All Kubernetes code MUST be developed and tested in the local overlay.
 >
 > **Previous (v2.1.0):** Added Production Parity Principle. All traffic MUST go through Traefik ingress controller.
 
@@ -183,6 +185,76 @@ kubectl delete pods -n tool-integration-local --field-selector=status.phase=Fail
 kubectl delete pods -n tool-integration-local -l job-name --field-selector=status.phase!=Running
 ```
 
+## Harbor Container Registry
+
+Harbor is deployed locally for container image storage. Build and push images to Harbor for production-like deployment workflows.
+
+### Build and Push Workflow
+
+```bash
+# 1. Use minikube's Docker daemon
+eval $(minikube docker-env)
+
+# 2. Build with versioned tag
+docker build -t api-service:0.4.0 .
+
+# 3. Tag for Harbor registry (use ClusterIP for internal access)
+docker tag api-service:0.4.0 10.106.241.219:443/blocksecops/api-service:0.4.0
+
+# 4. Docker login to Harbor (first time only)
+docker login 10.106.241.219:443 -u admin -p Harbor12345
+
+# 5. Push to Harbor
+docker push 10.106.241.219:443/blocksecops/api-service:0.4.0
+
+# 6. Tag as latest for kustomization
+docker tag api-service:0.4.0 blocksecops-api-service:latest
+
+# 7. Deploy via kustomization
+kubectl apply -k k8s/overlays/local/api-service
+```
+
+**Note:** With Harbor registry and versioned tags, `--no-cache` is no longer required for Docker builds. See [Docker Image Versioning Standards](./docker-image-versioning.md).
+
+### Harbor Access
+
+| Method | URL | Credentials |
+|--------|-----|-------------|
+| Web UI | `https://127.0.0.1:8443` | admin / Harbor12345 |
+| Docker Push (ClusterIP) | `10.106.241.219:443` | admin / Harbor12345 |
+
+## Prometheus Metrics Instrumentation
+
+All Python services expose Prometheus metrics on port 9090 using `prometheus-fastapi-instrumentator`.
+
+### Service Metrics Endpoints
+
+| Service | Namespace | Metrics Port | Endpoint |
+|---------|-----------|--------------|----------|
+| api-service | api-service-local | 9090 | /metrics |
+| data-service | data-service-local | 9090 | /metrics |
+| intelligence-engine | intelligence-engine-local | 9090 | /metrics |
+| orchestration | orchestration-local | 9090 | /metrics |
+| tool-integration | tool-integration-local | 9090 | /metrics |
+
+### Database Exporters
+
+| Exporter | Namespace | Port | Key Metrics |
+|----------|-----------|------|-------------|
+| postgres-exporter | postgresql-local | 9187 | pg_up, pg_stat_activity, pg_database_size |
+| redis-exporter | redis-local | 9121 | redis_up, redis_connected_clients, redis_memory_used |
+
+### Verify Metrics
+
+```bash
+# Check Python service metrics
+kubectl exec -n api-service-local deployment/api-service -- curl -s localhost:9090/metrics | head -20
+
+# Check database exporter metrics
+kubectl exec -n postgresql-local deployment/postgres-exporter -- curl -s localhost:9187/metrics | head -20
+kubectl exec -n redis-local deployment/redis-exporter -- curl -s localhost:9121/metrics | head -20
+```
+
 ## Access Endpoints
 
 > **IMPORTANT:** With the Traefik migration, the dashboard and API are accessed via a single Traefik ingress on port 3000. See [Dashboard Development Standards](./dashboard-development.md) for the correct startup procedure.
@@ -197,6 +269,7 @@ kubectl delete pods -n tool-integration-local -l job-name --field-selector=statu
 | Notification | `http://127.0.0.1:8003` | WebSocket server (direct port-forward) |
 | Grafana | `http://127.0.0.1:3001` | Monitoring dashboard |
 | Prometheus | `http://127.0.0.1:9090` | Metrics (when forwarded) |
+| Harbor | `https://127.0.0.1:8443` | Container registry (HTTPS, admin/Harbor12345) |
 | PostgreSQL | `127.0.0.1:5432` | Database (direct port-forward, optional) |
 | Redis | `127.0.0.1:6379` | Cache (direct port-forward, optional) |
 
@@ -237,11 +310,16 @@ echo "✅ Notification: http://127.0.0.1:8003"
 kubectl port-forward -n monitoring svc/monitoring-grafana 3001:80 > /tmp/pf-grafana.log 2>&1 &
 echo "✅ Grafana: http://127.0.0.1:3001"
 
+# Harbor Container Registry
+kubectl port-forward -n harbor-local svc/harbor 8443:443 > /tmp/pf-harbor.log 2>&1 &
+echo "✅ Harbor: https://127.0.0.1:8443"
+
 sleep 3
 echo ""
 echo "All port forwards active. Use 127.0.0.1 for all connections."
 echo "Dashboard: http://127.0.0.1:3000"
 echo "API Health: http://127.0.0.1:3000/api/v1/health/live"
+echo "Harbor: https://127.0.0.1:8443 (admin/Harbor12345)"
 ```
 
 ## Port Number Consistency Standards
@@ -262,6 +340,8 @@ echo "API Health: http://127.0.0.1:3000/api/v1/health/live"
 | Dashboard | 3000 | Main Dashboard UI | Primary user interface with Supabase Auth (blocksecops-dashboard) |
 | API Service | 8000 | Backend API | FastAPI application |
 | Notification | 8003 | WebSocket | Real-time notifications |
+| Vault | 8200 | Secret Management | HashiCorp Vault |
+| Harbor | 8443 | Container Registry | HTTPS with self-signed cert |
 | Grafana | 3001 | Monitoring | Metrics dashboard |
 | PostgreSQL | 5432 | Database | Port-forwarded only |
 | Redis | 6379 | Cache | Port-forwarded only |

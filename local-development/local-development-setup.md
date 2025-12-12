@@ -197,19 +197,28 @@ helm install vault hashicorp/vault \
   --namespace default
 ```
 
-### Install Monitoring Stack
+### Install Monitoring Stack (PLG)
+
+The monitoring stack uses Prometheus + Loki + Grafana (PLG) deployed via Kustomize:
 
 ```bash
-# Add Prometheus Helm repository
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
+# Deploy PLG monitoring stack
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/monitoring/
 
-# Install monitoring stack
-helm install monitoring prometheus-community/kube-prometheus-stack \
-  --set grafana.adminPassword=admin \
-  --namespace monitoring \
-  --create-namespace
+# Wait for pods to be ready
+kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=prometheus -n monitoring-local --timeout=120s
+kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=loki -n monitoring-local --timeout=120s
+kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=grafana -n monitoring-local --timeout=120s
+
+# Verify all pods are running
+kubectl get pods -n monitoring-local
 ```
+
+**Components:**
+- **Prometheus** (v2.48.0): Metrics collection with 7-day retention
+- **Loki** (v2.9.3): Log aggregation with 72-hour retention
+- **Grafana** (v10.2.3): Dashboards with pre-configured datasources
+- **Promtail** (v2.9.3): Log shipping agent (DaemonSet)
 
 ## Step 4: Build Service Images
 
@@ -265,20 +274,27 @@ kubectl create configmap service-config \
 
 ### Port Forwarding Setup
 
+See `/Users/pwner/Git/ABS/docs/standards/port-forwarding.md` for complete port mappings.
+
 ```bash
-# Forward API service
-kubectl port-forward svc/blocksecops-api-service 8000:8000 -n blocksecops &
+# Traefik Ingress (primary access point)
+kubectl port-forward -n traefik-local svc/traefik 3000:80 &
 
-# Forward main dashboard
-kubectl port-forward svc/blocksecops-dashboard 3000:3000 -n blocksecops &
+# Monitoring - Grafana (port 3001 to avoid Traefik conflict)
+kubectl port-forward -n monitoring-local svc/grafana 3001:3000 &
 
-# Forward Grafana
-kubectl port-forward svc/monitoring-grafana 3001:80 -n monitoring &
+# Monitoring - Prometheus (port 9091 to avoid API metrics conflict)
+kubectl port-forward -n monitoring-local svc/prometheus 9091:9090 &
+
+# Monitoring - Loki (logs)
+kubectl port-forward -n monitoring-local svc/loki 9093:3100 &
 
 # Access services:
-# API: http://localhost:8000
-# Dashboard: http://localhost:3000
-# Grafana: http://localhost:3001 (admin/admin)
+# Dashboard: http://127.0.0.1:3000 (via Traefik)
+# API: http://127.0.0.1:3000/api/v1 (via Traefik routing)
+# Grafana: http://127.0.0.1:3001 (admin/admin)
+# Prometheus: http://127.0.0.1:9091
+# Loki: http://127.0.0.1:9093
 ```
 
 ### Ingress Configuration

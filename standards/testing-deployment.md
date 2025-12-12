@@ -1,7 +1,7 @@
 # Testing and Deployment Standards
 
-**Version:** 1.8.0
-**Last Updated:** October 20, 2025
+**Version:** 1.9.0
+**Last Updated:** December 12, 2025
 **Status:** Active
 
 ## Testing Standards
@@ -105,20 +105,17 @@ vim src/presentation/api/v1/endpoints/analytics.py
 
 # 2. Build and deploy (DON'T COMMIT YET)
 eval $(minikube docker-env)
-docker build --no-cache -t api-service:latest .
-kubectl set image deployment/api-service api-service=api-service:latest -n api-service-local
+docker build -t api-service:0.4.2 .
+docker tag api-service:0.4.2 blocksecops-api-service:latest
+kubectl rollout restart deployment/api-service -n api-service-local
 kubectl rollout status deployment/api-service -n api-service-local
 
-# 3. Force pod restart to ensure new image is used
-kubectl delete pod -n api-service-local -l app.kubernetes.io/name=api-service
-kubectl rollout status deployment/api-service -n api-service-local
-
-# 4. Test the fix thoroughly
+# 3. Test the fix thoroughly
 curl http://127.0.0.1:8000/api/v1/analytics/summary | jq '.vulnerability_trends.summary.total_resolved_vulnerabilities'
 # Verify the dashboard shows correct numbers
 # Test with different scenarios
 
-# 5. ONLY AFTER confirming it works, commit
+# 4. ONLY AFTER confirming it works, commit
 git add src/presentation/api/v1/endpoints/analytics.py
 git commit -m "fix: Correct analytics resolved vulnerabilities count
 
@@ -128,7 +125,8 @@ git commit -m "fix: Correct analytics resolved vulnerabilities count
 
 Tested: Dashboard analytics now shows correct resolved count"
 
-# 6. Push and create PR
+# 5. Push to Harbor and create PR
+docker push <harbor-clusterip>:443/blocksecops/api-service:0.4.2
 git push
 ```
 
@@ -144,134 +142,63 @@ git push
 - Database migrations (verify data integrity)
 - Deployment configuration changes (verify services remain healthy)
 
-### CRITICAL: Always Build Docker Images with --no-cache
+### Docker Build Caching with Harbor Registry
 
-**MANDATORY:** Docker images MUST be built with the `--no-cache` flag to prevent stale code from being included in builds.
+**With Harbor registry and versioned tags, `--no-cache` is no longer required for most builds.**
 
-**The Problem:**
+**Why `--no-cache` is no longer mandatory:**
 
-Docker uses layer caching to speed up builds. When you change application code but the Dockerfile hasn't changed, Docker may reuse cached layers containing OLD code. This results in deploying images that don't include your latest changes.
+With the Harbor container registry:
+- Each version gets a unique tag (0.4.0, 0.4.1, etc.)
+- Images are pushed to Harbor with versioned tags
+- Kubernetes pulls images from Harbor by tag
+- The original Docker cache issue (stale `:latest` images) is solved by versioned tags
 
-**Example of the issue:**
-
-```bash
-# Day 1: Build image with code version A
-docker build -t api-service:latest .
-# Docker caches layers including code version A
-
-# Day 2: Update analytics.py with bug fix (code version B)
-vim src/presentation/api/v1/endpoints/analytics.py
-
-# Build image - Docker reuses cached layers!
-docker build -t api-service:latest .
-# ❌ Image contains OLD code (version A), not your fix (version B)!
-
-# Deploy the image
-kubectl set image deployment/api-service api-service=api-service:latest -n api-service-local
-# ❌ Deployed code doesn't have your fix!
-
-# Test shows bug still exists
-curl http://127.0.0.1:8000/api/v1/analytics/summary
-# Returns old behavior - your fix isn't deployed
-```
-
-**The Solution:**
-
-ALWAYS use `--no-cache` flag when building Docker images for local development and testing:
+**Standard Build Workflow:**
 
 ```bash
-✅ CORRECT: Build with --no-cache
+# 1. Build with new version tag
 eval $(minikube docker-env)
-docker build --no-cache -t api-service:latest .
+docker build -t api-service:0.4.1 .
 
-# This ensures:
-# - All layers rebuilt from scratch
-# - Latest code is included
-# - No stale cached code
-# - Deployed image matches source code
+# 2. Tag for Harbor and as latest
+docker tag api-service:0.4.1 <harbor-clusterip>:443/blocksecops/api-service:0.4.1
+docker tag api-service:0.4.1 blocksecops-api-service:latest
+
+# 3. Push to Harbor
+docker push <harbor-clusterip>:443/blocksecops/api-service:0.4.1
+
+# 4. Restart deployment
+kubectl rollout restart deployment/api-service -n api-service-local
 ```
 
-**When --no-cache is MANDATORY:**
+**When to use `--no-cache`:**
 
-- **Bug fixes** - Ensuring the fix is actually included
-- **Code changes** - Any modifications to application code
-- **After editing Python/JS/TS files** - Source code changes
-- **Testing fixes locally** - Before committing code
-- **When unsure** - Better safe than deploying stale code
+Use `--no-cache` only in these specific scenarios:
 
-**When --no-cache is optional (but still recommended):**
-
-- **Dockerfile changes only** - No application code changes
-- **Dependency updates in requirements.txt** - Package changes trigger rebuild anyway
-- **CI/CD pipelines** - Automated builds with version control
-
-**Why this matters:**
-
-- **Code Accuracy:** Deployed code must match source code
-- **Testing Validity:** Can't test a fix that isn't deployed
-- **Debugging Time:** Hours wasted debugging "broken fixes" that aren't deployed
-- **Cache Reliability:** Docker cache can be unpredictable with `COPY . /app` commands
-- **Development Speed:** Faster to rebuild than debug phantom issues
-
-**Build Time Trade-offs:**
+- **Debugging build issues** - When you suspect cached layers are causing problems
+- **Rebuilding same version tag** - If you must rebuild without incrementing version
+- **Fresh dependency downloads** - When you need to update all dependencies
+- **CI/CD initial builds** - First build in a clean environment
 
 ```bash
-# With cache (fast but risky)
-docker build -t api-service:latest .
+# Use --no-cache when needed
+docker build --no-cache -t api-service:0.4.1 .
+```
+
+**Build Time Comparison:**
+
+```bash
+# With cache (fast, safe with versioned tags)
+docker build -t api-service:0.4.1 .
 # Time: ~10-30 seconds
-# Risk: May include stale code
 
-# Without cache (slower but reliable)
-docker build --no-cache -t api-service:latest .
+# Without cache (slower, guaranteed fresh)
+docker build --no-cache -t api-service:0.4.1 .
 # Time: ~2-5 minutes
-# Risk: None - guaranteed fresh build
 ```
 
-**The extra 2-5 minutes is worth it to ensure your code changes are actually deployed.**
-
-**Real-World Example:**
-
-On October 17, 2025, an analytics bug fix was deployed THREE times before working:
-
-1. **First attempt:** Built without `--no-cache`, deployed stale code, bug persisted
-2. **Second attempt:** Built with `--no-cache`, BUT Kubernetes cached old image, bug persisted
-3. **Third attempt:** Built with `--no-cache` AND deleted pod, fix finally worked
-
-**Complete workflow to ensure code changes deploy:**
-
-```bash
-# 1. Make code changes
-vim src/presentation/api/v1/endpoints/analytics.py
-
-# 2. Build with --no-cache (MANDATORY)
-eval $(minikube docker-env)
-docker build --no-cache -t api-service:latest .
-
-# 3. Update deployment
-kubectl set image deployment/api-service api-service=api-service:latest -n api-service-local
-
-# 4. Force pod restart (ensures Kubernetes pulls fresh image)
-kubectl delete pod -n api-service-local -l app.kubernetes.io/name=api-service
-
-# 5. Wait for rollout
-kubectl rollout status deployment/api-service -n api-service-local
-
-# 6. Verify deployed code matches source
-kubectl exec -n api-service-local deployment/api-service -- grep -A 2 "net_change" /app/src/presentation/api/v1/endpoints/analytics.py
-
-# 7. Test the fix
-curl http://127.0.0.1:8000/api/v1/analytics/summary | jq '.'
-```
-
-**Exception for Production:**
-
-In CI/CD pipelines for staging/production, you MAY use Docker cache IF:
-- Images are tagged with specific versions (not `latest`)
-- Build system tracks source code changes
-- Each version is guaranteed a unique build
-- Cache invalidation is properly configured
-
-**For local development: ALWAYS use --no-cache. No exceptions.**
+**Best Practice:** Increment version tags for each code change. This eliminates caching ambiguity and provides clear version tracking.
 
 ### Rollback Procedure
 
