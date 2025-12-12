@@ -1,7 +1,7 @@
 # Port-Forwarding Standards
 
-**Version:** 2.1.0
-**Last Updated:** November 28, 2025
+**Version:** 2.3.0
+**Last Updated:** December 12, 2025
 **Status:** Active
 
 ## Overview
@@ -29,6 +29,22 @@ This document defines the standard port-forwarding configuration for local devel
 | **5432** | PostgreSQL | `postgresql-local` | 5432 | Main database |
 | **6379** | Redis | `redis-local` | 6379 | Cache & session store |
 | **8200** | Vault | `vault-local` | 8200 | Secret management |
+| **8443** | Harbor | `harbor-local` | 443 | Container registry (HTTPS) |
+
+### Monitoring Services (PLG Stack)
+
+| Local Port | Service | Namespace | Target Port | Purpose |
+|------------|---------|-----------|-------------|---------|
+| **3001** | Grafana | `monitoring-local` | 3000 | Dashboards & visualization |
+| **9091** | Prometheus | `monitoring-local` | 9090 | Metrics collection |
+| **9093** | Loki | `monitoring-local` | 3100 | Log aggregation |
+
+### Database Exporters
+
+| Local Port | Service | Namespace | Target Port | Purpose |
+|------------|---------|-----------|-------------|---------|
+| **9187** | postgres-exporter | `postgresql-local` | 9187 | PostgreSQL metrics |
+| **9121** | redis-exporter | `redis-local` | 9121 | Redis metrics |
 
 ### Frontend & Ingress
 
@@ -76,6 +92,22 @@ kubectl port-forward -n redis-local svc/redis 6379:6379 &
 # Vault Secret Manager
 kubectl port-forward -n vault-local svc/vault 8200:8200 &
 
+# Harbor Container Registry (HTTPS)
+kubectl port-forward -n harbor-local svc/harbor 8443:443 &
+
+# Monitoring - Grafana (port 3001 to avoid conflict with Traefik on 3000)
+kubectl port-forward -n monitoring-local svc/grafana 3001:3000 &
+
+# Monitoring - Prometheus (port 9091 to avoid conflict with API metrics on 9090)
+kubectl port-forward -n monitoring-local svc/prometheus 9091:9090 &
+
+# Monitoring - Loki (port 9093 for log queries)
+kubectl port-forward -n monitoring-local svc/loki 9093:3100 &
+
+# Database Exporters
+kubectl port-forward -n postgresql-local svc/postgres-exporter 9187:9187 &
+kubectl port-forward -n redis-local svc/redis-exporter 9121:9121 &
+
 echo "✅ All port-forwards established"
 echo ""
 echo "Service URLs:"
@@ -90,6 +122,12 @@ echo "  Tool Integration: http://127.0.0.1:8005"
 echo "  PostgreSQL:       postgresql://localhost:5432"
 echo "  Redis:            redis://localhost:6379"
 echo "  Vault:            http://127.0.0.1:8200"
+echo "  Harbor:           https://127.0.0.1:8443 (admin/Harbor12345)"
+echo ""
+echo "Monitoring URLs:"
+echo "  Grafana:          http://127.0.0.1:3001 (admin/admin)"
+echo "  Prometheus:       http://127.0.0.1:9091"
+echo "  Loki:             http://127.0.0.1:9093"
 ```
 
 ### Individual Service Commands
@@ -114,11 +152,37 @@ kubectl port-forward -n postgresql-local svc/postgresql 5432:5432
 kubectl port-forward -n redis-local svc/redis 6379:6379
 ```
 
+**Harbor Container Registry (HTTPS)**:
+```bash
+kubectl port-forward -n harbor-local svc/harbor 8443:443
+```
+
+**Note**: Harbor uses HTTPS with a self-signed certificate. Access via `https://127.0.0.1:8443`. Login: `admin` / `Harbor12345`.
+
+**Grafana (Dashboards)**:
+```bash
+kubectl port-forward -n monitoring-local svc/grafana 3001:3000
+```
+
+**Prometheus (Metrics)**:
+```bash
+kubectl port-forward -n monitoring-local svc/prometheus 9091:9090
+```
+
+**Loki (Logs)**:
+```bash
+kubectl port-forward -n monitoring-local svc/loki 9093:3100
+```
+
+**Note**: Monitoring ports are offset from their default values to avoid conflicts with other services (Traefik on 3000, API metrics on 9090).
+
 ## Port Assignment Rules
 
 ### Port Range Allocation
 
 - **8000-8099**: Application services (APIs, web services)
+- **8200-8299**: Secret management (Vault)
+- **8400-8499**: Container registry services (Harbor)
 - **5000-5999**: Databases and data stores
 - **6000-6999**: Cache and messaging systems
 - **9000-9999**: Monitoring and metrics
@@ -350,7 +414,7 @@ curl -s http://127.0.0.1:8000/health || echo "Port 8000 not accessible"
 #!/bin/bash
 # File: scripts/check-port-forwards.sh
 
-ports=(8000 8001 8002 8003 8004 8005 9090 5432 6379 8200)
+ports=(8000 8001 8002 8003 8004 8005 9090 5432 6379 8200 8443 3001 9091 9093 9187 9121)
 services=(
   "API Service HTTP"
   "Data Service"
@@ -362,6 +426,12 @@ services=(
   "PostgreSQL"
   "Redis"
   "Vault"
+  "Harbor Registry"
+  "Grafana"
+  "Prometheus"
+  "Loki"
+  "PostgreSQL Exporter"
+  "Redis Exporter"
 )
 
 echo "Checking port-forwards..."
@@ -494,6 +564,18 @@ curl http://127.0.0.1:3000
 
 # Test API routing
 curl http://127.0.0.1:3000/api/v1/scanners
+```
+
+**Test Monitoring Stack**:
+```bash
+# Test Grafana
+curl -s http://127.0.0.1:3001/api/health | jq .
+
+# Test Prometheus
+curl -s http://127.0.0.1:9091/-/ready
+
+# Test Loki
+curl -s http://127.0.0.1:9093/ready
 ```
 
 ---

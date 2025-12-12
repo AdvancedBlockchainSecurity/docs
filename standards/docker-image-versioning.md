@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 1.16.0
-**Last Updated:** December 7, 2025
+**Version:** 1.17.0
+**Last Updated:** December 12, 2025
 **Status:** Active
 
 ## Semantic Versioning for Docker Images
@@ -264,18 +264,16 @@ LABEL version="0.2.4"
 
 # 2. Build new scanner image with semantic version
 eval $(minikube docker-env)
-docker build --no-cache -t scanner-semgrep:0.2.4 -f Dockerfile .
+docker build -t scanner-semgrep:0.2.4 -f Dockerfile .
 
 # 3. Tag as latest for local development
 docker tag scanner-semgrep:0.2.4 scanner-semgrep:latest
 
-# 4. Rebuild tool-integration service (if needed)
-docker build --no-cache -t tool-integration:latest -f Dockerfile .
+# 4. Push to Harbor registry
+docker tag scanner-semgrep:0.2.4 <harbor-clusterip>:443/blocksecops/scanner-semgrep:0.2.4
+docker push <harbor-clusterip>:443/blocksecops/scanner-semgrep:0.2.4
 
-# 5. Apply ConfigMap (no version changes needed - uses :latest)
-kubectl apply -k k8s/base/
-
-# 6. Restart tool-integration deployment to pick up changes
+# 5. Restart tool-integration deployment to pick up changes
 kubectl rollout restart deployment/tool-integration -n tool-integration-local
 kubectl rollout status deployment/tool-integration -n tool-integration-local
 ```
@@ -329,12 +327,12 @@ data:
 
 ```bash
 # 1. Test new scanner version in local environment first
-docker build --no-cache -t scanner-semgrep:0.2.4 -f Dockerfile .
+docker build -t scanner-semgrep:0.2.4 -f Dockerfile .
 docker tag scanner-semgrep:0.2.4 scanner-semgrep:latest
 # Test locally...
 
 # 2. Build and push to production registry with explicit version
-docker build --no-cache -t scanner-semgrep:0.2.4 -f Dockerfile .
+docker build -t scanner-semgrep:0.2.4 -f Dockerfile .
 docker tag scanner-semgrep:0.2.4 registry.example.com/scanner-semgrep:0.2.4
 docker push registry.example.com/scanner-semgrep:0.2.4
 
@@ -405,7 +403,7 @@ docker build -t scanner-semgrep:0.2.4 -f Dockerfile .
 **Solution:** Always tag new version as latest for local dev
 ```bash
 # ✅ Build and tag as latest
-docker build --no-cache -t scanner-semgrep:0.2.4 -f Dockerfile .
+docker build -t scanner-semgrep:0.2.4 -f Dockerfile .
 docker tag scanner-semgrep:0.2.4 scanner-semgrep:latest
 ```
 
@@ -435,16 +433,20 @@ kubectl apply -k k8s/base/
 kubectl rollout restart deployment/tool-integration -n tool-integration-local
 ```
 
-**Pitfall 4: Docker cache preventing image updates**
-```bash
-# ❌ Built image but Docker used cached layers
-docker build -t scanner-semgrep:0.2.4 -f Dockerfile .
-# Image still contains old code due to layer caching
-```
+**Pitfall 4: Docker cache causing stale code (rare with Harbor)**
 
-**Solution:** Always use --no-cache flag per platform standards
+With Harbor registry and versioned tags, this is rarely an issue because:
+- Each version gets a unique tag (0.2.4, 0.2.5, etc.)
+- Kubernetes pulls the new tag from Harbor
+- Harbor stores the exact image that was pushed
+
+**When to use `--no-cache`:**
 ```bash
-# ✅ Force fresh build without cache
+# Use --no-cache only when:
+# - Debugging build issues
+# - Rebuilding same version tag with code changes
+# - Ensuring fresh dependency downloads
+
 docker build --no-cache -t scanner-semgrep:0.2.4 -f Dockerfile .
 ```
 
