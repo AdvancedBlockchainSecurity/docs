@@ -41,8 +41,11 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Scanner results:** Specialized result tables for gas analysis, fuzzing, formal verification, code quality (Phase 3)
 - **Contract analysis:** Parsed function, event, and state variable definitions from contracts
 - **Activity logging:** User activity tracking for uploads, scans, payments, and credit usage (Phase 3.1b)
+- **Favorites:** User favorites/pinned items for quick access (Phase 3.1b Sprint 3)
+- **Vulnerability annotations:** Mark vulnerabilities with status and notes (Phase 3.1b Sprint 3)
+- **Batch scans:** Multi-contract batch scan operations (Phase 3.1b Sprint 3)
 
-**Total Tables:** 33 (excluding alembic_version)
+**Total Tables:** 37 (excluding alembic_version)
 
 ---
 
@@ -902,6 +905,147 @@ User activity log entries for tracking uploads, scans, payments, and credit usag
 
 **API Endpoint:**
 - `GET /api/v1/users/me/activity` - Returns paginated activity log with summary statistics
+
+---
+
+### `user_favorites`
+
+User favorites/pinned items for quick access (Phase 3.1b - Sprint 3, Migration 016, December 11, 2025).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique favorite identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | User who favorited the item |
+| `item_type` | VARCHAR(50) | NOT NULL, INDEX | Type of item (project, contract, scan) |
+| `item_id` | UUID | NOT NULL | ID of the favorited item |
+| `display_order` | INTEGER | NOT NULL, DEFAULT 0 | Order for display in favorites list |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | When item was favorited |
+
+**Item Types:**
+- `project` - Favorited project
+- `contract` - Favorited contract
+- `scan` - Favorited scan result
+
+**Indexes:**
+- `ix_user_favorites_user_id` on `user_id`
+- `ix_user_favorites_item_type` on `item_type`
+- `uq_user_favorites_user_item` (UNIQUE) composite on `(user_id, item_type, item_id)` - Prevents duplicate favorites
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+
+**API Endpoints:**
+- `POST /api/v1/favorites` - Add a favorite
+- `GET /api/v1/favorites` - List user's favorites
+- `DELETE /api/v1/favorites/{type}/{id}` - Remove a favorite
+- `PUT /api/v1/favorites/reorder` - Reorder favorites
+- `GET /api/v1/favorites/check/{type}/{id}` - Check if item is favorited
+
+---
+
+### `vulnerability_annotations`
+
+User annotations/status tracking for vulnerabilities (Phase 3.1b - Sprint 3, Migration 017, December 11, 2025).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique annotation identifier |
+| `vulnerability_id` | UUID | NOT NULL, FK → vulnerabilities.id ON DELETE CASCADE, INDEX | Annotated vulnerability |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | User who created annotation |
+| `status` | VARCHAR(50) | NOT NULL, INDEX | Annotation status (see enum below) |
+| `note` | TEXT | NULLABLE | User notes about the vulnerability |
+| `reason` | VARCHAR(255) | NULLABLE | Brief reason for status assignment |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Annotation creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Annotation Status Values:**
+- `false_positive` - Marked as not a real vulnerability
+- `acknowledged` - Acknowledged but not yet addressed
+- `confirmed` - Confirmed as a real vulnerability
+- `wont_fix` - Will not be fixed (accepted risk)
+- `in_progress` - Fix is being worked on
+- `fixed` - Vulnerability has been fixed
+
+**Indexes:**
+- `ix_vulnerability_annotations_vulnerability_id` on `vulnerability_id`
+- `ix_vulnerability_annotations_user_id` on `user_id`
+- `ix_vulnerability_annotations_status` on `status`
+- `uq_vuln_annotation_user_vuln` (UNIQUE) composite on `(user_id, vulnerability_id)` - One annotation per user per vulnerability
+
+**Relationships:**
+- Many-to-one with `vulnerabilities` (vulnerability_id, CASCADE DELETE)
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- One-to-many with `vulnerability_annotation_history`
+
+**API Endpoints:**
+- `POST /api/v1/annotations` - Create annotation
+- `GET /api/v1/annotations/vulnerability/{id}` - Get annotation for vulnerability
+- `GET /api/v1/annotations` - List user's annotations
+- `DELETE /api/v1/annotations/{id}` - Delete annotation
+- `GET /api/v1/annotations/{id}/history` - Get annotation history
+- `GET /api/v1/annotations/scan/{id}` - Get all annotations for a scan
+- `POST /api/v1/annotations/bulk` - Bulk create annotations
+
+---
+
+### `vulnerability_annotation_history`
+
+Audit trail for vulnerability annotation changes (Phase 3.1b - Sprint 3, Migration 017, December 11, 2025).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique history entry identifier |
+| `annotation_id` | UUID | NOT NULL, FK → vulnerability_annotations.id ON DELETE CASCADE, INDEX | Parent annotation |
+| `previous_status` | VARCHAR(50) | NULLABLE | Status before change (null for creation) |
+| `new_status` | VARCHAR(50) | NOT NULL | Status after change |
+| `changed_by` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE | User who made the change |
+| `change_reason` | VARCHAR(255) | NULLABLE | Reason for the change |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Timestamp of change |
+
+**Indexes:**
+- `ix_vuln_annotation_history_annotation_id` on `annotation_id`
+- `ix_vuln_annotation_history_created_at` on `created_at`
+
+**Relationships:**
+- Many-to-one with `vulnerability_annotations` (annotation_id, CASCADE DELETE)
+- Many-to-one with `users` (changed_by, CASCADE DELETE)
+
+---
+
+### `scan_batches`
+
+Batch scan tracking for multi-contract scan operations (Phase 3.1b - Sprint 3, Migration 018, December 11, 2025).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique batch identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | User who created the batch |
+| `project_id` | UUID | NULLABLE, FK → projects.id ON DELETE SET NULL | Optional project association |
+| `total_contracts` | INTEGER | NOT NULL, DEFAULT 0 | Total number of contracts in batch |
+| `completed_count` | INTEGER | NOT NULL, DEFAULT 0 | Number of completed scans |
+| `failed_count` | INTEGER | NOT NULL, DEFAULT 0 | Number of failed scans |
+| `status` | VARCHAR(50) | NOT NULL, DEFAULT 'pending', INDEX | Batch status (pending, running, completed, partially_completed, failed) |
+| `priority` | VARCHAR(20) | NOT NULL, DEFAULT 'normal' | Batch priority (low, normal, high, critical) |
+| `scanner_ids` | VARCHAR(50)[] | NOT NULL | Array of scanner IDs to use |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Batch creation timestamp |
+| `completed_at` | TIMESTAMPTZ | NULLABLE | Batch completion timestamp |
+
+**Indexes:**
+- `ix_scan_batches_user_id` on `user_id`
+- `ix_scan_batches_status` on `status`
+- `ix_scan_batches_created_at` on `created_at`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `projects` (project_id, SET NULL)
+- One-to-many with `scans` (via scans.batch_id)
+
+**API Endpoints:**
+- `POST /api/v1/scans/batch` - Create batch scan for multiple contracts
+- `GET /api/v1/scans/batch` - List batch scans with pagination
+- `GET /api/v1/scans/batch/{batch_id}` - Get batch scan status with scan details
+
+**Note:** The `scans` table has a `batch_id` column (FK → scan_batches.id ON DELETE SET NULL) to link individual scans to their batch.
 
 ---
 
@@ -1861,9 +2005,24 @@ See [Platform Development Standards](/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPM
 
 ---
 
-**Document Version:** 1.6.0
-**Last Updated:** December 7, 2025 (Added 7 missing scanner result tables, 32 total tables)
+**Document Version:** 1.7.0
+**Last Updated:** December 11, 2025 (Added favorites and annotations tables, 36 total tables)
 **Maintained By:** BlockSecOps Team
+
+---
+
+## Recent Schema Changes
+
+### Migration 017: Vulnerability Annotations (December 11, 2025)
+- Added `vulnerability_annotations` table for tracking vulnerability status
+- Added `vulnerability_annotation_history` table for audit trail
+- Added AnnotationStatus enum: false_positive, acknowledged, confirmed, wont_fix, in_progress, fixed
+- Supports bulk annotation operations
+
+### Migration 016: User Favorites (December 11, 2025)
+- Added `user_favorites` table for pinned items
+- Supports projects, contracts, and scans as favorite types
+- Includes display ordering for custom sort
 
 ---
 
