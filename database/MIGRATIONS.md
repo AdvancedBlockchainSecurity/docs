@@ -222,6 +222,108 @@ Due to database state inconsistencies after the 2025-11-05 database reset, the s
   - API Client: `blocksecops-dashboard/src/lib/api/users.ts`
   - Navigation: Added to Sidebar under OVERVIEW section
 
+### Migration 016_user_favorites: User Favorites (Phase 3.1b - Task 27.1)
+- **Status**: ✅ Completed (December 11, 2025)
+- **Revision ID**: `016_user_favorites`
+- **Previous Revision**: `015_user_activity_logs`
+- **Description**: Favorites system for contracts, scans, and vulnerabilities
+- **Tables Created**:
+  - `user_favorites` - User favorite items with polymorphic reference
+- **Table Schema**:
+  - `id` (UUID) - Primary key
+  - `user_id` (UUID) - FK to users, CASCADE DELETE
+  - `item_type` (VARCHAR(50)) - Type of favorited item (contract, scan, vulnerability)
+  - `item_id` (UUID) - ID of the favorited item
+  - `notes` (VARCHAR(500)) - Optional user notes
+  - `created_at` (TIMESTAMPTZ) - When favorited
+- **Indexes Created**:
+  - `ix_user_favorites_user_id` on `user_id`
+  - `ix_user_favorites_item_type` on `item_type`
+  - Unique constraint on `(user_id, item_type, item_id)`
+- **API Endpoints Added**:
+  - `GET /api/v1/users/me/favorites` - List user favorites
+  - `POST /api/v1/users/me/favorites` - Add a favorite
+  - `DELETE /api/v1/users/me/favorites/:id` - Remove a favorite
+- **Related Files**:
+  - Migration: `alembic/versions/20251211_0100-016_add_user_favorites.py`
+  - Models: `src/infrastructure/database/models.py` (UserFavoriteModel)
+  - Schemas: `src/presentation/schemas/users.py` (FavoriteType, UserFavorite*)
+  - Endpoints: `src/presentation/api/v1/endpoints/users.py`
+
+### Migration 017_vulnerability_annotations: Vulnerability Annotations (Phase 3.1b - Task 27.1)
+- **Status**: ✅ Completed (December 11, 2025)
+- **Revision ID**: `017_vulnerability_annotations`
+- **Previous Revision**: `016_user_favorites`
+- **Description**: User annotations on vulnerabilities for tracking and notes
+- **Tables Created**:
+  - `vulnerability_annotations` - User annotations on vulnerabilities
+- **Table Schema**:
+  - `id` (UUID) - Primary key
+  - `user_id` (UUID) - FK to users, CASCADE DELETE
+  - `vulnerability_id` (UUID) - FK to vulnerabilities, CASCADE DELETE
+  - `status` (VARCHAR(50)) - Annotation status (confirmed, false_positive, investigating, etc.)
+  - `notes` (TEXT) - Detailed user notes
+  - `assigned_to` (VARCHAR(200)) - Assignment field
+  - `priority` (VARCHAR(20)) - Priority level (low, medium, high, critical)
+  - `tags` (ARRAY[VARCHAR(50)]) - User-defined tags
+  - `created_at` (TIMESTAMPTZ) - Created timestamp
+  - `updated_at` (TIMESTAMPTZ) - Last update timestamp
+- **Indexes Created**:
+  - `ix_vulnerability_annotations_user_id` on `user_id`
+  - `ix_vulnerability_annotations_vulnerability_id` on `vulnerability_id`
+  - `ix_vulnerability_annotations_status` on `status`
+  - Unique constraint on `(user_id, vulnerability_id)`
+- **API Endpoints Added**:
+  - `GET /api/v1/vulnerabilities/:id/annotations` - Get annotations for vulnerability
+  - `POST /api/v1/vulnerabilities/:id/annotations` - Create/update annotation
+  - `DELETE /api/v1/vulnerabilities/:id/annotations` - Delete annotation
+- **Related Files**:
+  - Migration: `alembic/versions/20251211_0200-017_add_vulnerability_annotations.py`
+  - Models: `src/infrastructure/database/models.py` (VulnerabilityAnnotationModel)
+  - Schemas: `src/presentation/schemas/vulnerabilities.py` (AnnotationStatus, VulnerabilityAnnotation*)
+  - Endpoints: `src/presentation/api/v1/endpoints/vulnerabilities.py`
+
+### Migration 018_scan_batches: Batch Scan Operations (Phase 3.1b - Task 27.2)
+- **Status**: ✅ Completed (December 11, 2025)
+- **Revision ID**: `018_scan_batches`
+- **Previous Revision**: `017_vulnerability_annotations`
+- **Description**: Batch scan tracking for multi-contract scan operations
+- **Tables Created**:
+  - `scan_batches` - Batch scan records for grouping multiple scans
+- **Table Schema**:
+  - `id` (UUID) - Primary key
+  - `user_id` (UUID) - FK to users, CASCADE DELETE
+  - `project_id` (UUID) - Optional FK to projects, SET NULL on delete
+  - `total_contracts` (INTEGER) - Total contracts in batch
+  - `completed_count` (INTEGER) - Completed scans count
+  - `failed_count` (INTEGER) - Failed scans count
+  - `status` (VARCHAR(50)) - Batch status (pending, running, completed, partially_completed, failed)
+  - `priority` (VARCHAR(20)) - Batch priority
+  - `scanner_ids` (ARRAY[VARCHAR(50)]) - Scanners to use
+  - `created_at` (TIMESTAMPTZ) - Created timestamp
+  - `completed_at` (TIMESTAMPTZ) - Completion timestamp
+- **Columns Added**:
+  - `scans.batch_id` (UUID) - FK to scan_batches, SET NULL on delete
+- **Indexes Created**:
+  - `ix_scan_batches_user_id` on `user_id`
+  - `ix_scan_batches_status` on `status`
+  - `ix_scan_batches_created_at` on `created_at`
+  - `ix_scans_batch_id` on `scans.batch_id`
+- **API Endpoints Added**:
+  - `POST /api/v1/scans/batch` - Create batch scan for multiple contracts
+  - `GET /api/v1/scans/batch` - List batch scans
+  - `GET /api/v1/scans/batch/:batch_id` - Get batch scan status with details
+  - `POST /api/v1/scans/batch/:batch_id/update-status` - Internal status update
+- **Related Files**:
+  - Migration: `alembic/versions/20251211_0300-018_add_scan_batches.py`
+  - Models: `src/infrastructure/database/models.py` (ScanBatchModel, ScanModel.batch_id)
+  - Schemas: `src/presentation/schemas/scans.py` (BatchScan*, ScanBatchStatus)
+  - Endpoints: `src/presentation/api/v1/endpoints/scans.py`
+- **Dashboard Components**:
+  - Batch Scan Page: `blocksecops-dashboard/src/pages/BatchScan.tsx`
+  - API Client: `blocksecops-dashboard/src/lib/api/scans.ts`
+  - Route: `/scan` - Batch scan management
+
 ### Migration Model Relationship Fix (December 2, 2025)
 - **Status**: ✅ Completed
 - **Description**: Fixed SQLAlchemy ORM relationship mapping errors for x402 models
@@ -234,17 +336,17 @@ Due to database state inconsistencies after the 2025-11-05 database reset, the s
 
 ---
 
-## Current Database State (2025-12-10)
+## Current Database State (2025-12-11)
 
 ### Alembic Version
 ```
-version_num: 015_user_activity_logs
+version_num: 018_scan_batches
 ```
 
 ### Existing Tables
 - ✅ `users`
 - ✅ `contracts`
-- ✅ `scans`
+- ✅ `scans` (with `batch_id` column)
 - ✅ `vulnerabilities` (with `pattern_id` column)
 - ✅ `vulnerability_patterns` (manually created)
 - ✅ `pattern_tool_mappings` (manually created)
@@ -253,6 +355,9 @@ version_num: 015_user_activity_logs
 - ✅ `payment_transactions` (Phase 3.4 x402)
 - ✅ `credit_transactions` (Phase 3.4 x402)
 - ✅ `user_activity_logs` (Phase 3.1b Task 21)
+- ✅ `user_favorites` (Phase 3.1b Task 27.1)
+- ✅ `vulnerability_annotations` (Phase 3.1b Task 27.1)
+- ✅ `scan_batches` (Phase 3.1b Task 27.2)
 - ❌ `deduplication_groups` (pending)
 - ❌ `vulnerability_classifications` (pending)
 - ❌ `vulnerability_trends` (pending)
