@@ -1,7 +1,7 @@
 # Platform Development Standards - Index
 
-**Version:** 1.8.0
-**Last Updated:** October 20, 2025
+**Version:** 1.9.0
+**Last Updated:** December 12, 2025
 **Status:** Active
 
 ## Overview
@@ -112,12 +112,16 @@ These standards ensure proper versioning and configuration management:
 11. **[Docker Image Versioning](./docker-image-versioning.md)**
     - Semantic versioning for Docker images (MAJOR.MINOR.PATCH)
     - Version increment rules
-    - Image tagging workflow
-    - Updating Kustomize configuration
-    - Version tracking and documentation
-    - Rollback considerations
+    - Kustomization configuration
+    - Why explicit versions (not `latest`)
 
-12. **[Tool Metadata ConfigMaps](./tool-metadata-configmaps.md)**
+12. **[Build Workflow](./build-workflow.md)**
+    - Local Docker build with Harbor registry
+    - Build and deploy steps
+    - Using build cache
+    - Why local Docker vs minikube Docker
+
+13. **[Tool Metadata ConfigMaps](./tool-metadata-configmaps.md)**
     - Managing third-party tool versions via ConfigMaps
     - Version selection policy (latest stable)
     - ConfigMap solution vs. hardcoded versions
@@ -126,7 +130,7 @@ These standards ensure proper versioning and configuration management:
     - Multi-environment support
     - Real-world example: Scanner metadata refactoring
 
-13. **[Dependency Management](./dependency-management.md)**
+14. **[Dependency Management](./dependency-management.md)**
     - Latest stable version policy
     - Prohibited dependencies (deprecated, retired, unmaintained)
     - Dependency health monitoring (monthly/quarterly audits)
@@ -137,7 +141,7 @@ These standards ensure proper versioning and configuration management:
 
 ### ✅ Compliance & Verification
 
-14. **[Compliance Checklist](./compliance-checklist.md)**
+15. **[Compliance Checklist](./compliance-checklist.md)**
     - Daily development checklist
     - Making changes checklist
     - Database configuration changes checklist
@@ -180,6 +184,7 @@ docs/standards/
 ├── testing-deployment.md
 ├── compliance-checklist.md
 ├── docker-image-versioning.md
+├── build-workflow.md
 ├── tool-metadata-configmaps.md
 └── dependency-management.md
 ```
@@ -229,5 +234,5 @@ Contact the development team or create an issue in the `blocksecops-docs` reposi
 
 ---
 
-**Last Updated:** October 29, 2025
+**Last Updated:** December 12, 2025
 **Maintained By:** BlockSecOps Team

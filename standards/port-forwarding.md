@@ -1,6 +1,6 @@
 # Port-Forwarding Standards
 
-**Version:** 2.3.0
+**Version:** 2.4.0
 **Last Updated:** December 12, 2025
 **Status:** Active
 
@@ -31,7 +31,9 @@ This document defines the standard port-forwarding configuration for local devel
 | **8200** | Vault | `vault-local` | 8200 | Secret management |
 | **8443** | Harbor | `harbor-local` | 443 | Container registry (HTTPS) |
 
-### Monitoring Services (PLG Stack)
+### Monitoring Services (PLG Stack) - DISABLED BY DEFAULT
+
+**Note:** Monitoring services are **disabled by default** for local development to reduce resource usage and improve performance. The platform functions fully without them.
 
 | Local Port | Service | Namespace | Target Port | Purpose |
 |------------|---------|-----------|-------------|---------|
@@ -39,12 +41,28 @@ This document defines the standard port-forwarding configuration for local devel
 | **9091** | Prometheus | `monitoring-local` | 9090 | Metrics collection |
 | **9093** | Loki | `monitoring-local` | 3100 | Log aggregation |
 
-### Database Exporters
+### Database Exporters - DISABLED BY DEFAULT
 
 | Local Port | Service | Namespace | Target Port | Purpose |
 |------------|---------|-----------|-------------|---------|
 | **9187** | postgres-exporter | `postgresql-local` | 9187 | PostgreSQL metrics |
 | **9121** | redis-exporter | `redis-local` | 9121 | Redis metrics |
+
+### Enabling/Disabling Monitoring
+
+**To disable monitoring (default for local dev):**
+```bash
+kubectl scale deployment prometheus grafana loki -n monitoring-local --replicas=0
+kubectl scale deployment postgres-exporter -n postgresql-local --replicas=0
+kubectl scale deployment redis-exporter -n redis-local --replicas=0
+```
+
+**To enable monitoring when needed:**
+```bash
+kubectl scale deployment prometheus grafana loki -n monitoring-local --replicas=1
+kubectl scale deployment postgres-exporter -n postgresql-local --replicas=1
+kubectl scale deployment redis-exporter -n redis-local --replicas=1
+```
 
 ### Frontend & Ingress
 
@@ -95,20 +113,15 @@ kubectl port-forward -n vault-local svc/vault 8200:8200 &
 # Harbor Container Registry (HTTPS)
 kubectl port-forward -n harbor-local svc/harbor 8443:443 &
 
-# Monitoring - Grafana (port 3001 to avoid conflict with Traefik on 3000)
-kubectl port-forward -n monitoring-local svc/grafana 3001:3000 &
+# NOTE: Monitoring services are DISABLED by default for local development
+# Uncomment below if you need monitoring:
+# kubectl port-forward -n monitoring-local svc/grafana 3001:3000 &
+# kubectl port-forward -n monitoring-local svc/prometheus 9091:9090 &
+# kubectl port-forward -n monitoring-local svc/loki 9093:3100 &
+# kubectl port-forward -n postgresql-local svc/postgres-exporter 9187:9187 &
+# kubectl port-forward -n redis-local svc/redis-exporter 9121:9121 &
 
-# Monitoring - Prometheus (port 9091 to avoid conflict with API metrics on 9090)
-kubectl port-forward -n monitoring-local svc/prometheus 9091:9090 &
-
-# Monitoring - Loki (port 9093 for log queries)
-kubectl port-forward -n monitoring-local svc/loki 9093:3100 &
-
-# Database Exporters
-kubectl port-forward -n postgresql-local svc/postgres-exporter 9187:9187 &
-kubectl port-forward -n redis-local svc/redis-exporter 9121:9121 &
-
-echo "✅ All port-forwards established"
+echo "✅ All port-forwards established (monitoring disabled by default)"
 echo ""
 echo "Service URLs:"
 echo "  Dashboard:        http://127.0.0.1:3000 (via Traefik)"
@@ -124,7 +137,7 @@ echo "  Redis:            redis://localhost:6379"
 echo "  Vault:            http://127.0.0.1:8200"
 echo "  Harbor:           https://127.0.0.1:8443 (admin/Harbor12345)"
 echo ""
-echo "Monitoring URLs:"
+echo "Monitoring (disabled by default - enable with scripts/enable-monitoring.sh):"
 echo "  Grafana:          http://127.0.0.1:3001 (admin/admin)"
 echo "  Prometheus:       http://127.0.0.1:9091"
 echo "  Loki:             http://127.0.0.1:9093"
@@ -414,25 +427,24 @@ curl -s http://127.0.0.1:8000/health || echo "Port 8000 not accessible"
 #!/bin/bash
 # File: scripts/check-port-forwards.sh
 
-ports=(8000 8001 8002 8003 8004 8005 9090 5432 6379 8200 8443 3001 9091 9093 9187 9121)
+# Core services (always needed)
+ports=(3000 8001 8002 8003 8004 8005 5432 6379 8200 8443)
 services=(
-  "API Service HTTP"
+  "Traefik (Dashboard/API)"
   "Data Service"
   "Intelligence Engine"
   "Notification Service"
   "Orchestration Service"
   "Tool Integration"
-  "API Service Metrics"
   "PostgreSQL"
   "Redis"
   "Vault"
   "Harbor Registry"
-  "Grafana"
-  "Prometheus"
-  "Loki"
-  "PostgreSQL Exporter"
-  "Redis Exporter"
 )
+
+# Optional monitoring ports (disabled by default)
+# monitoring_ports=(3001 9091 9093 9187 9121)
+# monitoring_services=("Grafana" "Prometheus" "Loki" "PostgreSQL Exporter" "Redis Exporter")
 
 echo "Checking port-forwards..."
 echo ""
