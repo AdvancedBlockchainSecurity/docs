@@ -59,17 +59,12 @@ echo -e "${BLUE}Populating Vault with local development secrets...${NC}"
 echo
 
 # ============================================
-# Infrastructure Secrets
+# Infrastructure Secrets (Shared)
 # ============================================
 echo -e "${BLUE}[1/7] Infrastructure secrets...${NC}"
 
-# PostgreSQL (used by api-service ExternalSecret)
-vault_kv_put "secret/kv/postgresql/local" \
-    username="postgres" \
-    password="postgres"
-
-# PostgreSQL (used by postgresql-local ExternalSecret)
-# Note: Write to secret/postgresql, Vault KV v2 stores at secret/data/postgresql
+# PostgreSQL (shared across all services)
+# Path: secret/postgresql - ESO with version: v2 handles /data/ prefix automatically
 vault_kv_put "secret/postgresql" \
     POSTGRES_DB="solidity_security" \
     POSTGRES_USER="postgres" \
@@ -77,14 +72,10 @@ vault_kv_put "secret/postgresql" \
     POSTGRES_REPLICATION_USER="replicator" \
     POSTGRES_REPLICATION_PASSWORD="replicator-password"
 
-# Redis (used by api-service ExternalSecret)
-vault_kv_put "secret/kv/redis/local" \
-    password="redis-local-password"
-
-# Redis (used by redis-local ExternalSecret)
-# Note: Write to secret/redis, Vault KV v2 stores at secret/data/redis
+# Redis (shared across all services)
+# Path: secret/redis - ESO with version: v2 handles /data/ prefix automatically
 vault_kv_put "secret/redis" \
-    password="redis-local-password"
+    password="redis123"
 
 echo -e "${GREEN}✓ Infrastructure secrets populated${NC}"
 echo
@@ -94,11 +85,18 @@ echo
 # ============================================
 echo -e "${BLUE}[2/7] API Service secrets...${NC}"
 
-vault_kv_put "secret/kv/api-service/local" \
-    jwt_secret_key="local-dev-jwt-secret-key-change-in-production" \
-    session_secret="local-dev-session-secret-change-in-production" \
-    oauth_client_id="local-dev-oauth-client-id" \
-    oauth_client_secret="local-dev-oauth-client-secret"
+# JWT Configuration
+vault_kv_put "secret/local/api-service/jwt" \
+    secret_key="local-dev-jwt-secret-key-change-in-production"
+
+# Session Configuration
+vault_kv_put "secret/local/api-service/session" \
+    secret="local-dev-session-secret-change-in-production"
+
+# OAuth Configuration (optional)
+vault_kv_put "secret/local/api-service/oauth" \
+    client_id="local-dev-oauth-client-id" \
+    client_secret="local-dev-oauth-client-secret"
 
 echo -e "${GREEN}✓ API Service secrets populated${NC}"
 echo
@@ -124,7 +122,7 @@ vault_kv_put "secret/local/data-service/database-read" \
 vault_kv_put "secret/local/data-service/redis" \
     host="redis-master.redis-local.svc.cluster.local" \
     port="6379" \
-    password="redis-local-password"
+    password="redis123"
 
 vault_kv_put "secret/local/data-service/encryption" \
     key="local-dev-encryption-key-change-in-production"
@@ -146,7 +144,7 @@ vault_kv_put "secret/local/tool-integration/credentials" \
 vault_kv_put "secret/local/tool-integration/redis" \
     host="redis-master.redis-local.svc.cluster.local" \
     port="6379" \
-    password="redis-local-password"
+    password="redis123"
 
 vault_kv_put "secret/local/tool-integration/database" \
     user="postgres" \
@@ -173,7 +171,7 @@ vault_kv_put "secret/local/notification/database" \
 vault_kv_put "secret/local/notification/redis" \
     host="redis-master.redis-local.svc.cluster.local" \
     port="6379" \
-    password="redis-local-password"
+    password="redis123"
 
 vault_kv_put "secret/local/notification/smtp" \
     host="localhost" \
@@ -205,27 +203,31 @@ vault_kv_put "secret/local/orchestration/database" \
 vault_kv_put "secret/local/orchestration/redis" \
     host="redis-master.redis-local.svc.cluster.local" \
     port="6379" \
-    password="redis-local-password"
+    password="redis123"
 
 echo -e "${GREEN}✓ Orchestration Service secrets populated${NC}"
 echo
 
 # ============================================
-# Intelligence Engine Secrets (if needed)
+# Intelligence Engine Secrets
 # ============================================
 echo -e "${BLUE}[7/7] Intelligence Engine secrets...${NC}"
 
+# Database URL (asyncpg format)
 vault_kv_put "secret/local/intelligence-engine/database" \
-    username="postgres" \
-    password="postgres" \
-    host="postgresql.postgresql-local.svc.cluster.local" \
-    port="5432" \
-    name="solidity_security"
+    url="postgresql+asyncpg://postgres:postgres@postgresql.postgresql-local.svc.cluster.local:5432/solidity_security"
 
+# Redis URL
 vault_kv_put "secret/local/intelligence-engine/redis" \
-    host="redis-master.redis-local.svc.cluster.local" \
-    port="6379" \
-    password="redis-local-password"
+    url="redis://:redis123@redis-master.redis-local.svc.cluster.local:6379/0"
+
+# ML Model API Key (placeholder for local development)
+vault_kv_put "secret/local/intelligence-engine/ml" \
+    api_key="local-dev-ml-api-key-placeholder"
+
+# API Service URL (internal cluster URL)
+vault_kv_put "secret/local/intelligence-engine/api" \
+    url="http://api-service.api-service-local.svc.cluster.local:8000"
 
 echo -e "${GREEN}✓ Intelligence Engine secrets populated${NC}"
 echo
@@ -237,14 +239,15 @@ echo -e "${BLUE}Verifying secrets were created...${NC}"
 echo
 
 SECRET_PATHS=(
-    "secret/kv/postgresql/local"
-    "secret/kv/redis/local"
-    "secret/kv/api-service/local"
     "secret/postgresql"
     "secret/redis"
+    "secret/local/api-service/jwt"
+    "secret/local/api-service/session"
     "secret/local/data-service/database"
     "secret/local/tool-integration/database"
     "secret/local/notification/database"
+    "secret/local/orchestration/database"
+    "secret/local/intelligence-engine/database"
 )
 
 FAILED=0

@@ -344,10 +344,13 @@ curl http://127.0.0.1:8000/api/v1/health/ready
 Update Vault with correct credentials:
 
 ```bash
-# Access Vault (requires token)
-kubectl exec -n vault-local vault-0 -- vault kv put kv/postgresql/local \
-  username=harbor \
-  password=harbor-local-password
+# Access Vault - use standardized path structure
+# Shared secrets: secret/postgresql, secret/redis
+# Service-specific: secret/local/<service>/<secret-type>
+kubectl exec -n vault-local vault-0 -- vault kv put secret/postgresql \
+  POSTGRES_USER=postgres \
+  POSTGRES_PASSWORD=postgres \
+  POSTGRES_DB=solidity_security
 
 # Force ExternalSecret to sync immediately
 kubectl annotate externalsecret api-service-secret -n api-service-local \
@@ -375,8 +378,10 @@ curl -X POST http://127.0.0.1:8000/api/v1/auth/login \
 ```yaml
 # File: k8s/overlays/local/api-service/externalsecret.yaml
 # Add comment at top:
-# NOTE: This syncs from Vault kv/postgresql/local
-# Local credentials: harbor:harbor-local-password
+# NOTE: This syncs from Vault using standardized paths:
+# - Shared: secret/postgresql, secret/redis
+# - Service-specific: secret/local/api-service/jwt, secret/local/api-service/session
+# IMPORTANT: Do NOT include /data/ in paths - ESO handles this automatically
 # For local dev debugging, consider using static secret instead
 ```
 

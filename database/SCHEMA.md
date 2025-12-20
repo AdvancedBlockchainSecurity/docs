@@ -20,7 +20,7 @@
 
 The BlockSecOps database supports a comprehensive smart contract security scanning platform with:
 
-- **Multi-language support:** 21+ blockchain languages including Solidity, Vyper, Rust, Move, Cairo
+- **Multi-language support:** Solidity, Vyper, and Solana/Rust (16/16 scanners available as of December 15, 2025)
 - **Multi-file contracts:** Support for complex projects with multiple source files
 - **Project organization:** Group related contracts into projects
 - **User authentication:** Supabase Auth with ES256 JWT tokens and JWKS verification
@@ -31,7 +31,7 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Performance optimization:** Specialized indexes including GIN, composite, and partial indexes
 - **Audit tracking:** Full timestamps and status tracking
 - **Intelligence layer:** Enrichment and fingerprinting for vulnerability deduplication
-- **Pattern matching:** Vulnerability pattern classification across 4 ecosystems (Solidity/EVM, Vyper, Solana, Cairo)
+- **Pattern matching:** Vulnerability pattern classification across 3 ecosystems (Solidity/EVM, Vyper, Solana/Rust)
 - **Deduplication:** Cross-scanner finding deduplication
 - **Tier-based quotas:** User quotas with monthly scan limits and tier-based priority
 - **Priority queue:** Scan priority system for tier-based queue processing
@@ -275,7 +275,8 @@ Enforced at upload endpoint (`POST /api/v1/upload`):
    - Returns HTTP 402 if archive exceeds file count limit
 
 3. **Language Validation**:
-   - Only Solidity (`.sol`), Vyper (`.vy`), Rust/Solana (`.rs`), Cairo (`.cairo`) supported
+   - **Currently Supported:** Solidity (`.sol`), Vyper (`.vy`), Rust/Solana (`.rs`)
+   - **Scanners Available:** 16/16 (10 Solidity + 2 Vyper + 4 Solana, as of December 15, 2025)
    - Archives: `.zip`, `.tar`, `.tar.gz`, `.tgz`
    - Returns HTTP 400 for unsupported file types
 
@@ -1113,13 +1114,14 @@ Standard vulnerability pattern definitions for classification and matching (Phas
 - Integer Issues (6 patterns): BVD-VYPER-INT-001 through BVD-VYPER-INT-006
 - Plus 73 additional patterns
 
-**Solana/Rust Patterns (82 patterns)**:
+**Solana/Rust Patterns (82 patterns)** ⏳ PENDING SCANNER INTEGRATION:
 - Access Control (15 patterns): BVD-SOLANA-ACC-001 through BVD-SOLANA-ACC-015
 - Integer Overflow (8 patterns): BVD-SOLANA-INT-001 through BVD-SOLANA-INT-008
 - PDA Issues (10 patterns): BVD-SOLANA-PDA-001 through BVD-SOLANA-PDA-010
 - Plus 49 additional patterns
+- **Note:** Docker images built (sol-azy, sec3-xray, trident, cargo-fuzz-solana) but scanners require Rust toolchain in orchestration pod. See Phase 3.5 scanner integration.
 
-**Cairo/StarkNet Patterns (14 patterns)** ✨ NEW:
+**Cairo/StarkNet Patterns (14 patterns)** ⏳ PENDING SCANNER INTEGRATION:
 - Access Control (2 patterns): BVD-CAIRO-ACC-001, BVD-CAIRO-ACC-002
 - Layer 2 Security (1 pattern): BVD-CAIRO-L2S-001
 - Arithmetic (1 pattern): BVD-CAIRO-ARI-001
@@ -1127,6 +1129,7 @@ Standard vulnerability pattern definitions for classification and matching (Phas
 - State Variables (1 pattern): BVD-CAIRO-STA-001
 - Code Quality (4 patterns): BVD-CAIRO-QUA-001 through BVD-CAIRO-QUA-004
 - Memory Safety (1 pattern): BVD-CAIRO-MEM-001
+- **Note:** Scanner Docker images not yet built. Caracal scanner defined but not available.
 
 **Category Codes**:
 - REE (Reentrancy), ACC (Access Control), INT (Integer Issues)
@@ -1675,12 +1678,12 @@ Credit usage and purchase history (Phase 3.4 - x402 Pay-Per-Scan).
 
 Supported blockchain programming languages.
 
-**Values:**
-- `solidity` - Ethereum/EVM smart contracts
-- `vyper` - Ethereum/EVM (Python-like)
-- `rust` - Solana programs
-- `move` - Aptos/Sui smart contracts
-- `cairo` - StarkNet contracts
+**Values (✅ = Scanner Available, ⏳ = Planned):**
+- `solidity` - Ethereum/EVM smart contracts ✅ (10 scanners)
+- `vyper` - Ethereum/EVM (Python-like) ✅ (2 scanners: Slither-Vyper, Moccasin)
+- `rust` - Solana programs ⏳ (Docker images built, scanners pending)
+- `move` - Aptos/Sui smart contracts ⏳
+- `cairo` - StarkNet contracts ⏳
 - `tact` - TON blockchain
 - `clarity` - Stacks blockchain
 - `yul` - EVM intermediate language

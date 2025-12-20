@@ -1,8 +1,8 @@
 # Secrets Management
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 1.8.0
-**Last Updated:** October 20, 2025
+**Version:** 1.9.0
+**Last Updated:** December 14, 2025
 **Status:** Active
 
 ## Overview
@@ -60,30 +60,54 @@ This document defines mandatory standards for managing secrets in the BlockSecOp
 
 **Kubernetes manifests MUST reference secrets via ExternalSecret resources:**
 
+### Vault Path Structure (KV v2)
+
+For Vault KV v2 with External Secrets Operator configured with `version: v2`:
+
+| Environment | Path Pattern | Example |
+|-------------|--------------|---------|
+| Local | `secret/local/<service>/<secret-type>` | `secret/local/api-service/jwt` |
+| Staging | `secret/staging/<service>/<secret-type>` | `secret/staging/api-service/jwt` |
+| Production | `secret/production/<service>/<secret-type>` | `secret/production/api-service/jwt` |
+| Shared | `secret/<resource>` | `secret/postgresql`, `secret/redis` |
+
+**IMPORTANT:** Do NOT include `/data/` in ExternalSecret paths. The External Secrets Operator with `version: v2` handles this automatically.
+
 ```yaml
-# ✅ CORRECT: ExternalSecret resource referencing Vault
-apiVersion: external-secrets.io/v1beta1
+# ✅ CORRECT: ExternalSecret resource referencing Vault (KV v2)
+apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: postgres-credentials
+  name: api-service-secrets
   namespace: api-service-local
 spec:
-  refreshInterval: 1h
+  refreshInterval: 30s
   secretStoreRef:
     name: vault-backend
-    kind: SecretStore
+    kind: SecretStore  # or ClusterSecretStore
   target:
-    name: postgres-credentials
+    name: api-service-secrets
     creationPolicy: Owner
   data:
-    - secretKey: password
+    # Service-specific secrets
+    - secretKey: jwt_secret
       remoteRef:
-        key: secret/data/api-service/postgres
-        property: password
-    - secretKey: username
+        key: secret/local/api-service/jwt    # ✅ No /data/ prefix
+        property: secret_key
+    # Shared infrastructure secrets
+    - secretKey: database_password
       remoteRef:
-        key: secret/data/api-service/postgres
-        property: username
+        key: secret/postgresql               # ✅ Shared secret path
+        property: POSTGRES_PASSWORD
+```
+
+```yaml
+# ❌ INCORRECT: Using /data/ in path (ESO handles this automatically)
+  data:
+    - secretKey: jwt_secret
+      remoteRef:
+        key: secret/data/local/api-service/jwt  # ❌ Don't include /data/
+        property: secret_key
 ```
 
 ```yaml
@@ -103,20 +127,21 @@ stringData:
 ### Adding a New Secret
 
 ```bash
-# 1. Store secret in Vault
-vault kv put secret/api-service/new-api-key \
+# 1. Store secret in Vault (use environment-specific path)
+# For local development:
+kubectl exec -n vault-local vault-0 -- vault kv put secret/local/api-service/new-api-key \
   api_key="your-secret-value"
 
-# 2. Create ExternalSecret manifest
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/api-service
+# 2. Create ExternalSecret manifest in the service's overlay
+cd /Users/pwner/Git/ABS/blocksecops-api-service/k8s/overlays/local/api-service
 cat > externalsecret-new-api-key.yaml <<EOF
-apiVersion: external-secrets.io/v1beta1
+apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: new-api-key
   namespace: api-service-local
 spec:
-  refreshInterval: 1h
+  refreshInterval: 30s
   secretStoreRef:
     name: vault-backend
     kind: SecretStore
@@ -126,38 +151,41 @@ spec:
   data:
     - secretKey: api_key
       remoteRef:
-        key: secret/data/api-service/new-api-key
+        key: secret/local/api-service/new-api-key  # No /data/ prefix!
         property: api_key
 EOF
 
-# 3. Commit the ExternalSecret manifest
-git add externalsecret-new-api-key.yaml
+# 3. Update kustomization.yaml to include the new resource
+# Add to resources: section: - externalsecret-new-api-key.yaml
+
+# 4. Commit the ExternalSecret manifest
+git add externalsecret-new-api-key.yaml kustomization.yaml
 git commit -m "Add ExternalSecret for new API key
 
-- References Vault path: secret/api-service/new-api-key
-- Auto-syncs every 1 hour
+- References Vault path: secret/local/api-service/new-api-key
+- Auto-syncs every 30 seconds
 - Creates Kubernetes Secret: new-api-key
 
 Refs: #789"
 
-# 4. Apply the ExternalSecret
-kubectl apply -f externalsecret-new-api-key.yaml
+# 5. Apply the kustomization
+kubectl apply -k .
 
-# 5. Verify secret was created
+# 6. Verify secret was created
 kubectl get secret new-api-key -n api-service-local
-kubectl get externalsecret new-api-key -n api-service-local -o yaml
+kubectl get externalsecret new-api-key -n api-service-local
 ```
 
 ### Rotating a Secret
 
 ```bash
-# 1. Update secret in Vault
-vault kv put secret/api-service/database \
+# 1. Update secret in Vault (use environment-specific path)
+kubectl exec -n vault-local vault-0 -- vault kv put secret/local/api-service/database \
   password="new-rotated-password"
 
 # 2. Wait for External Secrets Operator to sync (or force sync)
-kubectl annotate externalsecret postgres-credentials \
-  force-sync=$(date +%s) -n api-service-local
+kubectl annotate externalsecret api-service-secrets \
+  force-sync=$(date +%s) -n api-service-local --overwrite
 
 # 3. Restart pods to pick up new secret
 kubectl rollout restart deployment api-service -n api-service-local
@@ -203,19 +231,102 @@ Action: Secret revoked and removed from all environments"
 3. **Document local secret requirements** in `.env.example`
 4. **Provide setup scripts** to initialize local Vault with development secrets
 
+### Standard Local Secret Structure
+
+All local development secrets follow this standardized structure:
+
+```
+secret/
+├── postgresql                    # Shared PostgreSQL credentials
+│   ├── POSTGRES_DB
+│   ├── POSTGRES_USER
+│   └── POSTGRES_PASSWORD
+├── redis                         # Shared Redis credentials
+│   └── password
+├── harbor                        # Harbor registry
+│   ├── secretKey
+│   └── HARBOR_ADMIN_PASSWORD
+└── local/                        # Environment-specific secrets
+    ├── api-service/
+    │   ├── jwt/                  # JWT configuration
+    │   │   └── secret_key
+    │   ├── session/              # Session configuration
+    │   │   └── secret
+    │   ├── oauth/                # OAuth configuration
+    │   │   ├── client_id
+    │   │   └── client_secret
+    │   └── database/             # Database URL
+    │       └── url
+    ├── orchestration/
+    │   ├── database/             # Database credentials
+    │   │   ├── host, port, name
+    │   │   ├── username, password
+    │   └── redis/                # Redis credentials
+    │       ├── host, port
+    │       └── password
+    ├── intelligence-engine/
+    │   ├── database/             # Database URL
+    │   │   └── url
+    │   ├── redis/                # Redis URL
+    │   │   └── url
+    │   ├── ml/                   # ML model API
+    │   │   └── api_key
+    │   └── api/                  # API service URL
+    │       └── url
+    ├── data-service/
+    │   ├── database/             # Primary database
+    │   ├── database-read/        # Read replica
+    │   ├── redis/
+    │   └── encryption/
+    │       └── key
+    ├── notification/
+    │   ├── database/
+    │   ├── redis/
+    │   ├── smtp/                 # SMTP configuration
+    │   │   ├── host, port
+    │   │   ├── user, password
+    │   └── webhooks/             # Webhook URLs
+    │       ├── slack_url, teams_url, discord_url
+    │       └── webhook_secret
+    └── tool-integration/
+        ├── credentials/          # Tool credentials
+        │   └── credentials
+        ├── database/
+        └── redis/
+```
+
+### Standard Passwords (Local Development Only)
+
+| Secret | Value | Notes |
+|--------|-------|-------|
+| PostgreSQL | `postgres` | All services use same credentials |
+| Redis | `redis123` | Standardized across all services |
+| JWT Secret | `local-dev-jwt-secret-key-change-in-production` | |
+| Session Secret | `local-dev-session-secret-change-in-production` | |
+
+**⚠️ NEVER use these values in production!**
+
 **Example local Vault setup:**
 
 ```bash
-# scripts/setup-local-vault.sh
-#!/bin/bash
-# Initialize local Vault with development secrets
+# Initialize Vault secrets for local development
+# Run: kubectl exec -n vault-local vault-0 -- sh -c '<commands>'
 
-vault kv put secret/api-service/postgres \
-  username="postgres" \
-  password="local-dev-password"
+# Shared secrets
+vault kv put secret/postgresql \
+  POSTGRES_DB="solidity_security" \
+  POSTGRES_USER="postgres" \
+  POSTGRES_PASSWORD="postgres"
 
-vault kv put secret/api-service/redis \
-  password="local-dev-redis-password"
+vault kv put secret/redis \
+  password="redis123"
+
+# Service-specific secrets
+vault kv put secret/local/api-service/jwt \
+  secret_key="local-dev-jwt-secret-key-change-in-production"
+
+vault kv put secret/local/api-service/session \
+  secret="local-dev-session-secret-change-in-production"
 
 echo "✅ Local Vault initialized with development secrets"
 ```

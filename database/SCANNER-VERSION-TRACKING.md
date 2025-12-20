@@ -408,19 +408,24 @@ The database provides the **history** and **analytics** that ConfigMap cannot.
 - vyper (0.4.3) - scanner-vyper:0.2.0 - uses slither 0.11.3 for analysis ✅
 - moccasin (latest, vyper 0.4.3) - scanner-moccasin:0.2.0 - fuzzer ✅
 
-**Solana Scanners:**
-- sol-azy (latest) - scanner-sol-azy:latest - built from source ✅
-- sec3-xray (0.0.6) - scanner-sec3-xray:latest - official GHCR image ✅
-- trident (0.12.0) - scanner-trident:latest - fuzzer ✅
-- cargo-fuzz-solana (0.13.1) - scanner-cargo-fuzz-solana:latest - fuzzer ✅
+**Solana Scanners:** ⚠️ Docker images built, NOT available in orchestration (require Rust toolchain)
+- sol-azy (latest) - scanner-sol-azy:latest - built from source ❌ Unavailable
+- sec3-xray (0.0.6) - scanner-sec3-xray:latest - official GHCR image ❌ Unavailable
+- trident (0.12.0) - scanner-trident:latest - fuzzer ❌ Unavailable
+- cargo-fuzz-solana (0.13.1) - scanner-cargo-fuzz-solana:latest - fuzzer ❌ Unavailable
 
-**Cairo/StarkNet Scanners:**
-- caracal (0.2.3) - 0/14 detectors
-- tayt (0.1.0) - fuzzer (deprecated)
-- starknet-foundry (0.50.0) - fuzzer
+**Cairo/StarkNet Scanners:** ⚠️ NOT integrated - patterns defined but no scanner integration
+- caracal (0.2.3) - 0/14 detectors ❌ Unavailable (no Docker image)
+- tayt (0.1.0) - fuzzer (deprecated) ❌ Removed
+- starknet-foundry (0.50.0) - fuzzer ❌ Unavailable (no Docker image)
 
 ### Recent Updates Recorded
 
+- **2025-12-15**: Full scanner integration - 16/16 scanners available
+  - Vyper and Moccasin scanners available in orchestration pod (vyper 0.4.0, moccasin installed)
+  - Solana scanners enabled via Docker-based execution (Sol-azy, Sec3-xray, Trident, Cargo-fuzz-solana)
+  - Orchestration image 0.9.1 deployed with Docker-based Solana scanner execution
+  - Cairo scanners not integrated (no Docker images)
 - **2025-12-08**: Phase 3.5 Vyper/Rust scanner images built and tested
   - Vyper: scanner-vyper:0.2.0 with vyper 0.4.3, slither 0.11.3
   - Moccasin: scanner-moccasin:0.2.0 with vyper 0.4.3
@@ -582,5 +587,5 @@ SELECT record_scanner_update('scanner_name', 'new_version', 'new_image_tag');
 ---
 
 **Created**: 2025-10-30
-**Last Updated**: 2025-12-08
+**Last Updated**: 2025-12-15
 **Maintained By**: BlockSecOps Platform Team

@@ -1,7 +1,7 @@
 # BlockSecOps Changelogs
 
 **Purpose:** Centralized changelog directory for all BlockSecOps platform changes
-**Last Updated:** November 21, 2025
+**Last Updated:** December 15, 2025
 **Status:** Active
 
 ---
@@ -17,6 +17,25 @@ Changelogs are organized by component and maintained chronologically. Each chang
 ---
 
 ## Available Changelogs
+
+### 0. Platform Validation & Vyper/Moccasin Integration (`PLATFORM-VALIDATION-VYPER-MOCCASIN-2025-12-15.md`)
+
+**Component:** blocksecops-orchestration, blocksecops-notification
+**Scope:** Vyper/Moccasin scanner integration, WebSocket fix, platform validation
+**Date:** December 15, 2025
+
+**Key Changes:**
+- Vyper and Moccasin scanners integrated
+- Solana scanners enabled via Docker-based execution (16/16 scanners now available)
+- WebSocket 403 error fixed (notification service routing)
+- E2E scan workflow validated
+- Scanner documentation created (Vyper, Moccasin READMEs)
+
+**Use When:**
+- Understanding Vyper scanner integration
+- Debugging WebSocket issues
+- Reviewing platform validation results
+- Setting up scanner port-forwards
 
 ### 1. Dashboard Authentication (`dashboard-authentication.md`)
 
@@ -579,5 +598,5 @@ Create an issue or submit a PR with corrections.
 
 **Maintained By:** BlockSecOps Documentation Team
 **Location:** `/Users/pwner/Git/ABS/docs/changelogs/README.md`
-**Last Updated:** November 21, 2025
+**Last Updated:** December 15, 2025
 **Status:** ✅ Active
