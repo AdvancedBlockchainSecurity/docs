@@ -1,14 +1,14 @@
 # Local Development Setup Standards
 
-**Version:** 2.4.0
-**Last Updated:** December 12, 2025
+**Version:** 2.6.0
+**Last Updated:** December 22, 2025
 **Status:** Active
 
-> **Major Update (v2.4.0):** Added Harbor registry workflow and Prometheus metrics instrumentation details.
+> **Major Update (v2.6.0):** Simplified local development workflow. Harbor is no longer used for local development - images are built directly into minikube's Docker daemon for faster iteration.
+>
+> **Previous (v2.5.0):** Vault now uses persistent file storage with auto-unseal. Secrets persist across cluster restarts.
 >
 > **Previous (v2.2.0):** Added Local Overlay First Principle. All Kubernetes code MUST be developed and tested in the local overlay.
->
-> **Previous (v2.1.0):** Added Production Parity Principle. All traffic MUST go through Traefik ingress controller.
 
 ## Local Overlay First Principle
 
@@ -185,43 +185,94 @@ kubectl delete pods -n tool-integration-local --field-selector=status.phase=Fail
 kubectl delete pods -n tool-integration-local -l job-name --field-selector=status.phase!=Running
 ```
 
-## Harbor Container Registry
+### External DNS Resolution Failure After Restart
 
-Harbor is deployed locally for container image storage. Build and push images to Harbor for production-like deployment workflows.
+**Symptom:** After laptop crash or Docker restart, pods cannot resolve external hostnames (e.g., Supabase for auth token validation).
 
-### Build and Push Workflow
+```
+socket.gaierror: [Errno -3] Temporary failure in name resolution
+# or
+Token verification failed: Failed to resolve 'huzjlpypdlelqnbjvxad.supabase.co'
+```
+
+**Root Cause:** CoreDNS forwards to Docker Desktop DNS (192.168.65.254) which becomes unresponsive after restarts.
+
+**Fix:**
 
 ```bash
-# 1. Use minikube's Docker daemon
+# 1. Update CoreDNS to use Google DNS directly
+kubectl get configmap coredns -n kube-system -o json | \
+  jq '.data.Corefile |= sub("forward . /etc/resolv.conf"; "forward . 8.8.8.8 8.8.4.4")' | \
+  kubectl apply -f -
+
+# 2. Restart CoreDNS pod
+kubectl delete pod -n kube-system -l k8s-app=kube-dns
+
+# 3. Add control-plane hostname (if kube-proxy failing)
+minikube ssh "echo '192.168.49.2 control-plane.minikube.internal' | sudo tee -a /etc/hosts"
+
+# 4. Restart affected pods
+kubectl rollout restart deployment/api-service -n api-service-local
+```
+
+**Verification:**
+
+```bash
+# Test DNS from inside a pod
+kubectl exec -n api-service-local deployment/api-service -- \
+  python3 -c "import socket; print(socket.gethostbyname('google.com'))"
+```
+
+## Docker Image Build Workflow
+
+For local development, images are built directly into minikube's Docker daemon. This is faster and simpler than using a registry.
+
+> **Note:** Harbor is deployed in the cluster but is **not used for local development** due to the overhead of pushing/pulling images. Harbor is intended for staging/production workflows.
+
+### Build and Deploy Workflow
+
+```bash
+# 1. Use minikube's Docker daemon (REQUIRED)
 eval $(minikube docker-env)
 
 # 2. Build with versioned tag
-docker build -t api-service:0.4.0 .
+docker build -t <service>:<version> .
 
-# 3. Tag for Harbor registry (use ClusterIP for internal access)
-docker tag api-service:0.4.0 10.106.241.219:443/blocksecops/api-service:0.4.0
+# 3. Tag as the name expected by kustomization
+docker tag <service>:<version> <service>:latest
 
-# 4. Docker login to Harbor (first time only)
-docker login 10.106.241.219:443 -u admin -p Harbor12345
+# 4. Update kustomization.yaml with new version
+#    - Update images[].newTag
+#    - Update labels app.kubernetes.io/version
 
-# 5. Push to Harbor
-docker push 10.106.241.219:443/blocksecops/api-service:0.4.0
-
-# 6. Tag as latest for kustomization
-docker tag api-service:0.4.0 blocksecops-api-service:latest
-
-# 7. Deploy via kustomization
-kubectl apply -k k8s/overlays/local/api-service
+# 5. Deploy via kustomization
+kubectl apply -k k8s/overlays/local/<service>/
 ```
 
-**Note:** With Harbor registry and versioned tags, `--no-cache` is no longer required for Docker builds. See [Docker Image Versioning Standards](./docker-image-versioning.md).
+### Example: Building API Service
 
-### Harbor Access
+```bash
+eval $(minikube docker-env)
+cd /Users/pwner/Git/ABS/blocksecops-api-service
 
-| Method | URL | Credentials |
-|--------|-----|-------------|
-| Web UI | `https://127.0.0.1:8443` | admin / Harbor12345 |
-| Docker Push (ClusterIP) | `10.106.241.219:443` | admin / Harbor12345 |
+# Build and tag
+docker build -t api-service:0.4.1 .
+docker tag api-service:0.4.1 api-service:latest
+
+# Deploy
+kubectl apply -k k8s/overlays/local/
+```
+
+### Why Direct Minikube Docker (Not Harbor)
+
+| Direct Minikube Docker | Harbor Registry |
+|------------------------|-----------------|
+| No push/pull overhead | Requires push + pull |
+| Instant availability | Network transfer time |
+| Simple workflow | Requires socat proxy setup |
+| Good for rapid iteration | Better for CI/CD pipelines |
+
+**When to use Harbor:** Staging/production environments, CI/CD pipelines, or when testing registry-based deployments.
 
 ## Prometheus Metrics Instrumentation
 
@@ -267,11 +318,16 @@ kubectl exec -n redis-local deployment/redis-exporter -- curl -s localhost:9121/
 | API Service | `http://127.0.0.1:3000/api/v1` | FastAPI backend (via Traefik routing) |
 | API Docs | `http://127.0.0.1:3000/api/v1/docs` | Swagger UI (via Traefik) |
 | Notification | `http://127.0.0.1:8003` | WebSocket server (direct port-forward) |
-| Grafana | `http://127.0.0.1:3001` | Monitoring dashboard |
-| Prometheus | `http://127.0.0.1:9090` | Metrics (when forwarded) |
-| Harbor | `https://127.0.0.1:8443` | Container registry (HTTPS, admin/Harbor12345) |
-| PostgreSQL | `127.0.0.1:5432` | Database (direct port-forward, optional) |
-| Redis | `127.0.0.1:6379` | Cache (direct port-forward, optional) |
+| PostgreSQL | `127.0.0.1:5432` | Database (optional, for debugging) |
+| Redis | `127.0.0.1:6379` | Cache (optional, for debugging) |
+
+**Optional/Disabled Services:**
+
+| Service | Endpoint | Notes |
+|---------|----------|-------|
+| Grafana | `http://127.0.0.1:3001` | Monitoring (disabled by default) |
+| Prometheus | `http://127.0.0.1:9090` | Metrics (disabled by default) |
+| Harbor | N/A | Not used for local dev (images built in minikube) |
 
 ## Port Forward Standards
 
@@ -306,20 +362,19 @@ echo "✅ Redis: 127.0.0.1:6379"
 kubectl port-forward -n notification-local svc/notification 8003:8003 > /tmp/pf-notification.log 2>&1 &
 echo "✅ Notification: http://127.0.0.1:8003"
 
-# Grafana
-kubectl port-forward -n monitoring svc/monitoring-grafana 3001:80 > /tmp/pf-grafana.log 2>&1 &
-echo "✅ Grafana: http://127.0.0.1:3001"
+# Grafana (optional - disabled by default for resource savings)
+# kubectl port-forward -n monitoring svc/monitoring-grafana 3001:80 > /tmp/pf-grafana.log 2>&1 &
+# echo "✅ Grafana: http://127.0.0.1:3001"
 
-# Harbor Container Registry
-kubectl port-forward -n harbor-local svc/harbor 8443:443 > /tmp/pf-harbor.log 2>&1 &
-echo "✅ Harbor: https://127.0.0.1:8443"
+# Harbor Container Registry (NOT USED for local dev - images built directly in minikube)
+# kubectl port-forward -n harbor-local svc/harbor-core 8080:80 > /tmp/pf-harbor.log 2>&1 &
+# echo "✅ Harbor: http://127.0.0.1:8080"
 
 sleep 3
 echo ""
 echo "All port forwards active. Use 127.0.0.1 for all connections."
 echo "Dashboard: http://127.0.0.1:3000"
 echo "API Health: http://127.0.0.1:3000/api/v1/health/live"
-echo "Harbor: https://127.0.0.1:8443 (admin/Harbor12345)"
 ```
 
 ## Port Number Consistency Standards
@@ -337,14 +392,13 @@ echo "Harbor: https://127.0.0.1:8443 (admin/Harbor12345)"
 
 | Service | Port | Purpose | Notes |
 |---------|------|---------|-------|
-| Dashboard | 3000 | Main Dashboard UI | Primary user interface with Supabase Auth (blocksecops-dashboard) |
-| API Service | 8000 | Backend API | FastAPI application |
+| Dashboard | 3000 | Main Dashboard UI | Primary user interface via Traefik |
+| API Service | 8000 | Backend API | FastAPI application (routed via Traefik) |
 | Notification | 8003 | WebSocket | Real-time notifications |
-| Vault | 8200 | Secret Management | HashiCorp Vault |
-| Harbor | 8443 | Container Registry | HTTPS with self-signed cert |
-| Grafana | 3001 | Monitoring | Metrics dashboard |
-| PostgreSQL | 5432 | Database | Port-forwarded only |
-| Redis | 6379 | Cache | Port-forwarded only |
+| Vault | 8200 | Secret Management | HashiCorp Vault (persistent file storage, auto-unseal) |
+| PostgreSQL | 5432 | Database | Optional, for debugging |
+| Redis | 6379 | Cache | Optional, for debugging |
+| Grafana | 3001 | Monitoring | Disabled by default |
 
 **If a port is occupied:**
 

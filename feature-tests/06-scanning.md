@@ -1,7 +1,7 @@
 # Scanning Tests
 
 **Priority**: P0 - Critical
-**Last Tested**: _Not yet tested_
+**Last Tested**: December 22, 2025
 **Endpoint**: `POST /api/v1/scans`
 
 ---
@@ -45,16 +45,17 @@
 
 ## 3. Scanner Selection
 
-### 3.1 Available Scanners
-- [ ] Slither available for Solidity
-- [ ] Aderyn available for Solidity
-- [ ] Mythril available for Solidity
-- [ ] Echidna available for fuzzing
+> **Per-scanner validation tests**: See [22-scanner-validation.md](./22-scanner-validation.md)
+
+### 3.1 Scanner Availability
+- [ ] 17 scanners registered in orchestration
 - [ ] Scanner list matches tier capabilities
+- [ ] All scanner images present in minikube
 
 ### 3.2 Scanner Compatibility
 - [ ] Only compatible scanners shown per language
 - [ ] Solidity scanners for .sol files
+- [ ] Vyper scanners for .vy files
 - [ ] Rust scanners for .rs files
 - [ ] Invalid scanner + language combo rejected
 
@@ -197,6 +198,31 @@
 
 ---
 
+## 11. Scanner Pattern Coverage
+
+**Last Validated:** December 21, 2025
+**Status:** ✅ All Tests Passed
+
+### 11.1 Pattern Database Integrity
+- [x] No duplicate pattern IDs in vulnerability_patterns.json ✅
+- [x] Pattern count >= 397 (actual: 397) ✅
+- [x] Mapping count >= 638 (actual: 638) ✅
+- [x] No orphan mappings (mappings referencing non-existent patterns) ✅
+
+### 11.2 Scanner Registry
+- [x] All 17 scanner executors registered ✅
+- [x] All 15 scanner Dockerfiles present ✅
+- [x] Scanner IDs match pattern mappings ✅
+
+### 11.3 Verification Script
+- [x] Run `/scripts/verify-scanner-coverage.sh` ✅
+- [x] All critical checks pass (0 errors) ✅
+- [x] Parser tests pass (27/27) ✅
+
+**Validation Reference:** See `/TaskDocs-BlockSecOps/phases/02-phase-3.1-scanner-integration/SCANNER-AUDIT-VALIDATION-CHECKLIST.md`
+
+---
+
 ## Test Scenarios
 
 ### Quick Scan Test
@@ -225,4 +251,16 @@ _Record scanning test results here:_
 
 ```
 [Date] | [Scanner] | [Contract Type] | [Result] | [Notes]
+2025-12-23 | sol-azy | Rust/Solana | PASS | Vulnerabilities detected and displayed in dashboard
+2025-12-22 | sol-azy | Rust/Solana | PASS | Dashboard auto-selects based on language
+2025-12-22 | vyper | Vyper | PASS | Dashboard auto-selects based on language
+2025-12-22 | soliditydefend | Solidity | PASS | Default for Solidity contracts
 ```
+
+### Phase 3.5 Bug Fixes (2025-12-22/23)
+- **Dashboard**: Language-based scanner selection in `handleTriggerScan` (PR #76)
+- **Tool Integration**: Vyper/Solana scanners registered in `valid_scanners` (PR #60)
+- **Scanner Mappings**: Fixed `sol-azy` ID in kubernetes_job_manager.py
+- **Sol-azy Callback (2025-12-23)**: Added HTTP callback mechanism, fixed severity case for PostgreSQL
+- **File Extension Detection (2025-12-23)**: Rust/Vyper patterns detected, ConfigMap files named correctly
+- **K8s Job Env Vars (2025-12-23)**: Added CONTRACTS_DIR and OUTPUT_DIR to scanner jobs

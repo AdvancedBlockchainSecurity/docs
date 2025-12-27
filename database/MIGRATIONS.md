@@ -492,6 +492,79 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
   - `PricingService` - Scan pricing and packages
 - **API Endpoints**: `GET/POST /api/v1/payments/*`
 
+### Migration 019: Expand Vulnerability Patterns Columns
+- **Status**: ✅ Applied (December 24, 2025)
+- **Revision ID**: `019_expand_vuln_patterns`
+- **Description**: Expands column sizes in vulnerability_patterns table for multi-ecosystem support
+- **Changes**:
+  - `id` VARCHAR(20) → VARCHAR(50) - Accommodate longer pattern IDs (e.g., BVD-SOLANA-CPI-001)
+  - `name` VARCHAR(200) → VARCHAR(100) - Standardized name length
+  - `category` VARCHAR(50) - No change (already adequate)
+  - `severity` VARCHAR(20) - No change (already adequate)
+  - `swc_id` VARCHAR(20) - No change (already adequate)
+  - `cwe_id` VARCHAR(20) - No change (already adequate)
+  - `owasp_category` VARCHAR(100) - No change (already adequate)
+- **Reason**: Original column sizes were too small for Solana, Cairo, and other ecosystem patterns
+- **Manual Fix Applied**: See `/Users/pwner/Git/ABS/docs/database/MANUAL-FIXES.md` - December 24, 2025 entry
+- **Migration File**: `/Users/pwner/Git/ABS/blocksecops-api-service/alembic/versions/20251224_0100-019_expand_vulnerability_patterns_columns.py`
+
+### Migration 020: Expand Pattern Tool Mappings FK
+- **Status**: ✅ Applied (December 24, 2025)
+- **Revision ID**: `020_expand_mappings_fk`
+- **Description**: Expands pattern_id FK column to match parent table
+- **Changes**:
+  - `pattern_tool_mappings.pattern_id` VARCHAR(20) → VARCHAR(50)
+- **Reason**: FK column must match parent vulnerability_patterns.id column size
+- **Migration File**: `/Users/pwner/Git/ABS/blocksecops-api-service/alembic/versions/20251224_0200-020_expand_pattern_tool_mappings_fk.py`
+
+### Migration 021: Team Collaboration (Phase 4.5 - Task 26)
+- **Status**: ✅ Applied (December 27, 2025)
+- **Revision ID**: `021_add_team_collaboration`
+- **Previous Revision**: `020_expand_mappings_fk`
+- **Description**: Core tables for team collaboration feature
+- **Tables Created**:
+  - `teams` - Team definitions within organizations
+  - `team_members` - Team membership with roles (lead/member)
+  - `project_team_access` - Team-level project permissions
+  - `project_user_access` - Individual user project permissions
+  - `vulnerability_assignments` - Vulnerability remediation tracking
+  - `comments` - Polymorphic comments on entities (vulnerability, scan, contract, project)
+- **Table Schemas**:
+  - **teams**: id, organization_id (FK), name, slug, description, color, created_by (FK), timestamps
+  - **team_members**: id, team_id (FK), user_id (FK), role, added_by (FK), added_at
+  - **project_team_access**: id, project_id (FK), team_id (FK), access_level, granted_by (FK), granted_at
+  - **project_user_access**: id, project_id (FK), user_id (FK), access_level, granted_by (FK), granted_at
+  - **vulnerability_assignments**: id, vulnerability_id (FK), assignee_id (FK), assigned_by (FK), status, priority, due_date, notes, timestamps
+  - **comments**: id, user_id (FK), entity_type, entity_id, content, mentions (JSONB), parent_id (FK), is_edited, timestamps
+- **Indexes Created**:
+  - Unique constraint on (organization_id, slug) for teams
+  - Unique constraint on (team_id, user_id) for team_members
+  - Unique constraint on (project_id, team_id) for project_team_access
+  - Unique constraint on (project_id, user_id) for project_user_access
+  - Unique constraint on (vulnerability_id, assignee_id) for assignments
+  - Composite indexes on entity_type/entity_id for comments
+- **API Endpoints Added**:
+  - Teams: `/api/v1/organizations/{org_id}/teams/*`
+  - Project Access: `/api/v1/projects/{project_id}/access/*`
+  - Assignments: `/api/v1/assignments/*`
+  - Comments: `/api/v1/comments/*`
+- **Migration File**: `/Users/pwner/Git/ABS/blocksecops-api-service/alembic/versions/20251226_0100-021_add_team_collaboration.py`
+- **Related Files**:
+  - Endpoints: `teams.py`, `project_access.py`, `assignments.py`, `comments.py`
+  - Models: `TeamModel`, `TeamMemberModel`, `ProjectTeamAccessModel`, `ProjectUserAccessModel`, `VulnerabilityAssignmentModel`, `CommentModel`
+
+### Migration 022: Add Missing Collaboration Columns
+- **Status**: ✅ Applied (December 27, 2025)
+- **Revision ID**: `022_add_missing_collab_cols`
+- **Previous Revision**: `021_add_team_collaboration`
+- **Description**: Adds missing columns required for team collaboration endpoints
+- **Columns Added**:
+  - `users.display_name` (VARCHAR(255)) - User display name for UI
+  - `roles.display_name` (VARCHAR(255)) - Role display name for UI
+  - `organization_members.invited_at` (TIMESTAMPTZ) - Invitation timestamp
+- **Note**: Uses IF NOT EXISTS checks for idempotent upgrades
+- **Migration File**: `/Users/pwner/Git/ABS/blocksecops-api-service/alembic/versions/20251226_1900-022_add_missing_collaboration_columns.py`
+
 ### Creating Migrations
 ```bash
 # Generate migration from models

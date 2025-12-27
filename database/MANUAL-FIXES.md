@@ -578,6 +578,343 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 
 ---
 
+## December 23, 2025 - Increase api_keys.key_prefix Column Size
+
+### Issue
+API key creation failed with 500 Internal Server Error due to `key_prefix` column being too small.
+
+**Symptom:** POST /api/v1/api-keys returned 500 with error: `StringDataRightTruncationError: value too long for type character varying(10)`
+
+### Root Cause
+- The `api_keys.key_prefix` column was defined as `VARCHAR(10)`
+- The API generates prefixes in format `bso_XXXX_XXX` which is 12 characters
+- The backend generates key prefixes using: `f"bso_{secrets.token_urlsafe(4)}_{secrets.token_urlsafe(3)}"`
+
+### Fix Applied
+```sql
+ALTER TABLE api_keys ALTER COLUMN key_prefix TYPE VARCHAR(20);
+```
+
+### Verification
+```sql
+-- Check column size
+SELECT column_name, data_type, character_maximum_length
+FROM information_schema.columns
+WHERE table_name = 'api_keys' AND column_name = 'key_prefix';
+
+-- Expected: character_maximum_length = 20
+```
+
+### How to Reproduce Fix
+```bash
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U postgres -d solidity_security \
+  -c "ALTER TABLE api_keys ALTER COLUMN key_prefix TYPE VARCHAR(20);"
+```
+
+### Related Files
+- `blocksecops-api-service/app/models/api_key.py` - Model definition
+- `blocksecops-api-service/app/services/api_key_service.py` - Key generation logic
+- `docs/database/SCHEMA.md` - Schema documentation (updated)
+
+### Impact
+- **Before Fix:** API key creation failed with 500 error
+- **After Fix:** API keys created successfully with full prefix format
+
+### Prevention
+1. Ensure database column sizes accommodate generated data formats
+2. Test API key creation after schema migrations
+3. Consider adding database constraint validation in CI/CD
+
+---
+
+## December 24, 2025 - Expand vulnerability_patterns Column Sizes
+
+### Issue
+Seeding vulnerability patterns from JSON failed with `StringDataRightTruncationError: value too long for type character varying(20)`.
+
+**Symptom:** Running `seed_patterns_simple.py` failed when inserting patterns with longer category names, IDs, or OWASP categories.
+
+### Root Cause
+- Several columns in `vulnerability_patterns` table were defined as `VARCHAR(20)` or smaller
+- The vulnerability patterns JSON file contains values that exceed these limits:
+  - `id`: Up to 34 characters (e.g., `BVD-SOLANA-CPI-001`)
+  - `name`: Up to 49 characters
+  - `category`: Up to 24 characters (e.g., `cross-program-invocation`)
+  - `owasp_category`: Up to 47 characters
+- The patterns were added for Solana, Cairo, and other ecosystems with longer naming conventions
+
+### Fix Applied
+```sql
+ALTER TABLE vulnerability_patterns ALTER COLUMN category TYPE VARCHAR(50);
+ALTER TABLE vulnerability_patterns ALTER COLUMN id TYPE VARCHAR(50);
+ALTER TABLE vulnerability_patterns ALTER COLUMN name TYPE VARCHAR(100);
+ALTER TABLE vulnerability_patterns ALTER COLUMN owasp_category TYPE VARCHAR(100);
+ALTER TABLE vulnerability_patterns ALTER COLUMN swc_id TYPE VARCHAR(20);
+ALTER TABLE vulnerability_patterns ALTER COLUMN cwe_id TYPE VARCHAR(20);
+ALTER TABLE vulnerability_patterns ALTER COLUMN severity TYPE VARCHAR(20);
+```
+
+### Verification
+```sql
+-- Check column sizes
+SELECT column_name, data_type, character_maximum_length
+FROM information_schema.columns
+WHERE table_name = 'vulnerability_patterns'
+AND column_name IN ('id', 'name', 'category', 'owasp_category', 'swc_id', 'cwe_id', 'severity')
+ORDER BY column_name;
+
+-- Expected results:
+-- category: 50
+-- cwe_id: 20
+-- id: 50
+-- name: 100
+-- owasp_category: 100
+-- severity: 20
+-- swc_id: 20
+```
+
+### How to Reproduce Fix
+```bash
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U postgres -d solidity_security -c "
+ALTER TABLE vulnerability_patterns ALTER COLUMN category TYPE VARCHAR(50);
+ALTER TABLE vulnerability_patterns ALTER COLUMN id TYPE VARCHAR(50);
+ALTER TABLE vulnerability_patterns ALTER COLUMN name TYPE VARCHAR(100);
+ALTER TABLE vulnerability_patterns ALTER COLUMN owasp_category TYPE VARCHAR(100);
+ALTER TABLE vulnerability_patterns ALTER COLUMN swc_id TYPE VARCHAR(20);
+ALTER TABLE vulnerability_patterns ALTER COLUMN cwe_id TYPE VARCHAR(20);
+ALTER TABLE vulnerability_patterns ALTER COLUMN severity TYPE VARCHAR(20);
+"
+```
+
+### Related Files
+- Seed script: `blocksecops-api-service/seed_patterns_simple.py`
+- Patterns JSON: `blocksecops-api-service/seeds/vulnerability_patterns.json`
+- Migration 019: `blocksecops-api-service/alembic/versions/20251224_0100-019_expand_vulnerability_patterns_columns.py`
+- Migration 020: `blocksecops-api-service/alembic/versions/20251224_0200-020_expand_pattern_tool_mappings_fk.py`
+
+### Additional Fix: pattern_tool_mappings.pattern_id
+
+The `pattern_id` FK column in `pattern_tool_mappings` also required expansion to match:
+
+```sql
+ALTER TABLE pattern_tool_mappings ALTER COLUMN pattern_id TYPE VARCHAR(50);
+```
+
+### Impact
+- **Before Fix:** Pattern seeding failed, SolidityDefend findings showed as "uncategorized"
+- **After Fix:** All 397 patterns and 638 tool mappings can be seeded successfully
+
+### Prevention
+1. Always verify seed data lengths match column constraints before seeding
+2. Create migration with adequate column sizes for multi-ecosystem support
+3. Add validation in seed scripts to catch oversized values early
+
+---
+
+## December 23, 2025 - Fix Vulnerability Categories and Scan Statistics
+
+### Issue
+Multiple data quality issues discovered during scanner validation testing:
+1. SolidityDefend vulnerabilities showing as "uncategorized" despite pattern mappings existing
+2. Aderyn vulnerabilities had `scanner_id` set to detector name instead of "aderyn"
+3. Scan summary statistics (critical_count, high_count, etc.) not matching actual vulnerability counts
+4. Some vulnerabilities from all scanners remained uncategorized
+
+**Symptoms:**
+- Dashboard showed findings under incorrect "scanners" category (e.g., "unused-public-function" as scanner)
+- Scan totals showed "1" while 86 vulnerabilities were listed
+- SolidityDefend findings showed "uncategorized" instead of proper categories like "defi", "mev", "validation"
+
+### Root Cause
+1. **Categorization:** The `store_scan_results` API endpoint used hardcoded `VULNERABILITY_CATEGORIES` dict instead of querying `pattern_tool_mappings` database table
+2. **Scanner ID:** Aderyn results had detector_id (e.g., "unused-public-function") in scanner_id field instead of "aderyn"
+3. **Scan Stats:** Each scanner's results overwrote the scan statistics instead of accumulating them
+4. **Missing Mappings:** Some SolidityDefend detector IDs weren't in pattern_tool_mappings
+
+### Fix Applied
+
+#### 1. Fix vulnerability categories using pattern_tool_mappings
+```sql
+-- Update categories from pattern mappings (SolidityDefend, Slither, etc.)
+UPDATE vulnerabilities v
+SET category = vp.category
+FROM pattern_tool_mappings ptm
+JOIN vulnerability_patterns vp ON vp.id = ptm.pattern_id
+WHERE ptm.scanner_id = v.scanner_id
+  AND ptm.detector_id = v.title
+  AND ptm.is_active = true
+  AND vp.is_active = true
+  AND (v.category = 'uncategorized' OR v.category IS NULL);
+-- Updated 486+ rows
+```
+
+#### 2. Fix Aderyn scanner_id values
+```sql
+-- Fix where scanner_id was set to detector_id
+WITH aderyn_detectors AS (
+    SELECT DISTINCT detector_id FROM pattern_tool_mappings WHERE scanner_id = 'aderyn'
+)
+UPDATE vulnerabilities v
+SET scanner_id = 'aderyn'
+FROM aderyn_detectors ad
+WHERE v.scanner_id = ad.detector_id AND v.scanner_id != 'aderyn';
+-- Updated 60+ rows
+```
+
+#### 3. Fix Aderyn categories by title pattern matching
+```sql
+UPDATE vulnerabilities
+SET category = CASE
+    WHEN title ILIKE '%Public Function Not Used%' THEN 'code-quality'
+    WHEN title ILIKE '%State Change Without Event%' THEN 'code-quality'
+    WHEN title ILIKE '%Contract Name Reused%' THEN 'code-quality'
+    WHEN title ILIKE '%Reentrancy%' THEN 'reentrancy'
+    WHEN title ILIKE '%Unspecific Solidity Pragma%' THEN 'code-quality'
+    WHEN title ILIKE '%Unchecked Low Level%' THEN 'unchecked-calls'
+    ELSE 'code-quality'
+END
+WHERE scanner_id = 'aderyn'
+  AND (category = 'uncategorized' OR category IS NULL);
+```
+
+#### 4. Fix Slither uncategorized
+```sql
+UPDATE vulnerabilities
+SET category = CASE
+    WHEN title ILIKE '%Constable%' THEN 'code-quality'
+    WHEN title ILIKE '%Immutable%' THEN 'code-quality'
+    WHEN title ILIKE '%Low Level%' THEN 'unchecked-calls'
+    WHEN title ILIKE '%Too Many Digits%' THEN 'code-quality'
+    ELSE 'best_practice'
+END
+WHERE scanner_id = 'slither'
+  AND (category = 'uncategorized' OR category IS NULL);
+```
+
+#### 5. Fix scan statistics
+```sql
+UPDATE scans s
+SET
+    critical_count = (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'critical'),
+    high_count = (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'high'),
+    medium_count = (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'medium'),
+    low_count = (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'low')
+WHERE EXISTS (SELECT 1 FROM vulnerabilities v WHERE v.scan_id = s.id);
+-- Updated 16 scans
+```
+
+#### 6. Add missing SolidityDefend mappings
+```sql
+INSERT INTO pattern_tool_mappings (id, pattern_id, scanner_id, detector_id, match_type, is_active, created_at, updated_at)
+VALUES
+  (gen_random_uuid(), 'BVD-SOLIDITY-VAL-001', 'soliditydefend', 'missing-zero-address-check', 'exact', true, NOW(), NOW()),
+  (gen_random_uuid(), 'BVD-SOLIDITY-VAL-002', 'soliditydefend', 'parameter-consistency', 'exact', true, NOW(), NOW()),
+  (gen_random_uuid(), 'BVD-SOLIDITY-VAL-002', 'soliditydefend', 'array-bounds-check', 'exact', true, NOW(), NOW()),
+  (gen_random_uuid(), 'BVD-SOLIDITY-ACC-007', 'soliditydefend', 'missing-access-modifiers', 'exact', true, NOW(), NOW())
+ON CONFLICT DO NOTHING;
+```
+
+### Code Fix Applied
+
+Modified `/blocksecops-api-service/src/presentation/api/v1/endpoints/scans.py`:
+
+```python
+# Added import
+from src.infrastructure.database.specialized_models.intelligence import (
+    PatternToolMappingModel, VulnerabilityPatternModel
+)
+
+# Added async function to lookup category from database
+async def _lookup_pattern_category(db, scanner_id, detector_id):
+    """Look up category from pattern_tool_mappings and vulnerability_patterns"""
+    query = (
+        select(PatternToolMappingModel.pattern_id, VulnerabilityPatternModel.category)
+        .join(VulnerabilityPatternModel, ...)
+        .where(scanner_id == ..., detector_id == ...)
+    )
+    # Returns (pattern_id, category) or (None, None)
+
+# Modified store_scan_results to use pattern lookup instead of hardcoded dict
+```
+
+### Verification
+```sql
+-- Verify no uncategorized vulnerabilities remain
+SELECT COUNT(*) as uncategorized_count
+FROM vulnerabilities
+WHERE category = 'uncategorized' OR category IS NULL;
+-- Expected: 0
+
+-- Verify scan statistics match actual counts
+SELECT
+    s.id,
+    (s.critical_count + s.high_count + s.medium_count + s.low_count) as stats_total,
+    (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id) as actual_total
+FROM scans s
+WHERE (s.critical_count + s.high_count + s.medium_count + s.low_count) !=
+      (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id);
+-- Expected: 0 rows (all match)
+```
+
+### How to Reproduce Fix
+```bash
+# 1. Fix SolidityDefend categories
+kubectl exec -n postgresql-local postgresql-0 -- psql -U postgres -d solidity_security -c "
+UPDATE vulnerabilities v
+SET category = vp.category
+FROM pattern_tool_mappings ptm
+JOIN vulnerability_patterns vp ON vp.id = ptm.pattern_id
+WHERE ptm.scanner_id = v.scanner_id
+  AND ptm.detector_id = v.title
+  AND (v.category = 'uncategorized' OR v.category IS NULL);"
+
+# 2. Fix Aderyn scanner_id
+kubectl exec -n postgresql-local postgresql-0 -- psql -U postgres -d solidity_security -c "
+WITH aderyn_detectors AS (
+    SELECT DISTINCT detector_id FROM pattern_tool_mappings WHERE scanner_id = 'aderyn'
+)
+UPDATE vulnerabilities v
+SET scanner_id = 'aderyn'
+FROM aderyn_detectors ad
+WHERE v.scanner_id = ad.detector_id;"
+
+# 3. Fix scan statistics
+kubectl exec -n postgresql-local postgresql-0 -- psql -U postgres -d solidity_security -c "
+UPDATE scans s
+SET
+    critical_count = (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'critical'),
+    high_count = (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'high'),
+    medium_count = (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'medium'),
+    low_count = (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'low')
+WHERE EXISTS (SELECT 1 FROM vulnerabilities v WHERE v.scan_id = s.id);"
+```
+
+### Related Files
+- **Code Fix:** `blocksecops-api-service/src/presentation/api/v1/endpoints/scans.py` (lines 77-123, 1291-1350)
+- **Model Update:** `blocksecops-api-service/src/infrastructure/database/specialized_models/intelligence.py`
+- **API Image:** api-service:0.5.1
+
+### Impact
+- **Before Fix:**
+  - Dashboard showed findings under scanner names like "unused-public-function"
+  - Scan totals showed incorrect counts (e.g., "1" instead of "86")
+  - All SolidityDefend findings showed as "uncategorized"
+- **After Fix:**
+  - All 832 vulnerabilities properly categorized
+  - Scan statistics match actual vulnerability counts
+  - Dashboard shows proper category breakdown (code-quality, mev, defi, validation, etc.)
+
+### Prevention
+1. Use `pattern_tool_mappings` database table for category lookup (now implemented)
+2. Accumulate scan statistics instead of overwriting (TODO: fix in code)
+3. Validate scanner_id values match known scanner list
+4. Add pattern mappings when integrating new scanners
+5. Run category validation after pattern seeding
+
+---
+
 ## Template for Future Manual Fixes
 
 ### [Date] - [Brief Description]

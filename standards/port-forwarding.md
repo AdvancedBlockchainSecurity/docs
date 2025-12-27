@@ -1,7 +1,7 @@
 # Port-Forwarding Standards
 
-**Version:** 2.4.0
-**Last Updated:** December 12, 2025
+**Version:** 2.5.0
+**Last Updated:** December 22, 2025
 **Status:** Active
 
 ## Overview
@@ -26,10 +26,11 @@ This document defines the standard port-forwarding configuration for local devel
 
 | Local Port | Service | Namespace | Target Port | Purpose |
 |------------|---------|-----------|-------------|---------|
-| **5432** | PostgreSQL | `postgresql-local` | 5432 | Main database |
-| **6379** | Redis | `redis-local` | 6379 | Cache & session store |
+| **5432** | PostgreSQL | `postgresql-local` | 5432 | Main database (optional) |
+| **6379** | Redis | `redis-local` | 6379 | Cache & session store (optional) |
 | **8200** | Vault | `vault-local` | 8200 | Secret management |
-| **8443** | Harbor | `harbor-local` | 443 | Container registry (HTTPS) |
+
+> **Note:** Harbor is deployed but **not used for local development**. Images are built directly into minikube's Docker daemon using `eval $(minikube docker-env)`. See [Local Development Setup](./local-development-setup.md) for details.
 
 ### Monitoring Services (PLG Stack) - DISABLED BY DEFAULT
 
@@ -110,8 +111,9 @@ kubectl port-forward -n redis-local svc/redis 6379:6379 &
 # Vault Secret Manager
 kubectl port-forward -n vault-local svc/vault 8200:8200 &
 
-# Harbor Container Registry (HTTPS)
-kubectl port-forward -n harbor-local svc/harbor 8443:443 &
+# NOTE: Harbor is NOT used for local development
+# Images are built directly into minikube's Docker daemon
+# See local-development-setup.md for the build workflow
 
 # NOTE: Monitoring services are DISABLED by default for local development
 # Uncomment below if you need monitoring:
@@ -126,21 +128,18 @@ echo ""
 echo "Service URLs:"
 echo "  Dashboard:        http://127.0.0.1:3000 (via Traefik)"
 echo "  API Service:      http://127.0.0.1:3000/api/v1 (via Traefik)"
-echo "  API Metrics:      http://127.0.0.1:9090"
-echo "  Data Service:     http://127.0.0.1:8001"
-echo "  Intelligence:     http://127.0.0.1:8002"
 echo "  Notifications:    http://127.0.0.1:8003 (WebSocket: ws://127.0.0.1:8003/ws/)"
-echo "  Orchestration:    http://127.0.0.1:8004"
-echo "  Tool Integration: http://127.0.0.1:8005"
+echo "  Vault:            http://127.0.0.1:8200"
+echo ""
+echo "Optional (for debugging):"
 echo "  PostgreSQL:       postgresql://localhost:5432"
 echo "  Redis:            redis://localhost:6379"
-echo "  Vault:            http://127.0.0.1:8200"
-echo "  Harbor:           https://127.0.0.1:8443 (admin/Harbor12345)"
 echo ""
-echo "Monitoring (disabled by default - enable with scripts/enable-monitoring.sh):"
+echo "Monitoring (disabled by default):"
 echo "  Grafana:          http://127.0.0.1:3001 (admin/admin)"
 echo "  Prometheus:       http://127.0.0.1:9091"
-echo "  Loki:             http://127.0.0.1:9093"
+echo ""
+echo "Note: Harbor is NOT used for local dev. Build images with: eval \$(minikube docker-env)"
 ```
 
 ### Individual Service Commands
@@ -164,13 +163,6 @@ kubectl port-forward -n postgresql-local svc/postgresql 5432:5432
 ```bash
 kubectl port-forward -n redis-local svc/redis 6379:6379
 ```
-
-**Harbor Container Registry (HTTPS)**:
-```bash
-kubectl port-forward -n harbor-local svc/harbor 8443:443
-```
-
-**Note**: Harbor uses HTTPS with a self-signed certificate. Access via `https://127.0.0.1:8443`. Login: `admin` / `Harbor12345`.
 
 **Grafana (Dashboards)**:
 ```bash
@@ -245,10 +237,11 @@ export const apiClient: AxiosInstance = axios.create({
 
 Local development uses Traefik IngressRoutes to route traffic based on hostname and path:
 
-**Dashboard IngressRoute** (`k8s/overlays/local/dashboard/ingressroute.yaml`):
+**Dashboard IngressRoute** (`k8s/overlays/local/ingressroute.yaml`):
 ```yaml
 routes:
-  - match: Host(`localhost`) || Host(`127.0.0.1`)
+  # Catch all except /api/v1 paths (allows /api-keys, /audit-logs, /webhooks, etc.)
+  - match: (Host(`localhost`) || Host(`127.0.0.1`)) && !PathPrefix(`/api/v1`) && !PathPrefix(`/docs`)
     kind: Rule
     services:
       - name: dashboard
@@ -258,7 +251,8 @@ routes:
 **API Service IngressRoute** (`k8s/overlays/local/api-service/ingressroute.yaml`):
 ```yaml
 routes:
-  - match: (Host(`localhost`) || Host(`127.0.0.1`)) && PathPrefix(`/api`)
+  # Use /api/v1 specifically to avoid catching dashboard routes like /api-keys
+  - match: (Host(`localhost`) || Host(`127.0.0.1`)) && PathPrefix(`/api/v1`)
     kind: Rule
     services:
       - name: api-service
@@ -267,8 +261,12 @@ routes:
 
 **Routing Logic**:
 - `http://127.0.0.1:3000` → Dashboard UI
-- `http://127.0.0.1:3000/api/v1/...` → API Service (matches PathPrefix `/api`)
+- `http://127.0.0.1:3000/api-keys` → Dashboard UI (page route)
+- `http://127.0.0.1:3000/audit-logs` → Dashboard UI (page route)
+- `http://127.0.0.1:3000/api/v1/...` → API Service (matches PathPrefix `/api/v1`)
 - This mirrors production where all traffic goes through a single ingress point
+
+**Important**: Use `/api/v1` (not `/api`) for API routing to avoid catching dashboard page routes that start with `/api-*` (like `/api-keys`).
 
 ### Notification Service Ports
 
@@ -428,19 +426,16 @@ curl -s http://127.0.0.1:8000/health || echo "Port 8000 not accessible"
 # File: scripts/check-port-forwards.sh
 
 # Core services (always needed)
-ports=(3000 8001 8002 8003 8004 8005 5432 6379 8200 8443)
+ports=(3000 8003 8200)
 services=(
   "Traefik (Dashboard/API)"
-  "Data Service"
-  "Intelligence Engine"
   "Notification Service"
-  "Orchestration Service"
-  "Tool Integration"
-  "PostgreSQL"
-  "Redis"
   "Vault"
-  "Harbor Registry"
 )
+
+# Optional services (for debugging)
+# ports+=(5432 6379)
+# services+=("PostgreSQL" "Redis")
 
 # Optional monitoring ports (disabled by default)
 # monitoring_ports=(3001 9091 9093 9187 9121)
@@ -576,18 +571,22 @@ curl http://127.0.0.1:3000
 
 # Test API routing
 curl http://127.0.0.1:3000/api/v1/scanners
+
+# Test API health
+curl http://127.0.0.1:3000/api/v1/health/live
 ```
 
-**Test Monitoring Stack**:
+**Build Images for Local Development**:
 ```bash
-# Test Grafana
-curl -s http://127.0.0.1:3001/api/health | jq .
+# Use minikube's Docker daemon
+eval $(minikube docker-env)
 
-# Test Prometheus
-curl -s http://127.0.0.1:9091/-/ready
+# Build and tag
+docker build -t <service>:<version> .
+docker tag <service>:<version> <service>:latest
 
-# Test Loki
-curl -s http://127.0.0.1:9093/ready
+# Deploy
+kubectl apply -k k8s/overlays/local/<service>/
 ```
 
 ---

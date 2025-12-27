@@ -421,6 +421,22 @@ The database provides the **history** and **analytics** that ConfigMap cannot.
 
 ### Recent Updates Recorded
 
+- **2025-12-20**: Scanner Pattern Coverage Audit Complete
+  - Fixed 5 duplicate pattern IDs in vulnerability_patterns.json
+  - Added MythrilExecutor to scanner registry (was missing registration)
+  - Fixed Vyper scanner ID mismatch ("vyper" → "slither-vyper")
+  - Pattern count: 398 → 397 (1 merged), 638 mappings, 17 scanners
+  - Updated verification script with correct field names
+  - See: `/docs/changelogs/SCANNER-PATTERN-AUDIT-2025-12-20.md`
+
+- **2025-12-20**: Phase 3.5 Parsers Complete - All scanner output parsers implemented
+  - Added MoccasinParser for Vyper fuzzing output
+  - Added SolAzyParser, Sec3XRayParser, TridentParser, CargoFuzzSolanaParser for Solana
+  - Added GenericJsonParser as fallback for unknown scanners
+  - 27 unit tests passing in `blocksecops-tool-integration`
+  - SlitherParser validated with real scanner output (12 vulnerabilities parsed)
+  - See: `/docs/changelogs/PHASE-3.5-PARSERS-2025-12-20.md`
+
 - **2025-12-15**: Full scanner integration - 16/16 scanners available
   - Vyper and Moccasin scanners available in orchestration pod (vyper 0.4.0, moccasin installed)
   - Solana scanners enabled via Docker-based execution (Sol-azy, Sec3-xray, Trident, Cargo-fuzz-solana)
@@ -587,5 +603,5 @@ SELECT record_scanner_update('scanner_name', 'new_version', 'new_image_tag');
 ---
 
 **Created**: 2025-10-30
-**Last Updated**: 2025-12-15
+**Last Updated**: 2025-12-20
 **Maintained By**: BlockSecOps Platform Team

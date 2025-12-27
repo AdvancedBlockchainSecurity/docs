@@ -1,8 +1,8 @@
 # Secrets Management
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 1.9.0
-**Last Updated:** December 14, 2025
+**Version:** 2.0.0
+**Last Updated:** December 20, 2025
 **Status:** Active
 
 ## Overview
@@ -226,10 +226,25 @@ Action: Secret revoked and removed from all environments"
 
 **For local development environments:**
 
-1. **Use Vault dev mode** or a dedicated local Vault instance
+1. **Vault uses persistent file storage** with auto-unseal - secrets persist across cluster restarts
 2. **Never use production secrets** in local development
 3. **Document local secret requirements** in `.env.example`
 4. **Provide setup scripts** to initialize local Vault with development secrets
+5. **Initial setup required once** - after first initialization, secrets persist on the PVC
+
+### Vault Storage Configuration
+
+| Environment | Storage Backend | Persistence | Auto-Unseal |
+|-------------|-----------------|-------------|-------------|
+| Local | File (PVC) | ✅ Persists across restarts | ✅ Automatic |
+| Staging | Raft | ✅ Persists | Manual |
+| Production | Raft with HA | ✅ Persists | Auto-unseal via KMS |
+
+**Local Vault Behavior:**
+- Vault data stored on PVC at `/vault/data`
+- Unseal key and root token stored in `/vault/data/.vault-init.json`
+- Auto-unseals on pod restart using stored key
+- Run `init-vault-local.sh` only for initial setup or after PVC deletion
 
 ### Standard Local Secret Structure
 

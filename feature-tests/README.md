@@ -34,6 +34,14 @@ Manual testing checklists for all user-facing features.
 | [16-user-activity-logging.md](./16-user-activity-logging.md) | Activity log, filtering, tracking |
 | [17-scan-comparison.md](./17-scan-comparison.md) | Scan diff, export reports |
 | [18-favorites-annotations.md](./18-favorites-annotations.md) | Favorites, vulnerability annotations |
+| [19-scanner-effectiveness.md](./19-scanner-effectiveness.md) | Scanner effectiveness analytics |
+| [20-batch-scan.md](./20-batch-scan.md) | Batch scan operations |
+| [21-phase-3-dashboard-analytics.md](./21-phase-3-dashboard-analytics.md) | Phase 3 dashboard analytics |
+| [22-scanner-validation.md](./22-scanner-validation.md) | Per-scanner validation tests (all 17 scanners) |
+| [23-vulnerability-categorization.md](./23-vulnerability-categorization.md) | Category validation, pattern mappings, scan stats |
+| [24-cross-scanner-deduplication.md](./24-cross-scanner-deduplication.md) | Deduplication API, cross-scanner matching, group management |
+| [25-dark-mode-global-search.md](./25-dark-mode-global-search.md) | Dark mode toggle, command palette (Cmd+K), source code search |
+| [26-team-collaboration.md](./26-team-collaboration.md) | Teams, project access, assignments, comments (Phase 4.5) |
 
 ---
 
@@ -41,4 +49,11 @@ Manual testing checklists for all user-facing features.
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2025-12-27 | Claude Code | 26-team-collaboration.md | PASS - Teams API, project access, assignments, comments verified
+2025-12-26 | Claude Code | 25-dark-mode-global-search.md | PASS - Dark mode persists, Command Palette works, Source code search verified
+2025-12-25 | Claude Code | 24-cross-scanner-deduplication.md | PASS - 137 groups, 421 findings deduplicated, API verified
+2025-12-23 | Claude Code | 23-vulnerability-categorization.md | PASS - All 832 vulns categorized, scan stats fixed
+2025-12-22 | Manual | 13-vyper-rust-scanners.md | PASS - Phase 3.5 E2E integration complete
+2025-12-22 | Manual | 06-scanning.md | PASS - Language-based scanner selection working
+2025-12-21 | Claude Code (Automated) | 06-scanning.md (Section 11) | PASS - Scanner Pattern Coverage validated
 ```

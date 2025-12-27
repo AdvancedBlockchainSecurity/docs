@@ -44,8 +44,9 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Favorites:** User favorites/pinned items for quick access (Phase 3.1b Sprint 3)
 - **Vulnerability annotations:** Mark vulnerabilities with status and notes (Phase 3.1b Sprint 3)
 - **Batch scans:** Multi-contract batch scan operations (Phase 3.1b Sprint 3)
+- **Team collaboration:** Teams, project access control, assignments, comments (Phase 4.5)
 
-**Total Tables:** 37 (excluding alembic_version)
+**Total Tables:** 43 (excluding alembic_version)
 
 ---
 
@@ -1061,10 +1062,10 @@ Standard vulnerability pattern definitions for classification and matching (Phas
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
-| `id` | VARCHAR(20) | PRIMARY KEY | Pattern identifier (e.g., "BVD-EVM-REE-001", "BVD-EVM-ACC-001") |
-| `name` | VARCHAR(200) | NOT NULL | Pattern name (e.g., "Reentrancy Attack") |
+| `id` | VARCHAR(50) | PRIMARY KEY | Pattern identifier (e.g., "BVD-SOLIDITY-REE-001", "BVD-SOLANA-CPI-001") |
+| `name` | VARCHAR(100) | NOT NULL | Pattern name (e.g., "Reentrancy Attack") |
 | `description` | TEXT | NOT NULL | Detailed pattern description |
-| `category` | VARCHAR(50) | NOT NULL, INDEX | Vulnerability category (e.g., "reentrancy", "access_control") |
+| `category` | VARCHAR(50) | NOT NULL, INDEX | Vulnerability category (e.g., "reentrancy", "cross-program-invocation") |
 | `severity` | VARCHAR(20) | NOT NULL, INDEX | Default severity level |
 | `swc_id` | VARCHAR(20) | NULLABLE, INDEX | Smart Contract Weakness Classification ID |
 | `cwe_id` | VARCHAR(20) | NULLABLE, INDEX | Common Weakness Enumeration ID |
@@ -1148,7 +1149,7 @@ Mappings between scanner detector IDs and vulnerability patterns (Phase 4D).
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique mapping identifier |
-| `pattern_id` | VARCHAR(20) | NOT NULL, FK → vulnerability_patterns.id ON DELETE CASCADE, INDEX | Associated pattern |
+| `pattern_id` | VARCHAR(50) | NOT NULL, FK → vulnerability_patterns.id ON DELETE CASCADE, INDEX | Associated pattern |
 | `scanner_id` | VARCHAR(50) | NOT NULL, INDEX | Scanner name (e.g., "slither", "mythril") |
 | `detector_id` | VARCHAR(200) | NOT NULL, INDEX | Scanner-specific detector ID (e.g., "reentrancy-eth") |
 | `confidence_threshold` | DOUBLE PRECISION | NULLABLE | Minimum confidence for match |
@@ -1469,7 +1470,7 @@ API keys for programmatic access (Phase 4.5).
 | `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE | Owner user |
 | `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE CASCADE | Associated organization |
 | `name` | VARCHAR(255) | NOT NULL | Key name/description |
-| `key_prefix` | VARCHAR(10) | NOT NULL, INDEX | First 8 chars for identification |
+| `key_prefix` | VARCHAR(20) | NOT NULL, INDEX | Key prefix for identification (format: bso_XXXX_XXX) |
 | `key_hash` | VARCHAR(255) | NOT NULL | SHA-256 hash of full key |
 | `scopes` | JSONB | NOT NULL, DEFAULT '[]' | Permission scopes |
 | `rate_limit_per_minute` | INTEGER | NOT NULL, DEFAULT 60 | Requests per minute limit |
@@ -1490,13 +1491,17 @@ API keys for programmatic access (Phase 4.5).
 - Many-to-one with `users` (user_id, CASCADE DELETE)
 - Many-to-one with `organizations` (organization_id, CASCADE DELETE)
 
-**API Key Scopes:**
-- `scan:read` - Read scan results
-- `scan:write` - Create scans
-- `contract:read` - Read contracts
-- `contract:write` - Upload contracts
-- `vulnerability:read` - Read vulnerabilities
-- `webhook:manage` - Manage webhooks
+**API Key Scopes (implemented December 2025):**
+- `contracts:read` - Read contracts
+- `contracts:write` - Upload/modify contracts
+- `scans:read` - Read scan results
+- `scans:create` - Create new scans
+- `vulnerabilities:read` - Read vulnerabilities
+- `vulnerabilities:write` - Update vulnerability status
+- `patterns:read` - Read vulnerability patterns
+- `analytics:read` - Read analytics data
+- `webhooks:read` - Read webhooks
+- `webhooks:write` - Manage webhooks
 
 ---
 
@@ -1672,6 +1677,216 @@ Credit usage and purchase history (Phase 3.4 - x402 Pay-Per-Scan).
 
 ---
 
+### `teams`
+
+**ADDED:** Migration 021 (2025-12-26) - Phase 4.5 Team Collaboration
+
+Teams within organizations for grouping users and managing access.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique team identifier |
+| `organization_id` | UUID | NOT NULL, FK → organizations.id ON DELETE CASCADE | Parent organization |
+| `name` | VARCHAR(100) | NOT NULL | Team display name |
+| `slug` | VARCHAR(100) | NOT NULL | URL-friendly identifier |
+| `description` | TEXT | NULLABLE | Team description |
+| `color` | VARCHAR(7) | NULLABLE | Hex color code (e.g., "#FF5733") |
+| `created_by` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | User who created the team |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_teams_organization_id` on `organization_id`
+- `uq_teams_org_slug` (UNIQUE) on `(organization_id, slug)`
+
+**Relationships:**
+- Many-to-one with `organizations` (organization_id, CASCADE DELETE)
+- One-to-many with `team_members`
+- One-to-many with `project_team_access`
+
+---
+
+### `team_members`
+
+**ADDED:** Migration 021 (2025-12-26) - Phase 4.5 Team Collaboration
+
+Team membership with role assignment.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique membership identifier |
+| `team_id` | UUID | NOT NULL, FK → teams.id ON DELETE CASCADE | Team reference |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE | User reference |
+| `role` | VARCHAR(20) | NOT NULL, DEFAULT 'member' | Team role (lead, member) |
+| `added_by` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | User who added the member |
+| `added_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Add timestamp |
+
+**Indexes:**
+- `ix_team_members_team_id` on `team_id`
+- `ix_team_members_user_id` on `user_id`
+- `uq_team_members_team_user` (UNIQUE) on `(team_id, user_id)`
+
+**Relationships:**
+- Many-to-one with `teams` (team_id, CASCADE DELETE)
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+
+**Team Roles:**
+- `lead` - Manage team members, represent team in decisions
+- `member` - Standard team participant
+
+---
+
+### `project_team_access`
+
+**ADDED:** Migration 021 (2025-12-26) - Phase 4.5 Team Collaboration
+
+Team-level project access grants.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique access grant identifier |
+| `project_id` | UUID | NOT NULL, FK → projects.id ON DELETE CASCADE | Project reference |
+| `team_id` | UUID | NOT NULL, FK → teams.id ON DELETE CASCADE | Team reference |
+| `access_level` | VARCHAR(20) | NOT NULL, DEFAULT 'read' | Access level (owner, write, read) |
+| `granted_by` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | User who granted access |
+| `granted_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Grant timestamp |
+
+**Indexes:**
+- `ix_project_team_access_project_id` on `project_id`
+- `ix_project_team_access_team_id` on `team_id`
+- `uq_project_team_access_project_team` (UNIQUE) on `(project_id, team_id)`
+
+**Relationships:**
+- Many-to-one with `projects` (project_id, CASCADE DELETE)
+- Many-to-one with `teams` (team_id, CASCADE DELETE)
+
+**Access Levels:**
+- `owner` - Full control, can manage access and delete project
+- `write` - Create/update contracts, scans, vulnerabilities
+- `read` - View project and all contents
+
+---
+
+### `project_user_access`
+
+**ADDED:** Migration 021 (2025-12-26) - Phase 4.5 Team Collaboration
+
+Direct user-level project access grants.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique access grant identifier |
+| `project_id` | UUID | NOT NULL, FK → projects.id ON DELETE CASCADE | Project reference |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE | User reference |
+| `access_level` | VARCHAR(20) | NOT NULL, DEFAULT 'read' | Access level (owner, write, read) |
+| `granted_by` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | User who granted access |
+| `granted_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Grant timestamp |
+
+**Indexes:**
+- `ix_project_user_access_project_id` on `project_id`
+- `ix_project_user_access_user_id` on `user_id`
+- `uq_project_user_access_project_user` (UNIQUE) on `(project_id, user_id)`
+
+**Relationships:**
+- Many-to-one with `projects` (project_id, CASCADE DELETE)
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+
+**Access Resolution Order:**
+1. Project owner (always has full access)
+2. Direct user access (project_user_access)
+3. Team-based access (via team_members → project_team_access)
+4. Highest access level wins across all sources
+
+---
+
+### `vulnerability_assignments`
+
+**ADDED:** Migration 021 (2025-12-26) - Phase 4.5 Team Collaboration
+
+Vulnerability remediation task assignments.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique assignment identifier |
+| `vulnerability_id` | UUID | NOT NULL, FK → vulnerabilities.id ON DELETE CASCADE | Vulnerability reference |
+| `assignee_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE | Assigned user |
+| `assigned_by` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | User who created assignment |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT 'open' | Assignment status |
+| `priority` | VARCHAR(20) | NULLABLE | Priority level |
+| `due_date` | TIMESTAMPTZ | NULLABLE | Due date for completion |
+| `notes` | TEXT | NULLABLE | Assignment notes |
+| `assigned_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Assignment creation timestamp |
+| `resolved_at` | TIMESTAMPTZ | NULLABLE | Resolution timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_vuln_assignments_vulnerability_id` on `vulnerability_id`
+- `ix_vuln_assignments_assignee_id` on `assignee_id`
+- `ix_vuln_assignments_status` on `status`
+- `ix_vuln_assignments_due_date` on `due_date`
+
+**Relationships:**
+- Many-to-one with `vulnerabilities` (vulnerability_id, CASCADE DELETE)
+- Many-to-one with `users` (assignee_id, CASCADE DELETE)
+
+**Assignment Status Values:**
+- `open` - Initial state, work not started
+- `in_progress` - Work underway
+- `resolved` - Issue fixed
+- `wont_fix` - Decision to not fix
+
+**Priority Levels:**
+- `critical` - Immediate action required
+- `high` - Important issues for next sprint
+- `medium` - Standard priority items
+- `low` - Nice-to-have fixes
+
+---
+
+### `comments`
+
+**ADDED:** Migration 021 (2025-12-26) - Phase 4.5 Team Collaboration
+
+Polymorphic comments on various entities.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique comment identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE | Comment author |
+| `entity_type` | VARCHAR(50) | NOT NULL | Entity type (vulnerability, scan, contract, project) |
+| `entity_id` | UUID | NOT NULL | Entity UUID |
+| `content` | TEXT | NOT NULL | Comment content |
+| `mentions` | JSONB | NOT NULL, DEFAULT '[]' | Array of mentioned user UUIDs |
+| `parent_id` | UUID | NULLABLE, FK → comments.id ON DELETE CASCADE | Parent comment for threading |
+| `is_edited` | BOOLEAN | NOT NULL, DEFAULT false | Edit flag |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_comments_user_id` on `user_id`
+- `ix_comments_entity` on `(entity_type, entity_id)`
+- `ix_comments_parent_id` on `parent_id`
+- `ix_comments_created_at` on `created_at`
+- GIN index on `mentions` for array queries
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Self-referential with `comments` (parent_id, CASCADE DELETE)
+
+**Supported Entity Types:**
+- `vulnerability` - Comments on vulnerabilities
+- `scan` - Comments on scan results
+- `contract` - Comments on contracts
+- `project` - Comments on projects
+
+**Threading Model:**
+- Single-level threading only
+- Top-level comments can have replies
+- Replies cannot have nested replies
+- Parent validation ensures same entity
+
+---
+
 ## ENUM Types
 
 ### `contract_language`
@@ -1759,6 +1974,8 @@ Vulnerability severity classification (CVSS-inspired).
 4. `low` - Minor issue or best practice
 
 **Usage:** `vulnerabilities.severity`
+
+> **Important**: PostgreSQL enum values are **case-sensitive**. All values must be **lowercase**. Scanner integrations must convert uppercase values (e.g., `"HIGH"`) to lowercase (e.g., `"high"`) before inserting into the database.
 
 ---
 

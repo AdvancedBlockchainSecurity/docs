@@ -1,7 +1,7 @@
 # Scanner Selection User Guide
 
-**Last Updated**: October 17, 2025
-**Version**: 1.0
+**Last Updated**: December 22, 2025
+**Version**: 1.1
 
 ---
 
@@ -53,6 +53,18 @@ BlockSecOps provides a comprehensive suite of security scanning tools to analyze
    - Track progress in the "Recent Scans" section
 
 **That's it!** Your scan is now running. Results will appear on the contract detail page when complete.
+
+### Automatic Scanner Selection (New in v1.1)
+
+When you trigger a quick scan from the Contracts list, the dashboard automatically selects the appropriate scanner based on your contract's language:
+
+| Contract Language | Default Scanner |
+|-------------------|-----------------|
+| Solidity (.sol) | SolidityDefend |
+| Vyper (.vy) | Vyper |
+| Rust/Solana (.rs) | Sol-azy |
+
+This ensures you always get relevant security analysis without needing to manually configure scanner selection.
 
 ---
 
@@ -136,18 +148,19 @@ BlockSecOps offers four preset scan profiles to match different use cases:
 
 ## Available Scanners
 
-The platform provides security scanners across 5 smart contract languages:
+The platform provides security scanners across 3 smart contract ecosystems:
 
-### Solidity (8 scanners)
+### Solidity (9 scanners)
 
 | Scanner | Type | Runtime | Best For |
 |---------|------|---------|----------|
+| **SolidityDefend** | Static Analysis | ~20s | Comprehensive detection (204+ patterns) - Default for quick scans |
 | **Slither** | Static Analysis | ~15s | Comprehensive vulnerability detection (90+ checks) |
 | **Aderyn** | Static Analysis | ~20s | Rust-based static analysis, fast and accurate |
 | **Mythril** | Static Analysis | ~3min | Deep analysis using symbolic execution |
 | **Semgrep** | Static Analysis | ~10s | Pattern-based detection with custom rules |
 | **Solhint** | Linting | ~5s | Code style and best practices |
-| **4naly3er** | Static Analysis | ~12s | Gas optimization and efficiency analysis |
+| **Wake** | Static Analysis | ~12s | Gas optimization and efficiency analysis |
 | **Halmos** | Symbolic Execution | ~2min | Symbolic testing of contract properties |
 | **Echidna** | Fuzzing | ~3min | Property-based fuzzing for edge cases |
 
@@ -167,20 +180,9 @@ The platform provides security scanners across 5 smart contract languages:
 | **Trident** | Fuzzing | ~4min | Fuzzing framework for Solana programs |
 | **cargo-fuzz** | Fuzzing | ~5min | LibFuzzer-based fuzzing for Rust/Solana |
 
-### Move (2 scanners)
+### Additional Languages
 
-| Scanner | Type | Runtime | Best For |
-|---------|------|---------|----------|
-| **Move Prover** | Formal Verification | ~3min | Formal verification for Move contracts |
-| **cargo-fuzz (Move)** | Fuzzing | ~3min | Fuzzing for Move/Rust integration |
-
-### Cairo/StarkNet (3 scanners)
-
-| Scanner | Type | Runtime | Best For |
-|---------|------|---------|----------|
-| **Caracal** | Static Analysis | ~25s | Cairo smart contract static analysis |
-| **Starknet Foundry** | Fuzzing | ~2.5min | Testing and fuzzing for StarkNet |
-| **Tayt** | Fuzzing | ~2min | Cairo fuzzing by Trail of Bits |
+> **Note**: Move and Cairo/StarkNet scanners have been deprecated as of December 2025. The platform now focuses on Solidity, Vyper, and Rust/Solana ecosystems.
 
 ---
 
@@ -404,8 +406,8 @@ A: For Solidity: Slither, Mythril, and Echidna provide excellent coverage. For o
 **Q: Can I skip certain scanners?**
 A: Yes, use Custom scan profile to manually select/deselect any scanner.
 
-**Q: Why don't I see all 21 scanners?**
-A: The scanner list is automatically filtered based on your contract's programming language. You'll only see scanners that support your contract's language.
+**Q: Why don't I see all 15 scanners?**
+A: The scanner list is automatically filtered based on your contract's programming language. You'll only see scanners that support your contract's language (Solidity: 9, Vyper: 2, Rust/Solana: 4).
 
 **Q: What if I'm not sure which scanners to use?**
 A: Start with the Standard Scan profile. It's designed to provide comprehensive coverage for most use cases.

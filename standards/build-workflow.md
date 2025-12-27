@@ -1,61 +1,35 @@
 # Build Workflow
 
-**Version:** 2.0.0
-**Last Updated:** December 13, 2025
+**Version:** 3.0.0
+**Last Updated:** December 22, 2025
 
 ## Overview
 
+For local development, images are built directly into minikube's Docker daemon:
+
 ```
-Local Docker → Harbor Proxy (socat) → Harbor Registry → Kubernetes pulls from Harbor
-```
-
-Build locally (fast), push to Harbor via socat proxy, Kubernetes pulls the image.
-
-## Prerequisites
-
-### Harbor Proxy Setup
-
-Docker Desktop cannot directly reach minikube's network. A socat container bridges the connection.
-
-**One-time setup:**
-
-1. Add Harbor to Docker's insecure registries (`~/.docker/daemon.json`):
-```json
-{
-  "insecure-registries": ["localhost:5443"]
-}
+eval $(minikube docker-env) → docker build → kubectl apply
 ```
 
-2. Restart Docker Desktop
+This is the fastest workflow for rapid iteration during development.
 
-3. Start the Harbor proxy:
-```bash
-docker run -d --name harbor-proxy --restart always \
-  --network minikube \
-  -p 5443:5443 \
-  alpine/socat:latest \
-  TCP-LISTEN:5443,fork,reuseaddr TCP:192.168.49.2:30443
-```
+> **Note:** Harbor is deployed in the cluster but is **not used for local development**. Harbor is intended for staging/production CI/CD pipelines.
 
-**Verify connectivity:**
-```bash
-curl -k https://localhost:5443/v2/
-# Should return: {"errors":[{"code":"UNAUTHORIZED",...}]}
-```
+## Local Development Workflow (Recommended)
 
-## Build and Deploy
+### Build and Deploy
 
 ```bash
-# 1. Build
-docker build -t <service>:<version> -f <service>/Dockerfile .
+# 1. Switch to minikube's Docker daemon (REQUIRED)
+eval $(minikube docker-env)
 
-# 2. Tag for Harbor (via proxy)
-docker tag <service>:<version> localhost:5443/blocksecops/<service>:<version>
+# 2. Build with versioned tag
+docker build -t <service>:<version> .
 
-# 3. Push to Harbor
-docker push localhost:5443/blocksecops/<service>:<version>
+# 3. Tag as latest (for kustomization compatibility)
+docker tag <service>:<version> <service>:latest
 
-# 4. Update kustomization.yaml with new version tag
+# 4. Update kustomization.yaml with new version
 #    - Update images[].newTag
 #    - Update labels app.kubernetes.io/version
 
@@ -63,60 +37,115 @@ docker push localhost:5443/blocksecops/<service>:<version>
 kubectl apply -k k8s/overlays/local/<service>/
 ```
 
-## Kustomization Image Reference
+### Example: Building API Service
 
-Kubernetes pulls from Harbor using the ClusterIP (internal to cluster):
+```bash
+eval $(minikube docker-env)
+cd /Users/pwner/Git/ABS/blocksecops-api-service
+
+# Build
+docker build -t api-service:0.4.2 .
+docker tag api-service:0.4.2 api-service:latest
+
+# Update version in kustomization.yaml, then deploy
+kubectl apply -k k8s/overlays/local/
+```
+
+### Kustomization Image Reference
+
+For local development, use simple image names (no registry prefix):
 
 ```yaml
 # k8s/overlays/local/<service>/kustomization.yaml
 images:
 - name: <service>
-  newName: 10.106.241.219:443/blocksecops/<service>
+  newName: <service>
   newTag: "<version>"
 ```
 
-Get Harbor's ClusterIP: `kubectl get svc harbor -n harbor-local -o jsonpath='{.spec.clusterIP}'`
+## Why Minikube Docker (Not Harbor)
 
-## Using Build Cache
+| Minikube Docker | Harbor Registry |
+|-----------------|-----------------|
+| No push/pull overhead | Requires push + pull |
+| Instant availability | Network transfer time |
+| Simple workflow | Requires socat proxy setup |
+| Good for rapid iteration | Better for CI/CD pipelines |
+
+## Verifying Images in Minikube
 
 ```bash
-docker build \
-  --cache-from=localhost:5443/blocksecops/<service>:<previous-version> \
-  -t <service>:<new-version> \
-  -f <service>/Dockerfile .
+# List images in minikube's Docker
+eval $(minikube docker-env)
+docker images | grep <service>
+
+# Check what's running in cluster
+kubectl get pods -n <namespace> -o jsonpath='{.items[*].spec.containers[*].image}'
 ```
 
-## Why Local Docker (Not Minikube Docker)
+## Force Deployment Update
 
-| Local Docker | Minikube Docker (`eval $(minikube docker-env)`) |
-|--------------|------------------------------------------------|
-| Full system resources | Limited container resources |
-| Fast builds | Slow builds |
-| Harbor provides caching | No registry caching |
+If kubectl apply doesn't trigger a rollout (same image tag):
 
-Only use minikube's Docker for debugging:
+```bash
+# Option 1: Rollout restart
+kubectl rollout restart deployment/<service> -n <namespace>
 
+# Option 2: Set image explicitly
+kubectl set image deployment/<service> <service>=<service>:<new-version> -n <namespace>
+```
+
+## Troubleshooting
+
+### Image not found by Kubernetes
+
+Ensure you're building in minikube's Docker context:
+```bash
+# Check current Docker context
+docker context show
+# Should NOT be "default" - use minikube's daemon instead
+
+# Switch to minikube's Docker
+eval $(minikube docker-env)
+
+# Rebuild
+docker build -t <service>:<version> .
+```
+
+### Pod stuck in ImagePullBackOff
+
+Check the image exists in minikube:
 ```bash
 eval $(minikube docker-env)
 docker images | grep <service>
 ```
 
-## Troubleshooting
+If missing, rebuild the image.
 
-### Harbor proxy not running
+### Deployment not updating
+
+Force a rollout:
 ```bash
-docker ps | grep harbor-proxy
-# If not running:
-docker start harbor-proxy
-# Or recreate it (see Prerequisites)
+kubectl rollout restart deployment/<service> -n <namespace>
 ```
 
-### Certificate errors on push
-Ensure `localhost:5443` is in Docker's insecure-registries and Docker was restarted.
+---
 
-### Connection timeout
-Check socat container is on minikube network:
+## Harbor Workflow (Staging/Production Only)
+
+> **Note:** This section is for staging/production CI/CD pipelines. **Do not use Harbor for local development.**
+
+For CI/CD pipelines that need to push to Harbor:
+
 ```bash
-docker inspect harbor-proxy --format '{{range $k, $v := .NetworkSettings.Networks}}{{$k}}{{end}}'
-# Should output: minikube
+# Build locally
+docker build -t <service>:<version> .
+
+# Tag for Harbor
+docker tag <service>:<version> <harbor-clusterip>:443/blocksecops/<service>:<version>
+
+# Push to Harbor
+docker push <harbor-clusterip>:443/blocksecops/<service>:<version>
 ```
+
+Get Harbor's ClusterIP: `kubectl get svc harbor-core -n harbor-local -o jsonpath='{.spec.clusterIP}'`

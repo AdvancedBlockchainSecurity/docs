@@ -1,8 +1,10 @@
 # Phase 3.5: Vyper/Rust SAST Testing Implementation
 
+**Last Updated**: December 21, 2025
+
 ## Overview
 
-Phase 3.5 extends BlockSecOps security scanning capabilities to support Vyper smart contracts and Rust-based Solana programs. This phase implements scanner executors for 6 additional security tools, bringing the total scanner count to 19.
+Phase 3.5 extends BlockSecOps security scanning capabilities to support Vyper smart contracts and Rust-based Solana programs. This phase implements scanner executors for 6 additional security tools, bringing the total scanner count to 17.
 
 ## New Scanners
 
@@ -52,10 +54,9 @@ class ScannerExecutor(ABC):
 blocksecops-orchestration/src/blocksecops_orchestration/scanners/
 ├── base.py                  # Base classes
 ├── registry.py              # Scanner registration
-├── solidity_scanners.py     # Solidity scanners (12)
-├── vyper_scanners.py        # Vyper scanners (2) - NEW
-├── solana_scanners.py       # Solana scanners (4) - NEW
-└── cairo_scanners.py        # Cairo scanners (1)
+├── solidity_scanners.py     # Solidity scanners (11)
+├── vyper_scanners.py        # Vyper scanners (2)
+└── solana_scanners.py       # Solana scanners (4)
 ```
 
 ## Vyper Scanner Details

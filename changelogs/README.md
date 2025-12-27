@@ -1,7 +1,7 @@
 # BlockSecOps Changelogs
 
 **Purpose:** Centralized changelog directory for all BlockSecOps platform changes
-**Last Updated:** December 15, 2025
+**Last Updated:** December 26, 2025
 **Status:** Active
 
 ---
@@ -18,7 +18,100 @@ Changelogs are organized by component and maintained chronologically. Each chang
 
 ## Available Changelogs
 
-### 0. Platform Validation & Vyper/Moccasin Integration (`PLATFORM-VALIDATION-VYPER-MOCCASIN-2025-12-15.md`)
+### 0. API Endpoints Changelog (`API-ENDPOINTS-CHANGELOG.md`)
+
+**Component:** blocksecops-api-service
+**Scope:** Complete API version history (v1.0.0 - v1.3.0)
+**Date:** October 2025 - December 2025
+
+**Key Changes:**
+- Consolidated from blocksecops-docs/api/endpoints-reference.md
+- All API versions from v1.0.0 to v1.3.0
+- Phase 3.4, 3.1b, 4.5 feature additions
+- Database schema updates and tier access control
+
+**Use When:**
+- Looking up when an endpoint was added
+- Understanding API version history
+- Reviewing database migration history
+
+### 0. Dark Mode & Global Search (`DARK-MODE-GLOBAL-SEARCH-2025-12-26.md`)
+
+**Component:** blocksecops-api-service, blocksecops-dashboard
+**Scope:** UX enhancements - theme switching and command palette search
+**Date:** December 26, 2025
+
+**Key Changes:**
+- Dark mode toggle (light/dark/system) with localStorage persistence
+- Command Palette (Cmd+K / Ctrl+K) for quick navigation
+- `GET /search/quick` API endpoint with source code search
+- Line number + code snippet display in search results
+- Dashboard v0.14.0, API Service v0.6.0
+
+**Use When:**
+- Understanding theme system implementation
+- Debugging search functionality
+- Adding new searchable entity types
+- Customizing dark mode colors
+
+### 0. Vulnerability Categorization Fix (`VULNERABILITY-CATEGORIZATION-FIX-2025-12-23.md`)
+
+**Component:** blocksecops-api-service
+**Scope:** Vulnerability categorization, scan statistics, pattern lookup
+**Date:** December 23, 2025
+
+**Key Changes:**
+- Fixed SolidityDefend findings showing as "uncategorized" (486+ rows)
+- Implemented `_lookup_pattern_category()` to query pattern_tool_mappings table
+- Fixed Aderyn scanner_id values (60+ rows)
+- Fixed scan statistics to match actual vulnerability counts (16 scans)
+- Added 4 missing SolidityDefend pattern mappings
+- Built api-service:0.5.1
+
+**Use When:**
+- Understanding vulnerability categorization system
+- Debugging category display issues
+- Adding new scanner pattern mappings
+- Fixing scan statistics discrepancies
+
+### 0. Scanner Pattern Coverage Audit (`SCANNER-PATTERN-AUDIT-2025-12-20.md`)
+
+**Component:** blocksecops-api-service, blocksecops-orchestration
+**Scope:** Data integrity fixes for vulnerability patterns and scanner registry
+**Date:** December 20, 2025
+
+**Key Changes:**
+- Fixed 5 duplicate pattern IDs (DAT-004→DAT-006, L2-001→L2-002, ORA-003→ORA-009, ORA-004 merged, VAL-001→VAL-002)
+- Added MythrilExecutor to scanner registry (was missing, 4 pattern mappings orphaned)
+- Fixed Vyper scanner ID mismatch (99 pattern mappings affected)
+- Updated verification script with correct field names and counts
+- Pattern count: 398→397 (1 merged), Mappings: 638, Scanners: 16→17
+
+**Use When:**
+- Understanding pattern database fixes
+- Debugging scanner-pattern mismatches
+- Verifying scanner coverage after updates
+- Running scanner coverage verification script
+
+### 1. Phase 3.5 Parsers - Vyper & Solana (`PHASE-3.5-PARSERS-2025-12-20.md`)
+
+**Component:** blocksecops-tool-integration
+**Scope:** Scanner output parsers for Vyper and Solana/Rust scanners
+**Date:** December 20, 2025
+
+**Key Changes:**
+- Added MoccasinParser for Vyper fuzzing output
+- Added SolAzyParser, Sec3XRayParser, TridentParser, CargoFuzzSolanaParser for Solana
+- Added GenericJsonParser as fallback for unknown scanners
+- 27 unit tests passing, SlitherParser validated with real output
+
+**Use When:**
+- Understanding Phase 3.5 parser implementation
+- Adding new scanner output parsers
+- Debugging parser output normalization
+- Reviewing vulnerability severity mapping
+
+### 1. Platform Validation & Vyper/Moccasin Integration (`PLATFORM-VALIDATION-VYPER-MOCCASIN-2025-12-15.md`)
 
 **Component:** blocksecops-orchestration, blocksecops-notification
 **Scope:** Vyper/Moccasin scanner integration, WebSocket fix, platform validation
@@ -598,5 +691,5 @@ Create an issue or submit a PR with corrections.
 
 **Maintained By:** BlockSecOps Documentation Team
 **Location:** `/Users/pwner/Git/ABS/docs/changelogs/README.md`
-**Last Updated:** December 15, 2025
+**Last Updated:** December 20, 2025
 **Status:** ✅ Active
