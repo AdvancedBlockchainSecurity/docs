@@ -1,7 +1,7 @@
 # Vyper & Rust Scanner Integration Tests (Phase 3.5)
 
 **Priority**: P2 - Medium
-**Last Tested**: December 23, 2025
+**Last Tested**: December 29, 2025
 **Status**: ✅ Phase 3.5 Complete - Full E2E Verified with Vulnerability Detection
 **Feature**: Vyper Scanner Integration, Solana/Rust Scanner Integration
 **Scanner Validation Tests**: See [22-scanner-validation.md](./22-scanner-validation.md)
@@ -107,6 +107,11 @@ cd /Users/pwner/Git/ABS/blocksecops-tool-integration
 
 ```
 [Date] | [Test] | [Result] | [Notes]
+2025-12-29 | Vyper vulnerability detection | PASS | 2 vulnerabilities detected (1 High reentrancy, 1 Low unchecked send)
+2025-12-29 | vvm multi-version support | PASS | Automatic version detection and installation working
+2025-12-29 | Latest stable versions | PASS | Updated to vvm 0.3.2, Vyper 0.3.10/0.4.3, Slither 0.11.3
+2025-12-29 | Contract preprocessing | PASS | Module-level docstrings converted to comments for Slither compatibility
+2025-12-29 | scanner-vyper:0.4.0 image | PASS | Built and deployed with all fixes
 2025-12-23 | Solana vulnerability detection | PASS | Sol-azy found 2 vulnerabilities, displayed in dashboard
 2025-12-23 | Sol-azy callback fix | PASS | Fixed severity case (HIGH→high) for PostgreSQL enum
 2025-12-23 | File extension detection | PASS | .rs files correctly named in ConfigMap
@@ -131,3 +136,22 @@ cd /Users/pwner/Git/ABS/blocksecops-tool-integration
 5. **Environment variables**: Added `CONTRACTS_DIR` and `OUTPUT_DIR` to K8s Job spec
 
 **Image Version**: `scanner-sol-azy:0.2.1`
+
+### Vyper Scanner Fixes (2025-12-29)
+
+**Issues Fixed:**
+1. **Module-level docstrings**: Slither's Vyper parser failed on `Unsupported syntax for module namespace: Expr`
+   - Added preprocessing script to convert module-level docstrings to comments
+   - Preserves file-level and function docstrings
+2. **Multi-version support**: Added vvm (Vyper Version Manager) for automatic version detection
+3. **Latest stable versions**: Updated per dependency management standards
+   - vvm: 0.3.2
+   - Vyper: 0.3.10 (0.3.x), 0.4.3 (0.4.x)
+   - Slither: 0.11.3
+4. **Version selection logic**: Automatically uses latest stable for each major.minor line
+
+**Vulnerabilities Detected:**
+- 1 High: Reentrancy vulnerability in withdraw function
+- 1 Low: Unchecked send return value
+
+**Image Version**: `scanner-vyper:0.4.0`

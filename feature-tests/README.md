@@ -42,6 +42,38 @@ Manual testing checklists for all user-facing features.
 | [24-cross-scanner-deduplication.md](./24-cross-scanner-deduplication.md) | Deduplication API, cross-scanner matching, group management |
 | [25-dark-mode-global-search.md](./25-dark-mode-global-search.md) | Dark mode toggle, command palette (Cmd+K), source code search |
 | [26-team-collaboration.md](./26-team-collaboration.md) | Teams, project access, assignments, comments (Phase 4.5) |
+| [27-ai-ml-features.md](./27-ai-ml-features.md) | False positive detection, risk scoring, prioritization (Phase 5 - Implemented) |
+| [28-webapp-security.md](./28-webapp-security.md) | Security headers, CORS, request limits, error handling (Phase 7A) |
+| [29-application-security.md](./29-application-security.md) | OWASP testing, SQL injection, XSS, auth security, input validation |
+
+---
+
+## Phase 7A Security Hardening (Implemented)
+
+Security hardening features for production deployment:
+
+| Feature | Status | Tests |
+|---------|--------|-------|
+| Security Headers | Implemented | X-Frame-Options, CSP, HSTS |
+| CORS Restriction | Implemented | Explicit methods/headers |
+| Request Size Limit | Implemented | 10MB max, 413 response |
+| Error Handling | Implemented | Generic errors in production |
+| Security Logging | Implemented | Auth events, rate limits |
+| SQL Logging Control | Implemented | Disabled in production |
+
+---
+
+## Phase 5 AI/ML Features (Implemented)
+
+Phase 5 CPU-only ML features are now implemented (~$1/month operating cost):
+
+| Feature | Status | Tests |
+|---------|--------|-------|
+| False Positive Detection | Implemented (needs training data) | FP probability endpoint, training API |
+| Risk Scoring | Implemented | Score 0-100, level thresholds, adjustments |
+| Confidence Scoring | Implemented | Multi-signal weighted combination |
+| Semantic Deduplication | Implemented | Sentence Transformers embeddings |
+| Smart Prioritization | Implemented | Priority ranking, composite scoring |
 
 ---
 
@@ -49,6 +81,9 @@ Manual testing checklists for all user-facing features.
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2025-12-30 | Claude Code | 06-scanning.md (Sections 12.6, 13) | PASS - Fuzzer results display E2E verified
+2025-12-28 | Claude Code | 28-webapp-security.md | PASS - All security headers, CORS, request limits verified
+2025-12-27 | Claude Code | 27-ai-ml-features.md | PARTIAL - ML endpoints implemented, FP classifier needs training data
 2025-12-27 | Claude Code | 26-team-collaboration.md | PASS - Teams API, project access, assignments, comments verified
 2025-12-26 | Claude Code | 25-dark-mode-global-search.md | PASS - Dark mode persists, Command Palette works, Source code search verified
 2025-12-25 | Claude Code | 24-cross-scanner-deduplication.md | PASS - 137 groups, 421 findings deduplicated, API verified
