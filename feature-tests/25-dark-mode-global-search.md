@@ -1,10 +1,10 @@
 # Feature Test: Dark Mode & Global Search
 
 **Feature ID**: 25
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Added**: v0.14.0 (Dashboard), v0.6.0 (API)
-**Updated**: v0.15.1 (Dashboard) - CSS overrides for dark mode
-**Last Updated**: 2025-12-26
+**Updated**: v0.17.0 (Dashboard) - Intelligence Layer & Scanner modal dark mode
+**Last Updated**: 2025-12-27
 
 ---
 
@@ -265,6 +265,106 @@ curl -s "http://127.0.0.1:3000/api/v1/search/quick?q=transfer&limit=5" \
 | 3 | Toggle rapidly light→dark→light | No flickering or stuck states | [ ] |
 | 4 | Refresh in dark mode | Theme persists correctly | [ ] |
 | 5 | Check console for CSS errors | No errors | [ ] |
+
+---
+
+## Test 7: Intelligence Layer Dark Mode (v0.17.0)
+
+**Purpose**: Verify all Intelligence Layer components support dark mode.
+
+### 7.1 Deduplication Group Card
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Enable dark mode | Theme switches | [ ] |
+| 2 | Navigate to Deduplication page | Page loads | [ ] |
+| 3 | Verify group cards | Dark gray backgrounds | [ ] |
+| 4 | Verify confidence badges | Proper contrast colors | [ ] |
+| 5 | Verify buttons | Dark backgrounds, light text | [ ] |
+| 6 | Hover over group card | Hover state visible | [ ] |
+
+### 7.2 Deduplication Group List
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Verify loading skeleton | Dark placeholder colors | [ ] |
+| 2 | Verify filter inputs | Dark backgrounds, light text | [ ] |
+| 3 | Verify empty state | Readable text on dark background | [ ] |
+| 4 | Verify pagination | Dark controls | [ ] |
+
+### 7.3 Deduplication Indicator
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Find deduplication badge on vulnerability | Badge visible with contrast | [ ] |
+| 2 | Click/hover to open popover | Popover has dark background | [ ] |
+| 3 | Verify popover text | Light text, readable | [ ] |
+
+### 7.4 Scanner Comparison View
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Navigate to scan results with multiple scanners | Comparison view loads | [ ] |
+| 2 | Verify grid cells | Dark backgrounds | [ ] |
+| 3 | Verify severity colors | Proper contrast on dark | [ ] |
+| 4 | Verify footer section | Dark background, readable | [ ] |
+
+### 7.5 Fingerprint Debug Panel
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Open vulnerability detail with fingerprint | Panel loads | [ ] |
+| 2 | Expand collapsible panel | Dark background | [ ] |
+| 3 | Verify code blocks | Syntax highlighting visible | [ ] |
+| 4 | Verify JSON display | Readable on dark background | [ ] |
+
+### 7.6 Deduplication Insight Card
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Find insight card on dashboard | Card visible | [ ] |
+| 2 | Verify gradient backgrounds | Semi-transparent dark gradients | [ ] |
+| 3 | Verify text content | Light text, readable | [ ] |
+| 4 | Hover over card | Hover state visible | [ ] |
+
+---
+
+## Test 8: Scanner Modal Dark Mode (v0.17.0)
+
+**Purpose**: Verify Scanner Selection and Config modals support dark mode.
+
+### 8.1 Scanner Selector
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Enable dark mode | Theme switches | [ ] |
+| 2 | Click "Configure Security Scan" on contract | Modal opens | [ ] |
+| 3 | Verify modal background | Dark gray (not white) | [ ] |
+| 4 | Verify scanner rows | Dark backgrounds with contrast | [ ] |
+| 5 | Hover over scanner row | Hover state visible on dark | [ ] |
+| 6 | Verify preset selector | Dark dropdown, readable options | [ ] |
+| 7 | Verify scanner badges | Colored with proper contrast | [ ] |
+| 8 | Verify checkboxes | Visible on dark background | [ ] |
+
+### 8.2 Scanner Config Modal
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Click gear icon on scanner | Config modal opens | [ ] |
+| 2 | Verify modal container | Dark background | [ ] |
+| 3 | Verify form inputs | Dark inputs, light text | [ ] |
+| 4 | Verify select dropdowns | Dark options when opened | [ ] |
+| 5 | Verify buttons | Proper contrast | [ ] |
+| 6 | Close modal | Closes cleanly | [ ] |
+
+### 8.3 Section Preferences Modal
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Open Section Preferences modal | Modal opens | [ ] |
+| 2 | Verify modal background | Dark gray | [ ] |
+| 3 | Verify toggle switches | Visible on dark | [ ] |
+| 4 | Verify section labels | Light text, readable | [ ] |
 
 ---
 

@@ -2292,3 +2292,68 @@ See [Platform Development Standards](/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPM
 - Group related findings into deduplication groups
 - Select canonical findings from duplicate groups
 - Provide deduplication API and UI
+
+---
+
+## Phase 5 Summary
+
+**Phase 5: AI/ML Features** was completed on December 27, 2025.
+
+### ML-Related Fields
+
+The following database fields support Phase 5 ML features:
+
+#### Vulnerabilities Table (ML Fields)
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `false_positive_score` | DOUBLE PRECISION | ML-predicted probability of false positive (0.0-1.0) |
+| `classification_confidence` | DOUBLE PRECISION | Pattern match confidence score (0.0-1.0) |
+| `classification_method` | VARCHAR(20) | Classification method: 'rule_based', 'ml_based', or 'hybrid' |
+| `tool_consensus_score` | DOUBLE PRECISION | Consensus score across multiple scanners (0.0-1.0) |
+| `fingerprint_semantic` | VARCHAR(64) | Base64-encoded semantic embedding (384-dim vector) |
+| `user_classification` | VARCHAR(20) | User override classification for training data |
+| `user_feedback` | TEXT | User feedback/reason for classification |
+
+#### Vulnerability Patterns Table (ML Fields)
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `false_positive_rate` | DOUBLE PRECISION | Historical FP rate for this pattern |
+| `semantic_description` | TEXT | Text description for semantic embedding |
+| `keywords` | TEXT[] | Keywords for similarity matching |
+
+### ML Feature to Field Mapping
+
+| ML Feature | Database Fields Used |
+|------------|---------------------|
+| **Risk Scoring** | `severity`, `false_positive_score`, `tool_consensus_score`, `classification_confidence` |
+| **Confidence Scoring** | `false_positive_score`, `confidence`, `classification_confidence`, `tool_consensus_score` |
+| **Smart Prioritization** | `severity`, `false_positive_score`, `tool_consensus_score`, `pattern_code` |
+| **False Positive Detection** | All vulnerability fields (30+ features extracted) |
+| **Semantic Deduplication** | `fingerprint_semantic`, `title`, `description`, `code_snippet` |
+
+### Training Data Storage
+
+Training labels for the FP classifier are stored in the `vulnerability_classifications` table:
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `vulnerability_id` | UUID | Reference to vulnerability |
+| `was_actually_vulnerable` | BOOLEAN | Ground truth label (true = real issue) |
+| `user_feedback` | TEXT | User's reason for classification |
+| `exploitability_score` | DOUBLE PRECISION | User-assessed exploitability (0.0-1.0) |
+| `created_at` | TIMESTAMP | When label was created |
+| `updated_at` | TIMESTAMP | When label was updated |
+
+### Related Documentation
+
+- **Implementation Summary**: `/docs/changelogs/PHASE-5-AI-ML-IMPLEMENTATION-2025-12-27.md`
+- **Planning Summary**: `/docs/changelogs/PHASE-5-AI-ML-PLANNING-2025-12-27.md`
+- **Task Documentation**: `/TaskDocs-BlockSecOps/phases/05-phase-5-ai-ml/`
+- **ML Development Standards**: `/docs/standards/ml-development.md`
+- **Feature Tests**: `/docs/feature-tests/27-ai-ml-features.md`
+
+---
+
+**Last Updated**: December 27, 2025

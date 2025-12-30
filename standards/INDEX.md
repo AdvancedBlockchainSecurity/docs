@@ -1,7 +1,7 @@
 # Platform Development Standards - Index
 
-**Version:** 1.9.0
-**Last Updated:** December 12, 2025
+**Version:** 2.0.0
+**Last Updated:** December 27, 2025
 **Status:** Active
 
 ## Overview
@@ -139,9 +139,28 @@ These standards ensure proper versioning and configuration management:
     - Migration from deprecated dependencies
     - Real-world example: Manticore removal
 
+### 🤖 AI/ML Development Standards
+
+15. **[ML Development](./ml-development.md)**
+    - CPU-only ML architecture (no GPU/LLM costs)
+    - ML module structure and responsibilities
+    - Lazy loading patterns for models
+    - Feature extraction standards (30+ features)
+    - Model training and versioning
+    - Testing patterns with mocks
+    - Performance targets (<100ms inference)
+    - API endpoint conventions
+
+16. **[Intelligence Integration Standards](./INTELLIGENCE-INTEGRATION-STANDARDS.md)**
+    - Vulnerability pattern classification (BVD codes)
+    - Fingerprinting strategies (ASM, ENC, EVT, L2, Semantic)
+    - Deduplication algorithms
+    - Scanner-to-pattern mappings
+    - Canonical finding selection
+
 ### ✅ Compliance & Verification
 
-15. **[Compliance Checklist](./compliance-checklist.md)**
+17. **[Compliance Checklist](./compliance-checklist.md)**
     - Daily development checklist
     - Making changes checklist
     - Database configuration changes checklist
@@ -186,7 +205,10 @@ docs/standards/
 ├── docker-image-versioning.md
 ├── build-workflow.md
 ├── tool-metadata-configmaps.md
-└── dependency-management.md
+├── dependency-management.md
+├── ml-development.md
+├── INTELLIGENCE-INTEGRATION-STANDARDS.md
+└── ingress-networking.md
 ```
 
 ## Referencing Standards in Claude Code
