@@ -121,7 +121,14 @@ These standards ensure proper versioning and configuration management:
     - Using build cache
     - Why local Docker vs minikube Docker
 
-13. **[Tool Metadata ConfigMaps](./tool-metadata-configmaps.md)**
+13. **[Frontend Build-Time Environment Variables](./frontend-build-env.md)**
+    - Vite environment variable handling (baked at build time)
+    - Security classification (public vs private variables)
+    - Pass build args, never hardcode in Dockerfile
+    - Environment files (.env.local vs .env.example)
+    - Build workflow for local and CI/CD
+
+14. **[Tool Metadata ConfigMaps](./tool-metadata-configmaps.md)**
     - Managing third-party tool versions via ConfigMaps
     - Version selection policy (latest stable)
     - ConfigMap solution vs. hardcoded versions
@@ -130,7 +137,7 @@ These standards ensure proper versioning and configuration management:
     - Multi-environment support
     - Real-world example: Scanner metadata refactoring
 
-14. **[Dependency Management](./dependency-management.md)**
+15. **[Dependency Management](./dependency-management.md)**
     - Latest stable version policy
     - Prohibited dependencies (deprecated, retired, unmaintained)
     - Dependency health monitoring (monthly/quarterly audits)
@@ -141,7 +148,7 @@ These standards ensure proper versioning and configuration management:
 
 ### 🤖 AI/ML Development Standards
 
-15. **[ML Development](./ml-development.md)**
+16. **[ML Development](./ml-development.md)**
     - CPU-only ML architecture (no GPU/LLM costs)
     - ML module structure and responsibilities
     - Lazy loading patterns for models
@@ -151,7 +158,7 @@ These standards ensure proper versioning and configuration management:
     - Performance targets (<100ms inference)
     - API endpoint conventions
 
-16. **[Intelligence Integration Standards](./INTELLIGENCE-INTEGRATION-STANDARDS.md)**
+17. **[Intelligence Integration Standards](./INTELLIGENCE-INTEGRATION-STANDARDS.md)**
     - Vulnerability pattern classification (BVD codes)
     - Fingerprinting strategies (ASM, ENC, EVT, L2, Semantic)
     - Deduplication algorithms
@@ -160,7 +167,7 @@ These standards ensure proper versioning and configuration management:
 
 ### ✅ Compliance & Verification
 
-17. **[Compliance Checklist](./compliance-checklist.md)**
+18. **[Compliance Checklist](./compliance-checklist.md)**
     - Daily development checklist
     - Making changes checklist
     - Database configuration changes checklist
@@ -197,6 +204,7 @@ docs/standards/
 ├── port-forwarding.md
 ├── dashboard-development.md
 ├── frontend-development.md
+├── frontend-build-env.md
 ├── database-management.md
 ├── documentation-standards.md
 ├── version-control-standards.md

@@ -1,9 +1,11 @@
 # Dashboard Development Standards
 
-**Version:** 2.3.0
-**Last Updated:** November 30, 2025
+**Version:** 2.4.0
+**Last Updated:** December 30, 2025
 **Status:** Active
 
+> **Major Update (v2.4.0):** Dashboard builds use production mode with `serve -s dist`. Environment variables are baked in at build time via Docker build args. See [Frontend Build-Time Environment Variables](./frontend-build-env.md).
+>
 > **Major Update (v2.3.0):** All traffic MUST go through Traefik ingress controller. Port-forward to Traefik, NOT directly to services. This ensures API routing works correctly.
 
 ## Production Parity Principle
@@ -469,6 +471,59 @@ curl -s http://127.0.0.1:3000/api/v1/health/live
 # 6. Refresh dashboard browser page
 ```
 
+## Dashboard Build Workflow (v2.4.0)
+
+**IMPORTANT:** The dashboard uses Vite, which bakes environment variables into the JavaScript bundle at **build time**. You MUST pass required variables as Docker build args.
+
+### Build Command
+
+```bash
+# 1. Switch to minikube's Docker daemon
+eval $(minikube docker-env)
+
+# 2. Source environment variables from .env.local
+cd /Users/pwner/Git/ABS
+source blocksecops-dashboard/.env.local
+
+# 3. Build with required build args (DO NOT hardcode in Dockerfile!)
+docker build --no-cache \
+  --build-arg VITE_SUPABASE_URL=$VITE_SUPABASE_URL \
+  --build-arg VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY \
+  --build-arg VITE_WS_URL=$VITE_WS_URL \
+  --build-arg VITE_WS_ENABLED=$VITE_WS_ENABLED \
+  -t blocksecops-dashboard:0.19.0 \
+  -f blocksecops-dashboard/Dockerfile .
+
+# 4. Tag as latest
+docker tag blocksecops-dashboard:0.19.0 blocksecops-dashboard:latest
+
+# 5. Update kustomization.yaml version
+# Edit blocksecops-dashboard/k8s/overlays/local/kustomization.yaml
+
+# 6. Deploy
+kubectl apply -k blocksecops-dashboard/k8s/overlays/local/
+kubectl rollout restart deployment/dashboard -n dashboard-local
+kubectl rollout status deployment/dashboard -n dashboard-local
+```
+
+### Required Build Arguments
+
+| Build Arg | Required | Description |
+|-----------|----------|-------------|
+| `VITE_SUPABASE_URL` | **Yes** | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | **Yes** | Supabase anonymous key |
+| `VITE_WS_URL` | No (default: `ws://127.0.0.1:8003/ws`) | WebSocket endpoint |
+| `VITE_WS_ENABLED` | No (default: `true`) | Enable WebSocket |
+
+### Why Build Args, Not Hardcoded Values?
+
+The Dockerfile **validates** that required build args are provided and will fail if they're missing. This prevents accidentally committing sensitive values to Git.
+
+**Standard Reference:** See [Frontend Build-Time Environment Variables](./frontend-build-env.md) for complete details on:
+- Security classification (public vs private variables)
+- `.env.local` vs `.env.example` patterns
+- CI/CD integration
+
 ## Dashboard Development Checklist
 
 **Before starting development:**
@@ -709,5 +764,6 @@ The `useNotifications` hook tracks shown notifications in a `Set` to prevent dup
 **See Also:**
 - [Core Development Rules](./core-development-rules.md) - Critical development workflow rules
 - [Local Development Setup](./local-development-setup.md) - Local development standards and setup
+- [Frontend Build-Time Environment Variables](./frontend-build-env.md) - Vite build args and environment variable handling
 - [Testing & Deployment](./testing-deployment.md) - Testing and deployment workflows
 - [Notification Frontend](/Users/pwner/Git/ABS/blocksecops-docs/frontend/notification-frontend.md) - Detailed notification system documentation
