@@ -48,6 +48,7 @@ Manual testing checklists for all user-facing features.
 | [30-dashboard-production.md](./30-dashboard-production.md) | Production build, build args, static serving, Supabase integration |
 | [31-risk-scoring.md](./31-risk-scoring.md) | Unbounded risk scoring, risk levels, per-project breakdown |
 | [32-contract-name-duplication.md](./32-contract-name-duplication.md) | Duplicate contract name handling, rename/overwrite modal |
+| [33-pricing-page-usage.md](./33-pricing-page-usage.md) | Pricing page subscription alignment, current plan display |
 
 ---
 
@@ -93,6 +94,7 @@ The risk scoring system was redesigned to be unbounded (higher = riskier):
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2025-12-31 | Claude Code | 33-pricing-page-usage.md | IMPLEMENTED - CurrentPlanBanner, tier highlighting, WebSocket notification fix (v0.23.1 Dashboard)
 2025-12-31 | Claude Code | 32-contract-name-duplication.md | IMPLEMENTED - 409 conflict detection, DuplicateContractModal (v0.8.0 API, v0.22.0 Dashboard)
 2025-12-30 | Claude Code | 31-risk-scoring.md | PASS - Color badge display implemented (v0.21.0), replaces numeric 60.8k with "Critical Risk" badge
 2025-12-30 | Claude Code | 30-dashboard-production.md | PASS - Production build with build args verified
