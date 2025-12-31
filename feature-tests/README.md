@@ -45,6 +45,9 @@ Manual testing checklists for all user-facing features.
 | [27-ai-ml-features.md](./27-ai-ml-features.md) | False positive detection, risk scoring, prioritization (Phase 5 - Implemented) |
 | [28-webapp-security.md](./28-webapp-security.md) | Security headers, CORS, request limits, error handling (Phase 7A) |
 | [29-application-security.md](./29-application-security.md) | OWASP testing, SQL injection, XSS, auth security, input validation |
+| [30-dashboard-production.md](./30-dashboard-production.md) | Production build, build args, static serving, Supabase integration |
+| [31-risk-scoring.md](./31-risk-scoring.md) | Unbounded risk scoring, risk levels, per-project breakdown |
+| [32-contract-name-duplication.md](./32-contract-name-duplication.md) | Duplicate contract name handling, rename/overwrite modal |
 
 ---
 
@@ -70,10 +73,19 @@ Phase 5 CPU-only ML features are now implemented (~$1/month operating cost):
 | Feature | Status | Tests |
 |---------|--------|-------|
 | False Positive Detection | Implemented (needs training data) | FP probability endpoint, training API |
-| Risk Scoring | Implemented | Score 0-100, level thresholds, adjustments |
+| Risk Scoring | **Redesigned (v0.7.0)** | Unbounded scoring, CRITICAL/HIGH/MEDIUM/LOW levels |
 | Confidence Scoring | Implemented | Multi-signal weighted combination |
 | Semantic Deduplication | Implemented | Sentence Transformers embeddings |
 | Smart Prioritization | Implemented | Priority ranking, composite scoring |
+
+### Risk Scoring Redesign (December 30, 2025)
+
+The risk scoring system was redesigned to be unbounded (higher = riskier):
+
+- **Weights**: Critical=25, High=15, Medium=5, Low=1, Info=0
+- **Thresholds** (per-contract avg): CRITICAL>=50, HIGH>=25, MEDIUM>=10, LOW<10
+- **No cap**: Previously capped at 100, now accurately reflects total risk
+- **New endpoint**: GET /api/v1/statistics/risk for per-project breakdown
 
 ---
 
@@ -81,6 +93,9 @@ Phase 5 CPU-only ML features are now implemented (~$1/month operating cost):
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2025-12-31 | Claude Code | 32-contract-name-duplication.md | IMPLEMENTED - 409 conflict detection, DuplicateContractModal (v0.8.0 API, v0.22.0 Dashboard)
+2025-12-30 | Claude Code | 31-risk-scoring.md | PASS - Color badge display implemented (v0.21.0), replaces numeric 60.8k with "Critical Risk" badge
+2025-12-30 | Claude Code | 30-dashboard-production.md | PASS - Production build with build args verified
 2025-12-30 | Claude Code | 06-scanning.md (Sections 12.6, 13) | PASS - Fuzzer results display E2E verified
 2025-12-28 | Claude Code | 28-webapp-security.md | PASS - All security headers, CORS, request limits verified
 2025-12-27 | Claude Code | 27-ai-ml-features.md | PARTIAL - ML endpoints implemented, FP classifier needs training data
