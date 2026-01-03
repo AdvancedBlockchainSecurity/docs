@@ -2,7 +2,7 @@
 
 **Priority**: P1 - High
 **Last Tested**: _Not yet tested_
-**Related**: Phase 3.1b Frontend
+**Related**: Phase 3.1b Frontend, Project-Contract Display (January 2026)
 
 ---
 
@@ -48,11 +48,15 @@
 - [ ] Contract's project_id set to null
 - [ ] Contract still exists after removal
 
-### 2.3 View Project Contracts
-- [ ] List contracts in project
-- [ ] Contract details included
+### 2.3 View Project Contracts (January 2026)
+- [ ] List contracts in project via GET /projects/{id}/contracts
+- [ ] Contract details included (name, address, language, network, status)
+- [ ] Language badges displayed (Solidity, Vyper, Rust)
+- [ ] Lines of code shown per contract
 - [ ] Scan status shown per contract
-- [ ] Empty list for new project
+- [ ] Remove from project button works
+- [ ] Empty list for new project shows appropriate message
+- [ ] Contracts clickable to navigate to contract detail
 
 ---
 
@@ -123,7 +127,23 @@
 
 ---
 
-## 6. Edge Cases
+## 6. Contract-Project Association Display (January 2026)
+
+### 6.1 Contracts List Page (/contracts)
+- [ ] Contracts show project badges
+- [ ] Project badges are clickable (navigate to /projects/{id})
+- [ ] Contracts in multiple projects show all badges
+- [ ] Contracts with no project show "No project" indicator
+- [ ] Project badges styled as purple pills
+
+### 6.2 API Response Enhancement
+- [ ] GET /contracts returns `projects` array in each contract
+- [ ] Each project has `id` and `name` fields
+- [ ] Empty array for unassigned contracts
+
+---
+
+## 7. Edge Cases
 
 - [ ] Project with very long name
 - [ ] Project with special characters in name
