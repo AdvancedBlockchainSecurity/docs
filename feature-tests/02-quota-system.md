@@ -110,13 +110,43 @@
 
 ---
 
+## 7. Project Quota Enforcement (January 2026)
+
+### 7.1 Free Tier (3 projects max)
+- [ ] First 3 projects created successfully
+- [ ] 4th project blocked with 403 error
+- [ ] Error message shows quota and upgrade path
+- [ ] UI reflects project count/limit
+
+### 7.2 Pro Tier (10 projects max)
+- [ ] Projects 1-10 created successfully
+- [ ] 11th project blocked with 403 error
+- [ ] Error message appropriate for Pro tier
+
+### 7.3 Enterprise Tier (Unlimited)
+- [ ] Large number of projects succeed
+- [ ] No project limit applied
+- [ ] max_projects = -1 in database
+
+### 7.4 Quota Exceeded Error Response (HTTP 403)
+```json
+{
+  "detail": "Project quota exceeded. Your plan allows 3 projects (current: 3). Upgrade to Pro for 10 projects or Enterprise for unlimited."
+}
+```
+- [ ] Error message includes current count
+- [ ] Error message includes tier limit
+- [ ] Upgrade guidance provided
+
+---
+
 ## Tier Limits Reference
 
-| Tier | Scans/Month | Files/Scan | Single File | Archive |
-|------|-------------|------------|-------------|---------|
-| Free | 10 | 25 | 1 MB | 5 MB |
-| Pro | 100 | 100 | 5 MB | 25 MB |
-| Enterprise | Unlimited | Unlimited | 10 MB | 50 MB |
+| Tier | Scans/Month | Files/Scan | Projects | Single File | Archive |
+|------|-------------|------------|----------|-------------|---------|
+| Free | 10 | 25 | 3 | 1 MB | 5 MB |
+| Pro | 100 | 100 | 10 | 5 MB | 25 MB |
+| Enterprise | Unlimited | Unlimited | Unlimited | 10 MB | 50 MB |
 
 ---
 

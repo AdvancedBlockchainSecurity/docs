@@ -336,11 +336,11 @@ Due to database state inconsistencies after the 2025-11-05 database reset, the s
 
 ---
 
-## Current Database State (2025-12-11)
+## Current Database State (2026-01-03)
 
 ### Alembic Version
 ```
-version_num: 018_scan_batches
+version_num: 023_add_max_projects_quota
 ```
 
 ### Existing Tables
@@ -564,6 +564,28 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
   - `organization_members.invited_at` (TIMESTAMPTZ) - Invitation timestamp
 - **Note**: Uses IF NOT EXISTS checks for idempotent upgrades
 - **Migration File**: `/Users/pwner/Git/ABS/blocksecops-api-service/alembic/versions/20251226_1900-022_add_missing_collaboration_columns.py`
+
+### Migration 023: Add Max Projects Quota
+- **Status**: ✅ Applied (January 3, 2026)
+- **Revision ID**: `023_add_max_projects_quota`
+- **Previous Revision**: `022_add_missing_collab_cols`
+- **Description**: Adds tier-based project limits to user quotas
+- **Columns Added**:
+  - `user_quotas.max_projects` (INTEGER, NOT NULL, DEFAULT 3) - Maximum projects per tier (-1 = unlimited)
+- **Tier Defaults**:
+  - Free: 3 projects
+  - Pro: 10 projects
+  - Enterprise: -1 (unlimited)
+  - Enterprise Broker: -1 (unlimited)
+- **Trigger Updated**: `create_user_quota()` function updated to include `max_projects` based on tier
+- **Enforcement**: Project quota checked at `POST /api/v1/projects` endpoint
+- **HTTP 403 Response**: When project quota exceeded:
+  ```json
+  {
+    "detail": "Project quota exceeded. Your plan allows 3 projects (current: 3). Upgrade to Pro for 10 projects or Enterprise for unlimited."
+  }
+  ```
+- **Migration File**: `/Users/pwner/Git/ABS/blocksecops-api-service/alembic/versions/20260102_0100-023_add_max_projects_quota.py`
 
 ### Creating Migrations
 ```bash

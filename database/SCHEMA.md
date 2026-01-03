@@ -206,6 +206,7 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 | `webhooks_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Webhooks feature enabled |
 | `api_access_enabled` | BOOLEAN | NOT NULL, DEFAULT false | API access enabled |
 | `result_retention_days` | INTEGER | NOT NULL, DEFAULT 30 | Scan result retention period |
+| `max_projects` | INTEGER | NOT NULL, DEFAULT 3 | Maximum projects (-1 = unlimited) |
 | `quota_reset_at` | TIMESTAMPTZ | NOT NULL, DEFAULT next month | Next quota reset date |
 | `last_scan_at` | TIMESTAMPTZ | NULLABLE | Last scan timestamp |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Quota record creation |
@@ -218,11 +219,11 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 **Relationships:**
 - One-to-one with `users` (user_id, CASCADE DELETE)
 
-**Tier Limits (Phase 3.1a - All Enforced as of November 15, 2025)**:
-- **Free**: 10 scans/month, 25 files/scan, 1 MB files (5 MB archives), 30-day retention, priority=25
-- **Pro**: Unlimited scans, 100 files/scan, 5 MB files (25 MB archives), 365-day retention, priority=50, webhooks + API
-- **Enterprise**: Unlimited scans, unlimited files, 10 MB files (50 MB archives), 730-day retention, priority=75, all features
-- **Enterprise Broker**: Unlimited scans, unlimited files, 10 MB files (50 MB archives), 730-day retention, priority=100 (highest)
+**Tier Limits (Phase 3.1a - All Enforced as of November 15, 2025, Updated January 2026)**:
+- **Free**: 10 scans/month, 25 files/scan, 3 projects, 1 MB files (5 MB archives), 30-day retention, priority=25
+- **Pro**: Unlimited scans, 100 files/scan, 10 projects, 5 MB files (25 MB archives), 365-day retention, priority=50, webhooks + API
+- **Enterprise**: Unlimited scans, unlimited files, unlimited projects, 10 MB files (50 MB archives), 730-day retention, priority=75, all features
+- **Enterprise Broker**: Unlimited scans, unlimited files, unlimited projects, 10 MB files (50 MB archives), 730-day retention, priority=100 (highest)
 
 **Auto-Creation Trigger:**
 - Trigger function `create_user_quota()` automatically creates quota record on user insert
