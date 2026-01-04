@@ -1,6 +1,6 @@
 # BlockSecOps Pricing Tiers
 
-**Last Updated**: January 2, 2026
+**Last Updated**: January 3, 2026
 
 ## Overview
 
@@ -15,7 +15,7 @@ BlockSecOps offers a premium smart contract security platform with 17+ integrate
 | Tier | Monthly | Annual | Target | Scans/Month | Users |
 |------|---------|--------|--------|-------------|-------|
 | **Free** | $0 | $0 | Exploring | 10 | 1 |
-| **Developer** | $199 | $1,990 | Solo devs | 100 | 3 |
+| **Developer** | $199 | $1,990 | Solo devs | 100 | 1 |
 | **Startup** | $999 | $9,990 | Seed-Series A | 500 | 10 |
 | **Professional** | $2,499 | $24,990 | Series A-B | Unlimited | 25 |
 | **Enterprise** | Custom | Custom | Large orgs | Unlimited | Unlimited |
@@ -24,7 +24,8 @@ BlockSecOps offers a premium smart contract security platform with 17+ integrate
 
 ```
 Free → Developer ($199) → Startup ($999) → Professional ($2,499) → Enterprise ($60K+)
-       builds trust        grows team        scales protocol       enterprise needs
+       builds trust        needs team         scales protocol       enterprise needs
+       (solo dev)          (10 users)         (25 users)            (unlimited)
 ```
 
 ---
@@ -63,13 +64,12 @@ Free → Developer ($199) → Startup ($999) → Professional ($2,499) → Enter
 
 **Target Customer**:
 - Solo developers
-- Small teams (2-3 people)
-- Pre-seed startups
 - Freelance auditors
+- Individual security researchers
 
 **Included Features**:
 - 100 scans per month
-- 3 user seats
+- 1 user seat (solo tier)
 - 5 active projects
 - All 17+ scanners including SolidityDefend
 - Basic intelligence layer
@@ -91,7 +91,7 @@ Free → Developer ($199) → Startup ($999) → Professional ($2,499) → Enter
 - Plus intelligence layer and full dashboard
 - **Cost per scanner: $12** vs SolidityScan's $200
 
-**Land-and-expand purpose**: Developers become advocates who recommend the platform to their teams.
+**Land-and-expand purpose**: Solo developers become advocates who recommend the platform to their teams, driving upgrades to Startup tier.
 
 ---
 

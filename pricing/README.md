@@ -13,7 +13,7 @@ Pricing strategy and competitive analysis for BlockSecOps smart contract securit
 | Tier | Monthly | Annual | Scans/Month | Users |
 |------|---------|--------|-------------|-------|
 | **Free** | $0 | $0 | 10 | 1 |
-| **Developer** | $199 | $1,990 | 100 | 3 |
+| **Developer** | $199 | $1,990 | 100 | 1 |
 | **Startup** | $999 | $9,990 | 500 | 10 |
 | **Professional** | $2,499 | $24,990 | Unlimited | 25 |
 | **Enterprise** | Custom | $60K+ | Unlimited | Unlimited |
