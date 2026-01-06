@@ -45,8 +45,9 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Vulnerability annotations:** Mark vulnerabilities with status and notes (Phase 3.1b Sprint 3)
 - **Batch scans:** Multi-contract batch scan operations (Phase 3.1b Sprint 3)
 - **Team collaboration:** Teams, project access control, assignments, comments (Phase 4.5)
+- **Notification channels:** Slack, Teams, Discord webhook integrations (CI/CD Integrations - January 2026)
 
-**Total Tables:** 43 (excluding alembic_version)
+**Total Tables:** 46 (excluding alembic_version)
 
 ---
 
@@ -126,7 +127,7 @@ User accounts with Supabase authentication and tier tracking (Phase 3.1a - Migra
 | `is_superuser` | BOOLEAN | NOT NULL, DEFAULT false | Admin privileges flag |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Account creation timestamp |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
-| `tier` | VARCHAR(20) | NOT NULL, DEFAULT 'free', INDEX | User tier (free, pro, enterprise, enterprise_broker) |
+| `tier` | VARCHAR(20) | NOT NULL, DEFAULT 'free', INDEX | User tier (free, developer, startup, professional, enterprise) |
 | `tier_updated_at` | TIMESTAMPTZ | NULLABLE, DEFAULT now() | Last tier change timestamp |
 | `supabase_user_id` | UUID | NULLABLE, UNIQUE, INDEX | **Supabase Auth user identifier (PRIMARY auth key)** |
 | `stripe_customer_id` | VARCHAR(255) | NULLABLE | Stripe customer identifier for billing |
@@ -198,15 +199,18 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 |--------|------|-------------|-------------|
 | `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique quota identifier |
 | `user_id` | UUID | NOT NULL, UNIQUE, FK → users.id ON DELETE CASCADE | Associated user |
-| `tier` | VARCHAR(20) | NOT NULL, DEFAULT 'free', INDEX | Current tier (synced from users.tier) |
+| `tier` | VARCHAR(20) | NOT NULL, DEFAULT 'free', INDEX | Current tier (free, developer, startup, professional, enterprise) |
 | `monthly_scan_limit` | INTEGER | NOT NULL, DEFAULT 10 | Monthly scan limit (-1 = unlimited) |
 | `monthly_scans_used` | INTEGER | NOT NULL, DEFAULT 0 | Scans used this month |
 | `max_files_per_scan` | INTEGER | NOT NULL, DEFAULT 25 | Maximum files per scan (-1 = unlimited) |
-| `scan_priority` | INTEGER | NOT NULL, DEFAULT 25 | Scan queue priority (0=highest, 100=lowest) |
-| `webhooks_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Webhooks feature enabled |
-| `api_access_enabled` | BOOLEAN | NOT NULL, DEFAULT false | API access enabled |
+| `scan_priority` | INTEGER | NOT NULL, DEFAULT 50 | Scan queue priority (5=enterprise highest, 50=free lowest) |
+| `webhooks_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Webhooks feature enabled (startup+) |
+| `api_access_enabled` | BOOLEAN | NOT NULL, DEFAULT false | API access enabled (developer+) |
 | `result_retention_days` | INTEGER | NOT NULL, DEFAULT 30 | Scan result retention period |
 | `max_projects` | INTEGER | NOT NULL, DEFAULT 3 | Maximum projects (-1 = unlimited) |
+| `monthly_api_calls_limit` | INTEGER | NOT NULL, DEFAULT 0 | Monthly API call limit (0=no access, -1=unlimited) |
+| `monthly_api_calls_used` | INTEGER | NOT NULL, DEFAULT 0 | API calls used this month |
+| `max_team_members` | INTEGER | NOT NULL, DEFAULT 1 | Maximum team members (-1 = unlimited) |
 | `quota_reset_at` | TIMESTAMPTZ | NOT NULL, DEFAULT next month | Next quota reset date |
 | `last_scan_at` | TIMESTAMPTZ | NULLABLE | Last scan timestamp |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Quota record creation |
@@ -219,11 +223,30 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 **Relationships:**
 - One-to-one with `users` (user_id, CASCADE DELETE)
 
-**Tier Limits (Phase 3.1a - All Enforced as of November 15, 2025, Updated January 2026)**:
-- **Free**: 10 scans/month, 25 files/scan, 3 projects, 1 MB files (5 MB archives), 30-day retention, priority=25
-- **Pro**: Unlimited scans, 100 files/scan, 10 projects, 5 MB files (25 MB archives), 365-day retention, priority=50, webhooks + API
-- **Enterprise**: Unlimited scans, unlimited files, unlimited projects, 10 MB files (50 MB archives), 730-day retention, priority=75, all features
-- **Enterprise Broker**: Unlimited scans, unlimited files, unlimited projects, 10 MB files (50 MB archives), 730-day retention, priority=100 (highest)
+**Tier Limits (Migration 024 - January 3, 2026)**:
+
+| Tier | Scans/Mo | Files/Scan | Projects | API Calls/Mo | Team | Retention | Priority |
+|------|----------|------------|----------|--------------|------|-----------|----------|
+| **Free** | 10 | 25 | 3 | 0 (no API) | 1 | 30 days | 50 |
+| **Developer** | 100 | 50 | 5 | 1,000 | 1 | 90 days | 40 |
+| **Startup** | 500 | 100 | 20 | 10,000 | 10 | 180 days | 25 |
+| **Professional** | Unlimited | Unlimited | Unlimited | Unlimited | 25 | 365 days | 10 |
+| **Enterprise** | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | 730 days | 5 |
+
+**File Size Limits**:
+- Free: 1 MB single / 5 MB archive
+- Developer: 5 MB single / 25 MB archive
+- Startup: 10 MB single / 50 MB archive
+- Professional: 10 MB single / 50 MB archive
+- Enterprise: 20 MB single / 100 MB archive
+
+**Feature Access by Tier**:
+- API Access: developer+
+- Webhooks: startup+
+- Team Management: startup+
+- Organizations: professional+
+- Audit Logging: professional+
+- SSO/SAML: enterprise only
 
 **Auto-Creation Trigger:**
 - Trigger function `create_user_quota()` automatically creates quota record on user insert
@@ -247,10 +270,10 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
     "scans_used": 10,
     "scan_limit": 10,
     "scans_remaining": 0,
-    "reset_date": "2025-12-01T00:00:00+00:00",
+    "reset_date": "2026-02-01T00:00:00+00:00",
     "days_until_reset": 17,
     "upgrade_url": "/pricing",
-    "upgrade_message": "Upgrade to Pro for unlimited scans or wait until your quota resets"
+    "upgrade_message": "Upgrade to Developer for 100 scans/month or wait until your quota resets"
   }
 }
 ```
@@ -266,14 +289,17 @@ Enforced at upload endpoint (`POST /api/v1/upload`):
 
 1. **File Size Limits** (tier-based):
    - Free: 1 MB per file, 5 MB archives
-   - Pro: 5 MB per file, 25 MB archives
-   - Enterprise: 10 MB per file, 50 MB archives
+   - Developer: 5 MB per file, 25 MB archives
+   - Startup: 10 MB per file, 50 MB archives
+   - Professional: 10 MB per file, 50 MB archives
+   - Enterprise: 20 MB per file, 100 MB archives
    - Returns HTTP 413 if file size exceeds tier limit
 
 2. **Files-per-Scan Limits** (from `max_files_per_scan` column):
    - Free: 25 files max per archive
-   - Pro: 100 files max per archive
-   - Enterprise/Enterprise Broker: Unlimited (-1)
+   - Developer: 50 files max per archive
+   - Startup: 100 files max per archive
+   - Professional/Enterprise: Unlimited (-1)
    - Returns HTTP 402 if archive exceeds file count limit
 
 3. **Language Validation**:
@@ -1461,6 +1487,84 @@ Webhook delivery history and retry tracking (Phase 4.5).
 
 ---
 
+### `notification_channels`
+
+User-configured notification channels for Slack, Teams, and Discord webhook integrations (CI/CD Integrations - January 2026).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique channel identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Owner user |
+| `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE CASCADE, INDEX | Organization context |
+| `name` | VARCHAR(255) | NOT NULL | Channel display name |
+| `channel_type` | VARCHAR(50) | NOT NULL, INDEX | Channel type: `slack`, `teams`, `discord` |
+| `webhook_url` | VARCHAR(2048) | NOT NULL | Webhook endpoint URL |
+| `events` | JSONB | NOT NULL | Event types to subscribe to (e.g., `["scan.completed", "vulnerability.critical"]`) |
+| `filters` | JSONB | NULLABLE | Optional filters (severity, project_id, etc.) |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT true, INDEX | Channel active status |
+| `total_notifications` | INTEGER | NOT NULL, DEFAULT 0 | Total notifications sent |
+| `successful_notifications` | INTEGER | NOT NULL, DEFAULT 0 | Successful deliveries |
+| `failed_notifications` | INTEGER | NOT NULL, DEFAULT 0 | Failed deliveries |
+| `last_triggered_at` | TIMESTAMPTZ | NULLABLE | Last notification attempt |
+| `last_success_at` | TIMESTAMPTZ | NULLABLE | Last successful delivery |
+| `last_failure_at` | TIMESTAMPTZ | NULLABLE | Last failed delivery |
+| `last_error` | TEXT | NULLABLE | Last error message |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_notification_channels_user_id` on `user_id`
+- `ix_notification_channels_organization_id` on `organization_id`
+- `ix_notification_channels_channel_type` on `channel_type`
+- `ix_notification_channels_is_active` on `is_active`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `organizations` (organization_id, CASCADE DELETE)
+- One-to-many with `notification_deliveries`
+
+**Channel Types:**
+- `slack` - Slack webhooks with Block Kit formatting
+- `teams` - Microsoft Teams webhooks with Adaptive Cards
+- `discord` - Discord webhooks with rich embeds
+
+**Event Types:**
+- `scan.completed` - Scan finished successfully
+- `scan.failed` - Scan encountered an error
+- `vulnerability.critical` - Critical severity vulnerability found
+- `vulnerability.high` - High severity vulnerability found
+
+---
+
+### `notification_deliveries`
+
+Audit log for notification delivery attempts (CI/CD Integrations - January 2026).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique delivery identifier |
+| `channel_id` | UUID | NOT NULL, FK → notification_channels.id ON DELETE CASCADE, INDEX | Parent notification channel |
+| `event_type` | VARCHAR(50) | NOT NULL, INDEX | Event type (e.g., `scan.completed`) |
+| `event_id` | VARCHAR(100) | NOT NULL | Unique event identifier |
+| `payload` | JSONB | NOT NULL | Notification payload sent |
+| `status_code` | INTEGER | NULLABLE | HTTP response status code |
+| `response_body` | TEXT | NULLABLE | HTTP response body |
+| `success` | BOOLEAN | NOT NULL, DEFAULT false | Delivery success status |
+| `error_message` | TEXT | NULLABLE | Error message if failed |
+| `duration_ms` | INTEGER | NULLABLE | Delivery duration in milliseconds |
+| `triggered_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Trigger timestamp |
+| `delivered_at` | TIMESTAMPTZ | NULLABLE | Successful delivery timestamp |
+
+**Indexes:**
+- `ix_notification_deliveries_channel_id` on `channel_id`
+- `ix_notification_deliveries_event_type` on `event_type`
+- `ix_notification_deliveries_triggered_at` on `triggered_at`
+
+**Relationships:**
+- Many-to-one with `notification_channels` (channel_id, CASCADE DELETE)
+
+---
+
 ### `api_keys`
 
 API keys for programmatic access (Phase 4.5).
@@ -1734,6 +1838,60 @@ Team membership with role assignment.
 **Team Roles:**
 - `lead` - Manage team members, represent team in decisions
 - `member` - Standard team participant
+
+---
+
+### `team_invites`
+
+**ADDED:** Migration 024 (2026-01-03) - Tier Restructure & Lead Generation
+
+Team/organization invite tracking for onboarding and lead generation.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique invite identifier |
+| `inviter_user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE | User who sent the invite |
+| `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE CASCADE | Organization to join |
+| `team_id` | UUID | NULLABLE, FK → teams.id ON DELETE CASCADE | Team to join |
+| `email` | VARCHAR(255) | NOT NULL, INDEX | Invitee email address |
+| `name` | VARCHAR(255) | NULLABLE | Invitee name (for personalization) |
+| `role` | VARCHAR(50) | NOT NULL, DEFAULT 'member' | Invited role |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT 'pending', INDEX | Invite status |
+| `invite_token` | VARCHAR(64) | NOT NULL, UNIQUE, INDEX | Unique invite token |
+| `expires_at` | TIMESTAMPTZ | NOT NULL | Token expiration timestamp |
+| `accepted_at` | TIMESTAMPTZ | NULLABLE | When invite was accepted |
+| `accepted_by_user_id` | UUID | NULLABLE, FK → users.id | User who accepted (may be new) |
+| `email_sent_at` | TIMESTAMPTZ | NULLABLE | When invite email was sent |
+| `email_opened_at` | TIMESTAMPTZ | NULLABLE | When invite email was opened (tracking) |
+| `marketing_consent` | BOOLEAN | NOT NULL, DEFAULT false | Consent for marketing emails |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Invite creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_team_invites_email` on `email`
+- `ix_team_invites_status` on `status`
+- `ix_team_invites_inviter` on `inviter_user_id`
+- `ix_team_invites_token` (UNIQUE) on `invite_token`
+- `ix_team_invites_organization` on `organization_id`
+
+**Relationships:**
+- Many-to-one with `users` (inviter_user_id, CASCADE DELETE)
+- Many-to-one with `organizations` (organization_id, CASCADE DELETE)
+- Many-to-one with `teams` (team_id, CASCADE DELETE)
+- Many-to-one with `users` (accepted_by_user_id)
+
+**Invite Status Values:**
+- `pending` - Invite sent, awaiting response
+- `accepted` - Invite accepted, user joined
+- `expired` - Invite token expired
+- `revoked` - Invite manually revoked
+
+**Use Cases:**
+- Team onboarding and invite management
+- Lead generation from invited emails
+- Marketing consent tracking
+- Email engagement analytics
+- Conversion tracking (invite → signup → active user)
 
 ---
 

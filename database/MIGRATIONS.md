@@ -336,11 +336,11 @@ Due to database state inconsistencies after the 2025-11-05 database reset, the s
 
 ---
 
-## Current Database State (2026-01-03)
+## Current Database State (2026-01-04)
 
 ### Alembic Version
 ```
-version_num: 023_add_max_projects_quota
+version_num: 025_add_notification_channels
 ```
 
 ### Existing Tables
@@ -358,6 +358,8 @@ version_num: 023_add_max_projects_quota
 - ✅ `user_favorites` (Phase 3.1b Task 27.1)
 - ✅ `vulnerability_annotations` (Phase 3.1b Task 27.1)
 - ✅ `scan_batches` (Phase 3.1b Task 27.2)
+- ✅ `notification_channels` (CI/CD Integrations)
+- ✅ `notification_deliveries` (CI/CD Integrations)
 - ❌ `deduplication_groups` (pending)
 - ❌ `vulnerability_classifications` (pending)
 - ❌ `vulnerability_trends` (pending)
@@ -572,20 +574,137 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 - **Description**: Adds tier-based project limits to user quotas
 - **Columns Added**:
   - `user_quotas.max_projects` (INTEGER, NOT NULL, DEFAULT 3) - Maximum projects per tier (-1 = unlimited)
-- **Tier Defaults**:
+- **Tier Defaults** (old naming):
   - Free: 3 projects
   - Pro: 10 projects
   - Enterprise: -1 (unlimited)
   - Enterprise Broker: -1 (unlimited)
 - **Trigger Updated**: `create_user_quota()` function updated to include `max_projects` based on tier
-- **Enforcement**: Project quota checked at `POST /api/v1/projects` endpoint
-- **HTTP 403 Response**: When project quota exceeded:
-  ```json
-  {
-    "detail": "Project quota exceeded. Your plan allows 3 projects (current: 3). Upgrade to Pro for 10 projects or Enterprise for unlimited."
-  }
-  ```
+- **Note**: Superseded by Migration 024 which restructures all tier values
 - **Migration File**: `/Users/pwner/Git/ABS/blocksecops-api-service/alembic/versions/20260102_0100-023_add_max_projects_quota.py`
+
+### Migration 024: Tier Restructure (5-Tier Pricing)
+- **Status**: ✅ Applied (January 3, 2026)
+- **Revision ID**: `024_tier_restructure`
+- **Previous Revision**: `023_add_max_projects_quota`
+- **Description**: Major tier restructure implementing new 5-tier pricing model
+- **Breaking Change**: Tier names changed
+
+**Tier Renaming:**
+| Old Tier | New Tier |
+|----------|----------|
+| `free` | `free` (unchanged) |
+| `pro` | `developer` |
+| `enterprise` | `professional` |
+| `enterprise_broker` | `enterprise` |
+| (new) | `startup` |
+
+**New Columns Added to `user_quotas`:**
+- `monthly_api_calls_limit` (INTEGER, NOT NULL, DEFAULT 0) - Monthly API call limit (0=no access, -1=unlimited)
+- `monthly_api_calls_used` (INTEGER, NOT NULL, DEFAULT 0) - API calls used this month
+- `max_team_members` (INTEGER, NOT NULL, DEFAULT 1) - Maximum team members (-1 = unlimited)
+
+**New Table Created:**
+- `team_invites` - Team/organization invite tracking for onboarding and lead generation
+
+**Tier Limits (New Values):**
+
+| Tier | Scans/Mo | Files/Scan | Projects | API Calls/Mo | Team | Retention | Priority |
+|------|----------|------------|----------|--------------|------|-----------|----------|
+| Free | 10 | 25 | 3 | 0 | 1 | 30 days | 50 |
+| Developer | 100 | 50 | 5 | 1,000 | 1 | 90 days | 40 |
+| Startup | 500 | 100 | 20 | 10,000 | 10 | 180 days | 25 |
+| Professional | -1 | -1 | -1 | -1 | 25 | 365 days | 10 |
+| Enterprise | -1 | -1 | -1 | -1 | -1 | 730 days | 5 |
+
+**Feature Flags by Tier:**
+- `api_access_enabled`: developer+
+- `webhooks_enabled`: startup+
+
+**Trigger Updated:**
+- `create_user_quota()` function updated with new 5-tier structure and all new columns
+
+**Index Created:**
+- `ix_team_invites_email` on `team_invites(email)`
+- `ix_team_invites_status` on `team_invites(status)`
+- `ix_team_invites_inviter` on `team_invites(inviter_user_id)`
+- `ix_team_invites_token` (UNIQUE) on `team_invites(invite_token)`
+- `ix_team_invites_organization` on `team_invites(organization_id)`
+
+**Migration File**: `/Users/pwner/Git/ABS/blocksecops-api-service/alembic/versions/20260103_0100-024_tier_restructure.py`
+
+**Rollback Warning**: Downgrade reverses tier names back to old format and drops new columns/table
+
+### Migration 025: Notification Channels (CI/CD Integrations)
+- **Status**: ✅ Applied (January 3, 2026)
+- **Revision ID**: `025_add_notification_channels`
+- **Previous Revision**: `024_tier_restructure`
+- **Description**: Notification channel configuration for Slack, Teams, and Discord webhook integrations
+- **Tables Created**:
+  - `notification_channels` - User-configured notification channels with webhook URLs
+  - `notification_deliveries` - Audit log for notification delivery attempts
+
+**Table Schema - `notification_channels`:**
+- `id` (UUID) - Primary key
+- `user_id` (UUID) - FK to users, CASCADE DELETE
+- `organization_id` (UUID) - Optional FK to organizations, CASCADE DELETE
+- `name` (VARCHAR(255)) - Channel display name
+- `channel_type` (VARCHAR(50)) - Channel type: `slack`, `teams`, `discord`
+- `webhook_url` (VARCHAR(2048)) - Webhook endpoint URL
+- `events` (JSONB) - List of subscribed event types (e.g., `["scan.completed", "vulnerability.critical"]`)
+- `filters` (JSONB) - Optional filters (severity, project_id, etc.)
+- `is_active` (BOOLEAN) - Channel active status
+- `total_notifications` (INTEGER) - Total notifications sent
+- `successful_notifications` (INTEGER) - Successful deliveries
+- `failed_notifications` (INTEGER) - Failed deliveries
+- `last_triggered_at` (TIMESTAMPTZ) - Last notification attempt
+- `last_success_at` (TIMESTAMPTZ) - Last successful delivery
+- `last_failure_at` (TIMESTAMPTZ) - Last failed delivery
+- `last_error` (TEXT) - Last error message
+- `created_at` (TIMESTAMPTZ) - Created timestamp
+- `updated_at` (TIMESTAMPTZ) - Updated timestamp
+
+**Table Schema - `notification_deliveries`:**
+- `id` (UUID) - Primary key
+- `channel_id` (UUID) - FK to notification_channels, CASCADE DELETE
+- `event_type` (VARCHAR(50)) - Event type (e.g., `scan.completed`)
+- `event_id` (VARCHAR(100)) - Event identifier
+- `payload` (JSONB) - Notification payload sent
+- `status_code` (INTEGER) - HTTP response status code
+- `response_body` (TEXT) - HTTP response body
+- `success` (BOOLEAN) - Delivery success flag
+- `error_message` (TEXT) - Error message if failed
+- `duration_ms` (INTEGER) - Delivery duration in milliseconds
+- `triggered_at` (TIMESTAMPTZ) - When notification was triggered
+- `delivered_at` (TIMESTAMPTZ) - When delivery completed
+
+**Indexes Created:**
+- `ix_notification_channels_user_id` on `user_id`
+- `ix_notification_channels_organization_id` on `organization_id`
+- `ix_notification_channels_channel_type` on `channel_type`
+- `ix_notification_channels_is_active` on `is_active`
+- `ix_notification_deliveries_channel_id` on `channel_id`
+- `ix_notification_deliveries_event_type` on `event_type`
+- `ix_notification_deliveries_triggered_at` on `triggered_at`
+
+**API Endpoints Added:**
+- `GET /api/v1/notification-channels` - List user's notification channels
+- `POST /api/v1/notification-channels` - Create notification channel
+- `GET /api/v1/notification-channels/{id}` - Get channel by ID
+- `PUT /api/v1/notification-channels/{id}` - Update channel
+- `DELETE /api/v1/notification-channels/{id}` - Delete channel
+- `POST /api/v1/notification-channels/{id}/test` - Test channel with sample notification
+- `GET /api/v1/notification-channels/{id}/deliveries` - Get delivery history
+- `GET /api/v1/notification-channels/events` - List available event types
+
+**Related Files:**
+- Migration: `alembic/versions/20260103_1200-025_add_notification_channels.py`
+- Models: `src/infrastructure/database/models.py` (NotificationChannelModel, NotificationDeliveryModel)
+- Notifiers: `src/infrastructure/notifications/` (slack.py, teams.py, discord.py, service.py)
+- Endpoints: `src/presentation/api/v1/endpoints/notification_channels.py`
+- API Service Version: v0.7.1
+
+---
 
 ### Creating Migrations
 ```bash

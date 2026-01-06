@@ -1,0 +1,6 @@
+{
+  "label": "Scanners",
+  "icon": "shield",
+  "description": "Security scanner integration and configuration",
+  "order": 3
+}

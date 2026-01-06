@@ -49,6 +49,30 @@ Manual testing checklists for all user-facing features.
 | [31-risk-scoring.md](./31-risk-scoring.md) | Unbounded risk scoring, risk levels, per-project breakdown |
 | [32-contract-name-duplication.md](./32-contract-name-duplication.md) | Duplicate contract name handling, rename/overwrite modal |
 | [33-pricing-page-usage.md](./33-pricing-page-usage.md) | Pricing page subscription alignment, current plan display |
+| [34-notification-channels.md](./34-notification-channels.md) | Slack, Teams, Discord webhook notifications (CI/CD Integrations) |
+| [35-cli-tool.md](./35-cli-tool.md) | CLI tool, pre-commit hooks, output formats (CI/CD Integrations) |
+| [36-cicd-integration.md](./36-cicd-integration.md) | GitHub Actions, GitLab CI, Jenkins, Azure Pipelines integration |
+
+---
+
+## CI/CD Integrations (January 2026)
+
+Notification channels and CLI tool for CI/CD integration:
+
+| Feature | Status | Tests |
+|---------|--------|-------|
+| Notification Channels API | Implemented | Create/update/delete channels |
+| Slack Notifications | Implemented | Block Kit formatting |
+| Teams Notifications | Implemented | Adaptive Cards |
+| Discord Notifications | Implemented | Rich embeds |
+| CLI Tool | Implemented | Auth, scan, output formats |
+| Pre-commit Hooks | Implemented | Git hook integration |
+| SARIF Output | Implemented | GitHub/GitLab code scanning |
+| JUnit Output | Implemented | CI test reporting |
+| GitHub Actions | Implemented | Workflow, SARIF upload, PR comments |
+| GitLab CI | Implemented | Pipeline, JUnit reports, Code Quality |
+| Jenkins | Implemented | Freestyle, Pipeline, Multibranch |
+| Azure Pipelines | Implemented | YAML pipeline, test results |
 
 ---
 
@@ -94,6 +118,9 @@ The risk scoring system was redesigned to be unbounded (higher = riskier):
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-01-04 | Claude Code | 36-cicd-integration.md | IMPLEMENTED - GitHub Actions, GitLab CI, Jenkins, Azure Pipelines integration tests
+2026-01-04 | Claude Code | 35-cli-tool.md | IMPLEMENTED - blocksecops-cli v0.1.0, auth/scan commands, 4 output formats, pre-commit hooks
+2026-01-04 | Claude Code | 34-notification-channels.md | IMPLEMENTED - Migration 025, Slack/Teams/Discord notifiers, API endpoints (v0.7.1 API)
 2025-12-31 | Claude Code | 33-pricing-page-usage.md | IMPLEMENTED - CurrentPlanBanner, tier highlighting, WebSocket notification fix (v0.23.1 Dashboard)
 2025-12-31 | Claude Code | 32-contract-name-duplication.md | IMPLEMENTED - 409 conflict detection, DuplicateContractModal (v0.8.0 API, v0.22.0 Dashboard)
 2025-12-30 | Claude Code | 31-risk-scoring.md | PASS - Color badge display implemented (v0.21.0), replaces numeric 60.8k with "Critical Risk" badge
