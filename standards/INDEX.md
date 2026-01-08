@@ -76,6 +76,7 @@ These standards help you set up and maintain your local development environment:
    - Access endpoints (use 127.0.0.1)
    - Kubernetes service selector standards (includeSelectors: false)
    - Environment configuration (.env.local)
+   - External service integrations (Stripe CLI webhook forwarding)
    - Troubleshooting service endpoints
    - Local development checklist
 
@@ -264,5 +265,5 @@ Contact the development team or create an issue in the `blocksecops-docs` reposi
 
 ---
 
-**Last Updated:** December 12, 2025
+**Last Updated:** January 7, 2026
 **Maintained By:** BlockSecOps Team
