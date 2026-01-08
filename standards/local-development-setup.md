@@ -1,9 +1,11 @@
 # Local Development Setup Standards
 
-**Version:** 2.6.0
-**Last Updated:** December 22, 2025
+**Version:** 2.7.0
+**Last Updated:** January 7, 2026
 **Status:** Active
 
+> **Update (v2.7.0):** Added External Service Integrations section with Stripe CLI webhook forwarding for local billing development.
+>
 > **Major Update (v2.6.0):** Simplified local development workflow. Harbor is no longer used for local development - images are built directly into minikube's Docker daemon for faster iteration.
 >
 > **Previous (v2.5.0):** Vault now uses persistent file storage with auto-unseal. Secrets persist across cluster restarts.
@@ -730,6 +732,63 @@ def configure_cors(app):
         allow_headers=["*"],
     )
 ```
+
+## External Service Integrations
+
+### Stripe CLI (Billing/Payments Development)
+
+When developing Stripe billing integration, use the Stripe CLI to forward webhook events to your local environment.
+
+**Installation:**
+```bash
+# macOS
+brew install stripe/stripe-cli/stripe
+
+# Login to Stripe (will open browser for authentication)
+stripe login
+```
+
+**Webhook Forwarding:**
+```bash
+# Forward Stripe webhooks to local API via Traefik
+stripe listen --forward-to http://127.0.0.1:3000/api/v1/webhooks/stripe
+
+# Output will show webhook signing secret:
+# > Ready! Your webhook signing secret is whsec_xxxxx (^C to quit)
+```
+
+**Important:** Copy the `whsec_xxxxx` signing secret and add it to your local environment or Vault for webhook signature verification.
+
+**Test Events:**
+```bash
+# Trigger a test event
+stripe trigger checkout.session.completed
+
+# Trigger subscription events
+stripe trigger customer.subscription.created
+stripe trigger invoice.paid
+```
+
+**Test Card Numbers:**
+
+| Card Number | Result |
+|-------------|--------|
+| `4242424242424242` | Success |
+| `4000000000000341` | Card declined |
+| `4000000000009995` | Insufficient funds |
+| `4000000000000002` | Declined (generic) |
+
+**Port Note:** Webhooks are forwarded to Traefik (port 3000) which routes `/api/v1/*` to the API service. Do NOT forward directly to port 8000 as that bypasses the ingress routing.
+
+### Other External Services
+
+| Service | CLI Tool | Forward Command |
+|---------|----------|-----------------|
+| Stripe | `stripe` | `stripe listen --forward-to http://127.0.0.1:3000/api/v1/webhooks/stripe` |
+| GitHub | `gh` | N/A (uses outbound webhooks) |
+| Supabase | N/A | Uses Supabase cloud (no local forwarding needed) |
+
+---
 
 ## Local Development Checklist
 

@@ -52,6 +52,28 @@ Manual testing checklists for all user-facing features.
 | [34-notification-channels.md](./34-notification-channels.md) | Slack, Teams, Discord webhook notifications (CI/CD Integrations) |
 | [35-cli-tool.md](./35-cli-tool.md) | CLI tool, pre-commit hooks, output formats (CI/CD Integrations) |
 | [36-cicd-integration.md](./36-cicd-integration.md) | GitHub Actions, GitLab CI, Jenkins, Azure Pipelines integration |
+| [37-stripe-billing.md](./37-stripe-billing.md) | Stripe subscriptions, invoices, receipts (Phase 8a) |
+
+---
+
+## Phase 8a: Stripe Billing (January 2026)
+
+Stripe integration for subscription billing. **Pending GCP deployment** for production webhooks.
+
+| Feature | Status | Tests |
+|---------|--------|-------|
+| Stripe Checkout | Implemented | TC-37-001 |
+| Subscription Management | Implemented | TC-37-002, 004, 005 |
+| Customer Portal | Implemented | TC-37-006 |
+| Invoice Downloads | Implemented | TC-37-003 |
+| Billing Details | Implemented | TC-37-007 |
+| Combined Billing History | Implemented | TC-37-008 |
+| x402 Receipt PDFs | Implemented | TC-37-009 |
+| Webhooks | Implemented | TC-37-010, 011 |
+| Plan Upgrades | Implemented | TC-37-012 |
+| Annual Billing | Implemented | TC-37-013 |
+
+**Note**: All tests pending GCP deployment for webhook verification.
 
 ---
 

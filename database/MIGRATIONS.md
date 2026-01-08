@@ -706,6 +706,95 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 
 ---
 
+### Migration 026: Stripe Billing (Phase 8a)
+- **Status**: ✅ Applied (January 7, 2026)
+- **Revision ID**: `026_add_stripe_billing`
+- **Previous Revision**: `025_add_notification_channels`
+- **Description**: Stripe subscription billing and billing details for invoicing
+- **Tables Created**:
+  - `subscriptions` - Stripe subscription tracking
+  - `billing_details` - Company name, address, tax ID for invoices
+
+**Table Schema - `subscriptions`:**
+- `id` (UUID) - Primary key
+- `user_id` (UUID) - FK to users, CASCADE DELETE
+- `organization_id` (UUID) - Optional FK to organizations, SET NULL
+- `stripe_subscription_id` (VARCHAR(255)) - Stripe subscription ID, unique
+- `stripe_customer_id` (VARCHAR(255)) - Stripe customer ID
+- `stripe_price_id` (VARCHAR(255)) - Stripe price ID
+- `plan_tier` (VARCHAR(50)) - Plan tier: free, developer, startup, professional, enterprise
+- `billing_interval` (VARCHAR(20)) - Billing interval: monthly, annual
+- `status` (VARCHAR(50)) - Status: active, past_due, canceled, trialing, incomplete
+- `current_period_start` (TIMESTAMPTZ) - Current billing period start
+- `current_period_end` (TIMESTAMPTZ) - Current billing period end
+- `cancel_at_period_end` (BOOLEAN) - Scheduled for cancellation
+- `canceled_at` (TIMESTAMPTZ) - When canceled
+- `cancellation_reason` (VARCHAR(255)) - Reason for cancellation
+- `trial_start` (TIMESTAMPTZ) - Trial period start
+- `trial_end` (TIMESTAMPTZ) - Trial period end
+- `stripe_metadata` (JSONB) - Additional Stripe metadata
+- `created_at` (TIMESTAMPTZ) - Created timestamp
+- `updated_at` (TIMESTAMPTZ) - Updated timestamp
+
+**Table Schema - `billing_details`:**
+- `id` (UUID) - Primary key
+- `user_id` (UUID) - FK to users, CASCADE DELETE, unique
+- `company_name` (VARCHAR(255)) - Company name for invoices
+- `billing_email` (VARCHAR(255)) - Billing contact email
+- `address_line1` (VARCHAR(255)) - Street address line 1
+- `address_line2` (VARCHAR(255)) - Street address line 2
+- `city` (VARCHAR(100)) - City
+- `state` (VARCHAR(100)) - State/Province
+- `postal_code` (VARCHAR(20)) - Postal/ZIP code
+- `country` (VARCHAR(2)) - ISO 3166-1 alpha-2 country code
+- `tax_id` (VARCHAR(100)) - Tax identification number
+- `tax_id_type` (VARCHAR(50)) - Tax ID type: eu_vat, us_ein, etc.
+- `tax_exempt` (BOOLEAN) - Tax exemption status
+- `created_at` (TIMESTAMPTZ) - Created timestamp
+- `updated_at` (TIMESTAMPTZ) - Updated timestamp
+
+**Indexes Created:**
+- `ix_subscriptions_user_id` on `user_id`
+- `ix_subscriptions_organization_id` on `organization_id`
+- `ix_subscriptions_status` on `status`
+- `ix_subscriptions_plan_tier` on `plan_tier`
+- `ix_subscriptions_stripe_customer_id` on `stripe_customer_id`
+- `ix_billing_details_user_id` on `user_id`
+- Unique constraint on `subscriptions.stripe_subscription_id`
+- Unique constraint on `billing_details.user_id`
+
+**API Endpoints Added:**
+- `POST /api/v1/billing/checkout` - Create Stripe Checkout session
+- `POST /api/v1/billing/portal` - Create Stripe Customer Portal session
+- `GET /api/v1/billing/subscription` - Get current subscription
+- `POST /api/v1/billing/subscription/cancel` - Cancel subscription
+- `POST /api/v1/billing/subscription/reactivate` - Reactivate subscription
+- `GET /api/v1/billing/invoices` - List Stripe invoices
+- `GET /api/v1/billing/invoices/{id}/pdf` - Get invoice PDF URL
+- `GET /api/v1/billing/details` - Get billing details
+- `PUT /api/v1/billing/details` - Update billing details
+- `GET /api/v1/billing/history` - Combined billing history (Stripe + x402)
+- `GET /api/v1/billing/plans` - Available subscription plans
+- `POST /api/v1/webhooks/stripe` - Stripe webhook handler
+
+**Webhook Events Handled:**
+- `checkout.session.completed` - Creates subscription record
+- `customer.subscription.updated` - Updates subscription status/period
+- `customer.subscription.deleted` - Marks subscription as canceled
+- `invoice.payment_succeeded` - Confirms active status
+- `invoice.payment_failed` - Marks as past_due
+
+**Related Files:**
+- Migration: `alembic/versions/20260107_0100-026_add_stripe_billing.py`
+- Models: `src/infrastructure/database/models.py` (SubscriptionModel, BillingDetailsModel)
+- Services: `src/application/services/stripe_service.py`, `receipt_service.py`
+- Endpoints: `src/presentation/api/v1/endpoints/billing.py`, `stripe_webhook.py`
+- Dashboard: `src/components/billing/`, `src/lib/api/billing.ts`
+
+**Note**: Stripe integration requires GCP deployment for production webhooks. Use Stripe CLI for local testing.
+
+---
+
 ### Creating Migrations
 ```bash
 # Generate migration from models

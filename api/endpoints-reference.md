@@ -3220,6 +3220,392 @@ Get payment statistics. Requires superuser privileges.
 
 ---
 
+## Billing (Phase 8a - Stripe Integration)
+
+Stripe-based subscription billing, invoices, and billing details management. Works alongside x402 credit payments.
+
+### POST /billing/checkout
+
+Create Stripe Checkout session for subscription purchase.
+
+**Authentication**: Required (Supabase JWT)
+
+**Request Body**:
+```json
+{
+  "plan_tier": "startup",
+  "billing_interval": "monthly",
+  "success_url": "https://app.blocksecops.com/billing?success=true",
+  "cancel_url": "https://app.blocksecops.com/billing?canceled=true"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| plan_tier | string | Yes | Plan: developer, startup, professional |
+| billing_interval | string | Yes | monthly or annual |
+| success_url | string | No | Redirect URL on success |
+| cancel_url | string | No | Redirect URL on cancel |
+
+**Response** (200 OK):
+```json
+{
+  "checkout_url": "https://checkout.stripe.com/c/pay/cs_test_..."
+}
+```
+
+**Status Codes**:
+- `200` OK - Checkout session created
+- `400` Bad Request - Invalid plan tier or interval
+- `401` Unauthorized - Invalid token
+
+---
+
+### POST /billing/portal
+
+Get Stripe Customer Portal URL for self-service billing management.
+
+**Authentication**: Required (Supabase JWT)
+
+**Query Parameters**:
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| return_url | string | No | URL to return after portal |
+
+**Response** (200 OK):
+```json
+{
+  "portal_url": "https://billing.stripe.com/p/session/..."
+}
+```
+
+**Status Codes**:
+- `200` OK - Portal session created
+- `400` Bad Request - No Stripe customer found
+- `401` Unauthorized - Invalid token
+
+---
+
+### GET /billing/subscription
+
+Get current user's subscription details.
+
+**Authentication**: Required (Supabase JWT)
+
+**Response** (200 OK):
+```json
+{
+  "id": "uuid",
+  "plan_tier": "startup",
+  "billing_interval": "monthly",
+  "status": "active",
+  "current_period_start": "2026-01-01T00:00:00Z",
+  "current_period_end": "2026-02-01T00:00:00Z",
+  "cancel_at_period_end": false,
+  "canceled_at": null,
+  "trial_end": null,
+  "created_at": "2025-12-01T00:00:00Z"
+}
+```
+
+Returns `null` if user has no subscription (free tier).
+
+**Status Codes**:
+- `200` OK - Subscription retrieved (or null)
+- `401` Unauthorized - Invalid token
+
+---
+
+### POST /billing/subscription/cancel
+
+Cancel current subscription.
+
+**Authentication**: Required (Supabase JWT)
+
+**Request Body**:
+```json
+{
+  "cancel_immediately": false
+}
+```
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| cancel_immediately | boolean | false | If true, cancel now; if false, cancel at period end |
+
+**Response** (200 OK):
+```json
+{
+  "id": "uuid",
+  "plan_tier": "startup",
+  "status": "active",
+  "cancel_at_period_end": true,
+  ...
+}
+```
+
+**Status Codes**:
+- `200` OK - Subscription canceled
+- `400` Bad Request - No active subscription
+- `401` Unauthorized - Invalid token
+
+---
+
+### POST /billing/subscription/reactivate
+
+Reactivate a subscription scheduled for cancellation.
+
+**Authentication**: Required (Supabase JWT)
+
+**Response** (200 OK):
+```json
+{
+  "id": "uuid",
+  "plan_tier": "startup",
+  "status": "active",
+  "cancel_at_period_end": false,
+  ...
+}
+```
+
+**Status Codes**:
+- `200` OK - Subscription reactivated
+- `400` Bad Request - Subscription not scheduled for cancellation
+- `401` Unauthorized - Invalid token
+
+---
+
+### GET /billing/invoices
+
+List user's Stripe invoices.
+
+**Authentication**: Required (Supabase JWT)
+
+**Query Parameters**:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| limit | integer | 10 | Max invoices (1-100) |
+
+**Response** (200 OK):
+```json
+{
+  "invoices": [
+    {
+      "id": "in_xxx",
+      "number": "INV-0001",
+      "status": "paid",
+      "amount_due": 99900,
+      "amount_paid": 99900,
+      "currency": "usd",
+      "created": "2026-01-01T00:00:00Z",
+      "period_start": "2026-01-01T00:00:00Z",
+      "period_end": "2026-02-01T00:00:00Z",
+      "invoice_pdf": "https://pay.stripe.com/invoice/...",
+      "hosted_invoice_url": "https://invoice.stripe.com/..."
+    }
+  ],
+  "total": 5
+}
+```
+
+**Status Codes**:
+- `200` OK - Invoices retrieved
+- `401` Unauthorized - Invalid token
+
+---
+
+### GET /billing/invoices/{invoice_id}/pdf
+
+Get PDF URL for a specific invoice.
+
+**Authentication**: Required (Supabase JWT)
+
+**Response** (200 OK):
+```json
+{
+  "pdf_url": "https://pay.stripe.com/invoice/..."
+}
+```
+
+**Status Codes**:
+- `200` OK - PDF URL retrieved
+- `404` Not Found - Invoice not found or not owned by user
+
+---
+
+### GET /billing/details
+
+Get user's billing details (company, address, tax ID).
+
+**Authentication**: Required (Supabase JWT)
+
+**Response** (200 OK):
+```json
+{
+  "id": "uuid",
+  "user_id": "uuid",
+  "company_name": "Acme Corp",
+  "billing_email": "billing@acme.com",
+  "address_line1": "123 Main St",
+  "address_line2": "Suite 100",
+  "city": "San Francisco",
+  "state": "CA",
+  "postal_code": "94102",
+  "country": "US",
+  "tax_id": "US123456789",
+  "tax_id_type": "us_ein",
+  "created_at": "2025-12-01T00:00:00Z",
+  "updated_at": "2026-01-01T00:00:00Z"
+}
+```
+
+Returns `null` if no billing details exist.
+
+---
+
+### PUT /billing/details
+
+Update user's billing details.
+
+**Authentication**: Required (Supabase JWT)
+
+**Request Body**:
+```json
+{
+  "company_name": "Acme Corp",
+  "billing_email": "billing@acme.com",
+  "address_line1": "123 Main St",
+  "city": "San Francisco",
+  "state": "CA",
+  "postal_code": "94102",
+  "country": "US",
+  "tax_id": "US123456789",
+  "tax_id_type": "us_ein"
+}
+```
+
+**Response** (200 OK): Same as GET /billing/details
+
+---
+
+### GET /billing/history
+
+Get combined billing history (Stripe invoices + x402 receipts).
+
+**Authentication**: Required (Supabase JWT)
+
+**Query Parameters**:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| page | integer | 1 | Page number |
+| page_size | integer | 10 | Items per page (1-50) |
+| filter | string | all | Filter: all, subscriptions, credits |
+
+**Response** (200 OK):
+```json
+{
+  "items": [
+    {
+      "id": "in_xxx",
+      "type": "stripe_invoice",
+      "description": "Subscription - INV-0001",
+      "amount": "$999.00",
+      "currency": "USD",
+      "status": "paid",
+      "date": "2026-01-01T00:00:00Z",
+      "download_url": "https://pay.stripe.com/invoice/..."
+    },
+    {
+      "id": "uuid",
+      "type": "x402_receipt",
+      "description": "Credit Purchase - 25 credits",
+      "amount": "$17.50",
+      "currency": "USDC",
+      "status": "verified",
+      "date": "2025-12-15T00:00:00Z",
+      "download_url": "/api/v1/payments/uuid/receipt",
+      "payment_transaction_id": "uuid"
+    }
+  ],
+  "total": 10,
+  "page": 1,
+  "page_size": 10
+}
+```
+
+---
+
+### GET /billing/plans
+
+Get available subscription plans with pricing (public endpoint).
+
+**Authentication**: Not required
+
+**Response** (200 OK):
+```json
+{
+  "plans": [
+    {
+      "tier": "free",
+      "name": "Free",
+      "scans_per_month": 5,
+      "price_monthly": 0,
+      "price_annual": 0,
+      "features": ["5 scans per month", "Basic vulnerability detection"]
+    },
+    {
+      "tier": "developer",
+      "name": "Developer",
+      "scans_per_month": 50,
+      "price_monthly": 29,
+      "price_annual": 290,
+      "features": ["50 scans per month", "All scanners", "API access"]
+    }
+  ]
+}
+```
+
+---
+
+### POST /webhooks/stripe
+
+Stripe webhook endpoint for subscription lifecycle events.
+
+**Authentication**: Stripe signature verification (not JWT)
+
+**Events Handled**:
+- `checkout.session.completed` - Creates subscription record
+- `customer.subscription.updated` - Updates status/period
+- `customer.subscription.deleted` - Marks as canceled
+- `invoice.payment_succeeded` - Ensures active status
+- `invoice.payment_failed` - Marks as past_due
+
+**Response** (200 OK):
+```json
+{
+  "received": true
+}
+```
+
+---
+
+### GET /payments/{payment_id}/receipt
+
+Download PDF receipt for x402 credit purchase.
+
+**Authentication**: Required (Supabase JWT)
+
+**Response** (200 OK):
+- Content-Type: `application/pdf`
+- Content-Disposition: `attachment; filename="blocksecops-receipt-BSO-260101-XXXX.pdf"`
+
+**Status Codes**:
+- `200` OK - PDF returned
+- `404` Not Found - Payment not found or not owned by user
+- `400` Bad Request - Payment not verified (no receipt available)
+
+---
+
 ## Rate Limiting
 
 **Current Limits** (per user, per hour):
