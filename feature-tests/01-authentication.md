@@ -78,6 +78,52 @@
 
 ---
 
+## 6. OAuth Provider Login
+
+### 6.1 Google OAuth
+- [ ] "Sign in with Google" button visible
+- [ ] Clicking redirects to Google OAuth consent
+- [ ] Successful auth redirects back to dashboard
+- [ ] User created in database with Google provider
+
+### 6.2 GitHub OAuth
+- [ ] "Sign in with GitHub" button visible
+- [ ] Clicking redirects to GitHub OAuth consent
+- [ ] Successful auth redirects back to dashboard
+- [ ] User created in database with GitHub provider
+
+### 6.3 Microsoft/Azure OAuth
+- [ ] "Sign in with Microsoft" button visible
+- [ ] Clicking redirects to Microsoft OAuth consent
+- [ ] Successful auth redirects back to dashboard
+- [ ] User created in database with Azure provider
+
+### 6.4 Discord OAuth
+- [ ] "Sign in with Discord" button visible
+- [ ] Clicking redirects to Discord OAuth consent
+- [ ] Successful auth redirects back to dashboard
+- [ ] User created in database with Discord provider
+
+### 6.5 Slack OAuth
+- [ ] "Sign in with Slack" button visible
+- [ ] Clicking redirects to Slack OAuth consent
+- [ ] Successful auth redirects back to dashboard
+- [ ] User created in database with Slack provider
+
+### 6.6 BitBucket OAuth
+- [ ] "Sign in with BitBucket" button visible
+- [ ] Clicking redirects to BitBucket OAuth consent
+- [ ] Successful auth redirects back to dashboard
+- [ ] User created in database with BitBucket provider
+
+### 6.7 X (Twitter) OAuth
+- [ ] "Sign in with X" button visible
+- [ ] Clicking redirects to Twitter OAuth consent
+- [ ] Successful auth redirects back to dashboard
+- [ ] User created in database with Twitter provider
+
+---
+
 ## Test Notes
 
 _Record authentication test results here:_

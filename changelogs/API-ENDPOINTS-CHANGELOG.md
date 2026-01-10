@@ -1,7 +1,54 @@
 # API Endpoints Changelog
 
 **Source**: Consolidated from `blocksecops-docs/api/endpoints-reference.md`
-**Last Updated**: December 26, 2025
+**Last Updated**: January 10, 2026
+
+---
+
+## v1.4.0 (2026-01-10)
+
+**Added - Cursor-Based Pagination**:
+- Cursor-based (keyset) pagination for efficient navigation of large datasets
+- Stable pagination that handles concurrent inserts/updates without shifting results
+- Backward compatible with existing offset-based `skip`/`limit` parameters
+
+**New Query Parameters**:
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `first` | int (1-1000) | Number of items to return (forward pagination) |
+| `after` | string | Cursor to paginate after |
+| `last` | int (1-1000) | Number of items to return (backward pagination) |
+| `before` | string | Cursor to paginate before |
+| `include_total` | bool | Include total count (slower for large datasets) |
+
+**New Response Format**:
+```json
+{
+  "vulnerabilities": [...],
+  "page_info": {
+    "has_next_page": true,
+    "has_previous_page": false,
+    "start_cursor": "eyJ2IjoxLC...",
+    "end_cursor": "eyJ2IjoxLC...",
+    "total_count": null
+  }
+}
+```
+
+**Endpoints Updated**:
+- `GET /api/v1/vulnerabilities` - Full cursor pagination support
+- `GET /api/v1/scans` - Index ready for cursor pagination
+- `GET /api/v1/audit-logs` - Index ready for cursor pagination
+
+**Database Schema Updates**:
+- `ix_vulnerabilities_detected_at_id_cursor` - Composite index for keyset queries
+- `ix_scans_created_at_id_cursor` - Composite index for keyset queries
+- `ix_audit_logs_created_at_id_cursor` - Composite index for keyset queries
+
+**Technical**:
+- Cursor format: Base64url-encoded JSON with timestamp + UUID
+- API Service version 0.9.1
+- Migration 029: `029_cursor_pagination_idx`
 
 ---
 

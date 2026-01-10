@@ -47,7 +47,7 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Team collaboration:** Teams, project access control, assignments, comments (Phase 4.5)
 - **Notification channels:** Slack, Teams, Discord webhook integrations (CI/CD Integrations - January 2026)
 
-**Total Tables:** 46 (excluding alembic_version)
+**Total Tables:** 47 (excluding alembic_version)
 
 ---
 
@@ -136,6 +136,9 @@ User accounts with Supabase authentication and tier tracking (Phase 3.1a - Migra
 | `wallet_nonce` | VARCHAR(64) | NULLABLE | SIWE nonce for signature verification |
 | `wallet_linked_at` | TIMESTAMPTZ | NULLABLE | Timestamp when wallet was linked |
 | `ens_name` | VARCHAR(255) | NULLABLE, INDEX | ENS domain name (e.g., vitalik.eth) |
+| `solana_wallet_address` | VARCHAR(44) | NULLABLE, UNIQUE, INDEX | Solana wallet address - base58 encoded (Phase 3.1b) |
+| `solana_wallet_nonce` | VARCHAR(64) | NULLABLE | Nonce for Ed25519 signature verification |
+| `solana_wallet_linked_at` | TIMESTAMPTZ | NULLABLE | Timestamp when Solana wallet was linked |
 
 **Indexes:**
 - `ix_users_email` (UNIQUE) on `email`
@@ -143,6 +146,7 @@ User accounts with Supabase authentication and tier tracking (Phase 3.1a - Migra
 - `ix_users_supabase_user_id` (UNIQUE) on `supabase_user_id`
 - `ix_users_wallet_address` (UNIQUE) on `wallet_address`
 - `ix_users_ens_name` on `ens_name`
+- `ix_users_solana_wallet_address` (UNIQUE) on `solana_wallet_address`
 
 **Relationships:**
 - One-to-many with `sessions`
@@ -1312,6 +1316,51 @@ Confidence: exact (all 3 scanners detected identical code at identical location)
 
 ---
 
+### `ml_model_metadata`
+
+ML model versioning and continuous learning metadata (Phase 5B).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique record identifier |
+| `model_name` | VARCHAR(100) | NOT NULL, UNIQUE | Model identifier (e.g., 'fp_classifier') |
+| `current_version` | VARCHAR(50) | NULLABLE | Current model version string |
+| `previous_version` | VARCHAR(50) | NULLABLE | Previous model version |
+| `labels_since_train` | INTEGER | NOT NULL, DEFAULT 0 | Labels added since last training |
+| `retrain_threshold` | INTEGER | NOT NULL, DEFAULT 100 | Labels needed to trigger retrain |
+| `last_trained_at` | TIMESTAMPTZ | NULLABLE | Last training timestamp |
+| `next_scheduled_train` | TIMESTAMPTZ | NULLABLE | Next scheduled training |
+| `accuracy` | FLOAT | NULLABLE | Model accuracy metric |
+| `auc` | FLOAT | NULLABLE | Area under ROC curve |
+| `precision_score` | FLOAT | NULLABLE | Precision metric |
+| `recall_score` | FLOAT | NULLABLE | Recall metric |
+| `f1_score` | FLOAT | NULLABLE | F1 score |
+| `cv_auc_mean` | FLOAT | NULLABLE | Cross-validation AUC mean |
+| `cv_auc_std` | FLOAT | NULLABLE | Cross-validation AUC std dev |
+| `training_samples` | INTEGER | NULLABLE | Number of training samples |
+| `true_positive_count` | INTEGER | NULLABLE | True positive labels in training data |
+| `false_positive_count` | INTEGER | NULLABLE | False positive labels in training data |
+| `storage_backend` | VARCHAR(20) | NOT NULL, DEFAULT 'local' | Storage type (local, gcs) |
+| `storage_uri` | VARCHAR(500) | NULLABLE | Model file location |
+| `status` | VARCHAR(50) | NOT NULL, DEFAULT 'not_trained' | Training status |
+| `error_message` | TEXT | NULLABLE | Last error message if any |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Record creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_ml_model_metadata_model_name` (BTREE on `model_name`)
+
+**Purpose:**
+- Tracks ML model versions and training history
+- Triggers automatic retraining when label threshold reached
+- Stores model performance metrics
+- Supports local and GCS storage backends
+
+**Initial Record:**
+- Model `fp_classifier` created automatically for false positive detection
+
+---
+
 ### `organizations`
 
 Multi-tenant organization support for enterprise features (Phase 4.5).
@@ -2289,6 +2338,11 @@ All indexes are created for query optimization based on common access patterns:
 - `ix_contracts_user_language_created` on `contracts(user_id, language, created_at DESC)`
 - `ix_vulnerabilities_scan_severity` on `vulnerabilities(scan_id, severity)`
 - `ix_project_contracts_added` on `project_contracts(project_id, added_at DESC)`
+
+**Cursor Pagination Indexes (Migration 029):**
+- `ix_vulnerabilities_detected_at_id_cursor` on `vulnerabilities(detected_at DESC, id DESC)` - Cursor pagination
+- `ix_scans_created_at_id_cursor` on `scans(created_at DESC, id DESC)` - Cursor pagination
+- `ix_audit_logs_created_at_id_cursor` on `audit_logs(created_at DESC, id DESC)` - Cursor pagination
 
 **Partial Indexes:**
 - `ix_scans_user_completed` on `scans(user_id, completed_at DESC) WHERE status = 'completed'`
