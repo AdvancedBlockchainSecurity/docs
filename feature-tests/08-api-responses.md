@@ -211,10 +211,48 @@ or
 
 ---
 
+## 8. Cursor Pagination Response
+
+### Endpoint: `GET /api/v1/vulnerabilities?first=20`
+
+### 8.1 Page Info Structure
+```json
+{
+  "vulnerabilities": [...],
+  "page_info": {
+    "has_next_page": true,
+    "has_previous_page": false,
+    "start_cursor": "eyJ2IjoxLC...",
+    "end_cursor": "eyJ2IjoxLC...",
+    "total_count": null
+  }
+}
+```
+
+- [ ] `has_next_page` - boolean
+- [ ] `has_previous_page` - boolean
+- [ ] `start_cursor` - base64url string (no padding)
+- [ ] `end_cursor` - base64url string (no padding)
+- [ ] `total_count` - integer or null
+
+### 8.2 Cursor Query Parameters
+- [ ] `first` - 1-1000, forward pagination count
+- [ ] `after` - cursor string from previous response
+- [ ] `last` - 1-1000, backward pagination count
+- [ ] `before` - cursor string for backward pagination
+- [ ] `include_total` - boolean, returns total count
+
+### 8.3 Backward Compatibility
+- [ ] `skip`/`limit` still return legacy format
+- [ ] Cursor params override offset params
+
+---
+
 ## Test Notes
 
 _Record API validation test results here:_
 
 ```
 [Date] | [Endpoint] | [Field] | [Result] | [Notes]
+2026-01-10 | GET /vulnerabilities?first=20 | page_info | VERIFIED | Cursor pagination response format working
 ```

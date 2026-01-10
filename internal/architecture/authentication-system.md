@@ -20,7 +20,7 @@ BlockSecOps implements a secure authentication system using Supabase Auth with J
 - Project URL: `https://[project-ref].supabase.co`
 - Public Key: JWKS endpoint at `/auth/v1/.well-known/jwks.json`
 - Token expiration: 1 hour (configurable)
-- Supported OAuth providers: Google, Microsoft, GitHub
+- Supported OAuth providers: Google, Microsoft/Azure, GitHub, Discord, Slack, BitBucket, X (Twitter)
 - Algorithm: ES256 (ECDSA with P-256 curve and SHA-256)
 
 ### 2. API Service (Resource Server)
@@ -232,6 +232,15 @@ CREATE TABLE users (
     tier_updated_at TIMESTAMP WITH TIME ZONE,
     stripe_customer_id VARCHAR(255),
     stripe_subscription_id VARCHAR(255),
+    -- Ethereum wallet (Phase 3.3)
+    wallet_address VARCHAR(42) UNIQUE,           -- Checksummed Ethereum address
+    wallet_nonce VARCHAR(64),                    -- SIWE nonce
+    wallet_linked_at TIMESTAMP WITH TIME ZONE,
+    ens_name VARCHAR(255),                       -- ENS domain name
+    -- Solana wallet (Phase 3.1b)
+    solana_wallet_address VARCHAR(44) UNIQUE,    -- Base58 encoded (32 bytes = 44 chars)
+    solana_wallet_nonce VARCHAR(64),             -- Ed25519 signature nonce
+    solana_wallet_linked_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -590,14 +599,107 @@ stringData:
   database-url: <base64-encoded-url>
 ```
 
+## Web3 Wallet Authentication
+
+### Supported Wallets
+
+**Ethereum (EVM)**:
+- MetaMask (browser extension)
+- WalletConnect (QR code for mobile wallets)
+- Coinbase Wallet
+- Rainbow, Trust Wallet, and other WalletConnect-compatible wallets
+
+**Solana**:
+- Phantom
+- Solflare
+- Backpack
+- Ledger (via Solana adapter)
+
+### Ethereum Wallet Auth Flow (SIWE + Supabase)
+
+```
+1. User → Click "Connect Wallet"
+   ↓
+2. Frontend → Opens wallet modal (wagmi/RainbowKit)
+   ↓
+3. User → Selects wallet and approves connection
+   ↓
+4. Frontend → Receives wallet address
+   ↓
+5. Frontend → POST /api/v1/auth/wallet/nonce { address }
+   ↓
+6. Backend → Generates nonce, stores with address
+   ↓
+7. Frontend → Creates SIWE message (EIP-4361)
+   ↓
+8. Frontend → Requests signature from wallet
+   ↓
+9. User → Signs message in wallet
+   ↓
+10. Frontend → POST /api/v1/auth/wallet/verify { address, signature, message }
+    ↓
+11. Backend → Verifies signature using eth_account/siwe
+    ↓
+12. Backend → Creates/gets Supabase user via Admin API
+    ↓
+13. Backend → Returns Supabase session (access_token, refresh_token)
+    ↓
+14. Frontend → supabase.auth.setSession({ access_token, refresh_token })
+    ↓
+15. User → Authenticated with unified Supabase session
+```
+
+### Solana Wallet Auth Flow (+ Supabase)
+
+```
+1. User → Click "Connect Solana"
+   ↓
+2. Frontend → Opens Solana wallet modal (@solana/wallet-adapter)
+   ↓
+3. User → Selects wallet (Phantom, Solflare, etc.)
+   ↓
+4. Frontend → Receives public key (base58)
+   ↓
+5. Frontend → POST /api/v1/auth/wallet/solana/nonce { address }
+   ↓
+6. Backend → Generates nonce, stores with address
+   ↓
+7. Frontend → Creates sign-in message with nonce
+   ↓
+8. Frontend → Requests signature from wallet
+   ↓
+9. User → Signs message in wallet
+   ↓
+10. Frontend → POST /api/v1/auth/wallet/solana/verify { address, signature, message }
+    ↓
+11. Backend → Verifies signature using nacl (Ed25519)
+    ↓
+12. Backend → Creates/gets Supabase user via Admin API
+    ↓
+13. Backend → Returns Supabase session (access_token, refresh_token)
+    ↓
+14. Frontend → supabase.auth.setSession({ access_token, refresh_token })
+    ↓
+15. User → Authenticated with unified Supabase session
+```
+
+### Wallet Security Considerations
+
+- **Nonce expiration**: 5 minutes to prevent replay attacks
+- **One-time nonce**: Cleared after successful verification
+- **Address validation**: Ethereum (checksummed hex), Solana (base58, 32 bytes)
+- **Message format**: Clear, human-readable for user review
+
 ## References
 
 - [Supabase Auth Documentation](https://supabase.com/docs/guides/auth)
 - [JWT RS256 Specification](https://datatracker.ietf.org/doc/html/rfc7519)
 - [JWKS Specification](https://datatracker.ietf.org/doc/html/rfc7517)
 - [FastAPI Security](https://fastapi.tiangolo.com/tutorial/security/)
+- [SIWE (Sign-In with Ethereum)](https://eips.ethereum.org/EIPS/eip-4361)
+- [Solana Wallet Adapter](https://github.com/solana-labs/wallet-adapter)
 
 ---
 
-**Last Updated**: November 12, 2025
+**Last Updated**: January 10, 2026
 **Status**: Production

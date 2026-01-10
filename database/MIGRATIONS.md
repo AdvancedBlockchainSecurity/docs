@@ -336,11 +336,11 @@ Due to database state inconsistencies after the 2025-11-05 database reset, the s
 
 ---
 
-## Current Database State (2026-01-04)
+## Current Database State (2026-01-10)
 
 ### Alembic Version
 ```
-version_num: 025_add_notification_channels
+version_num: 029_cursor_pagination_idx
 ```
 
 ### Existing Tables
@@ -792,6 +792,98 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 - Dashboard: `src/components/billing/`, `src/lib/api/billing.ts`
 
 **Note**: Stripe integration requires GCP deployment for production webhooks. Use Stripe CLI for local testing.
+
+---
+
+### Migration 027: ML Model Metadata (Phase 5B)
+- **Status**: ✅ Applied (January 10, 2026)
+- **Revision ID**: `027_add_ml_model_metadata`
+- **Previous Revision**: `026_add_stripe_billing`
+- **Description**: ML model metadata table for False Positive classifier continuous learning
+- **Tables Created**:
+  - `ml_model_metadata` - Tracks ML model versions, metrics, and training state
+- **Table Schema**:
+  - `id` (UUID) - Primary key
+  - `model_name` (VARCHAR(100)) - Model identifier (e.g., 'fp_classifier')
+  - `model_version` (VARCHAR(50)) - Semantic version
+  - `is_active` (BOOLEAN) - Currently active model flag
+  - `accuracy` (FLOAT) - Model accuracy score
+  - `auc` (FLOAT) - Area under ROC curve
+  - `cv_auc_mean` (FLOAT) - Cross-validation AUC mean
+  - `cv_auc_std` (FLOAT) - Cross-validation AUC standard deviation
+  - `samples_count` (INTEGER) - Training samples used
+  - `true_positive_count` (INTEGER) - True positive labels
+  - `false_positive_count` (INTEGER) - False positive labels
+  - `model_path` (VARCHAR(500)) - Path to serialized model
+  - `training_params` (JSONB) - Training hyperparameters
+  - `trained_at` (TIMESTAMPTZ) - Training timestamp
+  - `created_at` (TIMESTAMPTZ) - Created timestamp
+- **Indexes Created**:
+  - `ix_ml_model_metadata_model_name` on `model_name`
+  - `ix_ml_model_metadata_is_active` on `is_active`
+  - Unique constraint on `(model_name, model_version)`
+- **Migration File**: `alembic/versions/20260109_0100-027_add_ml_model_metadata.py`
+
+---
+
+### Migration 028: Solana Wallet Authentication (Phase 3.1b)
+- **Status**: ✅ Applied (January 10, 2026)
+- **Revision ID**: `028_add_solana_wallet_auth`
+- **Previous Revision**: `027_add_ml_model_metadata`
+- **Description**: Solana wallet authentication fields for Phantom/Solflare sign-in
+- **Columns Added to `users`**:
+  - `solana_wallet_address` (VARCHAR(44)) - Solana wallet address (base58 encoded), unique, indexed
+  - `solana_wallet_nonce` (VARCHAR(64)) - Temporary nonce for Ed25519 signature verification
+  - `solana_wallet_linked_at` (TIMESTAMPTZ) - Timestamp when wallet was linked
+- **Indexes Created**:
+  - `ix_users_solana_wallet_address` on `solana_wallet_address`
+  - Unique constraint `uq_users_solana_wallet_address`
+- **API Endpoints Added**:
+  - `POST /api/v1/auth/wallet/solana/nonce` - Request signing nonce
+  - `POST /api/v1/auth/wallet/solana/verify` - Verify signature and authenticate
+  - `POST /api/v1/auth/wallet/solana/link` - Link wallet to existing account
+  - `POST /api/v1/auth/wallet/solana/unlink` - Unlink wallet from account
+  - `GET /api/v1/auth/wallet/solana/status` - Get wallet link status
+  - `GET /api/v1/auth/wallet/solana/lookup/{address}` - Check if wallet is registered
+- **Python Dependencies Added**:
+  - `pynacl>=1.5.0` - Ed25519 signature verification
+  - `base58>=2.1.0` - Solana address encoding
+- **Frontend Components**:
+  - `src/lib/solana/config.ts` - Wallet adapter configuration
+  - `src/lib/solana/SolanaProvider.tsx` - React context provider
+  - `src/lib/solana/walletApi.ts` - API client
+  - `src/components/auth/SolanaConnectButton.tsx` - Login/link button
+- **Supported Wallets**: Phantom, Solflare, Ledger, Torus
+- **Migration File**: `alembic/versions/20260110_0100-028_add_solana_wallet_auth.py`
+
+---
+
+### Migration 029: Cursor-Based Pagination Indexes
+- **Status**: ✅ Applied (January 10, 2026)
+- **Revision ID**: `029_cursor_pagination_idx`
+- **Previous Revision**: `028_add_solana_wallet_auth`
+- **Description**: Composite indexes for efficient cursor-based (keyset) pagination
+- **Indexes Created**:
+  - `ix_vulnerabilities_detected_at_id_cursor` on `vulnerabilities(detected_at DESC, id DESC)`
+  - `ix_scans_created_at_id_cursor` on `scans(created_at DESC, id DESC)`
+  - `ix_audit_logs_created_at_id_cursor` on `audit_logs(created_at DESC, id DESC)`
+- **Purpose**: Enables efficient cursor-based pagination for large datasets with stable results
+- **Cursor Format**: Base64url-encoded JSON: `{"v": 1, "ts": "ISO8601", "id": "uuid", "d": "desc"}`
+- **API Changes**:
+  - New query params: `first`, `after`, `last`, `before`, `include_total`
+  - New response format with `page_info`: `has_next_page`, `has_previous_page`, `start_cursor`, `end_cursor`, `total_count`
+  - Backward compatible with existing `skip`/`limit` offset pagination
+- **Endpoints Updated**:
+  - `GET /api/v1/vulnerabilities` - Full cursor pagination support
+  - `GET /api/v1/scans` - Cursor pagination (index ready)
+  - `GET /api/v1/audit-logs` - Cursor pagination (index ready)
+- **Related Files**:
+  - Migration: `alembic/versions/20260110_0200-029_add_cursor_pagination_indexes.py`
+  - Schemas: `src/presentation/schemas/pagination.py`
+  - Utilities: `src/infrastructure/database/pagination.py`
+  - Endpoints: `src/presentation/api/v1/endpoints/vulnerabilities.py`
+- **Performance**: Verified via EXPLAIN ANALYZE - composite indexes used for keyset queries
+- **Documentation**: See `/Users/pwner/Git/ABS/blocksecops-docs/API/pagination.md`
 
 ---
 

@@ -148,6 +148,47 @@ Phase 5 CPU-only ML features for intelligent vulnerability analysis.
 | 4.4.3 | Prediction includes confidence | confidence 0-1 | [ ] |
 | 4.4.4 | Prediction includes top features | Array of feature strings | [ ] |
 
+### 4.5 Labeling Scripts
+
+**Interactive CLI** (`scripts/label_vulnerabilities.py`):
+```bash
+cd /Users/pwner/Git/ABS/blocksecops-api-service
+python scripts/label_vulnerabilities.py --limit 50 --severity critical,high
+```
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 4.5.1 | Interactive labeling session | Color-coded output, label prompts | [ ] |
+| 4.5.2 | Export unlabeled to CSV | CSV file generated | [ ] |
+| 4.5.3 | Filter by severity | Only matching severities shown | [ ] |
+| 4.5.4 | Progress statistics | Shows labeled count, balance | [ ] |
+
+**CSV Import** (`scripts/import_labels.py`):
+```bash
+python scripts/import_labels.py --file labeled_vulns.csv --dry-run
+python scripts/import_labels.py --file labeled_vulns.csv
+```
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 4.5.5 | Dry-run import | No changes, validation only | [ ] |
+| 4.5.6 | Import valid CSV | Labels applied to database | [ ] |
+| 4.5.7 | Invalid UUID handling | Skipped with warning | [ ] |
+| 4.5.8 | Import statistics | Count of imported/skipped/errors | [ ] |
+
+**Auto-Labeling** (`scripts/auto_label_vulnerabilities.py`):
+```bash
+python scripts/auto_label_vulnerabilities.py --dry-run
+python scripts/auto_label_vulnerabilities.py --confidence 0.8
+```
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 4.5.9 | Auto-label with heuristics | Applies labels based on patterns | [ ] |
+| 4.5.10 | Minimum confidence filter | Only labels above threshold | [ ] |
+| 4.5.11 | Test file detection | test/ files marked as FP | [ ] |
+| 4.5.12 | Multi-scanner consensus | Higher confidence for multi-scanner | [ ] |
+
 ---
 
 ## 5. Semantic Similarity
@@ -249,6 +290,69 @@ cd /Users/pwner/Git/ABS/blocksecops-api-service
 
 ---
 
+## 9. Model Training & Versioning
+
+### 9.1 Training Requirements
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 9.1.1 | Training with < 50 samples | Error: insufficient data | [ ] |
+| 9.1.2 | Training with 50-199 samples | Warning: suboptimal, proceeds | [ ] |
+| 9.1.3 | Training with 200+ samples | Success, metrics returned | [ ] |
+| 9.1.4 | Training with imbalanced data | Warning about class imbalance | [ ] |
+
+### 9.2 Model Versioning
+
+**Endpoint**: `GET /api/v1/ml/model-stats`
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 9.2.1 | Get current model version | model_version string (v1, v2...) | [ ] |
+| 9.2.2 | Model trained timestamp | ISO timestamp | [ ] |
+| 9.2.3 | Model accuracy metric | 0.0-1.0 | [ ] |
+| 9.2.4 | Model AUC metric | 0.0-1.0 | [ ] |
+| 9.2.5 | Label counts | true_positive_count, false_positive_count | [ ] |
+
+### 9.3 Model Storage
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 9.3.1 | Local storage save | Model saved to filesystem | [ ] |
+| 9.3.2 | Local storage load | Model loaded from filesystem | [ ] |
+| 9.3.3 | GCS storage save | Model uploaded to bucket | [ ] |
+| 9.3.4 | GCS storage load | Model downloaded from bucket | [ ] |
+| 9.3.5 | Storage backend config | ML_STORAGE_BACKEND env var | [ ] |
+
+---
+
+## 10. Background Tasks & Auto-Retraining
+
+### 10.1 Label Threshold Triggers
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 10.1.1 | Labels below threshold | No retraining triggered | [ ] |
+| 10.1.2 | Labels reach threshold | Background retraining starts | [ ] |
+| 10.1.3 | Custom threshold config | ML_RETRAIN_THRESHOLD env var | [ ] |
+
+### 10.2 Background Task Execution
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 10.2.1 | Async training task | Non-blocking execution | [ ] |
+| 10.2.2 | Model update after training | New version available | [ ] |
+| 10.2.3 | Metrics update after training | accuracy, auc updated | [ ] |
+
+### 10.3 Model Freshness
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 10.3.1 | Fresh model (< 1 week) | is_stale: false | [ ] |
+| 10.3.2 | Stale model (> 1 week) | is_stale: true | [ ] |
+| 10.3.3 | Custom freshness config | ML_MODEL_MAX_AGE_DAYS env var | [ ] |
+
+---
+
 ## Notes
 
 ```
@@ -265,4 +369,5 @@ Testing Notes:
 
 | Date | Tester | Result | Notes |
 |------|--------|--------|-------|
-| 2025-12-27 | Claude Code | PARTIAL | ML module implemented, endpoints registered, FP classifier needs training data |
+| 2025-12-27 | - | PARTIAL | ML module implemented, endpoints registered |
+| 2026-01-08 | - | PARTIAL | Added model training, labeling scripts, background tasks, model storage |

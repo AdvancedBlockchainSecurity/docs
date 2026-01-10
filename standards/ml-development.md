@@ -46,9 +46,21 @@ blocksecops-api-service/src/ml/
 ├── feature_extractor.py           # Feature extraction for classifiers
 ├── false_positive_classifier.py   # FP prediction
 ├── semantic_deduplicator.py       # Embedding-based similarity
+├── background_tasks.py            # Async training tasks
+├── label_counter.py               # Label tracking for retrain triggers
+├── storage/
+│   ├── __init__.py                # Storage exports
+│   ├── base.py                    # Abstract storage interface
+│   ├── local_storage.py           # Local filesystem storage
+│   └── gcs_storage.py             # Google Cloud Storage backend
 └── models/
     ├── .gitkeep
     └── fp_classifier_v1.joblib    # Trained model (when available)
+
+blocksecops-api-service/scripts/
+├── label_vulnerabilities.py       # Interactive CLI for manual labeling
+├── import_labels.py               # CSV batch import
+└── auto_label_vulnerabilities.py  # Heuristic auto-labeling
 ```
 
 ### Module Responsibilities
@@ -61,6 +73,10 @@ blocksecops-api-service/src/ml/
 | `feature_extractor.py` | Extract features for ML models | No |
 | `false_positive_classifier.py` | Predict FP probability | Yes (200-500 labels) |
 | `semantic_deduplicator.py` | Find similar vulnerabilities | No (pretrained model) |
+| `background_tasks.py` | Async model training | N/A (orchestration) |
+| `label_counter.py` | Track labels, trigger retraining | N/A (metadata) |
+| `storage/local_storage.py` | Local model persistence | N/A (storage) |
+| `storage/gcs_storage.py` | GCS model persistence | N/A (storage) |
 
 ---
 

@@ -53,6 +53,21 @@ Manual testing checklists for all user-facing features.
 | [35-cli-tool.md](./35-cli-tool.md) | CLI tool, pre-commit hooks, output formats (CI/CD Integrations) |
 | [36-cicd-integration.md](./36-cicd-integration.md) | GitHub Actions, GitLab CI, Jenkins, Azure Pipelines integration |
 | [37-stripe-billing.md](./37-stripe-billing.md) | Stripe subscriptions, invoices, receipts (Phase 8a) |
+| [38-cursor-pagination.md](./38-cursor-pagination.md) | Cursor-based pagination, keyset queries |
+
+---
+
+## Cursor-Based Pagination (January 2026)
+
+API pagination improvements for efficient large dataset navigation:
+
+| Feature | Status | Tests |
+|---------|--------|-------|
+| Forward Pagination | Implemented | first/after params |
+| Backward Pagination | Implemented | last/before params |
+| Composite Indexes | Applied | Migration 029 |
+| Offset Compatibility | Verified | skip/limit still work |
+| Query Performance | Verified | EXPLAIN shows index scans |
 
 ---
 
@@ -140,6 +155,7 @@ The risk scoring system was redesigned to be unbounded (higher = riskier):
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-01-10 | Claude Code | 38-cursor-pagination.md | VERIFIED - Migration 029 applied, indexes used in queries, cursor encode/decode working
 2026-01-04 | Claude Code | 36-cicd-integration.md | IMPLEMENTED - GitHub Actions, GitLab CI, Jenkins, Azure Pipelines integration tests
 2026-01-04 | Claude Code | 35-cli-tool.md | IMPLEMENTED - blocksecops-cli v0.1.0, auth/scan commands, 4 output formats, pre-commit hooks
 2026-01-04 | Claude Code | 34-notification-channels.md | IMPLEMENTED - Migration 025, Slack/Teams/Discord notifiers, API endpoints (v0.7.1 API)

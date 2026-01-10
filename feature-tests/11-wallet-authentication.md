@@ -1,8 +1,9 @@
-# Wallet Authentication Tests (Phase 3.3)
+# Wallet Authentication Tests (Phase 3.3 + 3.1b)
 
 **Priority**: P1 - High
 **Last Tested**: _Not yet tested_
-**Feature**: MetaMask/WalletConnect Authentication
+**Feature**: Ethereum (MetaMask/WalletConnect) and Solana (Phantom/Solflare) Authentication
+**Session Management**: Supabase Admin API (unified sessions)
 
 ---
 
@@ -16,11 +17,12 @@
 - [ ] SIWE message format is correct (EIP-4361)
 
 ### 1.2 Signature Verification
-- [ ] `POST /api/v1/auth/wallet/verify` with valid signature returns JWT
+- [ ] `POST /api/v1/auth/wallet/verify` with valid signature returns Supabase session
 - [ ] Invalid signature returns 401 error
 - [ ] Expired nonce returns 401 error
 - [ ] Wrong message returns 401 error
-- [ ] Response includes access_token and refresh_token
+- [ ] Response includes access_token, refresh_token, expires_in
+- [ ] Token is valid Supabase JWT (can be used with protected endpoints)
 
 ### 1.3 Wallet Linking
 - [ ] `POST /api/v1/auth/wallet/link` links wallet to existing account
@@ -88,9 +90,11 @@
 
 ### 3.2 Successful Sign-In
 - [ ] Approved signature triggers verification
-- [ ] JWT tokens stored correctly
+- [ ] Supabase session set via `supabase.auth.setSession()`
+- [ ] Session stored in localStorage as `sb-*-auth-token`
 - [ ] User redirected to dashboard
 - [ ] User info displayed (address or ENS)
+- [ ] Protected API calls work with Supabase session
 
 ### 3.3 Failed Sign-In
 - [ ] Rejected signature shows error message
@@ -162,6 +166,87 @@
 - [ ] Network error during verification handled
 - [ ] Backend error during verification shown
 - [ ] Session expired during flow handled
+
+---
+
+---
+
+## 9. Solana Wallet - Backend API Tests
+
+### 9.1 Solana Nonce Generation
+- [ ] `POST /api/v1/auth/wallet/solana/nonce` returns nonce for valid Solana address
+- [ ] Nonce is unique per request
+- [ ] Nonce expires after 5 minutes
+- [ ] Invalid address format (non-base58) returns 400 error
+- [ ] Invalid address length (not 32-44 chars) returns 400 error
+
+### 9.2 Solana Signature Verification
+- [ ] `POST /api/v1/auth/wallet/solana/verify` with valid signature returns Supabase session
+- [ ] Uses nacl/Ed25519 for signature verification
+- [ ] Invalid signature returns 401 error
+- [ ] Expired nonce returns 401 error
+- [ ] Wrong message returns 401 error
+- [ ] Response includes access_token, refresh_token, expires_in
+- [ ] Token is valid Supabase JWT (can be used with protected endpoints)
+
+---
+
+## 10. Solana Wallet - Frontend Connection
+
+### 10.1 Phantom Wallet Connection
+- [ ] "Connect Solana" button visible on login page
+- [ ] Clicking button opens Phantom wallet popup
+- [ ] User can approve connection
+- [ ] User can reject connection (handled gracefully)
+- [ ] Connected address displayed correctly
+
+### 10.2 Solflare Wallet Connection
+- [ ] Solflare option available in wallet modal
+- [ ] Connection flow works correctly
+- [ ] Handles both browser extension and mobile
+
+### 10.3 Backpack Wallet Connection
+- [ ] Backpack wallet option available
+- [ ] Connection flow works correctly
+
+### 10.4 Ledger (via Solana Adapter)
+- [ ] Ledger option available
+- [ ] Hardware wallet connection works
+
+---
+
+## 11. Solana Wallet - Sign-In Flow
+
+### 11.1 Solana Signature Request
+- [ ] After connection, signature request sent to wallet
+- [ ] Message displayed correctly in wallet
+- [ ] Nonce included in message
+- [ ] Wallet address included in message
+
+### 11.2 Successful Solana Sign-In
+- [ ] Approved signature triggers verification
+- [ ] Supabase session set via `supabase.auth.setSession()`
+- [ ] Session stored in localStorage as `sb-*-auth-token`
+- [ ] User redirected to dashboard
+- [ ] User info displayed (Solana address)
+- [ ] Protected API calls work with Supabase session
+
+### 11.3 Failed Solana Sign-In
+- [ ] Rejected signature shows error message
+- [ ] User can retry sign-in
+- [ ] Timeout handled gracefully
+- [ ] Invalid signature from backend handled
+
+---
+
+## 12. Solana Database & Migration
+
+- [ ] Migration for Solana wallet fields runs successfully
+- [ ] `solana_wallet_address` column added to users table
+- [ ] `solana_wallet_nonce` column added
+- [ ] `solana_wallet_linked_at` column added
+- [ ] Unique constraint on solana_wallet_address works
+- [ ] Index on solana_wallet_address created
 
 ---
 
