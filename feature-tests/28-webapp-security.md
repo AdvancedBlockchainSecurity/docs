@@ -1,9 +1,9 @@
 # Feature Test: Web Application Security
 
 **Feature ID**: 28
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Added**: v0.1.6 (API), v0.17.1 (Dashboard)
-**Last Updated**: 2025-12-27
+**Last Updated**: 2026-01-13
 
 ---
 
@@ -212,25 +212,67 @@ RATE_LIMIT_EXCEEDED: {"event_type": "rate_limit_exceeded", "timestamp": "2025-12
 
 ---
 
-## Test 7: Production CSP (Dashboard)
+## Test 7: CSP via Traefik Middleware (Dashboard)
 
-### 7.1 CSP Header Present
+**Note**: As of v0.30.4, CSP is delivered via Traefik middleware HTTP headers, not HTML meta tags.
+This provides better security (server-enforced) and supports `frame-ancestors` directive.
+
+### 7.1 CSP Header Present (via Traefik)
 
 | Step | Action | Expected Result | Status |
 |------|--------|-----------------|--------|
-| 1 | Deploy production dashboard | Deployment succeeds | [ ] |
-| 2 | Check response headers | CSP header present | [ ] |
+| 1 | Deploy dashboard with IngressRoute | Deployment succeeds | [ ] |
+| 2 | Check response headers via curl | CSP header present | [ ] |
 | 3 | Verify default-src | `'self'` | [ ] |
-| 4 | Verify script-src | `'self'` (no unsafe-inline) | [ ] |
-| 5 | Verify frame-ancestors | `'none'` | [ ] |
+| 4 | Verify connect-src | Contains Supabase, wallet domains | [ ] |
+| 5 | Verify frame-ancestors | `'none'` (only works via HTTP headers) | [ ] |
+| 6 | Verify X-Frame-Options | `DENY` | [ ] |
+| 7 | Verify X-Content-Type-Options | `nosniff` | [ ] |
 
-### 7.2 CSP Violations
+```bash
+# Test CSP and security headers via Traefik
+curl -sI http://dashboard.local.blocksecops.com | grep -i -E "(content-security|x-frame|x-content-type|referrer-policy|permissions-policy)"
+```
+
+### 7.2 Traefik Middleware Configuration
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Check middleware exists | `kubectl get middleware -n dashboard-local` shows security-headers | [ ] |
+| 2 | Check IngressRoute | References security-headers middleware | [ ] |
+| 3 | Verify CSP contains Supabase URL | `huzjlpypdlelqnbjvxad.supabase.co` in connect-src | [ ] |
+
+```bash
+# Verify middleware configuration
+kubectl get middleware security-headers -n dashboard-local -o yaml | grep -A 30 spec
+
+# Verify IngressRoute references middleware
+kubectl get ingressroute dashboard -n dashboard-local -o yaml | grep -A 5 middlewares
+```
+
+### 7.3 CSP Violations
 
 | Step | Action | Expected Result | Status |
 |------|--------|-----------------|--------|
 | 1 | Inject inline script | Blocked by CSP | [ ] |
 | 2 | Check browser console | CSP violation error | [ ] |
 | 3 | Load external script | Blocked by CSP | [ ] |
+| 4 | Try to embed in iframe | Blocked by frame-ancestors | [ ] |
+
+### 7.4 Anti-Pattern Check
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Check index.html | NO CSP meta tags present | [ ] |
+| 2 | Check index.html | Comment referencing middleware | [ ] |
+
+```bash
+# Verify no CSP meta tags in HTML (should be empty)
+grep -i "content-security-policy" /path/to/dashboard/index.html
+
+# Should see only comment about middleware
+grep -i "middleware" /path/to/dashboard/index.html
+```
 
 ---
 
@@ -263,8 +305,8 @@ Run this script to verify all security hardening is in place:
 echo "=== BlockSecOps Security Hardening Tests ==="
 echo ""
 
-# Test 1: Security Headers
-echo "1. Testing Security Headers..."
+# Test 1: API Security Headers
+echo "1. Testing API Security Headers..."
 HEADERS=$(curl -sI http://127.0.0.1:8000/api/v1/health/ready)
 echo "$HEADERS" | grep -q "x-content-type-options: nosniff" && echo "   ✓ X-Content-Type-Options" || echo "   ✗ X-Content-Type-Options MISSING"
 echo "$HEADERS" | grep -q "x-frame-options: DENY" && echo "   ✓ X-Frame-Options" || echo "   ✗ X-Frame-Options MISSING"
@@ -272,6 +314,20 @@ echo "$HEADERS" | grep -q "x-xss-protection: 1; mode=block" && echo "   ✓ X-XS
 echo "$HEADERS" | grep -q "referrer-policy:" && echo "   ✓ Referrer-Policy" || echo "   ✗ Referrer-Policy MISSING"
 echo "$HEADERS" | grep -q "permissions-policy:" && echo "   ✓ Permissions-Policy" || echo "   ✗ Permissions-Policy MISSING"
 echo "$HEADERS" | grep -q "cache-control: no-store" && echo "   ✓ Cache-Control" || echo "   ✗ Cache-Control MISSING"
+echo ""
+
+# Test 1b: Dashboard CSP via Traefik (v0.30.4+)
+echo "1b. Testing Dashboard CSP via Traefik..."
+DASHBOARD_HEADERS=$(curl -sI http://dashboard.local.blocksecops.com 2>/dev/null || echo "")
+if [ -n "$DASHBOARD_HEADERS" ]; then
+  echo "$DASHBOARD_HEADERS" | grep -qi "content-security-policy" && echo "   ✓ CSP Header Present" || echo "   ✗ CSP Header MISSING"
+  echo "$DASHBOARD_HEADERS" | grep -qi "x-frame-options" && echo "   ✓ X-Frame-Options" || echo "   ✗ X-Frame-Options MISSING"
+  echo "$DASHBOARD_HEADERS" | grep -qi "x-content-type-options" && echo "   ✓ X-Content-Type-Options" || echo "   ✗ X-Content-Type-Options MISSING"
+  echo "$DASHBOARD_HEADERS" | grep -qi "referrer-policy" && echo "   ✓ Referrer-Policy" || echo "   ✗ Referrer-Policy MISSING"
+  echo "$DASHBOARD_HEADERS" | grep -qi "permissions-policy" && echo "   ✓ Permissions-Policy" || echo "   ✗ Permissions-Policy MISSING"
+else
+  echo "   ⚠ Dashboard not accessible at dashboard.local.blocksecops.com"
+fi
 echo ""
 
 # Test 2: CORS Configuration

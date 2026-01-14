@@ -130,6 +130,51 @@ curl -s -X POST -H "Authorization: Bearer ${TOKEN}" \
 
 ---
 
+#### 1.4 Team Member Quota Enforcement (NEW - January 2026)
+
+**Tier Limits**:
+| Tier | Max Team Members |
+|------|------------------|
+| Free | 1 (solo) |
+| Developer | 1 (solo) |
+| Startup | 10 |
+| Professional | 25 |
+| Enterprise | Unlimited |
+
+**Test: Quota Exceeded**:
+```bash
+# Add members until limit reached, then try one more
+curl -s -X POST -H "Authorization: Bearer ${TOKEN}" \
+  -H "Content-Type: application/json" \
+  "http://127.0.0.1:3000/api/v1/organizations/${ORG_ID}/teams/${TEAM_ID}/members" \
+  -d '{"user_id": "user-uuid", "role": "member"}' | jq '.'
+```
+
+**Expected Error Response (HTTP 403)**:
+```json
+{
+  "detail": {
+    "error": "team_member_limit_exceeded",
+    "message": "Organization has reached the maximum of 10 team members for the startup tier",
+    "tier": "startup",
+    "current_members": 10,
+    "max_team_members": 10,
+    "upgrade_url": "/pricing"
+  }
+}
+```
+
+**Test Cases**:
+- [ ] Free/Developer tier: Cannot add team members (solo only)
+- [ ] Startup tier: Can add up to 10 members
+- [ ] Startup tier: 11th member returns 403 with upgrade prompt
+- [ ] Professional tier: Can add up to 25 members
+- [ ] Enterprise tier: No member limit (max_team_members = -1)
+
+**Status**: [ ] NOT YET TESTED
+
+---
+
 ### 2. Project Access API
 
 #### 2.1 Grant Team Access
@@ -563,7 +608,8 @@ curl -s -H "Authorization: Bearer ${TOKEN}" \
 
 ---
 
-**Last Updated**: 2025-12-26
+**Last Updated**: 2026-01-11
 **Tested By**: Claude Code (Automated)
 **API Version**: v0.1.14
 **Dashboard Version**: v0.16.0
+**Notes**: Added team member quota enforcement tests (January 2026)

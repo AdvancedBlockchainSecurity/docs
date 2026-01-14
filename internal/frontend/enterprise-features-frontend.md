@@ -1,7 +1,7 @@
 # Enterprise Features Frontend
 
-**Last Updated**: 2025-12-23
-**Dashboard Version**: 0.13.0
+**Last Updated**: 2026-01-13
+**Dashboard Version**: 0.30.1
 **Status**: Production Ready
 
 ---
@@ -41,15 +41,117 @@ import { TierGate } from '@/components/common/TierGate';
 **Props**:
 | Prop | Type | Description |
 |------|------|-------------|
-| `requiredTier` | `'free' \| 'pro' \| 'enterprise'` | Minimum tier required |
+| `requiredTier` | `'free' \| 'developer' \| 'startup' \| 'professional' \| 'enterprise'` | Minimum tier required |
 | `featureName` | `string` | Feature name for upgrade prompt |
 | `children` | `ReactNode` | Content to render if authorized |
+| `mode` | `'block' \| 'preview'` | Display mode (default: 'block') |
+| `showUpgradePrompt` | `boolean` | Show upgrade prompt when blocked |
 
 **Behavior**:
 - Checks `user.tier` from `AuthContext`
-- Tier hierarchy: `free` < `pro` < `enterprise`
+- Tier hierarchy: `free` < `developer` < `startup` < `professional` < `enterprise`
 - Shows upgrade prompt with pricing link for insufficient tier
 - Renders children for authorized users
+
+### TierGate Display Modes (v0.30.0)
+
+**Block Mode** (default):
+- Completely hides content for unauthorized users
+- Shows upgrade prompt instead of content
+- Use for fully restricted features
+
+```tsx
+<TierGate requiredTier="enterprise" featureName="SSO">
+  <SSOConfiguration />
+</TierGate>
+```
+
+**Preview Mode** (new in v0.30.0):
+- Shows content with visual "greyed out" overlay
+- Displays upgrade badge on top of content
+- Allows users to see what they're missing
+- Creates upsell opportunity
+
+```tsx
+<TierGate requiredTier="developer" featureName="Quality Gates" mode="preview">
+  <QualityGatePanel projectId={projectId} />
+</TierGate>
+```
+
+**Preview Mode Styling**:
+- Greyed overlay with 50% opacity
+- Purple "Upgrade to {tier}" badge positioned top-right
+- Badge links to /pricing page
+- Content is visible but not interactive
+- Hover effects disabled on greyed content
+
+---
+
+## UpgradeBanner Component (v0.30.1)
+
+Location: `src/components/common/UpgradeBanner.tsx`
+
+Global dismissible banner that promotes tier upgrades across the application.
+
+### Usage
+
+```tsx
+// In App.tsx (global placement)
+{isAuthenticated && <UpgradeBanner />}
+
+// With custom configuration
+<UpgradeBanner
+  reappearAfterDays={14}
+  targetTier="professional"
+  highlightFeature="Unlimited Scans"
+/>
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `storageKey` | `string` | `'upgrade-banner-dismissed'` | localStorage key for dismissal state |
+| `reappearAfterDays` | `number` | `7` | Days before banner reappears after dismissal |
+| `targetTier` | `Tier` | auto | Target tier to promote (auto: next tier up) |
+| `message` | `string` | auto | Custom message text |
+| `highlightFeature` | `string` | - | Single feature to highlight |
+
+### Behavior
+
+1. **Automatic Tier Detection**: Shows next tier up from user's current tier
+2. **Feature Highlights**: Displays up to 3 key features of the target tier
+3. **Dismissible**: User can dismiss with X button
+4. **Reappearance**: Returns after configurable days (default: 7)
+5. **Enterprise Hidden**: Never shows for Enterprise tier users
+
+### Tier-Specific Highlights
+
+| Current Tier | Target Tier | Highlighted Features |
+|--------------|-------------|---------------------|
+| Free | Developer | Quality Gates, CI/CD Integration, Priority Support |
+| Developer | Startup | Team Collaboration, 100 AI Explanations/month, Advanced Analytics |
+| Startup | Professional | 500 AI Explanations/month, Custom Integrations, Dedicated Support |
+| Professional | Enterprise | Unlimited AI, SSO/SAML, Custom SLAs, Project Access Control |
+
+### Hook: useUpgradeBanner
+
+```tsx
+import { useUpgradeBanner } from '@/components/common/UpgradeBanner';
+
+const { resetBanner, dismissBanner, isDismissed } = useUpgradeBanner();
+
+// Force banner to show again
+resetBanner();
+
+// Programmatically dismiss
+dismissBanner();
+
+// Check current state
+if (isDismissed()) { /* ... */ }
+```
+
+---
 
 ### Sidebar Integration
 

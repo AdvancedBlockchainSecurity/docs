@@ -1,10 +1,12 @@
 # Local Development Setup Standards
 
-**Version:** 2.7.0
-**Last Updated:** January 7, 2026
+**Version:** 2.8.0
+**Last Updated:** January 11, 2026
 **Status:** Active
 
-> **Update (v2.7.0):** Added External Service Integrations section with Stripe CLI webhook forwarding for local billing development.
+> **Update (v2.8.0):** Added wallet authentication environment variables (SUPABASE_SERVICE_KEY, VITE_WALLETCONNECT_PROJECT_ID) for Ethereum and Solana wallet auth.
+>
+> **Previous (v2.7.0):** Added External Service Integrations section with Stripe CLI webhook forwarding for local billing development.
 >
 > **Major Update (v2.6.0):** Simplified local development workflow. Harbor is no longer used for local development - images are built directly into minikube's Docker daemon for faster iteration.
 >
@@ -688,6 +690,60 @@ labels:
 
 > **NOTE:** With the Traefik migration, the dashboard uses **relative URLs** for API calls (`/api/v1`). Traefik routes these requests to the API service. No `VITE_API_BASE_URL` is needed.
 
+### Wallet Authentication Environment Variables
+
+**Backend (API Service)** - Required for wallet auth to create Supabase sessions:
+
+| Variable | Purpose | Location |
+|----------|---------|----------|
+| `SUPABASE_SERVICE_KEY` | Admin API access for wallet user creation | ConfigMap `api-service-config` |
+
+The `SUPABASE_SERVICE_KEY` must be in both the ConfigMap AND explicitly referenced in the deployment env vars:
+
+```yaml
+# In configmap-patch.yaml
+SUPABASE_SERVICE_KEY: "your-service-role-key"
+
+# In deployment-patch.yaml
+- name: SUPABASE_SERVICE_KEY
+  valueFrom:
+    configMapKeyRef:
+      name: api-service-config
+      key: SUPABASE_SERVICE_KEY
+```
+
+**Verify with:**
+```bash
+kubectl exec -n api-service-local deployment/api-service -- printenv | grep SUPABASE
+# Should show: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_KEY
+```
+
+**Frontend (Dashboard)** - Required for WalletConnect mobile wallet support:
+
+| Variable | Purpose | Location |
+|----------|---------|----------|
+| `VITE_WALLETCONNECT_PROJECT_ID` | WalletConnect cloud project ID | Docker build arg |
+
+Get a WalletConnect Project ID from https://cloud.walletconnect.com and add to `.env.local`:
+
+```bash
+# In blocksecops-dashboard/.env.local
+VITE_WALLETCONNECT_PROJECT_ID=your-project-id-here
+```
+
+Build the dashboard with the project ID:
+
+```bash
+eval $(minikube docker-env)
+source blocksecops-dashboard/.env.local
+docker build --no-cache \
+  --build-arg VITE_SUPABASE_URL="$VITE_SUPABASE_URL" \
+  --build-arg VITE_SUPABASE_ANON_KEY="$VITE_SUPABASE_ANON_KEY" \
+  --build-arg VITE_WALLETCONNECT_PROJECT_ID="$VITE_WALLETCONNECT_PROJECT_ID" \
+  -t blocksecops-dashboard:latest \
+  -f blocksecops-dashboard/Dockerfile .
+```
+
 **Dashboard environment** (built into container):
 
 The dashboard is built with relative URL configuration and runs inside Minikube. The API client (`src/lib/api/client.ts`) uses:
@@ -804,6 +860,12 @@ Before starting development work:
 - [ ] Can access dashboard at `http://127.0.0.1:3000`
 - [ ] Can access API docs at `http://127.0.0.1:3000/api/v1/docs`
 - [ ] No console errors in browser (F12 → Console tab)
+
+**For Wallet Authentication Development:**
+- [ ] `SUPABASE_SERVICE_KEY` configured in API service: `kubectl exec -n api-service-local deployment/api-service -- printenv | grep SUPABASE_SERVICE_KEY`
+- [ ] `VITE_WALLETCONNECT_PROJECT_ID` set in `.env.local` (for Ethereum WalletConnect)
+- [ ] Dashboard rebuilt with wallet environment variables
+- [ ] Wallet nonce endpoint responds: `curl -X POST http://127.0.0.1:3000/api/v1/auth/wallet/nonce -H "Content-Type: application/json" -d '{"address":"0x1234"}'`
 
 ---
 

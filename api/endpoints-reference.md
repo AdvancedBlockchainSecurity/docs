@@ -5126,6 +5126,529 @@ Find semantically similar vulnerabilities.
 
 ---
 
+## Economic Analysis (Phase 5.5a - Implemented)
+
+Economic security analysis endpoints for detecting flash loan attacks, MEV exploitation, oracle manipulation, and DeFi protocol risks. **Status: Implementation Complete**
+
+These endpoints aggregate economic security findings already detected by SolidityDefend and provide focused visibility into financial attack vectors.
+
+### GET /scans/{scan_id}/economic-analysis
+
+Get economic security summary for a specific scan.
+
+**Authentication**: Required (Bearer token)
+
+**Path Parameters**:
+- `scan_id` (UUID) - Scan ID
+
+**Response** (200 OK):
+```json
+{
+  "scan_id": "uuid",
+  "total_economic_findings": 5,
+  "economic_risk_score": 45,
+  "highest_severity": "high",
+  "flash_loan_findings": [
+    {
+      "id": "uuid",
+      "title": "Flash Loan Attack Vector",
+      "description": "Function vulnerable to flash loan manipulation",
+      "severity": "high",
+      "pattern_id": "BVD-SOLIDITY-FLASH-001",
+      "contract_name": "LendingPool.sol",
+      "contract_id": "uuid",
+      "line_start": 142,
+      "line_end": null,
+      "confidence": 0.87,
+      "category": "flash_loan"
+    }
+  ],
+  "oracle_mev_findings": [
+    {
+      "id": "uuid",
+      "title": "MEV Sandwich Attack Risk",
+      "description": "Swap function vulnerable to sandwich attacks",
+      "severity": "medium",
+      "pattern_id": "BVD-SOLIDITY-MEV-002",
+      "contract_name": "DEX.sol",
+      "contract_id": "uuid",
+      "line_start": 89,
+      "line_end": null,
+      "confidence": 0.78,
+      "category": "mev"
+    }
+  ],
+  "defi_findings": [
+    {
+      "id": "uuid",
+      "title": "Oracle Manipulation Risk",
+      "description": "Price oracle can be manipulated in single transaction",
+      "severity": "high",
+      "pattern_id": "BVD-SOLIDITY-DEFI-003",
+      "contract_name": "PriceOracle.sol",
+      "contract_id": "uuid",
+      "line_start": 56,
+      "line_end": null,
+      "confidence": 0.92,
+      "category": "defi"
+    }
+  ],
+  "critical_count": 0,
+  "high_count": 2,
+  "medium_count": 2,
+  "low_count": 1,
+  "risk_level": "high",
+  "ai_explanation": null
+}
+```
+
+**Status Codes**:
+- `200` OK - Success
+- `401` Unauthorized - Invalid or missing token
+- `403` Forbidden - Not owner of scan
+- `404` Not Found - Scan does not exist
+
+**Economic Pattern Detection**:
+- `BVD-SOLIDITY-FLASH-*`: Flash loan attacks
+- `BVD-SOLIDITY-MEV-*`: MEV exploitation (sandwich, frontrun, backrun)
+- `BVD-SOLIDITY-DEFI-*`: DeFi protocol risks (oracle, liquidity, AMM)
+
+**Added**: January 2026 (Phase 5.5a)
+
+---
+
+### GET /scans/{scan_id}/economic-analysis/explain
+
+Get AI-generated explanation of economic security risks for a scan.
+
+**Authentication**: Required (Bearer token)
+
+**Tier Requirements**:
+| Tier | Monthly AI Explanations |
+|------|------------------------|
+| Free | 0 (not available) |
+| Developer | 10 |
+| Startup | 100 |
+| Professional | 500 |
+| Enterprise | Unlimited |
+
+**Path Parameters**:
+- `scan_id` (UUID) - Scan ID
+
+**Response** (200 OK):
+```json
+{
+  "scan_id": "uuid",
+  "explanation": "## Economic Security Analysis\n\nThis scan detected **5 economic security vulnerabilities** with an overall risk score of **45/100** (HIGH).\n\n### Critical Findings\n\n1. **Flash Loan Attack Vector** (High Severity)\n   - Location: LendingPool.sol:142\n   - The `borrow()` function can be exploited within a single transaction...\n\n2. **Oracle Manipulation Risk** (High Severity)\n   - Location: PriceOracle.sol:56\n   - Price can be manipulated by...\n\n### Recommendations\n1. Implement flash loan protection using reentrancy guards\n2. Use time-weighted average prices (TWAP) for oracle data\n3. Add MEV protection via commit-reveal schemes",
+  "generated_at": "2026-01-12T10:30:00Z",
+  "model": "claude-3-haiku",
+  "quota_remaining": 9
+}
+```
+
+**Response (402 Quota Exceeded)**:
+```json
+{
+  "detail": "AI explanation quota exceeded. Upgrade your plan for more explanations.",
+  "quota_limit": 10,
+  "quota_used": 10,
+  "upgrade_url": "https://app.blocksecops.com/settings/billing"
+}
+```
+
+**Status Codes**:
+- `200` OK - Success
+- `401` Unauthorized - Invalid or missing token
+- `402` Payment Required - AI explanation quota exceeded
+- `403` Forbidden - Not owner of scan or tier not eligible
+- `404` Not Found - Scan does not exist
+
+**Added**: January 2026 (Phase 5.5a)
+
+---
+
+### GET /contracts/{contract_id}/economic-findings
+
+Get economic security findings for a specific contract.
+
+**Authentication**: Required (Bearer token)
+
+**Path Parameters**:
+- `contract_id` (UUID) - Contract ID
+
+**Response** (200 OK):
+```json
+{
+  "contract_id": "uuid",
+  "findings": [
+    {
+      "id": "uuid",
+      "title": "Flash Loan Attack Vector",
+      "description": "Function vulnerable to flash loan manipulation",
+      "severity": "high",
+      "pattern_id": "BVD-SOLIDITY-FLASH-001",
+      "contract_name": "LendingPool.sol",
+      "contract_id": "uuid",
+      "line_start": 142,
+      "line_end": null,
+      "confidence": 0.87,
+      "category": "flash_loan"
+    }
+  ],
+  "total": 1
+}
+```
+
+**Status Codes**:
+- `200` OK - Success
+- `401` Unauthorized - Invalid or missing token
+- `403` Forbidden - Not owner of contract
+- `404` Not Found - Contract does not exist
+
+**Added**: January 2026 (Phase 5.5a)
+
+---
+
+### GET /projects/{project_id}/economic-risk
+
+Get aggregated economic risk across all scans in a project.
+
+**Authentication**: Required (Bearer token)
+
+**Path Parameters**:
+- `project_id` (UUID) - Project ID
+
+**Response** (200 OK):
+```json
+{
+  "project_id": "uuid",
+  "total_economic_findings": 12,
+  "aggregate_risk_score": 67,
+  "scans_analyzed": 5,
+  "highest_severity": "critical"
+}
+```
+
+**Status Codes**:
+- `200` OK - Success
+- `401` Unauthorized - Invalid or missing token
+- `403` Forbidden - Not owner of project
+- `404` Not Found - Project does not exist
+
+**Added**: January 2026 (Phase 5.5a)
+
+---
+
+## Quality Gates (Phase 5.5c - CI/CD Integration)
+
+Quality gate endpoints for enforcing security standards in CI/CD pipelines. Configure blocking rules and check build status programmatically. **Status: Implementation Complete**
+
+### GET /quality-gates/projects/{project_id}
+
+Get quality gate configuration for a project.
+
+**Authentication**: Required (Bearer token)
+
+**Tier Requirements**: Developer+ (not available on Free tier)
+
+**Path Parameters**:
+- `project_id` (UUID) - Project ID
+
+**Response** (200 OK):
+```json
+{
+  "id": "uuid",
+  "project_id": "uuid",
+  "organization_id": null,
+  "name": "Production Security Gate",
+  "description": "Blocks critical and high vulnerabilities",
+
+  "block_on_critical": true,
+  "block_on_high": true,
+  "block_on_medium": false,
+  "block_on_low": false,
+
+  "max_critical": 0,
+  "max_high": 0,
+  "max_medium": -1,
+  "max_low": -1,
+
+  "advanced_rules": null,
+
+  "is_active": true,
+  "enforce_on_pr": true,
+  "enforce_on_main": true,
+
+  "notify_on_failure": true,
+  "notification_channels": null,
+
+  "created_at": "2026-01-12T10:00:00Z",
+  "updated_at": "2026-01-12T10:00:00Z"
+}
+```
+
+**Configuration Options**:
+- `block_on_*`: Block build if ANY vulnerability of this severity exists
+- `max_*`: Block if count exceeds threshold (-1 = disabled)
+- `enforce_on_pr`: Enforce on pull request builds
+- `enforce_on_main`: Enforce on main branch builds
+
+**Status Codes**:
+- `200` OK - Success
+- `401` Unauthorized - Invalid or missing token
+- `403` Forbidden - Tier not eligible (Free tier)
+- `404` Not Found - Project not found
+
+**Added**: January 2026 (Phase 5.5c)
+
+---
+
+### PUT /quality-gates/projects/{project_id}
+
+Create or update quality gate configuration for a project.
+
+**Authentication**: Required (Bearer token)
+
+**Tier Requirements**: Developer+
+
+**Path Parameters**:
+- `project_id` (UUID) - Project ID
+
+**Request Body**:
+```json
+{
+  "name": "Production Security Gate",
+  "description": "Strict security requirements for production",
+
+  "block_on_critical": true,
+  "block_on_high": true,
+  "block_on_medium": false,
+  "block_on_low": false,
+
+  "max_critical": 0,
+  "max_high": 0,
+  "max_medium": 10,
+  "max_low": -1,
+
+  "enforce_on_pr": true,
+  "enforce_on_main": true,
+  "notify_on_failure": true
+}
+```
+
+**Response** (200 OK): Same as GET response
+
+**Status Codes**:
+- `200` OK - Created/Updated
+- `401` Unauthorized - Invalid or missing token
+- `403` Forbidden - Tier not eligible
+- `404` Not Found - Project not found
+
+**Added**: January 2026 (Phase 5.5c)
+
+---
+
+### POST /quality-gates/projects/{project_id}/evaluate
+
+Evaluate a scan against the project's quality gate.
+
+**Authentication**: Required (Bearer token)
+
+**Path Parameters**:
+- `project_id` (UUID) - Project ID
+
+**Request Body**:
+```json
+{
+  "scan_id": "uuid",
+  "triggered_by": "ci",
+  "ci_context": {
+    "branch": "main",
+    "commit": "abc123def456",
+    "pr": 42,
+    "workflow": "security-scan",
+    "run_id": "12345"
+  }
+}
+```
+
+**Response** (200 OK):
+```json
+{
+  "quality_gate_id": "uuid",
+  "scan_id": "uuid",
+  "project_id": "uuid",
+
+  "passed": false,
+  "status": "failing",
+
+  "critical_count": 2,
+  "high_count": 5,
+  "medium_count": 12,
+  "low_count": 23,
+
+  "violations": [
+    {
+      "rule": "block_on_critical",
+      "threshold": 0,
+      "actual": 2,
+      "severity": "critical",
+      "message": "Found 2 critical vulnerabilities (blocking)"
+    },
+    {
+      "rule": "max_high",
+      "threshold": 0,
+      "actual": 5,
+      "severity": "high",
+      "message": "High vulnerabilities (5) exceed threshold (0)"
+    }
+  ],
+
+  "triggered_by": "ci",
+  "ci_context": {
+    "branch": "main",
+    "commit": "abc123def456",
+    "pr": 42
+  },
+  "evaluated_at": "2026-01-12T10:30:00Z"
+}
+```
+
+**Status Values**:
+- `passing`: All rules satisfied
+- `failing`: One or more violations
+- `warning`: Soft violations (advisory)
+- `skipped`: No quality gate configured
+- `pending`: Awaiting scan completion
+
+**Status Codes**:
+- `200` OK - Evaluation complete
+- `401` Unauthorized - Invalid or missing token
+- `404` Not Found - Scan or project not found
+
+**Added**: January 2026 (Phase 5.5c)
+
+---
+
+### GET /quality-gates/projects/{project_id}/build-status
+
+Get current build status for CI/CD integration.
+
+**Authentication**: Optional (public access for badges)
+
+**Path Parameters**:
+- `project_id` (UUID) - Project ID
+
+**Response** (200 OK):
+```json
+{
+  "project_id": "uuid",
+  "status": "passing",
+  "quality_gate_name": "Production Security Gate",
+
+  "last_scan_id": "uuid",
+  "last_evaluation_id": "uuid",
+
+  "critical_count": 0,
+  "high_count": 0,
+  "medium_count": 5,
+  "low_count": 12,
+
+  "violations": [],
+
+  "badge_url": "/api/v1/quality-gates/projects/{id}/badge.svg",
+  "evaluated_at": "2026-01-12T10:30:00Z"
+}
+```
+
+**Usage in CI/CD**:
+```bash
+# Check build status and fail if not passing
+STATUS=$(curl -s "https://api.blocksecops.com/api/v1/quality-gates/projects/$PROJECT_ID/build-status" \
+  -H "Authorization: Bearer $TOKEN" | jq -r '.status')
+
+if [ "$STATUS" != "passing" ]; then
+  echo "Quality gate failed!"
+  exit 1
+fi
+```
+
+**Status Codes**:
+- `200` OK - Success
+- `404` Not Found - Project not found
+
+**Added**: January 2026 (Phase 5.5c)
+
+---
+
+### GET /quality-gates/projects/{project_id}/badge.svg
+
+Get SVG badge for build status (suitable for README files).
+
+**Authentication**: None (public)
+
+**Path Parameters**:
+- `project_id` (UUID) - Project ID
+
+**Response**: SVG image
+
+**Badge States**:
+- ![passing](https://img.shields.io/badge/security-passing-brightgreen) - All checks pass
+- ![failing](https://img.shields.io/badge/security-failing-red) - Violations detected
+- ![pending](https://img.shields.io/badge/security-pending-lightgrey) - No scans yet
+
+**Usage in README**:
+```markdown
+[![Security](https://api.blocksecops.com/api/v1/quality-gates/projects/YOUR_PROJECT_ID/badge.svg)](https://app.blocksecops.com/projects/YOUR_PROJECT_ID)
+```
+
+**Added**: January 2026 (Phase 5.5c)
+
+---
+
+### GET /quality-gates/projects/{project_id}/history
+
+Get quality gate evaluation history for a project.
+
+**Authentication**: Required (Bearer token)
+
+**Path Parameters**:
+- `project_id` (UUID) - Project ID
+
+**Query Parameters**:
+- `limit` (int, default=50, max=100) - Number of results
+
+**Response** (200 OK):
+```json
+[
+  {
+    "quality_gate_id": "uuid",
+    "scan_id": "uuid",
+    "project_id": "uuid",
+    "passed": true,
+    "status": "passing",
+    "critical_count": 0,
+    "high_count": 0,
+    "medium_count": 3,
+    "low_count": 8,
+    "violations": [],
+    "triggered_by": "ci",
+    "ci_context": {"branch": "main", "commit": "abc123"},
+    "evaluated_at": "2026-01-12T10:30:00Z"
+  }
+]
+```
+
+**Status Codes**:
+- `200` OK - Success
+- `401` Unauthorized - Invalid or missing token
+- `403` Forbidden - Not project owner
+- `404` Not Found - Project not found
+
+**Added**: January 2026 (Phase 5.5c)
+
+---
+
 ## Support
 
 For API issues:

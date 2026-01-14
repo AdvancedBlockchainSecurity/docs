@@ -1,8 +1,8 @@
 # Pricing Page Tests
 
 **Priority**: P2 - Medium
-**Last Updated**: January 3, 2026
-**Related**: Phase 3.1b Frontend, Migration 024
+**Last Updated**: January 11, 2026
+**Related**: Phase 3.1b Frontend, Migration 024, Migration 030
 
 ---
 
@@ -18,27 +18,32 @@
 - [ ] "Free" label displayed
 - [ ] Price shown ($0/month)
 - [ ] Feature list:
-  - [ ] 10 scans/month
-  - [ ] 25 files per scan
+  - [ ] 3 scans/month
+  - [ ] 5 files per scan
+  - [ ] 5,000 LoC per scan
   - [ ] 1 MB file limit (5 MB archives)
   - [ ] 3 projects
-  - [ ] Basic scanners
+  - [ ] All scanners (basic mode)
   - [ ] Community support
   - [ ] No API access
+  - [ ] No export (dashboard view only)
+  - [ ] 7-day retention
   - [ ] 1 user (solo)
 - [ ] "Current Plan" indicator (if user is Free)
 - [ ] "Get Started" button (if not logged in)
 
 ### 1.3 Developer Tier Card
 - [ ] "Developer" label displayed with green styling
-- [ ] Price shown ($199/month)
+- [ ] Price shown ($189/month)
 - [ ] Feature list:
   - [ ] 100 scans/month
-  - [ ] 50 files per scan
+  - [ ] Unlimited files per scan
+  - [ ] Unlimited LoC per scan
   - [ ] 5 MB file limit (25 MB archives)
   - [ ] 5 projects
   - [ ] All 17+ scanners
   - [ ] 1,000 API calls/month
+  - [ ] Export enabled (PDF, JSON, SARIF)
   - [ ] 90-day retention
   - [ ] 1 user (solo)
 - [ ] "Upgrade to Developer" button (if user is Free)
@@ -47,15 +52,17 @@
 ### 1.4 Startup Tier Card
 - [ ] "Startup" label displayed with blue styling
 - [ ] "Popular" badge shown
-- [ ] Price shown ($999/month)
+- [ ] Price shown ($489/month)
 - [ ] Feature list:
   - [ ] 500 scans/month
-  - [ ] 100 files per scan
+  - [ ] Unlimited files per scan
+  - [ ] Unlimited LoC per scan
   - [ ] 10 MB file limit (50 MB archives)
   - [ ] 20 projects
   - [ ] All scanners
   - [ ] 10,000 API calls/month
   - [ ] Webhooks enabled
+  - [ ] CI/CD integration
   - [ ] Up to 10 team members
   - [ ] 180-day retention
 - [ ] "Upgrade to Startup" button (if user is Free/Developer)
@@ -63,7 +70,7 @@
 
 ### 1.5 Professional Tier Card
 - [ ] "Professional" label displayed with indigo styling
-- [ ] Price shown ($2,499/month)
+- [ ] Price shown ($1,956/month)
 - [ ] Feature list:
   - [ ] Unlimited scans
   - [ ] Unlimited files per scan
@@ -125,12 +132,13 @@
 
 ### 3.2 Limit Comparison
 Features to verify in matrix:
-- [ ] Monthly Scans: 10 / 100 / 500 / Unlimited / Unlimited / Pay per scan
+- [ ] Monthly Scans: 3 / 100 / 500 / Unlimited / Unlimited / Pay per scan
 - [ ] Team Members: 1 / 1 / 10 / 25 / Unlimited / 1
 - [ ] Projects: 3 / 5 / 20 / Unlimited / Unlimited / 5
 - [ ] API Calls/Month: None / 1,000 / 10,000 / Unlimited / Unlimited / 1,000
-- [ ] Files/Scan: 25 / 50 / 100 / Unlimited / Unlimited / 50
-- [ ] Result Retention: 30 days / 90 days / 180 days / 365 days / 730 days / 90 days
+- [ ] Files/Scan: 5 / Unlimited / Unlimited / Unlimited / Unlimited / Per tier
+- [ ] LoC/Scan: 5,000 / Unlimited / Unlimited / Unlimited / Unlimited / Per tier
+- [ ] Result Retention: 7 days / 90 days / 180 days / 365 days / 730 days / 90 days
 - [ ] All Scanners: Basic / Yes / Yes / Yes / Yes / Yes
 - [ ] API Access: No / Yes / Yes / Yes / Yes / Yes
 - [ ] Webhooks: No / No / Yes / Yes / Yes / Yes
@@ -175,9 +183,10 @@ Features to verify in matrix:
 - [ ] "Buy Credits with USDC" button present
 
 ### 5.2 Pricing Tiers Display
-- [ ] Small tier shown ($1.00 for 1-10 files)
-- [ ] Medium tier shown ($3.00 for 11-50 files)
-- [ ] Large tier shown ($5.00 for 51-100 files)
+- [ ] Micro tier shown ($3.00 for 1-5 files, 4K LoC max)
+- [ ] Small tier shown ($7.00 for 6-25 files, 20K LoC max)
+- [ ] Medium tier shown ($15.00 for 26-100 files, 75K LoC max)
+- [ ] Large tier shown ($25.00 for 100+ files, Unlimited LoC)
 
 ### 5.3 Navigation
 - [ ] "Buy Credits with USDC" button navigates to /credits

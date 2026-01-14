@@ -1,7 +1,7 @@
 # x402 Pay-Per-Scan Tests (Phase 3.4)
 
 **Priority**: P1 - High
-**Last Tested**: 2025-12-03
+**Last Tested**: January 11, 2026
 **Feature**: USDC Micropayments on Base Blockchain
 **Automated Tests**: 59 tests (30 unit + 29 integration)
 
@@ -54,11 +54,11 @@
 - [ ] Invalid scan_id returns 404
 - [ ] Creates credit transaction record
 
-### 2.2 Complexity-Based Pricing
-- [ ] Simple scan (1-5 files): 0.5 credits deducted
-- [ ] Standard scan (6-25 files): 1.0 credits deducted
-- [ ] Complex scan (26-100 files): 2.0 credits deducted
-- [ ] Large scan (100+ files): 5.0 credits deducted
+### 2.2 Complexity-Based Pricing (per tier-standards.md)
+- [ ] Micro scan (1-5 files, 4K LoC max): $3.00 USDC
+- [ ] Small scan (6-25 files, 20K LoC max): $7.00 USDC
+- [ ] Medium scan (26-100 files, 75K LoC max): $15.00 USDC
+- [ ] Large scan (100+ files, Unlimited LoC): $25.00 USDC
 
 ---
 
@@ -78,12 +78,12 @@
 - [ ] `GET /api/v1/payments/prices` returns pricing tiers
 - [ ] No authentication required (public endpoint)
 - [ ] Returns all complexity tiers
-- [ ] Each tier has `complexity`, `file_range`, `price_usd`
-- [ ] Prices match specification:
-  - Simple: 1-5 files, $0.50
-  - Standard: 6-25 files, $1.00
-  - Complex: 26-100 files, $2.00
-  - Large: 100+ files, $5.00
+- [ ] Each tier has `complexity`, `file_range`, `loc_limit`, `price_usdc`
+- [ ] Prices match tier-standards.md:
+  - Micro: 1-5 files, 4,000 LoC, $3.00 USDC
+  - Small: 6-25 files, 20,000 LoC, $7.00 USDC
+  - Medium: 26-100 files, 75,000 LoC, $15.00 USDC
+  - Large: 100+ files, Unlimited LoC, $25.00 USDC
 
 ---
 

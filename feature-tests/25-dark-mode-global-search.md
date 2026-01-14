@@ -1,10 +1,10 @@
 # Feature Test: Dark Mode & Global Search
 
 **Feature ID**: 25
-**Version**: 1.2.0
+**Version**: 1.3.1
 **Added**: v0.14.0 (Dashboard), v0.6.0 (API)
-**Updated**: v0.17.0 (Dashboard) - Intelligence Layer & Scanner modal dark mode
-**Last Updated**: 2025-12-27
+**Updated**: v0.29.0 (Dashboard) - Advanced Search rename, Contracts page search, Contract links, Filter layout fix
+**Last Updated**: 2026-01-13
 
 ---
 
@@ -365,6 +365,144 @@ curl -s "http://127.0.0.1:3000/api/v1/search/quick?q=transfer&limit=5" \
 | 2 | Verify modal background | Dark gray | [ ] |
 | 3 | Verify toggle switches | Visible on dark | [ ] |
 | 4 | Verify section labels | Light text, readable | [ ] |
+
+---
+
+## Test 9: Advanced Search (Renamed from /search) (v0.29.0)
+
+**Purpose**: Verify the search page rename from `/search` to `/advanced-search`.
+
+### 9.1 URL and Navigation
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Navigate to `/advanced-search` | Advanced Search page loads | [ ] |
+| 2 | Check sidebar | "Advanced Search" item under Contracts | [ ] |
+| 3 | Click "Advanced Search" in sidebar | Navigates to `/advanced-search` | [ ] |
+| 4 | Navigate to old `/search` URL | Should 404 (no redirect) | [ ] |
+
+### 9.2 Saved Searches Integration
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Execute a saved search | Navigates to `/advanced-search?...` | [ ] |
+| 2 | Verify URL parameters | Query params preserved | [ ] |
+| 3 | Verify results display | Results load correctly | [ ] |
+
+---
+
+## Test 10: Contracts Page Search (v0.29.0)
+
+**Purpose**: Verify the new client-side search functionality on the Contracts page.
+
+### 10.1 Search Input
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Navigate to `/contracts` | Contracts page loads | [ ] |
+| 2 | Verify search input presence | Input visible below header | [ ] |
+| 3 | Verify placeholder text | "Search contracts by name or address..." | [ ] |
+| 4 | Verify search icon | Magnifying glass icon on left | [ ] |
+
+### 10.2 Search by Name
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Type contract name (e.g., "Token") | Results filter immediately | [ ] |
+| 2 | Verify case-insensitive | "token" matches "Token" | [ ] |
+| 3 | Verify partial match | "Tok" matches "TokenContract" | [ ] |
+| 4 | Type non-existent name | Table shows empty state | [ ] |
+
+### 10.3 Search by Address
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Type contract address | Results filter immediately | [ ] |
+| 2 | Type partial address | Matches contracts with that substring | [ ] |
+| 3 | Case insensitive | "0xABC" matches "0xabc" | [ ] |
+
+### 10.4 Clear and Reset
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Type search query | Results filter | [ ] |
+| 2 | Click X clear button | Query cleared, all contracts shown | [ ] |
+| 3 | Verify clear button visibility | Only visible when query present | [ ] |
+
+### 10.5 Select All with Filtered Results
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Type search query | Results filter | [ ] |
+| 2 | Click "Select All" checkbox | Only filtered contracts selected | [ ] |
+| 3 | Clear search | Selection count matches filtered count | [ ] |
+
+---
+
+## Test 11: Contract Links in Advanced Search (v0.29.0)
+
+**Purpose**: Verify contract results in Advanced Search are clickable and navigate correctly.
+
+### 11.1 Contract Result Click
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Navigate to `/advanced-search` | Page loads | [ ] |
+| 2 | Search for contracts | Contract results appear | [ ] |
+| 3 | Hover over contract result | Cursor changes to pointer, bg highlights | [ ] |
+| 4 | Click on contract result | Navigates to `/contracts/{id}` | [ ] |
+
+### 11.2 Visual Indicators
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | View contract results | Arrow (chevron-right) icon visible | [ ] |
+| 2 | Hover over result | Background changes to gray-50 | [ ] |
+
+### 11.3 Dark Mode Compatibility
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Enable dark mode | Theme switches | [ ] |
+| 2 | Search for contracts | Results visible with proper contrast | [ ] |
+| 3 | Hover over result | Hover state visible on dark background | [ ] |
+| 4 | Click result | Navigation works correctly | [ ] |
+
+---
+
+## Test 12: Advanced Search Filter Layout (v0.29.0)
+
+**Purpose**: Verify filter chips in Advanced Search don't overflow the content area.
+
+### 12.1 Filter Wrapping
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Navigate to `/advanced-search` | Page loads | [ ] |
+| 2 | Observe filter chips section | Filters organized in rows by type | [ ] |
+| 3 | Verify Severity row | "Severity:" label, 4 chips wrap properly | [ ] |
+| 4 | Verify Scanner row | "Scanners:" label, chips wrap to multiple lines | [ ] |
+| 5 | Verify Category row | "Categories:" label, chips wrap properly | [ ] |
+| 6 | Resize window narrower | Chips reflow without overflow | [ ] |
+
+### 12.2 No Overflow Behind Sidebar
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Open Advanced Search with many filters | All filters visible | [ ] |
+| 2 | Verify no horizontal scroll | Content stays within container | [ ] |
+| 3 | Verify Saved Searches section | Filters don't overlap or hide behind it | [ ] |
+| 4 | Toggle several filter chips | Active states visible, no layout shift | [ ] |
+
+### 12.3 Dark Mode Filter Layout
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Enable dark mode | Theme switches | [ ] |
+| 2 | Navigate to `/advanced-search` | Page loads | [ ] |
+| 3 | Verify filter section labels | Labels readable (text-gray-500 in dark) | [ ] |
+| 4 | Verify active/inactive chips | Proper contrast in dark mode | [ ] |
+| 5 | Verify confidence slider | Visible and functional | [ ] |
 
 ---
 

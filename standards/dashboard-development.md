@@ -1,9 +1,11 @@
 # Dashboard Development Standards
 
-**Version:** 2.4.0
-**Last Updated:** December 30, 2025
+**Version:** 2.5.0
+**Last Updated:** January 13, 2026
 **Status:** Active
 
+> **Major Update (v2.5.0):** Security headers (CSP, X-Frame-Options, etc.) are now delivered via Traefik middleware, NOT HTML meta tags. See [Security Headers via Traefik Middleware](#security-headers-via-traefik-middleware-v250).
+>
 > **Major Update (v2.4.0):** Dashboard builds use production mode with `serve -s dist`. Environment variables are baked in at build time via Docker build args. See [Frontend Build-Time Environment Variables](./frontend-build-env.md).
 >
 > **Major Update (v2.3.0):** All traffic MUST go through Traefik ingress controller. Port-forward to Traefik, NOT directly to services. This ensures API routing works correctly.
@@ -40,6 +42,7 @@ This ensures we catch production issues during local development, not after depl
 | Port-forward directly to API on separate port | Doesn't test production routing paths | Access API through Traefik at `localhost:3000/api/v1/*` |
 | Direct API calls from localhost | Bypasses Traefik routing, doesn't test ingress paths | Access API through Traefik at `localhost:3000/api/v1/*` |
 | Building dashboard outside cluster | Images must be built in Minikube Docker context | Use `eval $(minikube docker-env)` before `docker build` |
+| CSP via HTML meta tags | `frame-ancestors` ignored, hardcoded URLs, less secure | Use Traefik middleware for HTTP headers |
 
 **The dashboard is NEVER started locally. It ALWAYS runs inside the Kubernetes cluster with a PRODUCTION BUILD.**
 
@@ -523,6 +526,79 @@ The Dockerfile **validates** that required build args are provided and will fail
 - Security classification (public vs private variables)
 - `.env.local` vs `.env.example` patterns
 - CI/CD integration
+
+## Security Headers via Traefik Middleware (v2.5.0)
+
+**Added:** January 13, 2026
+
+Security headers (CSP, X-Frame-Options, etc.) are delivered via **Traefik middleware**, NOT HTML meta tags.
+
+### Why HTTP Headers, Not Meta Tags?
+
+| Aspect | Meta Tags | HTTP Headers (Traefik) |
+|--------|-----------|------------------------|
+| `frame-ancestors` directive | **Ignored** by browsers | Fully supported |
+| Hardcoded URLs | Must rebuild to change | Update middleware only |
+| Security | Can be bypassed by injected HTML | Server-enforced |
+| Environment flexibility | Baked into image | Per-environment config |
+| Industry standard | Development only | Production standard |
+
+### Implementation
+
+Security headers are configured in `k8s/overlays/local/middleware-security-headers.yaml`:
+
+```yaml
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: security-headers
+  namespace: dashboard-local
+spec:
+  headers:
+    contentSecurityPolicy: "default-src 'self'; connect-src 'self' https://*.supabase.co ..."
+    frameDeny: true
+    contentTypeNosniff: true
+    browserXssFilter: true
+    referrerPolicy: "strict-origin-when-cross-origin"
+```
+
+The middleware is referenced in `ingressroute.yaml`:
+
+```yaml
+middlewares:
+  - name: security-headers
+    namespace: dashboard-local
+```
+
+### Updating CSP for New Domains
+
+When adding new external services (wallets, APIs, etc.), update the `contentSecurityPolicy` in the middleware:
+
+```bash
+# Edit the middleware
+vim k8s/overlays/local/middleware-security-headers.yaml
+
+# Apply changes (no rebuild needed!)
+kubectl apply -k k8s/overlays/local/
+```
+
+### Per-Environment CSP
+
+Each environment overlay has its own middleware with appropriate CSP:
+- `overlays/local/middleware-security-headers.yaml` - Local development URLs
+- `overlays/staging/middleware-security-headers.yaml` - Staging URLs
+- `overlays/production/middleware-security-headers.yaml` - Production URLs
+
+### Verifying Headers
+
+```bash
+# Check response headers
+curl -I http://127.0.0.1:3000 2>&1 | grep -i "content-security-policy\|x-frame-options"
+
+# Expected output:
+# Content-Security-Policy: default-src 'self'; ...
+# X-Frame-Options: DENY
+```
 
 ## Dashboard Development Checklist
 

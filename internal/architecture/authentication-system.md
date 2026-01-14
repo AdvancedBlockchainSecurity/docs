@@ -576,8 +576,11 @@ async def create_scan(
 ```bash
 # Supabase Configuration
 SUPABASE_URL=https://[project-ref].supabase.co
-SUPABASE_SERVICE_KEY=<service-role-key>
-SUPABASE_ANON_KEY=<anon-key>
+SUPABASE_SERVICE_KEY=<service-role-key>    # REQUIRED for wallet auth (Admin API)
+SUPABASE_ANON_KEY=<anon-key>               # Frontend public key
+
+# WalletConnect (Dashboard only)
+VITE_WALLETCONNECT_PROJECT_ID=<project-id> # Get from cloud.walletconnect.com
 
 # Database
 DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgresql:5432/solidity_security
@@ -586,17 +589,66 @@ DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgresql:5432/solidity_sec
 FRONTEND_URL=https://app.blocksecops.com
 ```
 
-### Kubernetes Secrets
+**Important**: `SUPABASE_SERVICE_KEY` is required for wallet authentication to work. Without it, the backend cannot create Supabase users/sessions for wallet-authenticated users.
+
+### Kubernetes Configuration (Local Development)
+
+The API service loads Supabase configuration from a ConfigMap:
+
+**File**: `blocksecops-api-service/k8s/overlays/local/configmap-patch.yaml`
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-service-config
+data:
+  SUPABASE_URL: "https://[project-ref].supabase.co"
+  SUPABASE_ANON_KEY: "<anon-key>"
+  SUPABASE_SERVICE_KEY: "<service-role-key>"  # Required for wallet auth
+```
+
+**File**: `blocksecops-api-service/k8s/overlays/local/deployment-patch.yaml`
+```yaml
+env:
+  - name: SUPABASE_URL
+    valueFrom:
+      configMapKeyRef:
+        name: api-service-config
+        key: SUPABASE_URL
+  - name: SUPABASE_ANON_KEY
+    valueFrom:
+      configMapKeyRef:
+        name: api-service-config
+        key: SUPABASE_ANON_KEY
+  - name: SUPABASE_SERVICE_KEY
+    valueFrom:
+      configMapKeyRef:
+        name: api-service-config
+        key: SUPABASE_SERVICE_KEY
+```
+
+### Kubernetes Secrets (Production)
+
+For production, use Kubernetes Secrets instead of ConfigMaps for sensitive values:
 
 ```yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: auth-secrets
+  name: supabase-secrets
 type: Opaque
 stringData:
-  supabase-service-key: <base64-encoded-key>
-  database-url: <base64-encoded-url>
+  SUPABASE_SERVICE_KEY: <service-role-key>
+```
+
+Then reference in deployment:
+```yaml
+env:
+  - name: SUPABASE_SERVICE_KEY
+    valueFrom:
+      secretKeyRef:
+        name: supabase-secrets
+        key: SUPABASE_SERVICE_KEY
 ```
 
 ## Web3 Wallet Authentication
@@ -701,5 +753,5 @@ stringData:
 
 ---
 
-**Last Updated**: January 10, 2026
+**Last Updated**: January 11, 2026
 **Status**: Production

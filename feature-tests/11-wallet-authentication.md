@@ -7,6 +7,33 @@
 
 ---
 
+## Prerequisites
+
+Before testing wallet authentication, ensure the following are configured:
+
+### Backend (API Service)
+- [ ] `SUPABASE_URL` configured in Kubernetes ConfigMap
+- [ ] `SUPABASE_ANON_KEY` configured in Kubernetes ConfigMap
+- [ ] `SUPABASE_SERVICE_KEY` configured in Kubernetes ConfigMap (**required for wallet auth**)
+- [ ] API service restarted after config changes
+
+**Verify with:**
+```bash
+kubectl exec -n api-service-local deployment/api-service -- printenv | grep SUPABASE
+# Should show all three: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_KEY
+```
+
+### Frontend (Dashboard)
+- [ ] `VITE_WALLETCONNECT_PROJECT_ID` set (get from https://cloud.walletconnect.com)
+- [ ] Dashboard rebuilt with the project ID
+- [ ] Buffer polyfill working (no "Buffer is not defined" errors)
+
+**Verify with:**
+- No console errors related to WalletConnect
+- "Connect Wallet" modal shows MetaMask and WalletConnect options
+
+---
+
 ## 1. Backend API Tests
 
 ### 1.1 Nonce Generation
@@ -247,6 +274,32 @@
 - [ ] `solana_wallet_linked_at` column added
 - [ ] Unique constraint on solana_wallet_address works
 - [ ] Index on solana_wallet_address created
+
+---
+
+## 13. Supabase Integration Verification
+
+### 13.1 Backend Creates Supabase User
+- [ ] New wallet authentication creates user in Supabase Auth
+- [ ] User metadata includes `wallet_type` and `wallet_address`
+- [ ] User email follows pattern: `{address}@{wallet_type}.wallet.blocksecops.io`
+
+### 13.2 Session Token Validation
+- [ ] Returned `access_token` is valid Supabase JWT
+- [ ] Token can be used with `/api/v1/users/me` endpoint
+- [ ] Token works with all protected API endpoints
+- [ ] `refresh_token` works for session refresh
+
+### 13.3 Frontend Session Management
+- [ ] `supabase.auth.setSession()` called with tokens from backend
+- [ ] Session stored in localStorage as `sb-{project-ref}-auth-token`
+- [ ] Supabase client auto-refreshes token before expiry
+- [ ] Logout clears both wallet connection and Supabase session
+
+### 13.4 Error Scenarios
+- [ ] Missing `SUPABASE_SERVICE_KEY` returns clear error (not 500)
+- [ ] Invalid Supabase credentials handled gracefully
+- [ ] Duplicate wallet address across users rejected
 
 ---
 

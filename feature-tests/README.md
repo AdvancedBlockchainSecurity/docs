@@ -54,6 +54,53 @@ Manual testing checklists for all user-facing features.
 | [36-cicd-integration.md](./36-cicd-integration.md) | GitHub Actions, GitLab CI, Jenkins, Azure Pipelines integration |
 | [37-stripe-billing.md](./37-stripe-billing.md) | Stripe subscriptions, invoices, receipts (Phase 8a) |
 | [38-cursor-pagination.md](./38-cursor-pagination.md) | Cursor-based pagination, keyset queries |
+| [39-economic-security-analysis.md](./39-economic-security-analysis.md) | Economic security panel, flash loan/MEV/DeFi detection, AI explanations (Phase 5.5a) |
+| [40-quality-gates.md](./40-quality-gates.md) | CI/CD Quality Gates, blocking rules, thresholds, badges, evaluation history (Phase 5.5c) |
+
+---
+
+## Phase 5.5a Economic Security Analysis (January 2026)
+
+Economic security analysis for detecting flash loan attacks, MEV exploitation, and DeFi protocol risks:
+
+| Feature | Status | Tests |
+|---------|--------|-------|
+| Economic Summary API | Implemented | GET /scans/{id}/economic-analysis |
+| Flash Loan Detection | Implemented | BVD-SOLIDITY-FLASH-* patterns |
+| MEV Detection | Implemented | BVD-SOLIDITY-MEV-* patterns |
+| DeFi Risk Detection | Implemented | BVD-SOLIDITY-DEFI-* patterns |
+| AI Explanations | Implemented | Tier-gated quota system |
+| Economic Risk Scoring | Implemented | Weighted calculation with multipliers |
+| Dashboard Panel | Implemented | Economic Security panel in scan details |
+
+**AI Explanation Quotas**:
+- Free: 0 (not available)
+- Developer: 10/month
+- Startup: 100/month
+- Professional: 500/month
+- Enterprise: Unlimited
+
+---
+
+## Phase 5.5c CI/CD Quality Gates (January 2026)
+
+Quality Gates for CI/CD pipeline integration with configurable blocking rules:
+
+| Feature | Status | Tests |
+|---------|--------|-------|
+| Quality Gate Configuration | Implemented | GET/PUT /quality-gates/projects/{id} |
+| Scan Evaluation | Implemented | POST /quality-gates/projects/{id}/evaluate |
+| Build Status | Implemented | GET /quality-gates/projects/{id}/build-status |
+| SVG Badge | Implemented | GET /quality-gates/projects/{id}/badge.svg |
+| Evaluation History | Implemented | GET /quality-gates/projects/{id}/history |
+| Dashboard Integration | Implemented | QualityGatePanel in ProjectDetail |
+| Tier Gate | Implemented | Developer tier minimum |
+
+**Dashboard Updates (v0.29.0)**:
+- QualityGatePanel integrated into ProjectDetail page
+- Contracts page search (filter by name/address)
+- Advanced Search renamed from /search to /advanced-search
+- Clickable contract links in Advanced Search results
 
 ---
 
@@ -155,6 +202,10 @@ The risk scoring system was redesigned to be unbounded (higher = riskier):
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-01-13 | Claude Code | 25-dark-mode-global-search.md | FIX - Advanced Search filter overflow fixed, added Test 12 for filter layout (v0.29.0 Dashboard)
+2026-01-12 | Claude Code | 40-quality-gates.md | IMPLEMENTED - Quality Gates, ProjectDetail integration, contracts search, advanced-search rename (v0.10.2 API, v0.29.0 Dashboard)
+2026-01-12 | Claude Code | 25-dark-mode-global-search.md | UPDATED - Added Test 9-11 for advanced search, contracts search, contract links (v0.29.0 Dashboard)
+2026-01-12 | Claude Code | 39-economic-security-analysis.md | IMPLEMENTED - Economic panel, flash loan/MEV/DeFi detection, AI explanations (v0.10.0 API, v0.28.0 Dashboard)
 2026-01-10 | Claude Code | 38-cursor-pagination.md | VERIFIED - Migration 029 applied, indexes used in queries, cursor encode/decode working
 2026-01-04 | Claude Code | 36-cicd-integration.md | IMPLEMENTED - GitHub Actions, GitLab CI, Jenkins, Azure Pipelines integration tests
 2026-01-04 | Claude Code | 35-cli-tool.md | IMPLEMENTED - blocksecops-cli v0.1.0, auth/scan commands, 4 output formats, pre-commit hooks

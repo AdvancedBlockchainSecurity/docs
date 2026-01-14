@@ -1,7 +1,7 @@
 # BlockSecOps Changelogs
 
 **Purpose:** Centralized changelog directory for all BlockSecOps platform changes
-**Last Updated:** December 26, 2025
+**Last Updated:** January 13, 2026
 **Status:** Active
 
 ---
@@ -17,6 +17,24 @@ Changelogs are organized by component and maintained chronologically. Each chang
 ---
 
 ## Available Changelogs
+
+### 0. Dashboard v0.29.0 UI Updates (`DASHBOARD-V0.29.0-UI-UPDATES-2026-01-13.md`)
+
+**Component:** blocksecops-dashboard
+**Scope:** Quality Gates integration, search improvements, filter layout fix
+**Date:** January 13, 2026
+
+**Key Changes:**
+- QualityGatePanel integrated into ProjectDetail page
+- Contracts page search (filter by name/address)
+- `/search` renamed to `/advanced-search`
+- Contract links in Advanced Search results
+- Fixed filter overflow in Advanced Search page
+
+**Use When:**
+- Understanding v0.29.0 dashboard changes
+- Debugging Advanced Search filter layout
+- Understanding Quality Gates UI integration
 
 ### 0. API Endpoints Changelog (`API-ENDPOINTS-CHANGELOG.md`)
 

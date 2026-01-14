@@ -1,20 +1,23 @@
 # Quota System Tests
 
 **Priority**: P0 - Critical
-**Last Updated**: January 3, 2026
-**Related**: Phase 3.1a Freemium Auth, Migration 024
+**Last Updated**: January 11, 2026
+**Related**: Phase 3.1a Freemium Auth, Migration 024, Migration 030
+**Source of Truth**: `/docs/standards/tier-standards.md`
 
 ---
 
-## Tier Reference (Updated January 2026)
+## Tier Reference (Updated January 11, 2026)
 
-| Tier | Scans/Mo | Files/Scan | Projects | Single File | Archive | API Calls | Team |
-|------|----------|------------|----------|-------------|---------|-----------|------|
-| Free | 10 | 25 | 3 | 1 MB | 5 MB | 0 | 1 |
-| Developer | 100 | 50 | 5 | 5 MB | 25 MB | 1,000 | 1 |
-| Startup | 500 | 100 | 20 | 10 MB | 50 MB | 10,000 | 10 |
-| Professional | Unlimited | Unlimited | Unlimited | 10 MB | 50 MB | Unlimited | 25 |
-| Enterprise | Unlimited | Unlimited | Unlimited | 20 MB | 100 MB | Unlimited | Unlimited |
+| Tier | Scans/Mo | Files/Scan | LoC/Scan | Projects | Single File | Archive | API Calls | Team |
+|------|----------|------------|----------|----------|-------------|---------|-----------|------|
+| Free | 3 | 5 | 5,000 | 3 | 1 MB | 5 MB | 0 | 1 |
+| Developer | 100 | Unlimited | Unlimited | 5 | 5 MB | 25 MB | 1,000 | 1 |
+| Startup | 500 | Unlimited | Unlimited | 20 | 10 MB | 50 MB | 10,000 | 10 |
+| Professional | Unlimited | Unlimited | Unlimited | Unlimited | 10 MB | 50 MB | Unlimited | 25 |
+| Enterprise | Unlimited | Unlimited | Unlimited | Unlimited | 20 MB | 100 MB | Unlimited | Unlimited |
+
+**Note:** Values updated per Migration 030 and tier-standards.md. Free tier now enforces stricter limits.
 
 ---
 
@@ -22,26 +25,29 @@
 
 ### 1.1 Free Tier Display
 - [ ] QuotaWidget shows "Free" tier label
-- [ ] Shows scans used / 10 max
-- [ ] Shows files-per-scan limit (25)
+- [ ] Shows scans used / 3 max
+- [ ] Shows files-per-scan limit (5)
+- [ ] Shows LoC-per-scan limit (5,000)
 - [ ] Shows projects used / 3 max
 - [ ] Shows "No API access" for API calls
+- [ ] Shows "Export disabled" indicator
 - [ ] Shows upgrade prompt
 - [ ] Progress bar reflects usage
 
 ### 1.2 Developer Tier Display
 - [ ] QuotaWidget shows "Developer" tier label
 - [ ] Shows scans used / 100 max
-- [ ] Shows files-per-scan limit (50)
+- [ ] Shows unlimited files-per-scan
 - [ ] Shows projects used / 5 max
 - [ ] Shows API calls used / 1,000 max
 - [ ] Shows "Solo developer" for team (1 user)
+- [ ] Shows export enabled
 - [ ] Progress bar reflects usage
 
 ### 1.3 Startup Tier Display
 - [ ] QuotaWidget shows "Startup" tier label
 - [ ] Shows scans used / 500 max
-- [ ] Shows files-per-scan limit (100)
+- [ ] Shows unlimited files-per-scan
 - [ ] Shows projects used / 20 max
 - [ ] Shows API calls used / 10,000 max
 - [ ] Shows team members used / 10 max
@@ -66,11 +72,11 @@
 
 ## 2. Scan Quota Enforcement
 
-### 2.1 Free Tier (10 scans/month)
-- [ ] First 10 scans succeed
-- [ ] 11th scan blocked with 402 error
+### 2.1 Free Tier (3 scans/month)
+- [ ] First 3 scans succeed
+- [ ] 4th scan blocked with 402 error
 - [ ] Error message mentions quota exceeded
-- [ ] Upgrade URL provided in error response
+- [ ] Upgrade URL provided in error response (/pricing)
 - [ ] UI shows quota exhausted state
 
 ### 2.2 Developer Tier (100 scans/month)
@@ -99,28 +105,34 @@
 
 ## 3. Files-Per-Scan Limits
 
-### 3.1 Free Tier (25 files max)
-- [ ] Archive with 25 files uploads successfully
-- [ ] Archive with 26+ files shows 402 error
+### 3.1 Free Tier (5 files max)
+- [ ] Archive with 5 files uploads successfully
+- [ ] Archive with 6+ files shows 402 error
 - [ ] Error shows file count and limit
 - [ ] Upgrade message shown
 
-### 3.2 Developer Tier (50 files max)
-- [ ] Archive with 50 files uploads successfully
-- [ ] Archive with 51+ files shows error
-
-### 3.3 Startup Tier (100 files max)
-- [ ] Archive with 100 files uploads successfully
-- [ ] Archive with 101+ files shows error
-
-### 3.4 Professional/Enterprise Tier (Unlimited)
+### 3.2 Developer/Startup/Professional/Enterprise Tier (Unlimited)
 - [ ] Large archive uploads successfully
 - [ ] No file count limit applied
+- [ ] max_files_per_scan = -1 in database
 
-### 3.5 Smart Dependency Extraction
-- [ ] OpenZeppelin project (200+ files) extracts to <25 files
-- [ ] Free tier can upload OpenZeppelin projects
+### 3.3 Smart Dependency Extraction
+- [ ] OpenZeppelin project (200+ files) extracts to <5 files for Free tier
+- [ ] Smart extraction respects tier limits
 - [ ] Only imported files count toward limit
+
+## 3b. Lines-of-Code Per Scan Limits (NEW)
+
+### 3b.1 Free Tier (5,000 LoC max)
+- [ ] Code under 5,000 LoC uploads successfully
+- [ ] Code over 5,000 LoC shows 402 error
+- [ ] Error shows total LoC and limit
+- [ ] Upgrade message suggests Developer tier
+
+### 3b.2 Developer/Startup/Professional/Enterprise (Unlimited)
+- [ ] Large codebases upload successfully
+- [ ] No LoC limit applied
+- [ ] max_loc_per_scan = -1 in database
 
 ---
 
@@ -152,13 +164,27 @@
 
 ---
 
-## 5. Monthly Quota Reset
+## 5. Monthly/Annual Quota Reset
 
+### 5.1 Monthly Subscribers
 - [ ] Quota resets on first of month
 - [ ] monthly_scans_used resets to 0
 - [ ] monthly_api_calls_used resets to 0
+- [ ] quota_reset_at updated to next month
 - [ ] User can scan again after reset
 - [ ] Reset logged/tracked correctly
+
+### 5.2 Annual Subscribers
+- [ ] Quota resets on subscription renewal date
+- [ ] quota_reset_at aligns with subscription.current_period_end
+- [ ] Counters reset on annual billing period
+- [ ] Annual subscribers get monthly quotas renewed annually
+
+### 5.3 Background Reset Task
+- [ ] Scheduler runs hourly to check for resets
+- [ ] Automatic reset for users past quota_reset_at
+- [ ] Both monthly and annual intervals supported
+- [ ] Reset statistics logged (monthly_reset, annual_reset counts)
 
 ---
 
@@ -266,6 +292,34 @@
 ### 9.4 Enterprise Tier (Unlimited)
 - [ ] No seat limit
 - [ ] max_team_members = -1 in database
+
+---
+
+## 10. Export Feature Enforcement (NEW)
+
+### 10.1 Free Tier (Export Disabled)
+- [ ] Export buttons hidden or disabled
+- [ ] Export API returns 403 error
+- [ ] Error response includes upgrade URL
+- [ ] Error message: "Export feature is not available on your current tier"
+
+### 10.2 Developer/Startup/Professional/Enterprise (Export Enabled)
+- [ ] Export buttons visible and functional
+- [ ] PDF export works
+- [ ] JSON export works
+- [ ] export_enabled = true in database
+
+### 10.3 Export API Error Response (HTTP 403)
+```json
+{
+  "detail": {
+    "error": "export_not_available",
+    "message": "Export feature is not available on your current tier. Upgrade to Developer or higher to export reports.",
+    "tier": "free",
+    "upgrade_url": "/pricing"
+  }
+}
+```
 
 ---
 

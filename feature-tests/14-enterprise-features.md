@@ -1,9 +1,10 @@
 # Enterprise Features Tests (Phase 4.5)
 
 **Priority**: P1 - High
-**Last Tested**: December 23, 2025
-**Feature**: Webhooks, RBAC, SSO, API Keys, Audit Logging
+**Last Tested**: January 13, 2026
+**Feature**: Webhooks, RBAC, SSO, API Keys, Audit Logging, TierGate, UpgradeBanner
 **API Version**: 0.5.0
+**Dashboard Version**: 0.30.1
 
 ---
 
@@ -364,6 +365,47 @@
 - [ ] Loading spinner shown while user profile is being fetched (v0.13.4+)
 - [ ] No flash of upgrade prompt for enterprise users during page load (v0.13.4+)
 - [ ] `isEnhancedProfileLoaded` state prevents premature tier evaluation
+
+### 7.2.1 TierGate Preview Mode (v0.30.0)
+
+**Preview Mode Behavior:**
+- [ ] `mode="preview"` shows greyed content with overlay
+- [ ] Content is visible but not interactive
+- [ ] Purple "Upgrade to {tier}" badge displayed top-right
+- [ ] Badge links to /pricing page
+- [ ] Click on greyed content does not trigger actions
+
+**ProjectDetail Page TierGate Usage:**
+- [ ] QualityGatePanel wrapped in TierGate with `mode="preview"`
+- [ ] Free tier users see greyed QualityGatePanel
+- [ ] Developer+ users see fully functional QualityGatePanel
+- [ ] ProjectAccessPanel wrapped in TierGate with `mode="preview"`
+- [ ] Enterprise users see fully functional ProjectAccessPanel
+- [ ] Non-enterprise users see greyed ProjectAccessPanel
+
+### 7.2.2 UpgradeBanner Component (v0.30.1)
+
+**Banner Display:**
+- [ ] UpgradeBanner appears at top of dashboard (below TopBar)
+- [ ] Shows on all authenticated pages (global placement)
+- [ ] Gradient background (indigo to purple)
+- [ ] Shows sparkles icon and upgrade message
+- [ ] Shows up to 3 feature highlights (desktop only)
+- [ ] Shows price badge and "View Plans" button
+
+**Tier-Based Display:**
+- [ ] Free user sees Developer promotion
+- [ ] Developer user sees Startup promotion
+- [ ] Startup user sees Professional promotion
+- [ ] Professional user sees Enterprise promotion
+- [ ] Enterprise user: Banner NOT displayed
+
+**Dismissal Behavior:**
+- [ ] X button dismisses banner
+- [ ] Banner hidden for 7 days after dismissal
+- [ ] Dismissal stored in localStorage (`upgrade-banner-dismissed`)
+- [ ] After 7 days, banner reappears
+- [ ] Clearing localStorage makes banner reappear immediately
 
 ### 7.3 API Keys Page (`/api-keys`)
 

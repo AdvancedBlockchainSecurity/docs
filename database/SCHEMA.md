@@ -46,8 +46,9 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Batch scans:** Multi-contract batch scan operations (Phase 3.1b Sprint 3)
 - **Team collaboration:** Teams, project access control, assignments, comments (Phase 4.5)
 - **Notification channels:** Slack, Teams, Discord webhook integrations (CI/CD Integrations - January 2026)
+- **Quality gates:** CI/CD pipeline quality gate configurations and evaluation history (Phase 5.5c - January 2026)
 
-**Total Tables:** 47 (excluding alembic_version)
+**Total Tables:** 49 (excluding alembic_version)
 
 ---
 
@@ -204,18 +205,22 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 | `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique quota identifier |
 | `user_id` | UUID | NOT NULL, UNIQUE, FK → users.id ON DELETE CASCADE | Associated user |
 | `tier` | VARCHAR(20) | NOT NULL, DEFAULT 'free', INDEX | Current tier (free, developer, startup, professional, enterprise) |
-| `monthly_scan_limit` | INTEGER | NOT NULL, DEFAULT 10 | Monthly scan limit (-1 = unlimited) |
+| `monthly_scan_limit` | INTEGER | NOT NULL, DEFAULT 3 | Monthly scan limit (-1 = unlimited) |
 | `monthly_scans_used` | INTEGER | NOT NULL, DEFAULT 0 | Scans used this month |
-| `max_files_per_scan` | INTEGER | NOT NULL, DEFAULT 25 | Maximum files per scan (-1 = unlimited) |
+| `max_files_per_scan` | INTEGER | NOT NULL, DEFAULT 5 | Maximum files per scan (-1 = unlimited) |
+| `max_loc_per_scan` | INTEGER | NOT NULL, DEFAULT 5000 | Maximum lines of code per scan (-1 = unlimited) |
 | `scan_priority` | INTEGER | NOT NULL, DEFAULT 50 | Scan queue priority (5=enterprise highest, 50=free lowest) |
 | `webhooks_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Webhooks feature enabled (startup+) |
 | `api_access_enabled` | BOOLEAN | NOT NULL, DEFAULT false | API access enabled (developer+) |
-| `result_retention_days` | INTEGER | NOT NULL, DEFAULT 30 | Scan result retention period |
+| `export_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Export feature enabled (developer+) |
+| `result_retention_days` | INTEGER | NOT NULL, DEFAULT 7 | Scan result retention period |
 | `max_projects` | INTEGER | NOT NULL, DEFAULT 3 | Maximum projects (-1 = unlimited) |
 | `monthly_api_calls_limit` | INTEGER | NOT NULL, DEFAULT 0 | Monthly API call limit (0=no access, -1=unlimited) |
 | `monthly_api_calls_used` | INTEGER | NOT NULL, DEFAULT 0 | API calls used this month |
 | `max_team_members` | INTEGER | NOT NULL, DEFAULT 1 | Maximum team members (-1 = unlimited) |
-| `quota_reset_at` | TIMESTAMPTZ | NOT NULL, DEFAULT next month | Next quota reset date |
+| `monthly_ai_explanations_limit` | INTEGER | NOT NULL, DEFAULT 0 | Monthly AI explanation quota (0=none, -1=unlimited) |
+| `monthly_ai_explanations_used` | INTEGER | NOT NULL, DEFAULT 0 | AI explanations used this month |
+| `quota_reset_at` | TIMESTAMPTZ | NOT NULL, DEFAULT next month | Next quota reset date (monthly or annual) |
 | `last_scan_at` | TIMESTAMPTZ | NULLABLE | Last scan timestamp |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Quota record creation |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
@@ -227,15 +232,15 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 **Relationships:**
 - One-to-one with `users` (user_id, CASCADE DELETE)
 
-**Tier Limits (Migration 024 - January 3, 2026)**:
+**Tier Limits (Updated January 12, 2026 - Migration 031)**:
 
-| Tier | Scans/Mo | Files/Scan | Projects | API Calls/Mo | Team | Retention | Priority |
-|------|----------|------------|----------|--------------|------|-----------|----------|
-| **Free** | 10 | 25 | 3 | 0 (no API) | 1 | 30 days | 50 |
-| **Developer** | 100 | 50 | 5 | 1,000 | 1 | 90 days | 40 |
-| **Startup** | 500 | 100 | 20 | 10,000 | 10 | 180 days | 25 |
-| **Professional** | Unlimited | Unlimited | Unlimited | Unlimited | 25 | 365 days | 10 |
-| **Enterprise** | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | 730 days | 5 |
+| Tier | Scans/Mo | Files/Scan | LoC/Scan | Projects | API Calls/Mo | Team | AI Explain/Mo | Export | Retention | Priority |
+|------|----------|------------|----------|----------|--------------|------|---------------|--------|-----------|----------|
+| **Free** | 3 | 5 | 5,000 | 3 | 0 (no API) | 1 | 0 | No | 7 days | 50 |
+| **Developer** | 100 | Unlimited | Unlimited | 5 | 1,000 | 1 | 10 | Yes | 90 days | 40 |
+| **Startup** | 500 | Unlimited | Unlimited | 20 | 10,000 | 10 | 100 | Yes | 180 days | 25 |
+| **Professional** | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | 25 | 500 | Yes | 365 days | 10 |
+| **Enterprise** | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Yes | 730 days | 5 |
 
 **File Size Limits**:
 - Free: 1 MB single / 5 MB archive
@@ -246,33 +251,56 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 
 **Feature Access by Tier**:
 - API Access: developer+
+- AI Explanations: developer+ (quota-limited)
 - Webhooks: startup+
 - Team Management: startup+
 - Organizations: professional+
 - Audit Logging: professional+
-- SSO/SAML: enterprise only
+
+**AI Explanation Quotas (Phase 5.5a - January 2026)**:
+| Tier | Monthly Limit | Notes |
+|------|--------------|-------|
+| Free | 0 | Not available |
+| Developer | 10 | Reset monthly |
+| Startup | 100 | Reset monthly |
+| Professional | 500 | Reset monthly |
+| Enterprise | -1 | Unlimited |
+
+**SSO/SAML**: Enterprise tier only
 
 **Auto-Creation Trigger:**
 - Trigger function `create_user_quota()` automatically creates quota record on user insert
-- Quota limits set based on user's initial tier
-- Monthly reset handled by `quota_reset_at` timestamp
+- Quota limits set based on user's initial tier (Migration 030 values)
+- Monthly/annual reset handled by background task (`src/infrastructure/tasks/quota_reset.py`)
 
-**Quota Enforcement (Phase 3.1a Week 2 - November 14, 2025):**
-- Enforced at scan creation endpoint (`POST /api/v1/scans`)
-- Checks `monthly_scans_used >= monthly_scan_limit` before allowing scan
-- Returns HTTP 402 Payment Required when quota exceeded
-- Increments `monthly_scans_used` after successful scan creation
-- Updates `last_scan_at` timestamp on each scan
+**Quota Reset Background Task (Added January 11, 2026):**
+- Runs hourly via FastAPI lifespan scheduler
+- Checks users where `quota_reset_at <= now()`
+- Monthly subscribers: resets to 1st of next month
+- Annual subscribers: resets to subscription `current_period_end`
+- Resets `monthly_scans_used` and `monthly_api_calls_used` to 0
+
+**Quota Enforcement (Updated January 11, 2026):**
+
+| Quota | Endpoint | HTTP Code | Error Key |
+|-------|----------|-----------|-----------|
+| monthly_scan_limit | POST /api/v1/scans | 402 | quota_exceeded |
+| max_files_per_scan | POST /api/v1/upload | 402 | too_many_files |
+| max_loc_per_scan | POST /api/v1/upload | 402 | loc_limit_exceeded |
+| max_projects | POST /api/v1/projects | 403 | project_quota_exceeded |
+| max_team_members | POST /api/v1/teams/{id}/members | 403 | team_member_limit_exceeded |
+| export_enabled | GET /api/v1/scans/{id}/export | 403 | export_not_available |
+| api_access_enabled | All /api/v1/* (via API key) | 403 | api_access_not_available |
 
 **Quota Exceeded Error Response (HTTP 402):**
 ```json
 {
   "detail": {
     "error": "quota_exceeded",
-    "message": "You've used all 10 scans for this month",
+    "message": "You've used all 3 scans for this month",
     "tier": "free",
-    "scans_used": 10,
-    "scan_limit": 10,
+    "scans_used": 3,
+    "scan_limit": 3,
     "scans_remaining": 0,
     "reset_date": "2026-02-01T00:00:00+00:00",
     "days_until_reset": 17,
@@ -2048,6 +2076,117 @@ Vulnerability remediation task assignments.
 - `high` - Important issues for next sprint
 - `medium` - Standard priority items
 - `low` - Nice-to-have fixes
+
+---
+
+### `quality_gates`
+
+**ADDED:** Migration 032 (2026-01-12) - Phase 5.5c CI/CD Integration
+
+Quality gate configurations for CI/CD pipeline integration.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique quality gate identifier |
+| `project_id` | UUID | NULLABLE, FK → projects.id ON DELETE CASCADE | Project reference (null = org default) |
+| `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE CASCADE | Organization reference |
+| `name` | VARCHAR(255) | NOT NULL | Quality gate name |
+| `description` | TEXT | NULLABLE | Gate description |
+| `block_on_critical` | BOOLEAN | NOT NULL, DEFAULT true | Block pipeline on critical vulnerabilities |
+| `block_on_high` | BOOLEAN | NOT NULL, DEFAULT false | Block pipeline on high vulnerabilities |
+| `max_critical` | INTEGER | NOT NULL, DEFAULT 0 | Maximum critical vulnerabilities allowed |
+| `max_high` | INTEGER | NOT NULL, DEFAULT -1 | Maximum high vulnerabilities (-1 = unlimited) |
+| `max_medium` | INTEGER | NOT NULL, DEFAULT -1 | Maximum medium vulnerabilities (-1 = unlimited) |
+| `max_low` | INTEGER | NOT NULL, DEFAULT -1 | Maximum low vulnerabilities (-1 = unlimited) |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT true | Gate activation status |
+| `created_by` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | User who created the gate |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_quality_gates_project_id` on `project_id`
+- `ix_quality_gates_organization_id` on `organization_id`
+- Unique constraint on `(project_id)` WHERE `project_id IS NOT NULL`
+- Unique constraint on `(organization_id)` WHERE `organization_id IS NOT NULL AND project_id IS NULL`
+
+**Relationships:**
+- Many-to-one with `projects` (project_id, CASCADE DELETE)
+- Many-to-one with `organizations` (organization_id, CASCADE DELETE)
+- Many-to-one with `users` (created_by, SET NULL)
+
+**Blocking Rules:**
+- `block_on_critical` - Fails if ANY critical vulnerability found
+- `block_on_high` - Fails if ANY high vulnerability found
+
+**Threshold Rules:**
+- `max_critical >= 0` - Fails if count exceeds threshold
+- `max_high >= 0` - Fails if count exceeds threshold
+- `-1` means unlimited (no threshold check)
+
+---
+
+### `quality_gate_evaluations`
+
+**ADDED:** Migration 032 (2026-01-12) - Phase 5.5c CI/CD Integration
+
+Quality gate evaluation history for audit trail and CI/CD integration.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique evaluation identifier |
+| `quality_gate_id` | UUID | NOT NULL, FK → quality_gates.id ON DELETE CASCADE | Quality gate reference |
+| `scan_id` | UUID | NOT NULL, FK → scans.id ON DELETE CASCADE | Scan evaluated |
+| `project_id` | UUID | NOT NULL, FK → projects.id ON DELETE CASCADE | Project reference |
+| `status` | VARCHAR(20) | NOT NULL | Evaluation status |
+| `passed` | BOOLEAN | NOT NULL | Whether gate passed |
+| `critical_count` | INTEGER | NOT NULL, DEFAULT 0 | Critical vulnerabilities count |
+| `high_count` | INTEGER | NOT NULL, DEFAULT 0 | High vulnerabilities count |
+| `medium_count` | INTEGER | NOT NULL, DEFAULT 0 | Medium vulnerabilities count |
+| `low_count` | INTEGER | NOT NULL, DEFAULT 0 | Low vulnerabilities count |
+| `violations` | JSONB | NOT NULL, DEFAULT '[]' | Array of violation details |
+| `triggered_by` | VARCHAR(50) | NULLABLE | Trigger source (ci, manual, webhook) |
+| `ci_context` | JSONB | NULLABLE | CI/CD context data (branch, commit, PR, etc.) |
+| `evaluated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Evaluation timestamp |
+
+**Indexes:**
+- `ix_qg_evals_quality_gate_id` on `quality_gate_id`
+- `ix_qg_evals_scan_id` on `scan_id`
+- `ix_qg_evals_project_id` on `project_id`
+- `ix_qg_evals_evaluated_at` on `evaluated_at`
+
+**Relationships:**
+- Many-to-one with `quality_gates` (quality_gate_id, CASCADE DELETE)
+- Many-to-one with `scans` (scan_id, CASCADE DELETE)
+- Many-to-one with `projects` (project_id, CASCADE DELETE)
+
+**Evaluation Status Values:**
+- `passing` - Gate passed, no violations
+- `failing` - Gate failed, one or more violations
+- `pending` - Evaluation in progress
+
+**Violations JSONB Structure:**
+```json
+[
+  {
+    "rule": "max_critical",
+    "threshold": 0,
+    "actual": 2,
+    "severity": "critical",
+    "message": "Critical vulnerabilities (2) exceed threshold (0)"
+  }
+]
+```
+
+**CI Context JSONB Structure:**
+```json
+{
+  "branch": "main",
+  "commit": "abc123",
+  "pr": 42,
+  "workflow": "Security Scan",
+  "run_id": "12345"
+}
+```
 
 ---
 
