@@ -75,7 +75,7 @@ vault_kv_put "secret/postgresql" \
 # Redis (shared across all services)
 # Path: secret/redis - ESO with version: v2 handles /data/ prefix automatically
 vault_kv_put "secret/redis" \
-    password="redis123"
+    password="blocksecops-redis-password"
 
 echo -e "${GREEN}✓ Infrastructure secrets populated${NC}"
 echo
@@ -107,22 +107,22 @@ echo
 echo -e "${BLUE}[3/7] Data Service secrets...${NC}"
 
 vault_kv_put "secret/local/data-service/database" \
-    username="postgres" \
-    password="postgres" \
+    username="blocksecops" \
+    password="blocksecops-local-password" \
     host="postgresql.postgresql-local.svc.cluster.local" \
     port="5432" \
     name="solidity_security"
 
 vault_kv_put "secret/local/data-service/database-read" \
-    username="postgres" \
-    password="postgres" \
+    username="blocksecops" \
+    password="blocksecops-local-password" \
     host="postgresql.postgresql-local.svc.cluster.local" \
     port="5432"
 
 vault_kv_put "secret/local/data-service/redis" \
-    host="redis-master.redis-local.svc.cluster.local" \
+    host="redis.redis-local.svc.cluster.local" \
     port="6379" \
-    password="redis123"
+    password="blocksecops-redis-password"
 
 vault_kv_put "secret/local/data-service/encryption" \
     key="local-dev-encryption-key-change-in-production"
@@ -142,13 +142,13 @@ vault_kv_put "secret/local/tool-integration/credentials" \
     credentials="local-dev-tool-credentials"
 
 vault_kv_put "secret/local/tool-integration/redis" \
-    host="redis-master.redis-local.svc.cluster.local" \
+    host="redis.redis-local.svc.cluster.local" \
     port="6379" \
-    password="redis123"
+    password="blocksecops-redis-password"
 
 vault_kv_put "secret/local/tool-integration/database" \
-    user="postgres" \
-    password="postgres" \
+    user="blocksecops" \
+    password="blocksecops-local-password" \
     host="postgresql.postgresql-local.svc.cluster.local" \
     port="5432" \
     name="solidity_security"
@@ -162,16 +162,16 @@ echo
 echo -e "${BLUE}[5/7] Notification Service secrets...${NC}"
 
 vault_kv_put "secret/local/notification/database" \
-    username="postgres" \
-    password="postgres" \
+    username="blocksecops" \
+    password="blocksecops-local-password" \
     host="postgresql.postgresql-local.svc.cluster.local" \
     port="5432" \
     name="solidity_security"
 
 vault_kv_put "secret/local/notification/redis" \
-    host="redis-master.redis-local.svc.cluster.local" \
+    host="redis.redis-local.svc.cluster.local" \
     port="6379" \
-    password="redis123"
+    password="blocksecops-redis-password"
 
 vault_kv_put "secret/local/notification/smtp" \
     host="localhost" \
@@ -194,16 +194,16 @@ echo
 echo -e "${BLUE}[6/7] Orchestration Service secrets...${NC}"
 
 vault_kv_put "secret/local/orchestration/database" \
-    username="postgres" \
-    password="postgres" \
+    username="blocksecops" \
+    password="blocksecops-local-password" \
     host="postgresql.postgresql-local.svc.cluster.local" \
     port="5432" \
     name="solidity_security"
 
 vault_kv_put "secret/local/orchestration/redis" \
-    host="redis-master.redis-local.svc.cluster.local" \
+    host="redis.redis-local.svc.cluster.local" \
     port="6379" \
-    password="redis123"
+    password="blocksecops-redis-password"
 
 echo -e "${GREEN}✓ Orchestration Service secrets populated${NC}"
 echo
@@ -215,11 +215,11 @@ echo -e "${BLUE}[7/7] Intelligence Engine secrets...${NC}"
 
 # Database URL (asyncpg format)
 vault_kv_put "secret/local/intelligence-engine/database" \
-    url="postgresql+asyncpg://postgres:postgres@postgresql.postgresql-local.svc.cluster.local:5432/solidity_security"
+    url="postgresql+asyncpg://blocksecops:blocksecops-local-password@postgresql.postgresql-local.svc.cluster.local:5432/solidity_security"
 
 # Redis URL
 vault_kv_put "secret/local/intelligence-engine/redis" \
-    url="redis://:redis123@redis-master.redis-local.svc.cluster.local:6379/0"
+    url="redis://:blocksecops-redis-password@redis.redis-local.svc.cluster.local:6379/0"
 
 # ML Model API Key (placeholder for local development)
 vault_kv_put "secret/local/intelligence-engine/ml" \

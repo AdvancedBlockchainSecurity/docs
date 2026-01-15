@@ -1,14 +1,103 @@
-# Port-Forwarding Standards
+# Service Access Standards
 
-**Version:** 2.5.0
-**Last Updated:** December 22, 2025
+**Version:** 3.0.0
+**Last Updated:** January 15, 2026
 **Status:** Active
 
 ## Overview
 
-This document defines the standard port-forwarding configuration for local development with Minikube. Starting with the Traefik migration (v2.0.0), local development uses Traefik ingress controller to mirror production architecture, enabling services with relative URLs to work correctly in all environments.
+This document defines service access patterns for all environments. **Services MUST be always available without manual intervention.** Manual port-forwards are a debugging tool, not an access pattern.
 
-## Standard Port Mappings
+### Core Principle
+
+> **Services must be always available.** After cluster start, all services should be accessible immediately without running additional commands.
+
+---
+
+## Always-Available Access (Standard)
+
+Each environment has its own always-available access method:
+
+| Environment | Method | Access Pattern | Setup |
+|-------------|--------|----------------|-------|
+| **Local (minikube)** | `minikube tunnel` + LoadBalancer | `http://127.0.0.1:3000` | One-time background service |
+| **Server (kubeadm)** | hostPort 80/443 + Traefik | `http://app.blocksecops.local` | DNS entry only |
+| **Production (GCP)** | GCP Load Balancer | `https://app.blocksecops.com` | Managed by infrastructure |
+
+### Local Development (minikube) - Always Available
+
+**Standard Pattern:** Use `minikube tunnel` as a background service for automatic LoadBalancer IP allocation.
+
+**One-Time Setup:**
+```bash
+# Start minikube tunnel (requires sudo, runs persistently)
+# Option 1: Run in background terminal
+minikube tunnel
+
+# Option 2: Run as nohup background process
+nohup minikube tunnel > /tmp/minikube-tunnel.log 2>&1 &
+
+# Option 3: Run in tmux session (recommended)
+tmux new -s tunnel -d 'minikube tunnel'
+```
+
+**Daily Workflow:** None required. With tunnel running, services are immediately accessible.
+
+**Access URLs:**
+| Service | URL |
+|---------|-----|
+| Dashboard | http://127.0.0.1:3000 |
+| API | http://127.0.0.1:3000/api/v1/... |
+
+**Service Type:** Services must use `type: LoadBalancer` to work with minikube tunnel.
+
+### Server Environment (kubeadm) - Always Available
+
+**Standard Pattern:** Traefik with hostPort 80/443 provides standard HTTP/HTTPS access.
+
+**Node IP:** 192.168.86.225
+**Domain:** `app.blocksecops.local`
+
+**One-Time Setup (Client machines):**
+```bash
+# Add to /etc/hosts on any machine that needs to access the server
+echo "192.168.86.225  app.blocksecops.local" | sudo tee -a /etc/hosts
+```
+
+**One-Time Setup (Server itself):**
+```bash
+# Add to /etc/hosts so server can resolve its own domain (required for local API testing)
+echo "127.0.0.1  app.blocksecops.local" | sudo tee -a /etc/hosts
+```
+
+**Daily Workflow:** None required. Services are accessible immediately after cluster start.
+
+**Access URLs:**
+| Service | URL |
+|---------|-----|
+| Dashboard | http://app.blocksecops.local |
+| API | http://app.blocksecops.local/api/v1/... |
+| Direct IP | http://192.168.86.225 |
+
+**Kustomize Overlay:** `blocksecops-gcp-infrastructure/k8s/overlays/server/`
+
+### Production (GCP) - Always Available
+
+**Standard Pattern:** GCP Load Balancer with managed TLS certificate.
+
+**Domain:** `app.blocksecops.com`
+
+**Access URLs:**
+| Service | URL |
+|---------|-----|
+| Dashboard | https://app.blocksecops.com |
+| API | https://app.blocksecops.com/api/v1/... |
+
+**Kustomize Overlay:** `blocksecops-gcp-infrastructure/k8s/overlays/gcp-production/`
+
+---
+
+## Port Mappings Reference
 
 ### Core Services
 
@@ -71,11 +160,25 @@ kubectl scale deployment redis-exporter -n redis-local --replicas=1
 |------------|---------|------------|---------|
 | **3000** | Traefik Ingress | http://127.0.0.1:3000 | Main entry point for dashboard and API routing |
 
-## Port-Forward Setup Commands
+---
 
-### Complete Setup Script
+## Debugging Tools (Port-Forwards)
 
-Create all port-forwards for local development:
+**IMPORTANT:** Manual port-forwards are for **debugging and direct service access only**, not for regular platform access. Use the always-available patterns above for normal development.
+
+### When to Use Port-Forwards
+
+| Use Case | Recommended Approach |
+|----------|---------------------|
+| Regular development | **Always-available access** (minikube tunnel, hostPort) |
+| Direct database access | Port-forward to PostgreSQL |
+| Direct Redis access | Port-forward to Redis |
+| Debugging specific service | Port-forward to that service |
+| Accessing internal-only services | Port-forward as needed |
+
+### Port-Forward Setup Script (Debugging Only)
+
+For situations where you need direct service access:
 
 ```bash
 #!/bin/bash
@@ -514,84 +617,65 @@ If you add a new service that needs a port-forward:
 3. Add the port to the health check script
 4. Update the dashboard API client if applicable
 
-## Production vs Local Development
-
-### Local Development (Minikube with Traefik)
-
-**Architecture**: Local development now **mirrors production** using Traefik ingress controller.
-
-**Access Pattern**:
-- Single entry point: `http://127.0.0.1:3000` (Traefik ingress)
-- Dashboard: `http://127.0.0.1:3000`
-- API: `http://127.0.0.1:3000/api/v1/...`
-- Traefik routes traffic based on path prefixes
-
-**Benefits**:
-- Production-ready relative URLs work locally
-- No environment-specific configuration
-- Mirrors production routing behavior
-- Services can communicate through ingress just like production
-
-### Production Deployment
-
-Production uses the same Traefik ingress pattern at scale:
-- **Traefik ingress controller** for external HTTPS access
-- **TLS certificates** via cert-manager
-- **DNS-based routing** with custom domains
-- **Load balancers** for high availability
-- **Service mesh** (optional) for advanced traffic management
-
-**Key Difference**: Production has multiple Traefik replicas with load balancing, while local has single replica.
-
-See `/Users/pwner/Git/ABS/docs/standards/kubernetes-kustomize-structure-template.md` for production deployment configuration.
-
----
-
 ## Quick Reference
 
-**Setup All Port-Forwards**:
+### Always-Available Access (Standard)
+
+**Local (minikube):**
+```bash
+# One-time setup: Start tunnel in tmux
+tmux new -s tunnel -d 'minikube tunnel'
+
+# Access (no daily commands needed)
+curl http://127.0.0.1:3000                    # Dashboard
+curl http://127.0.0.1:3000/api/v1/health/live # API
+```
+
+**Server (kubeadm):**
+```bash
+# One-time setup: Add DNS entries
+# On server:
+echo "127.0.0.1  app.blocksecops.local" | sudo tee -a /etc/hosts
+# On client:
+echo "192.168.86.225  app.blocksecops.local" | sudo tee -a /etc/hosts
+
+# Access (no daily commands needed)
+curl http://app.blocksecops.local                    # Dashboard
+curl http://app.blocksecops.local/api/v1/health/live # API
+```
+
+### Debugging (Port-Forwards)
+
+**Setup Port-Forwards (debugging only):**
 ```bash
 ./scripts/setup-port-forwards.sh
 ```
 
-**Check Port-Forwards**:
-```bash
-./scripts/check-port-forwards.sh
-```
-
-**Kill All Port-Forwards**:
+**Kill All Port-Forwards:**
 ```bash
 pkill -f "kubectl port-forward"
 ```
 
-**Test Dashboard and API via Traefik**:
+### Build Images
+
+**Local Development (minikube):**
 ```bash
-# Test dashboard
-curl http://127.0.0.1:3000
-
-# Test API routing
-curl http://127.0.0.1:3000/api/v1/scanners
-
-# Test API health
-curl http://127.0.0.1:3000/api/v1/health/live
+eval $(minikube docker-env)
+docker build -t <service>:<version> .
+kubectl apply -k k8s/overlays/local/<service>/
 ```
 
-**Build Images for Local Development**:
+**Server (kubeadm with containerd):**
 ```bash
-# Use minikube's Docker daemon
-eval $(minikube docker-env)
-
-# Build and tag
-docker build -t <service>:<version> .
-docker tag <service>:<version> <service>:latest
-
-# Deploy
-kubectl apply -k k8s/overlays/local/<service>/
+docker build -t blocksecops-<service>:<version> .
+docker save blocksecops-<service>:<version> | sudo ctr -n k8s.io images import -
+kubectl apply -k k8s/overlays/server/
 ```
 
 ---
 
 **See Also**:
+- [Service Availability](./service-availability.md) - Always-available access principles
+- [Domain Management](./domain-management.md) - Domain and DNS configuration
 - [Docker Image Versioning](./docker-image-versioning.md)
-- [Kubernetes Kustomize Structure](../architecture-templates/kubernetes-kustomize-structure-template.md)
 - [Testing & Deployment](./testing-deployment.md)

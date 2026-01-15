@@ -1,7 +1,7 @@
 # Platform Development Standards - Index
 
-**Version:** 2.0.0
-**Last Updated:** December 27, 2025
+**Version:** 2.1.0
+**Last Updated:** January 15, 2026
 **Status:** Active
 
 ## Overview
@@ -80,24 +80,30 @@ These standards help you set up and maintain your local development environment:
    - Troubleshooting service endpoints
    - Local development checklist
 
-8. **[Port-Forwarding Standards](./port-forwarding.md)**
+8. **[Service Access Standards](./port-forwarding.md)**
+   - **Always-available access patterns** (services must be accessible without manual setup)
+   - Environment-specific access: minikube tunnel, hostPort, GCP Load Balancer
    - Standard port mappings for all services
-   - Port-forward setup commands and scripts
-   - Port assignment rules and range allocation
+   - Port-forward commands for debugging only
    - Service configuration and access URLs
-   - Troubleshooting port-forward issues
-   - Monitoring and health check scripts
-   - Best practices for port-forward management
+   - Troubleshooting access issues
 
-9. **[Dashboard Development](./dashboard-development.md)**
-   - Python 3.13 compatibility issue (MissingGreenlet)
-   - Proper dashboard startup procedure (7 steps)
-   - Port-forward best practices (deployment vs service)
-   - Troubleshooting dashboard issues
-   - Dashboard development workflow
-   - Daily development checklist
+9. **[Service Availability](./service-availability.md)** [NEW]
+   - Core principle: Services MUST be always available
+   - Anti-pattern: Manual port-forwards for regular access
+   - When port-forwards ARE acceptable (debugging, internal services)
+   - Environment access matrix
+   - Startup verification checklist
 
-10. **[Frontend Development](./frontend-development.md)**
+10. **[Dashboard Development](./dashboard-development.md)**
+    - Python 3.13 compatibility issue (MissingGreenlet)
+    - Proper dashboard startup procedure (7 steps)
+    - Port-forward best practices (deployment vs service)
+    - Troubleshooting dashboard issues
+    - Dashboard development workflow
+    - Daily development checklist
+
+11. **[Frontend Development](./frontend-development.md)**
     - React + TypeScript + Vite frontend setup
     - Supabase authentication integration
     - Proper frontend startup procedure
@@ -106,30 +112,39 @@ These standards help you set up and maintain your local development environment:
     - Troubleshooting frontend issues (CORS, auth, networking)
     - Frontend architecture and project structure
 
+12. **[Domain Management](./domain-management.md)**
+    - Environment-specific domain configuration (local, server, GCP)
+    - Setting up `app.blocksecops.local` for server testing
+    - Server self-resolution requirement (server must resolve its own domain)
+    - GCP migration checklist for `app.blocksecops.com`
+    - Kustomize overlay strategy for domains
+    - CORS and IngressRoute configuration
+    - Troubleshooting domain/DNS issues
+
 ### 🔵 Configuration & Versioning Standards
 
 These standards ensure proper versioning and configuration management:
 
-11. **[Docker Image Versioning](./docker-image-versioning.md)**
+13. **[Docker Image Versioning](./docker-image-versioning.md)**
     - Semantic versioning for Docker images (MAJOR.MINOR.PATCH)
     - Version increment rules
     - Kustomization configuration
     - Why explicit versions (not `latest`)
 
-12. **[Build Workflow](./build-workflow.md)**
+14. **[Build Workflow](./build-workflow.md)**
     - Local Docker build with Harbor registry
     - Build and deploy steps
     - Using build cache
     - Why local Docker vs minikube Docker
 
-13. **[Frontend Build-Time Environment Variables](./frontend-build-env.md)**
+15. **[Frontend Build-Time Environment Variables](./frontend-build-env.md)**
     - Vite environment variable handling (baked at build time)
     - Security classification (public vs private variables)
     - Pass build args, never hardcode in Dockerfile
     - Environment files (.env.local vs .env.example)
     - Build workflow for local and CI/CD
 
-14. **[Tool Metadata ConfigMaps](./tool-metadata-configmaps.md)**
+16. **[Tool Metadata ConfigMaps](./tool-metadata-configmaps.md)**
     - Managing third-party tool versions via ConfigMaps
     - Version selection policy (latest stable)
     - ConfigMap solution vs. hardcoded versions
@@ -138,7 +153,7 @@ These standards ensure proper versioning and configuration management:
     - Multi-environment support
     - Real-world example: Scanner metadata refactoring
 
-15. **[Dependency Management](./dependency-management.md)**
+17. **[Dependency Management](./dependency-management.md)**
     - Latest stable version policy
     - Prohibited dependencies (deprecated, retired, unmaintained)
     - Dependency health monitoring (monthly/quarterly audits)
@@ -149,7 +164,7 @@ These standards ensure proper versioning and configuration management:
 
 ### 🤖 AI/ML Development Standards
 
-16. **[ML Development](./ml-development.md)**
+18. **[ML Development](./ml-development.md)**
     - CPU-only ML architecture (no GPU/LLM costs)
     - ML module structure and responsibilities
     - Lazy loading patterns for models
@@ -159,7 +174,7 @@ These standards ensure proper versioning and configuration management:
     - Performance targets (<100ms inference)
     - API endpoint conventions
 
-17. **[Intelligence Integration Standards](./INTELLIGENCE-INTEGRATION-STANDARDS.md)**
+19. **[Intelligence Integration Standards](./INTELLIGENCE-INTEGRATION-STANDARDS.md)**
     - Vulnerability pattern classification (BVD codes)
     - Fingerprinting strategies (ASM, ENC, EVT, L2, Semantic)
     - Deduplication algorithms
@@ -168,7 +183,7 @@ These standards ensure proper versioning and configuration management:
 
 ### ✅ Compliance & Verification
 
-18. **[Compliance Checklist](./compliance-checklist.md)**
+20. **[Compliance Checklist](./compliance-checklist.md)**
     - Daily development checklist
     - Making changes checklist
     - Database configuration changes checklist
@@ -183,6 +198,7 @@ These standards ensure proper versioning and configuration management:
 3. **Using `localhost` instead of `127.0.0.1`** → See [Local Development Setup](./local-development-setup.md)
 4. **Committing directly to main instead of using feature branches** → See [Version Control Standards](./version-control-standards.md)
 5. **Building Docker images with cache (without --no-cache)** → See [Testing & Deployment](./testing-deployment.md)
+6. **Using manual port-forwards for regular access** → See [Service Availability](./service-availability.md)
 
 ### Most Frequent Issues
 
@@ -202,7 +218,9 @@ docs/standards/
 ├── core-development-rules.md
 ├── secrets-management.md
 ├── local-development-setup.md
-├── port-forwarding.md
+├── port-forwarding.md              # Renamed: Service Access Standards
+├── service-availability.md         # NEW: Always-available access principles
+├── domain-management.md
 ├── dashboard-development.md
 ├── frontend-development.md
 ├── frontend-build-env.md
