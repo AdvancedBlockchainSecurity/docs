@@ -73,3 +73,39 @@ curl "http://localhost:3000/api/v1/analytics/scanner-effectiveness" \
 - [ ] Each item has `scanner_b` string
 - [ ] Each item has `shared_findings` count
 - [ ] Each item has `overlap_percentage` number (0-100)
+
+---
+
+## Error Handling
+**How to test**: Verify API handles edge cases
+
+### Invalid Scanner IDs in Vulnerabilities
+**How to test**: Ensure scanner IDs not in VALID_SCANNER_IDS don't cause errors
+
+- [ ] API returns 200 even when vulnerabilities contain non-scanner scanner_ids (e.g., detector names like `state-change-without-event`)
+- [ ] Only valid scanner IDs appear in response (slither, aderyn, mythril, semgrep, soliditydefend, etc.)
+- [ ] Invalid scanner_ids are silently ignored, not counted
+
+---
+
+## Bug Fixes (January 2026)
+
+### KeyError Fix for Invalid Scanner IDs
+**Issue**: Scanner effectiveness endpoint returned 500 error when vulnerability records contained scanner_ids that weren't in the VALID_SCANNER_IDS list (e.g., detector names like `state-change-without-event`).
+
+**Root Cause**: The unique findings calculation didn't check if scanner_id was in the valid scanner list before incrementing counters.
+
+**Fix Applied**: Added check `if scanner_id in unique_by_scanner` before counting unique findings.
+
+**File Modified**: `blocksecops-api-service/src/presentation/api/v1/endpoints/analytics.py` (lines 780-783)
+
+**Verification**:
+```bash
+# Should return 200 (with valid auth)
+curl -s -o /dev/null -w "%{http_code}" \
+  -H "Host: app.blocksecops.local" \
+  -H "Authorization: Bearer $TOKEN" \
+  "http://127.0.0.1/api/v1/analytics/scanner-effectiveness?time_range=all_time"
+
+# Expected: 200
+```

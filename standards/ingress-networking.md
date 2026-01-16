@@ -1,8 +1,8 @@
 # Ingress and Networking Standards
 
 **Standard ID**: NET-001
-**Version**: 1.0.0
-**Last Updated**: 2025-11-23
+**Version**: 1.1.0
+**Last Updated**: 2026-01-15
 **Status**: Active
 
 ## Overview
@@ -425,6 +425,125 @@ kubectl exec -n <namespace> <pod> -- \
 ```bash
 kubectl logs -n traefik-local deployment/traefik --tail=100
 ```
+
+## WebSocket Routing
+
+WebSocket connections require special handling in Traefik to ensure proper routing and connection upgrades.
+
+### WebSocket IngressRoute Pattern
+
+WebSocket traffic should be routed to a dedicated IngressRoute with higher priority to ensure it takes precedence over other routes.
+
+**Key Configuration Points:**
+- Use `PathPrefix(\`/ws\`)` to match WebSocket paths
+- Set `priority: 100` to ensure WebSocket route is evaluated before other routes
+- Exclude `/ws` path from other IngressRoutes using `!PathPrefix(\`/ws\`)`
+
+### Local Environment (HTTP)
+
+```yaml
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: notification-websocket
+  namespace: notification-local
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`app.blocksecops.local`) && PathPrefix(`/ws`)
+      kind: Rule
+      priority: 100
+      services:
+        - name: notification
+          port: 8003
+```
+
+### Server Environment (HTTP with hostPort)
+
+```yaml
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: notification-websocket
+  namespace: notification-local
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`app.blocksecops.local`) && PathPrefix(`/ws`)
+      kind: Rule
+      priority: 100
+      services:
+        - name: notification
+          port: 8003
+```
+
+### Production Environment (HTTPS)
+
+```yaml
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: notification-websocket
+  namespace: notification-prod
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`app.blocksecops.com`) && PathPrefix(`/ws`)
+      kind: Rule
+      services:
+        - name: notification
+          port: 8003
+  tls:
+    certResolver: letsencrypt-prod
+```
+
+### Excluding WebSocket from Other Routes
+
+When adding a WebSocket route, update existing IngressRoutes to exclude the `/ws` path:
+
+```yaml
+# Dashboard IngressRoute - Exclude /ws
+spec:
+  routes:
+    - match: Host(`app.blocksecops.local`) && !PathPrefix(`/ws`) && !PathPrefix(`/api/v1`)
+      kind: Rule
+      services:
+        - name: dashboard
+          port: 3000
+```
+
+### Testing WebSocket Routing
+
+**Test WebSocket upgrade through Traefik:**
+```bash
+# Test WebSocket upgrade returns 101 Switching Protocols
+curl -s -o /dev/null -w "%{http_code}" \
+  -H "Host: app.blocksecops.local" \
+  -H "Connection: Upgrade" \
+  -H "Upgrade: websocket" \
+  -H "Sec-WebSocket-Version: 13" \
+  -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
+  http://127.0.0.1/ws
+
+# Expected: 101
+```
+
+### WebSocket Client Configuration
+
+Frontend applications should connect to WebSocket through Traefik, not directly to the service port:
+
+| Environment | WebSocket URL |
+|-------------|---------------|
+| Local (minikube) | `ws://127.0.0.1:3000/ws` |
+| Server (kubeadm) | `ws://app.blocksecops.local/ws` |
+| Production (GCP) | `wss://app.blocksecops.com/ws` |
+
+**IMPORTANT:** Never use direct port access (e.g., `ws://127.0.0.1:8003/ws`) in production or server environments. Always route through the ingress controller.
+
+---
 
 ## Migration from Nginx Ingress
 
