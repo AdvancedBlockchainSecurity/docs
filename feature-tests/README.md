@@ -56,6 +56,7 @@ Manual testing checklists for all user-facing features.
 | [38-cursor-pagination.md](./38-cursor-pagination.md) | Cursor-based pagination, keyset queries |
 | [39-economic-security-analysis.md](./39-economic-security-analysis.md) | Economic security panel, flash loan/MEV/DeFi detection, AI explanations (Phase 5.5a) |
 | [40-quality-gates.md](./40-quality-gates.md) | CI/CD Quality Gates, blocking rules, thresholds, badges, evaluation history (Phase 5.5c) |
+| [41-vulnerability-filtering.md](./41-vulnerability-filtering.md) | Vulnerability filtering, scanner dropdown, pattern input, copy button (Bug fixes Jan 2026) |
 
 ---
 
@@ -202,6 +203,7 @@ The risk scoring system was redesigned to be unbounded (higher = riskier):
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-01-15 | Claude Code | 41-vulnerability-filtering.md | NEW - Severity filter, scanner dropdown, pattern input, copy button bug fixes (v0.10.3 API, v0.30.6 Dashboard)
 2026-01-13 | Claude Code | 25-dark-mode-global-search.md | FIX - Advanced Search filter overflow fixed, added Test 12 for filter layout (v0.29.0 Dashboard)
 2026-01-12 | Claude Code | 40-quality-gates.md | IMPLEMENTED - Quality Gates, ProjectDetail integration, contracts search, advanced-search rename (v0.10.2 API, v0.29.0 Dashboard)
 2026-01-12 | Claude Code | 25-dark-mode-global-search.md | UPDATED - Added Test 9-11 for advanced search, contracts search, contract links (v0.29.0 Dashboard)
