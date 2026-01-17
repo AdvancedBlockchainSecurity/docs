@@ -1,21 +1,25 @@
 # Deduplication Pattern Codes
 
+**Last Tested**: 2026-01-17
+**API Version**: v0.11.0
+**Status**: PASS
+
 ## Deduplication Page Overview
 **How to test**: Navigate to `/deduplication`
 
-- [ ] Page loads with deduplication groups
-- [ ] Group tiles/cards display correctly
-- [ ] Each tile shows pattern code or "Pattern pending classification"
-- [ ] Severity badge is displayed
-- [ ] Finding count is shown
+- [x] Page loads with deduplication groups
+- [x] Group tiles/cards display correctly
+- [x] Each tile shows pattern code or "Pattern pending classification"
+- [x] Severity badge is displayed
+- [x] Finding count is shown
 
 ## Pattern Code Display
 **How to test**: Check the pattern code on each deduplication group tile
 
-- [ ] Groups with pattern mappings show BVD codes (e.g., `BVD-SOLIDITY-DEFI-LIQUIDITY-001`)
-- [ ] Groups without pattern mappings show "Pattern pending classification"
-- [ ] Pattern code format is `BVD-<CHAIN>-<CATEGORY>-<NUMBER>` (e.g., `BVD-SOLIDITY-REE-001`)
-- [ ] Long pattern codes display without truncation or overflow
+- [x] Groups with pattern mappings show BVD codes (e.g., `BVD-SOLIDITY-DEFI-LIQUIDITY-001`)
+- [x] Groups without pattern mappings show "Pattern pending classification"
+- [x] Pattern code format is `BVD-<CHAIN>-<CATEGORY>-<NUMBER>` (e.g., `BVD-SOLIDITY-REE-001`)
+- [x] Long pattern codes display without truncation or overflow
 
 ## Expected BVD Pattern Codes
 **How to test**: Verify these common pattern codes appear correctly
@@ -43,15 +47,16 @@
 ### GET /api/v1/deduplication/groups
 **How to test**:
 ```bash
-curl "http://app.blocksecops.local/api/v1/deduplication/groups" \
+curl "http://localhost:30180/api/v1/deduplication/groups" \
+  -H "Host: localhost" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-- [ ] Returns array of deduplication groups
-- [ ] Each group has `pattern_code` field (may be null)
-- [ ] Groups with mappings have non-null `pattern_code`
-- [ ] `pattern_code` values match BVD format
-- [ ] Returns 401 if not authenticated
+- [x] Returns array of deduplication groups
+- [x] Each group has `pattern_code` field (may be null)
+- [x] Groups with mappings have non-null `pattern_code`
+- [x] `pattern_code` values match BVD format
+- [x] Returns 401 if not authenticated
 
 ### Response Schema Validation
 **How to test**: Validate response structure
@@ -73,9 +78,9 @@ kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity
   "SELECT COUNT(*) as total, COUNT(pattern_code) as with_pattern FROM vulnerabilities;"
 ```
 
-- [ ] Majority of vulnerabilities have `pattern_code` populated
-- [ ] `pattern_code` matches `pattern_id` (denormalized)
-- [ ] Pattern codes are varchar(50) (not truncated)
+- [x] Majority of vulnerabilities have `pattern_code` populated
+- [x] `pattern_code` matches `pattern_id` (denormalized)
+- [x] Pattern codes are varchar(50) (not truncated)
 
 ### Deduplication Group Pattern Codes
 **How to test**: Run SQL query
@@ -84,9 +89,9 @@ kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity
   "SELECT COUNT(*) as total, COUNT(pattern_code) as with_pattern FROM deduplication_groups;"
 ```
 
-- [ ] Deduplication groups with canonical findings have `pattern_code`
-- [ ] Pattern codes derive from canonical finding's `pattern_code`
-- [ ] 79+ groups should have pattern codes (as of January 2026)
+- [x] Deduplication groups with canonical findings have `pattern_code`
+- [x] Pattern codes derive from canonical finding's `pattern_code`
+- [x] 79+ groups should have pattern codes (as of January 2026)
 
 ### Pattern Code Consistency
 **How to test**: Verify pattern_id = pattern_code
@@ -95,7 +100,22 @@ kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity
   "SELECT COUNT(*) FROM vulnerabilities WHERE pattern_id IS NOT NULL AND pattern_code IS NOT NULL AND pattern_id != pattern_code;"
 ```
 
-- [ ] Result should be 0 (pattern_id always equals pattern_code)
+- [x] Result should be 0 (pattern_id always equals pattern_code)
+
+### Fingerprint Generation (v0.11.0+)
+**How to test**: Verify new scans have fingerprints
+```bash
+kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -c \
+  "SELECT COUNT(*) as total,
+          COUNT(fingerprint_code) as with_fp_code,
+          COUNT(fingerprint_location) as with_fp_loc,
+          COUNT(deduplication_group_id) as in_dedup_group
+   FROM vulnerabilities WHERE created_at > NOW() - INTERVAL '1 day';"
+```
+
+- [x] New vulnerabilities have `fingerprint_code` populated
+- [x] New vulnerabilities have `fingerprint_location` populated
+- [x] Duplicates are assigned to `deduplication_group_id`
 
 ---
 

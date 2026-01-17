@@ -1,11 +1,47 @@
 # Cross-Scanner Deduplication Testing
 
 **Feature**: Intelligence Layer - Cross-Scanner Deduplication
-**Version**: v0.8.0 (pattern_code fix in v0.10.6)
-**Last Tested**: 2026-01-16
+**Version**: v0.11.0 (integrated into scan ingestion pipeline)
+**Last Tested**: 2026-01-17
 **Status**: PASS
 
-> **Fix (January 16, 2026)**: API v0.10.6 adds fallback to canonical finding's pattern_code when group's pattern_code is null.
+> **Enhancement (January 17, 2026)**: API v0.11.0 integrates deduplication directly into scan ingestion pipeline. Fingerprints are now generated automatically during scan result processing, and deduplication groups are created in real-time.
+
+---
+
+## Recent Changes (v0.11.0)
+
+### Scan Ingestion Integration
+
+Deduplication is now **automatically triggered** when scan results are stored:
+
+1. **Fingerprint Generation**: Each vulnerability gets fingerprints generated during `store_scan_results()`
+2. **Real-time Deduplication**: After scan completion, `_process_scan_deduplication()` creates groups for duplicates
+3. **Pattern Code Assignment**: Groups inherit `pattern_code` from canonical findings
+
+### Key Files Modified
+
+| File | Change |
+|------|--------|
+| `src/presentation/api/v1/endpoints/scans.py` | Integrated `VulnerabilityFingerprinter` and deduplication processing |
+| `src/application/services/vulnerability_fingerprinter.py` | Fingerprint generation logic |
+| `src/infrastructure/config.py` | Version now read from pyproject.toml via importlib.metadata |
+
+### Verified Behavior
+
+```sql
+-- Test scan with duplicate findings from different scanners
+-- Both vulnerabilities at line 42 share the same fingerprint_location
+SELECT v.id, v.title, v.scanner_id, v.line_number,
+       LEFT(v.fingerprint_location, 20) as fp_loc,
+       v.deduplication_group_id
+FROM vulnerabilities v
+WHERE v.scan_id = '615f68e1-918d-44a0-a437-9376d23a78c7';
+
+-- Result:
+-- Reentrancy Detected      | soliditydefend | 42 | 96bdd07ce5dfd8d4c9e4 | 08431010-3f04-4991-ba96-a8b33c5a7618
+-- Reentrancy Vulnerability | slither        | 42 | 96bdd07ce5dfd8d4c9e4 | 08431010-3f04-4991-ba96-a8b33c5a7618
+```
 
 ---
 
@@ -19,10 +55,10 @@ Tests for the deduplication engine that automatically identifies and groups dupl
 
 | Component | Value |
 |-----------|-------|
-| Platform | Minikube (local) |
-| API Service | v0.1.13 |
+| Platform | kubeadm (server) |
+| API Service | v0.11.0 |
 | Test User | jasonbrailowbizop@mail.com |
-| Access URL | http://127.0.0.1:3000 |
+| Access URL | http://localhost:30180 (via Traefik NodePort) |
 
 ---
 
@@ -307,6 +343,52 @@ curl -s -H "Authorization: Bearer ${TOKEN}" \
 
 ---
 
-**Last Updated**: 2025-12-26
+## v0.11.0 Verification (January 17, 2026)
+
+### Fingerprint Generation Test
+
+```bash
+# Create a test scan
+kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -c "
+INSERT INTO scans (contract_id, user_id, scan_type, status, critical_count, high_count, medium_count, low_count)
+VALUES ('598d95dc-a1fa-4814-8c18-eae9d7761ebd', '66f28736-4c19-43ec-8560-e70c645f1893', 'security', 'running', 0, 0, 0, 0)
+RETURNING id;"
+
+# Post results via API
+curl -X POST -H "Host: localhost" -H "Content-Type: application/json" \
+  http://localhost:30180/api/v1/scans/{scan_id}/results \
+  -d '{"scanner":"slither","status":"completed","vulnerabilities":[...]}'
+```
+
+### Verification Queries
+
+```bash
+# Check fingerprints are generated
+kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -c "
+SELECT COUNT(*) as total,
+       COUNT(fingerprint_code) as with_fp_code,
+       COUNT(fingerprint_location) as with_fp_loc
+FROM vulnerabilities WHERE scan_id = 'YOUR_SCAN_ID';"
+
+# Check deduplication groups created
+kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -c "
+SELECT id, group_size, pattern_code, scanner_distribution
+FROM deduplication_groups WHERE canonical_finding_id IN (
+  SELECT id FROM vulnerabilities WHERE scan_id = 'YOUR_SCAN_ID'
+);"
+```
+
+### Expected Results
+
+- [x] All vulnerabilities have `fingerprint_code` generated
+- [x] All vulnerabilities have `fingerprint_location` generated
+- [x] Duplicates at same location share `deduplication_group_id`
+- [x] Deduplication groups have correct `group_size`
+- [x] Deduplication groups have `pattern_code` from canonical finding
+- [x] `scanner_distribution` shows scanner breakdown (e.g., `{"slither": 1, "soliditydefend": 1}`)
+
+---
+
+**Last Updated**: 2026-01-17
 **Tested By**: Claude Code (Automated)
-**Dashboard Version**: v0.15.1
+**API Version**: v0.11.0
