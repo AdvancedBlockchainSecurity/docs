@@ -604,8 +604,8 @@ Detected security vulnerabilities and code issues.
 | `contract_name` | VARCHAR(200) | NULLABLE, INDEX | Contract name where vulnerability exists (Phase 4D) |
 | `category` | VARCHAR(100) | NULLABLE | Vulnerability type category (e.g., reentrancy, access_control) |
 | `confidence` | NUMERIC(3,2) | NULLABLE | Scanner confidence score (0.0 to 1.0) |
-| `pattern_id` | VARCHAR(20) | NULLABLE | FK → vulnerability_patterns.id - Pattern classification reference |
-| `pattern_code` | VARCHAR(20) | NULLABLE | Pattern code (e.g., 'SWC-107', 'SLITHER-REENTRANCY') |
+| `pattern_id` | VARCHAR(50) | NULLABLE | FK → vulnerability_patterns.id - Pattern classification reference |
+| `pattern_code` | VARCHAR(50) | NULLABLE | BVD pattern code (e.g., 'BVD-SOLIDITY-DEFI-LIQUIDITY-001') |
 | `classification_confidence` | DOUBLE PRECISION | NULLABLE | Pattern match confidence score (0.0 to 1.0) |
 | `classification_method` | VARCHAR(20) | NULLABLE | Classification method used ('exact', 'fuzzy', 'ml') |
 | `fingerprint_code` | VARCHAR(64) | NULLABLE | SHA256 hash of normalized code snippet |

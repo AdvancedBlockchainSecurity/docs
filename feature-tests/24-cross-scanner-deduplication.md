@@ -1,9 +1,11 @@
 # Cross-Scanner Deduplication Testing
 
 **Feature**: Intelligence Layer - Cross-Scanner Deduplication
-**Version**: v0.8.0
-**Last Tested**: 2025-12-25
+**Version**: v0.8.0 (pattern_code fix in v0.10.6)
+**Last Tested**: 2026-01-16
 **Status**: PASS
+
+> **Fix (January 16, 2026)**: API v0.10.6 adds fallback to canonical finding's pattern_code when group's pattern_code is null.
 
 ---
 

@@ -336,11 +336,11 @@ Due to database state inconsistencies after the 2025-11-05 database reset, the s
 
 ---
 
-## Current Database State (2026-01-10)
+## Current Database State (2026-01-16)
 
 ### Alembic Version
 ```
-version_num: 029_cursor_pagination_idx
+version_num: 033_backfill_pattern_code
 ```
 
 ### Existing Tables
@@ -360,7 +360,9 @@ version_num: 029_cursor_pagination_idx
 - ✅ `scan_batches` (Phase 3.1b Task 27.2)
 - ✅ `notification_channels` (CI/CD Integrations)
 - ✅ `notification_deliveries` (CI/CD Integrations)
-- ❌ `deduplication_groups` (pending)
+- ✅ `quality_gates` (CI/CD Quality Gates - Migration 032)
+- ✅ `quality_gate_evaluations` (CI/CD Quality Gates - Migration 032)
+- ✅ `deduplication_groups` (Intelligence Layer)
 - ❌ `vulnerability_classifications` (pending)
 - ❌ `vulnerability_trends` (pending)
 
@@ -884,6 +886,91 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
   - Endpoints: `src/presentation/api/v1/endpoints/vulnerabilities.py`
 - **Performance**: Verified via EXPLAIN ANALYZE - composite indexes used for keyset queries
 - **Documentation**: See `/Users/pwner/Git/ABS/blocksecops-docs/API/pagination.md`
+
+---
+
+### Migration 030: Competitive Pricing Tier Update
+- **Status**: ✅ Applied (January 11, 2026)
+- **Revision ID**: `030_pricing_update`
+- **Previous Revision**: `029_cursor_pagination_idx`
+- **Description**: Updates tier quotas to match competitive pricing analysis
+- **Source of Truth**: `/docs/standards/tier-standards.md`
+- **Columns Added to `user_quotas`**:
+  - `max_loc_per_scan` (INTEGER) - Max lines of code per scan (-1 = unlimited)
+  - `export_enabled` (BOOLEAN) - Whether user can export reports (PDF/JSON/SARIF)
+- **Tier Changes**:
+  - Free: 3 scans/month (was 10), 5 files (was 25), 5K LoC max, 7-day retention (was 30), no export
+  - Developer: 100 scans, unlimited files/LoC, 90-day retention, export enabled
+  - Startup: 500 scans, unlimited files/LoC, 180-day retention, webhooks
+  - Professional: Unlimited, 365-day retention
+  - Enterprise: Unlimited, 730-day retention
+- **Migration File**: `alembic/versions/20260111_0100-030_competitive_pricing_tier_update.py`
+
+---
+
+### Migration 031: AI Explanation Quota
+- **Status**: ✅ Applied (January 12, 2026)
+- **Revision ID**: `031_ai_explanation_quota`
+- **Previous Revision**: `030_pricing_update`
+- **Description**: Adds AI explanation usage tracking per tier (Phase 5.5a Economic Security)
+- **Columns Added to `user_quotas`**:
+  - `monthly_ai_explanations_limit` (INTEGER) - Monthly AI explanation limit (-1 = unlimited)
+  - `monthly_ai_explanations_used` (INTEGER) - AI explanations used this month
+- **Tier Quotas**:
+  - Free: 0 explanations/month
+  - Developer: 10 explanations/month
+  - Startup: 100 explanations/month
+  - Professional: 500 explanations/month
+  - Enterprise: -1 (unlimited)
+- **Migration File**: `alembic/versions/20260112_0100-031_add_ai_explanation_quota.py`
+
+---
+
+### Migration 032: Quality Gates for CI/CD
+- **Status**: ✅ Applied (January 12, 2026)
+- **Revision ID**: `032_add_quality_gates`
+- **Previous Revision**: `031_ai_explanation_quota`
+- **Description**: CI/CD blocking rules based on vulnerability severity thresholds
+- **Tables Created**:
+  - `quality_gates` - Quality gate configuration with blocking rules
+  - `quality_gate_evaluations` - Evaluation results for each scan
+- **Quality Gates Table Schema**:
+  - `id` (UUID) - Primary key
+  - `project_id` (UUID) - FK to projects, CASCADE DELETE
+  - `organization_id` (UUID) - FK to organizations, CASCADE DELETE
+  - `name` (VARCHAR(255)) - Gate name
+  - `block_on_critical/high/medium/low` (BOOLEAN) - Severity blocking flags
+  - `max_critical/high/medium/low` (INTEGER) - Maximum count thresholds
+  - `advanced_rules` (JSONB) - Custom rules
+  - `enforce_on_pr/main` (BOOLEAN) - Where to enforce
+  - `notification_channels` (JSONB) - Channel IDs for notifications
+- **Indexes Created**:
+  - `ix_quality_gates_project_id`, `ix_quality_gates_organization_id`
+  - `ix_quality_gates_project_active`, `ix_quality_gates_org_active`
+  - Various indexes on evaluations table
+- **Migration File**: `alembic/versions/20260112_1900-032_add_quality_gates.py`
+
+---
+
+### Migration 033: Pattern Code Backfill
+- **Status**: ✅ Applied (January 16, 2026)
+- **Revision ID**: `033_backfill_pattern_code`
+- **Previous Revision**: `032_add_quality_gates`
+- **Description**: Backfills pattern_id and pattern_code for vulnerabilities and deduplication groups
+- **Column Changes**:
+  - `vulnerabilities.pattern_id` VARCHAR(20) → VARCHAR(50)
+  - `vulnerabilities.pattern_code` VARCHAR(20) → VARCHAR(50)
+- **Data Backfill**:
+  1. Widen columns to accommodate longer BVD codes (e.g., BVD-SOLIDITY-DEFI-LIQUIDITY-001)
+  2. Backfill `vulnerabilities.pattern_id` from `pattern_tool_mappings` using `scanner_id + title`
+  3. Copy `pattern_id` to `pattern_code` for denormalized access
+  4. Backfill `deduplication_groups.pattern_code` from canonical findings
+- **Results**:
+  - 5,002 vulnerabilities backfilled with pattern codes
+  - 79 of 137 deduplication groups received pattern codes
+- **Reason**: Deduplication page tiles showed "Pattern pending classification" instead of BVD codes
+- **Migration File**: `alembic/versions/20260116_1000-033_backfill_pattern_code.py`
+- **Related Changelog**: `/docs/changelogs/PATTERN-CODE-BACKFILL-2026-01-16.md`
 
 ---
 

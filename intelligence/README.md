@@ -1,7 +1,7 @@
 # Intelligence Engine Documentation
 
-**Last Updated**: December 27, 2025
-**Version**: 2.0
+**Last Updated**: January 16, 2026
+**Version**: 2.1
 **Status**: Production
 
 ---
@@ -315,8 +315,8 @@ fingerprint = hashlib.sha256(
 ### Vulnerability Patterns Table
 ```sql
 CREATE TABLE vulnerability_patterns (
-    pattern_code VARCHAR(20) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    pattern_code VARCHAR(50) PRIMARY KEY,  -- Widened from 20 to 50 (Jan 2026)
+    name VARCHAR(100) NOT NULL,
     category VARCHAR(50) NOT NULL,
     chain VARCHAR(10) NOT NULL,
     severity VARCHAR(20) NOT NULL,
@@ -333,11 +333,28 @@ CREATE TABLE pattern_tool_mappings (
     id UUID PRIMARY KEY,
     scanner_id VARCHAR(100) NOT NULL,
     detector_id VARCHAR(100) NOT NULL,
-    pattern_code VARCHAR(20) REFERENCES vulnerability_patterns(pattern_code),
+    pattern_id VARCHAR(50) REFERENCES vulnerability_patterns(pattern_code),  -- Widened from 20 to 50
     confidence_adjustment INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
     UNIQUE(scanner_id, detector_id)
 );
 ```
+
+### Vulnerabilities Pattern Columns
+```sql
+-- Added to vulnerabilities table
+pattern_id VARCHAR(50),      -- BVD pattern code (e.g., BVD-SOLIDITY-REE-001)
+pattern_code VARCHAR(50),    -- Denormalized copy for quick access
+```
+
+### Deduplication Groups Pattern Column
+```sql
+-- Added to deduplication_groups table
+pattern_code VARCHAR(50),    -- Derived from canonical finding's pattern_code
+```
+
+**Note**: Column widths increased from VARCHAR(20) to VARCHAR(50) in January 2026 to accommodate
+longer BVD codes like `BVD-SOLIDITY-DEFI-LIQUIDITY-001` (34 characters). See Migration 033.
 
 ---
 
