@@ -1,5 +1,7 @@
 # User Activity Logging
 
+> **Status Update (January 16, 2026)**: Activity logging integration completed in API v0.10.6. Events are now logged when scans, contracts, and uploads occur. Previously the service existed but was not called.
+
 ## Activity Log Page
 **How to test**: Click "Activity Log" in the sidebar
 

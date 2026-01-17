@@ -203,6 +203,8 @@ The risk scoring system was redesigned to be unbounded (higher = riskier):
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-01-16 | Claude Code | 16-user-activity-logging.md | FIX - Activity logging integration, events now logged on scan/contract/upload (v0.10.6 API)
+2026-01-16 | Claude Code | 24-cross-scanner-deduplication.md | FIX - Pattern code fallback to canonical finding (v0.10.6 API)
 2026-01-15 | Claude Code | 41-vulnerability-filtering.md | NEW - Severity filter, scanner dropdown, pattern input, copy button bug fixes (v0.10.3 API, v0.30.6 Dashboard)
 2026-01-13 | Claude Code | 25-dark-mode-global-search.md | FIX - Advanced Search filter overflow fixed, added Test 12 for filter layout (v0.29.0 Dashboard)
 2026-01-12 | Claude Code | 40-quality-gates.md | IMPLEMENTED - Quality Gates, ProjectDetail integration, contracts search, advanced-search rename (v0.10.2 API, v0.29.0 Dashboard)
