@@ -1,7 +1,7 @@
 # Scanning Tests
 
 **Priority**: P0 - Critical
-**Last Tested**: December 29, 2025
+**Last Tested**: January 18, 2026
 **Endpoint**: `POST /api/v1/scans`
 
 ---
@@ -48,9 +48,21 @@
 > **Per-scanner validation tests**: See [22-scanner-validation.md](./22-scanner-validation.md)
 
 ### 3.1 Scanner Availability
-- [ ] 17 scanners registered in orchestration
-- [ ] Scanner list matches tier capabilities
-- [ ] All scanner images present in minikube
+- [x] 17+ scanners registered in orchestration
+- [x] Scanner list matches tier capabilities
+- [x] All scanner images present in registry
+
+### 3.1.1 Harbor Registry Integration (Server Environment)
+- [x] Scanner images pushed to Harbor (`harbor.blocksecops.local/blocksecops/scanner-*`)
+- [x] Scanner ConfigMap references Harbor images (scanner-versions-patch.yaml)
+- [x] `imagePullPolicy: IfNotPresent` configured for scanner jobs
+- [x] Scan jobs pull images from Harbor successfully
+- [x] No `ErrImageNeverPull` errors during scan execution
+
+**Verified:** SolidityDefend scan completed successfully (2026-01-18)
+- Scan ID: `2b9b81e2-e1cc-4d71-b9c5-b0e0d529ca1f`
+- Image: `harbor.blocksecops.local/blocksecops/scanner-soliditydefend:0.4.0`
+- Results: 126 findings (38 critical, 46 high, 31 medium, 11 low)
 
 ### 3.2 Scanner Compatibility
 - [ ] Only compatible scanners shown per language
