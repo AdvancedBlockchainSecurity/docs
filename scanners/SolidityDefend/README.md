@@ -1,23 +1,27 @@
 # SolidityDefend Scanner
 
-**Version:** 1.4.1
+**Version:** 1.10.3
 **Language:** Rust
 **Target:** Solidity Smart Contracts
 **Status:** ✅ Fully Integrated (Single-file + Project Mode)
-**Integration Date:** November 20, 2025 (v1.3.7), November 26, 2025 (v1.4.0 + Executor), November 28, 2025 (v1.4.1 Sync)
+**Integration Date:** November 20, 2025 (v1.3.7), November 26, 2025 (v1.4.0 + Executor), January 17, 2026 (v1.10.3 Major Upgrade)
 
 ---
 
 ## Overview
 
-SolidityDefend is a comprehensive Rust-based static analyzer specializing in modern blockchain vulnerabilities. It provides the most extensive coverage of contemporary smart contract security threats in the BlockSecOps platform, with 215 specialized detectors covering EIP-7702, ERC-4337 Account Abstraction, ERC-7683 intents, DeFi protocols, MEV, and emerging attack vectors.
+SolidityDefend is a comprehensive Rust-based static analyzer specializing in modern blockchain vulnerabilities. It provides the most extensive coverage of contemporary smart contract security threats in the BlockSecOps platform, with 333 specialized detectors covering EIP-7702, EIP-1153, EIP-3074/4844/6780, ERC-4337 Account Abstraction, ERC-7683 intents, DeFi protocols, MEV, L2/rollup security, advanced proxy patterns, and emerging attack vectors.
 
 ### Key Features
 
-- **215 Security Detectors** - Largest detector set in BlockSecOps
-- **Modern EIP Coverage** - EIP-7702, ERC-4337, EIP-1153, ERC-7683, ERC-7821
+- **333 Security Detectors** - Largest detector set in BlockSecOps
+- **Modern EIP Coverage** - EIP-7702, EIP-1153, EIP-3074, EIP-4844, EIP-6780, ERC-4337, ERC-7683, ERC-7821
 - **DeFi Security** - Vault attacks, AMM invariants, flash loans, oracle manipulation
-- **MEV Detection** - Sandwich attacks, front-running, JIT liquidity
+- **MEV Detection** - Sandwich attacks, front-running, JIT liquidity, liquidation MEV
+- **Advanced Proxy Security** - 45 detectors for UUPS, Beacon, Transparent, Diamond, EIP-1167 Clones
+- **L2/Rollup Security** - Sequencer MEV, challenge period bypass, blob data manipulation
+- **Governance/Access Control** - Timelock bypass, role escalation, quorum manipulation
+- **Callback Chain Detection** - Nested reentrancy, multicall msg.value reuse, ERC721/1155 callbacks
 - **AI Agent Security** - Emerging threat detection for autonomous contracts
 - **Restaking/LRT** - EigenLayer ecosystem vulnerabilities
 - **Zero-Knowledge** - ZK proof validation and trusted setup issues
@@ -53,13 +57,13 @@ SolidityDefend is a comprehensive Rust-based static analyzer specializing in mod
 | Pattern Mappings | ✅ Complete | 215 detectors mapped to BVD patterns |
 | Intelligence Layer | ✅ Complete | Automatic pattern classification & deduplication |
 
-### Pattern Database Integration (v3.13)
+### Pattern Database Integration (v3.14)
 
-- **Total Detectors:** 215
-- **New Patterns Created:** 43 (BVD-SOLIDITY-*)
+- **Total Detectors:** 333
+- **New Patterns Created:** 161 (BVD-SOLIDITY-*)
 - **Existing Patterns Used:** 61+
-- **Total Pattern Mappings:** 215 (100% coverage)
-- **Database Version:** v3.13
+- **Total Pattern Mappings:** 333 (100% coverage)
+- **Database Version:** v3.14
 
 ---
 
@@ -297,17 +301,20 @@ SolidityDefend findings are automatically enriched with:
 
 | Feature | SolidityDefend | Slither | Aderyn | Mythril |
 |---------|----------------|---------|---------|---------|
-| **Total Detectors** | **215** | ~80 | ~50 | ~40 |
-| **EIP-7702 Coverage** | ✅ 6 | ❌ | ❌ | ❌ |
+| **Total Detectors** | **333** | ~80 | ~50 | ~40 |
+| **EIP-7702/1153 Coverage** | ✅ 16 | ❌ | ❌ | ❌ |
+| **EIP-3074/4844/6780** | ✅ 8 | ❌ | ❌ | ❌ |
 | **ERC-4337 Coverage** | ✅ 21 | Partial | Partial | ❌ |
+| **Proxy/Upgradeable** | ✅ 45 | ~15 | ~10 | ~5 |
+| **L2/Rollup Security** | ✅ 10 | Basic | Basic | ❌ |
+| **Governance/Access** | ✅ 10 | Some | Some | ❌ |
 | **DeFi Patterns** | ✅ Extensive | Moderate | Limited | Limited |
-| **Modern EIPs (2024-25)** | ✅ Complete | Some | Some | Some |
+| **Modern EIPs (2024-26)** | ✅ Complete | Some | Some | Some |
 | **AI Agent Security** | ✅ 4 | ❌ | ❌ | ❌ |
 | **LRT/Restaking** | ✅ 9 | ❌ | ❌ | ❌ |
-| **MEV Detection** | ✅ 10 | Limited | Limited | Limited |
+| **MEV Detection** | ✅ 12 | Limited | Limited | Limited |
 | **Flash Loan Coverage** | ✅ 6 | Basic | Basic | Basic |
-| **Cross-Chain/L2** | ✅ 9 | Basic | Basic | ❌ |
-| **Pattern Mappings** | **215** | ~100 | ~87 | ~95 |
+| **Pattern Mappings** | **333** | ~100 | ~87 | ~95 |
 
 **Unique Strengths:**
 - **SolidityDefend:** Modern vulnerabilities, DeFi security, comprehensive coverage
@@ -323,10 +330,10 @@ See [DETECTOR-MAPPING.md](./DETECTOR-MAPPING.md) for complete detector-to-patter
 
 ### Summary Statistics
 
-- **Total Detectors:** 204
-- **Mapped to Existing Patterns:** 61 (30%)
-- **New Patterns Created:** 43 (21%)
-- **Pattern Categories:** 25+
+- **Total Detectors:** 333
+- **Mapped to Existing Patterns:** 172 (52%)
+- **New Patterns Created:** 161 (48%)
+- **Pattern Categories:** 40+
 - **Coverage:** 100%
 
 ### New Patterns Created
@@ -376,7 +383,7 @@ SCANNERS = {
     "soliditydefend": ScannerMetadata(
         id="soliditydefend",
         name="SolidityDefend",
-        description="Rust-based static analyzer with 204 vulnerability detectors for modern DeFi patterns",
+        description="Rust-based static analyzer with 333 vulnerability detectors for modern DeFi patterns",
         scanner_type=ScannerType.STATIC_ANALYSIS,
         languages=[ScannerLanguage.SOLIDITY],
         estimated_time_seconds=30,
@@ -404,7 +411,7 @@ STANDARD_SCAN_DETECTORS = [
     # ... ~80 detectors
 ]
 
-# Deep scan (all 204 detectors)
+# Deep scan (all 333 detectors)
 DEEP_SCAN_DETECTORS = "all"
 ```
 
@@ -416,9 +423,9 @@ DEEP_SCAN_DETECTORS = "all"
 
 | Project Size | Detectors | Average Time |
 |-------------|-----------|--------------|
-| Small (1-5 files) | 204 | 5-10 seconds |
-| Medium (10-20 files) | 204 | 15-30 seconds |
-| Large (50+ files) | 204 | 45-90 seconds |
+| Small (1-5 files) | 333 | 5-10 seconds |
+| Medium (10-20 files) | 333 | 15-30 seconds |
+| Large (50+ files) | 333 | 45-90 seconds |
 
 ### Resource Usage
 
@@ -510,13 +517,13 @@ soliditydefend scan --verbose path/to/Contract.sol
 - Added to API service scanner registry
 
 **Phase 2: Pattern Mapping** (November 20, 2025)
-- Mapped all 204 detectors to BVD patterns
+- Mapped all 333 detectors to BVD patterns
 - Created 43 new BVD-SOLIDITY patterns
 - Achieved 100% coverage
 
 **Phase 3: Database Integration** (November 20, 2025)
 - Updated vulnerability_patterns.json to v3.11
-- Added 204 pattern_tool_mappings
+- Added 333 pattern_tool_mappings
 - Deployed to API service
 
 **Impact:**
