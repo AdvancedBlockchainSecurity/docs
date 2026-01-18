@@ -1,9 +1,9 @@
 # SolidityDefend Detector to BVD Pattern Mapping
 
-**Scanner:** SolidityDefend v1.4.1
-**Total Detectors:** 215
-**Integration Date:** November 28, 2025 (Updated)
-**Database Version:** v3.13
+**Scanner:** SolidityDefend v1.10.3
+**Total Detectors:** 333
+**Integration Date:** January 17, 2026 (v1.10.3 Upgrade)
+**Database Version:** v3.14
 
 ---
 
@@ -11,9 +11,9 @@
 
 | Category | Detectors | BVD Patterns Used | Coverage |
 |----------|-----------|-------------------|----------|
-| **Total** | **215** | **104 patterns** | **100%** |
-| Mapped to Existing | 61 | 23 patterns | 30% |
-| Mapped to New | 143 | 43 patterns | 70% |
+| **Total** | **333** | **222 patterns** | **100%** |
+| Mapped to Existing | 172 | 61 patterns | 52% |
+| Mapped to New | 161 | 161 patterns | 48% |
 
 ---
 

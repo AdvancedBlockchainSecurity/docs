@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 3.0.0
-**Last Updated:** January 14, 2026
+**Version:** 3.1.0
+**Last Updated:** January 17, 2026
 
 ## Single Source of Truth
 
@@ -110,6 +110,51 @@ build-and-import() {
 }
 ```
 
+### kubeadm with Harbor (Recommended for Server)
+
+Harbor provides proper registry semantics that match production:
+
+```bash
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
+SERVICE="api-service"
+REGISTRY="harbor.blocksecops.local"
+
+# Build locally
+docker build -t ${REGISTRY}/blocksecops/${SERVICE}:${VERSION} .
+
+# Push to Harbor
+docker push ${REGISTRY}/blocksecops/${SERVICE}:${VERSION}
+
+# Deploy (Kubernetes pulls from Harbor)
+kubectl apply -k k8s/overlays/server/${SERVICE}/
+```
+
+**Why Harbor instead of direct containerd import:**
+- `imagePullPolicy: Always` actually works (triggers real pulls)
+- Digest tracking detects image updates
+- `:latest` tag behaves correctly
+- Matches GCP Artifact Registry workflow
+
+### kubeadm with containerd (Fallback)
+
+Direct import to containerd when Harbor is unavailable:
+
+```bash
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
+SERVICE="api-service"
+
+# Build in Docker
+docker build -t blocksecops-${SERVICE}:${VERSION} .
+
+# Bridge to containerd
+docker save blocksecops-${SERVICE}:${VERSION} | sudo ctr -n k8s.io images import -
+
+# Deploy
+kubectl apply -k k8s/overlays/server/${SERVICE}/
+```
+
+**Limitation:** No pull semantics - `imagePullPolicy: Always` won't re-pull updated images.
+
 ### GCP with Artifact Registry (Production)
 
 CI/CD handles everything automatically:
@@ -148,3 +193,47 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | tool-integration | 0.3.8 | |
 
 All services are `0.x.x` (development phase). Version `1.0.0` indicates stable, production-ready API.
+
+---
+
+## OCI Image Labels
+
+All Dockerfiles use OCI-compliant labels (not deprecated `org.label-schema`):
+
+```dockerfile
+ARG SERVICE_VERSION=0.0.0
+ARG BUILD_DATE
+ARG VCS_REF
+
+LABEL org.opencontainers.image.title="BlockSecOps API Service"
+LABEL org.opencontainers.image.description="Main API gateway for BlockSecOps platform"
+LABEL org.opencontainers.image.version="${SERVICE_VERSION}"
+LABEL org.opencontainers.image.created="${BUILD_DATE}"
+LABEL org.opencontainers.image.revision="${VCS_REF}"
+LABEL org.opencontainers.image.vendor="BlockSecOps"
+LABEL org.opencontainers.image.source="https://github.com/blocksecops/blocksecops-api-service"
+```
+
+### Build with Labels
+
+```bash
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
+docker build \
+  --build-arg SERVICE_VERSION=${VERSION} \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(git rev-parse --short HEAD) \
+  -t blocksecops-api-service:${VERSION} .
+```
+
+### Verify Labels
+
+```bash
+docker inspect --format='{{json .Config.Labels}}' blocksecops-api-service:${VERSION} | jq
+```
+
+---
+
+## Related Documentation
+
+- [Docker Standardization Plan](/home/pwner/Git/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-17-DOCKER-STANDARDIZATION-PLAN.md)
+- [Harbor Local Installation](/home/pwner/Git/TaskDocs-BlockSecOps/phases/02-phase-3.1a1-add-harbor/HARBOR-LOCAL-INSTALLATION.md)
