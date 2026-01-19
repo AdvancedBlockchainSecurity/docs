@@ -546,3 +546,70 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 
 ---
 
+## January 19, 2026 - IDE Integration Migration (scan_source field)
+
+### Backup Details
+**Filename:** `solidity_security_pre_scan_source_migration_20260119_084808.sql`
+**Location:** `/home/pwner/Git/docs/database/backups/solidity_security_pre_scan_source_migration_20260119_084808.sql`
+**Created:** January 19, 2026 08:48:08 MST
+**Size:** 5.7MB
+**Database Version:** PostgreSQL 15.4
+**Backup Method:** kubectl exec pg_dump from within cluster
+
+### Database State Before Migration
+**Tables:**
+- `scans`: 115 scan records
+- `contracts`: 58 contracts
+- `vulnerabilities`: 6,317 vulnerabilities
+- All existing data preserved
+
+**Schema Version:** Migration 033 (backfill_pattern_code)
+
+### Reason for Backup
+Created before adding `scan_source` field to scans table for IDE integration feature. This field tracks where scans originate from (web, cli, vscode, jetbrains, neovim, github_actions, etc.).
+
+### Changes Applied After This Backup
+```sql
+-- Migration 034_add_scan_source applied:
+ALTER TABLE scans ADD COLUMN scan_source VARCHAR(50) NOT NULL DEFAULT 'web';
+CREATE INDEX idx_scans_scan_source ON scans(scan_source);
+```
+
+### Database State After Migration
+**Schema Changes:**
+- Added `scan_source` column to `scans` table (VARCHAR(50), NOT NULL, DEFAULT 'web')
+- Added `idx_scans_scan_source` index for filtering by source
+- All existing scans have scan_source='web' (default)
+
+**Schema Version:** Migration 034 (add_scan_source)
+
+### Restore Command
+```bash
+# Stop API service to prevent concurrent access
+kubectl scale deployment/api-service -n api-service-local --replicas=0
+
+# Restore database
+kubectl cp /home/pwner/Git/docs/database/backups/solidity_security_pre_scan_source_migration_20260119_084808.sql \
+  postgresql-local/postgresql-0:/tmp/restore.sql
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U blocksecops -d solidity_security -f /tmp/restore.sql
+
+# Restart API service
+kubectl scale deployment/api-service -n api-service-local --replicas=1
+
+# Verify restoration
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U blocksecops -d solidity_security \
+  -c "SELECT COUNT(*) as total_scans FROM scans;
+      \d scans;"
+```
+
+### Related Documentation
+- Migration File: `blocksecops-api-service/alembic/versions/20260120_0100-034_add_scan_source.py`
+- IDE Integration Plan: `docs/features/IDE-INTEGRATION.md`
+- CLI Changes: `blocksecops-cli/src/blocksecops_cli/commands/scan.py` (--local, --scan-source flags)
+- API Changes: `blocksecops-api-service/src/presentation/api/v1/endpoints/scans.py` (scan_source filter)
+- Dashboard Changes: `blocksecops-dashboard/src/components/common/ScanSourceBadge.tsx`
+
+---
+

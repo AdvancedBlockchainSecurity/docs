@@ -12,6 +12,7 @@ This directory contains feature specifications and implementation documentation 
 | 3.4 | Enhanced Contract Details | Frontend Complete | [PHASE-3.4-ENHANCED-CONTRACT-DETAILS.md](./PHASE-3.4-ENHANCED-CONTRACT-DETAILS.md) |
 | 3.5 | Vyper & Rust SAST | Scanners Implemented | [PHASE-3.5-VYPER-RUST-SAST.md](./PHASE-3.5-VYPER-RUST-SAST.md) |
 | 4.5 | Enterprise Features | Backend Models Complete | [PHASE-4.5-ENTERPRISE-FEATURES.md](./PHASE-4.5-ENTERPRISE-FEATURES.md) |
+| 6 | IDE Integration | Implemented | [IDE-INTEGRATION.md](./IDE-INTEGRATION.md) |
 
 ## Phase 3.3: Wallet Authentication
 
@@ -65,6 +66,23 @@ Enterprise-grade features for organizations and compliance.
 - **Audit Logs**: Comprehensive activity tracking
 
 **Database Tables**: 7 new tables for enterprise functionality
+
+## Phase 6: IDE Integration
+
+IDE extensions for real-time security scanning in development environments.
+
+**Supported IDEs**:
+- VS Code: blocksecops-vscode extension
+- JetBrains: blocksecops-intellij plugin
+- Neovim: blocksecops-nvim Lua plugin
+- Vim 8+: ALE linter integration
+
+**Features**:
+- Local SolidityDefend scanning
+- Inline diagnostics
+- Scan on save
+- Dashboard sync
+- Scan source tracking
 
 ## Related Documentation
 

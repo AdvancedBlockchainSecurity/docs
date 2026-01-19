@@ -336,11 +336,11 @@ Due to database state inconsistencies after the 2025-11-05 database reset, the s
 
 ---
 
-## Current Database State (2026-01-16)
+## Current Database State (2026-01-19)
 
 ### Alembic Version
 ```
-version_num: 033_backfill_pattern_code
+version_num: 034_add_scan_source
 ```
 
 ### Existing Tables
@@ -971,6 +971,40 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 - **Reason**: Deduplication page tiles showed "Pattern pending classification" instead of BVD codes
 - **Migration File**: `alembic/versions/20260116_1000-033_backfill_pattern_code.py`
 - **Related Changelog**: `/docs/changelogs/PATTERN-CODE-BACKFILL-2026-01-16.md`
+
+---
+
+### Migration 034: Add Scan Source Field (IDE Integration)
+- **Status**: ✅ Applied (January 19, 2026)
+- **Revision ID**: `034_add_scan_source`
+- **Previous Revision**: `033_backfill_pattern_code`
+- **Description**: Tracks scan origin for IDE integration analytics
+- **Columns Added**:
+  - `scans.scan_source` (VARCHAR(50), NOT NULL, DEFAULT 'web') - Source of scan
+- **Valid Values**: web, cli, vscode, jetbrains, neovim, vim, github_actions, gitlab_ci
+- **Indexes Created**:
+  - `idx_scans_scan_source` on `scans(scan_source)`
+- **API Changes**:
+  - `POST /api/v1/scans` accepts `scan_source` field
+  - `GET /api/v1/scans` accepts `scan_source` query parameter for filtering
+  - `ScanResponse` includes `scan_source` field
+- **Dashboard Changes**:
+  - `ScanSourceBadge` component shows source with icon
+  - Scan list table includes "Source" column
+  - Filter dropdown for scan source
+- **Related Files**:
+  - Migration: `alembic/versions/20260120_0100-034_add_scan_source.py`
+  - Models: `src/infrastructure/database/models.py` (ScanModel.scan_source)
+  - Schemas: `src/presentation/schemas/scans.py` (ScanCreate, ScanResponse)
+  - Dashboard: `src/components/common/ScanSourceBadge.tsx`
+- **CLI Enhancements**:
+  - `--local` flag for local SolidityDefend scanning
+  - `--scan-source` parameter to specify origin
+  - Auto-download SolidityDefend from GitHub releases
+- **IDE Plugins**:
+  - VS Code: `blocksecops-vscode`
+  - JetBrains: `blocksecops-intellij`
+  - Neovim: `blocksecops-nvim`
 
 ---
 

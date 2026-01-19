@@ -57,6 +57,7 @@ Manual testing checklists for all user-facing features.
 | [39-economic-security-analysis.md](./39-economic-security-analysis.md) | Economic security panel, flash loan/MEV/DeFi detection, AI explanations (Phase 5.5a) |
 | [40-quality-gates.md](./40-quality-gates.md) | CI/CD Quality Gates, blocking rules, thresholds, badges, evaluation history (Phase 5.5c) |
 | [41-vulnerability-filtering.md](./41-vulnerability-filtering.md) | Vulnerability filtering, scanner dropdown, pattern input, copy button (Bug fixes Jan 2026) |
+| [42-ide-integration.md](./42-ide-integration.md) | IDE integrations: VS Code, JetBrains, Neovim, CLI local scanning (Phase 6) |
 
 ---
 
@@ -203,6 +204,7 @@ The risk scoring system was redesigned to be unbounded (higher = riskier):
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-01-19 | Claude Code | 42-ide-integration.md | IMPLEMENTED - IDE plugins (VS Code, JetBrains, Neovim), CLI --local flag, scan_source tracking (Migration 034)
 2026-01-16 | Claude Code | 16-user-activity-logging.md | FIX - Activity logging integration, events now logged on scan/contract/upload (v0.10.6 API)
 2026-01-16 | Claude Code | 24-cross-scanner-deduplication.md | FIX - Pattern code fallback to canonical finding (v0.10.6 API)
 2026-01-15 | Claude Code | 41-vulnerability-filtering.md | NEW - Severity filter, scanner dropdown, pattern input, copy button bug fixes (v0.10.3 API, v0.30.6 Dashboard)

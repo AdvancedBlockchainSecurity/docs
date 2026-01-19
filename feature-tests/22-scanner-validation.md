@@ -1,9 +1,10 @@
 # Scanner Validation Tests
 
 **Priority**: P0 - Critical
-**Last Tested**: _Not yet tested_
-**Active Scanners**: 17 (11 Solidity, 2 Vyper, 4 Solana pending)
+**Last Tested**: January 19, 2026
+**Active Scanners**: 17 (11 Solidity, 2 Vyper, 4 Solana)
 **Test Contract Location**: `/Users/pwner/Git/vulnerable-smart-contract-examples`
+**Registry**: Harbor (`harbor.blocksecops.local/blocksecops/scanner-*`)
 
 ---
 
@@ -19,30 +20,37 @@
 
 ## 0. Pre-Flight Checks
 
-### 0.1 Scanner Images Exist
+### 0.1 Scanner Images Exist in Harbor
 ```bash
-eval $(minikube docker-env)
-docker images | grep "^scanner-"
+# Check all scanner images in Harbor registry
+for scanner in slither aderyn semgrep solhint wake soliditydefend echidna medusa halmos vyper moccasin sol-azy sec3-xray trident cargo-fuzz-solana; do
+    result=$(curl -sk "https://harbor.blocksecops.local/api/v2.0/projects/blocksecops/repositories/scanner-${scanner}/artifacts" | jq -r '.[].tags[]?.name // empty' | head -1)
+    echo "scanner-${scanner}: ${result:-MISSING}"
+done
+
+# Or check local Docker images (if built locally)
+docker images | grep "harbor.blocksecops.local.*scanner-"
 ```
 
-| Scanner | Expected Image | Expected Size |
-|---------|---------------|---------------|
-| slither | scanner-slither:0.2.0 | ~400MB |
-| aderyn | scanner-aderyn:0.6.5 | ~300MB |
-| mythril | scanner-mythril:* | ~500MB |
-| semgrep | scanner-semgrep:0.3.0 | ~400MB |
-| solhint | scanner-solhint:0.2.0 | ~200MB |
-| wake | scanner-wake:0.3.1 | ~400MB |
-| soliditydefend | scanner-soliditydefend:0.2.1 | ~300MB |
-| echidna | scanner-echidna:0.2.0 | ~500MB |
-| medusa | scanner-medusa:0.2.0 | ~400MB |
-| halmos | scanner-halmos:0.2.0 | ~400MB |
-| vyper | scanner-vyper:0.2.0 | ~250MB |
-| moccasin | scanner-moccasin:0.2.0 | ~800MB |
-| sol-azy | scanner-sol-azy:0.2.0 | ~150MB |
-| sec3-xray | scanner-sec3-xray:0.2.0 | ~250MB |
-| trident | scanner-trident:0.2.0 | ~2GB |
-| cargo-fuzz-solana | scanner-cargo-fuzz-solana:0.2.0 | ~1.7GB |
+| Scanner | Harbor Image | Version | Status |
+|---------|--------------|---------|--------|
+| slither | harbor.blocksecops.local/blocksecops/scanner-slither | 0.2.0 | ✅ Verified |
+| aderyn | harbor.blocksecops.local/blocksecops/scanner-aderyn | 0.6.5 | ✅ Verified |
+| semgrep | harbor.blocksecops.local/blocksecops/scanner-semgrep | 0.3.0 | ✅ Verified |
+| solhint | harbor.blocksecops.local/blocksecops/scanner-solhint | 0.2.0 | ✅ Verified |
+| wake | harbor.blocksecops.local/blocksecops/scanner-wake | 0.3.4 | ✅ Verified |
+| soliditydefend | harbor.blocksecops.local/blocksecops/scanner-soliditydefend | 0.4.0 | ✅ Verified |
+| echidna | harbor.blocksecops.local/blocksecops/scanner-echidna | 0.2.0 | ✅ Verified |
+| medusa | harbor.blocksecops.local/blocksecops/scanner-medusa | 0.2.0 | ✅ Verified |
+| halmos | harbor.blocksecops.local/blocksecops/scanner-halmos | 0.2.0 | ✅ Verified |
+| vyper | harbor.blocksecops.local/blocksecops/scanner-vyper | 0.2.0 | ✅ Verified |
+| moccasin | harbor.blocksecops.local/blocksecops/scanner-moccasin | 0.2.0 | ✅ Verified |
+| sol-azy | harbor.blocksecops.local/blocksecops/scanner-sol-azy | 0.2.0 | ✅ Verified |
+| sec3-xray | harbor.blocksecops.local/blocksecops/scanner-sec3-xray | 0.2.0 | ✅ Verified |
+| trident | harbor.blocksecops.local/blocksecops/scanner-trident | 0.2.0 | ✅ Verified |
+| cargo-fuzz-solana | harbor.blocksecops.local/blocksecops/scanner-cargo-fuzz-solana | 0.2.0 | ✅ Verified |
+
+**Last Verified:** January 19, 2026
 
 - [ ] All Solidity scanner images present
 - [ ] All Vyper scanner images present
@@ -409,7 +417,9 @@ docker run --rm -v /tmp:/contracts scanner-vyper:0.2.0 /contracts/test.vy --json
 ---
 
 ### 3.2 Moccasin
-**Type**: Fuzzer | **Language**: Vyper
+**Type**: Fuzzer | **Language**: Vyper | **Requires Project**: Yes
+
+> **Important:** Moccasin requires a full project structure with test harnesses. It will NOT appear in the "Configure & Start Scan" modal for single-file `.vy` uploads. Upload a complete Vyper project (ZIP or GitHub) to access Moccasin.
 
 #### Image Verification
 ```bash
@@ -682,10 +692,14 @@ docker run --rm -v /path/to/fuzz-target:/project \
 
 ## Test Notes
 
-_Record scanner validation results here:_
-
 ```
 [Date] | [Scanner] | [Test Type] | [Result] | [Notes]
+2026-01-19 | All 15 scanners | Harbor image check | PASS | All images present in Harbor with correct versions
+2026-01-19 | vyper | E2E scan | PASS | scan-vyper-0c35bf78 completed, 2 vulnerabilities found
+2026-01-19 | moccasin | E2E scan | PASS | scan-moccasin-0c35bf78 completed successfully
+2026-01-19 | moccasin | UI visibility (single-file) | EXPECTED | Not shown - requires_project=true, expected behavior
+2026-01-19 | API scanners endpoint | Vyper filter | PASS | Returns vyper and moccasin for language=vyper
+2026-01-19 | ConfigMap | Harbor references | PASS | All SCANNER_IMAGE_* keys reference Harbor registry
 ```
 
 ---

@@ -1,10 +1,11 @@
 # Vyper & Rust Scanner Integration Tests (Phase 3.5)
 
 **Priority**: P2 - Medium
-**Last Tested**: December 29, 2025
+**Last Tested**: January 19, 2026
 **Status**: ✅ Phase 3.5 Complete - Full E2E Verified with Vulnerability Detection
 **Feature**: Vyper Scanner Integration, Solana/Rust Scanner Integration
 **Scanner Validation Tests**: See [22-scanner-validation.md](./22-scanner-validation.md)
+**Registry**: All scanner images now in Harbor (`harbor.blocksecops.local/blocksecops/`)
 
 ---
 
@@ -107,6 +108,11 @@ cd /Users/pwner/Git/ABS/blocksecops-tool-integration
 
 ```
 [Date] | [Test] | [Result] | [Notes]
+2026-01-19 | Harbor image verification | PASS | All 15 scanner images in Harbor with correct versions
+2026-01-19 | ConfigMap Harbor refs | PASS | scanner-versions ConfigMap uses Harbor registry
+2026-01-19 | Vyper E2E scan | PASS | scan-vyper-0c35bf78 completed with 2 vulnerabilities
+2026-01-19 | Moccasin E2E scan | PASS | scan-moccasin-0c35bf78 completed successfully
+2026-01-19 | Moccasin UI visibility | EXPECTED | Not shown for single-file (requires_project=true)
 2025-12-29 | Vyper vulnerability detection | PASS | 2 vulnerabilities detected (1 High reentrancy, 1 Low unchecked send)
 2025-12-29 | vvm multi-version support | PASS | Automatic version detection and installation working
 2025-12-29 | Latest stable versions | PASS | Updated to vvm 0.3.2, Vyper 0.3.10/0.4.3, Slither 0.11.3

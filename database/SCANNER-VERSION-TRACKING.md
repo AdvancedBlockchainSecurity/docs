@@ -389,9 +389,13 @@ The database provides the **history** and **analytics** that ConfigMap cannot.
 
 ---
 
-## Data Current as of 2025-12-08
+## Data Current as of 2026-01-19
 
-### Scanners Loaded (Docker Images Updated December 8, 2025)
+### Scanner Images in Harbor Registry (Verified January 19, 2026)
+
+All 15 scanner images are now in Harbor at `harbor.blocksecops.local/blocksecops/`:
+
+### Scanners Loaded
 
 **EVM/Solidity Scanners:**
 - slither (0.11.3, solc-select 1.1.0) - scanner-slither:0.2.0 - 101/101 detectors (100%) ✅
@@ -404,15 +408,16 @@ The database provides the **history** and **analytics** that ConfigMap cannot.
 - halmos (0.3.3) - scanner-halmos:0.2.0 - formal verification
 - certora (8.3.1) - 0/5 rules integrated
 
-**EVM/Vyper Scanners:**
-- vyper (0.4.3) - scanner-vyper:0.2.0 - uses slither 0.11.3 for analysis ✅
-- moccasin (latest, vyper 0.4.3) - scanner-moccasin:0.2.0 - fuzzer ✅
+**EVM/Vyper Scanners:** ✅ All in Harbor, E2E verified (January 19, 2026)
+- vyper (0.4.3) - harbor.blocksecops.local/blocksecops/scanner-vyper:0.2.0 - uses slither 0.11.3 ✅
+- moccasin (latest, vyper 0.4.3) - harbor.blocksecops.local/blocksecops/scanner-moccasin:0.2.0 - fuzzer ✅
+  - Note: Moccasin requires project structure (not shown for single-file contracts in UI)
 
-**Solana Scanners:** ⚠️ Docker images built, NOT available in orchestration (require Rust toolchain)
-- sol-azy (latest) - scanner-sol-azy:latest - built from source ❌ Unavailable
-- sec3-xray (0.0.6) - scanner-sec3-xray:latest - official GHCR image ❌ Unavailable
-- trident (0.12.0) - scanner-trident:latest - fuzzer ❌ Unavailable
-- cargo-fuzz-solana (0.13.1) - scanner-cargo-fuzz-solana:latest - fuzzer ❌ Unavailable
+**Solana Scanners:** ✅ All in Harbor (January 19, 2026)
+- sol-azy (latest) - harbor.blocksecops.local/blocksecops/scanner-sol-azy:0.2.0 ✅
+- sec3-xray (0.0.6) - harbor.blocksecops.local/blocksecops/scanner-sec3-xray:0.2.0 ✅
+- trident (0.12.0) - harbor.blocksecops.local/blocksecops/scanner-trident:0.2.0 ✅
+- cargo-fuzz-solana (0.13.1) - harbor.blocksecops.local/blocksecops/scanner-cargo-fuzz-solana:0.2.0 ✅
 
 **Cairo/StarkNet Scanners:** ⚠️ NOT integrated - patterns defined but no scanner integration
 - caracal (0.2.3) - 0/14 detectors ❌ Unavailable (no Docker image)
@@ -420,6 +425,13 @@ The database provides the **history** and **analytics** that ConfigMap cannot.
 - starknet-foundry (0.50.0) - fuzzer ❌ Unavailable (no Docker image)
 
 ### Recent Updates Recorded
+
+- **2026-01-19**: All Scanner Images Verified in Harbor
+  - All 15 scanner images confirmed in Harbor registry with correct versions
+  - ConfigMap (`scanner-versions`) updated with Harbor image references
+  - Orchestration SCANNER_METADATA updated with missing scanner entries (moccasin, vyper, soliditydefend, sol-azy, sec3-xray, trident, cargo-fuzz-solana)
+  - Vyper and Moccasin scans completing successfully (E2E verified)
+  - See: `/home/pwner/Git/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-19-SCANNER-HARBOR-IMAGES.md`
 
 - **2025-12-20**: Scanner Pattern Coverage Audit Complete
   - Fixed 5 duplicate pattern IDs in vulnerability_patterns.json
@@ -603,5 +615,5 @@ SELECT record_scanner_update('scanner_name', 'new_version', 'new_image_tag');
 ---
 
 **Created**: 2025-10-30
-**Last Updated**: 2025-12-20
+**Last Updated**: 2026-01-19
 **Maintained By**: BlockSecOps Platform Team
