@@ -160,7 +160,7 @@ BlockSecOps operates in the web3 smart contract security market, a smaller and l
 | **Aderyn** | Cyfrin | Growing | Rust |
 | **Echidna** | Trail of Bits | Fuzzer | Haskell |
 | **Medusa** | Trail of Bits | Fuzzer | Go |
-| **Halmos** | a]0xkitsune | Symbolic | Python |
+| **Halmos** | a16z | Symbolic | Python |
 | **Mythril** | ConsenSys | Symbolic | Python |
 
 **Gap**: No dashboard, no intelligence, no support, no deduplication, no false positive filtering
