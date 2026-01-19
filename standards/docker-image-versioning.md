@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 3.1.0
-**Last Updated:** January 17, 2026
+**Version:** 3.2.0
+**Last Updated:** January 18, 2026
 
 ## Single Source of Truth
 
@@ -65,6 +65,86 @@ git commit -m "chore(<service>): bump version to 0.2.1"
 
 ---
 
+## Service-Specific Build Requirements
+
+Some services have special build requirements due to shared dependencies or build-time environment variables.
+
+### Dashboard (blocksecops-dashboard)
+
+The dashboard requires:
+1. **Parent directory context** - Dockerfile references `blocksecops-shared` sibling directory
+2. **Build-time environment variables** - Supabase credentials are baked into static assets
+
+```bash
+cd /home/pwner/Git  # Parent directory containing both repos
+
+VERSION=$(grep '"version"' blocksecops-dashboard/package.json | head -1 | cut -d'"' -f4)
+REGISTRY="harbor.blocksecops.local"
+
+# Get Supabase credentials from existing ConfigMap
+SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')
+SUPABASE_KEY=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_anon_key}')
+WALLETCONNECT_ID=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.VITE_WALLETCONNECT_PROJECT_ID}')
+
+# Build with required build args
+docker build \
+  -f blocksecops-dashboard/Dockerfile \
+  --build-arg VITE_SUPABASE_URL=${SUPABASE_URL} \
+  --build-arg VITE_SUPABASE_ANON_KEY=${SUPABASE_KEY} \
+  --build-arg VITE_WALLETCONNECT_PROJECT_ID=${WALLETCONNECT_ID} \
+  --build-arg SERVICE_VERSION=${VERSION} \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(cd blocksecops-dashboard && git rev-parse --short HEAD) \
+  -t ${REGISTRY}/blocksecops/dashboard:${VERSION} .
+
+# Push and deploy
+docker push ${REGISTRY}/blocksecops/dashboard:${VERSION}
+kubectl apply -k blocksecops-dashboard/k8s/overlays/local/
+```
+
+**Why parent directory context?**
+- Dashboard imports `@blocksecops/shared` from sibling `blocksecops-shared/typescript/`
+- Dockerfile uses `COPY blocksecops-shared /workspace/blocksecops-shared`
+- Build context must include both directories
+
+### API Service (blocksecops-api-service)
+
+Standard build from service directory:
+
+```bash
+cd /home/pwner/Git/blocksecops-api-service
+
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
+REGISTRY="harbor.blocksecops.local"
+
+# Build image
+docker build \
+  --build-arg SERVICE_VERSION=${VERSION} \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(git rev-parse --short HEAD) \
+  -t ${REGISTRY}/blocksecops/api-service:${VERSION} .
+
+# Push and deploy
+docker push ${REGISTRY}/blocksecops/api-service:${VERSION}
+kubectl apply -k k8s/overlays/local/api-service/
+```
+
+### Other Services
+
+Most services follow the standard pattern (build from service directory):
+
+| Service | Build Context | Special Requirements |
+|---------|---------------|---------------------|
+| api-service | Service directory | None |
+| dashboard | **Parent directory** | Supabase build args, shared lib |
+| data-service | Service directory | None |
+| intelligence-engine | Service directory | None |
+| notification | Service directory | None |
+| orchestration | Service directory | None |
+| tool-integration | Service directory | None |
+
+---
+
 ## Environment-Specific Workflows
 
 ### minikube (Recommended for Local Dev)
@@ -75,7 +155,8 @@ minikube shares its Docker daemon, so builds are immediately available:
 # One-time setup per terminal session
 eval $(minikube docker-env)
 
-# Build and deploy (that's it!)
+# Build and deploy
+# Build and deploy
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
 docker build -t blocksecops-<service>:$VERSION .
 kubectl apply -k k8s/overlays/local/<service>/
@@ -126,8 +207,10 @@ docker build -t ${REGISTRY}/blocksecops/${SERVICE}:${VERSION} .
 docker push ${REGISTRY}/blocksecops/${SERVICE}:${VERSION}
 
 # Deploy (Kubernetes pulls from Harbor)
-kubectl apply -k k8s/overlays/server/${SERVICE}/
+kubectl apply -k k8s/overlays/local/${SERVICE}/
 ```
+
+**Note:** Services deployed on the server still use `k8s/overlays/local/` kustomization. The `server/` overlay in `blocksecops-gcp-infrastructure` only contains IngressRoutes and CORS middleware for the `app.blocksecops.local` domain.
 
 **Why Harbor instead of direct containerd import:**
 - `imagePullPolicy: Always` actually works (triggers real pulls)
@@ -150,7 +233,7 @@ docker build -t blocksecops-${SERVICE}:${VERSION} .
 docker save blocksecops-${SERVICE}:${VERSION} | sudo ctr -n k8s.io images import -
 
 # Deploy
-kubectl apply -k k8s/overlays/server/${SERVICE}/
+kubectl apply -k k8s/overlays/local/${SERVICE}/
 ```
 
 **Limitation:** No pull semantics - `imagePullPolicy: Always` won't re-pull updated images.
@@ -182,15 +265,15 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 
 ## Current Service Versions
 
-| Service | Version | Notes |
-|---------|---------|-------|
-| api-service | 0.10.2 | |
-| dashboard | 0.30.4 | |
-| data-service | 0.2.0 | |
-| intelligence-engine | 0.2.0 | |
-| notification | 0.1.2 | |
-| orchestration | 0.9.1 | |
-| tool-integration | 0.3.8 | |
+| Service | Version | Kustomization Path | Notes |
+|---------|---------|-------------------|-------|
+| api-service | 0.11.1 | `k8s/overlays/local/api-service/` | |
+| dashboard | 0.30.11 | `k8s/overlays/local/` | Requires parent context |
+| data-service | 0.2.0 | `k8s/overlays/local/` | |
+| intelligence-engine | 0.2.0 | `k8s/overlays/local/` | |
+| notification | 0.1.2 | `k8s/overlays/local/` | |
+| orchestration | 0.9.1 | `k8s/overlays/local/` | |
+| tool-integration | 0.3.8 | `k8s/overlays/local/` | |
 
 All services are `0.x.x` (development phase). Version `1.0.0` indicates stable, production-ready API.
 

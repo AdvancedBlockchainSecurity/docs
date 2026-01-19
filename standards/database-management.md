@@ -1,8 +1,23 @@
 # Database Management and Recovery Standards
 
-**Version:** 1.8.0
-**Last Updated:** October 20, 2025
+**Version:** 1.9.0
+**Last Updated:** January 18, 2026
 **Status:** Active
+
+## Database Configuration
+
+| Setting | Value | Notes |
+|---------|-------|-------|
+| Database System | PostgreSQL 15.4 | |
+| **Database Name** | `solidity_security` | NOT `blocksecops` - see note below |
+| Default User | postgres | Local development |
+| Schema | public | |
+
+> **Important:** The production database is named `solidity_security`, not `blocksecops`. This naming was established during initial platform development. All connection strings, scripts, and GCP migration plans should use this name.
+>
+> **Current Stats (January 18, 2026):** 15 scanners, 58 contracts, 115 scans, 6,317 vulnerabilities
+
+---
 
 ## Critical Database Safety Rules
 

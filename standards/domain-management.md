@@ -219,12 +219,38 @@ kubectl rollout restart deployment/dashboard -n dashboard-local
 
 When ready to deploy to GCP with `app.blocksecops.com`:
 
+> **Last Verified:** January 18, 2026 (SolidityDefend v1.10.3 verification)
+> See [Verification Report](/home/pwner/Git/docs/changelogs/SOLIDITYDEFEND-V1.10.3-VERIFICATION-2026-01-18.md) for details.
+
 ### Prerequisites
 
 - [ ] GCP project created
 - [ ] GKE cluster provisioned
 - [ ] DNS A record: `app.blocksecops.com` → GCP Load Balancer IP
 - [ ] DNS A record: `api.blocksecops.com` → GCP Load Balancer IP (if separate)
+
+### Infrastructure Migration (from January 2026 Verification)
+
+**Priority 1 - Security:**
+
+| Current State | GCP Target | Action |
+|---------------|------------|--------|
+| Self-signed TLS certificates | GCP Certificate Manager | Replace with managed certificates |
+| Sensitive values in ConfigMaps | GCP Secret Manager | Migrate secrets (DB passwords, API keys) |
+
+**Priority 2 - Core Infrastructure:**
+
+| Current State | GCP Target | Action |
+|---------------|------------|--------|
+| Harbor registry (local) | Google Artifact Registry | Migrate container images |
+| PostgreSQL (local) | Cloud SQL for PostgreSQL 15.4+ | Migrate `solidity_security` database |
+
+**Priority 3 - Authentication & Observability:**
+
+| Current State | GCP Target | Action |
+|---------------|------------|--------|
+| Supabase Auth | Keep Supabase OR Google Identity Platform | Evaluate based on feature needs |
+| Local logging | Cloud Monitoring + Cloud Logging | Integrate for centralized observability |
 
 ### Configuration Updates
 
@@ -283,29 +309,65 @@ When ready to deploy to GCP with `app.blocksecops.com`:
 # 1. Connect to GKE cluster
 gcloud container clusters get-credentials blocksecops-prod --zone us-central1-a
 
-# 2. Apply infrastructure (PostgreSQL, Redis, Vault)
-kubectl apply -k k8s/overlays/production/postgresql/
-kubectl apply -k k8s/overlays/production/redis/
-kubectl apply -k k8s/overlays/production/vault/
+# 2. Set up GCP Secret Manager (migrate from ConfigMaps)
+gcloud secrets create db-password --data-file=./secrets/db-password.txt
+gcloud secrets create supabase-jwt-secret --data-file=./secrets/jwt-secret.txt
+# Configure External Secrets Operator for GCP Secret Manager
 
-# 3. Apply cert-manager and certificates
-kubectl apply -k k8s/overlays/production/cert-manager/
+# 3. Set up Cloud SQL (replaces local PostgreSQL)
+# Database name: solidity_security (NOT blocksecops)
+gcloud sql instances create blocksecops-prod \
+  --database-version=POSTGRES_15 \
+  --tier=db-standard-2 \
+  --region=us-central1
+gcloud sql databases create solidity_security --instance=blocksecops-prod
 
-# 4. Apply Traefik with TLS
-kubectl apply -k k8s/overlays/production/traefik/
+# 4. Set up Artifact Registry (replaces Harbor)
+gcloud artifacts repositories create blocksecops \
+  --repository-format=docker \
+  --location=us-central1
+# Push images to: us-central1-docker.pkg.dev/PROJECT/blocksecops/
 
-# 5. Apply application services
-kubectl apply -k k8s/overlays/production/api-service/
-kubectl apply -k k8s/overlays/production/dashboard/
+# 5. Apply infrastructure (Redis, External Secrets)
+kubectl apply -k k8s/overlays/gcp-production/redis/
+kubectl apply -k k8s/overlays/gcp-production/external-secrets/
+
+# 6. Apply cert-manager and certificates (GCP-managed)
+kubectl apply -k k8s/overlays/gcp-production/cert-manager/
+
+# 7. Apply Traefik with TLS
+kubectl apply -k k8s/overlays/gcp-production/traefik/
+
+# 8. Apply application services
+kubectl apply -k k8s/overlays/gcp-production/api-service/
+kubectl apply -k k8s/overlays/gcp-production/dashboard/
+kubectl apply -k k8s/overlays/gcp-production/tool-integration/
 # ... other services
 
-# 6. Verify TLS certificate
+# 9. Verify TLS certificate
 kubectl get certificate -A
 kubectl describe certificate blocksecops-tls -n traefik
 
-# 7. Test HTTPS access
+# 10. Test HTTPS access
 curl https://app.blocksecops.com/api/v1/health/live
+
+# 11. Run E2E verification (similar to January 2026 verification)
+# - Test scanner endpoints
+# - Run SolidityDefend scan
+# - Verify tier-based access controls
 ```
+
+### Post-Migration Verification
+
+Based on January 2026 SolidityDefend verification, confirm:
+
+| Check | Command |
+|-------|---------|
+| Scanner ConfigMap | `kubectl get configmap scanner-soliditydefend -o yaml` |
+| API Endpoints | `curl https://app.blocksecops.com/api/v1/scanners` |
+| E2E Scan | Create scan and verify 4-second completion |
+| Database Stats | Verify scanners, contracts, scans, vulnerabilities counts |
+| Tier Access | Test `/audit-logs` (professional+), `/webhooks` (startup+) |
 
 ---
 
