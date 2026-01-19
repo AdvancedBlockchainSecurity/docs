@@ -3,7 +3,19 @@
 **Feature**: IDE Integration (VS Code, JetBrains, Neovim)
 **Version**: 1.0.0
 **Last Updated**: January 19, 2026
-**Status**: Implemented
+**Status**: Partially Implemented
+
+## Implementation Status
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| API scan_source field | ✅ Tested | API v0.11.2 - stores and returns scan_source |
+| API scan_source filter | ✅ Tested | `?scan_source=vscode` filtering works |
+| Dashboard ScanSourceBadge | ✅ Tested | Dashboard v0.30.12 - badges display correctly |
+| CLI --local flag | ⏳ Pending | Code created, needs testing |
+| VS Code extension | ⏳ Pending | Code created, needs build and install |
+| JetBrains plugin | ⏳ Pending | Code created, needs build and install |
+| Neovim plugin | ⏳ Pending | Code created, needs testing |
 
 ## Prerequisites
 
@@ -422,5 +434,7 @@ let g:ale_linters = { 'solidity': ['blocksecops'] }
 
 ```
 [Date] | [Tester] | [Test ID] | [Result] | [Notes]
-2026-01-19 | Claude Code | TC-42-001-042 | IMPLEMENTED - IDE plugins created, CLI enhanced, dashboard updated
+2026-01-19 | Claude Code | TC-42-040-042 | PASS | API scan_source tested (v0.11.2): create, store, filter all working
+2026-01-19 | Claude Code | ScanSourceBadge | PASS | Dashboard badges display correctly (v0.30.12)
+2026-01-19 | Claude Code | TC-42-001-039 | PENDING | CLI and IDE plugins created but not yet tested
 ```

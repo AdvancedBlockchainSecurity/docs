@@ -1,10 +1,10 @@
 # Web3 Smart Contract Security Market Analysis
 
-**Last Updated**: January 2, 2026
+**Last Updated**: January 19, 2026
 
 ## Executive Summary
 
-BlockSecOps operates in the web3 smart contract security market, a smaller and less mature market compared to web2 application security (Snyk, Checkmarx, Veracode). Our primary targets are developers and startups, with enterprise being an aspirational long-term goal.
+BlockSecOps operates in the web3 smart contract security market, a smaller and less mature market compared to web2 application security (Snyk, Checkmarx, Veracode). Our unique position as a unified DevSecOps platform aggregating 25+ scanners with 95% false positive reduction creates significant pricing leverage that competitors cannot match.
 
 ---
 
@@ -14,9 +14,11 @@ BlockSecOps operates in the web3 smart contract security market, a smaller and l
 
 | Capability | Description |
 |------------|-------------|
-| **SAST Scanner** | Unified aggregation of 17+ tools (SolidityDefend, Slither, Aderyn, etc.) |
+| **SAST Scanner** | Unified aggregation of 25+ tools (SolidityDefend, Slither, Aderyn, Halmos, Echidna, Medusa, etc.) |
 | **Fuzzing Scanner** | Integrated fuzzing capabilities |
-| **Intelligence Layer** | Enriched findings, cross-scanner deduplication, risk scoring |
+| **Intelligence Layer** | Enriched findings, cross-scanner deduplication, 95% false positive reduction |
+| **Multi-Chain Support** | Solidity, Vyper, Rust/Solana, Cairo, Move |
+| **Continuous Monitoring** | Post-deployment security scanning |
 | **Vulnerability Management** | Complete dashboard for tracking and remediation |
 
 **What We Are NOT**: Audits, on-chain scans, transaction monitoring
@@ -44,15 +46,40 @@ BlockSecOps operates in the web3 smart contract security market, a smaller and l
 - GitHub Actions integration
 
 **Weaknesses vs BlockSecOps**:
-- **Single scanner** (1 scanner vs our 17+)
+- **Single scanner** (1 scanner vs our 25+)
 - Limited intelligence layer
 - No cross-scanner deduplication
+- No 95% false positive reduction
 - No vulnerability management dashboard
-- **Cost per scanner: $200-500** vs BlockSecOps $12-147
+- **Cost per scanner: $200-500** vs BlockSecOps $12-28
 
 ---
 
-### 2. Olympix
+### 2. MetaTrust
+
+**Website**: [metatrust.io](https://metatrust.io)
+
+| Metric | Details |
+|--------|---------|
+| Pricing | $599/month starting |
+| Model | Per-line-of-code (~1.5¢/line) |
+| Transparency | Published pricing |
+
+**Strengths**:
+- Web3-specific focus
+- Published pricing
+- Enterprise features
+
+**Weaknesses vs BlockSecOps**:
+- **Single scanner** (1 scanner vs our 25+)
+- No cross-scanner deduplication
+- No 95% false positive reduction
+- Per-LOC pricing can become expensive at scale
+- **Cost per scanner: $599** vs BlockSecOps $12-28
+
+---
+
+### 3. Olympix
 
 **Website**: [olympix.security](https://olympix.security)
 
@@ -73,10 +100,34 @@ BlockSecOps operates in the web3 smart contract security market, a smaller and l
 - No unified scanning (single tool)
 - No vulnerability management
 - Opaque pricing
+- **Cost per scanner: ~$1,000** vs BlockSecOps $12-28
 
 ---
 
-### 3. Diligence Fuzzing (ConsenSys)
+### 4. Aikido Security
+
+**Website**: [aikido.dev](https://aikido.dev)
+
+| Metric | Details |
+|--------|---------|
+| Pricing | $300-600/month flat rate |
+| Model | Per-user seat (10 users) |
+| Focus | General DevSecOps |
+
+**Strengths**:
+- Transparent flat-rate pricing
+- Modern DevSecOps platform
+- Good CI/CD integration
+
+**Weaknesses vs BlockSecOps**:
+- **Not Web3-specific** (no blockchain scanner focus)
+- No smart contract analysis
+- No multi-chain support
+- No continuous monitoring for deployed contracts
+
+---
+
+### 5. Diligence Fuzzing (ConsenSys)
 
 **Website**: [diligence.security/fuzzing](https://diligence.security/fuzzing)
 
@@ -97,6 +148,7 @@ BlockSecOps operates in the web3 smart contract security market, a smaller and l
 - No vulnerability dashboard
 - No unified scanner aggregation
 - No intelligence layer
+- No multi-chain support
 
 ---
 
@@ -107,9 +159,11 @@ BlockSecOps operates in the web3 smart contract security market, a smaller and l
 | **Slither** | Trail of Bits | 93+ | Python |
 | **Aderyn** | Cyfrin | Growing | Rust |
 | **Echidna** | Trail of Bits | Fuzzer | Haskell |
+| **Medusa** | Trail of Bits | Fuzzer | Go |
+| **Halmos** | a16z | Symbolic | Python |
 | **Mythril** | ConsenSys | Symbolic | Python |
 
-**Gap**: No dashboard, no intelligence, no support, no deduplication
+**Gap**: No dashboard, no intelligence, no support, no deduplication, no false positive filtering
 
 ---
 
@@ -122,6 +176,8 @@ BlockSecOps operates in the web3 smart contract security market, a smaller and l
 | Cyfrin | Audits | Project-based, not continuous |
 | CertiK | Audits | One-time, not scanning |
 | Hacken | Audits | Consulting, not SaaS |
+| Trail of Bits | Audits | Premium manual review |
+| Halborn | Audits | Project-based engagements |
 
 ---
 
@@ -131,9 +187,9 @@ BlockSecOps operates in the web3 smart contract security market, a smaller and l
 
 OpenZeppelin Defender, the most complete Web3 DevSecOps platform, is sunsetting. This creates a significant migration opportunity for teams requiring continuous security integration.
 
-### 2. MythX Sunset (March 2025)
+### 2. Certora Prover Open-Sourced (February 2025)
 
-MythX is transitioning users to Diligence Fuzzing. Teams wanting SAST + Fuzzing need alternatives.
+Certora open-sourced its Prover with 2,000 free minutes/month for formal verification. BlockSecOps can integrate this as one capability within broader DevSecOps, not a standalone tool.
 
 ### 3. Market Fragmentation
 
@@ -142,7 +198,7 @@ Most teams currently use:
 - Point-in-time audits ($5K-$150K each)
 - No continuous vulnerability management
 
-BlockSecOps offers the only unified platform combining all capabilities.
+BlockSecOps offers the only unified platform combining all capabilities with 95% false positive reduction.
 
 ---
 
@@ -151,19 +207,20 @@ BlockSecOps offers the only unified platform combining all capabilities.
 ```
 Price Scale (Monthly):
 
-$0 ────────────────────────────────────────────────────────────── $5K+
-│                                                                  │
-Free Tools    SolidityScan    BlockSecOps       Olympix    Enterprise
-(Slither,     ($200-$500)     ($199-$2,499)     (~$1K)     Solutions
- Aderyn)                      17+ scanners       1 scanner
+$0 ──────────────────────────────────────────────────────────────── $2K+
+│                                                                     │
+Free Tools    BlockSecOps    MetaTrust      Olympix      Enterprise
+(Slither,     ($0-$699)      ($599)         (~$1K)       Solutions
+ Aderyn)      25+ scanners   1 scanner      1 scanner
+              95% FP reduce
 ```
 
 ### BlockSecOps Position
 
-- **Above** free tools: Dashboard, intelligence, support
-- **Entry matches** SolidityScan Individual: $199/mo but with 17x more scanners
-- **Premium tiers** above Olympix: Full platform vs IDE plugin
-- **Unique**: x402 pay-per-scan, unified scanning, vuln management
+- **Above** free tools: Dashboard, intelligence, 95% FP reduction, support
+- **Entry below** MetaTrust ($599): Team tier at $299 with 25x more scanners
+- **Premium tiers** competitive with Olympix: Full platform vs IDE plugin
+- **Unique**: x402 pay-per-scan, unified scanning, continuous monitoring
 
 ### Cost Per Scanner Comparison
 
@@ -171,33 +228,57 @@ Free Tools    SolidityScan    BlockSecOps       Olympix    Enterprise
 |----------|---------------|----------|--------------|
 | SolidityScan Individual | $200 | 1 | $200 |
 | SolidityScan Pro | $500 | 1 | $500 |
+| MetaTrust | $599 | 1 | $599 |
 | Olympix | ~$1,000 | 1 | $1,000 |
-| **BlockSecOps Developer** | $199 | 17+ | **$12** |
-| **BlockSecOps Startup** | $999 | 17+ | **$59** |
-| **BlockSecOps Pro** | $2,499 | 17+ | **$147** |
+| **BlockSecOps Team** | $299 | 25+ | **$12** |
+| **BlockSecOps Growth** | $699 | 25+ | **$28** |
 
 ---
 
 ## Feature Comparison Matrix
 
-| Feature | BlockSecOps | SolidityScan | Olympix | Diligence |
-|---------|-------------|--------------|---------|-----------|
-| SAST Scanning | 17+ scanners | 1 scanner | 1 scanner | - |
-| Fuzzing | Integrated | - | - | Core focus |
-| Dashboard | Full | Basic | - | - |
-| Intelligence Layer | Yes | Limited | - | - |
-| Deduplication | Cross-scanner | - | - | - |
-| Risk Scoring | ML-powered | Basic | - | - |
-| Multi-language | Sol, Vyper, Rust, Cairo | Solidity | Solidity | Solidity |
-| x402 Pay-per-scan | Yes | - | - | - |
-| CI/CD Integration | Full | GitHub | GitHub | Foundry |
-| Vulnerability Mgmt | Full | Basic | - | - |
+| Feature | BlockSecOps | SolidityScan | MetaTrust | Olympix | Diligence |
+|---------|-------------|--------------|-----------|---------|-----------|
+| SAST Scanning | 25+ scanners | 1 scanner | 1 scanner | 1 scanner | - |
+| Fuzzing | Integrated | - | - | - | Core focus |
+| Dashboard | Full | Basic | Basic | - | - |
+| Intelligence Layer | Yes | Limited | Limited | - | - |
+| Deduplication | Cross-scanner | - | - | - | - |
+| **95% FP Reduction** | **Yes** | - | - | - | - |
+| Multi-chain | Sol, Vyper, Rust, Cairo, Move | Solidity | Solidity | Solidity | Solidity |
+| Continuous Monitoring | Growth+ | - | - | - | - |
+| x402 Pay-per-scan | Yes | - | - | - | - |
+| CI/CD Integration | Full | GitHub | GitHub | GitHub | Foundry |
+| Vulnerability Mgmt | Full | Basic | Basic | - | - |
+
+---
+
+## Pricing Gap Analysis
+
+BlockSecOps exploits three significant pricing gaps in the Web3 security market:
+
+**Gap 1: No unified platform with transparent pricing.**
+- Web3-native tools (Olympix, MetaTrust) require sales contact for enterprise pricing
+- Traditional DevSecOps platforms (Aikido, Jit) have transparent pricing but lack blockchain coverage
+- BlockSecOps: Published, predictable pricing for a Web3-native unified platform
+
+**Gap 2: Aggregator premium is undermonetized.**
+- IBM research: Organizations use 83 security solutions from 29 vendors on average
+- Consolidated platforms deliver 72 days faster incident detection and 242% ROI
+- No Web3 vendor charges "consolidation premium" - BlockSecOps prices in this value
+
+**Gap 3: Usage-based pricing absent in continuous monitoring.**
+- Audit firms: project-based
+- DevSecOps tools: seat-based
+- BlockSecOps: Hybrid (subscription + usage-based expansion)
 
 ---
 
 ## Sources
 
 - SolidityScan: [solidityscan.com/pricing](https://solidityscan.com/pricing) (verified January 2026)
+- MetaTrust: [metatrust.io](https://metatrust.io) (verified January 2026)
 - Diligence Fuzzing: [diligence.security/fuzzing](https://diligence.security/fuzzing)
+- Aikido Security: [aikido.dev/pricing](https://aikido.dev/pricing)
 - Cyfrin: [cyfrin.io/blog/smart-contract-auditing-and-security-tools](https://www.cyfrin.io/blog/industry-leading-smart-contract-auditing-and-security-tools)
 - Trail of Bits Slither: [github.com/crytic/slither](https://github.com/crytic/slither)

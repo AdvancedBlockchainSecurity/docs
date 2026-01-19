@@ -2,7 +2,7 @@
 
 Pricing strategy and competitive analysis for BlockSecOps smart contract security platform.
 
-**Value Proposition**: 17+ scanners at the price of 1. The most comprehensive smart contract security platform.
+**Value Proposition**: 25+ scanners at the price of 1, with 95% false positive reduction. The most comprehensive smart contract security platform.
 
 ---
 
@@ -10,13 +10,22 @@ Pricing strategy and competitive analysis for BlockSecOps smart contract securit
 
 ### Subscription Tiers
 
-| Tier | Monthly | Annual | Scans/Month | Users |
-|------|---------|--------|-------------|-------|
-| **Free** | $0 | $0 | 10 | 1 |
-| **Developer** | $199 | $1,990 | 100 | 1 |
-| **Startup** | $999 | $9,990 | 500 | 10 |
-| **Professional** | $2,499 | $24,990 | Unlimited | 25 |
-| **Enterprise** | Custom | $60K+ | Unlimited | Unlimited |
+| Tier | Monthly | Annual | Contracts/Month | Users |
+|------|---------|--------|-----------------|-------|
+| **Developer (Free)** | $0 | $0 | 3 | 2 |
+| **Team** | $299 | ~$2,988 | 15 | 5 |
+| **Growth** | $699 | ~$7,188 | 50 | 15 |
+| **Enterprise** | $1,999+ | Custom | Unlimited | Unlimited |
+
+### Usage-Based Add-Ons
+
+| Component | Price | Trigger |
+|-----------|-------|---------|
+| Additional contracts | $19/contract | Over tier limit |
+| Express scan (4-hour) | $99/scan | On-demand |
+| Formal verification | $299/contract | Optional |
+| Additional users | $29/user/month | Over tier limit |
+| Audit report generation | $149/report | On-demand |
 
 ### x402 Credits (Pay-Per-Scan)
 
@@ -45,11 +54,12 @@ Pricing strategy and competitive analysis for BlockSecOps smart contract securit
 ```
 Price Scale (Monthly):
 
-$0 ────────────────────────────────────────────────────────────── $5K+
-│                                                                  │
-Free Tools    SolidityScan    BlockSecOps       Olympix    Enterprise
-(Slither)     ($200-$500)     ($199-$2,499)     (~$1K)     Solutions
-                1 scanner      17+ scanners      1 scanner
+$0 ─────────────────────────────────────────────────────────────── $2K+
+│                                                                    │
+Free Tools    BlockSecOps    MetaTrust      Olympix      Enterprise
+(Slither)     ($0-$699)      ($599)         (~$1K)       Solutions
+              25+ scanners   1 scanner      1 scanner
+              95% FP reduce
 ```
 
 ### Cost Per Scanner
@@ -57,30 +67,33 @@ Free Tools    SolidityScan    BlockSecOps       Olympix    Enterprise
 | Platform | Price | Scanners | Cost/Scanner |
 |----------|-------|----------|--------------|
 | SolidityScan | $200-500/mo | 1 | $200-500 |
+| MetaTrust | $599/mo | 1 | $599 |
 | Olympix | ~$1,000/mo | 1 | $1,000 |
-| **BlockSecOps** | $199-2,499/mo | 17+ | **$12-147** |
+| **BlockSecOps** | $299-699/mo | 25+ | **$12-28** |
 
 ---
 
 ## Key Differentiators
 
-1. **Unified Scanning**: 17+ scanners in one platform
-2. **SolidityDefend**: Proprietary scanner with unique detectors
-3. **Intelligence Layer**: ML-powered deduplication and risk scoring
-4. **Vulnerability Management**: Complete dashboard and workflow
-5. **x402 Pay-Per-Scan**: Crypto-native payments (unique in market)
-6. **Multi-Language**: Solidity, Vyper, Rust, Cairo
+1. **Unified Scanning**: 25+ scanners in one platform
+2. **95% False Positive Reduction**: ML-powered filtering (unique in market)
+3. **SolidityDefend**: Proprietary scanner with 509+ unique detectors
+4. **Intelligence Layer**: ML-powered deduplication and risk scoring
+5. **Multi-Chain Support**: Solidity, Vyper, Rust/Solana, Cairo, Move
+6. **Continuous Monitoring**: Post-deployment security (Growth+)
+7. **Vulnerability Management**: Complete dashboard and workflow
+8. **x402 Pay-Per-Scan**: Crypto-native payments (unique in market)
 
 ---
 
 ## Target Market
 
-| Segment | Priority | Notes |
-|---------|----------|-------|
-| Developers | Primary | Solo devs, small teams |
-| Startups | Primary | Seed to Series A |
-| Protocols | Secondary | Series A-B, significant TVL |
-| Enterprise | Aspirational | Large orgs, exchanges |
+| Segment | Priority | Tier Fit | Notes |
+|---------|----------|----------|-------|
+| Developers | Primary | Free/Team | Solo devs, evaluation |
+| Small Teams | Primary | Team | 3-5 developers |
+| Growing Protocols | Primary | Growth | Seed to Series A |
+| Enterprise | Secondary | Enterprise | Large orgs, exchanges |
 
 ---
 
@@ -88,7 +101,9 @@ Free Tools    SolidityScan    BlockSecOps       Olympix    Enterprise
 
 ### Direct Competitors
 - **SolidityScan**: $200-500/month (1 scanner, SAST only)
+- **MetaTrust**: $599/month (1 scanner, per-LOC pricing)
 - **Olympix**: ~$1K/month (1 scanner, IDE plugin only)
+- **Aikido Security**: $300-600/month (general DevSecOps, not Web3-specific)
 - **Diligence Fuzzing**: $0-$2K/month (Fuzzing only)
 
 ### NOT Competitors
@@ -97,8 +112,21 @@ Free Tools    SolidityScan    BlockSecOps       Olympix    Enterprise
 
 ---
 
+## Land & Expand Strategy
+
+```
+Developer (Free) → Team ($299) → Growth ($699) → Enterprise ($1,999+)
+       ↓               ↓              ↓              ↓
+   evaluation      small team     scaling up     compliance &
+   (3 contracts)   (15 contracts) (50 contracts) dedicated support
+```
+
+**14-Day Reverse Trial**: All new accounts get Team-tier features for 14 days, then drop to Free tier. Creates strong conversion motivation.
+
+---
+
 ## Related Documentation
 
 - [Business Operations](/docs/business-ops/)
-- [Existing Pricing Strategy](/docs/business-ops/Pricing/pricing-strategy.md)
+- [Pricing Strategy](/docs/business-ops/Pricing/pricing-strategy-011926.md)
 - [Feature Documentation](/blocksecops-docs/features/)

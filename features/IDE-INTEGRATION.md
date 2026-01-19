@@ -2,8 +2,20 @@
 
 **Version:** 1.0.0
 **Last Updated:** January 19, 2026
-**Status:** Implemented
+**Status:** Partially Implemented
 **Phase:** IDE Integration
+
+## Implementation Status
+
+| Component | Status | Version |
+|-----------|--------|---------|
+| API scan_source field | ✅ Tested | v0.11.2 |
+| Dashboard ScanSourceBadge | ✅ Tested | v0.30.12 |
+| CLI --local flag | ⏳ Created, not tested | - |
+| CLI --scan-source flag | ⏳ Created, not tested | - |
+| VS Code extension | ⏳ Created, not tested | - |
+| JetBrains plugin | ⏳ Created, not tested | - |
+| Neovim plugin | ⏳ Created, not tested | - |
 
 ## Overview
 
