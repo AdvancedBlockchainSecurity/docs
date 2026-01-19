@@ -471,3 +471,78 @@ jq -r '.version, (.patterns | length), (.pattern_tool_mappings | length)' \
 
 ---
 
+## January 18, 2026 - SolidityDefend Pattern Seeding
+
+### Backup Details
+**Filename:** `solidity_security_pre_soliditydefend_seeding_20260118_115725.sql`
+**Location:** `/home/pwner/Git/docs/database/backups/solidity_security_pre_soliditydefend_seeding_20260118_115725.sql`
+**Created:** January 18, 2026 11:57:25 MST
+**Size:** 5.6MB
+**Database Version:** PostgreSQL 15.4
+**Backup Method:** kubectl exec pg_dump from within cluster
+
+### Database State Before Seeding
+**Tables:**
+- `vulnerability_patterns`: 402 patterns
+- `pattern_tool_mappings`: 219 mappings for soliditydefend (total across all scanners higher)
+- All existing data preserved
+
+**Schema Version:** Current (all migrations applied)
+
+### Reason for Backup
+Created before running SolidityDefend v1.10.3 pattern seeding script to add pattern_tool_mappings for unmapped detectors discovered in vulnerability findings.
+
+### Changes Applied After This Backup
+```sql
+-- Created 11 new vulnerability patterns:
+-- BVD-SOL-MISC-SOL-JIT_LIQUIDITY_E (jit-liquidity-extraction)
+-- BVD-SOL-MISC-SOL-INITCODE_INJECT (initcode-injection)
+-- BVD-SOL-MISC-SOL-SANDWICH_CONDIT (sandwich-conditional-swap)
+-- BVD-SOL-MISC-SOL-REENTRANCY_DETE (reentrancy-detected)
+-- BVD-SOL-MISC-SOL-TRANSACTION_ORD (transaction-ordering-dependence)
+-- BVD-SOL-MISC-SOL-INVALID_STATE_T (invalid-state-transition)
+-- BVD-SOL-MISC-SOL-DOS_UNBOUNDED_S (dos-unbounded-storage)
+-- BVD-SOL-MISC-SOL-FLASH_CALLBACK (flash-callback-manipulation)
+-- BVD-SOL-MISC-SOL-BACKRUNNING_OPP (backrunning-opportunity)
+-- BVD-SOL-MISC-SOL-UNPROTECTED_INI (unprotected-initializer)
+-- BVD-SOL-MISC-SOL-TOKEN_LAUNCH_ME (token-launch-mev)
+
+-- Created 11 new pattern_tool_mappings for soliditydefend
+-- Total soliditydefend mappings after: 230
+-- Total vulnerability_patterns after: 413
+```
+
+### Database State After Seeding
+**Pattern Statistics:**
+- Total vulnerability_patterns: 413 (+11)
+- Total soliditydefend mappings: 230 (+11)
+- New patterns focus on MEV, reentrancy, DoS, and upgrade safety
+
+### Restore Command
+```bash
+# Stop API service to prevent concurrent access
+kubectl scale deployment/api-service -n api-service-local --replicas=0
+
+# Restore database
+kubectl cp /home/pwner/Git/docs/database/backups/solidity_security_pre_soliditydefend_seeding_20260118_115725.sql \
+  postgresql-local/postgresql-0:/tmp/restore.sql
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U blocksecops -d solidity_security -f /tmp/restore.sql
+
+# Restart API service
+kubectl scale deployment/api-service -n api-service-local --replicas=1
+
+# Verify restoration
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U blocksecops -d solidity_security \
+  -c "SELECT 'vulnerability_patterns' as table, COUNT(*) FROM vulnerability_patterns
+      UNION ALL SELECT 'pattern_tool_mappings (soliditydefend)', COUNT(*) FROM pattern_tool_mappings WHERE scanner_id = 'soliditydefend';"
+```
+
+### Related Documentation
+- Task Documentation: `TaskDocs-BlockSecOps/phases/03-phase-4-intelligence/SOLIDITYDEFEND-PATTERN-SEEDING-20260118.md`
+- Seed Script: `blocksecops-api-service/scripts/seed_scanner_patterns.py`
+- Implementation Plan: Original plan in Claude session transcript
+
+---
+
