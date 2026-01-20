@@ -263,6 +263,7 @@ _Record scanning test results here:_
 
 ```
 [Date] | [Scanner] | [Contract Type] | [Result] | [Notes]
+2026-01-20 | solhint | Solidity | PASS | Callback fix - scan completes, status changes to "completed"
 2025-12-23 | sol-azy | Rust/Solana | PASS | Vulnerabilities detected and displayed in dashboard
 2025-12-22 | sol-azy | Rust/Solana | PASS | Dashboard auto-selects based on language
 2025-12-22 | vyper | Vyper | PASS | Dashboard auto-selects based on language
