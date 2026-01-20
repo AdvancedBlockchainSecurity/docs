@@ -395,14 +395,28 @@ The database provides the **history** and **analytics** that ConfigMap cannot.
 
 All 15 scanner images are now in Harbor at `harbor.blocksecops.local/blocksecops/`:
 
+### Automated Version Checking
+
+Use the automated version checker to find outdated scanners:
+
+```bash
+# Human-readable output
+/home/pwner/Git/blocksecops-tool-integration/scripts/check-scanner-versions.sh
+
+# JSON output for CI
+/home/pwner/Git/blocksecops-tool-integration/scripts/check-scanner-versions.sh --json
+```
+
+See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.md` for step-by-step update instructions.
+
 ### Scanners Loaded
 
 **EVM/Solidity Scanners:**
-- slither (0.11.3, solc-select 1.1.0) - scanner-slither:0.2.0 - 101/101 detectors (100%) ✅
-- aderyn (0.6.5) - scanner-aderyn:0.6.5 (pre-built binary) - 87/87 detectors (100%) ✅
-- wake (eth-wake 4.21.0) - scanner-wake:0.3.0 ✅
-- semgrep (1.144.0) - scanner-semgrep:0.3.0 - 43/47 detectors (91.5%)
-- solhint (5.1.0) - scanner-solhint:0.2.0 - 16/20 detectors (80%)
+- slither (0.11.5, solc-select 1.1.0) - scanner-slither:0.2.0 - 101/101 detectors (100%) ✅
+- aderyn (0.6.7) - scanner-aderyn:0.7.0 (pre-built binary) - 87/87 detectors (100%) ✅
+- wake (eth-wake 4.21.0) - scanner-wake:0.3.4 ✅
+- semgrep (1.141.0) - scanner-semgrep:0.3.0 - 43/47 detectors (91.5%)
+- solhint (6.0.2) - scanner-solhint:0.3.0 - 16/20 detectors (80%) ✅ FIXED
 - echidna (2.2.7, solc-select 1.1.0) - scanner-echidna:0.2.0 - fuzzer
 - medusa (1.3.1) - scanner-medusa:0.2.0 - fuzzer
 - halmos (0.3.3) - scanner-halmos:0.2.0 - formal verification
@@ -425,6 +439,15 @@ All 15 scanner images are now in Harbor at `harbor.blocksecops.local/blocksecops
 - starknet-foundry (0.50.0) - fuzzer ❌ Unavailable (no Docker image)
 
 ### Recent Updates Recorded
+
+- **2026-01-19**: Scanner Version Updates (Slither, Aderyn, Solhint)
+  - **Slither**: 0.11.3 → 0.11.5 (minor bug fixes)
+  - **Aderyn**: 0.6.5 → 0.6.7 (new detectors)
+  - **Solhint**: 5.1.0 → 6.0.2 (**CRITICAL FIX** - ConfigMap claimed 6.0.1 but Dockerfile had 5.1.0)
+  - Created automation script: `scripts/check-scanner-versions.sh` to detect outdated scanners
+  - Created update procedure documentation: `docs/SCANNER-UPDATE-PROCEDURE.md`
+  - All images rebuilt and pushed to Harbor
+  - ConfigMap and deployments updated
 
 - **2026-01-19**: All Scanner Images Verified in Harbor
   - All 15 scanner images confirmed in Harbor registry with correct versions
