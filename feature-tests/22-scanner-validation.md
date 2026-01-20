@@ -37,7 +37,7 @@ docker images | grep "harbor.blocksecops.local.*scanner-"
 | slither | harbor.blocksecops.local/blocksecops/scanner-slither | 0.2.0 | ✅ Verified |
 | aderyn | harbor.blocksecops.local/blocksecops/scanner-aderyn | 0.6.5 | ✅ Verified |
 | semgrep | harbor.blocksecops.local/blocksecops/scanner-semgrep | 0.3.0 | ✅ Verified |
-| solhint | harbor.blocksecops.local/blocksecops/scanner-solhint | 0.2.0 | ✅ Verified |
+| solhint | harbor.blocksecops.local/blocksecops/scanner-solhint | 0.1.3 | ✅ Verified |
 | wake | harbor.blocksecops.local/blocksecops/scanner-wake | 0.3.4 | ✅ Verified |
 | soliditydefend | harbor.blocksecops.local/blocksecops/scanner-soliditydefend | 0.4.0 | ✅ Verified |
 | echidna | harbor.blocksecops.local/blocksecops/scanner-echidna | 0.2.0 | ✅ Verified |
@@ -193,8 +193,8 @@ docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contract
 
 #### Image Verification
 ```bash
-docker run --rm scanner-solhint:0.2.0 solhint --version
-# Expected: solhint 5.x.x
+docker run --rm scanner-solhint:0.1.3 solhint --version
+# Expected: solhint 6.x.x
 ```
 - [ ] Image runs without error
 - [ ] Version output correct
@@ -202,7 +202,7 @@ docker run --rm scanner-solhint:0.2.0 solhint --version
 #### Basic Analysis Test
 ```bash
 docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contracts \
-  scanner-solhint:0.2.0 solhint /contracts/solidity/**/*.sol
+  scanner-solhint:0.1.3 solhint /contracts/solidity/**/*.sol
 ```
 - [ ] Scanner executes without error
 - [ ] Linting warnings returned
@@ -694,6 +694,8 @@ docker run --rm -v /path/to/fuzz-target:/project \
 
 ```
 [Date] | [Scanner] | [Test Type] | [Result] | [Notes]
+2026-01-20 | solhint | E2E scan | PASS | Callback fix verified - scan completed in 10s, status "completed"
+2026-01-20 | solhint | Callback POST | PASS | Results posted successfully (HTTP 200)
 2026-01-19 | All 15 scanners | Harbor image check | PASS | All images present in Harbor with correct versions
 2026-01-19 | vyper | E2E scan | PASS | scan-vyper-0c35bf78 completed, 2 vulnerabilities found
 2026-01-19 | moccasin | E2E scan | PASS | scan-moccasin-0c35bf78 completed successfully
