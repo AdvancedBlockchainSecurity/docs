@@ -88,8 +88,9 @@
 - [ ] last_error contains failure message
 
 ### 1.10 Tier Restrictions
-- [ ] Free tier cannot create webhooks
-- [ ] Pro tier limited to 5 webhooks
+- [ ] Developer tier cannot create webhooks
+- [ ] Team tier limited to 5 webhooks
+- [ ] Growth tier limited to 10 webhooks
 - [ ] Enterprise tier unlimited webhooks
 - [ ] Tier upgrade enables webhook creation
 
@@ -302,8 +303,9 @@
 - [ ] Sensitive data redacted appropriately
 
 ### 5.6 Retention Policy
-- [ ] Free tier: 7 days retention
-- [ ] Pro tier: 30 days retention
+- [ ] Developer tier: 7 days retention
+- [ ] Team tier: 30 days retention
+- [ ] Growth tier: 90 days retention
 - [ ] Enterprise tier: 1 year retention
 - [ ] Old logs automatically purged
 - [ ] Retention configurable (enterprise)
@@ -351,14 +353,16 @@
 - [ ] Active page is highlighted in sidebar
 
 ### 7.2 TierGate Component Behavior
-- [ ] Free tier user sees upgrade prompt on API Keys page
-- [ ] Free tier user sees upgrade prompt on Webhooks page
-- [ ] Free tier user sees upgrade prompt on Audit Logs page
-- [ ] Free tier user sees upgrade prompt on Organizations page
-- [ ] Pro tier user can access API Keys page
-- [ ] Pro tier user can access Webhooks page
-- [ ] Pro tier user sees upgrade prompt on Audit Logs page
-- [ ] Pro tier user sees upgrade prompt on Organizations page
+- [ ] Developer tier user sees upgrade prompt on API Keys page
+- [ ] Developer tier user sees upgrade prompt on Webhooks page
+- [ ] Developer tier user sees upgrade prompt on Audit Logs page
+- [ ] Developer tier user sees upgrade prompt on Organizations page
+- [ ] Team tier user can access API Keys page
+- [ ] Team tier user can access Webhooks page
+- [ ] Team tier user sees upgrade prompt on Audit Logs page
+- [ ] Team tier user sees upgrade prompt on Organizations page
+- [ ] Growth tier user can access API Keys, Webhooks
+- [ ] Growth tier user sees upgrade prompt on Organizations page
 - [ ] Enterprise tier user can access all 4 pages
 - [ ] Upgrade prompt shows correct feature name
 - [ ] Upgrade prompt shows correct required tier
@@ -394,10 +398,9 @@
 - [ ] Shows price badge and "View Plans" button
 
 **Tier-Based Display:**
-- [ ] Free user sees Developer promotion
-- [ ] Developer user sees Startup promotion
-- [ ] Startup user sees Professional promotion
-- [ ] Professional user sees Enterprise promotion
+- [ ] Developer user sees Team promotion
+- [ ] Team user sees Growth promotion
+- [ ] Growth user sees Enterprise promotion
 - [ ] Enterprise user: Banner NOT displayed
 
 **Dismissal Behavior:**
@@ -689,7 +692,7 @@
 
 ## 8. Tier Availability
 
-### 8.1 Free Tier
+### 8.1 Developer Tier (Free - $0/mo)
 - [ ] No webhooks
 - [ ] No organizations
 - [ ] 1 team member (self)
@@ -697,7 +700,7 @@
 - [ ] 7 days audit logs
 - [ ] No audit export
 
-### 8.2 Pro Tier
+### 8.2 Team Tier ($299/mo)
 - [ ] 5 webhooks
 - [ ] 1 organization
 - [ ] 5 team members
@@ -705,7 +708,15 @@
 - [ ] 30 days audit logs
 - [ ] No audit export
 
-### 8.3 Enterprise Tier
+### 8.3 Growth Tier ($699/mo)
+- [ ] 10 webhooks
+- [ ] 1 organization
+- [ ] 15 team members
+- [ ] 10 API keys
+- [ ] 90 days audit logs
+- [ ] Full API access
+
+### 8.4 Enterprise Tier ($1,999+/mo)
 - [ ] Unlimited webhooks
 - [ ] Unlimited organizations
 - [ ] Unlimited team members
@@ -749,14 +760,14 @@
 
 #### Tier Gating Verification
 
-| Feature | Free | Pro | Enterprise |
-|---------|------|-----|------------|
-| View API Keys | ✅ | ✅ | ✅ |
-| Create API Keys | ❌ | ✅ | ✅ |
-| View Organizations | ✅ | ✅ | ✅ |
-| Create Organizations | ❌ | ❌ | ✅ |
-| View Audit Logs | ❌ | ❌ | ✅ |
-| Export Audit Logs | ❌ | ❌ | ✅ |
+| Feature | Developer | Team | Growth | Enterprise |
+|---------|-----------|------|--------|------------|
+| View API Keys | ✅ | ✅ | ✅ | ✅ |
+| Create API Keys | ❌ | ✅ | ✅ | ✅ |
+| View Organizations | ✅ | ✅ | ✅ | ✅ |
+| Create Organizations | ❌ | ❌ | ❌ | ✅ |
+| View Audit Logs | ❌ | ❌ | ❌ | ✅ |
+| Export Audit Logs | ❌ | ❌ | ❌ | ✅ |
 
 #### API Key Scopes Available
 ```
@@ -789,19 +800,28 @@ analytics:read, webhooks:read, webhooks:write
 - [ ] `scans_used_this_month` should reset to 0
 - [ ] User session reflects new tier immediately (or after re-login)
 
-#### Upgrade from Free to Pro
+#### Upgrade from Developer to Team
 - [ ] `monthly_scan_limit` increases from 10 to 100
-- [ ] `max_files_per_scan` increases from 25 to 100
-- [ ] `scan_priority` increases from 25 to 50
+- [ ] `max_files_per_scan` increases from 5 to unlimited
+- [ ] `scan_priority` increases from 50 to 30
 - [ ] `webhooks_enabled` changes from `false` to `true`
 - [ ] `api_access_enabled` changes from `false` to `true`
-- [ ] `result_retention_days` increases from 30 to 90
+- [ ] `result_retention_days` increases from 7 to 90
+- [ ] `max_team_members` increases from 1 to 5
 
-#### Upgrade from Pro to Enterprise
-- [ ] `monthly_scan_limit` increases to 10000 (or unlimited)
-- [ ] `max_files_per_scan` increases to 500
-- [ ] `scan_priority` increases to 100
-- [ ] `result_retention_days` increases to 365
+#### Upgrade from Team to Growth
+- [ ] `monthly_scan_limit` increases from 100 to 500
+- [ ] `scan_priority` increases from 30 to 15
+- [ ] `result_retention_days` increases from 90 to 180
+- [ ] `max_team_members` increases from 5 to 15
+- [ ] Full API access enabled
+
+#### Upgrade from Growth to Enterprise
+- [ ] `monthly_scan_limit` increases to unlimited
+- [ ] `max_files_per_scan` remains unlimited
+- [ ] `scan_priority` increases to 5
+- [ ] `result_retention_days` increases to 730
+- [ ] `max_team_members` unlimited
 
 ### 8.2 Automatic Quota Sync
 
@@ -849,25 +869,26 @@ WHERE user_id = '<user_uuid>';
 - [ ] `TierGate` component blocks access for insufficient tier
 - [ ] Upgrade prompt shown with link to pricing
 - [ ] ADMIN section in sidebar respects tier
-- [ ] API Keys visible to pro+ only
-- [ ] Webhooks visible to pro+ only
+- [ ] API Keys visible to team+ only
+- [ ] Webhooks visible to team+ only
 - [ ] Audit Logs visible to enterprise only
 - [ ] Organizations visible to enterprise only
 
 ### 8.6 Tier-Specific Limits Table
 
-| Feature | Free | Pro | Enterprise |
-|---------|------|-----|------------|
-| Monthly Scan Limit | 10 | 100 | 10,000 |
-| Max Files Per Scan | 25 | 100 | 500 |
-| Scan Priority | 25 | 50 | 100 |
-| Webhooks | ❌ | ✅ | ✅ |
-| API Access | ❌ | ✅ | ✅ |
-| Result Retention | 30 days | 90 days | 365 days |
-| Organizations | ❌ | ❌ | ✅ |
-| Audit Logs | ❌ | ❌ | ✅ |
-| Custom Roles | ❌ | ❌ | ✅ |
-| SSO Integration | ❌ | ❌ | ✅ |
+| Feature | Developer | Team | Growth | Enterprise |
+|---------|-----------|------|--------|------------|
+| Monthly Scan Limit | 10 | 100 | 500 | Unlimited |
+| Max Files Per Scan | 5 | Unlimited | Unlimited | Unlimited |
+| Scan Priority | 50 | 30 | 15 | 5 |
+| Webhooks | ❌ | ✅ | ✅ | ✅ |
+| API Access | ❌ | ✅ | ✅ (Full) | ✅ |
+| Result Retention | 7 days | 90 days | 180 days | 730 days |
+| Max Team Members | 1 | 5 | 15 | Unlimited |
+| Organizations | ❌ | ❌ | ❌ | ✅ |
+| Audit Logs | ❌ | ❌ | ❌ | ✅ |
+| Custom Roles | ❌ | ❌ | ❌ | ✅ |
+| SSO Integration | ❌ | ❌ | ❌ | ✅ |
 
 ### 8.7 Quota Reset Timing
 - [ ] Monthly reset occurs on 1st of month (UTC)

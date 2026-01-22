@@ -206,17 +206,17 @@
 
 ## Test Scenarios
 
-### Scenario: Free Tier Hitting Limits
-1. Upload 10 contracts (quota limit)
+### Scenario: Developer Tier Hitting Limits
+1. Upload 10 contracts (quota limit for developer tier)
 2. Try 11th upload
 3. Verify 402 error
 4. Verify upgrade message
 
 ### Scenario: Large OpenZeppelin Project
 1. Create project with 200+ OZ files
-2. Upload as Free tier
+2. Upload as Developer tier
 3. Verify smart filtering activates
-4. Verify <25 files extracted
+4. Verify <5 files extracted (developer tier limit)
 
 ### Scenario: Corrupted Archive
 1. Create intentionally corrupted ZIP

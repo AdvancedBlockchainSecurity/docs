@@ -115,8 +115,8 @@
 - [ ] Both files in cycle included once
 
 ### 5.3 File Limit Enforcement
-- [ ] Free tier stops at 25 files
-- [ ] Pro tier stops at 100 files
+- [ ] Developer tier stops at 5 files (free tier)
+- [ ] Team/Growth tier: no limit
 - [ ] Enterprise has no limit
 - [ ] Truncation logged when limit hit
 
@@ -144,12 +144,12 @@ contract Token is ERC20 {
 - [ ] IERC20.sol extracted (dependency)
 - [ ] IERC20Metadata.sol extracted
 - [ ] Context.sol extracted
-- [ ] Total files < 25 (free tier compatible)
+- [ ] Total files < 5 (developer tier compatible)
 
 ### 6.2 ERC721 with OpenZeppelin
 - [ ] ERC721 imports resolve
 - [ ] All NFT dependencies extracted
-- [ ] Free tier can upload
+- [ ] Developer tier can upload
 
 ### 6.3 Access Control with OpenZeppelin
 - [ ] Ownable.sol imports resolve

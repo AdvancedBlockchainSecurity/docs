@@ -1,4 +1,16 @@
-# BlockSecOps Pricing Tables
+> **⚠️ ARCHIVED - January 20, 2026**
+>
+> This document contains the OLD 5-tier pricing model from October 2025.
+> It has been superseded by the new 4-tier model (Developer/Team/Growth/Enterprise).
+>
+> **Current pricing documentation:**
+> - Source of truth: `docs/standards/tier-standards.md`
+> - Internal reference: `docs/pricing/pricing-tiers.md`
+> - Public docs: `blocksecops-docs/billing/pricing-tiers.md`
+
+---
+
+# BlockSecOps Pricing Tables (ARCHIVED)
 
 ## Table 1: BlockSecOps Pricing Structure
 

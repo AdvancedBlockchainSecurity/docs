@@ -71,34 +71,34 @@ The Pricing page now displays the authenticated user's current plan and usage st
 
 ---
 
-### TC-33.4: Free Tier User View
+### TC-33.4: Developer Tier User View
 
-**Objective**: Verify Free tier users see appropriate display
+**Objective**: Verify Developer tier users see appropriate display
 
 **Prerequisites**:
-- User on Free tier with some usage
+- User on Developer tier (free) with some usage
 
 **Steps**:
-1. Log in as Free tier user
+1. Log in as Developer tier user
 2. Navigate to /pricing
 
 **Expected Results**:
-- [ ] CurrentPlanBanner shows "Free" tier badge
+- [ ] CurrentPlanBanner shows "Developer" tier badge
 - [ ] Usage shows "X / 10 scans" format
-- [ ] Free tier card highlighted
+- [ ] Developer tier card highlighted
 - [ ] Other tiers show upgrade options
 
 ---
 
-### TC-33.5: Pro/Enterprise Tier User View
+### TC-33.5: Team/Growth/Enterprise Tier User View
 
-**Objective**: Verify Pro/Enterprise users see appropriate display
+**Objective**: Verify Team/Growth/Enterprise users see appropriate display
 
 **Prerequisites**:
-- User on Pro or Enterprise tier
+- User on Team, Growth, or Enterprise tier
 
 **Steps**:
-1. Log in as Pro/Enterprise user
+1. Log in as Team/Growth/Enterprise user
 2. Navigate to /pricing
 
 **Expected Results**:
@@ -133,7 +133,7 @@ The Pricing page now displays the authenticated user's current plan and usage st
 **Objective**: Verify warning display when near quota limit
 
 **Prerequisites**:
-- User with 80%+ quota usage (e.g., 8/10 scans on Free tier)
+- User with 80%+ quota usage (e.g., 8/10 scans on Developer tier)
 
 **Steps**:
 1. Log in as user near limit
@@ -152,7 +152,7 @@ The Pricing page now displays the authenticated user's current plan and usage st
 **Objective**: Verify display when at quota limit
 
 **Prerequisites**:
-- User at 100% quota (e.g., 10/10 scans on Free tier)
+- User at 100% quota (e.g., 10/10 scans on Developer tier)
 
 **Steps**:
 1. Log in as user at limit
@@ -163,7 +163,7 @@ The Pricing page now displays the authenticated user's current plan and usage st
 - [ ] "Limit Reached" badge displayed
 - [ ] Progress bar is red
 - [ ] Upgrade CTA section visible
-- [ ] "Buy Credits" and "Upgrade to Pro" buttons displayed
+- [ ] "Buy Credits" and "Upgrade to Team" buttons displayed
 
 ---
 
@@ -205,19 +205,19 @@ The Pricing page now displays the authenticated user's current plan and usage st
 
 ### TC-33.11: Scroll to Tier on Upgrade Click
 
-**Objective**: Verify "Upgrade to Pro" scrolls to Pro tier card
+**Objective**: Verify "Upgrade to Team" scrolls to Team tier card
 
 **Prerequisites**:
 - User at limit with upgrade CTAs visible
 
 **Steps**:
 1. Navigate to /pricing as at-limit user
-2. Click "Upgrade to Pro" button in CurrentPlanBanner
+2. Click "Upgrade to Team" button in CurrentPlanBanner
 
 **Expected Results**:
-- [ ] Page scrolls to Pro tier card
+- [ ] Page scrolls to Team tier card
 - [ ] Scroll is smooth animation
-- [ ] Pro tier card is visible in viewport
+- [ ] Team tier card is visible in viewport
 
 ---
 
@@ -262,9 +262,9 @@ The Pricing page now displays the authenticated user's current plan and usage st
 ```
 ┌─────────────────────┐     ┌─────────────────────┐
 │                     │     │ ═══════════════════ │ ← Green ring
-│       FREE          │     │     YOUR PLAN       │
-│                     │     │        PRO          │
-│    10 scans/mo      │     │   110 / 10,000      │ ← Usage stats
+│     DEVELOPER       │     │     YOUR PLAN       │
+│                     │     │        TEAM         │
+│    10 scans/mo      │     │   45 / 100          │ ← Usage stats
 │                     │     │   [████░░░░░░░░░░]  │ ← Progress bar
 │   [Get Started]     │     │    [Manage Plan]    │
 └─────────────────────┘     └─────────────────────┘
@@ -281,7 +281,7 @@ The Pricing page uses data from the existing `/users/me/enhanced` endpoint via t
 ```json
 {
   "quota": {
-    "tier": "free",
+    "tier": "developer",
     "monthly_scan_limit": 10,
     "monthly_scans_used": 8,
     "scans_remaining": 2,

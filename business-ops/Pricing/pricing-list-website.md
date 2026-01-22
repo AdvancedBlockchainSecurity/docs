@@ -1,4 +1,15 @@
-# BlockSecOps Website Pricing Update
+> **⚠️ ARCHIVED - January 20, 2026**
+>
+> This document contains website pricing instructions for the OLD 5-tier model from October 2025.
+> It has been superseded by the new 4-tier model (Developer/Team/Growth/Enterprise).
+>
+> **Current pricing documentation:**
+> - Source of truth: `docs/standards/tier-standards.md`
+> - Public docs: `blocksecops-docs/billing/pricing-tiers.md`
+
+---
+
+# BlockSecOps Website Pricing Update (ARCHIVED)
 
 ## Instructions for Claude Code
 Please update the BlockSecOps website pricing page with the following five-tier structure. Replace the existing three-tier pricing (Starter/Professional/Enterprise) with this new structure.

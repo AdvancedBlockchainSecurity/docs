@@ -132,14 +132,13 @@ curl -s -X POST -H "Authorization: Bearer ${TOKEN}" \
 
 #### 1.4 Team Member Quota Enforcement (NEW - January 2026)
 
-**Tier Limits**:
-| Tier | Max Team Members |
-|------|------------------|
-| Free | 1 (solo) |
-| Developer | 1 (solo) |
-| Startup | 10 |
-| Professional | 25 |
-| Enterprise | Unlimited |
+**Tier Limits (4-Tier Model)**:
+| Tier | Price | Max Team Members |
+|------|-------|------------------|
+| Developer | $0 | 1 (solo) |
+| Team | $299/mo | 5 |
+| Growth | $699/mo | 15 |
+| Enterprise | $1,999+/mo | Unlimited |
 
 **Test: Quota Exceeded**:
 ```bash
@@ -155,20 +154,21 @@ curl -s -X POST -H "Authorization: Bearer ${TOKEN}" \
 {
   "detail": {
     "error": "team_member_limit_exceeded",
-    "message": "Organization has reached the maximum of 10 team members for the startup tier",
-    "tier": "startup",
-    "current_members": 10,
-    "max_team_members": 10,
+    "message": "Organization has reached the maximum of 5 team members for the team tier",
+    "tier": "team",
+    "current_members": 5,
+    "max_team_members": 5,
     "upgrade_url": "/pricing"
   }
 }
 ```
 
 **Test Cases**:
-- [ ] Free/Developer tier: Cannot add team members (solo only)
-- [ ] Startup tier: Can add up to 10 members
-- [ ] Startup tier: 11th member returns 403 with upgrade prompt
-- [ ] Professional tier: Can add up to 25 members
+- [ ] Developer tier: Cannot add team members (solo only)
+- [ ] Team tier: Can add up to 5 members
+- [ ] Team tier: 6th member returns 403 with upgrade prompt
+- [ ] Growth tier: Can add up to 15 members
+- [ ] Growth tier: 16th member returns 403 with upgrade prompt
 - [ ] Enterprise tier: No member limit (max_team_members = -1)
 
 **Status**: [ ] NOT YET TESTED

@@ -75,12 +75,11 @@ Economic security analysis for detecting flash loan attacks, MEV exploitation, a
 | Economic Risk Scoring | Implemented | Weighted calculation with multipliers |
 | Dashboard Panel | Implemented | Economic Security panel in scan details |
 
-**AI Explanation Quotas**:
-- Free: 0 (not available)
-- Developer: 10/month
-- Startup: 100/month
-- Professional: 500/month
-- Enterprise: Unlimited
+**AI Explanation Quotas (4-Tier Model)**:
+- Developer ($0): 0 (not available)
+- Team ($299/mo): 10/month
+- Growth ($699/mo): 100/month
+- Enterprise ($1,999+/mo): Unlimited
 
 ---
 

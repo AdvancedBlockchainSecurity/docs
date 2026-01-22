@@ -40,13 +40,13 @@ stripe listen --forward-to localhost:8000/api/v1/webhooks/stripe
 **Steps**:
 1. Login to dashboard
 2. Navigate to Billing → View Plans
-3. Select "Startup" plan (monthly)
+3. Select "Growth" plan (monthly)
 4. Click "Subscribe"
 5. Verify redirect to Stripe Checkout
 
 **Expected Result**:
 - Redirects to Stripe Checkout page
-- Shows correct plan and price ($999/month)
+- Shows correct plan and price ($699/month)
 - Can complete payment with test card
 
 **Test Data**:
@@ -69,7 +69,7 @@ stripe listen --forward-to localhost:8000/api/v1/webhooks/stripe
 **Expected Result**:
 - Subscription appears in Billing page
 - Status shows "Active"
-- Plan tier shows "Startup"
+- Plan tier shows "Growth"
 - Current period dates are correct
 - User's tier updated in database
 
@@ -245,9 +245,9 @@ WHERE user_id = 'user-uuid';
 **Status**: ⏳ Pending
 
 **Steps**:
-1. Login with Developer plan
+1. Login with Team plan
 2. Navigate to Billing → View Plans
-3. Select "Startup" plan
+3. Select "Growth" plan
 4. Complete checkout
 
 **Expected Result**:
@@ -263,7 +263,7 @@ WHERE user_id = 'user-uuid';
 **Status**: ⏳ Pending
 
 **Steps**:
-1. Select Startup plan (annual)
+1. Select Growth plan (annual)
 2. Verify pricing shows annual rate
 3. Complete checkout
 

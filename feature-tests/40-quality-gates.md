@@ -37,12 +37,12 @@ Quality Gates enable CI/CD pipeline integration for automated security scanning 
 
 ---
 
-### TC-40.2: Tier Restriction - Free Tier
+### TC-40.2: Tier Restriction - Developer Tier
 
-**Objective**: Verify Free tier users cannot access Quality Gates
+**Objective**: Verify Developer tier users cannot access Quality Gates
 
 **Prerequisites**:
-- User authenticated on Free tier
+- User authenticated on Developer tier (free)
 
 **Steps**:
 1. Navigate to project settings
@@ -51,7 +51,7 @@ Quality Gates enable CI/CD pipeline integration for automated security scanning 
 **Expected Results**:
 - [ ] Quality Gate tab/option not visible or disabled
 - [ ] Upgrade prompt displayed
-- [ ] Message: "Quality Gates are available on Developer tier and above"
+- [ ] Message: "Quality Gates are available on Team tier and above"
 - [ ] API returns 403 for direct endpoint access
 
 ---
@@ -356,7 +356,7 @@ curl -s "http://localhost:8000/api/v1/quality-gates/projects/$PROJECT_ID/history
 **Objective**: Verify dashboard quality gate configuration UI
 
 **Prerequisites**:
-- User on Developer tier or higher
+- User on Team tier or higher
 - Project exists
 
 **Steps**:
@@ -492,15 +492,14 @@ Returns evaluation history with pagination.
 
 ---
 
-## Tier Requirements
+## Tier Requirements (4-Tier Model)
 
-| Tier | Quality Gates Access |
-|------|---------------------|
-| Free | Not available |
-| Developer | Full access |
-| Startup | Full access |
-| Professional | Full access |
-| Enterprise | Full access |
+| Tier | Price | Quality Gates Access |
+|------|-------|---------------------|
+| Developer | $0 | Not available |
+| Team | $299/mo | Full access |
+| Growth | $699/mo | Full access |
+| Enterprise | $1,999+/mo | Full access |
 
 ---
 
