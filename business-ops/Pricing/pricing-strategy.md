@@ -1,4 +1,15 @@
-# BlockSecOps Pricing Strategy Document
+> **⚠️ ARCHIVED - January 20, 2026**
+>
+> This document contains the OLD 5-tier pricing strategy from October 2025.
+> It has been superseded by the new 4-tier model (Developer/Team/Growth/Enterprise).
+>
+> **Current pricing documentation:**
+> - Source of truth: `docs/standards/tier-standards.md`
+> - Updated strategy: `docs/business-ops/Pricing/pricing-strategy-011926.md`
+
+---
+
+# BlockSecOps Pricing Strategy Document (ARCHIVED)
 ## Enterprise DevSecOps Platform for Blockchain Security
 
 **Document Version:** 1.0  

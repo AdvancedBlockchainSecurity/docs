@@ -1,4 +1,15 @@
-# DevSecOps and Blockchain Security Platform Pricing Analysis for BlockSecOps
+> **⚠️ ARCHIVED - January 20, 2026**
+>
+> This document contains competitive analysis from October 2025 referencing the OLD 5-tier pricing model.
+> The pricing recommendations have been superseded by the new 4-tier model (Developer/Team/Growth/Enterprise).
+>
+> **Current pricing documentation:**
+> - Source of truth: `docs/standards/tier-standards.md`
+> - Updated strategy: `docs/business-ops/Pricing/pricing-strategy-011926.md`
+
+---
+
+# DevSecOps and Blockchain Security Platform Pricing Analysis for BlockSecOps (ARCHIVED)
 
 BlockSecOps's current pricing sits squarely within market ranges but shows strategic positioning challenges against both Web2 enterprise security leaders and emerging Web3 platforms. **The $10K Starter tier underprices relative to the market, while the $150K Enterprise tier aligns with mid-market Web2 standards.** However, the real insight lies in understanding how Web2 platforms achieve $35K-$500K+ enterprise deals and why Web3 platforms struggle with pricing transparency.
 

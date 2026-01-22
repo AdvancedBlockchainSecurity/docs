@@ -234,13 +234,14 @@ Logs are available through:
 
 ### Rate Limits
 
-| Tier | Requests/min | Concurrent Scans |
-|------|--------------|------------------|
-| Free | 60 | 1 |
-| Developer | 120 | 2 |
-| Startup | 300 | 5 |
-| Professional | 600 | 10 |
-| Enterprise | Custom | Custom |
+| Tier | Web Requests/min | Concurrent Scans | API Access |
+|------|------------------|------------------|------------|
+| Developer | 60 | 1 | No |
+| Team | 120 | 2 | No |
+| Growth | 300 | 5 | Yes (300 req/min) |
+| Enterprise | Custom | Custom | Yes (Custom) |
+
+> **Note:** API access is only available on Growth and Enterprise tiers.
 
 ### Caching
 

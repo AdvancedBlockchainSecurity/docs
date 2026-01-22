@@ -576,11 +576,11 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 - **Description**: Adds tier-based project limits to user quotas
 - **Columns Added**:
   - `user_quotas.max_projects` (INTEGER, NOT NULL, DEFAULT 3) - Maximum projects per tier (-1 = unlimited)
-- **Tier Defaults** (old naming):
-  - Free: 3 projects
-  - Pro: 10 projects
+- **Tier Defaults** (new 4-tier naming):
+  - Developer: 3 projects
+  - Team: 10 projects
+  - Growth: 20 projects
   - Enterprise: -1 (unlimited)
-  - Enterprise Broker: -1 (unlimited)
 - **Trigger Updated**: `create_user_quota()` function updated to include `max_projects` based on tier
 - **Note**: Superseded by Migration 024 which restructures all tier values
 - **Migration File**: `/Users/pwner/Git/ABS/blocksecops-api-service/alembic/versions/20260102_0100-023_add_max_projects_quota.py`
@@ -595,11 +595,11 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 **Tier Renaming:**
 | Old Tier | New Tier |
 |----------|----------|
-| `free` | `free` (unchanged) |
-| `pro` | `developer` |
-| `enterprise` | `professional` |
-| `enterprise_broker` | `enterprise` |
-| (new) | `startup` |
+| `free` | `developer` |
+| `developer` | `team` |
+| `startup` | `growth` |
+| `professional` | `enterprise` |
+| `enterprise_broker` | (removed) |
 
 **New Columns Added to `user_quotas`:**
 - `monthly_api_calls_limit` (INTEGER, NOT NULL, DEFAULT 0) - Monthly API call limit (0=no access, -1=unlimited)
@@ -609,19 +609,18 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 **New Table Created:**
 - `team_invites` - Team/organization invite tracking for onboarding and lead generation
 
-**Tier Limits (New Values):**
+**Tier Limits (New 4-Tier Model Values):**
 
-| Tier | Scans/Mo | Files/Scan | Projects | API Calls/Mo | Team | Retention | Priority |
-|------|----------|------------|----------|--------------|------|-----------|----------|
-| Free | 10 | 25 | 3 | 0 | 1 | 30 days | 50 |
-| Developer | 100 | 50 | 5 | 1,000 | 1 | 90 days | 40 |
-| Startup | 500 | 100 | 20 | 10,000 | 10 | 180 days | 25 |
-| Professional | -1 | -1 | -1 | -1 | 25 | 365 days | 10 |
-| Enterprise | -1 | -1 | -1 | -1 | -1 | 730 days | 5 |
+| Tier | Price | Scans/Mo | Files/Scan | Projects | API Calls/Mo | Team | Retention | Priority |
+|------|-------|----------|------------|----------|--------------|------|-----------|----------|
+| Developer | $0 | 10 | 25 | 3 | 0 | 1 | 30 days | 50 |
+| Team | $299/mo | 100 | 50 | 5 | 1,000 | 5 | 90 days | 40 |
+| Growth | $699/mo | 500 | 100 | 20 | 10,000 | 10 | 180 days | 25 |
+| Enterprise | $1,999+/mo | -1 | -1 | -1 | -1 | -1 | 730 days | 5 |
 
 **Feature Flags by Tier:**
-- `api_access_enabled`: developer+
-- `webhooks_enabled`: startup+
+- `api_access_enabled`: team+
+- `webhooks_enabled`: growth+
 
 **Trigger Updated:**
 - `create_user_quota()` function updated with new 5-tier structure and all new columns
@@ -724,7 +723,7 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 - `stripe_subscription_id` (VARCHAR(255)) - Stripe subscription ID, unique
 - `stripe_customer_id` (VARCHAR(255)) - Stripe customer ID
 - `stripe_price_id` (VARCHAR(255)) - Stripe price ID
-- `plan_tier` (VARCHAR(50)) - Plan tier: free, developer, startup, professional, enterprise
+- `plan_tier` (VARCHAR(50)) - Plan tier: developer, team, growth, enterprise
 - `billing_interval` (VARCHAR(20)) - Billing interval: monthly, annual
 - `status` (VARCHAR(50)) - Status: active, past_due, canceled, trialing, incomplete
 - `current_period_start` (TIMESTAMPTZ) - Current billing period start
@@ -899,11 +898,10 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
   - `max_loc_per_scan` (INTEGER) - Max lines of code per scan (-1 = unlimited)
   - `export_enabled` (BOOLEAN) - Whether user can export reports (PDF/JSON/SARIF)
 - **Tier Changes**:
-  - Free: 3 scans/month (was 10), 5 files (was 25), 5K LoC max, 7-day retention (was 30), no export
-  - Developer: 100 scans, unlimited files/LoC, 90-day retention, export enabled
-  - Startup: 500 scans, unlimited files/LoC, 180-day retention, webhooks
-  - Professional: Unlimited, 365-day retention
-  - Enterprise: Unlimited, 730-day retention
+  - Developer: 10 scans/month, 5 files, 5K LoC max, 7-day retention, no export ($0)
+  - Team: 100 scans, unlimited files/LoC, 90-day retention, export enabled ($299/mo)
+  - Growth: 500 scans, unlimited files/LoC, 180-day retention, webhooks ($699/mo)
+  - Enterprise: Unlimited, 730-day retention ($1,999+/mo)
 - **Migration File**: `alembic/versions/20260111_0100-030_competitive_pricing_tier_update.py`
 
 ---
@@ -917,11 +915,10 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
   - `monthly_ai_explanations_limit` (INTEGER) - Monthly AI explanation limit (-1 = unlimited)
   - `monthly_ai_explanations_used` (INTEGER) - AI explanations used this month
 - **Tier Quotas**:
-  - Free: 0 explanations/month
-  - Developer: 10 explanations/month
-  - Startup: 100 explanations/month
-  - Professional: 500 explanations/month
-  - Enterprise: -1 (unlimited)
+  - Developer: 0 explanations/month ($0 tier)
+  - Team: 10 explanations/month ($299/mo)
+  - Growth: 100 explanations/month ($699/mo)
+  - Enterprise: -1 unlimited ($1,999+/mo)
 - **Migration File**: `alembic/versions/20260112_0100-031_add_ai_explanation_quota.py`
 
 ---

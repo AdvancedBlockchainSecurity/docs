@@ -11,14 +11,14 @@
 ### 1.1 Page Load
 - [ ] Pricing page accessible at /pricing
 - [ ] Page loads without errors
-- [ ] All five tiers displayed (Free, Developer, Startup, Professional, Enterprise)
+- [ ] All four tiers displayed (Developer, Team, Growth, Enterprise)
 - [ ] Responsive on mobile/tablet/desktop
 
-### 1.2 Free Tier Card
-- [ ] "Free" label displayed
+### 1.2 Developer Tier Card (Free)
+- [ ] "Developer" label displayed
 - [ ] Price shown ($0/month)
 - [ ] Feature list:
-  - [ ] 3 scans/month
+  - [ ] 10 scans/month
   - [ ] 5 files per scan
   - [ ] 5,000 LoC per scan
   - [ ] 1 MB file limit (5 MB archives)
@@ -29,48 +29,49 @@
   - [ ] No export (dashboard view only)
   - [ ] 7-day retention
   - [ ] 1 user (solo)
-- [ ] "Current Plan" indicator (if user is Free)
+- [ ] "Current Plan" indicator (if user is Developer)
 - [ ] "Get Started" button (if not logged in)
 
-### 1.3 Developer Tier Card
-- [ ] "Developer" label displayed with green styling
-- [ ] Price shown ($189/month)
+### 1.3 Team Tier Card ($299/mo)
+- [ ] "Team" label displayed with green styling
+- [ ] Price shown ($299/month)
 - [ ] Feature list:
   - [ ] 100 scans/month
   - [ ] Unlimited files per scan
   - [ ] Unlimited LoC per scan
   - [ ] 5 MB file limit (25 MB archives)
-  - [ ] 5 projects
+  - [ ] 10 projects
   - [ ] All 17+ scanners
   - [ ] 1,000 API calls/month
   - [ ] Export enabled (PDF, JSON, SARIF)
   - [ ] 90-day retention
-  - [ ] 1 user (solo)
-- [ ] "Upgrade to Developer" button (if user is Free)
-- [ ] "Current Plan" indicator (if user is Developer)
+  - [ ] Up to 5 team members
+- [ ] "Upgrade to Team" button (if user is Developer)
+- [ ] "Current Plan" indicator (if user is Team)
 
-### 1.4 Startup Tier Card
-- [ ] "Startup" label displayed with blue styling
+### 1.4 Growth Tier Card ($699/mo)
+- [ ] "Growth" label displayed with blue styling
 - [ ] "Popular" badge shown
-- [ ] Price shown ($489/month)
+- [ ] Price shown ($699/month)
 - [ ] Feature list:
   - [ ] 500 scans/month
   - [ ] Unlimited files per scan
   - [ ] Unlimited LoC per scan
   - [ ] 10 MB file limit (50 MB archives)
-  - [ ] 20 projects
+  - [ ] 25 projects
   - [ ] All scanners
   - [ ] 10,000 API calls/month
+  - [ ] Full API access enabled
   - [ ] Webhooks enabled
   - [ ] CI/CD integration
-  - [ ] Up to 10 team members
+  - [ ] Up to 15 team members
   - [ ] 180-day retention
-- [ ] "Upgrade to Startup" button (if user is Free/Developer)
-- [ ] "Current Plan" indicator (if user is Startup)
+- [ ] "Upgrade to Growth" button (if user is Developer/Team)
+- [ ] "Current Plan" indicator (if user is Growth)
 
-### 1.5 Professional Tier Card
-- [ ] "Professional" label displayed with indigo styling
-- [ ] Price shown ($1,956/month)
+### 1.5 Enterprise Tier Card ($1,999+/mo)
+- [ ] "Enterprise" label displayed with purple styling
+- [ ] Price shown ($1,999+/month or "Contact Sales")
 - [ ] Feature list:
   - [ ] Unlimited scans
   - [ ] Unlimited files per scan
@@ -78,17 +79,6 @@
   - [ ] Unlimited API calls
   - [ ] Organizations support
   - [ ] Audit logging
-  - [ ] Up to 25 team members
-  - [ ] 365-day retention
-  - [ ] Priority support
-- [ ] "Upgrade to Professional" button
-- [ ] "Current Plan" indicator (if user is Professional)
-
-### 1.6 Enterprise Tier Card
-- [ ] "Enterprise" label displayed with purple styling
-- [ ] "Custom" or "Contact Sales" pricing
-- [ ] Feature list:
-  - [ ] Unlimited everything
   - [ ] SSO/SAML integration
   - [ ] Custom policies
   - [ ] Unlimited team members
@@ -120,43 +110,42 @@
 ### 3.1 Feature Matrix Display
 - [ ] "Detailed Feature Comparison" section visible
 - [ ] All features listed in rows
-- [ ] Six columns: Free, Developer, Startup, Professional, Enterprise, x402 Pay-Per-Scan
+- [ ] Five columns: Developer, Team, Growth, Enterprise, x402 Pay-Per-Scan
 - [ ] Correct styling for each tier column:
-  - [ ] Free: Gray
-  - [ ] Developer: Green
-  - [ ] Startup: Blue
-  - [ ] Professional: Indigo
+  - [ ] Developer: Gray
+  - [ ] Team: Green
+  - [ ] Growth: Blue
   - [ ] Enterprise: Purple
   - [ ] x402: Emerald
 - [ ] Checkmarks/values accurate per tier
 
 ### 3.2 Limit Comparison
 Features to verify in matrix:
-- [ ] Monthly Scans: 3 / 100 / 500 / Unlimited / Unlimited / Pay per scan
-- [ ] Team Members: 1 / 1 / 10 / 25 / Unlimited / 1
-- [ ] Projects: 3 / 5 / 20 / Unlimited / Unlimited / 5
-- [ ] API Calls/Month: None / 1,000 / 10,000 / Unlimited / Unlimited / 1,000
-- [ ] Files/Scan: 5 / Unlimited / Unlimited / Unlimited / Unlimited / Per tier
-- [ ] LoC/Scan: 5,000 / Unlimited / Unlimited / Unlimited / Unlimited / Per tier
-- [ ] Result Retention: 7 days / 90 days / 180 days / 365 days / 730 days / 90 days
-- [ ] All Scanners: Basic / Yes / Yes / Yes / Yes / Yes
-- [ ] API Access: No / Yes / Yes / Yes / Yes / Yes
-- [ ] Webhooks: No / No / Yes / Yes / Yes / Yes
-- [ ] Teams: No / No / Yes / Yes / Yes / No
-- [ ] Organizations: No / No / No / Yes / Yes / No
-- [ ] SSO/SAML: No / No / No / No / Yes / No
-- [ ] Audit Logs: No / No / No / Yes / Yes / No
+- [ ] Monthly Scans: 10 / 100 / 500 / Unlimited / Pay per scan
+- [ ] Team Members: 1 / 5 / 15 / Unlimited / 1
+- [ ] Projects: 3 / 10 / 25 / Unlimited / 5
+- [ ] API Calls/Month: None / 1,000 / 10,000 / Unlimited / 1,000
+- [ ] Files/Scan: 5 / Unlimited / Unlimited / Unlimited / Per tier
+- [ ] LoC/Scan: 5,000 / Unlimited / Unlimited / Unlimited / Per tier
+- [ ] Result Retention: 7 days / 90 days / 180 days / 730 days / 90 days
+- [ ] All Scanners: Basic / Yes / Yes / Yes / Yes
+- [ ] API Access: No / Yes / Yes (Full) / Yes / Yes
+- [ ] Webhooks: No / No / Yes / Yes / Yes
+- [ ] Teams: No / Yes / Yes / Yes / No
+- [ ] Organizations: No / No / No / Yes / No
+- [ ] SSO/SAML: No / No / No / Yes / No
+- [ ] Audit Logs: No / No / No / Yes / No
 
 ---
 
 ## 4. Upgrade Flow
 
 ### 4.1 Upgrade Buttons
-- [ ] Free -> Developer: "Upgrade to Developer" button works
-- [ ] Free -> Startup: "Upgrade to Startup" button works
-- [ ] Developer -> Startup: "Upgrade to Startup" button works
-- [ ] Developer -> Professional: "Upgrade to Professional" button works
-- [ ] Startup -> Professional: "Upgrade to Professional" button works
+- [ ] Developer -> Team: "Upgrade to Team" button works
+- [ ] Developer -> Growth: "Upgrade to Growth" button works
+- [ ] Team -> Growth: "Upgrade to Growth" button works
+- [ ] Team -> Enterprise: "Upgrade to Enterprise" button works
+- [ ] Growth -> Enterprise: "Upgrade to Enterprise" button works
 - [ ] Any tier -> Enterprise: "Contact Sales" button works
 
 ### 4.2 Current Plan Banner

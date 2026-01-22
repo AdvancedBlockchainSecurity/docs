@@ -133,7 +133,7 @@ User accounts with Supabase authentication and tier tracking (Phase 3.1a - Migra
 | `is_superuser` | BOOLEAN | NOT NULL, DEFAULT false | Admin privileges flag |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Account creation timestamp |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
-| `tier` | VARCHAR(20) | NOT NULL, DEFAULT 'free', INDEX | User tier (free, developer, startup, professional, enterprise) |
+| `tier` | VARCHAR(20) | NOT NULL, DEFAULT 'developer', INDEX | User tier (developer, team, growth, enterprise) |
 | `tier_updated_at` | TIMESTAMPTZ | NULLABLE, DEFAULT now() | Last tier change timestamp |
 | `supabase_user_id` | UUID | NULLABLE, UNIQUE, INDEX | **Supabase Auth user identifier (PRIMARY auth key)** |
 | `stripe_customer_id` | VARCHAR(255) | NULLABLE | Stripe customer identifier for billing |
@@ -209,15 +209,15 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 |--------|------|-------------|-------------|
 | `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique quota identifier |
 | `user_id` | UUID | NOT NULL, UNIQUE, FK → users.id ON DELETE CASCADE | Associated user |
-| `tier` | VARCHAR(20) | NOT NULL, DEFAULT 'free', INDEX | Current tier (free, developer, startup, professional, enterprise) |
+| `tier` | VARCHAR(20) | NOT NULL, DEFAULT 'developer', INDEX | Current tier (developer, team, growth, enterprise) |
 | `monthly_scan_limit` | INTEGER | NOT NULL, DEFAULT 3 | Monthly scan limit (-1 = unlimited) |
 | `monthly_scans_used` | INTEGER | NOT NULL, DEFAULT 0 | Scans used this month |
 | `max_files_per_scan` | INTEGER | NOT NULL, DEFAULT 5 | Maximum files per scan (-1 = unlimited) |
 | `max_loc_per_scan` | INTEGER | NOT NULL, DEFAULT 5000 | Maximum lines of code per scan (-1 = unlimited) |
-| `scan_priority` | INTEGER | NOT NULL, DEFAULT 50 | Scan queue priority (5=enterprise highest, 50=free lowest) |
-| `webhooks_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Webhooks feature enabled (startup+) |
-| `api_access_enabled` | BOOLEAN | NOT NULL, DEFAULT false | API access enabled (developer+) |
-| `export_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Export feature enabled (developer+) |
+| `scan_priority` | INTEGER | NOT NULL, DEFAULT 50 | Scan queue priority (5=enterprise highest, 50=developer lowest) |
+| `webhooks_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Webhooks feature enabled (growth+) |
+| `api_access_enabled` | BOOLEAN | NOT NULL, DEFAULT false | API access enabled (team+) |
+| `export_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Export feature enabled (team+) |
 | `result_retention_days` | INTEGER | NOT NULL, DEFAULT 7 | Scan result retention period |
 | `max_projects` | INTEGER | NOT NULL, DEFAULT 3 | Maximum projects (-1 = unlimited) |
 | `monthly_api_calls_limit` | INTEGER | NOT NULL, DEFAULT 0 | Monthly API call limit (0=no access, -1=unlimited) |
@@ -237,39 +237,36 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 **Relationships:**
 - One-to-one with `users` (user_id, CASCADE DELETE)
 
-**Tier Limits (Updated January 12, 2026 - Migration 031)**:
+**Tier Limits (Updated January 22, 2026 - New 4-Tier Pricing Model)**:
 
-| Tier | Scans/Mo | Files/Scan | LoC/Scan | Projects | API Calls/Mo | Team | AI Explain/Mo | Export | Retention | Priority |
-|------|----------|------------|----------|----------|--------------|------|---------------|--------|-----------|----------|
-| **Free** | 3 | 5 | 5,000 | 3 | 0 (no API) | 1 | 0 | No | 7 days | 50 |
-| **Developer** | 100 | Unlimited | Unlimited | 5 | 1,000 | 1 | 10 | Yes | 90 days | 40 |
-| **Startup** | 500 | Unlimited | Unlimited | 20 | 10,000 | 10 | 100 | Yes | 180 days | 25 |
-| **Professional** | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | 25 | 500 | Yes | 365 days | 10 |
-| **Enterprise** | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Yes | 730 days | 5 |
+| Tier | Price | Scans/Mo | Files/Scan | LoC/Scan | Projects | API Calls/Mo | Team | AI Explain/Mo | Export | Retention | Priority |
+|------|-------|----------|------------|----------|----------|--------------|------|---------------|--------|-----------|----------|
+| **Developer** | $0 | 10 | 5 | 5,000 | 3 | 0 (no API) | 1 | 0 | No | 7 days | 50 |
+| **Team** | $299/mo | 100 | Unlimited | Unlimited | 10 | 1,000 | 5 | 10 | Yes | 90 days | 40 |
+| **Growth** | $699/mo | 500 | Unlimited | Unlimited | 20 | 10,000 | 10 | 100 | Yes | 180 days | 25 |
+| **Enterprise** | $1,999+/mo | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Yes | 730 days | 5 |
 
 **File Size Limits**:
-- Free: 1 MB single / 5 MB archive
-- Developer: 5 MB single / 25 MB archive
-- Startup: 10 MB single / 50 MB archive
-- Professional: 10 MB single / 50 MB archive
-- Enterprise: 20 MB single / 100 MB archive
+- Developer: 1 MB single / 5 MB archive ($0 tier)
+- Team: 5 MB single / 25 MB archive ($299/mo)
+- Growth: 10 MB single / 50 MB archive ($699/mo)
+- Enterprise: 20 MB single / 100 MB archive ($1,999+/mo)
 
 **Feature Access by Tier**:
-- API Access: developer+
-- AI Explanations: developer+ (quota-limited)
-- Webhooks: startup+
-- Team Management: startup+
-- Organizations: professional+
-- Audit Logging: professional+
+- API Access: team+ ($299/mo)
+- AI Explanations: team+ (quota-limited)
+- Webhooks: growth+ ($699/mo)
+- Team Management: growth+
+- Organizations: enterprise ($1,999+/mo)
+- Audit Logging: enterprise
 
 **AI Explanation Quotas (Phase 5.5a - January 2026)**:
-| Tier | Monthly Limit | Notes |
-|------|--------------|-------|
-| Free | 0 | Not available |
-| Developer | 10 | Reset monthly |
-| Startup | 100 | Reset monthly |
-| Professional | 500 | Reset monthly |
-| Enterprise | -1 | Unlimited |
+| Tier | Price | Monthly Limit | Notes |
+|------|-------|--------------|-------|
+| Developer | $0 | 0 | Not available |
+| Team | $299/mo | 10 | Reset monthly |
+| Growth | $699/mo | 100 | Reset monthly |
+| Enterprise | $1,999+/mo | -1 | Unlimited |
 
 **SSO/SAML**: Enterprise tier only
 
@@ -303,14 +300,14 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
   "detail": {
     "error": "quota_exceeded",
     "message": "You've used all 3 scans for this month",
-    "tier": "free",
+    "tier": "developer",
     "scans_used": 3,
     "scan_limit": 3,
     "scans_remaining": 0,
     "reset_date": "2026-02-01T00:00:00+00:00",
     "days_until_reset": 17,
     "upgrade_url": "/pricing",
-    "upgrade_message": "Upgrade to Developer for 100 scans/month or wait until your quota resets"
+    "upgrade_message": "Upgrade to Team for 100 scans/month or wait until your quota resets"
   }
 }
 ```
@@ -325,18 +322,17 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 Enforced at upload endpoint (`POST /api/v1/upload`):
 
 1. **File Size Limits** (tier-based):
-   - Free: 1 MB per file, 5 MB archives
-   - Developer: 5 MB per file, 25 MB archives
-   - Startup: 10 MB per file, 50 MB archives
-   - Professional: 10 MB per file, 50 MB archives
-   - Enterprise: 20 MB per file, 100 MB archives
+   - Developer: 1 MB per file, 5 MB archives ($0)
+   - Team: 5 MB per file, 25 MB archives ($299/mo)
+   - Growth: 10 MB per file, 50 MB archives ($699/mo)
+   - Enterprise: 20 MB per file, 100 MB archives ($1,999+/mo)
    - Returns HTTP 413 if file size exceeds tier limit
 
 2. **Files-per-Scan Limits** (from `max_files_per_scan` column):
-   - Free: 25 files max per archive
-   - Developer: 50 files max per archive
-   - Startup: 100 files max per archive
-   - Professional/Enterprise: Unlimited (-1)
+   - Developer: 25 files max per archive ($0)
+   - Team: 50 files max per archive ($299/mo)
+   - Growth: 100 files max per archive ($699/mo)
+   - Enterprise: Unlimited (-1) ($1,999+/mo)
    - Returns HTTP 402 if archive exceeds file count limit
 
 3. **Language Validation**:
@@ -352,8 +348,8 @@ File Too Large (HTTP 413):
 {
   "detail": {
     "error": "file_too_large",
-    "message": "File size (2.5 MB) exceeds free tier limit of 1 MB for files",
-    "tier": "free",
+    "message": "File size (2.5 MB) exceeds developer tier limit of 1 MB for files",
+    "tier": "developer",
     "file_size_mb": 2.5,
     "max_size_mb": 1,
     "upgrade_url": "/pricing"
@@ -366,8 +362,8 @@ Too Many Files (HTTP 402):
 {
   "detail": {
     "error": "too_many_files",
-    "message": "Archive contains 30 files, exceeding free tier limit of 25 files per scan",
-    "tier": "free",
+    "message": "Archive contains 30 files, exceeding developer tier limit of 25 files per scan",
+    "tier": "developer",
     "file_count": 30,
     "max_files_per_scan": 25,
     "upgrade_url": "/pricing"
@@ -553,7 +549,7 @@ Security scan execution records.
 | `high_count` | INTEGER | NOT NULL | Count of high severity issues |
 | `medium_count` | INTEGER | NOT NULL | Count of medium severity issues |
 | `low_count` | INTEGER | NOT NULL | Count of low severity issues |
-| `priority` | INTEGER | NOT NULL, DEFAULT 50, INDEX | Scan priority (lower = higher priority). Enterprise=5, Pro=25, Free=50 |
+| `priority` | INTEGER | NOT NULL, DEFAULT 50, INDEX | Scan priority (lower = higher priority). Enterprise=5, Growth=25, Team=40, Developer=50 |
 | `scanners_used` | ARRAY(VARCHAR(50)) | NULLABLE | Array of scanner IDs used in this scan |
 | `scan_config` | JSONB | NULLABLE, DEFAULT '{}' | Scanner configuration parameters |
 | `duration_seconds` | INTEGER | NULLABLE | Scan duration in seconds |
@@ -1405,7 +1401,7 @@ Multi-tenant organization support for enterprise features (Phase 4.5).
 | `slug` | VARCHAR(100) | NOT NULL, UNIQUE, INDEX | URL-friendly identifier |
 | `description` | TEXT | NULLABLE | Organization description |
 | `logo_url` | VARCHAR(2048) | NULLABLE | Logo URL |
-| `tier` | VARCHAR(50) | NOT NULL, DEFAULT 'free' | Organization tier (free, pro, enterprise) |
+| `tier` | VARCHAR(50) | NOT NULL, DEFAULT 'developer' | Organization tier (developer, team, growth, enterprise) |
 | `stripe_customer_id` | VARCHAR(255) | NULLABLE, UNIQUE | Stripe customer ID for billing |
 | `stripe_subscription_id` | VARCHAR(255) | NULLABLE | Stripe subscription ID |
 | `sso_enabled` | BOOLEAN | NOT NULL, DEFAULT false | SSO enabled flag |

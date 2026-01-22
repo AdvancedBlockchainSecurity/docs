@@ -145,23 +145,22 @@ curl -s "http://localhost:8000/api/v1/scans/$SCAN_ID/economic-analysis" \
 
 **Objective**: Verify AI explanation respects tier-based quotas
 
-**Tier Quotas**:
-| Tier | Monthly AI Explanations |
-|------|------------------------|
-| Free | 0 (not available) |
-| Developer | 10 |
-| Startup | 100 |
-| Professional | 500 |
-| Enterprise | Unlimited (-1) |
+**Tier Quotas (4-Tier Model)**:
+| Tier | Price | Monthly AI Explanations |
+|------|-------|------------------------|
+| Developer | $0 | 0 (not available) |
+| Team | $299/mo | 10 |
+| Growth | $699/mo | 100 |
+| Enterprise | $1,999+/mo | Unlimited (-1) |
 
-**Steps for Free Tier**:
-1. Login as Free tier user
+**Steps for Developer Tier**:
+1. Login as Developer tier user
 2. Open scan with economic findings
 3. Click "AI Explain" button
 
-**Expected Results (Free Tier)**:
+**Expected Results (Developer Tier)**:
 - [ ] AI Explain button disabled or shows upgrade prompt
-- [ ] Message: "AI explanations not available on Free tier"
+- [ ] Message: "AI explanations not available on Developer tier"
 - [ ] Upgrade CTA visible
 
 ---
@@ -171,7 +170,7 @@ curl -s "http://localhost:8000/api/v1/scans/$SCAN_ID/economic-analysis" \
 **Objective**: Verify AI explanation endpoint works for eligible tiers
 
 **Prerequisites**:
-- User on Developer tier or higher
+- User on Team tier or higher
 - AI explanation quota not exhausted
 
 **Steps**:
@@ -396,12 +395,11 @@ Returns aggregated economic risk across all project scans.
 
 ---
 
-## AI Explanation Quota by Tier
+## AI Explanation Quota by Tier (4-Tier Model)
 
-| Tier | Monthly Quota | Reset |
-|------|--------------|-------|
-| Free | 0 | N/A |
-| Developer | 10 | Monthly |
-| Startup | 100 | Monthly |
-| Professional | 500 | Monthly |
-| Enterprise | -1 (unlimited) | N/A |
+| Tier | Price | Monthly Quota | Reset |
+|------|-------|--------------|-------|
+| Developer | $0 | 0 | N/A |
+| Team | $299/mo | 10 | Monthly |
+| Growth | $699/mo | 100 | Monthly |
+| Enterprise | $1,999+/mo | -1 (unlimited) | N/A |

@@ -6,44 +6,44 @@
 
 ---
 
-## Tier Reference
+## Tier Reference (4-Tier Model - January 2026)
 
 | Tier | Price | Scans/Mo | Files/Scan | Users | Projects | API Calls/Mo |
 |------|-------|----------|------------|-------|----------|--------------|
-| Free | $0 | 3 | 5 | 1 | 3 | 0 (no API) |
-| Developer | $189/mo | 100 | Unlimited | 1 | 5 | 1,000 |
-| Startup | $489/mo | 500 | Unlimited | 10 | 20 | 10,000 |
-| Professional | $1,956/mo | Unlimited | Unlimited | 25 | Unlimited | Unlimited |
-| Enterprise | Custom | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
+| Developer | $0 | 10 | 5 | 1 | 3 | 0 (no API) |
+| Team | $299/mo | 100 | Unlimited | 5 | 10 | 1,000 |
+| Growth | $699/mo | 500 | Unlimited | 15 | 25 | 10,000 |
+| Enterprise | $1,999+/mo | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
 
 ---
 
-## 1. Free to Developer Upgrade
+## 1. Developer to Team Upgrade
 
 ### 1.1 Upgrade Initiation
-- [ ] Upgrade button visible on pricing page for Free users
+- [ ] Upgrade button visible on pricing page for Developer users
 - [ ] Upgrade button visible in quota widget when near limit
 - [ ] Clicking upgrade navigates to checkout/payment flow
-- [ ] User tier shown as "Free" before upgrade
+- [ ] User tier shown as "Developer" before upgrade
 
 ### 1.2 Payment Processing
 - [ ] Payment form loads correctly
-- [ ] Valid payment method accepted ($189/month)
+- [ ] Valid payment method accepted ($299/month)
 - [ ] Invalid payment method shows error
 - [ ] Payment confirmation displayed
 
 ### 1.3 Post-Upgrade Verification
-- [ ] User tier updated to "developer" in database
-- [ ] Quota widget shows "Developer" tier label
+- [ ] User tier updated to "team" in database
+- [ ] Quota widget shows "Team" tier label
 - [ ] Scan limit increased to 100/month
 - [ ] Files per scan now unlimited (-1)
 - [ ] LoC per scan now unlimited (-1)
 - [ ] File size limit increased to 5 MB single / 25 MB archive
 - [ ] Export enabled (PDF, JSON, SARIF)
-- [ ] Projects limit increased to 5
+- [ ] Projects limit increased to 10
 - [ ] API access enabled (1,000 calls/month)
-- [ ] Priority queue level updated (40)
+- [ ] Priority queue level updated (30)
 - [ ] All 17+ scanners now accessible
+- [ ] Team members limit increased to 5
 
 ### 1.4 Quota Preservation
 - [ ] Existing monthly_scans_used count preserved
@@ -52,12 +52,12 @@
 
 ---
 
-## 2. Developer to Startup Upgrade
+## 2. Team to Growth Upgrade
 
 ### 2.1 Upgrade Initiation
-- [ ] "Upgrade to Startup" button visible for Developer users
-- [ ] Upgrade benefits clearly shown (team features, webhooks, CI/CD)
-- [ ] Price shown ($489/month)
+- [ ] "Upgrade to Growth" button visible for Team users
+- [ ] Upgrade benefits clearly shown (more users, full API access, webhooks, CI/CD)
+- [ ] Price shown ($699/month)
 - [ ] Clicking upgrade navigates to payment flow
 
 ### 2.2 Payment Processing
@@ -66,63 +66,65 @@
 - [ ] Payment confirmation displayed
 
 ### 2.3 Post-Upgrade Verification
-- [ ] User tier updated to "startup" in database
-- [ ] Quota widget shows "Startup" tier label
+- [ ] User tier updated to "growth" in database
+- [ ] Quota widget shows "Growth" tier label
 - [ ] Scan limit increased to 500/month
 - [ ] Files per scan remains unlimited (-1)
 - [ ] File size limit increased to 10 MB single / 50 MB archive
-- [ ] Projects limit increased to 20
+- [ ] Projects limit increased to 25
 - [ ] API calls increased to 10,000/month
-- [ ] Priority queue level updated (25)
-- [ ] Team management enabled (up to 10 members)
+- [ ] Full API access enabled
+- [ ] Priority queue level updated (15)
+- [ ] Team management enabled (up to 15 members)
 - [ ] Webhooks enabled
 - [ ] Result retention increased to 180 days
 
-### 2.4 Team Features Unlocked
-- [ ] Team invite functionality now available
-- [ ] Can invite up to 9 additional members
-- [ ] Basic RBAC enabled
+### 2.4 Team Features Expanded
+- [ ] Team invite functionality expanded
+- [ ] Can invite up to 14 additional members
+- [ ] Full API access now available
 
 ---
 
-## 3. Startup to Professional Upgrade
+## 3. Growth to Enterprise Upgrade
 
 ### 3.1 Upgrade Initiation
-- [ ] "Upgrade to Professional" button visible for Startup users
-- [ ] Upgrade benefits clearly shown (unlimited, organizations, audit)
-- [ ] Price shown ($1,956/month)
-- [ ] Clicking upgrade navigates to payment flow
+- [ ] "Upgrade to Enterprise" or "Contact Sales" button visible for Growth users
+- [ ] Upgrade benefits clearly shown (unlimited, organizations, audit, SSO)
+- [ ] Price shown ($1,999+/month or "Contact Sales")
+- [ ] Clicking upgrade navigates to payment flow or contact form
 
 ### 3.2 Payment Processing
-- [ ] Payment form loads correctly
+- [ ] Payment form loads correctly (or contact sales flow)
 - [ ] Price difference handled correctly
 - [ ] Payment confirmation displayed
 
 ### 3.3 Post-Upgrade Verification
-- [ ] User tier updated to "professional" in database
-- [ ] Quota widget shows "Professional" tier label
+- [ ] User tier updated to "enterprise" in database
+- [ ] Quota widget shows "Enterprise" tier label
 - [ ] Scan limit shows "Unlimited" (-1 in database)
 - [ ] Files per scan shows "Unlimited" (-1 in database)
 - [ ] Projects shows "Unlimited" (-1 in database)
 - [ ] API calls shows "Unlimited" (-1 in database)
-- [ ] Priority queue level updated (10)
-- [ ] Team increased to 25 members max
+- [ ] Priority queue level updated (5)
+- [ ] Team members unlimited
 - [ ] Organizations feature enabled
 - [ ] Audit logging enabled
-- [ ] Result retention increased to 365 days
+- [ ] SSO/SAML enabled
+- [ ] Result retention increased to 730 days (2 years)
 
 ---
 
-## 4. Professional to Enterprise Upgrade
+## 4. Direct Upgrades to Enterprise
 
-### 4.1 Upgrade Initiation
-- [ ] "Contact Sales" button visible for Professional users
+### 4.1 Upgrade Initiation (Any Tier)
+- [ ] "Contact Sales" button visible for all users
 - [ ] Contact form or email link works
 - [ ] Sales inquiry submitted successfully
 - [ ] User receives confirmation of inquiry
 
 ### 4.2 Admin-Applied Upgrade
-- [ ] Admin can upgrade user to Enterprise
+- [ ] Admin can upgrade user to Enterprise from any tier
 - [ ] User notified of upgrade via email
 - [ ] Upgrade effective immediately
 
@@ -139,22 +141,17 @@
 
 ---
 
-## 5. Free to Higher Tiers (Skip Upgrades)
+## 5. Developer to Higher Tiers (Skip Upgrades)
 
-### 5.1 Free to Startup
+### 5.1 Developer to Growth
 - [ ] Direct upgrade path available
-- [ ] No requirement to go through Developer first
-- [ ] Team features enabled immediately
-- [ ] All Startup limits applied
+- [ ] No requirement to go through Team first
+- [ ] Full API access enabled immediately
+- [ ] All Growth limits applied
 
-### 5.2 Free to Professional
-- [ ] Direct upgrade path available
-- [ ] Unlimited features enabled immediately
-- [ ] Organizations and audit logging available
-
-### 5.3 Free to Enterprise
+### 5.2 Developer to Enterprise
 - [ ] "Contact Sales" flow works
-- [ ] Admin can apply Enterprise directly to Free user
+- [ ] Admin can apply Enterprise directly to Developer user
 - [ ] All Enterprise features enabled
 
 ---
@@ -168,15 +165,15 @@
 - [ ] No gap in service
 
 ### 6.2 At Quota Limit Upgrade
-- [ ] User at 3/3 scans (Free tier) can initiate upgrade
-- [ ] After upgrade to Developer, user shows 3/100
-- [ ] After upgrade to Professional, user shows 3/Unlimited
+- [ ] User at 10/10 scans (Developer tier) can initiate upgrade
+- [ ] After upgrade to Team, user shows 10/100
+- [ ] After upgrade to Enterprise, user shows 10/Unlimited
 - [ ] User can scan immediately after upgrade
 - [ ] No scan loss during upgrade
 
 ### 6.3 At Team Limit Upgrade
-- [ ] Startup user with 10/10 team members can upgrade
-- [ ] After upgrade to Professional, shows 10/25
+- [ ] Team user with 5/5 team members can upgrade
+- [ ] After upgrade to Growth, shows 5/15
 - [ ] Can immediately invite more members
 
 ### 6.4 Failed Payment Recovery
@@ -198,7 +195,7 @@
 - [ ] Scan quota exceeded shows upgrade prompt
 - [ ] Project quota exceeded shows upgrade prompt
 - [ ] File limit exceeded shows upgrade prompt
-- [ ] API access denied (Free) shows upgrade to Developer prompt
+- [ ] API access denied (Developer) shows upgrade to Growth prompt
 - [ ] API quota exceeded shows upgrade prompt
 - [ ] Team invite blocked shows upgrade prompt
 - [ ] Feature gated shows upgrade prompt with required tier
@@ -234,34 +231,29 @@
 - [ ] "View Plans" button links to /pricing
 
 ### 8.2 Tier-Based Messaging
-- [ ] Free user sees: "Upgrade to Developer..."
-- [ ] Developer user sees: "Upgrade to Startup..."
-- [ ] Startup user sees: "Upgrade to Professional..."
-- [ ] Professional user sees: "Upgrade to Enterprise..."
+- [ ] Developer user sees: "Upgrade to Team..."
+- [ ] Team user sees: "Upgrade to Growth..."
+- [ ] Growth user sees: "Upgrade to Enterprise..."
 - [ ] Enterprise user: Banner NOT shown
 
 ### 8.3 Feature Highlights per Tier
 
-**Developer tier highlights shown to Free users:**
+**Team tier highlights shown to Developer users:**
 - [ ] Quality Gates
 - [ ] CI/CD Integration
-- [ ] Priority Support
+- [ ] Team Collaboration (5 users)
 
-**Startup tier highlights shown to Developer users:**
-- [ ] Team Collaboration
+**Growth tier highlights shown to Team users:**
+- [ ] Full API Access
 - [ ] 100 AI Explanations/month
-- [ ] Advanced Analytics
+- [ ] Up to 15 team members
 
-**Professional tier highlights shown to Startup users:**
-- [ ] 500 AI Explanations/month
-- [ ] Custom Integrations
-- [ ] Dedicated Support
-
-**Enterprise tier highlights shown to Professional users:**
+**Enterprise tier highlights shown to Growth users:**
 - [ ] Unlimited AI
 - [ ] SSO/SAML
 - [ ] Custom SLAs
 - [ ] Project Access Control
+- [ ] Unlimited team members
 
 ### 8.4 Dismissal Behavior
 - [ ] X button visible on right side
@@ -318,8 +310,8 @@ localStorage.removeItem('upgrade-banner-dismissed')
 **Scan Quota (402)**:
 ```json
 {
-  "detail": "Monthly scan limit reached (3/3). Upgrade to Developer for 100 scans/month.",
-  "current_tier": "free",
+  "detail": "Monthly scan limit reached (10/10). Upgrade to Team for 100 scans/month.",
+  "current_tier": "developer",
   "upgrade_url": "/pricing"
 }
 ```
@@ -327,9 +319,9 @@ localStorage.removeItem('upgrade-banner-dismissed')
 **API Access Denied (403)**:
 ```json
 {
-  "detail": "API access not available on Free tier. Upgrade to Developer.",
-  "current_tier": "free",
-  "required_tier": "developer"
+  "detail": "API access not available on Developer tier. Upgrade to Growth for full API access.",
+  "current_tier": "developer",
+  "required_tier": "growth"
 }
 ```
 
@@ -337,7 +329,7 @@ localStorage.removeItem('upgrade-banner-dismissed')
 ```json
 {
   "detail": "API call limit reached (1000/month). Resets 2026-02-01. Upgrade for more calls.",
-  "current_tier": "developer",
+  "current_tier": "team",
   "upgrade_url": "/pricing"
 }
 ```
@@ -345,9 +337,9 @@ localStorage.removeItem('upgrade-banner-dismissed')
 **Team Seat Limit (403)**:
 ```json
 {
-  "detail": "Team seat limit reached (10/10). Upgrade to Professional for 25 seats.",
-  "current_tier": "startup",
-  "required_tier": "professional"
+  "detail": "Team seat limit reached (5/5). Upgrade to Growth for 15 seats.",
+  "current_tier": "team",
+  "required_tier": "growth"
 }
 ```
 
