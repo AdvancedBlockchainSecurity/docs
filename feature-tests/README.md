@@ -60,6 +60,8 @@ Manual testing checklists for all user-facing features.
 | [42-ide-integration.md](./42-ide-integration.md) | IDE integrations: VS Code, JetBrains, Neovim, CLI local scanning (Phase 6) |
 | [43-dashboard-enhancement-jan2026.md](./43-dashboard-enhancement-jan2026.md) | Dashboard enhancements: layout, theme toggle, API key limits, status dropdown, new pages (Jan 2026) |
 | [44-platform-integrations.md](./44-platform-integrations.md) | Platform integrations: GitHub, GitLab, Bitbucket, Jira (OAuth, repositories, issue sync) |
+| [45-integrations-hub.md](./45-integrations-hub.md) | Integrations hub UI page |
+| [46-platform-admin-panel.md](./46-platform-admin-panel.md) | **NEW** - Platform admin panel: MFA, user management, emergency actions (Phase 4.6) |
 
 ---
 
@@ -222,10 +224,38 @@ The risk scoring system was redesigned to be unbounded (higher = riskier):
 
 ---
 
+## Phase 4.6 Platform Admin Panel (January 2026)
+
+Internal admin panel for platform administrators with MFA, audit logging, and emergency controls:
+
+| Feature | Status | Tests |
+|---------|--------|-------|
+| Admin CLI Tool | Implemented | create-admin, list, revoke, reset-mfa |
+| MFA Authentication | Implemented | TOTP setup, verify, session management |
+| User Management | Implemented | List, update tier, disable/enable |
+| Organization Management | Implemented | List, view details |
+| System Statistics | Implemented | Platform stats, health check |
+| Audit Logs | Implemented | View admin actions, platform logs |
+| Emergency Actions | Implemented | Revoke sessions, disable user, revoke admin |
+
+**Admin Roles:**
+- super_admin: Full platform access
+- platform_admin: User/org management
+- support_admin: Read-only access
+
+**Security Features:**
+- TOTP MFA (RFC 6238)
+- IP-bound sessions (30 min timeout)
+- Encrypted MFA secrets (Fernet)
+- Permanent audit logs
+
+---
+
 ## Test Notes
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-01-23 | Claude Code | 46-platform-admin-panel.md | NEW - Platform admin panel: MFA, user management, emergency actions (Phase 4.6)
 2026-01-23 | Claude Code | 44-platform-integrations.md | NEW - GitHub/GitLab/Bitbucket/Jira integrations, OAuth flow, repository import, Jira issue sync
 2026-01-22 | Claude Code | 43-dashboard-enhancement-jan2026.md | NEW - Dashboard layout, theme toggle, API key tier limits, vulnerability status, Users/Roles/RecentScans pages
 2026-01-19 | Claude Code | 42-ide-integration.md | IMPLEMENTED - IDE plugins (VS Code, JetBrains, Neovim), CLI --local flag, scan_source tracking (Migration 034)

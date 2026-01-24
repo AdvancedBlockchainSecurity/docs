@@ -52,8 +52,9 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Team collaboration:** Teams, project access control, assignments, comments (Phase 4.5)
 - **Notification channels:** Slack, Teams, Discord webhook integrations (CI/CD Integrations - January 2026)
 - **Quality gates:** CI/CD pipeline quality gate configurations and evaluation history (Phase 5.5c - January 2026)
+- **Platform admin:** Admin sessions with MFA, IP binding, and permanent admin audit logs (Phase 4.6 - January 2026)
 
-**Total Tables:** 49 (excluding alembic_version)
+**Total Tables:** 51 (excluding alembic_version)
 
 ---
 
@@ -167,6 +168,20 @@ User accounts with Supabase authentication and tier tracking (Phase 3.1a - Migra
 - One-to-many with `api_keys` (Phase 4.5)
 - One-to-many with `audit_logs` (Phase 4.5)
 - One-to-many with `user_activity_logs` (Phase 3.1b)
+- One-to-many with `admin_sessions` (Phase 4.6)
+- One-to-many with `admin_audit_logs` (Phase 4.6)
+
+**Platform Admin Columns (Phase 4.6 - January 2026):**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `admin_role` | VARCHAR(50) | NULLABLE, INDEX | Admin role (super_admin, platform_admin, support_admin) |
+| `admin_mfa_enabled` | BOOLEAN | NOT NULL, DEFAULT false | MFA setup complete |
+| `admin_mfa_secret` | VARCHAR(255) | NULLABLE | Encrypted TOTP secret (Fernet encryption) |
+| `admin_last_activity` | TIMESTAMPTZ | NULLABLE | Last admin panel activity |
+| `admin_session_ip` | VARCHAR(45) | NULLABLE | Current session IP (for binding) |
+| `admin_created_by` | UUID | NULLABLE, FK → users.id | Who granted admin access |
+| `admin_created_at` | TIMESTAMPTZ | NULLABLE | When admin access was granted |
 
 ---
 
@@ -198,6 +213,81 @@ This table is no longer used. Authentication is now handled by Supabase Auth wit
 - Table can be dropped after confirming all users migrated to Supabase
 - No new records are created after Phase 3.1a migration
 - Existing records can be safely deleted
+
+---
+
+### `admin_sessions`
+
+Admin panel sessions with MFA verification and IP binding (Phase 4.6 - January 2026).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique session identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id, INDEX | Admin user |
+| `session_token` | VARCHAR(255) | NOT NULL, UNIQUE, INDEX | Hashed session token (SHA-256) |
+| `ip_address` | VARCHAR(45) | NOT NULL | Client IP (for session binding) |
+| `user_agent` | VARCHAR(500) | NULLABLE | Browser user agent |
+| `mfa_verified` | BOOLEAN | NOT NULL, DEFAULT false | MFA verification status |
+| `mfa_verified_at` | TIMESTAMPTZ | NULLABLE | MFA verification timestamp |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Session creation time |
+| `expires_at` | TIMESTAMPTZ | NOT NULL | Session expiration (30 min inactivity) |
+| `last_activity` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last activity timestamp |
+| `is_revoked` | BOOLEAN | NOT NULL, DEFAULT false | Revocation status |
+| `revoked_at` | TIMESTAMPTZ | NULLABLE | Revocation timestamp |
+| `revoked_reason` | VARCHAR(255) | NULLABLE | Reason for revocation |
+
+**Indexes:**
+- `ix_admin_sessions_user_id` on `user_id`
+- `ix_admin_sessions_session_token` (UNIQUE) on `session_token`
+- `ix_admin_sessions_expires_at` on `expires_at`
+
+**Relationships:**
+- Many-to-one with `users` (user_id)
+
+**Security Notes:**
+- Sessions are IP-bound (invalidated on IP change)
+- Maximum session duration: 8 hours
+- Inactivity timeout: 30 minutes
+- Session tokens are hashed before storage
+
+---
+
+### `admin_audit_logs`
+
+Permanent audit log of all admin actions (Phase 4.6 - January 2026). **Never purged.**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique log identifier |
+| `admin_user_id` | UUID | NOT NULL, FK → users.id, INDEX | Admin who performed action |
+| `admin_role` | VARCHAR(50) | NOT NULL | Admin's role at time of action |
+| `action` | VARCHAR(100) | NOT NULL, INDEX | Action identifier (e.g., user.tier_changed) |
+| `target_type` | VARCHAR(50) | NULLABLE | Entity type (user, organization, system) |
+| `target_id` | UUID | NULLABLE, INDEX | Target entity ID |
+| `ip_address` | VARCHAR(45) | NOT NULL | Admin's IP address |
+| `user_agent` | VARCHAR(500) | NULLABLE | Browser user agent |
+| `request_id` | VARCHAR(100) | NULLABLE | Request correlation ID |
+| `old_values` | JSONB | NULLABLE | State before change |
+| `new_values` | JSONB | NULLABLE | State after change |
+| `reason` | TEXT | NULLABLE | Required for destructive actions |
+| `success` | BOOLEAN | NOT NULL, DEFAULT true | Action success status |
+| `error_message` | TEXT | NULLABLE | Error message if failed |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Action timestamp |
+
+**Indexes:**
+- `ix_admin_audit_logs_admin_user_id` on `admin_user_id`
+- `ix_admin_audit_logs_action` on `action`
+- `ix_admin_audit_logs_target_id` on `target_id`
+- `ix_admin_audit_logs_created_at` on `created_at`
+- `ix_admin_audit_logs_target_type_action` on (`target_type`, `action`)
+
+**Relationships:**
+- Many-to-one with `users` (admin_user_id)
+
+**Retention Policy:**
+- Logs are **never purged** (permanent record)
+- Required for compliance and incident investigation
+- All admin actions logged regardless of success/failure
 
 ---
 
