@@ -336,11 +336,11 @@ Due to database state inconsistencies after the 2025-11-05 database reset, the s
 
 ---
 
-## Current Database State (2026-01-19)
+## Current Database State (2026-01-24)
 
 ### Alembic Version
 ```
-version_num: 034_add_scan_source
+version_num: 041_add_mfa_lockout_fields
 ```
 
 ### Existing Tables
@@ -1002,6 +1002,51 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
   - VS Code: `blocksecops-vscode`
   - JetBrains: `blocksecops-intellij`
   - Neovim: `blocksecops-nvim`
+
+---
+
+### Migration 040: Platform Admin Features (Phase 4.6)
+- **Status**: ✅ Applied (January 23, 2026)
+- **Revision ID**: `040_add_platform_admin_features`
+- **Previous Revision**: `039_add_service_accounts`
+- **Description**: Secure admin panel for platform administrators with MFA requirement
+- **Tables Created**:
+  - `admin_sessions` - MFA-verified admin sessions with IP binding
+  - `admin_audit_logs` - Permanent audit trail for all admin actions
+- **Columns Added to `users`**:
+  - `admin_role` (VARCHAR(50)) - Admin role: `super_admin`, `platform_admin`, `support_admin`
+  - `admin_mfa_enabled` (BOOLEAN) - MFA setup complete
+  - `admin_mfa_secret` (VARCHAR(255)) - Encrypted TOTP secret (Fernet)
+  - `admin_last_activity` (TIMESTAMPTZ) - Last admin panel activity
+  - `admin_session_ip` (VARCHAR(45)) - Current session IP
+  - `admin_created_by` (UUID) - Who granted admin access
+  - `admin_created_at` (TIMESTAMPTZ) - When admin was granted
+- **Indexes Created**:
+  - `ix_users_admin_role` on `admin_role`
+  - `ix_admin_sessions_user_id`, `ix_admin_sessions_session_token` (unique)
+  - Various indexes on `admin_audit_logs`
+- **Migration File**: `alembic/versions/20260123_1000-040_add_platform_admin_features.py`
+- **Related Documentation**: `/docs/admin/platform-admin.md`
+
+---
+
+### Migration 041: MFA Lockout Fields (Security Hardening)
+- **Status**: ✅ Applied (January 24, 2026)
+- **Revision ID**: `041_add_mfa_lockout_fields`
+- **Previous Revision**: `040_add_platform_admin_features`
+- **Description**: Security hardening for MFA - adds lockout mechanism to prevent brute force attacks
+- **Columns Added to `users`**:
+  - `mfa_failed_attempts` (INTEGER, NOT NULL, DEFAULT 0) - Consecutive failed MFA attempts
+  - `mfa_locked_until` (TIMESTAMPTZ, NULLABLE) - Account locked until this time
+  - `mfa_last_failed_at` (TIMESTAMPTZ, NULLABLE) - Last failed MFA attempt timestamp
+- **Indexes Created**:
+  - `ix_users_mfa_locked_until` (partial index on non-null values)
+- **Security Policy**:
+  - 5 failed MFA attempts triggers 15-minute account lockout
+  - Successful MFA verification resets the counter
+  - Rate limiting: 3 attempts per minute per IP
+- **Migration File**: `alembic/versions/20260124_1000-041_add_mfa_lockout_fields.py`
+- **Related Documentation**: `/docs/admin/platform-admin.md` (Security Model section)
 
 ---
 

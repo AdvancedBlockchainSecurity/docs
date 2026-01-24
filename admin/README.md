@@ -15,6 +15,7 @@ This section covers administrative tasks for managing the BlockSecOps platform, 
 
 | Document | Description |
 |----------|-------------|
+| [Platform Admin Panel](./platform-admin.md) | **NEW** - Internal admin panel with MFA, user management, emergency actions |
 | [Notification Channels](./notification-channels.md) | Managing webhook notifications for Slack, Teams, Discord |
 | [CLI Deployment](./cli-deployment.md) | Deploying and configuring the CLI tool for organizations |
 | [User Management](./user-management.md) | Managing users, tiers, and quotas |
