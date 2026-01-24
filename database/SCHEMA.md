@@ -2709,4 +2709,97 @@ Training labels for the FP classifier are stored in the `vulnerability_classific
 
 ---
 
-**Last Updated**: December 27, 2025
+## Phase 6 Summary: Unified Integrations Hub (January 2026)
+
+**Phase 6: Unified Integrations Hub** was completed on January 23, 2026.
+
+### New Tables
+
+#### `ide_tokens`
+
+IDE integration tokens for VS Code and IntelliJ extensions.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique token identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE | Owner user |
+| `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE CASCADE | Associated organization |
+| `name` | VARCHAR(255) | NOT NULL | Display name (e.g., "My Laptop - VS Code") |
+| `ide_type` | VARCHAR(50) | NOT NULL | 'vscode' or 'intellij' |
+| `token_prefix` | VARCHAR(12) | NOT NULL, INDEX | First 12 chars for display |
+| `token_hash` | VARCHAR(64) | NOT NULL | SHA-256 hash of full token |
+| `permissions` | JSONB | NOT NULL, DEFAULT '[]' | List of granted permissions |
+| `last_used_at` | TIMESTAMPTZ | NULLABLE | Last API call timestamp |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT true | Active status |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+
+**Indexes:**
+- `ix_ide_tokens_user_id` on `user_id`
+- `ix_ide_tokens_token_prefix` on `token_prefix`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `organizations` (organization_id, CASCADE DELETE)
+
+---
+
+#### `service_accounts`
+
+Organization-level service accounts for CI/CD automation (Growth tier+, Admin only).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique account identifier |
+| `organization_id` | UUID | NOT NULL, FK → organizations.id ON DELETE CASCADE, INDEX | Owner organization |
+| `name` | VARCHAR(255) | NOT NULL | Display name (e.g., "GitHub Actions Bot") |
+| `description` | VARCHAR(500) | NULLABLE | Usage description |
+| `created_by` | UUID | NOT NULL, FK → users.id ON DELETE RESTRICT | Admin who created |
+| `key_prefix` | VARCHAR(12) | NOT NULL, INDEX | First 12 chars (bso_sa_xxxx) |
+| `key_hash` | VARCHAR(64) | NOT NULL | SHA-256 hash of full key |
+| `scopes` | JSONB | NOT NULL, DEFAULT '[]' | List of granted permissions |
+| `rate_limit_per_minute` | INTEGER | NOT NULL, DEFAULT 120 | Rate limit per minute |
+| `rate_limit_per_hour` | INTEGER | NOT NULL, DEFAULT 2000 | Rate limit per hour |
+| `last_used_at` | TIMESTAMPTZ | NULLABLE | Last API call timestamp |
+| `total_requests` | INTEGER | NOT NULL, DEFAULT 0 | Lifetime request count |
+| `expires_at` | TIMESTAMPTZ | NULLABLE | Optional expiration |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT true, INDEX | Active status |
+| `revoked_at` | TIMESTAMPTZ | NULLABLE | When revoked |
+| `revoked_by` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | Admin who revoked |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `idx_service_accounts_org_id` on `organization_id`
+- `idx_service_accounts_key_prefix` on `key_prefix`
+- `idx_service_accounts_is_active` on `is_active`
+
+**Relationships:**
+- Many-to-one with `organizations` (organization_id, CASCADE DELETE)
+- Many-to-one with `users` (created_by, RESTRICT DELETE)
+- Many-to-one with `users` (revoked_by, SET NULL)
+
+**Constraints:**
+- Maximum 20 active service accounts per organization
+- Key prefix must start with 'bso_sa_'
+
+**Service Account Scopes:**
+- `contracts:read` - Read contracts
+- `contracts:write` - Upload/modify contracts
+- `scans:read` - Read scan results
+- `scans:create` - Create new scans
+- `vulnerabilities:read` - Read vulnerabilities
+- `vulnerabilities:write` - Update vulnerability status
+- `patterns:read` - Read vulnerability patterns
+- `analytics:read` - Read analytics data
+- `webhooks:read` - Read webhooks
+- `webhooks:write` - Manage webhooks
+
+### Related Documentation
+
+- **Feature Test**: `docs/feature-tests/45-integrations-hub.md`
+- **Task Documentation**: `TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-23-INTEGRATIONS-HUB.md`
+- **User Documentation**: `blocksecops-docs/integrations/hub/README.md`
+
+---
+
+**Last Updated**: January 23, 2026

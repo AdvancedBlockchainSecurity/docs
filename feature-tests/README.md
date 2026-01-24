@@ -58,6 +58,29 @@ Manual testing checklists for all user-facing features.
 | [40-quality-gates.md](./40-quality-gates.md) | CI/CD Quality Gates, blocking rules, thresholds, badges, evaluation history (Phase 5.5c) |
 | [41-vulnerability-filtering.md](./41-vulnerability-filtering.md) | Vulnerability filtering, scanner dropdown, pattern input, copy button (Bug fixes Jan 2026) |
 | [42-ide-integration.md](./42-ide-integration.md) | IDE integrations: VS Code, JetBrains, Neovim, CLI local scanning (Phase 6) |
+| [43-dashboard-enhancement-jan2026.md](./43-dashboard-enhancement-jan2026.md) | Dashboard enhancements: layout, theme toggle, API key limits, status dropdown, new pages (Jan 2026) |
+| [44-platform-integrations.md](./44-platform-integrations.md) | Platform integrations: GitHub, GitLab, Bitbucket, Jira (OAuth, repositories, issue sync) |
+
+---
+
+## Platform Integrations (January 2026)
+
+Connect to external VCS and issue tracking platforms:
+
+| Feature | Status | Tests |
+|---------|--------|-------|
+| GitHub Integration | Implemented | OAuth flow, repository import |
+| GitLab Integration | Implemented | OAuth flow, repository import |
+| Bitbucket Integration | Implemented | OAuth flow, repository import |
+| Jira Integration | Implemented | OAuth flow, project mapping, issue sync |
+| Repository Settings | Implemented | Auto-scan on push/PR, project linking |
+| OAuth Security | Implemented | URL validation, token encryption |
+
+**Tier Requirements:**
+- GitHub/GitLab/Bitbucket: Team+ tier
+- Jira: Enterprise tier only
+
+**Note:** Jenkins integration not implemented - use CLI tool with webhooks instead.
 
 ---
 
@@ -203,6 +226,8 @@ The risk scoring system was redesigned to be unbounded (higher = riskier):
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-01-23 | Claude Code | 44-platform-integrations.md | NEW - GitHub/GitLab/Bitbucket/Jira integrations, OAuth flow, repository import, Jira issue sync
+2026-01-22 | Claude Code | 43-dashboard-enhancement-jan2026.md | NEW - Dashboard layout, theme toggle, API key tier limits, vulnerability status, Users/Roles/RecentScans pages
 2026-01-19 | Claude Code | 42-ide-integration.md | IMPLEMENTED - IDE plugins (VS Code, JetBrains, Neovim), CLI --local flag, scan_source tracking (Migration 034)
 2026-01-16 | Claude Code | 16-user-activity-logging.md | FIX - Activity logging integration, events now logged on scan/contract/upload (v0.10.6 API)
 2026-01-16 | Claude Code | 24-cross-scanner-deduplication.md | FIX - Pattern code fallback to canonical finding (v0.10.6 API)
