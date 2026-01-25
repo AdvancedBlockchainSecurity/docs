@@ -537,9 +537,11 @@ Frontend applications should connect to WebSocket through Traefik, not directly 
 
 | Environment | WebSocket URL |
 |-------------|---------------|
-| Local (minikube) | `ws://127.0.0.1:3000/ws` |
-| Server (kubeadm) | `ws://app.blocksecops.local/ws` |
+| Local (minikube) | `ws://127.0.0.1:3000/ws` (pure local dev) or `wss://app.blocksecops.local/ws` |
+| Server (kubeadm) | `wss://app.blocksecops.local/ws` |
 | Production (GCP) | `wss://app.blocksecops.com/ws` |
+
+**Note:** Use `wss://` for all server/staging/production environments. `ws://localhost` is acceptable only for pure local development where traffic stays on the machine.
 
 **IMPORTANT:** Never use direct port access (e.g., `ws://127.0.0.1:8003/ws`) in production or server environments. Always route through the ingress controller.
 

@@ -22,7 +22,7 @@ The notification system provides real-time toast notifications and WebSocket int
 ┌─────────────────────────────────────────────────────────────┐
 │              Notification Service (Port 8003)               │
 │  Namespace: notification-local                              │
-│  WebSocket: ws://127.0.0.1:8003/ws/                         │
+│  WebSocket: wss://app.blocksecops.local/ws (server/prod)    │
 │  Events: scan_progress, scan_completed, vulnerability_found │
 └─────────────────────┬───────────────────────────────────────┘
                       │ WebSocket Messages
@@ -407,7 +407,10 @@ curl http://127.0.0.1:8003/
 # Expected: {"message":"Solidity Security Notification Service",...}
 
 # 3. Test WebSocket (using websocat or similar)
+# For pure local dev:
 websocat ws://127.0.0.1:8003/ws/
+# For server/staging with TLS:
+websocat wss://app.blocksecops.local/ws --insecure
 
 # 4. In browser console, check WebSocket connection
 # Look for: [WebSocket] Connected to notification service
@@ -421,7 +424,8 @@ WebSocket URL is configured in `src/utils/env.ts`:
 export const envConfig = {
   websocket: {
     enabled: import.meta.env.VITE_WS_ENABLED !== 'false',
-    url: import.meta.env.VITE_WS_URL || 'ws://127.0.0.1:8003/ws/',
+    // Use wss:// for server/staging/production. ws://localhost acceptable for pure local dev.
+    url: import.meta.env.VITE_WS_URL || 'wss://localhost:8003/ws',
   },
 };
 ```

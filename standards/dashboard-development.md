@@ -515,7 +515,7 @@ kubectl rollout status deployment/dashboard -n dashboard-local
 |-----------|----------|-------------|
 | `VITE_SUPABASE_URL` | **Yes** | Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | **Yes** | Supabase anonymous key |
-| `VITE_WS_URL` | No (default: `ws://127.0.0.1:8003/ws`) | WebSocket endpoint |
+| `VITE_WS_URL` | No (default: `wss://localhost:8003/ws`) | WebSocket endpoint (use wss:// for server/staging/production) |
 | `VITE_WS_ENABLED` | No (default: `true`) | Enable WebSocket |
 
 ### Why Build Args, Not Hardcoded Values?
@@ -640,7 +640,7 @@ The dashboard includes a real-time notification system that integrates with WebS
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                 Notification Service (8003)                 │
-│  WebSocket: ws://127.0.0.1:8003/ws/                         │
+│  WebSocket: wss://app.blocksecops.local/ws                  │
 └─────────────────┬───────────────────────────────────────────┘
                   │ WebSocket Events
                   ▼
