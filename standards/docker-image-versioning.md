@@ -316,6 +316,57 @@ docker inspect --format='{{json .Config.Labels}}' blocksecops-api-service:${VERS
 
 ---
 
+## BuildKit Cache Mount Best Practices
+
+When using BuildKit cache mounts in multi-stage Dockerfiles, use unique cache IDs to prevent lock conflicts during parallel builds.
+
+### Problem
+
+Cache mounts without IDs share the same cache across all stages:
+
+```dockerfile
+# BAD: Both stages share the same apt cache, causing lock conflicts
+FROM python:3.11-slim AS builder
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y gcc
+
+FROM python:3.11-slim AS runtime
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y curl
+```
+
+Error: `E: Could not get lock /var/lib/apt/lists/lock. It is held by process 0`
+
+### Solution
+
+Use unique cache IDs for each stage:
+
+```dockerfile
+# GOOD: Each stage has its own cache
+FROM python:3.11-slim AS builder
+RUN --mount=type=cache,id=apt-cache-builder,target=/var/cache/apt \
+    --mount=type=cache,id=apt-lib-builder,target=/var/lib/apt \
+    apt-get update && apt-get install -y gcc
+
+FROM python:3.11-slim AS runtime
+RUN --mount=type=cache,id=apt-cache-runtime,target=/var/cache/apt \
+    --mount=type=cache,id=apt-lib-runtime,target=/var/lib/apt \
+    apt-get update && apt-get install -y curl
+```
+
+### Cache ID Naming Convention
+
+Use descriptive IDs: `{cache-type}-{stage-name}`
+
+| Stage | Cache Type | ID Example |
+|-------|------------|------------|
+| builder | apt cache | `apt-cache-builder` |
+| builder | apt lib | `apt-lib-builder` |
+| runtime | apt cache | `apt-cache-runtime` |
+| runtime | pip | `pip-cache-runtime` |
+
+---
+
 ## Related Documentation
 
 - [Docker Standardization Plan](/home/pwner/Git/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-17-DOCKER-STANDARDIZATION-PLAN.md)
