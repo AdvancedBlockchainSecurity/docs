@@ -1050,6 +1050,78 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 
 ---
 
+### Migration Fix: Inconsistent State Resolution (January 24, 2026)
+
+**Problem:** Database was in an inconsistent state after partial migration runs:
+- Alembic version showed 039 (expected: 041)
+- admin_sessions and admin_audit_logs tables were missing (dropped during cleanup)
+- MFA columns from migration 041 were present (orphaned from partial run)
+- ix_users_mfa_locked_until index was present (orphaned)
+
+**Root Cause:** Multiple partial migration runs left orphaned objects while Alembic version didn't reflect actual schema.
+
+**Resolution Steps:**
+
+1. **Dropped orphaned MFA objects:**
+   ```sql
+   DROP INDEX IF EXISTS ix_users_mfa_locked_until;
+   ALTER TABLE users DROP COLUMN IF EXISTS mfa_failed_attempts;
+   ALTER TABLE users DROP COLUMN IF EXISTS mfa_locked_until;
+   ALTER TABLE users DROP COLUMN IF EXISTS mfa_last_failed_at;
+   ```
+
+2. **Ran migrations fresh:**
+   ```bash
+   kubectl exec -n api-service-local deployment/api-service -- alembic upgrade head
+   ```
+
+3. **Verified state:**
+   ```bash
+   kubectl exec -n api-service-local deployment/api-service -- alembic current
+   # Output: 041_add_mfa_lockout_fields (head)
+   ```
+
+**Verification Script:**
+```python
+# Verify all admin schema objects exist
+import asyncio, os
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy import text
+
+async def verify():
+    engine = create_async_engine(os.environ['DATABASE_URL'])
+    async with engine.connect() as conn:
+        # Check tables
+        tables = await conn.execute(text('''
+            SELECT table_name FROM information_schema.tables
+            WHERE table_schema = 'public' AND table_name IN ('admin_sessions', 'admin_audit_logs')
+        '''))
+        print('Admin tables:', [r[0] for r in tables.fetchall()])
+
+        # Check columns
+        cols = await conn.execute(text('''
+            SELECT column_name FROM information_schema.columns
+            WHERE table_name = 'users' AND (column_name LIKE 'admin_%' OR column_name LIKE 'mfa_%')
+        '''))
+        print('Admin/MFA columns:', [r[0] for r in cols.fetchall()])
+
+asyncio.run(verify())
+```
+
+**Expected Output:**
+- Admin tables: `['admin_sessions', 'admin_audit_logs']`
+- Admin/MFA columns: 10 columns (7 admin_* + 3 mfa_*)
+
+**Lessons Learned:**
+1. Always verify alembic version matches actual schema state
+2. After partial migration failures, check for orphaned objects
+3. Use `alembic current` and schema inspection together for verification
+4. Document inconsistent states and resolutions for future reference
+
+**Related Documentation:** `TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-24-SCANNER-MIGRATION-FIXES.md`
+
+---
+
 ### Creating Migrations
 ```bash
 # Generate migration from models
