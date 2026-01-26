@@ -753,8 +753,11 @@ const API_PREFIX = '/api/v1';  // Relative URL - routed by Traefik
 
 **WebSocket configuration** (if needed):
 ```bash
-# For WebSocket connections that bypass Traefik
-VITE_WS_URL=ws://127.0.0.1:8003
+# For server/staging/production with TLS:
+VITE_WS_URL=wss://app.blocksecops.local/ws
+
+# For pure local development (traffic stays on machine), ws://localhost is acceptable:
+# VITE_WS_URL=ws://127.0.0.1:8003/ws
 ```
 
 **CORS Configuration Template:**

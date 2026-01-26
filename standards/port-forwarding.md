@@ -231,7 +231,7 @@ echo ""
 echo "Service URLs:"
 echo "  Dashboard:        http://127.0.0.1:3000 (via Traefik)"
 echo "  API Service:      http://127.0.0.1:3000/api/v1 (via Traefik)"
-echo "  Notifications:    http://127.0.0.1:8003 (WebSocket: ws://127.0.0.1:8003/ws/)"
+echo "  Notifications:    http://127.0.0.1:8003 (WebSocket: wss://app.blocksecops.local/ws)"
 echo "  Vault:            http://127.0.0.1:8200"
 echo ""
 echo "Optional (for debugging):"
@@ -411,7 +411,7 @@ kubectl port-forward -n notification-local svc/notification 8003:8003
 | API-triggered notifications | Yes |
 
 **Note**: The Notification Service is **optional** for basic local development. The core workflow (creating scans, viewing vulnerabilities) works without it. Only port-forward when you need:
-- Real-time WebSocket updates in the dashboard (`ws://127.0.0.1:8003/ws/`)
+- Real-time WebSocket updates in the dashboard (`wss://app.blocksecops.local/ws`)
 - Webhook/notification testing for Phase 4.5 features
 
 ### API Service Ports
