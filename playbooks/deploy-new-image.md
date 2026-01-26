@@ -63,6 +63,35 @@ Edit `package.json`:
 
 ## Step 2: Build Docker Image
 
+### Services Using Base Images (Orchestration, Intelligence-Engine)
+
+These services use pre-built base images from Harbor for faster builds:
+
+```bash
+cd /home/pwner/Git/blocksecops-orchestration
+
+# Set version
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
+
+# Build using base image (fast: ~2-3 min for code changes)
+docker build --no-cache \
+  --build-arg BASE_IMAGE_TAG=latest \
+  --build-arg SERVICE_VERSION=$VERSION \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(git rev-parse --short HEAD) \
+  -t harbor.blocksecops.local/blocksecops/orchestration:$VERSION .
+```
+
+**Note:** Base images are stored in Harbor:
+- `harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:latest`
+- `harbor.blocksecops.local/blocksecops/blocksecops-intelligence-base-cpu:latest`
+
+To rebuild base images (only needed for dependency changes):
+```bash
+./docker/build-base-image.sh
+docker push harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:latest
+```
+
 ### API Service (Python)
 
 ```bash

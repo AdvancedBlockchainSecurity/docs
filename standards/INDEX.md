@@ -131,11 +131,13 @@ These standards ensure proper versioning and configuration management:
     - Kustomization configuration
     - Why explicit versions (not `latest`)
 
-14. **[Docker Base Images](./docker-base-images.md)** [NEW]
-    - Pre-built base images for services with heavy dependencies
+14. **[Docker Base Images](./docker-base-images.md)** [UPDATED v2.0]
+    - Pre-built base images stored in Harbor for persistence
     - Reduces build times from ~20 min to ~2-3 min for code changes
     - Applies to: intelligence-engine (ML), orchestration (security tools)
-    - Base image versioning and rebuild triggers
+    - Security hardening: checksum verification, pinned digests, pipx isolation
+    - Base image versioning with content hashing
+    - Complete build and push workflow
 
 15. **[Build Workflow](./build-workflow.md)**
     - Local Docker build with Harbor registry
