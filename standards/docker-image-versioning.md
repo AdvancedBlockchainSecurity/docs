@@ -367,7 +367,37 @@ Use descriptive IDs: `{cache-type}-{stage-name}`
 
 ---
 
+---
+
+## Base Images
+
+Some services use pre-built base images to optimize build times. See [Docker Base Images](./docker-base-images.md) for details.
+
+### Base Image Workflow
+
+| Service | Base Image | When to Rebuild |
+|---------|------------|-----------------|
+| intelligence-engine | `blocksecops-intelligence-base-cpu` | ML dependency changes |
+| orchestration | `blocksecops-orchestration-base` | Security tool updates |
+
+### Base Image Tag Format
+
+```
+{version}-{dockerfile-hash}
+Example: 1.0.0-e4beef6a
+```
+
+Base images are stored in Harbor and referenced by application Dockerfiles:
+
+```dockerfile
+ARG BASE_IMAGE_TAG=latest
+FROM harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:${BASE_IMAGE_TAG} AS builder
+```
+
+---
+
 ## Related Documentation
 
+- [Docker Base Images](./docker-base-images.md) - Pre-built base images for heavy dependencies
 - [Docker Standardization Plan](/home/pwner/Git/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-17-DOCKER-STANDARDIZATION-PLAN.md)
 - [Harbor Local Installation](/home/pwner/Git/TaskDocs-BlockSecOps/phases/02-phase-3.1a1-add-harbor/HARBOR-LOCAL-INSTALLATION.md)

@@ -9,6 +9,7 @@ Step-by-step operational guides for common tasks.
 | Playbook | Description |
 |----------|-------------|
 | [Deploy New Image](deploy-new-image.md) | Build, push, and deploy a new Docker image to the cluster |
+| [Docker Cleanup](docker-cleanup.md) | Safely clean up Docker images and build cache without affecting Harbor |
 
 ### User & Organization Management
 
