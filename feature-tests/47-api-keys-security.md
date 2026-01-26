@@ -1,8 +1,8 @@
 # Feature Test: API Keys Security
 
 **Feature:** API Keys Management Security
-**Version:** 0.13.1
-**Last Updated:** 2026-01-26
+**Version:** 0.13.2
+**Last Updated:** 2026-01-25
 **Status:** Active
 
 ## Overview
@@ -14,6 +14,21 @@ This document covers testing for API Keys security features implemented in the A
 - Growth or Enterprise tier account (Developer/Team do not have API access)
 - Valid Bearer token for authentication
 - Access to API service at `https://app.blocksecops.local`
+
+### Setting Up Test User Tier
+
+If your test user doesn't have `growth` tier, set it using the admin CLI:
+
+```bash
+kubectl exec -n api-service-local deployment/api-service -- \
+  python -m src.cli.admin set-tier --email YOUR_EMAIL@example.com --tier growth
+```
+
+Verify the tier was set:
+```bash
+kubectl exec -n api-service-local deployment/api-service -- \
+  python -m src.cli.admin list | grep YOUR_EMAIL
+```
 
 ## Test Scenarios
 
@@ -253,3 +268,5 @@ done
 - [API Key Authentication](/home/pwner/Git/blocksecops-docs/api/api-key.md)
 - [Rate Limits](/home/pwner/Git/blocksecops-docs/api/rate-limits.md)
 - [Tier Standards](/home/pwner/Git/docs/standards/tier-standards.md)
+- [Admin CLI Commands](/home/pwner/Git/docs/playbooks/admin-cli-commands.md)
+- [Security Audit](/home/pwner/Git/TaskDocs-BlockSecOps/audits/API-KEYS-SECURITY-AUDIT-2026-01-26.md)
