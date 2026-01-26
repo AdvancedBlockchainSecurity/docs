@@ -1,7 +1,7 @@
 # Platform Development Standards - Index
 
-**Version:** 2.1.0
-**Last Updated:** January 15, 2026
+**Version:** 2.2.0
+**Last Updated:** January 25, 2026
 **Status:** Active
 
 ## Overview
@@ -131,20 +131,26 @@ These standards ensure proper versioning and configuration management:
     - Kustomization configuration
     - Why explicit versions (not `latest`)
 
-14. **[Build Workflow](./build-workflow.md)**
+14. **[Docker Base Images](./docker-base-images.md)** [NEW]
+    - Pre-built base images for services with heavy dependencies
+    - Reduces build times from ~20 min to ~2-3 min for code changes
+    - Applies to: intelligence-engine (ML), orchestration (security tools)
+    - Base image versioning and rebuild triggers
+
+15. **[Build Workflow](./build-workflow.md)**
     - Local Docker build with Harbor registry
     - Build and deploy steps
     - Using build cache
     - Why local Docker vs minikube Docker
 
-15. **[Frontend Build-Time Environment Variables](./frontend-build-env.md)**
+16. **[Frontend Build-Time Environment Variables](./frontend-build-env.md)**
     - Vite environment variable handling (baked at build time)
     - Security classification (public vs private variables)
     - Pass build args, never hardcode in Dockerfile
     - Environment files (.env.local vs .env.example)
     - Build workflow for local and CI/CD
 
-16. **[Tool Metadata ConfigMaps](./tool-metadata-configmaps.md)**
+17. **[Tool Metadata ConfigMaps](./tool-metadata-configmaps.md)**
     - Managing third-party tool versions via ConfigMaps
     - Version selection policy (latest stable)
     - ConfigMap solution vs. hardcoded versions
@@ -153,7 +159,7 @@ These standards ensure proper versioning and configuration management:
     - Multi-environment support
     - Real-world example: Scanner metadata refactoring
 
-17. **[Dependency Management](./dependency-management.md)**
+18. **[Dependency Management](./dependency-management.md)**
     - Latest stable version policy
     - Prohibited dependencies (deprecated, retired, unmaintained)
     - Dependency health monitoring (monthly/quarterly audits)
@@ -164,7 +170,7 @@ These standards ensure proper versioning and configuration management:
 
 ### 🤖 AI/ML Development Standards
 
-18. **[ML Development](./ml-development.md)**
+19. **[ML Development](./ml-development.md)**
     - CPU-only ML architecture (no GPU/LLM costs)
     - ML module structure and responsibilities
     - Lazy loading patterns for models
@@ -174,7 +180,7 @@ These standards ensure proper versioning and configuration management:
     - Performance targets (<100ms inference)
     - API endpoint conventions
 
-19. **[Intelligence Integration Standards](./INTELLIGENCE-INTEGRATION-STANDARDS.md)**
+20. **[Intelligence Integration Standards](./INTELLIGENCE-INTEGRATION-STANDARDS.md)**
     - Vulnerability pattern classification (BVD codes)
     - Fingerprinting strategies (ASM, ENC, EVT, L2, Semantic)
     - Deduplication algorithms
@@ -183,7 +189,7 @@ These standards ensure proper versioning and configuration management:
 
 ### ✅ Compliance & Verification
 
-20. **[Compliance Checklist](./compliance-checklist.md)**
+21. **[Compliance Checklist](./compliance-checklist.md)**
     - Daily development checklist
     - Making changes checklist
     - Database configuration changes checklist
@@ -230,6 +236,7 @@ docs/standards/
 ├── testing-deployment.md
 ├── compliance-checklist.md
 ├── docker-image-versioning.md
+├── docker-base-images.md          # NEW: Pre-built base images for heavy deps
 ├── build-workflow.md
 ├── tool-metadata-configmaps.md
 ├── dependency-management.md

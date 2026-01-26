@@ -182,6 +182,9 @@ User accounts with Supabase authentication and tier tracking (Phase 3.1a - Migra
 | `admin_session_ip` | VARCHAR(45) | NULLABLE | Current session IP (for binding) |
 | `admin_created_by` | UUID | NULLABLE, FK → users.id | Who granted admin access |
 | `admin_created_at` | TIMESTAMPTZ | NULLABLE | When admin access was granted |
+| `mfa_failed_attempts` | INTEGER | NOT NULL, DEFAULT 0 | Failed MFA attempt counter (resets on success) |
+| `mfa_locked_until` | TIMESTAMPTZ | NULLABLE | Lockout expiry (15 min after 5 failures) |
+| `mfa_last_failed_at` | TIMESTAMPTZ | NULLABLE | Last failed MFA attempt (for rate limiting) |
 
 ---
 
