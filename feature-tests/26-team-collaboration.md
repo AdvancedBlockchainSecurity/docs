@@ -525,6 +525,95 @@ curl -s -H "Authorization: Bearer ${TOKEN}" \
 
 ---
 
+### Users Management Page (Updated January 2026)
+
+**URL**: `http://127.0.0.1:3000/users`
+**Component**: `src/pages/Users.tsx`
+**API Version**: v0.13.2, Dashboard v0.31.4
+
+#### API Endpoints Used
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/roles` | GET | List available roles (convenience) |
+| `/api/v1/organizations/current/users` | GET | List organization members |
+| `/api/v1/organizations/current/users` | POST | Invite member (email + role_id) |
+| `/api/v1/organizations/current/users/{user_id}` | PATCH | Update member role |
+| `/api/v1/organizations/current/users/{user_id}` | DELETE | Remove member |
+
+#### Test: List Roles (Convenience Endpoint)
+
+**Endpoint**: `GET /api/v1/roles`
+
+```bash
+TOKEN="your-auth-token"
+curl -s -H "Authorization: Bearer ${TOKEN}" \
+  "http://app.blocksecops.local/api/v1/roles" | jq '.'
+```
+
+**Expected Response**:
+```json
+{
+  "roles": [
+    {"id": "uuid", "name": "owner", "display_name": "Owner"},
+    {"id": "uuid", "name": "admin", "display_name": "Administrator"},
+    {"id": "uuid", "name": "developer", "display_name": "Developer"},
+    {"id": "uuid", "name": "auditor", "display_name": "Auditor"},
+    {"id": "uuid", "name": "guest", "display_name": "Guest"}
+  ],
+  "total": 5
+}
+```
+
+**Status**: [ ] PENDING - Requires authenticated user in organization
+
+---
+
+#### Test: List Organization Members
+
+**Endpoint**: `GET /api/v1/organizations/current/users`
+
+```bash
+TOKEN="your-auth-token"
+curl -s -H "Authorization: Bearer ${TOKEN}" \
+  "http://app.blocksecops.local/api/v1/organizations/current/users" | jq '.'
+```
+
+**Expected Response**:
+```json
+{
+  "members": [
+    {
+      "id": "uuid",
+      "user_id": "uuid",
+      "user_email": "user@example.com",
+      "role_id": "uuid",
+      "role_name": "owner",
+      "is_active": true,
+      "joined_at": "2026-01-25T..."
+    }
+  ],
+  "total": 1
+}
+```
+
+**Status**: [ ] PENDING - Requires authenticated user in organization
+
+---
+
+#### UI Test Steps
+
+1. [ ] Navigate to Users page via sidebar (Settings > Users)
+2. [ ] Verify user list loads without 404 errors
+3. [ ] Verify roles dropdown populates with 5 system roles
+4. [ ] Add new user via Invite button
+5. [ ] Change user role via dropdown
+6. [ ] Remove user via actions menu
+
+**Status**: [ ] PENDING - Requires authenticated browser session
+
+---
+
 ## Test Data Summary
 
 | Metric | Value |
@@ -608,8 +697,8 @@ curl -s -H "Authorization: Bearer ${TOKEN}" \
 
 ---
 
-**Last Updated**: 2026-01-11
+**Last Updated**: 2026-01-25
 **Tested By**: Claude Code (Automated)
-**API Version**: v0.1.14
-**Dashboard Version**: v0.16.0
-**Notes**: Added team member quota enforcement tests (January 2026)
+**API Version**: v0.13.2
+**Dashboard Version**: v0.31.4
+**Notes**: Added Users page and roles endpoint tests (January 2026)

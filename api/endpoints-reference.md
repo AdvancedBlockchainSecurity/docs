@@ -4143,6 +4143,195 @@ Remove a member from the organization.
 
 ---
 
+## Current Organization Convenience Endpoints
+
+These endpoints automatically use the authenticated user's current organization, eliminating the need to specify the organization ID. Useful for frontend applications where the user is typically working within a single organization context.
+
+### GET /roles
+
+List roles in the current user's organization.
+
+**Authentication**: Required
+**Tier**: All tiers
+
+**Response** (200 OK):
+```json
+{
+  "roles": [
+    {
+      "id": "uuid",
+      "name": "owner",
+      "display_name": "Owner",
+      "description": "Full access to all organization resources",
+      "is_system_role": true
+    },
+    {
+      "id": "uuid",
+      "name": "admin",
+      "display_name": "Administrator",
+      "description": "Manage members, roles, and settings",
+      "is_system_role": true
+    },
+    {
+      "id": "uuid",
+      "name": "developer",
+      "display_name": "Developer",
+      "description": "Create and manage contracts and scans",
+      "is_system_role": true
+    },
+    {
+      "id": "uuid",
+      "name": "auditor",
+      "display_name": "Auditor",
+      "description": "Read-only access with audit log visibility",
+      "is_system_role": true
+    },
+    {
+      "id": "uuid",
+      "name": "guest",
+      "display_name": "Guest",
+      "description": "Limited read-only access",
+      "is_system_role": true
+    }
+  ],
+  "total": 5
+}
+```
+
+**Status Codes**:
+- `200` OK - Roles listed
+- `401` Unauthorized - Not authenticated
+- `404` Not Found - User not a member of any organization
+
+---
+
+### GET /organizations/current/users
+
+List members in the current user's organization.
+
+**Authentication**: Required
+**Tier**: All tiers
+
+**Response** (200 OK):
+```json
+{
+  "members": [
+    {
+      "id": "uuid",
+      "user_id": "uuid",
+      "user_email": "user@example.com",
+      "role_id": "uuid",
+      "role_name": "owner",
+      "is_active": true,
+      "joined_at": "2025-12-23T10:00:00Z"
+    }
+  ],
+  "total": 1
+}
+```
+
+**Status Codes**:
+- `200` OK - Members listed
+- `401` Unauthorized - Not authenticated
+- `404` Not Found - User not a member of any organization
+
+---
+
+### POST /organizations/current/users
+
+Add a member to the current organization.
+
+**Authentication**: Required
+**Tier**: Enterprise only (admin role)
+
+**Request Body**:
+```json
+{
+  "email": "newuser@example.com",
+  "role_id": "uuid"
+}
+```
+
+**Response** (201 Created):
+```json
+{
+  "id": "uuid",
+  "user_id": "uuid",
+  "user_email": "newuser@example.com",
+  "role_id": "uuid",
+  "role_name": "developer",
+  "is_active": true,
+  "joined_at": "2025-12-23T10:00:00Z"
+}
+```
+
+**Status Codes**:
+- `201` Created - Member added
+- `400` Bad Request - Invalid input
+- `401` Unauthorized - Not authenticated
+- `403` Forbidden - Not admin role
+- `404` Not Found - Role not found or user not in organization
+- `409` Conflict - User already a member
+
+---
+
+### PATCH /organizations/current/users/{user_id}
+
+Update a member's role in the current organization.
+
+**Authentication**: Required
+**Tier**: Enterprise only (admin role)
+
+**Path Parameters**:
+- `user_id` (UUID) - The member's user ID
+
+**Request Body**:
+```json
+{
+  "role_id": "uuid"
+}
+```
+
+**Response** (200 OK):
+```json
+{
+  "id": "uuid",
+  "user_id": "uuid",
+  "user_email": "user@example.com",
+  "role_id": "uuid",
+  "role_name": "admin",
+  "is_active": true,
+  "joined_at": "2025-12-23T10:00:00Z"
+}
+```
+
+**Status Codes**:
+- `200` OK - Member updated
+- `400` Bad Request - Invalid input
+- `401` Unauthorized - Not authenticated
+- `403` Forbidden - Not admin role or cannot modify owner
+- `404` Not Found - Member or role not found
+
+---
+
+### DELETE /organizations/current/users/{user_id}
+
+Remove a member from the current organization.
+
+**Authentication**: Required
+**Tier**: Enterprise only (admin role)
+
+**Path Parameters**:
+- `user_id` (UUID) - The member's user ID
+
+**Status Codes**:
+- `204` No Content - Member removed
+- `401` Unauthorized - Not authenticated
+- `403` Forbidden - Not admin role or cannot remove owner
+- `404` Not Found - Member not found
+
+---
+
 ## API Keys (Phase 4.5 - Enterprise)
 
 ### GET /api-keys/scopes
