@@ -210,8 +210,19 @@ Phase 5 CPU-only ML features are now implemented (~$1/month operating cost):
 | False Positive Detection | Implemented (needs training data) | FP probability endpoint, training API |
 | Risk Scoring | **Redesigned (v0.7.0)** | Unbounded scoring, CRITICAL/HIGH/MEDIUM/LOW levels |
 | Confidence Scoring | Implemented | Multi-signal weighted combination |
-| Semantic Deduplication | Implemented | Sentence Transformers embeddings |
+| Semantic Deduplication | **Refactored (Jan 2026)** | HTTP calls to intelligence-engine |
 | Smart Prioritization | Implemented | Priority ranking, composite scoring |
+
+### ML Architecture Update (January 26, 2026)
+
+ML embedding generation moved from api-service to intelligence-engine:
+
+| Service | Before | After |
+|---------|--------|-------|
+| api-service | 12.6 GB (had PyTorch) | **934 MB** (lightweight HTTP client) |
+| intelligence-engine | 3 GB | 3 GB (hosts `/api/v1/embeddings`) |
+
+**Result:** 93% reduction in api-service image size. Deduplication functionality unchanged.
 
 ### Risk Scoring Redesign (December 30, 2025)
 
@@ -255,6 +266,8 @@ Internal admin panel for platform administrators with MFA, audit logging, and em
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-01-26 | Claude Code | 27-ai-ml-features.md | UPDATE - ML dependency split: embeddings moved to intelligence-engine, api-service reduced from 12.6GB to 934MB
+2026-01-26 | Claude Code | 24-cross-scanner-deduplication.md | UPDATE - Architecture change: semantic deduplication now uses intelligence-engine for embeddings
 2026-01-23 | Claude Code | 46-platform-admin-panel.md | NEW - Platform admin panel: MFA, user management, emergency actions (Phase 4.6)
 2026-01-23 | Claude Code | 44-platform-integrations.md | NEW - GitHub/GitLab/Bitbucket/Jira integrations, OAuth flow, repository import, Jira issue sync
 2026-01-22 | Claude Code | 43-dashboard-enhancement-jan2026.md | NEW - Dashboard layout, theme toggle, API key tier limits, vulnerability status, Users/Roles/RecentScans pages

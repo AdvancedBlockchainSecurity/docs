@@ -1,7 +1,7 @@
 # Docker Base Image Standards
 
-**Version:** 2.0.0
-**Last Updated:** January 25, 2026
+**Version:** 2.1.0
+**Last Updated:** January 26, 2026
 **Status:** Active
 
 ## Overview
@@ -20,11 +20,12 @@ Create separate base images containing pre-installed heavy dependencies, store t
 
 ## Services Using Base Images
 
-| Service | Base Image | Size | Heavy Dependencies |
-|---------|------------|------|-------------------|
-| `blocksecops-intelligence-engine` | `blocksecops-intelligence-base-cpu` | ~12GB | PyTorch, TensorFlow, transformers, scikit-learn, spacy, NLP libraries |
-| `blocksecops-intelligence-engine` | `blocksecops-intelligence-base-gpu` | ~14GB | Same as CPU + CUDA support |
-| `blocksecops-orchestration` | `blocksecops-orchestration-base` | ~5GB | Security analysis tools (Slither, Semgrep, Echidna, Foundry, Wake, etc.) |
+| Service | Base Image (Harbor) |
+|---------|---------------------|
+| `blocksecops-intelligence-engine` | `harbor.blocksecops.local/blocksecops/blocksecops-intelligence-base-cpu` |
+| `blocksecops-orchestration` | `harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base` |
+
+**Note:** GPU variant available: `blocksecops-intelligence-base-gpu`
 
 ## Build Time Comparison
 
@@ -237,12 +238,20 @@ docker push harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:
 
 ### Step 3: Update Application Dockerfile
 
-Update the `FROM` line to reference Harbor:
+Update the `FROM` line to reference Harbor using the `BASE_REGISTRY` ARG pattern:
 
 ```dockerfile
+ARG BASE_REGISTRY=harbor.blocksecops.local
+ARG BASE_VARIANT=cpu
 ARG BASE_IMAGE_TAG=latest
-FROM harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:${BASE_IMAGE_TAG} AS builder
+
+FROM ${BASE_REGISTRY}/blocksecops/blocksecops-intelligence-base-${BASE_VARIANT}:${BASE_IMAGE_TAG} AS builder
 ```
+
+**Why `BASE_REGISTRY` ARG?**
+- Allows switching registries without modifying Dockerfile
+- Supports both local Harbor and production GCP Artifact Registry
+- Can override at build time: `--build-arg BASE_REGISTRY=us-central1-docker.pkg.dev/project/repo`
 
 ### Step 4: Build Application Image
 
@@ -265,6 +274,27 @@ docker tag blocksecops-orchestration:${VERSION} \
   harbor.blocksecops.local/blocksecops/orchestration:${VERSION}
 docker push harbor.blocksecops.local/blocksecops/orchestration:${VERSION}
 ```
+
+---
+
+## Deployment Requirements
+
+### For All Base Image Services
+
+| Requirement | Setting | Why |
+|-------------|---------|-----|
+| Image pull policy | `imagePullPolicy: IfNotPresent` | Allows Harbor pulls (not `Never`) |
+| Kustomize labels | `includeSelectors: false` | Prevents immutable selector errors |
+| Kustomize newName | Full Harbor path | e.g., `harbor.blocksecops.local/blocksecops/intelligence-engine` |
+
+### For ML Services (intelligence-engine)
+
+| Requirement | Setting |
+|-------------|---------|
+| Memory limit | `2Gi` minimum |
+| HF_HOME | `/app/models` |
+| TRANSFORMERS_CACHE | `/app/models` |
+| SENTENCE_TRANSFORMERS_HOME | `/app/models` |
 
 ---
 
@@ -307,39 +337,29 @@ Before pushing a base image to Harbor:
 
 The following services do not benefit from base images and should continue using standard multi-stage builds:
 
-| Service | Reason |
-|---------|--------|
-| `blocksecops-api-service` | Lightweight FastAPI dependencies, builds fast |
-| `blocksecops-notification` | Lightweight dependencies |
-| `blocksecops-contract-parser` | Rust with cargo dependency caching |
-| `blocksecops-shared` | Already optimized multi-stage build |
-| Node.js frontends | npm ci with cache mounts is efficient |
+| Service | Image Size | Reason |
+|---------|------------|--------|
+| `blocksecops-api-service` | ~934 MB | Lightweight FastAPI dependencies, builds fast |
+| `blocksecops-notification` | ~200 MB | Lightweight dependencies |
+| `blocksecops-contract-parser` | ~200 MB | Rust with cargo dependency caching |
+| `blocksecops-shared` | ~100 MB | Already optimized multi-stage build |
+| Node.js frontends | ~300 MB | npm ci with cache mounts is efficient |
+
+> **Note (January 26, 2026):** The api-service was reduced from 12.6GB to 934MB by moving ML dependencies (sentence-transformers, PyTorch) to intelligence-engine. See [ML-DEPENDENCY-SPLIT-2026-01-26](/home/pwner/Git/docs/changelogs/ML-DEPENDENCY-SPLIT-2026-01-26.md).
 
 ---
 
 ## Troubleshooting
 
-### "No broken requirements found" but tool doesn't work
-
-Check if tool is installed via pipx:
-```bash
-docker run --rm <image> which semgrep
-# Should show: /opt/pipx/bin/semgrep
-```
-
-### Base image not found during build
-
-Ensure image is in Harbor:
-```bash
-docker pull harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:latest
-```
-
-### Disk space issues
-
-Base images are large. After pushing to Harbor, prune local cache:
-```bash
-docker image prune -f  # Safe - Harbor images are preserved
-```
+| Problem | Symptom | Fix |
+|---------|---------|-----|
+| Tool not found | pipx tool missing | Check `which semgrep` shows `/opt/pipx/bin/semgrep` |
+| Base image not found | Build fails | `docker pull harbor.blocksecops.local/blocksecops/<base-image>:latest` |
+| ErrImageNeverPull | Pod stuck | Change `imagePullPolicy` to `IfNotPresent`, verify image in Harbor |
+| Read-only filesystem | ML model cache error | Set `HF_HOME`, `TRANSFORMERS_CACHE`, `SENTENCE_TRANSFORMERS_HOME` to `/app/models` |
+| Selector immutable | Deployment fails | Add `includeSelectors: false` to kustomization labels |
+| OOM Killed (exit 137) | Pod restarts | Increase memory limit to `2Gi` for ML services |
+| Disk space | Local disk full | `docker image prune -f` (Harbor images preserved) |
 
 ---
 

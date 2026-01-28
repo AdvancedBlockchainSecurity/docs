@@ -267,10 +267,10 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
-| api-service | 0.11.1 | `k8s/overlays/local/api-service/` | |
+| api-service | 0.13.4 | `k8s/overlays/local/api-service/` | Lightweight (934MB) |
 | dashboard | 0.30.11 | `k8s/overlays/local/` | Requires parent context |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
-| intelligence-engine | 0.2.0 | `k8s/overlays/local/` | |
+| intelligence-engine | 0.2.1 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | |
 | orchestration | 0.9.1 | `k8s/overlays/local/` | |
 | tool-integration | 0.3.8 | `k8s/overlays/local/` | |

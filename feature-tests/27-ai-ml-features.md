@@ -363,6 +363,22 @@ Testing Notes:
 - No external API calls needed (no LLM costs)
 ```
 
+## Architecture Update (January 26, 2026)
+
+**ML Dependency Split:** Embedding generation moved from api-service to intelligence-engine.
+
+| Component | Before | After |
+|-----------|--------|-------|
+| api-service | 12.6GB (included PyTorch) | 934MB (HTTP client only) |
+| intelligence-engine | 3GB | 3GB (hosts embeddings endpoint) |
+
+**Embeddings Endpoint:** `POST /api/v1/embeddings`
+- Host: `intelligence-engine.intelligence-engine-local.svc.cluster.local:8000`
+- Model: `all-MiniLM-L6-v2`
+- Dimensions: 384
+
+The api-service `semantic_deduplicator.py` now uses httpx to call the intelligence-engine instead of loading the model locally. This reduces api-service image size by 93%.
+
 ---
 
 ## Test Results
@@ -371,3 +387,4 @@ Testing Notes:
 |------|--------|--------|-------|
 | 2025-12-27 | - | PARTIAL | ML module implemented, endpoints registered |
 | 2026-01-08 | - | PARTIAL | Added model training, labeling scripts, background tasks, model storage |
+| 2026-01-26 | Claude Code | PARTIAL | ML dependency split complete - embeddings moved to intelligence-engine, api-service reduced from 12.6GB to 934MB |
