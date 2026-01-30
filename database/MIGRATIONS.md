@@ -336,11 +336,11 @@ Due to database state inconsistencies after the 2025-11-05 database reset, the s
 
 ---
 
-## Current Database State (2026-01-24)
+## Current Database State (2026-01-30)
 
 ### Alembic Version
 ```
-version_num: 041_add_mfa_lockout_fields
+version_num: 055_add_gdpr_requests
 ```
 
 ### Existing Tables
@@ -363,6 +363,9 @@ version_num: 041_add_mfa_lockout_fields
 - ✅ `quality_gates` (CI/CD Quality Gates - Migration 032)
 - ✅ `quality_gate_evaluations` (CI/CD Quality Gates - Migration 032)
 - ✅ `deduplication_groups` (Intelligence Layer)
+- ✅ `tos_consent_records` (ML Data Strategy - Migration 053)
+- ✅ `ml_training_data_provenance` (ML Data Strategy - Migration 054)
+- ✅ `gdpr_data_requests` (ML Data Strategy - Migration 055)
 - ❌ `vulnerability_classifications` (pending)
 - ❌ `vulnerability_trends` (pending)
 
@@ -1047,6 +1050,103 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
   - Rate limiting: 3 attempts per minute per IP
 - **Migration File**: `alembic/versions/20260124_1000-041_add_mfa_lockout_fields.py`
 - **Related Documentation**: `/docs/admin/platform-admin.md` (Security Model section)
+
+---
+
+### Migration 053: ToS Consent Tracking (ML Data Strategy)
+- **Status**: ✅ Applied (January 30, 2026)
+- **Revision ID**: `053_add_consent_tracking`
+- **Previous Revision**: `049_add_scanner_quality_metrics`
+- **Description**: GDPR/LGPD compliant consent tracking for ToS and Privacy Policy acceptance
+- **Tables Created**:
+  - `tos_consent_records` - User consent records with version tracking
+- **Table Schema**:
+  - `id` (UUID) - Primary key
+  - `user_id` (UUID) - FK to users, CASCADE DELETE
+  - `tos_version` (VARCHAR(20)) - Terms of Service version accepted
+  - `privacy_policy_version` (VARCHAR(20)) - Privacy Policy version accepted
+  - `ml_data_collection_consent` (BOOLEAN) - Consent for ML data collection (default true)
+  - `consent_ip_address` (VARCHAR(45)) - IP address at time of consent
+  - `consent_user_agent` (TEXT) - User agent string at consent
+  - `consented_at` (TIMESTAMPTZ) - When consent was given
+  - `withdrawn_at` (TIMESTAMPTZ) - When consent was withdrawn (nullable)
+  - `created_at` (TIMESTAMPTZ) - Record creation timestamp
+- **Indexes Created**:
+  - `ix_tos_consent_records_user_id` on `user_id`
+  - `ix_tos_consent_records_consented_at` on `consented_at`
+- **Migration File**: `alembic/versions/20260130_0100-053_add_consent_tracking.py`
+- **Related Documentation**: ML Data Strategy implementation
+
+---
+
+### Migration 054: ML Training Data Provenance (ML Data Strategy)
+- **Status**: ✅ Applied (January 30, 2026)
+- **Revision ID**: `054_add_ml_provenance`
+- **Previous Revision**: `053_add_consent_tracking`
+- **Description**: Data provenance tracking for ML training data with consent lineage
+- **Tables Created**:
+  - `ml_training_data_provenance` - Training data lineage records
+- **Table Schema**:
+  - `id` (UUID) - Primary key
+  - `vulnerability_id` (UUID) - FK to vulnerabilities, CASCADE DELETE
+  - `organization_id` (UUID) - FK to organizations, SET NULL (nullable)
+  - `user_id` (UUID) - FK to users (who labeled), SET NULL
+  - `label` (VARCHAR(50)) - Label: true_positive, false_positive, needs_review
+  - `confidence` (FLOAT) - Label confidence 0.0-1.0
+  - `features_snapshot` (JSONB) - Anonymized feature data (no PII)
+  - `tos_consent_id` (UUID) - FK to tos_consent_records, SET NULL
+  - `consent_version` (VARCHAR(20)) - ToS version at labeling time
+  - `excluded_from_training` (BOOLEAN) - Whether excluded from ML training
+  - `exclusion_reason` (VARCHAR(100)) - Reason for exclusion
+  - `created_at` (TIMESTAMPTZ) - Record creation timestamp
+  - `updated_at` (TIMESTAMPTZ) - Last update timestamp
+- **Indexes Created**:
+  - `ix_ml_provenance_vulnerability_id` on `vulnerability_id`
+  - `ix_ml_provenance_organization_id` on `organization_id`
+  - `ix_ml_provenance_user_id` on `user_id`
+  - `ix_ml_provenance_excluded` on `excluded_from_training`
+  - `ix_ml_provenance_created_at` on `created_at`
+- **Columns Added to `organizations`**:
+  - `ai_data_collection_disabled` (BOOLEAN) - Enterprise AI opt-out flag
+  - `ai_opt_out_date` (TIMESTAMPTZ) - When opt-out was enabled
+  - `ai_opt_out_reason` (VARCHAR(500)) - Reason for opt-out
+- **Migration File**: `alembic/versions/20260130_0200-054_add_ml_provenance.py`
+- **Related Documentation**: ML Data Strategy implementation
+
+---
+
+### Migration 055: GDPR Data Requests (ML Data Strategy)
+- **Status**: ✅ Applied (January 30, 2026)
+- **Revision ID**: `055_add_gdpr_requests`
+- **Previous Revision**: `054_add_ml_provenance`
+- **Description**: GDPR Article 15/17 compliance for data export and deletion requests
+- **Tables Created**:
+  - `gdpr_data_requests` - Data access and deletion request tracking
+- **Table Schema**:
+  - `id` (UUID) - Primary key
+  - `user_id` (UUID) - FK to users, CASCADE DELETE
+  - `request_type` (VARCHAR(20)) - Request type: export, deletion
+  - `status` (VARCHAR(20)) - Status: pending, processing, completed, rejected
+  - `requester_email` (VARCHAR(255)) - Email for notification
+  - `requested_at` (TIMESTAMPTZ) - Request timestamp
+  - `processed_at` (TIMESTAMPTZ) - Processing completion timestamp
+  - `processed_by` (UUID) - Admin who processed (nullable)
+  - `export_file_path` (VARCHAR(500)) - Path to export file (for exports)
+  - `export_expires_at` (TIMESTAMPTZ) - Export download expiry
+  - `notes` (TEXT) - Admin notes
+  - `created_at` (TIMESTAMPTZ) - Record creation timestamp
+- **Indexes Created**:
+  - `ix_gdpr_requests_user_id` on `user_id`
+  - `ix_gdpr_requests_status` on `status`
+  - `ix_gdpr_requests_request_type` on `request_type`
+  - `ix_gdpr_requests_requested_at` on `requested_at`
+- **API Endpoints Added**:
+  - `POST /api/v1/gdpr/export-request` - Request data export
+  - `GET /api/v1/gdpr/export/{id}` - Check export status
+  - `POST /api/v1/gdpr/deletion-request` - Request data deletion
+  - `GET /api/v1/gdpr/my-data` - View data summary
+- **Migration File**: `alembic/versions/20260130_0300-055_add_gdpr_requests.py`
+- **Related Documentation**: ML Data Strategy implementation
 
 ---
 

@@ -61,7 +61,9 @@ Manual testing checklists for all user-facing features.
 | [43-dashboard-enhancement-jan2026.md](./43-dashboard-enhancement-jan2026.md) | Dashboard enhancements: layout, theme toggle, API key limits, status dropdown, new pages (Jan 2026) |
 | [44-platform-integrations.md](./44-platform-integrations.md) | Platform integrations: GitHub, GitLab, Bitbucket, Jira (OAuth, repositories, issue sync) |
 | [45-integrations-hub.md](./45-integrations-hub.md) | Integrations hub UI page |
-| [46-platform-admin-panel.md](./46-platform-admin-panel.md) | **NEW** - Platform admin panel: MFA, user management, emergency actions (Phase 4.6) |
+| [46-platform-admin-panel.md](./46-platform-admin-panel.md) | Platform admin panel: MFA, user management, emergency actions (Phase 4.6) |
+| [47-api-keys-security.md](./47-api-keys-security.md) | API key security, tier limits, validation |
+| [48-ml-data-strategy.md](./48-ml-data-strategy.md) | **NEW** - ML Data Strategy: consent tracking, data provenance, GDPR compliance |
 
 ---
 
@@ -262,10 +264,32 @@ Internal admin panel for platform administrators with MFA, audit logging, and em
 
 ---
 
+## ML Data Strategy & Legal Compliance (January 2026)
+
+GDPR/LGPD compliance features for ML data collection:
+
+| Feature | Status | Tests |
+|---------|--------|-------|
+| ToS Consent Tracking | Implemented | Registration flow, consent API |
+| ML Data Provenance | Implemented | Label tracking, feature snapshots |
+| Organization AI Opt-Out | Implemented | Enterprise-only, admin API |
+| GDPR Data Export | Implemented | Export request API |
+| GDPR Data Deletion | Implemented | Deletion request API |
+
+**Database Tables:**
+- `tos_consent_records` - User consent with version tracking
+- `ml_training_data_provenance` - Training data lineage
+- `gdpr_data_requests` - Export/deletion request tracking
+
+**Migrations:** 053, 054, 055
+
+---
+
 ## Test Notes
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-01-30 | Claude Code | 48-ml-data-strategy.md | NEW - ML Data Strategy: consent tracking, provenance, GDPR compliance (v0.16.0 API, v0.34.0 Dashboard)
 2026-01-26 | Claude Code | 27-ai-ml-features.md | UPDATE - ML dependency split: embeddings moved to intelligence-engine, api-service reduced from 12.6GB to 934MB
 2026-01-26 | Claude Code | 24-cross-scanner-deduplication.md | UPDATE - Architecture change: semantic deduplication now uses intelligence-engine for embeddings
 2026-01-23 | Claude Code | 46-platform-admin-panel.md | NEW - Platform admin panel: MFA, user management, emergency actions (Phase 4.6)
