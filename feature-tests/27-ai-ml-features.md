@@ -381,6 +381,107 @@ The api-service `semantic_deduplicator.py` now uses httpx to call the intelligen
 
 ---
 
+---
+
+## 11. Frontend AI Features (Dashboard v0.32.0)
+
+**Implementation Date**: 2026-01-29
+**Dashboard Version**: 0.32.0
+
+### 11.1 Navigation
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 11.1.1 | AI ASSISTANT section appears in sidebar | Shows robot icon with section title | [ ] |
+| 11.1.2 | Security Copilot link | Navigates to `/copilot` | [ ] |
+| 11.1.3 | Code Review link | Navigates to `/code-review` | [ ] |
+| 11.1.4 | Code Repair link | Navigates to `/code-repair` | [ ] |
+| 11.1.5 | Scanner Quality link under INTELLIGENCE | Navigates to `/intelligence/scanner-quality` | [ ] |
+
+### 11.2 Scanner Quality Page (`/intelligence/scanner-quality`)
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 11.2.1 | Page loads without errors | No console errors | [ ] |
+| 11.2.2 | Quality gauges display | Shows Accuracy, AUC, CV AUC Mean gauges | [ ] |
+| 11.2.3 | Training Data Stats card | Shows total samples, TP, FP counts | [ ] |
+| 11.2.4 | Scanner Quality Table | Sortable table with scanner metrics | [ ] |
+| 11.2.5 | Retrain Model button | Clickable, shows loading state | [ ] |
+| 11.2.6 | Preview banner | Yellow warning banner displays | [ ] |
+
+### 11.3 AI Copilot (`/copilot`)
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 11.3.1 | Chat interface renders | Message input, send button visible | [ ] |
+| 11.3.2 | Preview banner displays | Shows AI preview warning | [ ] |
+| 11.3.3 | Conversation list sidebar | Shows conversation history | [ ] |
+| 11.3.4 | New conversation button | Creates new conversation | [ ] |
+| 11.3.5 | Message input accepts text | Can type in input field | [ ] |
+| 11.3.6 | Send button functional | Button responds to click | [ ] |
+| 11.3.7 | Conversations List page | `/copilot/conversations` loads | [ ] |
+| 11.3.8 | Conversation Detail page | `/copilot/conversations/:id` loads | [ ] |
+
+### 11.4 Code Repair (`/code-repair`)
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 11.4.1 | Page loads | Main repair page renders | [ ] |
+| 11.4.2 | Filter buttons work | All, Ready, Applied, Rejected, Pending | [ ] |
+| 11.4.3 | Empty state shows | "No repair suggestions" message | [ ] |
+| 11.4.4 | "How Code Repair Works" section | 3-step explanation visible | [ ] |
+| 11.4.5 | View History link | Navigates to `/code-repair/history` | [ ] |
+| 11.4.6 | History page loads | `/code-repair/history` renders table | [ ] |
+| 11.4.7 | Detail page loads | `/code-repair/:id` renders (with valid ID) | [ ] |
+| 11.4.8 | Code diff component | Shows original vs repaired code | [ ] |
+
+### 11.5 Code Review (`/code-review`)
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 11.5.1 | Page loads | Main review page renders | [ ] |
+| 11.5.2 | Status filter buttons | All, Completed, In Progress, Pending, Failed | [ ] |
+| 11.5.3 | Empty state shows | "No reviews found" message | [ ] |
+| 11.5.4 | Stats cards area | Shows review statistics (when data exists) | [ ] |
+| 11.5.5 | Suggestion Types section | Security, Gas, Best Practice, Code Quality | [ ] |
+| 11.5.6 | View History link | Navigates to `/code-review/history` | [ ] |
+| 11.5.7 | History page loads | `/code-review/history` renders table | [ ] |
+| 11.5.8 | Detail page loads | `/code-review/:id` renders (with valid ID) | [ ] |
+
+### 11.6 General UI Tests
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 11.6.1 | Dark mode styling | Glass-card, gradients consistent | [ ] |
+| 11.6.2 | No console errors | Browser DevTools clean | [ ] |
+| 11.6.3 | Responsive layout | Works on different screen sizes | [ ] |
+| 11.6.4 | Back links work | Navigate to parent pages correctly | [ ] |
+| 11.6.5 | Loading states | Skeleton/spinner shows during data fetch | [ ] |
+| 11.6.6 | Error handling | Graceful error display on API failures | [ ] |
+
+### 11.7 API Integration Notes
+
+**Expected Behavior Without Backend:**
+- API calls will return errors (503/404) - this is expected
+- Pages should show empty states or error messages gracefully
+- Preview banners warn users about AI preview mode
+
+**New Routes Added:**
+```
+/copilot
+/copilot/conversations
+/copilot/conversations/:id
+/code-repair
+/code-repair/history
+/code-repair/:id
+/code-review
+/code-review/history
+/code-review/:id
+/intelligence/scanner-quality
+```
+
+---
+
 ## Test Results
 
 | Date | Tester | Result | Notes |
@@ -388,3 +489,4 @@ The api-service `semantic_deduplicator.py` now uses httpx to call the intelligen
 | 2025-12-27 | - | PARTIAL | ML module implemented, endpoints registered |
 | 2026-01-08 | - | PARTIAL | Added model training, labeling scripts, background tasks, model storage |
 | 2026-01-26 | Claude Code | PARTIAL | ML dependency split complete - embeddings moved to intelligence-engine, api-service reduced from 12.6GB to 934MB |
+| 2026-01-29 | Claude Code | PENDING | Frontend AI features added (v0.32.0) - Copilot, Code Repair, Code Review, Scanner Quality UI |

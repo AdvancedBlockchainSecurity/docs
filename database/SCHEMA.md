@@ -53,8 +53,9 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Notification channels:** Slack, Teams, Discord webhook integrations (CI/CD Integrations - January 2026)
 - **Quality gates:** CI/CD pipeline quality gate configurations and evaluation history (Phase 5.5c - January 2026)
 - **Platform admin:** Admin sessions with MFA, IP binding, and permanent admin audit logs (Phase 4.6 - January 2026)
+- **ML Data Strategy:** ToS consent tracking, ML training data provenance, GDPR data requests (January 2026)
 
-**Total Tables:** 51 (excluding alembic_version)
+**Total Tables:** 54 (excluding alembic_version)
 
 ---
 
@@ -2895,4 +2896,122 @@ Organization-level service accounts for CI/CD automation (Growth tier+, Admin on
 
 ---
 
-**Last Updated**: January 23, 2026
+## ML Data Strategy & Legal Compliance (January 2026)
+
+**ML Data Strategy** was completed on January 30, 2026 to support GDPR/LGPD compliance for ML data collection.
+
+### New Tables
+
+#### `tos_consent_records`
+
+Tracks user consent for Terms of Service and Privacy Policy with version history for GDPR/LGPD compliance.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique consent identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | User who consented |
+| `tos_version` | VARCHAR(20) | NOT NULL | Terms of Service version accepted |
+| `privacy_policy_version` | VARCHAR(20) | NOT NULL | Privacy Policy version accepted |
+| `ml_data_collection_consent` | BOOLEAN | NOT NULL, DEFAULT true | Consent for ML data collection |
+| `consent_ip_address` | VARCHAR(45) | NULLABLE | IP address at time of consent |
+| `consent_user_agent` | TEXT | NULLABLE | User agent string at consent |
+| `consented_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | When consent was given |
+| `withdrawn_at` | TIMESTAMPTZ | NULLABLE | When consent was withdrawn |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Record creation timestamp |
+
+**Indexes:**
+- `ix_tos_consent_records_user_id` on `user_id`
+- `ix_tos_consent_records_consented_at` on `consented_at`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+
+---
+
+#### `ml_training_data_provenance`
+
+Tracks data lineage for ML training data with consent references and exclusion tracking.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique provenance identifier |
+| `vulnerability_id` | UUID | NOT NULL, FK → vulnerabilities.id ON DELETE CASCADE, INDEX | Labeled vulnerability |
+| `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE SET NULL, INDEX | Organization context |
+| `user_id` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL, INDEX | User who labeled |
+| `label` | VARCHAR(50) | NOT NULL | true_positive, false_positive, needs_review |
+| `confidence` | FLOAT | NULLABLE | Label confidence 0.0-1.0 |
+| `features_snapshot` | JSONB | NULLABLE | Anonymized feature data (no PII) |
+| `tos_consent_id` | UUID | NULLABLE, FK → tos_consent_records.id ON DELETE SET NULL | Consent reference |
+| `consent_version` | VARCHAR(20) | NULLABLE | ToS version at labeling time |
+| `excluded_from_training` | BOOLEAN | NOT NULL, DEFAULT false, INDEX | Excluded from ML training |
+| `exclusion_reason` | VARCHAR(100) | NULLABLE | user_consent_withdrawn, organization_opted_out |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Record creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_ml_provenance_vulnerability_id` on `vulnerability_id`
+- `ix_ml_provenance_organization_id` on `organization_id`
+- `ix_ml_provenance_user_id` on `user_id`
+- `ix_ml_provenance_excluded` on `excluded_from_training`
+- `ix_ml_provenance_created_at` on `created_at`
+
+**Relationships:**
+- Many-to-one with `vulnerabilities` (vulnerability_id, CASCADE DELETE)
+- Many-to-one with `organizations` (organization_id, SET NULL)
+- Many-to-one with `users` (user_id, SET NULL)
+- Many-to-one with `tos_consent_records` (tos_consent_id, SET NULL)
+
+---
+
+#### `gdpr_data_requests`
+
+Tracks GDPR Article 15 (access) and Article 17 (erasure) data requests.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique request identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Requesting user |
+| `request_type` | VARCHAR(20) | NOT NULL, INDEX | export, deletion |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT 'pending', INDEX | pending, processing, completed, rejected |
+| `requester_email` | VARCHAR(255) | NOT NULL | Email for notification |
+| `requested_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Request timestamp |
+| `processed_at` | TIMESTAMPTZ | NULLABLE | Processing completion timestamp |
+| `processed_by` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | Admin who processed |
+| `export_file_path` | VARCHAR(500) | NULLABLE | Path to export file |
+| `export_expires_at` | TIMESTAMPTZ | NULLABLE | Export download expiry |
+| `notes` | TEXT | NULLABLE | Admin notes |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Record creation timestamp |
+
+**Indexes:**
+- `ix_gdpr_requests_user_id` on `user_id`
+- `ix_gdpr_requests_status` on `status`
+- `ix_gdpr_requests_request_type` on `request_type`
+- `ix_gdpr_requests_requested_at` on `requested_at`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `users` (processed_by, SET NULL)
+
+---
+
+### Organization AI Opt-Out Columns
+
+Columns added to `organizations` table for Enterprise AI opt-out:
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `ai_data_collection_disabled` | BOOLEAN | NOT NULL, DEFAULT false | Enterprise AI opt-out flag |
+| `ai_opt_out_date` | TIMESTAMPTZ | NULLABLE | When opt-out was enabled |
+| `ai_opt_out_reason` | VARCHAR(500) | NULLABLE | Reason for opt-out |
+
+**Note:** AI opt-out is only available for Enterprise tier organizations and must be set by organization admin via API request.
+
+### Related Documentation
+
+- **Feature Test**: `docs/feature-tests/48-ml-data-strategy.md`
+- **Task Documentation**: `TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-30-ML-DATA-STRATEGY.md`
+- **Database Migrations**: `docs/database/MIGRATIONS.md` (Migrations 053-055)
+
+---
+
+**Last Updated**: January 30, 2026
