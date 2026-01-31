@@ -1,11 +1,21 @@
 # Tier Standards - Source of Truth
 
-**Last Updated**: January 26, 2026
-**Version**: 3.1 (4-Tier Model + Phase 5 AI Quotas)
+**Last Updated**: January 30, 2026
+**Version**: 3.2 (Centralized Config Package)
 **Status**: Official
 **Owner**: Product Team
 
-This document is the **single source of truth** for all tier and pricing information across the BlockSecOps platform. All other implementations must match these values.
+This document describes the tier and pricing standards for the BlockSecOps platform.
+
+## Centralized Configuration
+
+**The actual source of truth is now `blocksecops-shared/tier-config/tiers.json`.**
+
+All tier values (quotas, features, pricing, rate limits) are defined in that JSON file and consumed by:
+- **Python backend**: `blocksecops-tier-config` package
+- **TypeScript frontend**: `@blocksecops/tier-config` package
+
+This document serves as **human-readable documentation** of those values. When values differ, `tiers.json` is authoritative.
 
 ---
 
@@ -413,10 +423,32 @@ CREDIT_PACKAGE_BULK_CREDITS=1000
 
 ## Implementation Reference
 
+### Centralized Tier Config Package
+
+**Location**: `blocksecops-shared/tier-config/`
+
+| File | Purpose |
+|------|---------|
+| `tiers.json` | **THE SOURCE OF TRUTH** - all tier values |
+| `python/blocksecops_tier_config/` | Python package for backend |
+| `typescript/` | TypeScript package for frontend |
+
+**Usage**:
+```python
+# Python (backend)
+from blocksecops_tier_config import get_tier, get_tier_quotas_for_db, VALID_TIERS
+```
+
+```typescript
+// TypeScript (frontend)
+import { getTier, TIER_HIERARCHY, VALID_TIERS } from '@blocksecops/tier-config';
+```
+
 ### Source Files That Must Match These Standards
 
 | Component | File Path | What to Update |
 |-----------|-----------|----------------|
+| **Tier Config** | `blocksecops-shared/tier-config/tiers.json` | **Primary source - update here first** |
 | Website | `~/Git/Platform-websites/blocksecops_com/app/(frontend)/pricing/page.tsx` | `pricingTiers` array |
 | Dashboard | `/blocksecops-dashboard/src/pages/Pricing.tsx` | Pricing display |
 | DB Trigger | `alembic/versions/20260103_0100-024_tier_restructure.py` | `create_user_quota()` function |
