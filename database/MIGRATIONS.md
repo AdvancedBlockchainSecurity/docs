@@ -1222,6 +1222,81 @@ asyncio.run(verify())
 
 ---
 
+### Migration 058: Audit Log Protection (Phase E Prerequisite)
+- **Status**: ✅ Completed
+- **Created**: January 30, 2026
+- **Revision ID**: `058_add_audit_log_protection`
+- **Description**: Adds database-level protection for audit logs (immutable audit trail)
+- **Changes**:
+  - Creates trigger `audit_log_no_update` to prevent UPDATE operations on audit_logs table
+  - Creates trigger `audit_log_no_delete` to prevent DELETE operations on audit_logs table
+- **Security**: Ensures audit logs cannot be tampered with at the database level
+- **Migration File**: `alembic/versions/20260130_0600-058_add_audit_log_protection.py`
+- **Note**: Fixed asyncpg multi-statement error by splitting SQL statements into separate execute calls
+
+---
+
+### Migration 059: AI Invariant Generation Tables (Phase E)
+- **Status**: ✅ Completed
+- **Created**: January 31, 2026
+- **Revision ID**: `059_add_invariant_tables`
+- **Description**: Database schema for AI-powered Foundry invariant generation
+- **Tables Created**:
+  - `invariant_templates` - Reusable invariant templates for common patterns
+    - `id` UUID PRIMARY KEY
+    - `name` VARCHAR(200) UNIQUE NOT NULL
+    - `description` TEXT
+    - `template_code` TEXT NOT NULL
+    - `invariant_type` VARCHAR(50) NOT NULL
+    - `applicable_patterns` JSON
+    - `keywords` JSON
+    - `usage_count` INTEGER DEFAULT 0
+    - `is_active` BOOLEAN DEFAULT TRUE
+    - `created_at`, `updated_at` TIMESTAMPTZ
+  - `invariants` - AI-generated Foundry invariants for contracts
+    - `id` UUID PRIMARY KEY
+    - `user_id` UUID FK → users(id) ON DELETE CASCADE
+    - `contract_id` UUID FK → contracts(id) ON DELETE CASCADE
+    - `invariant_code` TEXT NOT NULL
+    - `invariant_type` VARCHAR(50) NOT NULL
+    - `function_name` VARCHAR(200)
+    - `description` TEXT
+    - `model_used` VARCHAR(100) NOT NULL
+    - `tokens_input`, `tokens_output` INTEGER
+    - `generation_time_ms` INTEGER
+    - `confidence` FLOAT NOT NULL
+    - `was_applied` BOOLEAN DEFAULT FALSE
+    - `applied_at` TIMESTAMPTZ
+    - `rating` INTEGER (1-5)
+    - `feedback_text` TEXT
+    - `was_helpful` BOOLEAN
+    - `syntax_valid` BOOLEAN
+    - `validation_error` TEXT
+    - `created_at`, `updated_at` TIMESTAMPTZ
+- **Columns Added to `user_quotas`**:
+  - `invariant_daily_used` INTEGER DEFAULT 0
+  - `invariant_last_generated_at` TIMESTAMPTZ
+  - `invariant_daily_reset_at` TIMESTAMPTZ
+- **Indexes Created**:
+  - `idx_invariants_user_contract` on (user_id, contract_id)
+  - `idx_invariants_type` on (invariant_type)
+  - `idx_invariants_created_at` on (created_at)
+  - `idx_invariant_templates_type` on (invariant_type)
+  - `idx_invariant_templates_active` on (is_active)
+- **Pre-seeded Data**: 5 default invariant templates
+  - `balance_consistency` - ERC20 balance invariant
+  - `no_zero_address_owner` - Access control invariant
+  - `reentrancy_lock` - Reentrancy guard validation
+  - `arithmetic_no_overflow` - Arithmetic safety check
+  - `pause_halts_transfers` - Pause mechanism validation
+- **Migration File**: `alembic/versions/20260131_0600-059_add_invariant_tables.py`
+- **Related Documentation**:
+  - [AI Invariants Database Schema](/docs/database/INVARIANTS.md)
+  - [Feature Test #50](/docs/feature-tests/50-ai-invariant-generation.md)
+  - [Phase E Implementation](/TaskDocs-BlockSecOps/phases/04-phase-5-ai-ml/phase-e-ai-invariants.md)
+
+---
+
 ### Creating Migrations
 ```bash
 # Generate migration from models
