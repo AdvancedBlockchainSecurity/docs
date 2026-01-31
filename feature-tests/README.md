@@ -63,7 +63,9 @@ Manual testing checklists for all user-facing features.
 | [45-integrations-hub.md](./45-integrations-hub.md) | Integrations hub UI page |
 | [46-platform-admin-panel.md](./46-platform-admin-panel.md) | Platform admin panel: MFA, user management, emergency actions (Phase 4.6) |
 | [47-api-keys-security.md](./47-api-keys-security.md) | API key security, tier limits, validation |
-| [48-ml-data-strategy.md](./48-ml-data-strategy.md) | **NEW** - ML Data Strategy: consent tracking, data provenance, GDPR compliance |
+| [48-ml-data-strategy.md](./48-ml-data-strategy.md) | ML Data Strategy: consent tracking, data provenance, GDPR compliance |
+| [49-intelligence-cve-enrichment.md](./49-intelligence-cve-enrichment.md) | Intelligence CVE Enrichment: NVD/MITRE data, exploit-db correlation |
+| [50-ai-invariant-generation.md](./50-ai-invariant-generation.md) | **NEW** - AI Invariant Generation: Foundry test generation, tier quotas, prompt injection prevention |
 
 ---
 
