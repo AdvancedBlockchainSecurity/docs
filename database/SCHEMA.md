@@ -8,7 +8,7 @@
 > **Important Note on Database Naming:**
 > The database is named `solidity_security`, NOT `blocksecops`. This name was established during initial platform development when the focus was solely on Solidity security scanning. The name has been retained for backward compatibility and to avoid migration complexity. All services, connection strings, and documentation should reference `solidity_security`.
 >
-> **Verified:** January 18, 2026 (SolidityDefend v1.10.3 verification confirmed 15 scanners, 58 contracts, 115 scans, 6,317 vulnerabilities in `solidity_security` database)
+> **Verified:** January 31, 2026 (Migration 060 cleanup removed 3,061 invalid scanner_ids. Current stats: 15 scanners, ~58 contracts, ~232 scans, 1,872 vulnerabilities in `solidity_security` database)
 
 ## Table of Contents
 
