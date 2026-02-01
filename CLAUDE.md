@@ -85,11 +85,11 @@ Read @.claude/agents/blocksecops-aws-infrastructure.md and add a new Kubernetes 
 | 3001 | Findings UI / Grafana |
 | 3002 | Analysis UI |
 | 8000 | API Service |
-| 8001 | Intelligence Engine |
-| 8002 | Data Service |
+| 8001 | Data Service |
+| 8002 | Intelligence Engine |
 | 8003 | Notification Service |
-| 8004 | Tool Integration |
-| 8005 | Orchestration |
+| 8004 | Orchestration |
+| 8005 | Tool Integration |
 | 5432 | PostgreSQL |
 | 6379 | Redis |
 | 9000 | Contract Parser |

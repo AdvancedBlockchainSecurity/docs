@@ -66,6 +66,7 @@ Manual testing checklists for all user-facing features.
 | [48-ml-data-strategy.md](./48-ml-data-strategy.md) | ML Data Strategy: consent tracking, data provenance, GDPR compliance |
 | [49-intelligence-cve-enrichment.md](./49-intelligence-cve-enrichment.md) | Intelligence CVE Enrichment: NVD/MITRE data, exploit-db correlation |
 | [50-ai-invariant-generation.md](./50-ai-invariant-generation.md) | **NEW** - AI Invariant Generation: Foundry test generation, tier quotas, prompt injection prevention |
+| [51-kubernetes-security.md](./51-kubernetes-security.md) | **NEW** - Kubernetes Security: revisionHistoryLimit, security contexts, NetworkPolicies, pod lifecycle |
 
 ---
 
@@ -190,6 +191,28 @@ Notification channels and CLI tool for CI/CD integration:
 
 ---
 
+## GCP Launch Phase 2: Kubernetes Security (February 2026)
+
+Kubernetes security configuration for GCP production deployment:
+
+| Feature | Status | Tests |
+|---------|--------|-------|
+| revisionHistoryLimit | Implemented | All 8 deployments set to 3 |
+| Pod Security Context | Implemented | runAsNonRoot, runAsUser, seccompProfile |
+| Container Security Context | Implemented | allowPrivilegeEscalation=false, readOnlyRootFilesystem |
+| NetworkPolicies | Implemented | Default-deny + service-specific rules |
+| Dashboard Security | Implemented | Security context + NetworkPolicy added |
+
+**Services Secured:**
+- api-service, orchestration, tool-integration, dashboard
+- data-service, intelligence-engine, notification, contract-parser
+
+**Documentation:**
+- [51-kubernetes-security.md](./51-kubernetes-security.md) - Feature tests
+- [kubernetes-pod-lifecycle.md](../standards/kubernetes-pod-lifecycle.md) - Standards
+
+---
+
 ## Phase 7A Security Hardening (Implemented)
 
 Security hardening features for production deployment:
@@ -291,6 +314,7 @@ GDPR/LGPD compliance features for ML data collection:
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-02-01 | Claude Code | 51-kubernetes-security.md | NEW - Kubernetes Security: revisionHistoryLimit, security contexts, NetworkPolicies, pod lifecycle (GCP Launch Phase 2)
 2026-01-30 | Claude Code | 48-ml-data-strategy.md | NEW - ML Data Strategy: consent tracking, provenance, GDPR compliance (v0.16.0 API, v0.34.0 Dashboard)
 2026-01-26 | Claude Code | 27-ai-ml-features.md | UPDATE - ML dependency split: embeddings moved to intelligence-engine, api-service reduced from 12.6GB to 934MB
 2026-01-26 | Claude Code | 24-cross-scanner-deduplication.md | UPDATE - Architecture change: semantic deduplication now uses intelligence-engine for embeddings

@@ -440,6 +440,14 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
 
 ### Recent Updates Recorded
 
+- **2026-01-31**: SolidityDefend Scanner Wrapper 0.5.0 Upgrade
+  - **SolidityDefend**: Image 0.4.0 → 0.5.0 (tool version remains 1.10.3)
+  - 333 detectors available, 22 triggered on test contract
+  - Clean slate approach: 10,515 old findings deleted before upgrade
+  - Created reusable playbook: `docs/playbooks/upgrade-scanner-image.md`
+  - Test scan verified: 34 findings (12 critical, 15 high, 4 medium, 3 low)
+  - See: `docs/changelogs/SOLIDITYDEFEND-0.5.0-UPGRADE-2026-01-31.md`
+
 - **2026-01-19**: Scanner Version Updates (Slither, Aderyn, Solhint)
   - **Slither**: 0.11.3 → 0.11.5 (minor bug fixes)
   - **Aderyn**: 0.6.5 → 0.6.7 (new detectors)

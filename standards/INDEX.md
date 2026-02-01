@@ -1,7 +1,7 @@
 # Platform Development Standards - Index
 
-**Version:** 2.2.0
-**Last Updated:** January 25, 2026
+**Version:** 2.3.0
+**Last Updated:** February 1, 2026
 **Status:** Active
 
 ## Overview
@@ -189,9 +189,34 @@ These standards ensure proper versioning and configuration management:
     - Scanner-to-pattern mappings
     - Canonical finding selection
 
+### 🔒 Security Standards
+
+21. **[API Endpoint Authentication](./api-endpoint-auth.md)** [NEW]
+    - Authentication dependency selection (JWT vs API Key vs Dual-Auth)
+    - **CRITICAL:** Write endpoints MUST use `require_auth_with_scope()`
+    - API key scope enforcement (prevents unauthorized actions)
+    - Scope-to-endpoint mapping reference
+    - Decision tree for new endpoints
+    - Migration guide for converting JWT-only to dual-auth
+
+22. **[Tier Standards](./tier-standards.md)**
+    - Tier-based feature access (free, growth, enterprise)
+    - API key availability per tier
+    - Rate limiting by tier
+
+### ☸️ Kubernetes Standards
+
+23. **[Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md)** [NEW]
+    - Revision history limits (`revisionHistoryLimit: 3`)
+    - Pod-level and container-level security contexts
+    - NetworkPolicy patterns (default-deny, ingress, egress)
+    - Automatic cleanup of old ReplicaSets
+    - Volume mounts for read-only root filesystem
+    - Troubleshooting pod lifecycle issues
+
 ### ✅ Compliance & Verification
 
-21. **[Compliance Checklist](./compliance-checklist.md)**
+24. **[Compliance Checklist](./compliance-checklist.md)**
     - Daily development checklist
     - Making changes checklist
     - Database configuration changes checklist
@@ -207,6 +232,10 @@ These standards ensure proper versioning and configuration management:
 4. **Committing directly to main instead of using feature branches** → See [Version Control Standards](./version-control-standards.md)
 5. **Building Docker images with cache (without --no-cache)** → See [Testing & Deployment](./testing-deployment.md)
 6. **Using manual port-forwards for regular access** → See [Service Availability](./service-availability.md)
+7. **Using `get_current_user_or_api_key` for write endpoints** → See [API Endpoint Authentication](./api-endpoint-auth.md) - MUST use `require_auth_with_scope()`
+8. **Missing `revisionHistoryLimit` on Deployments** → See [Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md) - causes stale pod accumulation
+9. **Missing security context on pods/containers** → See [Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md) - required for security compliance
+10. **Missing NetworkPolicy for services** → See [Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md) - required for network isolation
 
 ### Most Frequent Issues
 
@@ -244,7 +273,10 @@ docs/standards/
 ├── dependency-management.md
 ├── ml-development.md
 ├── INTELLIGENCE-INTEGRATION-STANDARDS.md
-└── ingress-networking.md
+├── ingress-networking.md
+├── api-endpoint-auth.md           # NEW: API authentication and scope enforcement
+├── tier-standards.md
+└── kubernetes-pod-lifecycle.md    # NEW: Pod lifecycle, security contexts, NetworkPolicies
 ```
 
 ## Referencing Standards in Claude Code
