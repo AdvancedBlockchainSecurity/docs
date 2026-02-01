@@ -336,11 +336,11 @@ Due to database state inconsistencies after the 2025-11-05 database reset, the s
 
 ---
 
-## Current Database State (2026-01-30)
+## Current Database State (2026-01-31)
 
 ### Alembic Version
 ```
-version_num: 055_add_gdpr_requests
+version_num: 060_cleanup_invalid_scanner_ids
 ```
 
 ### Existing Tables
@@ -1294,6 +1294,40 @@ asyncio.run(verify())
   - [AI Invariants Database Schema](/docs/database/INVARIANTS.md)
   - [Feature Test #50](/docs/feature-tests/50-ai-invariant-generation.md)
   - [Phase E Implementation](/TaskDocs-BlockSecOps/phases/04-phase-5-ai-ml/phase-e-ai-invariants.md)
+
+---
+
+### Migration 060: Cleanup Invalid Scanner IDs (Data Integrity)
+- **Status**: ✅ Completed
+- **Created**: January 31, 2026
+- **Revision ID**: `060_cleanup_invalid_scanner_ids`
+- **Previous Revision**: `059_add_invariant_tables`
+- **Description**: Removes vulnerabilities with invalid scanner_ids (detector IDs from old SolidityDefend versions)
+- **Data Changes**:
+  - **Deleted**: 3,061 vulnerabilities with invalid scanner_ids
+  - **Updated**: 232 scan records with recalculated severity counts
+  - **Cascaded**: Orphaned deduplication_groups cleaned by FK CASCADE
+- **Invalid Scanner IDs Removed** (29 total, all were detector IDs not scanner IDs):
+  - `state-change-without-event` (835 records)
+  - `reused-contract-name` (397 records)
+  - `empty-require-revert` (367 records)
+  - `eth-send-unchecked-address` (348 records)
+  - `reentrancy-state-change` (342 records)
+  - `unsafe-erc20-operation` (159 records)
+  - And 23 other detector IDs with fewer records
+- **Valid Scanner IDs** (from platform ConfigMap):
+  - `slither`, `aderyn`, `semgrep`, `solhint`, `halmos`, `echidna`
+  - `vyper`, `moccasin`, `sol-azy`, `sec3-xray`, `trident`
+  - `cargo-fuzz-solana`, `wake`, `medusa`, `soliditydefend`
+- **Root Cause**: Older SolidityDefend versions incorrectly stored detector names as scanner_id instead of using `soliditydefend` as scanner_id with detector name in title/detector_id field
+- **Post-Migration State**:
+  - Total vulnerabilities: 1,872 (down from 4,933)
+  - Valid scanner_ids only: slither (1,522), soliditydefend (165), aderyn (131), wake (53)
+- **Downgrade**: Not supported (data deletion cannot be reversed without backup)
+- **Migration File**: `alembic/versions/20260131_1930-060_cleanup_invalid_scanner_ids.py`
+- **Related Documentation**:
+  - [Feature Test #41 - Vulnerability Filtering](/docs/feature-tests/41-vulnerability-filtering.md) (TC-41.2 scanner filter validation)
+  - [Task Documentation](/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-31-INVALID-SCANNER-ID-CLEANUP.md)
 
 ---
 
