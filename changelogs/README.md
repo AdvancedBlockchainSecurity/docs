@@ -1,7 +1,7 @@
 # BlockSecOps Changelogs
 
 **Purpose:** Centralized changelog directory for all BlockSecOps platform changes
-**Last Updated:** January 13, 2026
+**Last Updated:** January 31, 2026
 **Status:** Active
 
 ---
@@ -17,6 +17,24 @@ Changelogs are organized by component and maintained chronologically. Each chang
 ---
 
 ## Available Changelogs
+
+### 0. SolidityDefend Scanner Wrapper 0.5.0 (`SOLIDITYDEFEND-0.5.0-UPGRADE-2026-01-31.md`)
+
+**Component:** blocksecops-tool-integration
+**Scope:** Scanner image upgrade, playbook creation
+**Date:** January 31, 2026
+
+**Key Changes:**
+- Scanner wrapper image 0.4.0 → 0.5.0 (tool version 1.10.3)
+- 333 detectors, clean slate approach with old findings deleted
+- Created reusable playbook: `docs/playbooks/upgrade-scanner-image.md`
+- Test scan verified: 34 findings (12 critical, 15 high, 4 medium, 3 low)
+- Bug fix: API service `last_scan_at` column reference removed
+
+**Use When:**
+- Understanding scanner wrapper upgrade process
+- Following scanner upgrade playbook
+- Reviewing SolidityDefend capabilities
 
 ### 0. Dashboard v0.29.0 UI Updates (`DASHBOARD-V0.29.0-UI-UPDATES-2026-01-13.md`)
 

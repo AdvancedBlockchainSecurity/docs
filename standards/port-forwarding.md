@@ -110,6 +110,7 @@ echo "127.0.0.1  app.blocksecops.local" | sudo tee -a /etc/hosts
 | **8003** | Notification Service | `notification-local` | 8003 | Notification API + WebSocket |
 | **8004** | Orchestration Service | `orchestration-local` | 8004 | Scan orchestration API |
 | **8005** | Tool Integration | `tool-integration-local` | 8005 | Scanner integration API |
+| **9000** | Contract Parser | `contract-parser-local` | 9000 | Solidity contract parsing API |
 
 ### Infrastructure Services
 

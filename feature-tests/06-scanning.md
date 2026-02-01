@@ -1,7 +1,7 @@
 # Scanning Tests
 
 **Priority**: P0 - Critical
-**Last Tested**: January 18, 2026
+**Last Tested**: January 31, 2026
 **Endpoint**: `POST /api/v1/scans`
 
 ---
@@ -59,10 +59,12 @@
 - [x] Scan jobs pull images from Harbor successfully
 - [x] No `ErrImageNeverPull` errors during scan execution
 
-**Verified:** SolidityDefend scan completed successfully (2026-01-18)
-- Scan ID: `2b9b81e2-e1cc-4d71-b9c5-b0e0d529ca1f`
-- Image: `harbor.blocksecops.local/blocksecops/scanner-soliditydefend:0.4.0`
-- Results: 126 findings (38 critical, 46 high, 31 medium, 11 low)
+**Verified:** SolidityDefend scan completed successfully (2026-01-31)
+- Scan ID: `7fb85269-a29f-4524-b0a8-ea64240e2831`
+- Image: `harbor.blocksecops.local/blocksecops/scanner-soliditydefend:0.5.0`
+- Tool Version: 1.10.3 (333 detectors)
+- Results: 34 findings (12 critical, 15 high, 4 medium, 3 low)
+- Duration: 4 seconds
 
 ### 3.2 Scanner Compatibility
 - [ ] Only compatible scanners shown per language
