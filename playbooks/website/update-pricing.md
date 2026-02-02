@@ -1,5 +1,13 @@
 # Playbook: Update Website Pricing
 
+> **DEPRECATED:** This playbook is outdated. The frontend is NOT the source of truth for pricing.
+>
+> **Use instead:** [Adjust Pricing](../adjust-pricing.md)
+>
+> The source of truth is `blocksecops-shared/tier-config/tiers.json`. See the new playbook for the correct workflow.
+
+---
+
 Update pricing information on blocksecops.com.
 
 ## Prerequisites
