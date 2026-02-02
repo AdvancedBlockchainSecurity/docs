@@ -1331,6 +1331,46 @@ asyncio.run(verify())
 
 ---
 
+### Migration 061: Support Tickets Table (JIRA Integration)
+- **Status**: ✅ Completed
+- **Created**: February 1, 2026
+- **Revision ID**: `061_add_support_tickets`
+- **Previous Revision**: `060_cleanup_invalid_scanner_ids`
+- **Description**: Adds support ticket submission system with optional JIRA Cloud integration
+- **Tables Created**:
+  - `support_tickets` - User support ticket submissions
+- **Schema**:
+  - `id` UUID PRIMARY KEY
+  - `user_id` UUID FK → users.id (CASCADE DELETE)
+  - `category` VARCHAR(50) - bug, billing, feature_request, security, general
+  - `priority` VARCHAR(20) - low, medium, high, urgent
+  - `subject` VARCHAR(255)
+  - `description` TEXT
+  - `user_email` VARCHAR(255) - Captured at submission
+  - `user_tier` VARCHAR(20) - Captured at submission
+  - `page_url` VARCHAR(500) - URL where ticket was submitted
+  - `user_agent` VARCHAR(500) - Browser/client info
+  - `jira_issue_key` VARCHAR(50) - JIRA issue (e.g., SUPPORT-123)
+  - `jira_issue_url` VARCHAR(2048) - Link to JIRA issue
+  - `jira_sync_status` VARCHAR(20) - pending, synced, failed, disabled
+  - `status` VARCHAR(20) - open, in_progress, resolved, closed
+  - `created_at` TIMESTAMPTZ
+  - `updated_at` TIMESTAMPTZ
+- **Indexes**:
+  - `ix_support_tickets_user_id` on `user_id`
+  - `ix_support_tickets_status` on `status`
+  - `ix_support_tickets_jira_issue_key` on `jira_issue_key`
+  - `ix_support_tickets_created_at` on `created_at`
+- **API Endpoint**: `POST /api/v1/support-tickets`
+- **Rate Limit**: 5 tickets per user per day
+- **JIRA Integration**: Optional, configured via environment variables
+- **Migration File**: `alembic/versions/20260201_0100-061_add_support_tickets.py`
+- **Related Documentation**:
+  - [Feature Test #53](/docs/feature-tests/53-support-tickets.md)
+  - [Task Documentation](/TaskDocs-BlockSecOps/blocksecops/support-ticket-jira-integration.md)
+
+---
+
 ### Creating Migrations
 ```bash
 # Generate migration from models
