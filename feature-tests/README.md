@@ -67,6 +67,7 @@ Manual testing checklists for all user-facing features.
 | [49-intelligence-cve-enrichment.md](./49-intelligence-cve-enrichment.md) | Intelligence CVE Enrichment: NVD/MITRE data, exploit-db correlation |
 | [50-ai-invariant-generation.md](./50-ai-invariant-generation.md) | **NEW** - AI Invariant Generation: Foundry test generation, tier quotas, prompt injection prevention |
 | [51-kubernetes-security.md](./51-kubernetes-security.md) | **NEW** - Kubernetes Security: revisionHistoryLimit, security contexts, NetworkPolicies, pod lifecycle |
+| [52-dual-payment-options.md](./52-dual-payment-options.md) | **NEW** - Dual Payment Options: Stripe + x402 crypto, payment method selector, pricing page integration |
 
 ---
 
@@ -149,7 +150,7 @@ API pagination improvements for efficient large dataset navigation:
 
 ---
 
-## Phase 8a: Stripe Billing (January 2026)
+## Phase 8a: Stripe Billing (January-February 2026)
 
 Stripe integration for subscription billing. **Pending GCP deployment** for production webhooks.
 
@@ -165,6 +166,13 @@ Stripe integration for subscription billing. **Pending GCP deployment** for prod
 | Webhooks | Implemented | TC-37-010, 011 |
 | Plan Upgrades | Implemented | TC-37-012 |
 | Annual Billing | Implemented | TC-37-013 |
+| **Dual Payment Options** | **Implemented (v0.36.0)** | TC-52-001 to 012 |
+
+**Dual Payment Options (February 2026)**:
+- Payment method selector on pricing page (Card/Crypto tabs)
+- Stripe Checkout redirect for card payments
+- x402 crypto wallet integration preserved
+- Success/cancel redirect handling
 
 **Note**: All tests pending GCP deployment for webhook verification.
 
@@ -314,6 +322,7 @@ GDPR/LGPD compliance features for ML data collection:
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-02-01 | Claude Code | 52-dual-payment-options.md | NEW - Dual Payment Options: Stripe + x402 crypto payment selector on pricing page (v0.36.0 Dashboard)
 2026-02-01 | Claude Code | 51-kubernetes-security.md | NEW - Kubernetes Security: revisionHistoryLimit, security contexts, NetworkPolicies, pod lifecycle (GCP Launch Phase 2)
 2026-01-30 | Claude Code | 48-ml-data-strategy.md | NEW - ML Data Strategy: consent tracking, provenance, GDPR compliance (v0.16.0 API, v0.34.0 Dashboard)
 2026-01-26 | Claude Code | 27-ai-ml-features.md | UPDATE - ML dependency split: embeddings moved to intelligence-engine, api-service reduced from 12.6GB to 934MB
