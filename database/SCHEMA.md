@@ -54,8 +54,9 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Quality gates:** CI/CD pipeline quality gate configurations and evaluation history (Phase 5.5c - January 2026)
 - **Platform admin:** Admin sessions with MFA, IP binding, and permanent admin audit logs (Phase 4.6 - January 2026)
 - **ML Data Strategy:** ToS consent tracking, ML training data provenance, GDPR data requests (January 2026)
+- **Support tickets:** User support ticket submissions with JIRA integration (February 2026)
 
-**Total Tables:** 54 (excluding alembic_version)
+**Total Tables:** 55 (excluding alembic_version)
 
 ---
 
@@ -1825,6 +1826,63 @@ Comprehensive audit trail for security and compliance (Phase 4.5).
 - `api_key.create`, `api_key.revoke`
 - `organization.create`, `organization.update`, `organization.delete`
 - `member.invite`, `member.join`, `member.remove`
+
+---
+
+### `support_tickets`
+
+User support ticket submissions with optional JIRA integration (Phase 7 - February 2026, Migration 061).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique ticket identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | User who submitted the ticket |
+| `category` | VARCHAR(50) | NOT NULL, INDEX | Ticket category (bug, billing, feature_request, security, general) |
+| `priority` | VARCHAR(20) | NOT NULL, DEFAULT 'medium' | Priority level (low, medium, high, urgent) |
+| `subject` | VARCHAR(255) | NOT NULL | Ticket subject line |
+| `description` | TEXT | NOT NULL | Detailed description of the issue |
+| `user_email` | VARCHAR(255) | NOT NULL | User's email at submission time |
+| `user_tier` | VARCHAR(20) | NOT NULL | User's subscription tier at submission time |
+| `page_url` | VARCHAR(500) | NULLABLE | URL where ticket was submitted from |
+| `user_agent` | VARCHAR(500) | NULLABLE | Browser/client user agent |
+| `jira_issue_key` | VARCHAR(50) | NULLABLE, INDEX | JIRA issue key (e.g., SUPPORT-123) |
+| `jira_issue_url` | VARCHAR(2048) | NULLABLE | Full URL to JIRA issue |
+| `jira_sync_status` | VARCHAR(20) | NOT NULL, DEFAULT 'pending' | Sync status (pending, synced, failed, disabled) |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT 'open', INDEX | Ticket status (open, in_progress, resolved, closed) |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Categories:**
+- `bug` - Software defects or issues
+- `billing` - Payment and subscription questions
+- `feature_request` - New feature suggestions
+- `security` - Security concerns or vulnerabilities
+- `general` - General inquiries
+
+**JIRA Sync Status:**
+- `pending` - Awaiting JIRA sync
+- `synced` - Successfully created in JIRA
+- `failed` - JIRA sync failed (will retry)
+- `disabled` - JIRA integration not configured
+
+**Indexes:**
+- `ix_support_tickets_user_id` on `user_id`
+- `ix_support_tickets_status` on `status`
+- `ix_support_tickets_jira_issue_key` on `jira_issue_key`
+- `ix_support_tickets_created_at` on `created_at`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+
+**Rate Limiting:**
+- 5 tickets per day per user
+
+**API Endpoint:**
+- `POST /api/v1/support-tickets` - Submit a support ticket
+
+**Ticket Reference Format:**
+- Generated as `BSO-XXXXXXXX` (8 character alphanumeric)
+- Derived from UUID for uniqueness
 
 ---
 
