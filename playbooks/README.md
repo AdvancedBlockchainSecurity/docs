@@ -72,6 +72,13 @@ Step-by-step operational guides for common tasks.
 | [Upgrade Scanner Image](upgrade-scanner-image.md) | Upgrade a scanner image with dual versioning (tool + wrapper) |
 | [Docker Cleanup](docker-cleanup.md) | Safely clean up Docker images and build cache without affecting Harbor |
 
+### Pricing & Billing
+
+| Playbook | Description |
+|----------|-------------|
+| [Adjust Pricing](adjust-pricing.md) | Update pricing tiers, quotas, features, and credit packages using the centralized tier config |
+| [Adjust Rate Limits](adjust-rate-limits.md) | Update endpoint-specific rate limits via centralized configuration |
+
 ### Platform Admin Panel
 
 | Playbook | Description |
