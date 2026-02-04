@@ -1,8 +1,8 @@
 # Feature Test: Stripe Billing Integration
 
 **Feature**: Phase 8a - Stripe Billing & Invoices
-**Status**: ⏳ Pending (Requires GCP Deployment)
-**Last Updated**: 2026-01-08
+**Status**: ✅ Local Testing Ready
+**Last Updated**: 2026-02-03
 
 ## Overview
 
@@ -10,26 +10,57 @@ Stripe integration for subscription billing alongside x402 credit purchases.
 
 ## Prerequisites
 
-- [ ] Stripe account configured
+- [x] Stripe account configured (Test mode)
 - [ ] Stripe Products/Prices created for all tiers
-- [ ] `STRIPE_API_KEY` in Vault
-- [ ] `STRIPE_WEBHOOK_SECRET` in Vault
-- [ ] Public HTTPS endpoint (GCP)
-- [ ] Stripe CLI installed for local testing
+- [x] `STRIPE_API_KEY` in Vault (`secret/local/api-service/stripe`)
+- [x] `STRIPE_WEBHOOK_SECRET` in Vault
+- [ ] Dashboard rebuilt with `VITE_STRIPE_PUBLISHABLE_KEY`
+- [x] Stripe CLI installed for local testing
 
-## Local Testing Setup
+## Local Testing Setup (kubeadm Server)
+
+### 1. Verify Vault Secrets
 
 ```bash
-# Install Stripe CLI
-brew install stripe/stripe-cli/stripe
+# Get Vault root token
+ROOT_TOKEN=$(kubectl exec vault-0 -n vault-local -- cat /vault/data/.vault-init.json 2>/dev/null | jq -r '.root_token')
 
-# Login to Stripe
-stripe login
-
-# Forward webhooks to local endpoint
-stripe listen --forward-to localhost:8000/api/v1/webhooks/stripe
-# Copy the webhook signing secret and set STRIPE_WEBHOOK_SECRET
+# Check Stripe secrets
+kubectl exec vault-0 -n vault-local -- sh -c "VAULT_TOKEN=$ROOT_TOKEN vault kv get secret/local/api-service/stripe"
 ```
+
+### 2. Start Webhook Forwarding
+
+```bash
+# Forward webhooks to kubeadm NodePort (192.168.86.225:30180)
+~/bin/stripe listen \
+  --api-key "YOUR_STRIPE_SECRET_KEY" \
+  --forward-to http://192.168.86.225:30180/api/v1/webhooks/stripe
+
+# The webhook signing secret is displayed - store it in Vault if different
+```
+
+### 3. Rebuild Dashboard (if needed)
+
+```bash
+cd /home/pwner/Git
+STRIPE_PK="pk_test_YOUR_PUBLISHABLE_KEY"
+
+docker build --no-cache \
+  -f blocksecops-dashboard/Dockerfile \
+  --build-arg VITE_STRIPE_PUBLISHABLE_KEY=${STRIPE_PK} \
+  --build-arg VITE_SUPABASE_URL=$(kubectl get cm dashboard-config -n dashboard-local -o jsonpath='{.data.supabase_url}') \
+  --build-arg VITE_SUPABASE_ANON_KEY=$(kubectl get cm dashboard-config -n dashboard-local -o jsonpath='{.data.supabase_anon_key}') \
+  -t harbor.blocksecops.local/blocksecops/dashboard:latest .
+
+docker push harbor.blocksecops.local/blocksecops/dashboard:latest
+kubectl rollout restart deployment/dashboard -n dashboard-local
+```
+
+### 4. Access Dashboard
+
+- **kubeadm**: http://app.blocksecops.local or http://192.168.86.225
+- **minikube**: http://127.0.0.1:3000
 
 ## Test Cases
 
