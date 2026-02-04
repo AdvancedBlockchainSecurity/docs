@@ -1,7 +1,7 @@
 # Intelligence Engine Documentation
 
-**Last Updated**: January 16, 2026
-**Version**: 2.1
+**Last Updated**: February 4, 2026
+**Version**: 2.2
 **Status**: Production
 
 ---
@@ -42,6 +42,38 @@ The Intelligence Engine provides AI/ML-powered vulnerability analysis and patter
 - `GET /api/v1/ml/model-stats` - Model performance stats
 
 See: [ML Development Standards](/docs/standards/ml-development.md)
+
+---
+
+## Cross-Scan Deduplication (February 2026)
+
+**New Feature:** Automatic cross-scan deduplication with semantic matching.
+
+### How It Works
+
+When a scan completes, deduplication runs in two phases:
+
+| Phase | Scope | Strategy |
+|-------|-------|----------|
+| Intra-scan | Within same scan | Location fingerprint matching |
+| Cross-scan | Across prior scans | 3-level matching (fingerprint + semantic) |
+
+### Matching Levels
+
+| Level | Confidence | Strategy |
+|-------|------------|----------|
+| EXACT | 99% | `fingerprint_code` match |
+| HIGH | 95% | `fingerprint_location` + detector type |
+| SEMANTIC | 85%+ | Embedding similarity via Intelligence Engine |
+
+### Historical Tracking
+
+Cross-scan matches update:
+- `occurrence_count` - Times vulnerability seen
+- `last_seen` - Latest detection timestamp
+- `first_seen` - Original detection (preserved)
+
+See: [Deduplication Workflow](/docs/workflows/deduplication-workflow.md)
 
 ---
 
@@ -102,22 +134,29 @@ Advanced vulnerability fingerprinting strategies:
 
 ## Intelligence Platform Statistics
 
-### Current Coverage (v1.3)
+### Current Coverage (v3.13)
 
-| Metric | Count | Coverage |
-|--------|-------|----------|
-| **Total Patterns** | 69 | 15.3% of 509 detectors |
-| **Pattern Mappings** | 80 | Multiple detectors per pattern |
-| **Solidity Coverage** | 78/371 | 21.0% |
-| **Vyper Coverage** | 0/138 | 0% (planned Phase 4) |
+| Metric | Count | Notes |
+|--------|-------|-------|
+| **Total Patterns** | 397 | BVD vulnerability patterns |
+| **Pattern Mappings** | 214+ | Across 11 scanners |
+| **Seed File Version** | 3.13 | `seeds/vulnerability_patterns.json` |
 
-### Integrated Scanners (3/27)
+### Integrated Scanners (11)
 
-✅ **Phase 2.1**: Semgrep (43/47 detectors, 91.5%)
-✅ **Phase 2.2**: Solhint (16/20 detectors, 80%)
-⏳ **Phase 2.3**: Aderyn (88 detectors, in progress)
-
-**Remaining**: 4naly3er, Slither, Mythril, and 21 others
+| Scanner | Mappings | Status |
+|---------|----------|--------|
+| Slither | 93+ | Complete |
+| Mythril | 25+ | Complete |
+| Securify2 | 15+ | Complete |
+| Oyente | 10+ | Complete |
+| SmartCheck | 12+ | Complete |
+| Solhint | 16+ | Complete |
+| SolidityDefend | 20+ | Complete |
+| Wake | 10+ | Complete |
+| Echidna | 5+ | Complete |
+| Medusa | 5+ | Complete |
+| Halmos | 3+ | Complete |
 
 ---
 
