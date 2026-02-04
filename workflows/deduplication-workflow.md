@@ -1,7 +1,8 @@
 # Deduplication Workflow
 
-**Last Updated:** February 2026
+**Last Updated:** February 4, 2026
 **Status:** Active
+**API Version:** 0.25.0
 
 ---
 
@@ -104,7 +105,7 @@ SCANNER_PRIORITY = {
 
 **Algorithm:**
 1. Query existing vulnerabilities from prior scans (same contract_id)
-2. For each new vulnerability (not yet in a group):
+2. For each new vulnerability (including those with intra-scan groups):
    - **Level 1 (EXACT):** Match `fingerprint_code`
    - **Level 2 (HIGH):** Match `fingerprint_location` + same detector
    - **Level 3 (SEMANTIC):** Use Intelligence Engine embeddings
@@ -113,11 +114,27 @@ SCANNER_PRIORITY = {
    - Link to existing `deduplication_group_id`
    - Update `occurrence_count` and `last_seen`
    - Set `is_duplicate = True`, `is_primary = False`
+   - **If vulnerability has intra-scan group:** Track for merging
 
-4. If no match:
+4. **Group Merging (Bug Fix - February 4, 2026):**
+   - After processing all vulnerabilities, merge intra-scan groups into cross-scan groups
+   - Update all vulnerabilities in intra-scan group to point to cross-scan group
+   - Delete empty intra-scan groups
+
+5. If no match:
    - Vulnerability remains standalone (may become group leader later)
 
 **Location:** `src/presentation/api/v1/endpoints/scans.py` → `_process_cross_scan_deduplication()`
+
+### Bug Fix History
+
+**February 4, 2026 (v0.25.0):** Fixed critical bug where cross-scan deduplication skipped vulnerabilities that already had `deduplication_group_id` from intra-scan deduplication. The fix:
+- Processes ALL vulnerabilities regardless of existing group assignment
+- Tracks intra-scan groups that need to be merged into cross-scan groups
+- Merges groups by updating all vulnerabilities to point to the cross-scan group
+- Deletes empty intra-scan groups after merging
+
+**Commit:** `6775677` - `fix(deduplication): Fix cross-scan deduplication to handle intra-scan groups`
 
 ---
 
@@ -351,8 +368,31 @@ curl -X POST http://127.0.0.1:8000/api/v1/deduplication/maintenance/recalculate-
 
 ---
 
+## Known Issues
+
+### Fingerprint Code Generation (Discovered February 4, 2026)
+
+Some scanner parsers generate empty fingerprint codes (SHA256 of empty string: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). This prevents fingerprint-based cross-scan matching from working correctly.
+
+**Impact:** Cross-scan deduplication falls back to semantic matching only when fingerprint codes are empty.
+
+**To Verify:**
+```sql
+-- Check for empty fingerprint codes (all same hash = problem)
+SELECT DISTINCT fingerprint_code, COUNT(*)
+FROM vulnerabilities
+WHERE contract_id = 'your-contract-uuid'
+GROUP BY fingerprint_code
+ORDER BY COUNT(*) DESC;
+```
+
+**Status:** Requires investigation in scanner parser implementations.
+
+---
+
 ## Related Documentation
 
 - [Intelligence Pipeline Workflow](./intelligence-pipeline-workflow.md)
 - [ML Training Workflow](./ml-training-workflow.md)
 - [Smart Contract Scanning Workflow](./smart-contract-scanning-workflow.md)
+- [Cross-Scan Deduplication Implementation](../../TaskDocs-BlockSecOps/blocksecops/cross-scan-deduplication-implementation.md)
