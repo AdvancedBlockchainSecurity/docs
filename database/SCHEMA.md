@@ -784,10 +784,17 @@ Vulnerabilities support soft deletion to preserve ML training data. Soft-deleted
 - `ix_vulnerabilities_deduplication_group_id` on `deduplication_group_id` (Phase 4D)
 - `ix_vulnerabilities_deleted_at` on `deleted_at` (Migration 062)
 - `ix_vulnerabilities_active` partial index on active vulnerabilities WHERE `deleted_at IS NULL` (Migration 062)
+- `ix_vulnerabilities_classification_confidence` on `classification_confidence` (Dedup Audit 2026-02-04)
+- `ix_vulnerabilities_classification_method` on `classification_method` (Dedup Audit 2026-02-04)
+- `ix_vulnerabilities_deduplication_strategy` on `deduplication_strategy` (Dedup Audit 2026-02-04)
+- `ix_vulnerabilities_similarity_score` on `similarity_score` (Dedup Audit 2026-02-04)
+- `ix_vulnerabilities_multi_class_model_version` on `multi_class_model_version` (Dedup Audit 2026-02-04)
 
 **Relationships:**
 - Many-to-one with `scans` (scan_id, CASCADE DELETE - vulnerabilities are deleted when parent scan is deleted)
 - Many-to-one with `contracts` (contract_id)
+- Many-to-one with `deduplication_groups` (deduplication_group_id, SET NULL on delete) (Dedup Audit 2026-02-04)
+- Many-to-one with `vulnerability_patterns` (pattern_id, SET NULL on delete) (Dedup Audit 2026-02-04)
 - One-to-many with `implicit_labels` (vulnerability_id, Migration 064)
 
 ---
@@ -1397,7 +1404,7 @@ Groups of duplicate vulnerability findings detected by multiple scanners analyzi
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique group identifier |
-| `canonical_finding_id` | UUID | NOT NULL, FK → vulnerabilities.id ON DELETE CASCADE | Primary/canonical finding reference (renamed from `primary_vulnerability_id` in migration 012) |
+| `canonical_finding_id` | UUID | NULLABLE, FK → vulnerabilities.id ON DELETE SET NULL | Primary/canonical finding reference (renamed from `primary_vulnerability_id` in migration 012, changed to SET NULL in Dedup Audit 2026-02-04) |
 | `contract_id` | UUID | NOT NULL, FK → contracts.id ON DELETE CASCADE | Associated contract |
 | `pattern_code` | VARCHAR(50) | NULLABLE, FK → vulnerability_patterns.id ON DELETE SET NULL | Pattern code (e.g., "BVD-SOLIDITY-REE-001") (renamed from `pattern_id` in migration 012) |
 | `group_size` | INTEGER | NOT NULL, DEFAULT 1 | Total number of vulnerabilities in this group |
@@ -1438,8 +1445,8 @@ The `DeduplicationGroupModel` SQLAlchemy model provides computed properties for 
 - Index on `contract_id` (foreign key)
 
 **Relationships:**
-- One-to-many with `vulnerabilities` (vulnerabilities reference deduplication_group_id)
-- Many-to-one with `vulnerabilities` (canonical_finding_id references a single vulnerability as the "primary")
+- One-to-many with `vulnerabilities` (vulnerabilities reference deduplication_group_id, with ORM `vulnerabilities` relationship for reverse navigation - Dedup Audit 2026-02-04)
+- Many-to-one with `vulnerabilities` (canonical_finding_id references a single vulnerability as the "primary", SET NULL on delete)
 
 **Confidence Levels:**
 - `exact`: Identical code_hash AND location_hash (99%+ precision)
