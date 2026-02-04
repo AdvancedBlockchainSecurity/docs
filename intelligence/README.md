@@ -77,6 +77,54 @@ See: [Deduplication Workflow](/docs/workflows/deduplication-workflow.md)
 
 ---
 
+## Deduplication & Metadata Audit Fixes (February 4, 2026)
+
+27 issues were identified and fixed in the comprehensive audit of deduplication, patterns, vulnerability entries, and metadata systems.
+
+### Critical Fixes
+
+| Issue | Location | Fix |
+|-------|----------|-----|
+| MythrilParser empty results | `parser.py:253-303` | Complete rewrite with JSON parsing, SWC-ID mapping |
+| String length truncation | `models.py:784-789` | Changed `String(20)` to `String(50)` for `pattern_id` |
+
+### SWC-ID Mapping
+
+Now implemented with 45+ detector-to-SWC mappings and fallback matching:
+
+```python
+# Direct mapping from pattern database
+swc_id = pattern.swc_id  # From vulnerability_patterns table
+
+# Fallback for unmapped detectors
+DETECTOR_TO_SWC_FALLBACK = {
+    "reentrancy": "SWC-107",
+    "tx-origin": "SWC-115",
+    "suicidal": "SWC-106",
+    # ... 40+ more
+}
+```
+
+### New Database Indexes
+
+5 new indexes added for query optimization:
+
+- `ix_vulnerabilities_classification_confidence`
+- `ix_vulnerabilities_classification_method`
+- `ix_vulnerabilities_deduplication_strategy`
+- `ix_vulnerabilities_similarity_score`
+- `ix_vulnerabilities_multi_class_model_version`
+
+### ORM Relationship Improvements
+
+- VulnerabilityModel now has relationships to `DeduplicationGroupModel` and `VulnerabilityPatternModel`
+- DeduplicationGroupModel has bidirectional `vulnerabilities` relationship
+- `canonical_finding_id` changed from CASCADE to SET NULL to prevent orphaned records
+
+See: [Changelog](/docs/changelogs/DEDUPLICATION-METADATA-AUDIT-FIXES-2026-02-04.md)
+
+---
+
 ## Contents
 
 ### 📘 Developer Guides

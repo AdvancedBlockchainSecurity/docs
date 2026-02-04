@@ -386,7 +386,25 @@ GROUP BY fingerprint_code
 ORDER BY COUNT(*) DESC;
 ```
 
-**Status:** Requires investigation in scanner parser implementations.
+**Status:** Improved in Deduplication Audit (February 4, 2026). MythrilParser completely rewritten, code_snippet extraction improved in SlitherParser, AderynParser, EchidnaParser, MedusaParser.
+
+---
+
+## Audit Fixes (February 4, 2026)
+
+The comprehensive deduplication and metadata audit addressed 27 issues. Key improvements:
+
+| Fix | Impact |
+|-----|--------|
+| MythrilParser complete rewrite | Mythril scans now produce vulnerability findings |
+| Code snippet extraction improved | 6 parsers now extract meaningful code context |
+| SWC-ID mapping implemented | 45+ detector-to-SWC mappings with fallback |
+| avg_time_to_fix calculation | Patterns now show average fix times |
+| 5 new database indexes | Improved query performance for dedup fields |
+| ORM relationships added | `vuln.deduplication_group` and `vuln.pattern` navigation |
+| Cascade delete fix | Changed to SET NULL to prevent orphaned records |
+
+See: [Deduplication & Metadata Audit Fixes Changelog](/docs/changelogs/DEDUPLICATION-METADATA-AUDIT-FIXES-2026-02-04.md)
 
 ---
 
@@ -396,3 +414,4 @@ ORDER BY COUNT(*) DESC;
 - [ML Training Workflow](./ml-training-workflow.md)
 - [Smart Contract Scanning Workflow](./smart-contract-scanning-workflow.md)
 - [Cross-Scan Deduplication Implementation](../../TaskDocs-BlockSecOps/blocksecops/cross-scan-deduplication-implementation.md)
+- [Deduplication & Metadata Audit Fixes](/docs/changelogs/DEDUPLICATION-METADATA-AUDIT-FIXES-2026-02-04.md)

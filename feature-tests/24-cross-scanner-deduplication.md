@@ -517,3 +517,72 @@ HAVING COUNT(DISTINCT v.scan_id) > 1;
 - API service image reduced from 12.6GB to 934MB (93% reduction)
 - Deduplication functionality unchanged - same API, different internal implementation
 - Intelligence engine model: `all-MiniLM-L6-v2` (384 dimensions)
+
+---
+
+## Deduplication & Metadata Audit Fixes (February 4, 2026)
+
+Comprehensive audit of deduplication, patterns, vulnerability entries, and metadata systems identified and fixed 27 issues.
+
+### Critical Fixes
+
+| Issue | Location | Fix |
+|-------|----------|-----|
+| MythrilParser empty results | `parser.py:253-303` | Complete rewrite with JSON parsing, SWC-ID mapping, code snippets |
+| String length truncation | `models.py:784-789` | Changed `String(20)` to `String(50)` for `pattern_id`/`pattern_code` |
+
+### High Priority Fixes
+
+| Issue | Fix |
+|-------|-----|
+| Missing FK on `pattern_id` | Added FK to `vulnerability_patterns` with `SET NULL` |
+| Missing FK on `deduplication_group_id` | Added FK to `deduplication_groups` with `SET NULL` |
+| Orphaned records on cascade delete | Changed `canonical_finding_id` from `CASCADE` to `SET NULL` |
+| Missing ORM relationships | Added `deduplication_group` and `pattern` relationships |
+
+### New Database Indexes
+
+5 new indexes added for query optimization:
+- `ix_vulnerabilities_classification_confidence`
+- `ix_vulnerabilities_classification_method`
+- `ix_vulnerabilities_deduplication_strategy`
+- `ix_vulnerabilities_similarity_score`
+- `ix_vulnerabilities_multi_class_model_version`
+
+### SWC-ID Mapping Implementation
+
+Now implemented with 45+ detector-to-SWC fallback mappings:
+- Pattern lookup returns `swc_id` from database
+- Fallback function handles unmapped detectors with partial matching
+- Example: `"reentrancy" → "SWC-107"`, `"tx-origin" → "SWC-115"`
+
+### Code Snippet Extraction Improvements
+
+| Parser | Before | After |
+|--------|--------|-------|
+| SlitherParser | Function name only | Elements (function, expression, variable, contract) |
+| AderynParser | None | `src` field or `hint` fallback |
+| MythrilParser | None | `code` field from JSON |
+| EchidnaParser | None | Counterexample/call_sequence |
+| MedusaParser | None | Location code, function, or counterexample |
+
+### Verification Queries
+
+```sql
+-- Check pattern_id truncation is fixed
+SELECT id FROM vulnerability_patterns WHERE LENGTH(id) > 20;
+
+-- Verify FK constraints work
+INSERT INTO vulnerabilities (pattern_id, ...) VALUES ('nonexistent-pattern', ...);
+-- Should fail with FK violation
+
+-- Check new indexes exist
+SELECT indexname FROM pg_indexes WHERE tablename = 'vulnerabilities'
+  AND indexname LIKE '%classification%';
+```
+
+### Related Documentation
+
+- [Changelog](/docs/changelogs/DEDUPLICATION-METADATA-AUDIT-FIXES-2026-02-04.md)
+- [Deduplication Workflow](/docs/workflows/deduplication-workflow.md)
+- [Intelligence README](/docs/intelligence/README.md)
