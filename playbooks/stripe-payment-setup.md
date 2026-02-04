@@ -291,29 +291,33 @@ cp dist/blocksecops_tier_config-*.whl /home/pwner/Git/
 
 ### 4.3 Configure API Service Secrets
 
-The API service needs the Stripe Secret Key. Update the Vault secret or environment:
+The API service needs the Stripe Secret Key. **All secrets MUST be stored in Vault** per [Secrets Management Standards](../standards/secrets-management.md).
 
-**Option A: Via Vault (Production)**
+**Local Development (Vault)**
 ```bash
-vault kv put secret/api-service \
-  STRIPE_SECRET_KEY="sk_test_51ABC123..." \
-  STRIPE_WEBHOOK_SECRET="whsec_..."
+# Get Vault root token
+ROOT_TOKEN=$(kubectl exec vault-0 -n vault-local -- cat /vault/data/.vault-init.json 2>/dev/null | jq -r '.root_token')
+
+# Store Stripe secrets in Vault
+kubectl exec vault-0 -n vault-local -- sh -c "VAULT_TOKEN=$ROOT_TOKEN vault kv put secret/local/api-service/stripe \
+  api_key='sk_test_YOUR_KEY' \
+  webhook_secret='whsec_YOUR_SECRET'"
+
+# Force ExternalSecret to resync
+kubectl annotate externalsecret api-service-secret -n api-service-local force-sync="$(date +%s)" --overwrite
+
+# Restart API service to pick up new secrets
+kubectl rollout restart deployment/api-service -n api-service-local
 ```
 
-**Option B: Via ConfigMap (Local Development)**
-
-Edit the API service ConfigMap:
+**GCP Production (Secret Manager)**
 ```bash
-vim /home/pwner/Git/blocksecops-api-service/k8s/overlays/local/api-service/configmap-patch.yaml
+# Create secrets in GCP Secret Manager
+echo -n "sk_live_YOUR_KEY" | gcloud secrets create solidity-security-production-stripe-api-key --data-file=-
+echo -n "whsec_YOUR_SECRET" | gcloud secrets create solidity-security-production-stripe-webhook-secret --data-file=-
 ```
 
-Add or update:
-```yaml
-data:
-  STRIPE_SECRET_KEY: "sk_test_51ABC123..."
-  STRIPE_PUBLISHABLE_KEY: "pk_test_51ABC123..."
-  STRIPE_TAX_ENABLED: "false"
-```
+**Note:** Never store secrets in ConfigMaps. The ExternalSecret automatically syncs from Vault to the `api-service-secret` Kubernetes Secret.
 
 ### 4.4 Configure Dashboard
 
@@ -369,16 +373,31 @@ sudo apt update && sudo apt install stripe
 stripe login
 ```
 
-**Forward Webhooks to Local:**
+**Forward Webhooks to Local (kubeadm server):**
 ```bash
-# Forward to local API service
-stripe listen --forward-to http://127.0.0.1:8000/api/v1/webhooks/stripe
+# Get webhook secret first (save this!)
+~/bin/stripe listen --api-key "sk_test_YOUR_KEY" --print-secret
 
-# Or if using app.blocksecops.local
-stripe listen --forward-to http://app.blocksecops.local/api/v1/webhooks/stripe
+# Forward to API service via Traefik NodePort
+# Node IP: 192.168.86.225, NodePort: 30180
+~/bin/stripe listen \
+  --api-key "sk_test_YOUR_KEY" \
+  --forward-to http://192.168.86.225:30180/api/v1/webhooks/stripe
+
+# The CLI will show forwarded events like:
+# 2026-02-03 23:01:42   --> checkout.session.completed [evt_xxx]
+# 2026-02-03 23:01:42  <--  [200] POST http://192.168.86.225:30180/api/v1/webhooks/stripe
 ```
 
-The CLI will output a webhook signing secret (starts with `whsec_...`). Use this for local development.
+**Forward Webhooks to Local (minikube):**
+```bash
+# With minikube tunnel running:
+~/bin/stripe listen \
+  --api-key "sk_test_YOUR_KEY" \
+  --forward-to http://127.0.0.1:3000/api/v1/webhooks/stripe
+```
+
+The CLI outputs a webhook signing secret (starts with `whsec_...`). **Store this in Vault** using the commands in section 4.3.
 
 ### 5.3 Update Webhook Secret
 
@@ -574,3 +593,4 @@ Before going live:
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | 1.0.0 | 2026-02-02 | Initial playbook | BlockSecOps Team |
+| 1.1.0 | 2026-02-03 | Updated secrets to use Vault (not ConfigMap), updated webhook forwarding for kubeadm NodePort | BlockSecOps Team |

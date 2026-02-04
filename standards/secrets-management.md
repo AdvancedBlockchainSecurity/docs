@@ -270,6 +270,13 @@ secret/
     │   ├── oauth/                # OAuth configuration
     │   │   ├── client_id
     │   │   └── client_secret
+    │   ├── stripe/               # Stripe Billing (Phase 8a)
+    │   │   ├── api_key           # sk_test_... or sk_live_...
+    │   │   └── webhook_secret    # whsec_...
+    │   ├── supabase/             # Supabase Auth
+    │   │   └── anon_key
+    │   ├── encryption/           # MFA/OAuth token encryption
+    │   │   └── key
     │   └── database/             # Database URL
     │       └── url
     ├── orchestration/
