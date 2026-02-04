@@ -2,7 +2,7 @@
 
 **Last Updated:** February 4, 2026
 **Status:** Active
-**API Version:** 0.25.0
+**API Version:** 0.25.2
 
 ---
 
