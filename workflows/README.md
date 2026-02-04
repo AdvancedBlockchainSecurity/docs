@@ -15,6 +15,9 @@ This directory contains comprehensive documentation of key workflows in the Bloc
 | Workflow | Description | Status |
 |----------|-------------|--------|
 | [Smart Contract Scanning](./smart-contract-scanning-workflow.md) | Complete flow from contract upload to vulnerability display | Active |
+| [Intelligence Pipeline](./intelligence-pipeline-workflow.md) | Vulnerability classification, fingerprinting, and enrichment | Active |
+| [Deduplication Workflow](./deduplication-workflow.md) | Multi-tier deduplication with semantic matching | Active |
+| [ML Training Workflow](./ml-training-workflow.md) | False positive classifier training and evaluation | Active |
 
 ---
 

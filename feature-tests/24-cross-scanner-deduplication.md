@@ -389,9 +389,118 @@ FROM deduplication_groups WHERE canonical_finding_id IN (
 
 ---
 
-**Last Updated**: 2026-01-26
+**Last Updated**: 2026-02-04
 **Tested By**: Claude Code (Automated)
-**API Version**: v0.13.4
+**API Version**: v0.25.0
+
+---
+
+## Cross-Scan Deduplication Enhancement (February 4, 2026)
+
+**Major Feature:** Cross-scan deduplication with semantic matching via Intelligence Engine.
+
+### What's New
+
+Deduplication now operates in **two phases**:
+
+| Phase | Scope | Strategy |
+|-------|-------|----------|
+| Phase 1: Intra-scan | Within same scan | `fingerprint_location` matching |
+| Phase 2: Cross-scan | Across prior scans | 3-level matching (fingerprint + semantic) |
+
+### Cross-Scan Matching Levels
+
+| Level | Confidence | Strategy | Description |
+|-------|------------|----------|-------------|
+| EXACT | 99% | `fingerprint_code` | Identical code hash |
+| HIGH | 95% | `fingerprint_location` + detector | Same location, same detector type |
+| SEMANTIC | 85%+ | Embedding similarity | Via Intelligence Engine |
+
+### New Function Added
+
+**File:** `src/presentation/api/v1/endpoints/scans.py`
+**Function:** `_process_cross_scan_deduplication()`
+
+```python
+async def _process_cross_scan_deduplication(
+    db: AsyncSession,
+    scan_id: UUID,
+    contract_id: UUID,
+    new_vulnerability_ids: list[UUID],
+) -> dict:
+    """
+    Process cross-scan deduplication for vulnerabilities.
+
+    1. Queries existing vulnerabilities from prior scans (same contract)
+    2. Uses fingerprint AND semantic matching
+    3. Links to existing deduplication groups or creates new ones
+    4. Updates occurrence_count and last_seen for historical tracking
+    """
+```
+
+### Automatic Flow on Scan Completion
+
+```
+Store Results
+     │
+     ▼
+Phase 1: Intra-scan Deduplication
+     │ Groups duplicates within this scan
+     ▼
+Phase 2: Cross-scan Deduplication (NEW)
+     │ Links to prior scans via:
+     │ - Fingerprint code matching
+     │ - Location + detector matching
+     │ - Semantic similarity (Intelligence Engine)
+     ▼
+Done - Vulnerabilities linked to groups
+```
+
+### Intelligence Engine Integration
+
+Semantic matching requires Intelligence Engine for embeddings:
+
+```
+URL: http://intelligence-engine.intelligence-engine-local.svc.cluster.local:80
+Endpoint: POST /api/v1/embeddings
+Model: all-MiniLM-L6-v2 (384-dim)
+Threshold: 0.85 similarity
+```
+
+### Historical Tracking
+
+Cross-scan matches update historical fields:
+- `occurrence_count` - Incremented on each match
+- `last_seen` - Updated to current timestamp
+- `first_seen` - Preserved from original finding
+
+### Verification Query
+
+```sql
+-- Check cross-scan deduplication worked
+SELECT
+    v.id,
+    v.title,
+    v.scan_id,
+    v.deduplication_group_id,
+    v.is_duplicate,
+    v.occurrence_count,
+    v.deduplication_strategy
+FROM vulnerabilities v
+WHERE v.contract_id = 'your-contract-uuid'
+ORDER BY v.first_seen ASC;
+
+-- Verify groups span multiple scans
+SELECT
+    dg.id as group_id,
+    dg.group_size,
+    dg.strategy,
+    COUNT(DISTINCT v.scan_id) as scans_in_group
+FROM deduplication_groups dg
+JOIN vulnerabilities v ON v.deduplication_group_id = dg.id
+GROUP BY dg.id, dg.group_size, dg.strategy
+HAVING COUNT(DISTINCT v.scan_id) > 1;
+```
 
 ---
 

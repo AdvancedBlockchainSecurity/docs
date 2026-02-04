@@ -89,6 +89,12 @@ Step-by-step operational guides for common tasks.
 | [Admin Session Management](admin-session-management.md) | View, revoke, and troubleshoot admin sessions |
 | [Admin Emergency Operations](admin-emergency-operations.md) | Emergency disable users, revoke admin access, incident response |
 
+### AI/ML Operations
+
+| Playbook | Description |
+|----------|-------------|
+| [AI/ML Comprehensive Audit](ai-ml-audit-playbook.md) | Audit all AI/ML features: patterns, deduplication, ML endpoints, frontend components |
+
 ## Playbook Format
 
 Each playbook follows this structure:
