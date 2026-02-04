@@ -1326,7 +1326,7 @@ List all vulnerabilities for authenticated user with Intelligence Layer enrichme
 - `limit` (integer, default: 100, max: 1000)
 - `severity` (string, optional) - Filter by severity (critical, high, medium, low)
 - `status` (string, optional) - Filter by status (open, acknowledged, fixed, false_positive)
-- `pattern_code` (string, optional) - Filter by Intelligence Layer pattern code (e.g., BVD-EVM-REE-001)
+- `pattern_code` (string, optional) - Filter by Intelligence Layer pattern code (e.g., BVD-SOLIDITY-REE-001)
 - `min_classification_confidence` (float, optional) - Filter by minimum classification confidence (0.0-1.0)
 
 **Response** (200 OK):
@@ -1350,7 +1350,7 @@ List all vulnerabilities for authenticated user with Intelligence Layer enrichme
       "updated_at": "2025-10-06T22:00:00Z",
 
       "pattern_id": "550e8400-e29b-41d4-a716-446655440003",
-      "pattern_code": "BVD-EVM-REE-001",
+      "pattern_code": "BVD-SOLIDITY-REE-001",
       "classification_confidence": 0.95,
       "classification_method": "rule_based",
       "fingerprint_code": "a3f5e2c8b1d7f9e4c6a8d2f5b7e9c1a4d6f8e0a2c4b6d8e0f2a4c6e8b0d2f4a6",
@@ -1371,7 +1371,7 @@ List all vulnerabilities for authenticated user with Intelligence Layer enrichme
 
 **Intelligence Layer Fields**:
 - `pattern_id` (string, nullable) - UUID of matched vulnerability pattern from pattern database
-- `pattern_code` (string, nullable) - Standardized pattern code (e.g., BVD-EVM-REE-001 for Ethereum reentrancy)
+- `pattern_code` (string, nullable) - Standardized pattern code (e.g., BVD-SOLIDITY-REE-001 for Solidity reentrancy)
 - `classification_confidence` (float, nullable) - Confidence score for pattern classification (0.0-1.0, where 1.0 is highest confidence)
 - `classification_method` (string, nullable) - Classification method used: `rule_based`, `ml_based`, or `hybrid`
 - `fingerprint_code` (string, nullable) - SHA-256 hash of normalized code snippet for deduplication
@@ -1418,7 +1418,7 @@ Get details of a specific vulnerability including Intelligence Layer enrichment 
   "detected_at": "2025-10-06T22:00:00Z",
 
   "pattern_id": "550e8400-e29b-41d4-a716-446655440003",
-  "pattern_code": "BVD-EVM-REE-001",
+  "pattern_code": "BVD-SOLIDITY-REE-001",
   "classification_confidence": 0.95,
   "classification_method": "rule_based",
   "fingerprint_code": "a3f5e2c8b1d7f9e4c6a8d2f5b7e9c1a4d6f8e0a2c4b6d8e0f2a4c6e8b0d2f4a6",

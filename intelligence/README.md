@@ -57,7 +57,7 @@ See: [ML Development Standards](/docs/standards/ml-development.md)
 
 - **[Detector Addition Guide](DETECTOR-ADDITION-GUIDE.md)** - Add new vulnerability detectors
   - Creating vulnerability patterns
-  - Pattern code conventions (BVD-EVM-XXX-NNN)
+  - Pattern code conventions (BVD-SOLIDITY-XXX-NNN)
   - Detector-to-pattern mappings
   - Testing new patterns
 
@@ -125,17 +125,17 @@ Advanced vulnerability fingerprinting strategies:
 
 ### Pattern Code Convention
 
-**Format**: `BVD-<CHAIN>-<CATEGORY>-<NUMBER>`
+**Format**: `BVD-<LANGUAGE>-<CATEGORY>-<NUMBER>`
 
 - **BVD**: BlockSecOps Vulnerability Database
-- **CHAIN**: EVM, SOL (Solana), STRK (Starknet)
-- **CATEGORY**: 3-letter code (REE, ACC, ARI, etc.)
+- **LANGUAGE**: SOLIDITY, VYPER, SOLANA (Rust), CAIRO (Starknet)
+- **CATEGORY**: 3-letter code (REE, ACC, INT, etc.)
 - **NUMBER**: 3-digit sequence (001, 002, etc.)
 
 **Examples**:
-- `BVD-EVM-REE-001` - Reentrancy vulnerability
-- `BVD-EVM-ACC-001` - Access control issue
-- `BVD-EVM-ARI-001` - Arithmetic overflow
+- `BVD-SOLIDITY-REE-001` - Reentrancy vulnerability
+- `BVD-SOLIDITY-ACC-001` - Access control issue
+- `BVD-SOLIDITY-INT-001` - Integer overflow
 
 ### Pattern Categories
 
@@ -181,7 +181,7 @@ POST /api/v1/intelligence/enrich
 ```json
 {
   "enriched": true,
-  "pattern_code": "BVD-EVM-REE-001",
+  "pattern_code": "BVD-SOLIDITY-REE-001",
   "pattern_name": "Reentrancy Vulnerability",
   "severity": "critical",
   "confidence": "high",
@@ -202,10 +202,10 @@ POST /api/v1/intelligence/enrich
 **1. Define Pattern in `vulnerability_patterns.json`**:
 ```json
 {
-  "pattern_code": "BVD-EVM-NEW-001",
+  "pattern_code": "BVD-SOLIDITY-NEW-001",
   "name": "New Vulnerability Type",
   "category": "NEW",
-  "chain": "EVM",
+  "chain": "SOLIDITY",
   "severity": "medium",
   "description": "Detailed description...",
   "remediation": "How to fix...",
@@ -220,7 +220,7 @@ POST /api/v1/intelligence/enrich
 {
   "scanner_id": "slither",
   "detector_id": "my-detector",
-  "pattern_code": "BVD-EVM-NEW-001",
+  "pattern_code": "BVD-SOLIDITY-NEW-001",
   "confidence_adjustment": 0
 }
 ```
@@ -248,7 +248,7 @@ See: [Detector Addition Guide](DETECTOR-ADDITION-GUIDE.md)
 ### Fingerprint Generation
 
 **Components**:
-- Pattern code (BVD-EVM-XXX-NNN)
+- Pattern code (BVD-SOLIDITY-XXX-NNN)
 - Contract address
 - Location (file + line number)
 - Function name

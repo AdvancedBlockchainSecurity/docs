@@ -1,7 +1,7 @@
 # BlockSecOps Changelogs
 
 **Purpose:** Centralized changelog directory for all BlockSecOps platform changes
-**Last Updated:** January 31, 2026
+**Last Updated:** February 3, 2026
 **Status:** Active
 
 ---
@@ -17,6 +17,25 @@ Changelogs are organized by component and maintained chronologically. Each chang
 ---
 
 ## Available Changelogs
+
+### 0. Test Suite Maintenance (`TEST-SUITE-MAINTENANCE-2026-02-03.md`)
+
+**Component:** blocksecops-api-service
+**Scope:** Pattern ID standardization, ML dataclass updates, HTTP-based embedding tests
+**Date:** February 3, 2026
+
+**Key Changes:**
+- Updated pattern IDs from `BVD-EVM-` to `BVD-SOLIDITY-` format
+- Added `from_soft_deleted` and `multi_class_label` ML dataclass fields
+- Rewrote SemanticDeduplicator tests for HTTP-based Intelligence Engine
+- Added Move and Cairo smart contract test fixtures
+- Fixed feature extractor line count for trailing newlines
+- 616 tests passing, 19 skipped
+
+**Use When:**
+- Understanding test suite changes
+- Debugging test failures related to pattern IDs
+- Understanding ML dataclass field requirements
 
 ### 0. SolidityDefend Scanner Wrapper 0.5.0 (`SOLIDITYDEFEND-0.5.0-UPGRADE-2026-01-31.md`)
 

@@ -79,6 +79,7 @@ print(f'SolidityDefend: {SCANNERS[\"soliditydefend\"].version}')
 
 | Version | Date | Notes |
 |---------|------|-------|
+| 1.10.13 | 2026-02-03 | Project-aware scanning, cross-contract detection, 4 FP fixes (pool-donation, uups, proxy-storage, token-supply) |
 | 1.10.3 | 2026-01-17 | Major upgrade: 333 detectors (+118), EIP-7702/1153, proxy, L2, governance, noise reduction |
 | 1.4.0 | 2025-11-26 | Project mode support (Foundry/Hardhat) |
 | 1.3.7 | 2025-11-15 | Bug fixes |

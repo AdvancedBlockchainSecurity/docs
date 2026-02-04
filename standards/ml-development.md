@@ -110,24 +110,32 @@ class RiskScoreResult:
     adjustments: List[str]          # Applied adjustments
 ```
 
-### 3. Lazy Loading Pattern
-Models should be loaded lazily to avoid startup delays:
+### 3. Service-Based Embedding Pattern
+Embeddings are generated via HTTP calls to the Intelligence Engine service, which hosts the sentence-transformers model (all-MiniLM-L6-v2):
 
 ```python
 class SemanticDeduplicator:
-    _model = None
+    """Uses HTTP calls to Intelligence Engine for embedding generation."""
 
-    @classmethod
-    def _load_model(cls):
-        if cls._model is None:
-            from sentence_transformers import SentenceTransformer
-            cls._model = SentenceTransformer('all-MiniLM-L6-v2')
-        return cls._model
+    EMBEDDING_DIM = 384
 
-    def embed(self, text: str) -> np.ndarray:
-        model = self._load_model()
-        return model.encode(text)
+    def embed_vulnerability(self, vulnerability: Dict[str, Any]) -> np.ndarray:
+        """Generate embedding via Intelligence Engine HTTP API."""
+        text = self._build_text(vulnerability)
+
+        if not text.strip():
+            return np.zeros(self.EMBEDDING_DIM, dtype=np.float32)
+
+        # Call Intelligence Engine /api/v1/embeddings endpoint
+        embeddings = _get_embeddings_sync([text])
+        return embeddings[0]
 ```
+
+**Why HTTP instead of local model?**
+- Model (~100MB) hosted once in intelligence-engine service
+- API service stays lightweight (~50MB)
+- Consistent embedding generation across all services
+- Easy to scale embedding capacity independently
 
 ### 4. Error Handling
 Handle missing data gracefully with sensible defaults:

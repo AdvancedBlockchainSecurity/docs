@@ -513,26 +513,26 @@ Phase 8: Production Deployment (1-2 hours)
 
 | Code | Category | Description | Example IDs |
 |------|----------|-------------|-------------|
-| REE | reentrancy | Reentrancy vulnerabilities | BVD-EVM-REE-001, BVD-EVM-REE-002 |
-| ACC | access-control | Access control issues | BVD-EVM-ACC-001, BVD-EVM-ACC-006 |
-| INT | integer-overflow | Integer overflow/underflow | BVD-EVM-INT-001, BVD-EVM-INT-002 |
-| UNC | unchecked-calls | Unchecked external calls | BVD-EVM-UNC-001, BVD-EVM-UNC-002 |
-| TIM | timestamp | Timestamp manipulation | BVD-EVM-TIM-001, BVD-EVM-TIM-002 |
-| RAN | randomness | Weak randomness | BVD-EVM-RAN-001 |
-| DEL | delegatecall | Delegatecall issues | BVD-EVM-DEL-001, BVD-EVM-DEL-002 |
-| FRO | front-running | Front-running vulnerabilities | BVD-EVM-FRO-001, BVD-EVM-FRO-002 |
-| DOS | denial-of-service | DoS vulnerabilities | BVD-EVM-DOS-001, BVD-EVM-DOS-003 |
-| GAS | gas-optimization | Gas optimization issues | BVD-EVM-GAS-001, BVD-EVM-GAS-010 |
-| COD | code-quality | Code quality issues | BVD-EVM-COD-001, BVD-EVM-COD-004 |
-| DEP | deprecated | Deprecated patterns | BVD-EVM-DEP-001, BVD-EVM-DEP-002 |
-| ENC | encoding | Encoding issues | BVD-EVM-ENC-001 |
-| BAL | validation | Balance/validation checks | BVD-EVM-BAL-001 |
-| LOC | locked-ether | Locked ether issues | BVD-EVM-LOC-001 |
-| COL | collision | Collision vulnerabilities | BVD-EVM-COL-001 |
-| ERC | interface | ERC standard compliance | BVD-EVM-ERC-001, BVD-EVM-ERC-002 |
-| MUL | multicall | Multicall issues | BVD-EVM-MUL-001 |
-| SEL | selfdestruct | Selfdestruct issues | BVD-EVM-SEL-001 |
-| LOG | logic | Logic errors | BVD-EVM-LOG-001, BVD-EVM-LOG-010 |
+| REE | reentrancy | Reentrancy vulnerabilities | BVD-SOLIDITY-REE-001, BVD-SOLIDITY-REE-002 |
+| ACC | access-control | Access control issues | BVD-SOLIDITY-ACC-001, BVD-SOLIDITY-ACC-006 |
+| INT | integer-overflow | Integer overflow/underflow | BVD-SOLIDITY-INT-001, BVD-SOLIDITY-INT-002 |
+| UNC | unchecked-calls | Unchecked external calls | BVD-SOLIDITY-UNC-001, BVD-SOLIDITY-UNC-002 |
+| TIM | timestamp | Timestamp manipulation | BVD-SOLIDITY-TIM-001, BVD-SOLIDITY-TIM-002 |
+| RAN | randomness | Weak randomness | BVD-SOLIDITY-RAN-001 |
+| DEL | delegatecall | Delegatecall issues | BVD-SOLIDITY-DEL-001, BVD-SOLIDITY-DEL-002 |
+| FRO | front-running | Front-running vulnerabilities | BVD-SOLIDITY-FRO-001, BVD-SOLIDITY-FRO-002 |
+| DOS | denial-of-service | DoS vulnerabilities | BVD-SOLIDITY-DOS-001, BVD-SOLIDITY-DOS-003 |
+| GAS | gas-optimization | Gas optimization issues | BVD-SOLIDITY-GAS-001, BVD-SOLIDITY-GAS-010 |
+| COD | code-quality | Code quality issues | BVD-SOLIDITY-COD-001, BVD-SOLIDITY-COD-004 |
+| DEP | deprecated | Deprecated patterns | BVD-SOLIDITY-DEP-001, BVD-SOLIDITY-DEP-002 |
+| ENC | encoding | Encoding issues | BVD-SOLIDITY-ENC-001 |
+| BAL | validation | Balance/validation checks | BVD-SOLIDITY-BAL-001 |
+| LOC | locked-ether | Locked ether issues | BVD-SOLIDITY-LOC-001 |
+| COL | collision | Collision vulnerabilities | BVD-SOLIDITY-COL-001 |
+| ERC | interface | ERC standard compliance | BVD-SOLIDITY-ERC-001, BVD-SOLIDITY-ERC-002 |
+| MUL | multicall | Multicall issues | BVD-SOLIDITY-MUL-001 |
+| SEL | selfdestruct | Selfdestruct issues | BVD-SOLIDITY-SEL-001 |
+| LOG | logic | Logic errors | BVD-SOLIDITY-LOG-001, BVD-SOLIDITY-LOG-010 |
 
 **Adding New Categories**:
 1. Check if existing category fits
@@ -669,8 +669,8 @@ python scripts/validate_patterns.py
 - Detector ALWAYS indicates this vulnerability
 - Accuracy >90%
 - Examples:
-  - slither:reentrancy-eth → BVD-EVM-REE-001
-  - aderyn:tx-origin-auth → BVD-EVM-ACC-006
+  - slither:reentrancy-eth → BVD-SOLIDITY-REE-001
+  - aderyn:tx-origin-auth → BVD-SOLIDITY-ACC-006
 
 **2. fuzzy**
 - Close match, minor variations
@@ -1121,12 +1121,12 @@ pragma solidity ^0.8.20;
  * @dev Intentionally vulnerable contract for testing scanner integration
  */
 contract VulnerableScannerTest {
-    // BVD-EVM-XXX-001: Vulnerability Name (Line 15)
+    // BVD-SOLIDITY-XXX-001: Vulnerability Name (Line 15)
     function vulnerableFunction() public {
         // Vulnerable code here
     }
 
-    // BVD-EVM-XXX-002: Another Vulnerability (Line 20)
+    // BVD-SOLIDITY-XXX-002: Another Vulnerability (Line 20)
     function anotherVulnerable() public {
         // Vulnerable code here
     }
@@ -1202,7 +1202,7 @@ Complete <Scanner> static analyzer integration achieving 100% detector coverage.
 
 ### New Vulnerability Patterns (5 added)
 
-1. **BVD-EVM-XXX-001**: Pattern Name
+1. **BVD-SOLIDITY-XXX-001**: Pattern Name
    - Severity: high
    - Category: category-name
    - SWC: SWC-###
@@ -1635,16 +1635,16 @@ After successful rollback:
 
 | Detector ID | Existing Pattern | Match Quality |
 |-------------|------------------|---------------|
-| detector-1  | BVD-EVM-XXX-001     | EXACT         |
-| detector-2  | BVD-EVM-XXX-002     | FUZZY         |
+| detector-1  | BVD-SOLIDITY-XXX-001     | EXACT         |
+| detector-2  | BVD-SOLIDITY-XXX-002     | FUZZY         |
 | ...         | ...             | ...           |
 
 ### Detectors Requiring New Patterns (P detectors)
 
 | Detector ID | New Pattern ID | Category | Severity |
 |-------------|----------------|----------|----------|
-| detector-3  | BVD-EVM-YYY-001   | category | high     |
-| detector-4  | BVD-EVM-YYY-002   | category | medium   |
+| detector-3  | BVD-SOLIDITY-YYY-001   | category | high     |
+| detector-4  | BVD-SOLIDITY-YYY-002   | category | medium   |
 | ...         | ...            | ...      | ...      |
 
 ## Timeline
@@ -1685,8 +1685,8 @@ Achieve 100% <Scanner> detector coverage by adding N new patterns and M mappings
 
 Pattern Database Changes:
 - Added N new patterns:
-  * BVD-EVM-XXX-001: Pattern Name 1
-  * BVD-EVM-XXX-002: Pattern Name 2
+  * BVD-SOLIDITY-XXX-001: Pattern Name 1
+  * BVD-SOLIDITY-XXX-002: Pattern Name 2
   * ...
 
 - Added M new detector mappings (P to existing + Q to new patterns)
@@ -1741,12 +1741,12 @@ Complete <Scanner> static analyzer integration achieving 100% detector coverage 
 
 ### New Vulnerability Patterns
 
-1. **BVD-EVM-XXX-001**: Pattern Name 1
+1. **BVD-SOLIDITY-XXX-001**: Pattern Name 1
    - Severity: high
    - Category: category-name
    - SWC: SWC-###
 
-2. **BVD-EVM-XXX-002**: Pattern Name 2
+2. **BVD-SOLIDITY-XXX-002**: Pattern Name 2
    - Severity: medium
    - Category: category-name
    - SWC: SWC-###

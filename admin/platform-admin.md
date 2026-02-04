@@ -1,15 +1,48 @@
 # Platform Admin Panel Guide
 
-**Version:** 1.1.0
-**Phase:** 4.6 - Platform Administration
-**Last Updated:** 2026-01-24
+**Version:** 2.0.0
+**Phase:** 4.7 - Admin Portal Isolation
+**Last Updated:** 2026-02-02
 **Security Hardening:** January 2026
+**Admin Portal Isolation:** February 2026
 
 ---
 
 ## Overview
 
 The Platform Admin Panel provides BlockSecOps internal team with full administrative access to manage the platform. This includes user management, organization oversight, audit logging, and emergency response capabilities.
+
+> **February 2026 Update:** The admin panel has been moved to a **separate repository** (`blocksecops-admin-portal`) with its own Supabase project for complete authentication isolation. This ensures that any compromise of customer authentication cannot affect admin access.
+
+---
+
+## Admin Portal Architecture
+
+### Separate Repository
+
+| Component | Location |
+|-----------|----------|
+| **Customer Dashboard** | `blocksecops-dashboard` at `app.blocksecops.com` |
+| **Admin Portal** | `blocksecops-admin-portal` at `admin.blocksecops.com` |
+
+### Authentication Isolation
+
+| Aspect | Customer Dashboard | Admin Portal |
+|--------|-------------------|--------------|
+| Supabase Project | Customer Supabase | Same project (shared) |
+| JWT Verification | Customer JWKS | Same JWKS |
+| Cookie Domain | `app.blocksecops.com` | `admin.blocksecops.com` |
+| Token Storage | localStorage | **Memory only (XSS protection)** |
+| Network Access | Public | **IP allowlist (restricted)** |
+
+### Security Benefits
+
+1. **Network Isolation**: Admin portal restricted to allowlisted IPs at ingress level
+2. **XSS Protection**: Admin tokens stored in memory only, not localStorage
+3. **Cookie Isolation**: Separate subdomain prevents cookie leakage
+4. **Defense in Depth**: Client-side rate limiting supplements server-side controls
+5. **Role-Based Access**: `admin_role` check in database - not just any authenticated user
+6. **Separate Sessions**: Independent `admin_sessions` table with IP binding
 
 ---
 
@@ -49,11 +82,21 @@ The CLI will:
 
 ### First Login
 
-1. Login to BlockSecOps dashboard with your regular credentials
-2. Navigate to `/admin`
-3. You'll be redirected to `/admin/mfa-verify`
+**Admin Portal URL:** `https://admin.blocksecops.com` (production) or `http://admin.blocksecops.local:3000` (local)
+
+1. Navigate to the Admin Portal URL
+2. Login with your admin credentials (separate Admin Supabase account)
+3. You'll be redirected to `/mfa-verify`
 4. Enter the 6-digit code from your authenticator app
 5. After verification, you'll have access to the admin panel
+
+> **Note:** Admin portal uses a separate Supabase project. You need an account in the Admin Supabase project (not the customer Supabase).
+
+### Creating Admin Supabase Account
+
+1. Contact a super_admin to create your Admin Supabase account
+2. Use the same email as your main BlockSecOps account
+3. The admin role and permissions are linked by email
 
 ---
 
@@ -75,21 +118,58 @@ Manage all platform users:
 | Action | Role Required | Description |
 |--------|---------------|-------------|
 | View users | support_admin+ | List and search all users |
-| View user details | support_admin+ | See full user profile with activity |
-| Change tier | platform_admin+ | Upgrade/downgrade user tier |
+| View user details | support_admin+ | See full user profile with quota info |
+| Update user | platform_admin+ | Change tier, display name, active status |
 | Disable user | platform_admin+ | Prevent user from logging in |
 | Enable user | platform_admin+ | Re-enable disabled user |
+| Delete user | super_admin | Soft delete (anonymize and deactivate) |
+
+**API Endpoints:**
+
+| Method | Endpoint | Role | Description |
+|--------|----------|------|-------------|
+| GET | `/api/v1/admin/users` | support_admin+ | List users with pagination, filters |
+| GET | `/api/v1/admin/users/{id}` | support_admin+ | Get user detail with quota info |
+| PATCH | `/api/v1/admin/users/{id}` | platform_admin+ | Update user (tier, display_name, is_active) |
+| POST | `/api/v1/admin/users/{id}/disable` | platform_admin+ | Disable user (requires reason) |
+| POST | `/api/v1/admin/users/{id}/enable` | platform_admin+ | Enable user (requires reason) |
+| DELETE | `/api/v1/admin/users/{id}` | super_admin | Soft delete user (requires reason) |
+
+**Query Parameters (GET /admin/users):**
+- `search` - Search by email or display name
+- `tier` - Filter by tier (developer, team, growth, enterprise)
+- `is_active` - Filter by active status (true/false)
+- `is_superuser` - Filter by admin status (true/false)
+- `page` - Page number (default: 1)
+- `page_size` - Items per page (default: 20, max: 100)
 
 **Audit Trail**: All user modifications are logged with before/after values.
 
 ### Organization Management (`/admin/organizations`)
 
-View all organizations on the platform:
+Manage all organizations on the platform:
 
 | Action | Role Required | Description |
 |--------|---------------|-------------|
 | View organizations | support_admin+ | List all organizations |
 | View org details | support_admin+ | See members, projects, activity |
+| Update organization | platform_admin+ | Change name, description, active status |
+| Delete organization | super_admin | Soft delete (deactivate) |
+
+**API Endpoints:**
+
+| Method | Endpoint | Role | Description |
+|--------|----------|------|-------------|
+| GET | `/api/v1/admin/organizations` | support_admin+ | List organizations with pagination |
+| GET | `/api/v1/admin/organizations/{id}` | support_admin+ | Get organization detail with members |
+| PATCH | `/api/v1/admin/organizations/{id}` | platform_admin+ | Update organization |
+| DELETE | `/api/v1/admin/organizations/{id}` | super_admin | Soft delete organization |
+
+**Query Parameters (GET /admin/organizations):**
+- `search` - Search by name or slug
+- `is_active` - Filter by active status (true/false)
+- `page` - Page number (default: 1)
+- `page_size` - Items per page (default: 20, max: 100)
 
 ### Audit Logs (`/admin/audit-logs`)
 
@@ -337,9 +417,16 @@ Use this method for programmatic access. The session token is returned in the MF
 |--------|----------|-------------|
 | POST | `/api/v1/admin/auth/mfa/setup` | Generate MFA secret |
 | POST | `/api/v1/admin/auth/mfa/verify` | Verify MFA, get session |
-| GET | `/api/v1/admin/users` | List users |
-| GET | `/api/v1/admin/users/{id}` | Get user details |
+| GET | `/api/v1/admin/users` | List users (with filters) |
+| GET | `/api/v1/admin/users/{id}` | Get user details with quota |
 | PATCH | `/api/v1/admin/users/{id}` | Update user |
+| POST | `/api/v1/admin/users/{id}/disable` | Disable user |
+| POST | `/api/v1/admin/users/{id}/enable` | Enable user |
+| DELETE | `/api/v1/admin/users/{id}` | Soft delete user |
+| GET | `/api/v1/admin/organizations` | List organizations |
+| GET | `/api/v1/admin/organizations/{id}` | Get organization details with members |
+| PATCH | `/api/v1/admin/organizations/{id}` | Update organization |
+| DELETE | `/api/v1/admin/organizations/{id}` | Soft delete organization |
 | GET | `/api/v1/admin/system/stats` | Platform statistics |
 | GET | `/api/v1/admin/audit/admin-actions` | Admin audit log |
 | POST | `/api/v1/admin/emergency/revoke-sessions/{id}` | Revoke sessions |
@@ -387,6 +474,65 @@ Permanent record of all admin actions with before/after state.
 
 ## Changelog
 
+### v2.1.0 (2026-02-03) - User & Organization Management Endpoints
+
+**New API Endpoints:**
+
+User Management (`/admin/users`):
+- `GET /admin/users` - List users with search, tier, and status filters
+- `GET /admin/users/{id}` - Get user detail with quota information
+- `PATCH /admin/users/{id}` - Update user (tier, display_name, is_active)
+- `POST /admin/users/{id}/disable` - Disable user with reason
+- `POST /admin/users/{id}/enable` - Enable user with reason
+- `DELETE /admin/users/{id}` - Soft delete user (super_admin only)
+
+Organization Management (`/admin/organizations`):
+- `GET /admin/organizations` - List organizations with search filter
+- `GET /admin/organizations/{id}` - Get organization detail with members
+- `PATCH /admin/organizations/{id}` - Update organization
+- `DELETE /admin/organizations/{id}` - Soft delete organization (super_admin only)
+
+**Backend Changes:**
+- New file: `src/presentation/api/v1/endpoints/admin/users.py`
+- New file: `src/presentation/api/v1/endpoints/admin/organizations.py`
+- Updated: `admin/__init__.py` to register new routers
+- API Service version: 0.22.4
+
+**Security:**
+- All endpoints use `require_admin_role_portal()` for authentication
+- Role-based access control enforced (support_admin, platform_admin, super_admin)
+- All actions logged to admin audit log with before/after values
+- Reason required for destructive actions (disable, enable, delete)
+
+### v2.0.0 (2026-02-02) - Admin Portal Isolation
+
+**Major Architecture Change:**
+- Admin panel moved to separate repository: `blocksecops-admin-portal`
+- Separate subdomain: `admin.blocksecops.com`
+- Separate Supabase project for complete authentication isolation
+- Admin code removed from customer dashboard
+
+**Security Improvements:**
+- Admin tokens stored in memory only (not localStorage) - XSS protection
+- Client-side MFA rate limiting (5 attempts, 5-minute lockout)
+- UUID validation for all user ID inputs
+- Confirmation dialogs for destructive actions
+- Impersonation tokens auto-hide after 30 seconds
+- Clipboard auto-clear after copying sensitive tokens
+- QR code URL validation (data: URIs only)
+- Production security headers (CSP, COOP, COEP, CORP)
+
+**Backend Changes:**
+- New module: `admin_supabase_client.py` for admin JWKS verification
+- New dependencies: `get_admin_user_unified()`, `get_current_admin_from_portal()`
+- Admin auth endpoints support both admin and customer Supabase JWTs
+- Backward compatible with legacy authentication
+
+**Kubernetes:**
+- Separate deployment manifests in `blocksecops-admin-portal/k8s/`
+- Production ingress with security headers
+- Optional IP allowlist middleware
+
 ### v1.1.0 (2026-01-24) - Security Hardening
 
 **Security Improvements:**
@@ -417,5 +563,5 @@ Permanent record of all admin actions with before/after state.
 
 ---
 
-**Last Updated**: 2026-01-24
+**Last Updated**: 2026-02-02
 **Maintained By**: BlockSecOps Team

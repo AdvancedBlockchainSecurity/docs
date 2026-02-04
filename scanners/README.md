@@ -411,7 +411,7 @@ See: [Phase 3.5 Parser Changelog](/docs/changelogs/PHASE-3.5-PARSERS-2025-12-20.
    {
      "scanner_id": "myscan",
      "detector_id": "my-detector-001",
-     "pattern_code": "BVD-EVM-XXX-001"
+     "pattern_code": "BVD-SOLIDITY-XXX-001"
    }
    ```
 

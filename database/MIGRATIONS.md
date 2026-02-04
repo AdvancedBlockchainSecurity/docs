@@ -1371,6 +1371,114 @@ asyncio.run(verify())
 
 ---
 
+### Migration 062: Vulnerability Soft Delete
+- **Status**: ✅ Completed
+- **Created**: February 3, 2026
+- **Revision ID**: `062_vulnerability_soft_delete`
+- **Previous Revision**: `061_add_support_tickets`
+- **Description**: Adds soft delete support for vulnerabilities to preserve ML training data
+- **Columns Added to `vulnerabilities`**:
+  - `deleted_at` TIMESTAMPTZ NULLABLE - Soft delete timestamp
+  - `deleted_by` UUID NULLABLE FK → users.id - User who deleted
+  - `deletion_reason` VARCHAR(50) NULLABLE - Reason: user_action, contract_deleted, scan_deleted
+- **Indexes Added**:
+  - `ix_vulnerabilities_deleted_at` on `deleted_at`
+  - `ix_vulnerabilities_active` partial index WHERE `deleted_at IS NULL`
+- **API Changes**:
+  - All vulnerability list endpoints filter by `deleted_at IS NULL` by default
+  - `?include_deleted=true` parameter shows soft-deleted vulnerabilities
+  - `DELETE /api/v1/vulnerabilities/{id}` now soft-deletes instead of hard delete
+- **ML Training Impact**: Soft-deleted vulnerabilities retain labels and are included in training data
+- **Migration File**: `alembic/versions/20260203_0100-062_vulnerability_soft_delete.py`
+
+---
+
+### Migration 063: Contract Archive Support
+- **Status**: ✅ Completed
+- **Created**: February 3, 2026
+- **Revision ID**: `063_contract_archive`
+- **Previous Revision**: `062_vulnerability_soft_delete`
+- **Description**: Adds contract archival capability with external reference and compressed backup
+- **Columns Added to `contracts`**:
+  - `source_hash` VARCHAR(64) NULLABLE - SHA-256 hash of source code
+  - `source_repo_url` VARCHAR(500) NULLABLE - External repo URL
+  - `source_commit_hash` VARCHAR(40) NULLABLE - Git commit hash
+  - `source_file_path` VARCHAR(500) NULLABLE - File path in repository
+  - `is_archived` BOOLEAN NOT NULL DEFAULT false - Archive status
+  - `archived_at` TIMESTAMPTZ NULLABLE - Archive timestamp
+- **New Table Created**: `contract_archives`
+  - Stores archive metadata and compressed source backup
+  - Links to external providers (GitHub/GitLab) for re-download
+  - Enables source restoration with hash verification
+- **Indexes Added**:
+  - `ix_contracts_source_hash` on `source_hash`
+  - `ix_contract_archives_contract_id` (UNIQUE)
+  - `ix_contract_archives_source_hash`
+- **API Endpoints**:
+  - `POST /api/v1/contracts/{id}/archive` - Archive contract source
+  - `POST /api/v1/contracts/{id}/restore` - Restore from archive
+  - `GET /api/v1/contracts/{id}/archive` - Get archive info
+- **Migration File**: `alembic/versions/20260203_0200-063_contract_archive.py`
+
+---
+
+### Migration 064: Implicit Labels for ML Training
+- **Status**: ✅ Completed
+- **Created**: February 3, 2026
+- **Revision ID**: `064_implicit_labels`
+- **Previous Revision**: `063_contract_archive`
+- **Description**: Adds implicit label generation from user actions for ML training
+- **New Table Created**: `implicit_labels`
+  - `id` UUID PRIMARY KEY
+  - `vulnerability_id` UUID FK → vulnerabilities.id
+  - `label` VARCHAR(50) - confirmed, false_positive, wont_fix
+  - `confidence` FLOAT - Label confidence 0.0-1.0
+  - `source` VARCHAR(50) - status_change, view_pattern, etc.
+  - `action_type` VARCHAR(100) - e.g., status:open->fixed
+  - `previous_value`, `new_value` VARCHAR(100)
+  - `user_id` UUID FK → users.id
+  - `is_active` BOOLEAN - False if overridden by explicit label
+  - `label_metadata` JSONB - Additional metadata
+- **Indexes Added**:
+  - `ix_implicit_labels_vulnerability_id`
+  - `ix_implicit_labels_label`
+  - `ix_implicit_labels_source`
+  - `ix_implicit_labels_is_active`
+  - `ix_implicit_labels_vuln_active` composite
+- **Label Generation Rules**:
+  - Status `fixed` → `confirmed` (0.95 confidence)
+  - Status `false_positive` → `false_positive` (0.90 confidence)
+  - Status `wont_fix` → `wont_fix` (0.80 confidence)
+  - Status `acknowledged` → `confirmed` (0.60 confidence)
+- **Integration**: Hooks into annotation endpoint status changes
+- **Migration File**: `alembic/versions/20260203_0300-064_implicit_labels.py`
+
+---
+
+### Migration 065: Multi-Class Classification Support
+- **Status**: ✅ Completed
+- **Created**: February 3, 2026
+- **Revision ID**: `065_multi_class_labels`
+- **Previous Revision**: `064_implicit_labels`
+- **Description**: Extends classification from binary (FP/real) to 4-class system
+- **Classification Classes**:
+  - `confirmed` - Real vulnerability, should fix
+  - `false_positive` - Not a real vulnerability
+  - `wont_fix` - Real but accepted risk
+  - `needs_review` - Uncertain, needs human review
+- **ML Model Changes**:
+  - `MultiClassVulnerabilityClassifier` with Random Forest
+  - `class_weight="balanced"` for handling class imbalance
+  - Returns probability distribution across all 4 classes
+- **New API Endpoints**:
+  - `GET /api/v1/ml/vulnerabilities/{id}/classify` - Get multi-class prediction
+  - `POST /api/v1/ml/scans/{id}/classify-all` - Classify all vulnerabilities in scan
+  - `POST /api/v1/ml/multi-class/train` - Train multi-class model
+- **Model Storage**: `/tmp/ml_models/multi_class_classifier.joblib`
+- **Migration File**: `alembic/versions/20260203_0400-065_multi_class_labels.py`
+
+---
+
 ### Creating Migrations
 ```bash
 # Generate migration from models

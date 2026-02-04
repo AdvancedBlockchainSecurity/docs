@@ -8,7 +8,7 @@
 > **Important Note on Database Naming:**
 > The database is named `solidity_security`, NOT `blocksecops`. This name was established during initial platform development when the focus was solely on Solidity security scanning. The name has been retained for backward compatibility and to avoid migration complexity. All services, connection strings, and documentation should reference `solidity_security`.
 >
-> **Verified:** January 31, 2026 (Migration 060 cleanup removed 3,061 invalid scanner_ids. Current stats: 15 scanners, ~58 contracts, ~232 scans, 1,872 vulnerabilities in `solidity_security` database)
+> **Verified:** February 3, 2026 (Current stats: 70 contracts, 240 scans, 1,922 vulnerabilities, 6 users, 1 admin user in `solidity_security` database)
 
 ## Table of Contents
 
@@ -52,11 +52,13 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Team collaboration:** Teams, project access control, assignments, comments (Phase 4.5)
 - **Notification channels:** Slack, Teams, Discord webhook integrations (CI/CD Integrations - January 2026)
 - **Quality gates:** CI/CD pipeline quality gate configurations and evaluation history (Phase 5.5c - January 2026)
-- **Platform admin:** Admin sessions with MFA, IP binding, and permanent admin audit logs (Phase 4.6 - January 2026)
+- **Platform admin:** Admin sessions with MFA, IP binding, and permanent admin audit logs (Phase 4.6 - January 2026). Admin portal isolated to separate application (February 2026)
 - **ML Data Strategy:** ToS consent tracking, ML training data provenance, GDPR data requests (January 2026)
 - **Support tickets:** User support ticket submissions with JIRA integration (February 2026)
+- **ML Data Preservation:** Soft delete vulnerabilities, contract archival, implicit labeling for ML training (February 2026)
+- **Multi-class Classification:** 4-class vulnerability classification (confirmed, false_positive, wont_fix, needs_review) (February 2026)
 
-**Total Tables:** 55 (excluding alembic_version)
+**Total Tables:** 57 (excluding alembic_version)
 
 ---
 
@@ -174,6 +176,8 @@ User accounts with Supabase authentication and tier tracking (Phase 3.1a - Migra
 - One-to-many with `admin_audit_logs` (Phase 4.6)
 
 **Platform Admin Columns (Phase 4.6 - January 2026):**
+
+> **Admin Portal Isolation (February 2026):** Admin functionality has been moved to a separate admin portal application (`admin.blocksecops.local` / `admin.blocksecops.com`). The admin portal shares the same Supabase project and database as the customer dashboard, but security is enforced through IP allowlisting, mandatory MFA, and admin_role checks. Admin routes have been removed from the main dashboard (`app.blocksecops.local`).
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
@@ -543,12 +547,27 @@ Smart contract source code and metadata.
 | `status` | contract_status | NOT NULL | Current processing status |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Upload timestamp |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+| `source_hash` | VARCHAR(64) | NULLABLE, INDEX | SHA-256 hash of source code (Migration 063) |
+| `source_repo_url` | VARCHAR(500) | NULLABLE | External repo URL for re-download (GitHub/GitLab) |
+| `source_commit_hash` | VARCHAR(40) | NULLABLE | Git commit hash for external reference |
+| `source_file_path` | VARCHAR(500) | NULLABLE | File path within external repository |
+| `is_archived` | BOOLEAN | NOT NULL, DEFAULT false | Contract source has been archived |
+| `archived_at` | TIMESTAMPTZ | NULLABLE | When source was archived |
+
+**Contract Archival (Migration 063 - February 2026)**:
+
+Contracts can be archived to preserve ML training data while removing source code:
+- `source_hash` enables verification when restoring from external sources
+- `source_repo_url` + `source_commit_hash` allow re-download from GitHub/GitLab
+- When archived, `source_code` is set to NULL but vulnerabilities and labels are preserved
+- See `contract_archives` table for compressed source backup
 
 **Indexes:**
 - `ix_contracts_user_id` on `user_id`
 - `ix_contracts_address` on `address`
 - `ix_contracts_language` on `language`
 - `idx_contracts_framework` on `framework` (partial, WHERE framework IS NOT NULL) - Phase 3.2
+- `ix_contracts_source_hash` on `source_hash` (Migration 063)
 
 **Framework Support (Phase 3.2 - November 25, 2025)**:
 
@@ -733,6 +752,17 @@ Detected security vulnerabilities and code issues.
 | `normalization_version` | VARCHAR(20) | NULLABLE | Version of normalization logic used |
 | `detected_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Detection timestamp |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last status update |
+| `deleted_at` | TIMESTAMPTZ | NULLABLE, INDEX | Soft delete timestamp (Migration 062) |
+| `deleted_by` | UUID | NULLABLE, FK → users.id | User who soft-deleted this vulnerability |
+| `deletion_reason` | VARCHAR(50) | NULLABLE | Reason: user_action, contract_deleted, scan_deleted |
+
+**Soft Delete Support (Migration 062 - February 2026)**:
+
+Vulnerabilities support soft deletion to preserve ML training data. Soft-deleted vulnerabilities:
+- Are excluded from normal API queries by default
+- Can be included with `?include_deleted=true` parameter
+- Retain all labels and annotations for ML training
+- Are automatically soft-deleted when parent contract is deleted (with `deletion_reason='contract_deleted'`)
 
 **Indexes:**
 - `ix_vulnerabilities_scan_id` on `scan_id`
@@ -752,10 +782,13 @@ Detected security vulnerabilities and code issues.
 - `ix_vulnerabilities_fingerprint_composite` on `fingerprint_composite` (Phase 4D)
 - `ix_vulnerabilities_fingerprint_location_fuzzy` on `fingerprint_location_fuzzy` (Phase 4D)
 - `ix_vulnerabilities_deduplication_group_id` on `deduplication_group_id` (Phase 4D)
+- `ix_vulnerabilities_deleted_at` on `deleted_at` (Migration 062)
+- `ix_vulnerabilities_active` partial index on active vulnerabilities WHERE `deleted_at IS NULL` (Migration 062)
 
 **Relationships:**
 - Many-to-one with `scans` (scan_id, CASCADE DELETE - vulnerabilities are deleted when parent scan is deleted)
 - Many-to-one with `contracts` (contract_id)
+- One-to-many with `implicit_labels` (vulnerability_id, Migration 064)
 
 ---
 
@@ -1210,10 +1243,11 @@ Batch scan tracking for multi-contract scan operations (Phase 3.1b - Sprint 3, M
 
 Standard vulnerability pattern definitions for classification and matching (Phase 4D).
 
-**Pattern Code Format (Updated 2025-10-28):** All pattern codes use the `BVD-` prefix to denote **Blockchain Vulnerability Database** classification.
-- **Format**: `BVD-{CATEGORY}-{NUMBER}` (e.g., "BVD-EVM-REE-001", "BVD-EVM-ACC-001")
-- **Category Codes**: REE (Reentrancy), ACC (Access Control), INT (Integer), ORA (Oracle), TOK (Token), etc.
-- **Historical Note**: Prior to 2025-10-28, patterns used format without BVD prefix (e.g., "REE-001")
+**Pattern Code Format (Updated 2026-02-03):** All pattern codes use the `BVD-` prefix to denote **Blockchain Vulnerability Database** classification.
+- **Format**: `BVD-{LANGUAGE}-{CATEGORY}-{NUMBER}` (e.g., "BVD-SOLIDITY-REE-001", "BVD-VYPER-ACC-001", "BVD-SOLANA-CPI-001")
+- **Language Prefixes**: SOLIDITY (EVM/Solidity), VYPER (Vyper), SOLANA (Solana/Rust)
+- **Category Codes**: REE (Reentrancy), ACC (Access Control), INT (Integer), ORA (Oracle), TOK (Token), CPI (Cross-Program Invocation), etc.
+- **Historical Note**: Prior to 2025-10-28, patterns used format without BVD prefix (e.g., "REE-001"). Prior to 2026-02-03, Solidity patterns used `BVD-EVM-` prefix.
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
@@ -1256,12 +1290,12 @@ Standard vulnerability pattern definitions for classification and matching (Phas
 **Pattern Distribution (352 total patterns across 4 ecosystems, 100% BVD compliant)**:
 
 **Solidity/EVM Patterns (171 patterns)**:
-- Reentrancy (15 patterns): BVD-EVM-REE-001 through BVD-EVM-REE-015
-- Access Control (18 patterns): BVD-EVM-ACC-001 through BVD-EVM-ACC-018
-- Integer/Arithmetic (12 patterns): BVD-EVM-INT-001 through BVD-EVM-INT-012
-- External Calls (10 patterns): BVD-EVM-EXT-001 through BVD-EVM-EXT-010
-- State Variables (8 patterns): BVD-EVM-STA-001 through BVD-EVM-STA-008
-- Gas Optimization (15 patterns): BVD-EVM-GAS-001 through BVD-EVM-GAS-015
+- Reentrancy (15 patterns): BVD-SOLIDITY-REE-001 through BVD-SOLIDITY-REE-015
+- Access Control (18 patterns): BVD-SOLIDITY-ACC-001 through BVD-SOLIDITY-ACC-018
+- Integer/Arithmetic (12 patterns): BVD-SOLIDITY-INT-001 through BVD-SOLIDITY-INT-012
+- External Calls (10 patterns): BVD-SOLIDITY-EXT-001 through BVD-SOLIDITY-EXT-010
+- State Variables (8 patterns): BVD-SOLIDITY-STA-001 through BVD-SOLIDITY-STA-008
+- Gas Optimization (15 patterns): BVD-SOLIDITY-GAS-001 through BVD-SOLIDITY-GAS-015
 - Plus 124 additional patterns across 35+ categories
 
 **Vyper Patterns (99 patterns)**:
@@ -1365,7 +1399,7 @@ Groups of duplicate vulnerability findings detected by multiple scanners analyzi
 | `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique group identifier |
 | `canonical_finding_id` | UUID | NOT NULL, FK → vulnerabilities.id ON DELETE CASCADE | Primary/canonical finding reference (renamed from `primary_vulnerability_id` in migration 012) |
 | `contract_id` | UUID | NOT NULL, FK → contracts.id ON DELETE CASCADE | Associated contract |
-| `pattern_code` | VARCHAR(50) | NULLABLE, FK → vulnerability_patterns.id ON DELETE SET NULL | Pattern code (e.g., "BVD-EVM-REE-001") (renamed from `pattern_id` in migration 012) |
+| `pattern_code` | VARCHAR(50) | NULLABLE, FK → vulnerability_patterns.id ON DELETE SET NULL | Pattern code (e.g., "BVD-SOLIDITY-REE-001") (renamed from `pattern_id` in migration 012) |
 | `group_size` | INTEGER | NOT NULL, DEFAULT 1 | Total number of vulnerabilities in this group |
 | `strategy` | VARCHAR(20) | NOT NULL | Deduplication strategy (exact, fuzzy, semantic) |
 | `confidence` | DOUBLE PRECISION | NOT NULL | Match confidence score (0.0 to 1.0) |
@@ -1429,7 +1463,7 @@ The `DeduplicationGroupModel` SQLAlchemy model provides computed properties for 
 **Example:**
 ```
 Group ID: abc-123-def
-Pattern: BVD-EVM-REE-001 (Reentrancy)
+Pattern: BVD-SOLIDITY-REE-001 (Reentrancy)
 Fingerprint Code: a3f5e2c8... (SHA-256 of normalized code)
 Finding Count: 3
 Scanner Count: 3
@@ -2384,6 +2418,97 @@ Polymorphic comments on various entities.
 - Top-level comments can have replies
 - Replies cannot have nested replies
 - Parent validation ensures same entity
+
+---
+
+### `contract_archives`
+
+Archive records for contracts with source code removed (Migration 063 - February 2026).
+
+Enables ML training data preservation by allowing contract source to be archived while maintaining restoration capability.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique archive identifier |
+| `contract_id` | UUID | NOT NULL, UNIQUE, FK → contracts.id ON DELETE CASCADE | Associated contract |
+| `source_hash` | VARCHAR(64) | NOT NULL | SHA-256 hash for verification |
+| `provider` | VARCHAR(50) | NULLABLE | External provider: github, gitlab |
+| `repo_full_name` | VARCHAR(500) | NULLABLE | Repository name (owner/repo) |
+| `commit_hash` | VARCHAR(40) | NULLABLE | Git commit hash |
+| `file_path` | VARCHAR(500) | NULLABLE | File path within repository |
+| `compressed_source` | BYTEA | NULLABLE | Gzip-compressed source (fallback) |
+| `archived_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Archive timestamp |
+| `archived_by` | UUID | NOT NULL, FK → users.id | User who archived |
+| `last_restored_at` | TIMESTAMPTZ | NULLABLE | Last restoration timestamp |
+| `restore_count` | INTEGER | NOT NULL, DEFAULT 0 | Number of restorations |
+
+**Indexes:**
+- `ix_contract_archives_contract_id` (UNIQUE) on `contract_id`
+- `ix_contract_archives_source_hash` on `source_hash`
+- `ix_contract_archives_provider` on `provider`
+
+**Relationships:**
+- One-to-one with `contracts` (contract_id, CASCADE DELETE)
+- Many-to-one with `users` (archived_by)
+
+**Archive Strategy:**
+1. If contract has external reference (GitHub integration), store repo/commit/path
+2. Otherwise, store gzip-compressed source as fallback
+3. Always store `source_hash` for verification on restore
+
+**Restoration Priority:**
+1. Try external provider (GitHub/GitLab API)
+2. Fall back to compressed source
+3. Verify hash matches before restoring
+
+---
+
+### `implicit_labels`
+
+Implicit labels inferred from user actions for ML training (Migration 064 - February 2026).
+
+Stores labels automatically generated from user actions such as status changes, providing additional training data without requiring explicit user labeling.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique label identifier |
+| `vulnerability_id` | UUID | NOT NULL, FK → vulnerabilities.id ON DELETE CASCADE, INDEX | Associated vulnerability |
+| `label` | VARCHAR(50) | NOT NULL, INDEX | Label: confirmed, false_positive, wont_fix |
+| `confidence` | FLOAT | NOT NULL | Confidence score 0.0-1.0 |
+| `source` | VARCHAR(50) | NOT NULL, INDEX | Source: status_change, view_pattern, etc. |
+| `action_type` | VARCHAR(100) | NOT NULL | Action type: status:open->fixed, etc. |
+| `previous_value` | VARCHAR(100) | NULLABLE | Previous value before action |
+| `new_value` | VARCHAR(100) | NOT NULL | New value after action |
+| `user_id` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | User who performed action |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Creation timestamp |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT true, INDEX | False if overridden by explicit label |
+| `label_metadata` | JSONB | NULLABLE | Additional action metadata |
+
+**Indexes:**
+- `ix_implicit_labels_vulnerability_id` on `vulnerability_id`
+- `ix_implicit_labels_label` on `label`
+- `ix_implicit_labels_source` on `source`
+- `ix_implicit_labels_is_active` on `is_active`
+- `ix_implicit_labels_created_at` on `created_at`
+- `ix_implicit_labels_vuln_active` on `(vulnerability_id, is_active)` composite
+
+**Relationships:**
+- Many-to-one with `vulnerabilities` (vulnerability_id, CASCADE DELETE)
+- Many-to-one with `users` (user_id, SET NULL on delete)
+
+**Label Mapping from Status Changes:**
+
+| Status | Label | Confidence | Rationale |
+|--------|-------|------------|-----------|
+| `fixed` | `confirmed` | 0.95 | User fixed it = was real |
+| `false_positive` | `false_positive` | 0.90 | Explicit FP marking |
+| `wont_fix` | `wont_fix` | 0.80 | Real but accepted risk |
+| `acknowledged` | `confirmed` | 0.60 | Lower confidence confirmation |
+
+**Integration with ML Training:**
+- Implicit labels are collected by `LabelAggregator`
+- Explicit labels take priority over implicit labels
+- `is_active=false` when overridden by explicit annotation
 
 ---
 
