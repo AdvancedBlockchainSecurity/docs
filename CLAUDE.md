@@ -51,6 +51,28 @@ All development must follow these standards (see `standards/` for full documenta
 3. **Backups**: MANDATORY backup before any database changes
 4. **Git Workflow**: Feature branch -> PR -> Review -> Merge (never direct to main)
 5. **Docker Builds**: Always use `--no-cache` flag
+6. **Report All Issues**: ALWAYS report discovered bugs, edge cases, or potential problems - even if not directly related to the current task
+
+### Issue Reporting
+
+**ALWAYS proactively report issues discovered during work:**
+
+- Bugs found in existing code (even if unrelated to current task)
+- Edge cases that could cause problems
+- Missing error handling or validation
+- Security concerns
+- Performance issues
+- Data integrity problems (e.g., empty fingerprints, malformed data)
+- Inconsistencies between documentation and implementation
+- Technical debt that should be tracked
+
+**Format:** When reporting issues, include:
+1. What was discovered
+2. Where it was found (file, function, line)
+3. Potential impact
+4. Suggested fix or investigation steps
+
+**Document discovered issues in:** `~/Git/TaskDocs-BlockSecOps/` or relevant workflow/playbook docs
 
 ### Standards Index
 
