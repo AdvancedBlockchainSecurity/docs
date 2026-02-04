@@ -57,6 +57,7 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 - **Support tickets:** User support ticket submissions with JIRA integration (February 2026)
 - **ML Data Preservation:** Soft delete vulnerabilities, contract archival, implicit labeling for ML training (February 2026)
 - **Multi-class Classification:** 4-class vulnerability classification (confirmed, false_positive, wont_fix, needs_review) (February 2026)
+- **Deduplication Audit Fixes:** Performance indexes, FK cascade behavior fix for canonical_finding_id (February 2026)
 
 **Total Tables:** 57 (excluding alembic_version)
 
@@ -788,7 +789,6 @@ Vulnerabilities support soft deletion to preserve ML training data. Soft-deleted
 - `ix_vulnerabilities_classification_method` on `classification_method` (Dedup Audit 2026-02-04)
 - `ix_vulnerabilities_deduplication_strategy` on `deduplication_strategy` (Dedup Audit 2026-02-04)
 - `ix_vulnerabilities_similarity_score` on `similarity_score` (Dedup Audit 2026-02-04)
-- `ix_vulnerabilities_multi_class_model_version` on `multi_class_model_version` (Dedup Audit 2026-02-04)
 
 **Relationships:**
 - Many-to-one with `scans` (scan_id, CASCADE DELETE - vulnerabilities are deleted when parent scan is deleted)
@@ -2862,13 +2862,23 @@ See [Platform Development Standards](/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPM
 
 ---
 
-**Document Version:** 1.7.0
-**Last Updated:** December 11, 2025 (Added favorites and annotations tables, 36 total tables)
+**Document Version:** 1.8.0
+**Last Updated:** February 4, 2026 (Added deduplication audit fixes - Migration 066)
 **Maintained By:** BlockSecOps Team
 
 ---
 
 ## Recent Schema Changes
+
+### Migration 066: Deduplication Audit Fixes (February 4, 2026)
+- Added indexes for improved query performance on classification/deduplication columns:
+  - `ix_vulnerabilities_classification_confidence`
+  - `ix_vulnerabilities_classification_method`
+  - `ix_vulnerabilities_deduplication_strategy`
+  - `ix_vulnerabilities_similarity_score`
+- Fixed `canonical_finding_id` FK in deduplication_groups: changed from CASCADE to SET NULL
+  - Preserves deduplication groups when canonical finding is deleted
+  - Prevents loss of audit history and group membership data
 
 ### Migration 017: Vulnerability Annotations (December 11, 2025)
 - Added `vulnerability_annotations` table for tracking vulnerability status

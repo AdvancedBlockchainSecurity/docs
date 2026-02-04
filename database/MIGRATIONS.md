@@ -1479,6 +1479,29 @@ asyncio.run(verify())
 
 ---
 
+### Migration 066: Deduplication Audit Fixes
+- **Status**: ✅ Completed
+- **Created**: February 4, 2026
+- **Revision ID**: `066_deduplication_audit_fixes`
+- **Previous Revision**: `065_multi_class_labels`
+- **Description**: Database fixes from comprehensive deduplication & vulnerability metadata audit
+- **Index Changes**:
+  - Added `ix_vulnerabilities_classification_confidence` for faster confidence-based queries
+  - Added `ix_vulnerabilities_classification_method` for filtering by classification method
+  - Added `ix_vulnerabilities_deduplication_strategy` for dedup strategy lookups
+  - Added `ix_vulnerabilities_similarity_score` for similarity-based queries
+- **FK Constraint Changes**:
+  - `deduplication_groups.canonical_finding_id`: Changed from CASCADE to SET NULL on delete
+  - Preserves deduplication groups when canonical finding is deleted
+  - Prevents loss of audit history and group membership data
+- **Why This Matters**:
+  - Query performance improvement for ML classification workflows
+  - Data integrity preservation during vulnerability cleanup operations
+- **Migration File**: `alembic/versions/20260204_0100-066_deduplication_audit_fixes.py`
+- **Related Documentation**: Plan file `glowing-inventing-sparkle.md` (Deduplication & Vulnerability Metadata Audit)
+
+---
+
 ### Creating Migrations
 ```bash
 # Generate migration from models
