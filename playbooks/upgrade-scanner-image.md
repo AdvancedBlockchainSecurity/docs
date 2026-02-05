@@ -1,7 +1,7 @@
 # Playbook: Upgrade Scanner Image
 
-**Version:** 1.0.0
-**Last Updated:** January 31, 2026
+**Version:** 1.2.0
+**Last Updated:** February 5, 2026
 
 ## Overview
 
@@ -366,6 +366,95 @@ kubectl get configmap scanner-versions -n tool-integration-local -o yaml | grep 
 kubectl rollout restart deployment/tool-integration -n tool-integration-local
 ```
 
+### Scanner Job Fails with JSON Parse Error (HTTP 500)
+
+**Symptoms:** Scanner shows "Degraded" status with failed jobs. Job logs show:
+```
+ERROR: Failed to post results to callback URL (HTTP 500)
+{"detail":"Expecting value: line 1 column 155 (char 154)"}
+```
+
+**Root Cause:** Scanner wrapper script generates invalid JSON when findings are empty. Common pattern:
+```bash
+# BUG: Returns empty string (not "0") when input is empty
+"total_findings": $(echo "$FINDINGS" | jq 'length'),
+# Produces: "total_findings": ,   <-- invalid JSON
+```
+
+**Fix Pattern:**
+```bash
+# 1. Guard against empty strings before jq validation
+if [ -z "$FINDINGS" ] || ! echo "$FINDINGS" | jq empty 2>/dev/null; then
+    FINDINGS="[]"
+fi
+
+# 2. Pre-compute counts with fallback
+TOTAL_FINDINGS=$(echo "$FINDINGS" | jq 'length' 2>/dev/null || echo "0")
+if [ -z "$TOTAL_FINDINGS" ]; then
+    TOTAL_FINDINGS=0
+fi
+
+# 3. Use pre-computed variable in JSON output
+"total_findings": $TOTAL_FINDINGS,
+```
+
+**Key Lesson:** `jq empty` on an empty string returns exit 0 (no error), and `jq 'length'` on empty string returns no output (not "0"). Always check `[ -z "$VAR" ]` before piping to jq.
+
+**See:** [Semgrep JSON Fix (2026-02-05)](../changelogs/ADMIN-SYSTEM-FIXES-2026-02-05.md#issue-2-semgrep-degraded-status-json-generation-bug)
+
+---
+
+## Admin Dashboard Upgrade (Full Pipeline)
+
+As of API Service v0.25.9, the Admin Dashboard "Upgrade" button runs the **full scanner upgrade pipeline** automatically: ConfigMap update, detector comparison, pattern seeding, and audit validation.
+
+**Location:** Admin System → Security Scanners table → "Upgrade" button (shown when `latest_version ≠ version`)
+
+**What this does:**
+1. Updates `SCANNER_METADATA` version in the `scanner-versions` ConfigMap
+2. Restarts the tool-integration deployment
+3. Runs detector comparison (identifies new/changed/removed detectors)
+4. Seeds patterns for unmapped vulnerabilities (creates BVD codes and mappings)
+5. Runs audit validation (calculates coverage and health score)
+6. Logs the action in the admin audit trail
+7. Displays pipeline results in the confirmation dialog
+
+**What this does NOT do:**
+- Rebuild the Docker scanner image (Steps 2-4 of this playbook)
+- Run deduplication maintenance (handled by daily CronJob at 2AM UTC)
+
+**When to use:** Use the Admin Dashboard button after the Docker image has been rebuilt and pushed to Harbor. The button handles both metadata updates and database-side intelligence operations (detector comparison, pattern seeding, audit). For the full image rebuild + pipeline, follow Steps 1-8 of this playbook first, then click "Upgrade" in the Admin Dashboard.
+
+**See:** [Scanner Upgrade Workflow](../workflows/scanner-upgrade-workflow.md) for full workflow details and [Scanner Upgrade Pipeline](../pipelines/scanner-upgrade-pipeline.md) for pipeline architecture.
+
+---
+
+## Full Upgrade Pipeline Scripts
+
+After completing the image build and ConfigMap update (Steps 1-8), use these scripts for detector comparison and pattern seeding:
+
+```bash
+cd /home/pwner/Git/blocksecops-api-service
+
+# Detector comparison (identify added/removed detectors)
+DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/solidity_security" \
+  .venv/bin/python scripts/upgrade_scanner.py --scanner <scanner_id> --new-version <version>
+
+# Pattern seeding - dry-run first
+DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/solidity_security" \
+  .venv/bin/python scripts/seed_scanner_patterns.py --scanner <scanner_id> --dry-run
+
+# Pattern seeding - apply
+DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/solidity_security" \
+  .venv/bin/python scripts/seed_scanner_patterns.py --scanner <scanner_id> --apply
+
+# Audit validation
+DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/solidity_security" \
+  .venv/bin/python scripts/audit_scanner_upgrade.py --scanner <scanner_id>
+```
+
+Deduplication maintenance runs automatically via daily CronJob (2AM UTC).
+
 ---
 
 ## Checklist
@@ -373,7 +462,7 @@ kubectl rollout restart deployment/tool-integration -n tool-integration-local
 - [ ] Database backup created (if existing findings)
 - [ ] Old findings deleted (if clean slate preferred)
 - [ ] Dockerfile updated with correct versions
-- [ ] Image built with `--no-cache` flag
+- [ ] Image built
 - [ ] Image pushed to Harbor registry
 - [ ] Base ConfigMap updated (version + note)
 - [ ] Local overlay patch updated
@@ -381,15 +470,19 @@ kubectl rollout restart deployment/tool-integration -n tool-integration-local
 - [ ] Pod healthy (1/1 Ready)
 - [ ] Test scan completes successfully
 - [ ] New findings appear in database
-- [ ] Pattern seeding runs without errors (if needed)
+- [ ] Detector comparison script run (if new version has detector changes)
+- [ ] Pattern seeding runs without errors (if new detectors found)
+- [ ] Audit validation passes
 - [ ] Changes committed to Git
 
 ---
 
 ## Related Documentation
 
+- [Scanner Upgrade Workflow](../workflows/scanner-upgrade-workflow.md) - Full automated pipeline overview
 - [Docker Image Versioning Standards](../standards/docker-image-versioning.md)
 - [Tool Metadata ConfigMaps Standard](../standards/tool-metadata-configmaps.md)
 - [Docker Base Images Standard](../standards/docker-base-images.md)
 - [Deploy New Image Playbook](deploy-new-image.md)
 - [Database Management Standards](../standards/database-management.md)
+- [Scanner Version Tracking Database](../database/SCANNER-VERSION-TRACKING.md)

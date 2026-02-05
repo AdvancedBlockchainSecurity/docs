@@ -1,7 +1,7 @@
 # Platform Development Standards - Index
 
-**Version:** 2.3.0
-**Last Updated:** February 1, 2026
+**Version:** 2.4.0
+**Last Updated:** February 5, 2026
 **Status:** Active
 
 ## Overview
@@ -214,6 +214,14 @@ These standards ensure proper versioning and configuration management:
     - Volume mounts for read-only root filesystem
     - Troubleshooting pod lifecycle issues
 
+24. **[Kustomize Standards](./kustomize-standards.md)** [NEW]
+    - Base vs overlay directory structure
+    - Patch file naming conventions
+    - Environment-specific configuration patterns
+    - Image versioning integration with pyproject.toml/package.json
+    - Common patterns and anti-patterns
+    - Validation and troubleshooting
+
 ### ✅ Compliance & Verification
 
 24. **[Compliance Checklist](./compliance-checklist.md)**
@@ -276,7 +284,8 @@ docs/standards/
 ├── ingress-networking.md
 ├── api-endpoint-auth.md           # NEW: API authentication and scope enforcement
 ├── tier-standards.md
-└── kubernetes-pod-lifecycle.md    # NEW: Pod lifecycle, security contexts, NetworkPolicies
+├── kubernetes-pod-lifecycle.md    # NEW: Pod lifecycle, security contexts, NetworkPolicies
+└── kustomize-standards.md         # NEW: Kustomize base/overlay patterns
 ```
 
 ## Referencing Standards in Claude Code

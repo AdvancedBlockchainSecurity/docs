@@ -322,7 +322,7 @@ secret/
 | Secret | Value | Notes |
 |--------|-------|-------|
 | PostgreSQL | `postgres` | All services use same credentials |
-| Redis | `redis123` | Standardized across all services |
+| Redis | `blocksecops-redis-password` | Standardized across all services |
 | JWT Secret | `local-dev-jwt-secret-key-change-in-production` | |
 | Session Secret | `local-dev-session-secret-change-in-production` | |
 

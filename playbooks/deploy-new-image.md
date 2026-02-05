@@ -1,7 +1,7 @@
 # Playbook: Deploy New Image to Cluster
 
-**Version:** 1.0.0
-**Last Updated:** January 22, 2026
+**Version:** 1.1.0
+**Last Updated:** February 5, 2026
 
 ## Overview
 
@@ -238,10 +238,15 @@ kubectl get pods -n dashboard-local -l app.kubernetes.io/name=dashboard
 ### Verify Image Version
 
 ```bash
-# Check running image
+# Check running image (Deployment)
 kubectl get deployment api-service -n api-service-local \
   -o jsonpath='{.spec.template.spec.containers[0].image}'
+
+# Check CronJob image (if applicable)
+kubectl get cronjob -n api-service-local -o custom-columns='NAME:.metadata.name,IMAGE:.spec.jobTemplate.spec.template.spec.containers[0].image'
 ```
+
+**IMPORTANT:** Kustomize `images` block applies to ALL resources. Both Deployments AND CronJobs will use the same version tag.
 
 ### Health Check
 
@@ -358,6 +363,7 @@ kubectl delete pods -n api-service-local -l app.kubernetes.io/name=api-service
 - [ ] Kustomization.yaml updated with new tag
 - [ ] Deployment applied
 - [ ] Rollout completed successfully
+- [ ] CronJobs verified (same image as Deployment)
 - [ ] Health check passed
 - [ ] Smoke test passed (manual verification)
 
