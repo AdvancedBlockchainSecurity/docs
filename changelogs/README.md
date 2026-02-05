@@ -1,7 +1,7 @@
 # BlockSecOps Changelogs
 
 **Purpose:** Centralized changelog directory for all BlockSecOps platform changes
-**Last Updated:** February 3, 2026
+**Last Updated:** February 4, 2026
 **Status:** Active
 
 ---
@@ -17,6 +17,39 @@ Changelogs are organized by component and maintained chronologically. Each chang
 ---
 
 ## Available Changelogs
+
+### 0. Deduplication Metadata Audit Fixes (`DEDUPLICATION-METADATA-AUDIT-FIXES-2026-02-04.md`)
+
+**Component:** blocksecops-api-service, blocksecops-tool-integration
+**Scope:** Comprehensive audit fixes for deduplication and vulnerability metadata
+**Date:** February 4, 2026
+
+**Key Changes:**
+- Migration 066: Added 4 indexes for classification columns
+- Fixed FK cascade behavior (SET NULL instead of CASCADE)
+- Semantic fingerprinting implementation
+- SlitherParser scanner_id fallback fix
+- API Service 0.25.4, Tool Integration 0.3.12
+
+**Use When:**
+- Understanding deduplication system fixes
+- Debugging fingerprinting issues
+- Reviewing database schema changes
+
+### 0. Dashboard v0.38.1 Vulnerability Modal Link
+
+**Component:** blocksecops-dashboard
+**Scope:** Added "View Full Details" button in vulnerability modal
+**Date:** February 4, 2026
+
+**Key Changes:**
+- New "View Full Details" button in scan results vulnerability modal
+- Links to `/vulnerabilities/{id}` for full vulnerability detail page
+- Dashboard 0.38.1
+
+**Use When:**
+- Understanding scan results UI changes
+- Documenting vulnerability viewing workflow
 
 ### 0. Test Suite Maintenance (`TEST-SUITE-MAINTENANCE-2026-02-03.md`)
 

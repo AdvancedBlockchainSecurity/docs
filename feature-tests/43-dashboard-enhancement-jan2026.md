@@ -22,6 +22,10 @@ Manual testing checklist for dashboard enhancements implemented in January 2026.
 6. [New Pages (Users, Roles, RecentScans)](#6-new-pages)
 7. [PDF Export Branding](#7-pdf-export-branding)
 8. [Pattern ID to BVD-ID Rename](#8-pattern-id-to-bvd-id-rename)
+9. [Organizations Role-Based Permissions](#organizations-role-based-permissions)
+10. [Webhooks UI](#10-webhooks-ui)
+11. [Webhook Test Feature](#11-webhook-test-feature)
+12. [Vulnerability Modal "View Full Details" Button](#12-vulnerability-modal-view-full-details-button-v0381)
 
 ---
 
@@ -308,11 +312,42 @@ Manual testing checklist for dashboard enhancements implemented in January 2026.
 
 ---
 
+## 12. Vulnerability Modal "View Full Details" Button (v0.38.1)
+
+### Test 12.1: Button Visibility
+
+**Precondition:** User has scans with vulnerabilities
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Navigate to Scan Results | Scan results page loads | [ ] |
+| 2 | Click on a vulnerability | Vulnerability modal opens | [ ] |
+| 3 | Look at modal footer | "View Full Details" blue button visible | [ ] |
+
+### Test 12.2: Button Navigation
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Open vulnerability modal | Modal opens | [ ] |
+| 2 | Click "View Full Details" | Navigates to /vulnerabilities/{id} | [ ] |
+| 3 | Verify page content | Full vulnerability detail page loads | [ ] |
+
+### Test 12.3: Button Styling
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Open vulnerability modal | Modal opens | [ ] |
+| 2 | Observe button styling | Blue primary button (bg-blue-600) | [ ] |
+| 3 | Hover over button | Hover state visible (darker blue) | [ ] |
+
+---
+
 ## Test Notes
 
 ```
 [Date] | [Tester] | [Section] | [Result]
 2026-01-22 | Claude Code | Implementation | COMPLETE - All features implemented
+2026-02-04 | Claude Code | Section 12 | ADDED - View Full Details button tests
 ```
 
 ---
