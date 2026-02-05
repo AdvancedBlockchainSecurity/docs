@@ -1,8 +1,8 @@
 # Admin Portal Deployment Playbook
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Created:** 2026-02-02
-**Updated:** 2026-02-03
+**Updated:** 2026-02-05
 **Component:** blocksecops-admin-portal
 
 ---
@@ -338,8 +338,68 @@ Before deploying to production:
 
 ---
 
+## Post-Deployment Health Verification
+
+After deploying admin portal, verify the System page health monitoring:
+
+### Dashboard Metrics Verification
+
+```bash
+# Access admin portal
+# Local: http://admin.blocksecops.local:3000
+# Server: http://admin.blocksecops.local
+
+# Verify dashboard loads and shows all 8 KPI cards
+# Verify system health panel shows component statuses
+```
+
+### System Page Verification
+
+```bash
+# Platform Services should show:
+# - API Service: status + response time in ms (not "-")
+# - All other services: status + response time
+
+# Security Scanners should show:
+# - All scanners with "Available" status (no "Degraded")
+# - Scanner versions displayed
+
+# If API Service response time shows "-":
+# Check AdminSystem.tsx for responseTime assignment in isApiService branch
+# See: docs/changelogs/ADMIN-SYSTEM-FIXES-2026-02-05.md
+
+# If any scanner shows "Degraded":
+# Check scanner job logs for HTTP 500 errors
+# Likely JSON generation bug in scanner wrapper - see upgrade-scanner-image.md troubleshooting
+```
+
+### Build with OCI Labels (Required)
+
+When building for server deployment, include OCI labels per standards:
+
+```bash
+VERSION=$(grep '"version"' package.json | head -1 | cut -d'"' -f4)
+SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')
+SUPABASE_KEY=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_anon_key}')
+
+docker build \
+  --build-arg VITE_ADMIN_SUPABASE_URL=${SUPABASE_URL} \
+  --build-arg VITE_ADMIN_SUPABASE_ANON_KEY=${SUPABASE_KEY} \
+  --build-arg VITE_ENVIRONMENT=local \
+  --build-arg SERVICE_VERSION=${VERSION} \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(git rev-parse --short HEAD) \
+  -t harbor.blocksecops.local/blocksecops/admin-portal:${VERSION} .
+```
+
+> **Note:** Admin portal shares the same Supabase project as the customer dashboard. Credentials can be sourced from the `dashboard-config` ConfigMap in the `dashboard-local` namespace.
+
+---
+
 ## Related Documentation
 
 - [Platform Admin Guide](../admin/platform-admin.md)
 - [Security Hardening](../../TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-24-SECURITY-HARDENING.md)
 - [Admin Portal Isolation](../../TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-02-ADMIN-PORTAL-ISOLATION.md)
+- [Admin System Fixes (2026-02-05)](../changelogs/ADMIN-SYSTEM-FIXES-2026-02-05.md)
+- [Admin Dashboard Metrics Feature Test](../feature-tests/56-admin-dashboard-metrics.md)

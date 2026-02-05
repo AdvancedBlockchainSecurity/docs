@@ -43,6 +43,17 @@ Security scanner integration, management, and troubleshooting guides for the Blo
   - Detector additions
   - Breaking change handling
 
+- **[Scanner Upgrade Workflow](../workflows/scanner-upgrade-workflow.md)** - Automated upgrade pipeline
+  - Admin Dashboard one-click upgrade (metadata only)
+  - Full pipeline: version update → image build → detector comparison → pattern seeding → audit
+  - CLI scripts: `upgrade_scanner.py`, `seed_scanner_patterns.py`, `audit_scanner_upgrade.py`
+
+- **[Upgrade Scanner Image Playbook](../playbooks/upgrade-scanner-image.md)** - Step-by-step manual upgrade
+  - Docker image build and push
+  - ConfigMap updates
+  - Test scan verification
+  - Pattern seeding
+
 - **[Scanner Removal Guide](SCANNER-REMOVAL-GUIDE.md)** - Remove scanners safely
   - Deprecation process
   - Database cleanup

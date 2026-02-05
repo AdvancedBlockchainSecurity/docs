@@ -1,7 +1,7 @@
 # Service Access Standards
 
-**Version:** 3.0.0
-**Last Updated:** January 15, 2026
+**Version:** 3.1.0
+**Last Updated:** February 5, 2026
 **Status:** Active
 
 ## Overview
@@ -119,6 +119,21 @@ echo "127.0.0.1  app.blocksecops.local" | sudo tee -a /etc/hosts
 | **5432** | PostgreSQL | `postgresql-local` | 5432 | Main database (optional) |
 | **6379** | Redis | `redis-local` | 6379 | Cache & session store (optional) |
 | **8200** | Vault | `vault-local` | 8200 | Secret management |
+
+### Internal Service Health Endpoints
+
+These URLs are used for service-to-service health checks (e.g., Admin System page):
+
+| Service | Internal URL | Health Path | Response Key |
+|---------|--------------|-------------|--------------|
+| Tool Integration | `http://tool-integration.tool-integration-local.svc.cluster.local:8005` | `/health` | `status` |
+| Orchestration | `http://orchestration.orchestration-local.svc.cluster.local:8004` | `/api/v1/health/live` | `status` |
+| Notification | `http://notification.notification-local.svc.cluster.local:8003` | `/api/v1/health/live` | `status` |
+| Intelligence Engine | `http://intelligence-engine.intelligence-engine-local.svc.cluster.local:80` | `/health` | `status` |
+| Data Service | `http://data-service.data-service-local.svc.cluster.local:8001` | `/` | `status` |
+| Contract Parser | `http://contract-parser.contract-parser-local.svc.cluster.local:80` | `/health` | `status` |
+
+**Note:** These URLs follow Kubernetes DNS format: `<service>.<namespace>.svc.cluster.local:<port>`
 
 > **Note:** Harbor is deployed but **not used for local development**. Images are built directly into minikube's Docker daemon using `eval $(minikube docker-env)`. See [Local Development Setup](./local-development-setup.md) for details.
 

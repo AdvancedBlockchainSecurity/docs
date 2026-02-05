@@ -18,6 +18,26 @@ Changelogs are organized by component and maintained chronologically. Each chang
 
 ## Available Changelogs
 
+### 0. Admin Portal Dashboard Enhancement (`ADMIN-PORTAL-DASHBOARD-2026-02-04.md`)
+
+**Component:** blocksecops-admin-portal
+**Scope:** Comprehensive metrics dashboard for platform administrators
+**Date:** February 4, 2026
+
+**Key Changes:**
+- Complete dashboard rewrite with 8 primary KPI cards
+- Real-time system health monitoring
+- Revenue & transaction analytics
+- Vulnerability and deduplication statistics
+- Intelligence database metrics
+- Auto-refresh every 60 seconds
+- Admin Portal 0.1.5
+
+**Use When:**
+- Understanding admin dashboard features
+- Debugging admin portal metrics
+- Adding new dashboard panels
+
 ### 0. Deduplication Metadata Audit Fixes (`DEDUPLICATION-METADATA-AUDIT-FIXES-2026-02-04.md`)
 
 **Component:** blocksecops-api-service, blocksecops-tool-integration

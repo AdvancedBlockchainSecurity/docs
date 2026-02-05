@@ -415,7 +415,7 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
 - slither (0.11.5, solc-select 1.1.0) - scanner-slither:0.2.0 - 101/101 detectors (100%) ✅
 - aderyn (0.6.7) - scanner-aderyn:0.7.0 (pre-built binary) - 87/87 detectors (100%) ✅
 - wake (eth-wake 4.21.0) - scanner-wake:0.3.4 ✅
-- semgrep (1.141.0) - scanner-semgrep:0.3.0 - 43/47 detectors (91.5%)
+- semgrep (1.141.0) - scanner-semgrep:0.3.2 - 43/47 detectors (91.5%) - Fixed JSON generation bug (2026-02-05)
 - solhint (6.0.2) - scanner-solhint:0.3.0 - 16/20 detectors (80%) ✅ FIXED
 - echidna (2.2.7, solc-select 1.1.0) - scanner-echidna:0.2.0 - fuzzer
 - medusa (1.3.1) - scanner-medusa:0.2.0 - fuzzer
@@ -439,6 +439,13 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
 - starknet-foundry (0.50.0) - fuzzer ❌ Unavailable (no Docker image)
 
 ### Recent Updates Recorded
+
+- **2026-02-05**: Semgrep Scanner Wrapper 0.3.2 Bug Fix
+  - **Semgrep**: Image 0.3.1 → 0.3.2 (tool version remains 1.141.0)
+  - Fixed JSON generation bug when findings are empty (invalid JSON at char 154)
+  - Root cause: `jq 'length'` on empty string returns no output, creating `"total_findings": ,`
+  - Added empty string guard + pre-computed TOTAL_FINDINGS with fallback to 0
+  - See: `docs/changelogs/ADMIN-SYSTEM-FIXES-2026-02-05.md`
 
 - **2026-01-31**: SolidityDefend Scanner Wrapper 0.5.0 Upgrade
   - **SolidityDefend**: Image 0.4.0 → 0.5.0 (tool version remains 1.10.3)
@@ -575,14 +582,18 @@ SELECT * FROM scanner_versions WHERE scanner_name = 'slither';
 
 ## Future Enhancements
 
+### Implemented
+
+1. **GitHub Version Checking**: Tool-integration service checks GitHub API for latest versions (1-hour cache) - see `GITHUB_REPOS` in `blocksecops-tool-integration/src/main.py`
+2. **Admin Dashboard Upgrade**: Admin System page shows version indicators and "Upgrade" button for one-click ConfigMap metadata updates - see [Scanner Upgrade Workflow](../workflows/scanner-upgrade-workflow.md)
+3. **Audit Logging**: Scanner upgrades via admin dashboard are logged in the admin audit trail (`admin.scanner.upgrade` action)
+
 ### Potential Additions
 
-1. **API Integration**: Automatically check GitHub/PyPI for latest versions
-2. **Alerting**: Trigger alerts when scanners become outdated
-3. **CI/CD Integration**: Auto-update database from CI pipeline
-4. **Web Dashboard**: Build web UI on top of database
-5. **Version Comparison API**: Expose version data via REST API
-6. **Automated Release Tracking**: Scrape GitHub releases periodically
+1. **Alerting**: Trigger alerts when scanners become outdated
+2. **CI/CD Integration**: Auto-update database from CI pipeline
+3. **Full Pipeline Automation**: Integrate detector comparison, pattern seeding, and audit validation into the admin dashboard upgrade flow
+4. **Automated Release Tracking**: Scrape GitHub releases periodically
 
 ### Schema Extensions
 
@@ -646,5 +657,5 @@ SELECT record_scanner_update('scanner_name', 'new_version', 'new_image_tag');
 ---
 
 **Created**: 2025-10-30
-**Last Updated**: 2026-01-19
+**Last Updated**: 2026-02-05
 **Maintained By**: BlockSecOps Platform Team
