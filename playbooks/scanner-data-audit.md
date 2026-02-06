@@ -1,0 +1,476 @@
+# Playbook: Scanner Data Audit
+
+**Version:** 1.0.0
+**Last Updated:** February 6, 2026
+
+## Overview
+
+This playbook provides a systematic audit of scanner data integrity, pattern mappings, fingerprints, deduplication groups, and ConfigMap consistency. Run this audit after scanner upgrades, clean-slate operations, or periodically to detect data drift.
+
+---
+
+## Prerequisites
+
+- [ ] PostgreSQL accessible (kubectl exec or port-forward)
+- [ ] API service running
+- [ ] Tool-integration service running
+- [ ] Valid JWT token for API authentication
+- [ ] Database backup created before any fixes
+
+---
+
+## Quick Reference
+
+```bash
+# Full audit cycle
+1. Pre-flight: service health checks
+2. Scanner data overview (vuln counts, missing fields)
+3. ConfigMap version consistency check
+4. Fingerprint coverage analysis
+5. Pattern mapping gap analysis
+6. Deduplication group integrity check
+7. Scan severity count accuracy check
+8. API endpoint verification
+9. ML training data review
+10. Generate report and prioritize fixes
+```
+
+---
+
+## Phase 1: Pre-Flight Checks
+
+### 1.1 Service Health
+
+```bash
+# API Service
+curl -sL https://app.blocksecops.local/api/v1/health/ready | jq '.'
+
+# Tool Integration (from inside pod)
+kubectl exec -n tool-integration-local deployment/tool-integration -- \
+  curl -s http://localhost:8005/health
+
+# PostgreSQL
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U blocksecops -d solidity_security -c "SELECT 1 AS connected;"
+```
+
+### 1.2 Get Auth Token
+
+```bash
+SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')
+SUPABASE_KEY=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_anon_key}')
+TOKEN=$(curl -s "${SUPABASE_URL}/auth/v1/token?grant_type=password" \
+  -H "apikey: ${SUPABASE_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"<EMAIL>","password":"<PASSWORD>"}' | jq -r '.access_token')
+```
+
+### 1.3 Database Backup
+
+```bash
+kubectl exec -n postgresql-local postgresql-0 -- pg_dump \
+  -U blocksecops -d solidity_security -F c \
+  -f /tmp/pre_audit_backup.dump
+kubectl cp postgresql-local/postgresql-0:/tmp/pre_audit_backup.dump \
+  ~/backups/solidity_security_$(date +%Y%m%d_%H%M%S)_pre_audit.dump
+```
+
+---
+
+## Phase 2: Scanner Data Overview
+
+### 2.1 Vulnerability Counts and Missing Fields
+
+```sql
+SELECT
+  scanner_id,
+  COUNT(*) AS total_vulns,
+  COUNT(*) FILTER (WHERE fingerprint_composite IS NULL OR fingerprint_composite = '') AS missing_fingerprint,
+  COUNT(*) FILTER (WHERE pattern_id IS NULL OR pattern_id = '') AS missing_pattern,
+  COUNT(*) FILTER (WHERE deduplication_group_id IS NULL) AS ungrouped
+FROM vulnerabilities
+GROUP BY scanner_id
+ORDER BY total_vulns DESC;
+```
+
+**What to look for:**
+- `missing_fingerprint` should be 0 (or near 0) for all scanners
+- `missing_pattern` should be 0 for scanners with mapped detectors
+- `ungrouped` near 0 indicates healthy deduplication
+
+### 2.2 Severity Distribution
+
+```sql
+SELECT scanner_id, severity, COUNT(*) AS cnt
+FROM vulnerabilities
+GROUP BY scanner_id, severity
+ORDER BY scanner_id, severity;
+```
+
+**What to look for:**
+- No `info` or `informational` severity values (not in DB enum)
+- Distribution should match expected scanner behavior
+
+### 2.3 Data Integrity Checks
+
+```sql
+-- NULL scanner_id or category
+SELECT COUNT(*) AS null_scanner FROM vulnerabilities
+WHERE scanner_id IS NULL OR scanner_id = '';
+
+SELECT COUNT(*) AS null_category FROM vulnerabilities
+WHERE category IS NULL OR category = '';
+
+-- Orphaned dedup groups (canonical points to deleted vuln)
+SELECT COUNT(*) AS orphaned_groups
+FROM deduplication_groups dg
+LEFT JOIN vulnerabilities v ON dg.canonical_finding_id = v.id
+WHERE v.id IS NULL;
+```
+
+**Expected:** All counts should be 0.
+
+---
+
+## Phase 3: ConfigMap Version Consistency
+
+### 3.1 Compare API Service vs Tool-Integration
+
+```bash
+echo "=== API Service ===" && \
+kubectl get cm scanner-versions -n api-service-local \
+  -o jsonpath='{.data.SCANNER_METADATA}' | jq 'to_entries[] | "\(.key): \(.value.version)"' -r
+
+echo "=== Tool Integration ===" && \
+kubectl get cm scanner-versions -n tool-integration-local \
+  -o jsonpath='{.data.SCANNER_METADATA}' | jq 'to_entries[] | "\(.key): \(.value.version)"' -r
+```
+
+**What to look for:** Versions must match between both ConfigMaps. The tool-integration ConfigMap is the source of truth (updated by admin dashboard upgrades).
+
+### 3.2 Compare API Response vs ConfigMap
+
+```bash
+curl -sk "https://app.blocksecops.local/api/v1/scanners" \
+  -H "Authorization: Bearer $TOKEN" | jq '[.scanners[] | {id, version}]'
+```
+
+**What to look for:** API response versions should match the API service ConfigMap.
+
+### 3.3 Fix: Sync Stale ConfigMap
+
+If versions are mismatched, copy `SCANNER_METADATA` from the tool-integration base ConfigMap to the API service ConfigMap:
+
+**Source:** `blocksecops-tool-integration/k8s/base/scanner-versions-configmap.yaml`
+**Target:** `blocksecops-api-service/k8s/overlays/local/api-service/scanner-versions-configmap.yaml`
+
+```bash
+# After updating the file in Git:
+kubectl apply -k /home/pwner/Git/blocksecops-api-service/k8s/overlays/local/api-service/
+kubectl rollout restart deployment/api-service -n api-service-local
+kubectl rollout status deployment/api-service -n api-service-local --timeout=120s
+```
+
+---
+
+## Phase 4: Fingerprint Coverage
+
+### 4.1 Fingerprint Field Breakdown
+
+```sql
+SELECT scanner_id,
+  COUNT(*) AS total,
+  COUNT(*) FILTER (WHERE fingerprint_code IS NOT NULL AND fingerprint_code != '') AS fp_code,
+  COUNT(*) FILTER (WHERE fingerprint_ast IS NOT NULL AND fingerprint_ast != '') AS fp_ast,
+  COUNT(*) FILTER (WHERE fingerprint_location IS NOT NULL AND fingerprint_location != '') AS fp_location,
+  COUNT(*) FILTER (WHERE fingerprint_semantic IS NOT NULL AND fingerprint_semantic != '') AS fp_semantic,
+  COUNT(*) FILTER (WHERE fingerprint_composite IS NOT NULL AND fingerprint_composite != '') AS fp_composite
+FROM vulnerabilities
+GROUP BY scanner_id
+ORDER BY scanner_id;
+```
+
+**What to look for:**
+- `fp_composite` should be populated for all vulnerabilities with `fp_code` or `fp_location`
+- If `fp_composite` is 0 but components exist, dedup maintenance backfill is needed
+- If a scanner has near-zero fingerprints (all components), the scanner wrapper may not be generating them
+
+### 4.2 Fix: Run Fingerprint Backfill
+
+```bash
+# Via API endpoint
+curl -sk -X POST "https://app.blocksecops.local/api/v1/deduplication/maintenance/run-full-backfill" \
+  -H "Authorization: Bearer $TOKEN" | jq '.'
+```
+
+Or via CLI:
+
+```bash
+cd /home/pwner/Git/blocksecops-api-service
+DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/solidity_security" \
+  .venv/bin/python -c "
+from src.infrastructure.tasks.deduplication_maintenance import run_full_maintenance
+import asyncio
+asyncio.run(run_full_maintenance())
+"
+```
+
+---
+
+## Phase 5: Pattern Mapping Gaps
+
+### 5.1 Find Unmapped Detectors
+
+```sql
+SELECT v.scanner_id, v.category AS detector_id, COUNT(*) AS vuln_count
+FROM vulnerabilities v
+LEFT JOIN pattern_tool_mappings ptm
+  ON v.scanner_id = ptm.scanner_id AND v.category = ptm.detector_id
+WHERE ptm.id IS NULL
+  AND v.category IS NOT NULL AND v.category != ''
+GROUP BY v.scanner_id, v.category
+ORDER BY v.scanner_id, vuln_count DESC;
+```
+
+### 5.2 Check Mapping Status Per Category
+
+```sql
+SELECT v.scanner_id, v.category,
+  CASE
+    WHEN EXISTS (
+      SELECT 1 FROM pattern_tool_mappings ptm
+      WHERE ptm.scanner_id = v.scanner_id AND ptm.detector_id = v.category
+    ) THEN 'MAPPED'
+    ELSE 'UNMAPPED'
+  END AS mapping_status,
+  COUNT(*) AS vuln_count,
+  COUNT(*) FILTER (WHERE v.pattern_id IS NOT NULL AND v.pattern_id != '') AS has_pattern_id
+FROM vulnerabilities v
+GROUP BY v.scanner_id, v.category
+ORDER BY v.scanner_id, vuln_count DESC;
+```
+
+**What to look for:**
+- High-count UNMAPPED categories indicate scanner wrappers outputting broad category names instead of specific detector IDs
+- `has_pattern_id` > 0 for UNMAPPED categories means some vulns were assigned patterns through other mechanisms
+
+### 5.3 Pattern Mapping Coverage Summary
+
+```sql
+SELECT ptm.scanner_id, COUNT(DISTINCT ptm.detector_id) AS mapped_detectors
+FROM pattern_tool_mappings ptm
+WHERE ptm.is_active = true
+GROUP BY ptm.scanner_id
+ORDER BY ptm.scanner_id;
+```
+
+### 5.4 Fix: Seed Missing Patterns
+
+```bash
+cd /home/pwner/Git/blocksecops-api-service
+
+# Dry-run
+DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/solidity_security" \
+  .venv/bin/python scripts/seed_scanner_patterns.py --scanner <scanner_id> --dry-run
+
+# Apply
+DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/solidity_security" \
+  .venv/bin/python scripts/seed_scanner_patterns.py --scanner <scanner_id> --apply
+```
+
+---
+
+## Phase 6: Deduplication Group Integrity
+
+### 6.1 Group Size Mismatches
+
+```sql
+SELECT dg.id, dg.group_size AS recorded_size,
+  (SELECT COUNT(*) FROM vulnerabilities v
+   WHERE v.deduplication_group_id = dg.id) AS actual_size,
+  dg.strategy
+FROM deduplication_groups dg
+WHERE dg.group_size != (
+  SELECT COUNT(*) FROM vulnerabilities v
+  WHERE v.deduplication_group_id = dg.id
+)
+ORDER BY dg.group_size DESC;
+```
+
+### 6.2 Fix: Recalculate Group Sizes
+
+```sql
+-- MANDATORY: Create backup before running
+UPDATE deduplication_groups
+SET group_size = (
+  SELECT COUNT(*) FROM vulnerabilities
+  WHERE deduplication_group_id = deduplication_groups.id
+)
+WHERE group_size != (
+  SELECT COUNT(*) FROM vulnerabilities
+  WHERE deduplication_group_id = deduplication_groups.id
+);
+```
+
+### 6.3 Verify Fix
+
+```sql
+SELECT COUNT(*) AS remaining_mismatches
+FROM deduplication_groups dg
+WHERE dg.group_size != (
+  SELECT COUNT(*) FROM vulnerabilities v
+  WHERE v.deduplication_group_id = dg.id
+);
+-- Expected: 0
+```
+
+---
+
+## Phase 7: Scan Severity Count Accuracy
+
+### 7.1 Find Scans with Wrong Counts
+
+```sql
+SELECT s.id,
+  s.critical_count, s.high_count, s.medium_count, s.low_count,
+  (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'critical') AS actual_critical,
+  (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'high') AS actual_high,
+  (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'medium') AS actual_medium,
+  (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'low') AS actual_low
+FROM scans s
+WHERE s.critical_count != (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'critical')
+   OR s.high_count != (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'high')
+   OR s.medium_count != (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'medium')
+   OR s.low_count != (SELECT COUNT(*) FROM vulnerabilities v WHERE v.scan_id = s.id AND v.severity = 'low');
+```
+
+### 7.2 Fix: Recalculate Severity Counts
+
+```sql
+UPDATE scans SET
+  critical_count = (SELECT COUNT(*) FROM vulnerabilities WHERE scan_id = scans.id AND severity = 'critical'),
+  high_count = (SELECT COUNT(*) FROM vulnerabilities WHERE scan_id = scans.id AND severity = 'high'),
+  medium_count = (SELECT COUNT(*) FROM vulnerabilities WHERE scan_id = scans.id AND severity = 'medium'),
+  low_count = (SELECT COUNT(*) FROM vulnerabilities WHERE scan_id = scans.id AND severity = 'low')
+WHERE critical_count != (SELECT COUNT(*) FROM vulnerabilities WHERE scan_id = scans.id AND severity = 'critical')
+   OR high_count != (SELECT COUNT(*) FROM vulnerabilities WHERE scan_id = scans.id AND severity = 'high')
+   OR medium_count != (SELECT COUNT(*) FROM vulnerabilities WHERE scan_id = scans.id AND severity = 'medium')
+   OR low_count != (SELECT COUNT(*) FROM vulnerabilities WHERE scan_id = scans.id AND severity = 'low');
+```
+
+---
+
+## Phase 8: API Endpoint Verification
+
+### 8.1 Scanner List
+
+```bash
+curl -sk "https://app.blocksecops.local/api/v1/scanners" \
+  -H "Authorization: Bearer $TOKEN" | jq '{count: (.scanners | length), ids: [.scanners[].id]}'
+```
+
+### 8.2 Scanner Effectiveness
+
+```bash
+curl -sk "https://app.blocksecops.local/api/v1/analytics/scanner-effectiveness" \
+  -H "Authorization: Bearer $TOKEN" | \
+  jq '.scanners[] | {scanner_id, total_findings, unique_findings, overlap_rate, false_positive_rate}'
+```
+
+**What to look for:**
+- All scanners with data should appear
+- `overlap_rate` and `false_positive_rate` should not be NULL
+
+### 8.3 Deduplication Groups
+
+```bash
+# Valid severity filter
+curl -sk "https://app.blocksecops.local/api/v1/deduplication/groups?severity=high" \
+  -H "Authorization: Bearer $TOKEN" | jq '{total: .total}'
+
+# Invalid severity should return 422
+curl -sk "https://app.blocksecops.local/api/v1/deduplication/groups?severity=info" \
+  -H "Authorization: Bearer $TOKEN" | jq '.detail'
+```
+
+### 8.4 Tool Integration Scanner Health
+
+```bash
+kubectl exec -n tool-integration-local deployment/tool-integration -- \
+  curl -s http://localhost:8005/scanners/health | jq '.scanners | to_entries[] | {scanner: .key, status: .value.status, version: .value.version}'
+```
+
+---
+
+## Phase 9: ML Training Data Review
+
+### 9.1 Label Distribution by Scanner
+
+```sql
+SELECT scanner_id, user_classification, COUNT(*)
+FROM vulnerabilities
+WHERE user_classification IS NOT NULL
+GROUP BY scanner_id, user_classification
+ORDER BY scanner_id, user_classification;
+```
+
+**What to look for:**
+- Minimum 50 labeled vulnerabilities for ML training
+- Balanced distribution between `confirmed` and `false_positive`
+- All active scanners should have some labels
+- Heavy imbalance (e.g., 90% FP for one scanner) may indicate bulk labeling from a prior operation
+
+---
+
+## Audit Report Template
+
+```markdown
+## Scanner Data Audit Report — YYYY-MM-DD
+
+### Summary
+| Metric | Value |
+|--------|-------|
+| Total vulnerabilities | |
+| Total scans | |
+| Total dedup groups | |
+| Active scanners with data | |
+
+### Issues Found
+
+#### Issue N: [SEVERITY] — Title
+**Impact:** ...
+**Fix:** ...
+**Status:** Fixed / Pending
+
+### Recommended Actions
+1. ...
+2. ...
+```
+
+---
+
+## Checklist
+
+- [ ] Database backup created before any fixes
+- [ ] Service health verified
+- [ ] Scanner data overview reviewed
+- [ ] ConfigMap versions consistent across services
+- [ ] Fingerprint coverage acceptable
+- [ ] Unmapped detectors identified and documented
+- [ ] Dedup group sizes accurate
+- [ ] Scan severity counts accurate
+- [ ] API endpoints returning expected data
+- [ ] ML training data reviewed
+- [ ] Audit report generated
+- [ ] Fixes committed via feature branch + PR
+
+---
+
+## Related Documentation
+
+- [Scanner Upgrade Playbook](upgrade-scanner-image.md) - Full scanner upgrade procedure
+- [Scanner Upgrade Pipeline](../pipelines/scanner-upgrade-pipeline.md) - Pipeline phases and clean-slate procedure
+- [Scanner Data Audit Pipeline](../pipelines/scanner-data-audit-pipeline.md) - Automated pipeline architecture
+- [Deduplication Pipeline](../pipelines/deduplication-pipeline.md) - Daily maintenance tasks
+- [AI/ML Audit Playbook](ai-ml-audit-playbook.md) - ML-specific audit procedures
+- [Database Management Standards](../standards/database-management.md) - Backup requirements
