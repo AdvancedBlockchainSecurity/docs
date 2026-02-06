@@ -127,15 +127,18 @@ Phase 5 CPU-only ML features for intelligent vulnerability analysis.
 | 4.2.3 | Label with reason | reason field stored | [ ] |
 | 4.2.4 | Label with confidence | confidence 0.0-1.0 | [ ] |
 
-### 4.3 Training API
+### 4.3 Training API (Admin Only)
 
-**Endpoint**: `POST /api/v1/ml/retrain`
+**Endpoint**: `POST /api/v1/admin/system/ml/retrain` (requires `platform_admin` role)
 
 | # | Test Case | Expected | Status |
 |---|-----------|----------|--------|
-| 4.3.1 | Retrain with insufficient data | Error: need 200+ samples | [ ] |
-| 4.3.2 | Retrain with force=true | Attempts with fewer samples | [ ] |
-| 4.3.3 | Retrain with sufficient data | Returns accuracy, auc metrics | [ ] |
+| 4.3.1 | Retrain with insufficient data | `success: false`, insufficient data message | [ ] |
+| 4.3.2 | Retrain with force=true | Attempts with fewer samples (50+ min) | [ ] |
+| 4.3.3 | Retrain with sufficient data | Returns accuracy, auc metrics, `success: true` | [ ] |
+| 4.3.4 | Retrain as non-admin user | 403 Forbidden | [ ] |
+| 4.3.5 | Retrain via legacy endpoint (`POST /ml/retrain`) | 403 for non-admin, deprecated warning | [ ] |
+| 4.3.6 | Audit log entry created | `admin.ml.retrain` action logged | [ ] |
 
 ### 4.4 Prediction API
 
@@ -400,14 +403,17 @@ The api-service `semantic_deduplicator.py` now uses httpx to call the intelligen
 
 ### 11.2 Scanner Quality Page (`/intelligence/scanner-quality`)
 
+**Note:** As of Dashboard v0.39.0, the Retrain Model button has been removed from the user dashboard. Retraining is now admin-only via the Admin Portal at `admin.blocksecops.local/ml-models`.
+
 | # | Test Case | Expected | Status |
 |---|-----------|----------|--------|
 | 11.2.1 | Page loads without errors | No console errors | [ ] |
 | 11.2.2 | Quality gauges display | Shows Accuracy, AUC, CV AUC Mean gauges | [ ] |
 | 11.2.3 | Training Data Stats card | Shows total samples, TP, FP counts | [ ] |
 | 11.2.4 | Scanner Quality Table | Sortable table with scanner metrics | [ ] |
-| 11.2.5 | Retrain Model button | Clickable, shows loading state | [ ] |
-| 11.2.6 | Preview banner | Yellow warning banner displays | [ ] |
+| 11.2.5 | No Retrain button present | Retrain removed from user dashboard (admin-only) | [ ] |
+| 11.2.6 | Empty state message | Explains labeling needed, 10+ labels per scanner, links to vulnerability detail | [ ] |
+| 11.2.7 | ModelStatusWidget is read-only | No retrain controls visible | [ ] |
 
 ### 11.3 AI Copilot (`/copilot`)
 

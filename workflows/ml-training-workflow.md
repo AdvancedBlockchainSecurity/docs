@@ -129,22 +129,40 @@ The `FPTrainingCollector` tracks:
 - Labels since last training
 - Auto-triggers when threshold reached
 
-### Manual Training
+### Manual Training (Admin Only)
+
+As of API Service v0.26.0, model retraining is an **admin-only operation** performed via the Admin Portal or the admin API endpoint.
+
+**Admin Portal UI:**
+
+Navigate to `admin.blocksecops.local/ml-models` and click **Retrain Model**.
+
+**Admin API Endpoint:**
 
 ```bash
-POST /api/v1/ml/retrain
+POST /api/v1/admin/system/ml/retrain
 Content-Type: application/json
-Authorization: Bearer $TOKEN
+Authorization: Bearer $ADMIN_TOKEN
 
 {
-  "min_samples": 50,
+  "min_samples": 200,
   "force": false
 }
 ```
 
 Parameters:
-- `min_samples`: Minimum required samples (default: 50)
-- `force`: Override minimum sample check (not recommended)
+- `min_samples`: Minimum required samples (default: 200, minimum: 50)
+- `force`: Override minimum sample check (still requires 50)
+
+Requires `platform_admin` role. All retrain attempts are recorded in the admin audit log.
+
+**Legacy Endpoint (Deprecated):**
+
+```bash
+POST /api/v1/ml/retrain  # Deprecated in v0.26.0
+```
+
+This endpoint now requires `platform_admin` role. Use the admin endpoint above instead.
 
 ---
 
@@ -409,4 +427,6 @@ curl -s http://127.0.0.1:8000/api/v1/ml/training-data-stats \
 
 - [Intelligence Pipeline Workflow](./intelligence-pipeline-workflow.md)
 - [Deduplication Workflow](./deduplication-workflow.md)
-- [ML Training Playbook](/home/pwner/Git/blocksecops-dashboard/docs/playbooks/ml-training-playbook.md)
+- [ML Model Retraining Playbook](../playbooks/ml-model-retraining.md)
+- [FP Training Pipeline](../pipelines/fp-training-pipeline.md)
+- [ML Development Standards](../standards/ml-development.md)
