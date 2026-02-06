@@ -1,8 +1,8 @@
 # Scanner Upgrade Workflow
 
-**Last Updated:** February 5, 2026
+**Last Updated:** February 6, 2026
 **Status:** Active
-**API Version:** 0.25.9
+**API Version:** 0.27.1
 
 ---
 
@@ -288,8 +288,32 @@ curl -X POST "http://127.0.0.1:8000/api/v1/scans" \
 
 ---
 
+## FP-Heavy Scanner Upgrades
+
+When a scanner upgrade fixes a large number of false positives (>20% of findings), the standard workflow above is not sufficient. Old false-positive findings will pollute data quality, deduplication groups, and ML predictions.
+
+**Use the Clean-Slate Procedure** documented in the [Scanner Upgrade Pipeline — FP-Heavy Scanner Upgrade](../pipelines/scanner-upgrade-pipeline.md#fp-heavy-scanner-upgrade-clean-slate).
+
+This applies to maturing scanners like SolidityDefend where upstream releases may fix large batches of FPs. It does NOT apply to mature scanners (slither, aderyn, wake) where upgrades typically add detectors rather than fix FPs.
+
+**Summary of clean-slate steps:**
+1. Database backup
+2. Delete old vulnerabilities for the scanner
+3. Delete single-scanner scans (scans that only used this scanner)
+4. Recalculate severity counts on multi-scanner scans
+5. Clean orphaned deduplication groups
+6. Trigger deduplication maintenance
+7. Run upgrade pipeline (pattern seeding + audit)
+8. Rescan all contracts with new scanner version
+9. Label new findings
+10. Retrain ML model (Admin Portal → ML Models → Force Retrain)
+11. Verify health score
+
+---
+
 ## Related Documentation
 
+- [Scanner Upgrade Pipeline](../pipelines/scanner-upgrade-pipeline.md) - Pipeline phases, ML retrain, and clean-slate procedure
 - [Upgrade Scanner Image Playbook](../playbooks/upgrade-scanner-image.md) - Full manual upgrade steps
 - [Deduplication Workflow](./deduplication-workflow.md) - Deduplication matching strategy
 - [Smart Contract Scanning Workflow](./smart-contract-scanning-workflow.md) - Scan execution flow
