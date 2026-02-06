@@ -3,7 +3,7 @@
 **Feature ID:** 45
 **Feature Name:** Unified Integrations Hub
 **Version:** 1.0.0
-**Last Updated:** January 23, 2026
+**Last Updated:** February 5, 2026
 **Status:** Implemented
 
 ---
@@ -12,7 +12,7 @@
 
 The Unified Integrations Hub consolidates all platform integrations into a single organized page with tabbed navigation. It includes:
 - **Source Control**: GitHub, GitLab, Bitbucket
-- **CI/CD**: Jenkins
+- **CI/CD**: GitHub Actions, GitLab CI, BitBucket Pipelines, Jenkins
 - **Issue Tracking**: JIRA
 - **ChatOps**: Slack, Discord, Teams (migrated from NotificationChannels)
 - **IDE**: VS Code, IntelliJ token management
@@ -56,7 +56,7 @@ The Unified Integrations Hub consolidates all platform integrations into a singl
 |------|--------|-----------------|
 | 1 | View Overview tab | Shows grouped integrations by category |
 | 2 | Check Source Control section | Shows GitHub, GitLab, Bitbucket status |
-| 3 | Check CI/CD section | Shows Jenkins status |
+| 3 | Check CI/CD section | Shows GitHub Actions, GitLab CI, BitBucket Pipelines, Jenkins status |
 | 4 | Check ChatOps section | Shows Slack, Discord, Teams channel counts |
 | 5 | Check IDE section | Shows active token count |
 | 6 | Check Service Accounts section | Shows active service account count |
@@ -87,21 +87,53 @@ The Unified Integrations Hub consolidates all platform integrations into a singl
 
 ### 4. CI/CD Tab
 
-**Goal:** Verify Jenkins integration
+**Goal:** Verify all 4 CI/CD provider integrations
 
 **Prerequisites:**
 - Team+ tier account
-- Jenkins OAuth configured in backend
 
-**Test Steps:**
+**Test Steps (Provider Cards):**
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 1 | View CI/CD tab | Shows Jenkins integration card |
-| 2 | Click "Connect" on Jenkins | OAuth flow initiates |
-| 3 | Authorize on Jenkins | Returns with success |
-| 4 | Verify integration status | Shows "Connected" with pipeline info |
-| 5 | View connected pipelines | Lists available Jenkins pipelines |
+| 1 | View CI/CD tab | Shows 4 provider cards: GitHub Actions, GitLab CI, BitBucket Pipelines, Jenkins |
+| 2 | Check GitHub Actions card | Shows "Shared with Source Control" indicator |
+| 3 | Check GitLab CI card | Shows "Shared with Source Control" indicator |
+| 4 | Check BitBucket Pipelines card | Shows "Shared with Source Control" indicator |
+| 5 | Check Jenkins card | Shows standalone "Connect" button |
+
+**Test Steps (Shared Providers - Not Connected):**
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Click "Connect" on GitHub Actions (not connected in Source Control) | Redirected to Source Control tab |
+| 2 | Toast message shown | "Connect GitHub in Source Control first" |
+
+**Test Steps (Shared Providers - Already Connected):**
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Connect GitHub in Source Control tab first | GitHub shows as connected |
+| 2 | Navigate to CI/CD tab | GitHub Actions card shows "Connected" status |
+| 3 | Click "Connect" on GitHub Actions | Toast: "GitHub Actions is ready - connected via Source Control" |
+
+**Test Steps (Pipeline Config Snippets):**
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Scroll to pipeline configuration section | Tabbed interface with 4 tabs |
+| 2 | Click "GitHub Actions" tab | Shows YAML workflow snippet |
+| 3 | Click "GitLab CI" tab | Shows `.gitlab-ci.yml` snippet |
+| 4 | Click "BitBucket Pipelines" tab | Shows `bitbucket-pipelines.yml` snippet |
+| 5 | Click "Jenkins" tab | Shows Groovy pipeline snippet |
+
+**Test Steps (Jenkins OAuth):**
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Click "Connect" on Jenkins | OAuth flow initiates |
+| 2 | Authorize on Jenkins | Returns with success |
+| 3 | Verify integration status | Shows "Connected" |
 
 ---
 
@@ -145,13 +177,7 @@ The Unified Integrations Hub consolidates all platform integrations into a singl
 | 7 | Edit channel | Edit modal opens with current values |
 | 8 | Delete channel | Confirmation modal, then removed |
 
-**Backwards Compatibility:**
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 1 | Navigate to `/notification-channels` | Page loads (not broken) |
-| 2 | Check for redirect banner | Shows "Moved to Integrations Hub" with link |
-| 3 | Click banner link | Navigates to `/integrations?tab=chatops` |
+**Note:** The standalone Notifications page (`/notification-channels`) has been removed as of February 5, 2026. All notification channel management is exclusively through this ChatOps tab. Navigating to `/notification-channels` will show a 404.
 
 ---
 
@@ -190,35 +216,35 @@ The Unified Integrations Hub consolidates all platform integrations into a singl
 
 ---
 
-### 8. Service Accounts Tab - Tier Gating
+### 8. Service Accounts Tab - Visibility & Tier Gating
 
-**Goal:** Verify tier-based access control
+**Goal:** Verify tab is hidden for non-admin users and tier-gated
 
-**Test Steps (Developer/Team Tier):**
+**Test Steps (Non-Admin User - Any Tier):**
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 1 | Login as Developer tier user | Login successful |
-| 2 | Navigate to `/integrations?tab=service-accounts` | Tab visible but greyed out |
-| 3 | View tab content | Shows TierGate overlay with upsell |
+| 1 | Login as non-admin user (member/viewer role) | Login successful |
+| 2 | Navigate to `/integrations` | Page loads |
+| 3 | Check tab navigation | Service Accounts tab is NOT visible |
+| 4 | Navigate to `/integrations?tab=service-accounts` | Defaults to Overview tab (invalid tab ignored) |
+
+**Test Steps (Admin, Developer/Team Tier):**
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Login as admin with Developer/Team tier | Login successful |
+| 2 | Navigate to `/integrations` | Service Accounts tab IS visible |
+| 3 | Click Service Accounts tab | Shows TierGate overlay with upsell |
 | 4 | Click "Upgrade" in overlay | Navigates to `/pricing` |
 
-**Test Steps (Growth+ Tier, Non-Admin):**
+**Test Steps (Admin, Growth+ Tier):**
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 1 | Login as Growth tier non-admin | Login successful |
-| 2 | Navigate to `/integrations?tab=service-accounts` | Tab content loads |
-| 3 | View tab content | Shows "Admin Access Required" message |
-| 4 | No create/manage buttons visible | Correct - non-admin cannot manage |
-
-**Test Steps (Growth+ Tier, Admin):**
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 1 | Login as Growth tier admin | Login successful |
-| 2 | Navigate to `/integrations?tab=service-accounts` | Tab content loads |
-| 3 | View tab content | Shows full Service Accounts management UI |
+| 1 | Login as Growth tier admin/owner | Login successful |
+| 2 | Navigate to `/integrations` | Service Accounts tab IS visible |
+| 3 | Click Service Accounts tab | Shows full Service Accounts management UI |
 | 4 | See "Create Service Account" button | Button visible and enabled |
 
 ---
@@ -439,7 +465,7 @@ curl -X GET https://app.blocksecops.local/api/v1/contracts \
 | `src/pages/IntegrationsHub.tsx` | New - main tabbed page |
 | `src/components/integrations/hub/OverviewTab.tsx` | New - overview dashboard |
 | `src/components/integrations/hub/SourceControlTab.tsx` | New - extracted from Integrations.tsx |
-| `src/components/integrations/hub/CICDTab.tsx` | New - Jenkins integration |
+| `src/components/integrations/hub/CICDTab.tsx` | New - GitHub Actions, GitLab CI, BitBucket Pipelines, Jenkins |
 | `src/components/integrations/hub/IssueTrackingTab.tsx` | New - JIRA integration |
 | `src/components/integrations/hub/ChatOpsTab.tsx` | New - notification channels |
 | `src/components/integrations/hub/IDETab.tsx` | New - IDE token management |
