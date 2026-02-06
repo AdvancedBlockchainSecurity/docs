@@ -533,6 +533,47 @@ The following bugs were discovered and fixed during testing (2026-01-25):
 
 ---
 
+### 6. ML Model Retraining (Admin Only)
+
+Added in API Service v0.26.0, Admin Portal v0.2.0.
+
+#### 6.1 Admin Retrain Endpoint
+
+**Endpoint**: `POST /api/v1/admin/system/ml/retrain`
+
+**Test Command**:
+```bash
+curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
+  -H "X-Admin-Session: ${ADMIN_SESSION}" \
+  -H "Content-Type: application/json" \
+  "https://app.blocksecops.local/api/v1/admin/system/ml/retrain" \
+  -d '{"force": false, "min_samples": 200}' | jq '.'
+```
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 6.1.1 | Retrain with platform_admin role | Returns success/failure with metrics | [ ] |
+| 6.1.2 | Retrain as non-admin | 403 Forbidden | [ ] |
+| 6.1.3 | Retrain with insufficient data | `success: false`, message about samples needed | [ ] |
+| 6.1.4 | Force retrain (50+ samples) | `success: true` if 50+ labels | [ ] |
+| 6.1.5 | Audit log entry created | `admin.ml.retrain` action logged | [ ] |
+| 6.1.6 | Success response includes metrics | `accuracy`, `auc`, `samples_used` fields | [ ] |
+
+#### 6.2 Admin Portal ML Models Page
+
+**URL**: `admin.blocksecops.local/ml-models`
+
+| # | Test Case | Expected | Status |
+|---|-----------|----------|--------|
+| 6.2.1 | Page loads | Model status, training data, scanner quality sections | [ ] |
+| 6.2.2 | Nav item visible | "ML Models" in sidebar for platform_admin | [ ] |
+| 6.2.3 | Retrain Model button | Triggers retrain, shows result | [ ] |
+| 6.2.4 | Force Retrain button | Triggers with force=true | [ ] |
+| 6.2.5 | Model stats display | Shows is_trained, accuracy, AUC, version | [ ] |
+| 6.2.6 | Training data stats | Shows sample counts by source | [ ] |
+
+---
+
 ## Test Summary
 
 | Category | Total Tests | Passed | Failed | Not Tested |
@@ -542,11 +583,12 @@ The following bugs were discovered and fixed during testing (2026-01-25):
 | System Stats | 1 | 1 | 0 | 0 |
 | Audit Logs | 1 | 1 | 0 | 0 |
 | Emergency Actions | 3 | 2 | 0 | 1 |
+| ML Model Retraining | 12 | 0 | 0 | 12 |
 | UI Tests | 28 | 0 | 0 | 28 |
 | Security Tests | 9 | 9 | 0 | 0 |
 | Security Hardening | 24 | 22 | 0 | 2 |
 | CLI Tests | 5 | 5 | 0 | 0 |
-| **Total** | **79** | **48** | **0** | **31** |
+| **Total** | **91** | **48** | **0** | **43** |
 
 **Note**: Security Hardening test "Access after lockout expires" marked N/A (requires 15 minute wait). Secure flag on cookie marked INFO (internal HTTP, external HTTPS via Traefik).
 
