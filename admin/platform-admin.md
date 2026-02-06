@@ -533,6 +533,27 @@ Organization Management (`/admin/organizations`):
 - Production ingress with security headers
 - Optional IP allowlist middleware
 
+### v1.2.0 (2026-02-06) - Scan Monitoring
+
+**New Feature: Scan Timeout & Auto-Retry Monitoring**
+- Admin portal Scan Monitoring page with real-time scan health dashboard
+- KPI cards: Active Scans, Stale Scans, Auto-Retries 24h, Failed 24h
+- Stale scan table with manual Retry and Force Fail actions
+- Automatic stale scan detection via Celery Beat task (every 30s)
+- Auto-retry of stuck scans with configurable timeout (600s) and retry limit (3)
+- All actions audit logged with required reason field
+
+**Database Changes:**
+- Added `retry_count`, `last_retry_at`, `retry_reason` columns to `scans` table
+- Added composite index `ix_scans_status_started_at`
+- Migration: `067_add_scan_retry_tracking`
+
+**API Endpoints:**
+- `GET /api/v1/admin/scan-monitoring/stats` — Scan health statistics (support_admin+)
+- `GET /api/v1/admin/scan-monitoring/stale` — List stale scans (support_admin+)
+- `POST /api/v1/admin/scan-monitoring/scans/{id}/retry` — Manual retry (platform_admin+)
+- `POST /api/v1/admin/scan-monitoring/scans/{id}/fail` — Force fail (platform_admin+)
+
 ### v1.1.0 (2026-01-24) - Security Hardening
 
 **Security Improvements:**

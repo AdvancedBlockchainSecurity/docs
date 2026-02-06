@@ -1513,6 +1513,40 @@ asyncio.run(verify())
 
 ---
 
+### Migration 067: Add Scan Retry Tracking (Merge Migration)
+- **Status**: ✅ Completed
+- **Created**: 2026-02-06
+- **Revision ID**: `067_add_scan_retry_tracking`
+- **Previous Revisions**: `060_add_quota_check_constraints`, `066_deduplication_audit_fixes`, `034_remove_info_severity` (merge point)
+- **Description**: Adds retry tracking columns to the scans table for stale scan detection and auto-retry. Also merges three branch heads into a single migration chain.
+- **Tables Affected**: `scans`
+- **Columns Added**:
+  - `retry_count` (Integer, NOT NULL, DEFAULT 0) — Number of times scan has been retried
+  - `last_retry_at` (DateTime with timezone, nullable) — Timestamp of most recent retry
+  - `retry_reason` (String(200), nullable) — Reason for the retry (stale_timeout, task_exception, manual_admin_retry)
+- **Indexes Created**:
+  - `ix_scans_status_started_at` on (`status`, `started_at`) — Composite index for stale scan detection query
+- **API Endpoints Added**:
+  - `GET /api/v1/admin/scan-monitoring/stats` — Scan health statistics (support_admin+)
+  - `GET /api/v1/admin/scan-monitoring/stale` — List stale scans (support_admin+)
+  - `POST /api/v1/admin/scan-monitoring/scans/{scan_id}/retry` — Manual retry (platform_admin+)
+  - `POST /api/v1/admin/scan-monitoring/scans/{scan_id}/fail` — Force fail (platform_admin+)
+- **Celery Beat Task Added**: `check_stale_scans` — runs every 30 seconds, detects running scans older than stale timeout and requeues or fails them
+- **Migration File**: `alembic/versions/20260206_1400-067_add_scan_retry_tracking.py`
+- **Related Files**:
+  - Migration: `blocksecops-api-service/alembic/versions/20260206_1400-067_add_scan_retry_tracking.py`
+  - API Models: `blocksecops-api-service/src/infrastructure/database/models.py`
+  - API Config: `blocksecops-api-service/src/infrastructure/config.py`
+  - API Endpoints: `blocksecops-api-service/src/presentation/api/v1/endpoints/admin/scan_monitoring.py`
+  - Orchestration Models: `blocksecops-orchestration/src/blocksecops_orchestration/models/models.py`
+  - Orchestration Config: `blocksecops-orchestration/src/blocksecops_orchestration/core/config.py`
+  - Orchestration Task: `blocksecops-orchestration/src/blocksecops_orchestration/tasks/scan_tasks_sync.py`
+  - Beat Schedule: `blocksecops-orchestration/src/blocksecops_orchestration/core/celery_app.py`
+  - Admin Portal Page: `blocksecops-admin-portal/src/pages/AdminScanMonitoring.tsx`
+  - Admin Portal API Client: `blocksecops-admin-portal/src/lib/api/admin.ts`
+
+---
+
 ### Creating Migrations
 ```bash
 # Generate migration from models
