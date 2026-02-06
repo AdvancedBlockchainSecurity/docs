@@ -101,8 +101,7 @@ kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity
   "UPDATE scans SET
     high_count = (SELECT COUNT(*) FROM vulnerabilities WHERE scan_id = scans.id AND severity = 'high'),
     medium_count = (SELECT COUNT(*) FROM vulnerabilities WHERE scan_id = scans.id AND severity = 'medium'),
-    low_count = (SELECT COUNT(*) FROM vulnerabilities WHERE scan_id = scans.id AND severity = 'low'),
-    informational_count = (SELECT COUNT(*) FROM vulnerabilities WHERE scan_id = scans.id AND severity = 'informational');"
+    low_count = (SELECT COUNT(*) FROM vulnerabilities WHERE scan_id = scans.id AND severity = 'low');"
 
 # Clean deduplication groups
 kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -c \

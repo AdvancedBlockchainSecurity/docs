@@ -1502,6 +1502,17 @@ asyncio.run(verify())
 
 ---
 
+### Migration 034: Remove Info Severity
+- **Status**: ✅ Completed
+- **Created**: 2026-02-06
+- **Revision ID**: `034`
+- **Description**: Removes "info" and "informational" severity values from vulnerability_patterns table, remapping them to "low". The DB enum vulnerability_severity only supports critical/high/medium/low - this migration cleans up string-based severity values in the patterns table.
+- **Tables Affected**: `vulnerability_patterns`
+- **SQL**: `UPDATE vulnerability_patterns SET severity = 'low' WHERE severity IN ('info', 'informational');`
+- **Rollback**: `UPDATE vulnerability_patterns SET severity = 'info' WHERE severity = 'low' AND [original was info];` (Note: rollback loses original distinction between info and low)
+
+---
+
 ### Creating Migrations
 ```bash
 # Generate migration from models

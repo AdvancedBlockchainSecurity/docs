@@ -68,6 +68,7 @@ Manual testing checklists for all user-facing features.
 | [50-ai-invariant-generation.md](./50-ai-invariant-generation.md) | **NEW** - AI Invariant Generation: Foundry test generation, tier quotas, prompt injection prevention |
 | [51-kubernetes-security.md](./51-kubernetes-security.md) | **NEW** - Kubernetes Security: revisionHistoryLimit, security contexts, NetworkPolicies, pod lifecycle |
 | [52-dual-payment-options.md](./52-dual-payment-options.md) | **NEW** - Dual Payment Options: Stripe + x402 crypto, payment method selector, pricing page integration |
+| [58-platform-v0.27-v0.40-v0.3-fixes.md](./58-platform-v0.27-v0.40-v0.3-fixes.md) | **NEW** - Platform-wide bug fixes - info severity removal, pending→queued, auto-apply filters, dark mode, admin portal enhancements |
 
 ---
 

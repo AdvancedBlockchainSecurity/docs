@@ -50,7 +50,7 @@ class NormalizedFinding:
     detector_id: str     # Scanner's detector name
     title: str
     description: str
-    severity: str        # critical, high, medium, low, info
+    severity: str        # critical, high, medium, low
     swc_id: str | None   # SWC-XXX classification
     cwe_id: str | None   # CWE-XXX classification
     line_number: int | None

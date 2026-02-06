@@ -18,6 +18,24 @@ Changelogs are organized by component and maintained chronologically. Each chang
 
 ## Available Changelogs
 
+### 0. Platform-Wide Bug Fixes v0.27/v0.40/v0.3 (`PLATFORM-V0.27-V0.40-V0.3-FIXES-2026-02-06.md`)
+
+**Component:** blocksecops-api-service, blocksecops-dashboard, blocksecops-admin-portal
+**Scope:** Info severity removal, pending-to-queued mapping, auto-apply filters, dark mode fixes, admin portal enhancements
+**Date:** February 6, 2026
+
+**Key Changes:**
+- API v0.27.0: Removed info severity, pending→queued status mapping, audit log fixes, role management guards
+- Dashboard v0.40.0: Light mode fixes, auto-apply filters, info severity removal from UI, queued status label
+- Admin Portal v0.3.0: Pricing display fix, MFA verification modals, radar chart, retention banner
+- Migration 034: Remap info/informational severity to low in vulnerability_patterns
+
+**Use When:**
+- Understanding info severity removal across the platform
+- Debugging filter auto-apply behavior
+- Reviewing dark/light mode fixes
+- Understanding admin portal v0.3.0 changes
+
 ### 0. Admin Portal Dashboard Enhancement (`ADMIN-PORTAL-DASHBOARD-2026-02-04.md`)
 
 **Component:** blocksecops-admin-portal
