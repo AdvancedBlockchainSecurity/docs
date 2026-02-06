@@ -479,6 +479,7 @@ Deduplication maintenance runs automatically via daily CronJob (2AM UTC).
 ## Related Documentation
 
 - [Scanner Upgrade Workflow](../workflows/scanner-upgrade-workflow.md) - Full automated pipeline overview
+- [Scanner Upgrade Pipeline](../pipelines/scanner-upgrade-pipeline.md) - Pipeline phases, ML retrain, and clean-slate procedure
 - [Docker Image Versioning Standards](../standards/docker-image-versioning.md)
 - [Tool Metadata ConfigMaps Standard](../standards/tool-metadata-configmaps.md)
 - [Docker Base Images Standard](../standards/docker-base-images.md)
