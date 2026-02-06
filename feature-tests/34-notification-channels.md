@@ -283,9 +283,11 @@ Create channel with:
 
 ## 6. Dashboard Integration
 
+> **Note (February 5, 2026):** The standalone Notifications page (`/notification-channels`) has been removed from the sidebar and routing. Notification channel management is now exclusively available through the **Integrations Hub > ChatOps tab** (`/integrations?tab=chatops`). The API endpoints remain unchanged. The tests below still apply but the navigation path is now via Integrations Hub.
+
 ### 6.1 Channel Management Page
 
-Navigate to: **Admin > Notifications** (`/notification-channels`)
+Navigate to: **Integrations Hub > ChatOps tab** (`/integrations?tab=chatops`)
 
 **Stats Cards:**
 - [ ] Total Channels count displays correctly

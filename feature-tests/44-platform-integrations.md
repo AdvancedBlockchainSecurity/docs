@@ -3,7 +3,7 @@
 **Feature ID:** 44
 **Feature Name:** Platform Integrations (VCS & Issue Tracking)
 **Version:** 1.0.0
-**Last Updated:** January 23, 2026
+**Last Updated:** February 5, 2026
 **Status:** Implemented
 
 ---
@@ -141,9 +141,9 @@ Platform integrations enable connecting BlockSecOps to external version control 
 
 ### 6. OAuth Error Handling
 
-**Goal:** Verify OAuth error states are handled gracefully
+**Goal:** Verify OAuth error states are handled gracefully with descriptive messages
 
-**Test Steps:**
+**Test Steps (User Cancellation):**
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
@@ -151,6 +151,24 @@ Platform integrations enable connecting BlockSecOps to external version control 
 | 2 | Cancel/deny authorization | Redirects back to `/integrations?error=access_denied` |
 | 3 | Observe error toast | Shows "Failed to connect: access denied" |
 | 4 | Check URL cleanup | URL params cleared, shows `/integrations` |
+
+**Test Steps (Missing OAuth Configuration):**
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Click "Connect" on GitHub (no `GITHUB_CLIENT_ID` configured) | Error toast appears |
+| 2 | Check error toast title | Shows "Failed to initiate GitHub connection" |
+| 3 | Check error toast message | Shows descriptive error from backend (e.g., "GitHub OAuth not configured: missing GITHUB_CLIENT_ID") |
+| 4 | Same for GitLab, Bitbucket, JIRA | Each shows provider-specific error detail |
+
+**Test Steps (Reconnection Error):**
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Click reconnect on expired integration (backend OAuth misconfigured) | Error toast appears |
+| 2 | Check error toast message | Shows descriptive error from backend (not generic "Failed to initiate OAuth connection") |
+
+**Note (February 5, 2026):** Backend now returns `detail=str(e)` from `OAuthServiceError` instead of hardcoded generic message. Frontend extracts `err.response.data.detail` and displays it in the toast notification.
 
 ---
 

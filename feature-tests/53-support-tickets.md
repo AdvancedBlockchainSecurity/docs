@@ -3,7 +3,7 @@
 **Feature ID:** 53
 **Date:** February 1, 2026
 **Status:** Implemented
-**Version:** API v0.22.0, Dashboard v0.37.0
+**Version:** API v0.26.1, Dashboard v0.39.1
 
 ## Overview
 
@@ -304,17 +304,243 @@ GROUP BY jira_sync_status;
 
 ---
 
+## Support Tickets Page (List & Detail)
+
+### 11. Access Support Tickets Page
+
+**Preconditions:**
+- User is logged in
+
+**Steps:**
+1. Click "Support Tickets" in the sidebar (ADMIN section)
+2. Or navigate directly to `/support`
+
+**Expected Results:**
+- Support Tickets page loads
+- Shows stats bar with Total, Open, In Progress, Resolved counts
+- Shows status filter tabs (All, Open, In Progress, Resolved, Closed)
+- Shows data table with user's tickets
+- "Submit New Ticket" button visible in header
+
+**Status:** PASS
+
+---
+
+### 12. Support Ticket List - Pagination
+
+**Steps:**
+1. Navigate to `/support`
+2. Verify ticket list shows up to 20 items per page
+3. If >20 tickets, check pagination controls at bottom
+4. Click page 2
+
+**Expected Results:**
+- Page 1 shows first 20 tickets (newest first)
+- Pagination shows current page and total pages
+- Page 2 loads next set of tickets
+- URL does not change (client-side state)
+
+**Status:** PASS
+
+---
+
+### 13. Support Ticket List - Status Filter
+
+**Steps:**
+1. Navigate to `/support`
+2. Click "Open" filter tab
+3. Verify only open tickets shown
+4. Click "In Progress" tab
+5. Click "All" tab
+
+**Expected Results:**
+- Each filter shows only tickets with matching status
+- "All" shows all tickets regardless of status
+- Stats bar always shows total counts (not filtered counts)
+- Active filter tab is visually highlighted
+
+**Status:** PASS
+
+---
+
+### 14. Support Ticket List - Table Columns
+
+**Steps:**
+1. Navigate to `/support`
+2. Examine table columns
+
+**Expected Results:**
+- Columns: Reference, Subject, Category, Priority, Status, JIRA, Created
+- Reference format: BSO-XXXXXXXX
+- Priority shows colored badge (urgent=red, high=orange, medium=yellow, low=gray)
+- Status shows colored badge (open=blue, in_progress=yellow, resolved=green, closed=gray)
+- JIRA column shows link to JIRA issue (or "-" if not synced)
+- Created shows relative time (e.g., "2 days ago")
+
+**Status:** PASS
+
+---
+
+### 15. Support Ticket Detail - Expandable Row
+
+**Steps:**
+1. Navigate to `/support`
+2. Click on a ticket row
+3. View expanded detail section
+
+**Expected Results:**
+- Row expands to show ticket detail below
+- Shows full description
+- Shows category, priority, status, created/updated timestamps
+- If JIRA linked: shows JIRA status, assigned engineer (with avatar if available)
+- If JIRA linked: shows comments timeline with author, body, and timestamp
+- Clicking row again collapses the detail
+
+**Status:** PASS
+
+---
+
+### 16. Support Ticket Detail - JIRA Live Data
+
+**Preconditions:**
+- Ticket has linked JIRA issue
+- JIRA integration is configured
+
+**Steps:**
+1. Navigate to `/support`
+2. Click on a ticket with JIRA link
+3. View JIRA details section
+
+**Expected Results:**
+- JIRA status shown (e.g., "In Progress", "Done")
+- Assigned engineer name displayed
+- Assignee avatar shown (if available from JIRA)
+- Comments displayed in timeline format (newest first)
+- Each comment shows author name, body text, and created timestamp
+- Last updated timestamp from JIRA shown
+
+**Status:** PASS (when JIRA configured)
+
+---
+
+### 17. Submit Ticket from Support Page
+
+**Steps:**
+1. Navigate to `/support`
+2. Click "Submit New Ticket" button in header
+
+**Expected Results:**
+- SupportTicketModal opens (same as sidebar "Get Help" button)
+- After successful submission, modal closes
+- New ticket appears in the list (may require page refresh)
+
+**Status:** PASS
+
+---
+
+## API Test Commands (List & Detail)
+
+### List Tickets (Authenticated)
+
+```bash
+# List all tickets (page 1, 20 per page)
+curl -X GET "http://app.blocksecops.local/api/v1/support-tickets?page=1&page_size=20" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Expected Response:**
+```json
+{
+  "tickets": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "ticket_reference": "BSO-550E8400",
+      "category": "bug",
+      "priority": "high",
+      "subject": "Test support ticket",
+      "status": "open",
+      "jira_issue_key": "SUPPORT-123",
+      "jira_issue_url": "https://blocksecops.atlassian.net/browse/SUPPORT-123",
+      "created_at": "2026-02-05T10:30:00Z",
+      "updated_at": "2026-02-05T10:30:00Z"
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "page_size": 20
+}
+```
+
+### List Tickets with Status Filter
+
+```bash
+# Filter by status
+curl -X GET "http://app.blocksecops.local/api/v1/support-tickets?status=open" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Get Ticket Detail with JIRA Data
+
+```bash
+# Get specific ticket (includes live JIRA data)
+curl -X GET "http://app.blocksecops.local/api/v1/support-tickets/550e8400-e29b-41d4-a716-446655440000" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Expected Response:**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "category": "bug",
+  "priority": "high",
+  "subject": "Test support ticket",
+  "description": "Detailed description of the issue...",
+  "user_email": "user@example.com",
+  "user_tier": "team",
+  "jira_issue_key": "SUPPORT-123",
+  "jira_issue_url": "https://blocksecops.atlassian.net/browse/SUPPORT-123",
+  "jira_sync_status": "synced",
+  "status": "open",
+  "created_at": "2026-02-05T10:30:00Z",
+  "updated_at": "2026-02-05T10:30:00Z",
+  "jira_details": {
+    "status": "In Progress",
+    "assignee": "Jane Smith",
+    "assignee_avatar": "https://avatar.example.com/jane.jpg",
+    "comments": [
+      {
+        "author": "Jane Smith",
+        "body": "Looking into this now.",
+        "created": "2026-02-05T11:00:00Z"
+      }
+    ],
+    "last_updated": "2026-02-05T11:00:00Z"
+  }
+}
+```
+
+### Verify Ticket Ownership
+
+```bash
+# Attempting to view another user's ticket should return 404
+curl -X GET "http://app.blocksecops.local/api/v1/support-tickets/other-users-ticket-id" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Expected:** HTTP 404 "Support ticket not found"
+
+---
+
 ## Known Limitations
 
-1. **No ticket history page** - Users cannot view past tickets (by design)
-2. **Rate limit is per calendar day** - Resets at midnight UTC
-3. **JIRA sync is synchronous** - May add latency to ticket submission
-4. **No file attachments** - Screenshots/files not supported in initial release
+1. **Rate limit is per calendar day** - Resets at midnight UTC
+2. **JIRA sync is synchronous** - May add latency to ticket submission
+3. **No file attachments** - Screenshots/files not supported in initial release
+4. **JIRA comments are read-only** - Users cannot reply to JIRA comments from the dashboard
 
 ## Future Enhancements
 
-- Ticket status tracking
 - Email notifications on ticket updates
 - File attachment support
-- Ticket history page (optional)
+- Reply to JIRA comments from dashboard
 - Admin view of all tickets
