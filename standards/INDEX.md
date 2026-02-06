@@ -224,11 +224,19 @@ These standards ensure proper versioning and configuration management:
 
 ### ✅ Compliance & Verification
 
-24. **[Compliance Checklist](./compliance-checklist.md)**
+25. **[Compliance Checklist](./compliance-checklist.md)**
     - Daily development checklist
     - Making changes checklist
     - Database configuration changes checklist
     - Code review checklist
+
+26. **[Smoke Test](./smoke-test.md)** [NEW]
+    - Platform smoke test after deployments
+    - Pre-flight infrastructure checks
+    - External and internal service health checks
+    - Authenticated endpoint verification
+    - Database integrity checks
+    - Quick full smoke test script
 
 ## Quick Reference
 
@@ -285,7 +293,8 @@ docs/standards/
 ├── api-endpoint-auth.md           # NEW: API authentication and scope enforcement
 ├── tier-standards.md
 ├── kubernetes-pod-lifecycle.md    # NEW: Pod lifecycle, security contexts, NetworkPolicies
-└── kustomize-standards.md         # NEW: Kustomize base/overlay patterns
+├── kustomize-standards.md         # NEW: Kustomize base/overlay patterns
+└── smoke-test.md                  # NEW: Platform smoke test procedures
 ```
 
 ## Referencing Standards in Claude Code
