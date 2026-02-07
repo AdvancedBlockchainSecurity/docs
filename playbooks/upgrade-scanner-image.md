@@ -26,7 +26,7 @@ This playbook covers upgrading a scanner image in the BlockSecOps platform. Scan
 1. Create database backup (if needed)
 2. Delete old findings (if clean slate preferred)
 3. Update Dockerfile with new versions
-4. Build image with --no-cache
+4. Build image with new version tag
 5. Push to Harbor
 6. Update ConfigMaps (base + overlay)
 7. Apply and restart deployment
@@ -150,8 +150,7 @@ RUN git clone --branch v1.10.3 --depth 1 https://github.com/BlockSecOps/<Scanner
 ```bash
 cd /home/pwner/Git/blocksecops-tool-integration/scanner-images/<scanner>
 
-# CRITICAL: Always use --no-cache for production builds
-docker build --no-cache \
+docker build \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
   -t harbor.blocksecops.local/blocksecops/scanner-<scanner>:<IMAGE_VERSION> \
@@ -160,7 +159,7 @@ docker build --no-cache \
 
 ### Build Tips
 
-- Use `--no-cache` to ensure fresh build with latest dependencies
+- Use `--no-cache` only when debugging build issues or updating dependencies at the same version
 - Build can take 10-30 minutes for Rust-based scanners
 - Monitor build output for compilation errors
 - For large builds, consider using `docker build --progress=plain` for verbose output

@@ -74,7 +74,7 @@ cd /home/pwner/Git/blocksecops-orchestration
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
 
 # Build using base image (fast: ~2-3 min for code changes)
-docker build --no-cache \
+docker build \
   --build-arg BASE_IMAGE_TAG=latest \
   --build-arg SERVICE_VERSION=$VERSION \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
@@ -101,7 +101,7 @@ cd /home/pwner/Git/blocksecops-api-service
 VERSION="0.11.4"
 
 # Build image
-docker build --no-cache \
+docker build \
   --build-arg SERVICE_VERSION=$VERSION \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
@@ -123,7 +123,7 @@ SUPABASE_ANON_KEY=$(kubectl get configmap api-service-config -n api-service-loca
   -o jsonpath='{.data.supabase_anon_key}')
 
 # Build from parent directory (monorepo structure)
-docker build --no-cache \
+docker build \
   -f blocksecops-dashboard/Dockerfile \
   --build-arg VITE_SUPABASE_URL=$SUPABASE_URL \
   --build-arg VITE_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY \
@@ -135,8 +135,8 @@ docker build --no-cache \
 
 ### Build Tips
 
-- Use `--no-cache` for clean builds
-- Build can take 5-15 minutes depending on service
+- Use `--no-cache` only when debugging build issues or rebuilding the same version tag
+- With cache: ~10-30 seconds; without cache: ~2-5 minutes
 - Monitor with `docker build` output or check `docker images` after
 
 ---

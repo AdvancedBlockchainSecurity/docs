@@ -1,7 +1,7 @@
 # BlockSecOps Full API Security Audit Report
 
 **Date:** February 7, 2026
-**Scope:** API Service v0.28.1, Dashboard v0.41.0, Admin Portal
+**Scope:** API Service v0.28.2, Dashboard v0.41.0, Admin Portal
 **Targets:** `app.blocksecops.local`, `admin.blocksecops.local`
 **Method:** 5-phase code review (64 endpoint files, 17 audit plan areas) + live testing against running cluster
 
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This comprehensive API security audit covered authentication, authorization (64 endpoints), data layer (SQLi/SSRF/upload), WebSocket/rate limiting/AI-ML, and logging/business logic/CI-CD. The audit identified **9 new findings** (2 CRITICAL, 4 HIGH, 2 MEDIUM, 1 existing MEDIUM with new details) and confirmed **5 previously-open findings as resolved**. All findings were remediated and deployed as API Service v0.28.1.
+This comprehensive API security audit covered authentication, authorization (64 endpoints), data layer (SQLi/SSRF/upload), WebSocket/rate limiting/AI-ML, and logging/business logic/CI-CD. The audit identified **9 new findings** (2 CRITICAL, 4 HIGH, 2 MEDIUM, 1 existing MEDIUM with new details) and confirmed **5 previously-open findings as resolved**. All findings remediated: v0.28.1 resolved CRITICAL/HIGH, v0.28.2 resolved remaining MEDIUM/LOW.
 
 ### Results Summary
 
@@ -17,11 +17,11 @@ This comprehensive API security audit covered authentication, authorization (64 
 |----------|------|----------|-------|
 | CRITICAL | 0 | 6 | 6 |
 | HIGH | 0 | 23 | 23 |
-| MEDIUM | 1 | 20 | 21 |
-| LOW | 3 | 2 | 5 |
-| **Total** | **4** | **51** | **55** |
+| MEDIUM | 0 | 21 | 21 |
+| LOW | 0 | 5 | 5 |
+| **Total** | **0** | **55** | **55** |
 
-**Remaining open:** 1 MEDIUM (WebSocket per-user connection limits), 3 LOW (log truncation, partial mitigations). No CRITICAL or HIGH findings remain.
+**All 55 findings resolved.** No open findings remain.
 
 ---
 
@@ -166,7 +166,7 @@ All 12 admin files properly enforce `require_admin_role()` or `require_admin_rol
 #### BSO-SEC-WS-002: No Per-User WebSocket Connection Limits — MEDIUM
 - **Severity:** MEDIUM | **CVSS 3.1:** 5.3
 - **Location:** `websocket/manager.py` lines 85-104
-- **Status:** Open — Tracks by scan_id but no per-user limit.
+- **Status:** FIXED (v0.28.2) — Added `MAX_CONNECTIONS_PER_USER = 10`, per-user tracking in `_user_connections` dict, `check_user_limit()` enforced before `connect()`.
 
 **Scan ownership:** Properly verified (`scan.user_id != current_user.id` → rejected).
 
@@ -419,25 +419,27 @@ Tests executed against running cluster (API v0.28.1).
 
 ---
 
-## Remaining Open Findings (4)
+## Remaining Open Findings (0)
 
-### Backlog
-| ID | Severity | Description | Notes |
+All 55 findings resolved as of v0.28.2.
+
+| ID | Severity | Description | Resolution (v0.28.2) |
 |----|----------|-------------|-------|
-| BSO-SEC-WS-002 | MEDIUM | No per-user WebSocket connection limits | Low risk — JWT auth + scan ownership already enforced |
-| BSO-SEC-LOW-001 | LOW | Error message truncation incomplete in some storage paths | Partially mitigated |
-| BSO-SEC-LOW-002 | LOW | User-Agent not truncated in admin session storage | Partially mitigated |
-| BSO-SEC-LOW-003 | LOW | IP address validation incomplete in some storage paths | Partially mitigated |
+| BSO-SEC-WS-002 | MEDIUM | No per-user WebSocket connection limits | FIXED — `MAX_CONNECTIONS_PER_USER = 10` with per-user tracking |
+| BSO-SEC-LOW-001 | LOW | Error message truncation incomplete in some storage paths | FIXED — `_truncate_message()` applied to all DB storage and logger calls |
+| BSO-SEC-LOW-002 | LOW | User-Agent not truncated in admin session storage | FIXED — `_truncate_user_agent()` applied to session and audit log creation |
+| BSO-SEC-LOW-003 | LOW | IP address validation incomplete in some storage paths | FIXED — `get_client_ip()` validates all IP addresses before storage |
 
 ---
 
 ## Resolution Summary
 
-All CRITICAL and HIGH findings resolved in API Service v0.28.1. Deployed and verified against live cluster.
+All CRITICAL and HIGH findings resolved in API Service v0.28.1. All remaining LOW findings resolved in v0.28.2.
 
-- **v0.28.1** built with `--no-cache`, pushed to Harbor, deployed via `kubectl apply -k`
+- **v0.28.1** pushed to Harbor, deployed via `kubectl apply -k`
+- **v0.28.2** resolves remaining BSO-SEC-WS-002, LOW-001, LOW-002, LOW-003
 - **638 unit tests passing**, 0 regressions
-- **4 remaining open** (1 MEDIUM, 3 LOW) — tracked for future sprints
+- **All 55 findings resolved**
 
 ---
 

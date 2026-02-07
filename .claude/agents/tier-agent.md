@@ -347,7 +347,7 @@ Returns:
 Follow all standards in `docs/standards/`:
 - Codebase-first development
 - Local endpoint: use `127.0.0.1`
-- Docker builds: always use `--no-cache`
+- Docker builds: use versioned tags (cache is fine with Harbor)
 - Database: backup before changes
 - Git: feature branch workflow
 
