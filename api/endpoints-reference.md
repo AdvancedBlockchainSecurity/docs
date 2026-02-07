@@ -1,6 +1,6 @@
 # API Endpoints Reference
 
-**Last Updated**: 2026-01-04
+**Last Updated**: 2026-02-07
 **API Version**: v1
 **Base URL**: `http://localhost:8000/api/v1` (local) | `https://api.blocksecops.com/api/v1` (production)
 
@@ -5835,6 +5835,63 @@ Get quality gate evaluation history for a project.
 - `404` Not Found - Project not found
 
 **Added**: January 2026 (Phase 5.5c)
+
+---
+
+---
+
+## Admin Portal Endpoints
+
+Admin endpoints require cookie-based authentication (admin session) and appropriate admin role.
+
+### GET /admin/dependencies
+
+Get installed Python package versions and latest available versions from PyPI, plus platform service versions.
+
+**Authentication**: Required (Admin cookie session)
+**Required Role**: `support_admin` or higher
+
+**Response** (200 OK):
+```json
+{
+  "dependencies": [
+    {
+      "service": "api-service",
+      "name": "fastapi",
+      "current_version": "0.115.6",
+      "latest_version": "0.115.8"
+    },
+    {
+      "service": "api-service",
+      "name": "sqlalchemy",
+      "current_version": "2.0.36",
+      "latest_version": "2.0.38"
+    },
+    {
+      "service": "orchestration",
+      "name": "orchestration",
+      "current_version": "0.9.5",
+      "latest_version": "0.9.5"
+    }
+  ]
+}
+```
+
+**Tracked Packages**: fastapi, uvicorn, pydantic, sqlalchemy, alembic, asyncpg, redis, httpx, python-jose, supabase, slowapi, celery, structlog, prometheus-client, scikit-learn, anthropic, web3, eth-account, stripe, reportlab, tree-sitter, tree-sitter-solidity, google-cloud-storage, google-cloud-secret-manager, sentry-sdk, cryptography
+
+**Tracked Services**: tool-integration, orchestration, notification, intelligence-engine, data-service, contract-parser
+
+**Status Codes**:
+- `200` OK - Success
+- `401` Unauthorized - Not authenticated
+- `403` Forbidden - Insufficient admin role
+
+**Notes**:
+- PyPI version lookups cached for 1 hour
+- First request may take 2-3 seconds (concurrent PyPI lookups)
+- Platform service versions fetched from internal health endpoints
+
+**Added**: February 2026 (API v0.27.7)
 
 ---
 
