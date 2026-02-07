@@ -1,7 +1,7 @@
 # BlockSecOps Changelogs
 
 **Purpose:** Centralized changelog directory for all BlockSecOps platform changes
-**Last Updated:** February 4, 2026
+**Last Updated:** February 6, 2026
 **Status:** Active
 
 ---
@@ -17,6 +17,24 @@ Changelogs are organized by component and maintained chronologically. Each chang
 ---
 
 ## Available Changelogs
+
+### 0. API Service v0.27.2 - Wallet Auth Fix & OAuth Plumbing (`API-SERVICE-V0.27.2-WALLET-AUTH-OAUTH-2026-02-06.md`)
+
+**Component:** blocksecops-api-service, blocksecops-orchestration, blocksecops-admin-portal
+**Scope:** Wallet auth nonce fix, per-provider OAuth Kustomize plumbing, image tag alignment
+**Date:** February 6, 2026
+
+**Key Changes:**
+- Fixed wallet auth and Solana wallet auth nonce endpoints (slowapi parameter conflict causing 500s)
+- Added per-provider OAuth plumbing for GitHub, GitLab, Bitbucket, Jira in ExternalSecret + deployment
+- Added DASHBOARD_BASE_URL for OAuth callback construction
+- Rebuilt orchestration (0.9.5) and admin-portal (0.3.0) to align with canonical tags
+- API Service 0.27.1 → 0.27.2
+
+**Use When:**
+- Understanding wallet auth nonce endpoint fix
+- Setting up OAuth provider credentials for GCP
+- Reviewing per-provider OAuth Kustomize configuration
 
 ### 0. Platform-Wide Bug Fixes v0.27/v0.40/v0.3 (`PLATFORM-V0.27-V0.40-V0.3-FIXES-2026-02-06.md`)
 
