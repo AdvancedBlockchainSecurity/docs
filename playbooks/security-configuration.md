@@ -173,7 +173,75 @@ entities = db.query(Entity).filter(
 
 ---
 
-## 5. Verification Checklist
+## 5. API Security Controls (v0.28.1)
+
+### Overview
+
+The February 2026 API security audit added the following mandatory controls.
+
+### Error Message Sanitization
+
+All HTTP error responses must use `get_safe_error_detail()` instead of `str(e)`:
+
+```python
+from src.infrastructure.security.error_sanitizer import get_safe_error_detail
+
+# WRONG: Leaks internal details
+raise HTTPException(status_code=500, detail=str(e))
+
+# RIGHT: Returns generic message
+raise HTTPException(status_code=500, detail=get_safe_error_detail(e, "operation name"))
+```
+
+### SSRF Validation on Webhook URLs
+
+All webhook URL inputs must be validated with `SSRFValidator`:
+
+```python
+from src.infrastructure.security.url_validation import validate_webhook_url
+
+# Applied via Pydantic field_validator on create AND update schemas
+@field_validator('webhook_url')
+def validate_url(cls, v):
+    validate_webhook_url(str(v))
+    return v
+```
+
+### AI/ML Tier Gating
+
+All AI/ML endpoints require `team` tier or higher:
+
+```python
+router = APIRouter(
+    dependencies=[Depends(require_tier("team"))]
+)
+```
+
+Applies to: copilot, code_review, code_repair, ml endpoints.
+
+### Model Signing
+
+ML models loaded via `joblib.load()` must be signed with HMAC-SHA256:
+
+```python
+from src.ml.storage.model_signing import ModelSigner
+
+signer = ModelSigner(secret_key)
+signer.verify_and_load(model_path)  # Raises if signature invalid
+```
+
+### Rate Limit Key Function
+
+Rate limiting must use trusted proxy validation, not raw `X-Forwarded-For`:
+
+```python
+# Uses _get_client_ip_for_rate_limit() which validates trusted proxies
+# before extracting client IP from XFF header
+```
+
+---
+
+## 6. Verification Checklist
 
 ### Pre-Deployment
 
@@ -202,3 +270,4 @@ curl -sk https://app.blocksecops.local/api/v1/health/ready
 
 - [Security Testing Guide](../feature-tests/54-security-testing.md)
 - [Security Standards](../standards/security-standards.md)
+- [API Security Audit Report](../audits/2026-02-07_API_Security_Audit.md)

@@ -1,8 +1,8 @@
 # Security Testing Guide
 
-**Version:** 1.1.0
-**Last Updated:** February 3, 2026
-**Security Tags:** BSO-SEC-RES-001 through BSO-SEC-RES-004, BSO-SEC-015, BSO-SEC-TASK-001, BSO-PERF-001
+**Version:** 1.2.0
+**Last Updated:** February 7, 2026
+**Security Tags:** BSO-SEC-RES-001 through BSO-SEC-RES-004, BSO-SEC-015, BSO-SEC-TASK-001, BSO-PERF-001, BSO-SEC-JWT-001, BSO-SEC-JWKS-001, BSO-SEC-RATE-001, BSO-SEC-WS-001, BSO-SEC-SSRF-002, BSO-SEC-ILIKE-001, BSO-SEC-LOG-003, BSO-SEC-DESER-001, BSO-SEC-AUTHZ-002
 
 ## Overview
 
@@ -25,6 +25,15 @@ This guide covers testing procedures for security features implemented in the Ja
 | Zip bomb detection | Upload 100:1 ratio | Rejected with error |
 | N+1 query prevention | Fetch 100 items | Query count constant |
 | Celery JSON-only | Send pickle payload | Rejected by broker |
+| JWT alg=none attack | Send token with alg=none | 401 rejected |
+| JWT without kid | Send token without kid header | 401 rejected in production |
+| WebSocket origin validation | Connect from unauthorized origin | Connection rejected |
+| SSRF in notification channels | Webhook URL with internal IP | Rejected |
+| ILIKE wildcard injection | Search with `%_` in admin | Literal match only |
+| Error message leakage | Trigger exception | Generic error, no stack trace |
+| AI/ML tier gating | Access copilot/ML without team tier | 403 forbidden |
+| Model deserialization | Load unsigned model | Rejected with signature error |
+| X-Forwarded-For spoofing | Spoof XFF header | Rate limit uses real IP |
 
 ---
 
@@ -391,7 +400,71 @@ Manual testing through the dashboard to verify security implementations.
 
 ---
 
+## 8. API Security Audit Tests (v0.28.1)
+
+Added February 7, 2026 from full API security audit.
+
+### 8.1 JWT Security (BSO-SEC-JWT-001, JWKS-001)
+
+```bash
+# Test alg=none attack
+curl -s http://app.blocksecops.local/api/v1/contracts \
+  -H "Authorization: Bearer eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiJ0ZXN0In0."
+# Expected: 401
+
+# Test expired token
+curl -s http://app.blocksecops.local/api/v1/contracts \
+  -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjF9.invalid"
+# Expected: 401
+```
+
+### 8.2 Rate Limit XFF Bypass (BSO-SEC-RATE-001)
+
+```bash
+# Verify XFF spoofing does not bypass rate limits
+for i in $(seq 1 15); do
+  curl -s -o /dev/null -w "%{http_code}" \
+    -H "X-Forwarded-For: 10.0.0.$i" \
+    http://app.blocksecops.local/api/v1/auth/wallet/nonce \
+    -H "Content-Type: application/json" \
+    -d '{"wallet_address": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD00"}'
+done
+# Expected: 429 after configured limit (not bypassed by different XFF)
+```
+
+### 8.3 SSRF in Notification Channels (BSO-SEC-SSRF-002)
+
+```bash
+# Test internal IP rejection
+curl -s -X POST http://app.blocksecops.local/api/v1/notification-channels \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "test", "type": "webhook", "webhook_url": "http://169.254.169.254/latest/meta-data/"}'
+# Expected: 422 (SSRF validation rejects internal IP)
+```
+
+### 8.4 Error Message Sanitization (BSO-SEC-LOG-003)
+
+```bash
+# Trigger an error and verify no stack trace in response
+curl -s http://app.blocksecops.local/api/v1/quality-gates/00000000-0000-0000-0000-000000000000 \
+  -H "Authorization: Bearer $TOKEN"
+# Expected: Generic error message, no Python traceback or internal details
+```
+
+### 8.5 AI/ML Tier Gating (BSO-SEC-AUTHZ-002)
+
+```bash
+# Access copilot without team tier
+curl -s http://app.blocksecops.local/api/v1/copilot/conversations \
+  -H "Authorization: Bearer $DEVELOPER_TIER_TOKEN"
+# Expected: 403 (requires team tier or higher)
+```
+
+---
+
 ## Related Documentation
 
 - [Security Configuration Playbook](../playbooks/security-configuration.md)
 - [Security Standards](../standards/security-standards.md)
+- [API Security Audit Report](../audits/2026-02-07_API_Security_Audit.md)

@@ -268,7 +268,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.4.0 | `k8s/overlays/local/` | Supabase build args required |
-| api-service | 0.27.7 | `k8s/overlays/local/api-service/` | Dependencies endpoint |
+| api-service | 0.28.1 | `k8s/overlays/local/api-service/` | Security audit remediation |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.40.0 | `k8s/overlays/local/` | Requires parent context |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
