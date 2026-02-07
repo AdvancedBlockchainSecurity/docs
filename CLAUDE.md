@@ -50,7 +50,7 @@ All development must follow these standards (see `standards/` for full documenta
 2. **Endpoints**: Always use `127.0.0.1` (not localhost) for local development
 3. **Backups**: MANDATORY backup before any database changes
 4. **Git Workflow**: Feature branch -> PR -> Review -> Merge (never direct to main)
-5. **Docker Builds**: Always use `--no-cache` flag
+5. **Docker Builds**: Use versioned tags; `--no-cache` only when debugging build issues
 6. **Report All Issues**: ALWAYS report discovered bugs, edge cases, or potential problems - even if not directly related to the current task
 
 ### Issue Reporting

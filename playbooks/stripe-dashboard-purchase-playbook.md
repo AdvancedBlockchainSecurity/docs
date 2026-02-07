@@ -136,7 +136,7 @@ WALLETCONNECT_ID=$(kubectl get configmap -n dashboard-local dashboard-config -o 
 STRIPE_PK="pk_test_YOUR_PUBLISHABLE_KEY"
 
 # Build with Stripe key
-docker build --no-cache \
+docker build \
   -f blocksecops-dashboard/Dockerfile \
   --build-arg VITE_SUPABASE_URL=${SUPABASE_URL} \
   --build-arg VITE_SUPABASE_ANON_KEY=${SUPABASE_KEY} \
