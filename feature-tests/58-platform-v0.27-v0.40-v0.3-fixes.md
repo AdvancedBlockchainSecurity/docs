@@ -122,3 +122,7 @@
 
 ### 3.9 Dependencies
 - [ ] Dependencies page loads
+- [ ] Shows Python package versions (current vs latest)
+- [ ] Shows platform service versions
+
+> **Note**: Dependencies page now fully functional with API v0.27.7 backend endpoint. See [59-admin-portal-v0.4.0.md](./59-admin-portal-v0.4.0.md) for comprehensive tests.
