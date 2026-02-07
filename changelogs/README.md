@@ -18,6 +18,43 @@ Changelogs are organized by component and maintained chronologically. Each chang
 
 ## Available Changelogs
 
+### 0. API Service v0.27.5 - NetworkPolicy Rewrite & CronJob Secret Fix (`API-SERVICE-V0.27.5-SECURITY-FIXES-2026-02-06.md`)
+
+**Component:** blocksecops-api-service
+**Scope:** NetworkPolicy rewrite with correct selectors, full service egress coverage, CronJob secret fix
+**Date:** February 6, 2026
+
+**Key Changes:**
+- Rewrote all NetworkPolicy namespace selectors to use `kubernetes.io/metadata.name` (previously never matched)
+- Converted egress rules from ORed to ANDed selectors (defense-in-depth for Calico/Cilium)
+- Added 10 new per-service egress rules for health-check dependencies
+- Replaced overly permissive `egress-internet` with `egress-external-apis` (ipBlock excluding RFC1918, port 443 only)
+- Fixed CronJob secret name: `api-service-secrets` -> `api-service-secret`
+- API Service 0.27.4 -> 0.27.5
+
+**Use When:**
+- Understanding NetworkPolicy AND vs OR selector patterns
+- Reviewing api-service egress rules and service connectivity
+- Debugging CronJob `CreateContainerConfigError`
+- Planning Calico/Cilium CNI migration
+
+### 0. Admin Portal v0.3.1 - HTTPS IngressRoute Fix (`ADMIN-PORTAL-V0.3.1-HTTPS-INGRESSROUTE-2026-02-06.md`)
+
+**Component:** blocksecops-admin-portal
+**Scope:** Add missing websecure IngressRoute for HTTPS access
+**Date:** February 6, 2026
+
+**Key Changes:**
+- Added `ingressroute-server.yaml` with `websecure` entryPoint and `tls: {}`
+- Root cause fix for "Stale Scans not showing" - entire admin portal was unreachable over HTTPS
+- API proxy route and UI route both covered
+- Admin Portal 0.3.0 -> 0.3.1
+
+**Use When:**
+- Understanding admin portal HTTPS access
+- Debugging IngressRoute / websecure entryPoint issues
+- Adding HTTPS IngressRoutes for other services
+
 ### 0. API Service v0.27.2 - Wallet Auth Fix & OAuth Plumbing (`API-SERVICE-V0.27.2-WALLET-AUTH-OAUTH-2026-02-06.md`)
 
 **Component:** blocksecops-api-service, blocksecops-orchestration, blocksecops-admin-portal

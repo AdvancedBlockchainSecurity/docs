@@ -78,7 +78,7 @@ For Vault KV v2 with External Secrets Operator configured with `version: v2`:
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: api-service-secrets
+  name: api-service-secret
   namespace: api-service-local
 spec:
   refreshInterval: 30s
@@ -86,7 +86,7 @@ spec:
     name: vault-backend
     kind: SecretStore  # or ClusterSecretStore
   target:
-    name: api-service-secrets
+    name: api-service-secret
     creationPolicy: Owner
   data:
     # Service-specific secrets

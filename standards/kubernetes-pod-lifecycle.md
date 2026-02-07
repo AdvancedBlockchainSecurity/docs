@@ -198,7 +198,7 @@ spec:
 
 ### Egress Policy Template (DNS)
 
-**MANDATORY:** All services need DNS egress.
+**MANDATORY:** All services need DNS egress with AND selector (namespace + pod).
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -213,12 +213,61 @@ spec:
     - Egress
   egress:
     - to:
-        - namespaceSelector: {}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
       ports:
         - protocol: UDP
           port: 53
         - protocol: TCP
           port: 53
+```
+
+### AND vs OR Selectors (Critical)
+
+**IMPORTANT:** Egress `to:` items with separate list entries are ORed, not ANDed. For defense-in-depth, use a single object with both `namespaceSelector` and `podSelector`:
+
+```yaml
+# CORRECT (AND - must match BOTH namespace AND pod label):
+egress:
+  - to:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: postgresql-local
+        podSelector:              # Same list item = AND
+          matchLabels:
+            app.kubernetes.io/name: postgresql
+
+# WRONG (OR - matches any pod in namespace OR any namespace with pod label):
+egress:
+  - to:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: postgresql-local
+      - podSelector:              # Separate list item = OR
+          matchLabels:
+            app.kubernetes.io/name: postgresql
+```
+
+On non-enforcing CNIs (Flannel) both patterns appear to work, but on enforcing CNIs (Calico, Cilium) the OR pattern allows unintended traffic.
+
+### Namespace Selector Labels
+
+**MANDATORY:** Always use `kubernetes.io/metadata.name` for namespace selectors. This label is automatically applied by Kubernetes to every namespace and is guaranteed to exist.
+
+```yaml
+# CORRECT:
+namespaceSelector:
+  matchLabels:
+    kubernetes.io/metadata.name: postgresql-local
+
+# WRONG (custom label that may not exist):
+namespaceSelector:
+  matchLabels:
+    name: postgresql-local
 ```
 
 ### Common Egress Patterns
@@ -230,6 +279,9 @@ egress:
       - namespaceSelector:
           matchLabels:
             kubernetes.io/metadata.name: postgresql-local
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: postgresql
     ports:
       - protocol: TCP
         port: 5432
@@ -242,6 +294,10 @@ egress:
       - namespaceSelector:
           matchLabels:
             kubernetes.io/metadata.name: redis-local
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+            app.kubernetes.io/component: master
     ports:
       - protocol: TCP
         port: 6379
@@ -254,18 +310,30 @@ egress:
       - namespaceSelector:
           matchLabels:
             kubernetes.io/metadata.name: vault-local
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: vault
     ports:
       - protocol: TCP
         port: 8200
 ```
 
-**External HTTPS (webhooks, APIs):**
+**External HTTPS (APIs, webhooks) - RFC1918 exclusion:**
 ```yaml
 egress:
-  - ports:
+  - to:
+      - ipBlock:
+          cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+    ports:
       - protocol: TCP
         port: 443
 ```
+
+> **Note:** Use `ipBlock` with RFC1918 exclusions instead of `namespaceSelector: {}` to prevent internal cluster traffic from bypassing per-service egress rules.
 
 ### Kustomization Integration
 
