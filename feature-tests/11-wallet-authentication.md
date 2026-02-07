@@ -303,6 +303,33 @@ kubectl exec -n api-service-local deployment/api-service -- printenv | grep SUPA
 
 ---
 
+## Known Issues and Fixes
+
+### slowapi Rate Limiter Parameter Conflict (Fixed v0.27.2 - February 6, 2026)
+
+**Issue:** The `@limiter.limit` decorator from slowapi expects a parameter named `request` of type Starlette `Request`. Both `wallet_auth.py` and `solana_wallet_auth.py` nonce endpoints had a Pydantic body parameter also named `request`, causing slowapi to find the wrong object and crash with a 500 error.
+
+**Affected Endpoints:**
+- `POST /api/v1/auth/wallet/nonce` (wallet_auth.py)
+- `POST /api/v1/auth/wallet/solana/nonce` (solana_wallet_auth.py)
+
+**Fix:** Renamed the Starlette `Request` parameter from `http_request` to `request` and the Pydantic body parameter from `request` to `body`:
+```python
+# Before (broken):
+async def request_nonce(http_request: Request, request: WalletNonceRequest):
+    address = request.wallet_address
+
+# After (fixed):
+async def request_nonce(request: Request, body: WalletNonceRequest):
+    address = body.wallet_address
+```
+
+**Files Changed:**
+- `src/presentation/api/v1/endpoints/wallet_auth.py` (line ~200)
+- `src/presentation/api/v1/endpoints/solana_wallet_auth.py` (line ~226)
+
+---
+
 ## Test Notes
 
 _Record wallet authentication test results here:_
