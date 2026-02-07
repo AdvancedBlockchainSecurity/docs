@@ -136,7 +136,7 @@ kubectl exec -n dashboard-local deployment/dashboard -- ps aux | head -5
 
 | Service | Namespace | Policies Expected | Status |
 |---------|-----------|-------------------|--------|
-| api-service | api-service-local | ≥4 | [ ] |
+| api-service | api-service-local | ≥16 | [ ] |
 | orchestration | orchestration-local | ≥3 | [ ] |
 | tool-integration | tool-integration-local | ≥3 | [ ] |
 | dashboard | dashboard-local | ≥3 | [ ] |

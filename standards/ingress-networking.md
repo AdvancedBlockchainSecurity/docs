@@ -232,11 +232,14 @@ spec:
 ```
 k8s/overlays/local/<service>/
 ├── kustomization.yaml
-├── ingressroute.yaml          # For HTTP services
+├── ingressroute.yaml          # For HTTP services (web entryPoint)
+├── ingressroute-server.yaml   # For HTTPS services (websecure entryPoint)
 ├── ingressroute-tcp.yaml      # For TCP services
 ├── middleware-cors.yaml       # For CORS
 └── middleware-*.yaml          # Other middlewares
 ```
+
+**IMPORTANT:** Services accessed over HTTPS (server/production environments) need **both** `ingressroute.yaml` (HTTP) and `ingressroute-server.yaml` (HTTPS). Without the `websecure` IngressRoute, the service is unreachable when traffic arrives on port 443.
 
 ### Complete Example: HTTP Service with CORS
 
@@ -479,7 +482,40 @@ spec:
           port: 8003
 ```
 
-### Production Environment (HTTPS)
+### Server Environment (HTTPS with self-signed/default cert)
+
+For the server environment (kubeadm), use `tls: {}` to enable HTTPS with Traefik's default certificate:
+
+```yaml
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: <service>-ingressroute-server
+  namespace: <service>-local
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`<domain>.blocksecops.local`) && PathPrefix(`/api/v1`)
+      kind: Rule
+      services:
+        - name: api-service
+          namespace: api-service-local
+          port: 8000
+    - match: Host(`<domain>.blocksecops.local`) && !PathPrefix(`/api/v1`)
+      kind: Rule
+      services:
+        - name: <service>
+          port: 3000
+      middlewares:
+        - name: <service>-security-headers
+          namespace: <service>-local
+  tls: {}
+```
+
+**Note:** `tls: {}` uses Traefik's default self-signed certificate. For production, use `certResolver` instead.
+
+### Production Environment (HTTPS with Let's Encrypt)
 
 ```yaml
 apiVersion: traefik.io/v1alpha1
