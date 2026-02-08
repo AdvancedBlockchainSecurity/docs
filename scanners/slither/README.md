@@ -1,10 +1,10 @@
 # Slither Scanner Integration Documentation
 
-**Version:** 0.2.0
-**Last Updated:** 2025-12-05
-**Scanner Version:** Slither 0.11.3
+**Version:** 0.3.1
+**Last Updated:** 2026-02-08
+**Scanner Version:** Slither 0.11.5
 **Solc-select Version:** 1.1.0
-**Docker Image:** scanner-slither:0.2.0
+**Docker Image:** scanner-slither:0.3.1
 
 ## Table of Contents
 

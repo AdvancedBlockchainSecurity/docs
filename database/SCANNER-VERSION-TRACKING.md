@@ -412,7 +412,7 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
 ### Scanners Loaded
 
 **EVM/Solidity Scanners:**
-- slither (0.11.5, solc-select 1.1.0) - scanner-slither:0.2.0 - 101/101 detectors (100%) ✅
+- slither (0.11.5, solc-select 1.1.0) - scanner-slither:0.3.1 - 101/101 detectors (100%) ✅
 - aderyn (0.6.7) - scanner-aderyn:0.7.0 (pre-built binary) - 87/87 detectors (100%) ✅
 - wake (eth-wake 4.21.0) - scanner-wake:0.3.4 ✅
 - semgrep (1.141.0) - scanner-semgrep:0.3.2 - 43/47 detectors (91.5%) - Fixed JSON generation bug (2026-02-05)

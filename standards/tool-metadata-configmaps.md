@@ -136,7 +136,7 @@ data:
     }
 
   # Tool Docker image tags (used by orchestration service)
-  SCANNER_IMAGE_SLITHER: "scanner-slither:0.2.0"
+  SCANNER_IMAGE_SLITHER: "scanner-slither:0.3.1"
   SCANNER_IMAGE_MYTHRIL: "mythril/myth:latest"
   SCANNER_IMAGE_ADERYN: "scanner-aderyn:0.1.0"
 ```
