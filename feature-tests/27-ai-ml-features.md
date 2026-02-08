@@ -373,10 +373,10 @@ Testing Notes:
 | Component | Before | After |
 |-----------|--------|-------|
 | api-service | 12.6GB (included PyTorch) | 934MB (HTTP client only) |
-| intelligence-engine | 3GB | 3GB (hosts embeddings endpoint) |
+| intelligence-engine | 3GB | **1.89GB** (hosts embeddings endpoint, trimmed Feb 8 2026) |
 
 **Embeddings Endpoint:** `POST /api/v1/embeddings`
-- Host: `intelligence-engine.intelligence-engine-local.svc.cluster.local:8000`
+- Host: `intelligence-engine.intelligence-engine-local.svc.cluster.local:80`
 - Model: `all-MiniLM-L6-v2`
 - Dimensions: 384
 

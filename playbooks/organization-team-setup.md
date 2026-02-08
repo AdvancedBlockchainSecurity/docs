@@ -1,7 +1,7 @@
 # Playbook: Organization, Team, and Project Setup for Team Leads/Managers
 
-**Version:** 1.0.0
-**Last Updated:** January 23, 2026
+**Version:** 1.1.0
+**Last Updated:** February 8, 2026
 
 ## Overview
 
@@ -38,7 +38,7 @@ This playbook guides team leads and managers through the complete workflow for c
 
 | Action | Required Permission | Who Can Perform | API Endpoint |
 |--------|---------------------|-----------------|--------------|
-| Create Organization | Enterprise tier | Any enterprise user | `POST /organizations` |
+| Create Organization | Enterprise tier + no existing owned org | Enterprise user without existing org | `POST /organizations` |
 | View Organization | Member of org | Any org member | `GET /organizations/{id}` |
 | Update Organization | Owner only | Organization owner | `PUT /organizations/{id}` |
 | Delete Organization | Owner only | Organization owner | `DELETE /organizations/{id}` |

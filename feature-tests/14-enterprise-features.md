@@ -103,6 +103,8 @@
 - [ ] Creator becomes owner automatically
 - [ ] Slug generated from name
 - [ ] Slug must be unique
+- [x] User who already owns an active organization gets 400 "You already own an organization" (v0.28.3)
+- [x] Deactivated organizations do not count against ownership limit (v0.28.3)
 - [ ] `GET /api/v1/organizations` lists user's orgs
 - [ ] `GET /api/v1/organizations/{id}` returns details
 - [ ] `PATCH /api/v1/organizations/{id}` updates org

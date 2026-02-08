@@ -43,7 +43,7 @@ Base images MUST be stored in Harbor to ensure availability and prevent deletion
 
 | Environment | Registry | Example |
 |-------------|----------|---------|
-| **Local/Server** | `harbor.blocksecops.local/blocksecops/` | `harbor.blocksecops.local/blocksecops/blocksecops-intelligence-base-cpu:1.0.0-e4beef6a` |
+| **Local/Server** | `harbor.blocksecops.local/blocksecops/` | `harbor.blocksecops.local/blocksecops/blocksecops-intelligence-base-cpu:1.0.0-<hash>` |
 | **Production** | GCP Artifact Registry | `us-central1-docker.pkg.dev/solidity-security/blocksecops/blocksecops-intelligence-base-cpu:1.0.0` |
 
 ### Why Harbor for Base Images
@@ -68,7 +68,7 @@ Base images are versioned using a hash of their dependency specification:
 
 | Base Image | Tag | Dockerfile Hash |
 |------------|-----|-----------------|
-| `blocksecops-intelligence-base-cpu` | `1.0.0-e4beef6a` | e4beef6a |
+| `blocksecops-intelligence-base-cpu` | `1.0.0-5ede3c61` | 5ede3c61 (trimmed base-ml.txt, 7 packages, 1.85GB) |
 | `blocksecops-orchestration-base` | `1.0.0-ac02c353` | ac02c353 |
 
 ---

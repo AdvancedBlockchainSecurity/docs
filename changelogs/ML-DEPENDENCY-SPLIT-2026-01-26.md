@@ -103,6 +103,10 @@ None. The semantic deduplication API is unchanged - only the implementation (HTT
 
 2. **Missing HOME environment**: Python couldn't find packages in `/home/appuser/.local/` because HOME wasn't set. Fixed by adding `HOME="/home/appuser"` to ENV.
 
+## Subsequent Optimization (February 8, 2026)
+
+The intelligence-engine image was further reduced from ~3GB to **1.89GB** (base image: 12.1GB → 1.85GB) by removing 13 unused ML packages (TensorFlow, spacy, pandas, etc.), switching to CPU-only PyTorch, and using multi-stage builds. See [PLAN-2026-02-08-INTELLIGENCE-ENGINE-DOCKER-SLIM.md](/home/pwner/Git/TaskDocs-BlockSecOps/PLAN-2026-02-08-INTELLIGENCE-ENGINE-DOCKER-SLIM.md).
+
 ## Related
 
 - [ML-DEPENDENCY-SPLIT-PLAN.md](/home/pwner/Git/TaskDocs-BlockSecOps/phases/03-phase-4-intelligence/ML-DEPENDENCY-SPLIT-PLAN.md)
