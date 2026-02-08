@@ -1,7 +1,7 @@
 # Tier Standards - Source of Truth
 
-**Last Updated**: January 30, 2026
-**Version**: 3.2 (Centralized Config Package)
+**Last Updated**: February 7, 2026
+**Version**: 3.3 (AI Features Active)
 **Status**: Official
 **Owner**: Product Team
 
@@ -282,81 +282,117 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 
 ## AI Features (Claude Integration)
 
-**Status**: PLANNED (Phase 5.5 & Task 6)
+**Status**: ACTIVE (v0.28.2)
 **Added**: January 11, 2026
+**Deployed**: February 7, 2026
 
-AI-powered features use Claude API and are tier-gated with monthly quotas.
+AI-powered features use the Anthropic Claude API and are tier-gated with monthly quotas. All AI endpoints require Team tier or above (`require_tier("team")`).
 
 ### AI Feature Overview
 
-| Feature | Description | Model | Cost/Request |
-|---------|-------------|-------|--------------|
-| **Economic AI Explainer** | AI explanations of economic vulnerabilities | Claude Haiku 3.5 | ~$0.012 |
-| **AI Invariant Generator** | Generate formal verification properties | Claude Sonnet 4 | ~$0.09 |
-| **Natural Language Converter** | Convert text to invariant specs | Claude Sonnet 4 | ~$0.03 |
+| Feature | Endpoint Prefix | Model | Max Tokens | Cost/Request |
+|---------|-----------------|-------|------------|--------------|
+| **AI Copilot** | `/copilot/` | Claude Sonnet 4 | 2,048 | ~$0.03-0.09 |
+| **Code Review** | `/review/` | Claude Haiku 3.5 | 2,048 | ~$0.012 |
+| **Code Repair** | `/code-repair/` | Claude Sonnet 4 | 4,096 | ~$0.06-0.15 |
+| **Invariant Generation** | `/invariants/` | Claude Sonnet 4 | 4,096 | ~$0.09 |
+| **Economic Analysis** | `/economic-analysis/` | Claude Haiku 3.5 | N/A | ~$0.012 |
 
-### AI Quota Summary
-
-| Tier | AI Explanations | Invariant Gens | NL Conversions | Priority Queue |
-|------|-----------------|----------------|----------------|----------------|
-| Developer | 0 | 0 | 0 | No |
-| Team | 50 | 10 | 25 | No |
-| Growth | 200 | 50 | 100 | No |
-| Enterprise | -1 | -1 | -1 | Yes |
-
-### Phase 5 AI Feature Quotas (Planned)
+### AI Quota Summary (Monthly)
 
 | Feature | Developer | Team | Growth | Enterprise |
 |---------|-----------|------|--------|------------|
-| AI Copilot queries/mo | 0 | 25 | 100 | -1 |
-| Code Review requests/mo | 0 | 25 | 100 | -1 |
-| Code Repair requests/mo | 0 | 10 | 50 | -1 |
-| Compliance assessments/mo | 0 | 3 | 10 | -1 |
+| AI Copilot queries | 0 | 25 | 100 | -1 |
+| Code Review requests | 0 | 25 | 100 | -1 |
+| Code Repair requests | 0 | 10 | 50 | -1 |
+| Invariant Generations | 0 | 10 | 50 | -1 |
+| AI Explanations | 0 | 50 | 200 | -1 |
+| NL Conversions | 0 | 25 | 100 | -1 |
+| Priority Queue | No | No | No | Yes |
 
-**Note:** `-1` means unlimited. These quotas will be enforced when Phase 5 features are implemented.
+**Note:** `-1` means unlimited. Enterprise has a daily cap of 500 invariant generations to prevent runaway usage.
 
-### Claude API Pricing (January 2026)
+### AI Rate Limits
 
-| Model | Input (per MTok) | Output (per MTok) | Use Case |
-|-------|------------------|-------------------|----------|
-| Claude Haiku 3.5 | $0.80 | $4.00 | Economic explanations |
-| Claude Sonnet 4 | $3.00 | $15.00 | Invariant generation |
+| Control | Value | Scope |
+|---------|-------|-------|
+| Global per-user rate | 20 req/min | All AI endpoints combined |
+| Per-feature rate limit | Tier-based via `get_rate_limit_string("ai", <feature>)` | Individual features |
+| Invariant cooldown | 5 seconds between requests | Invariant generation only |
+
+### Security Controls
+
+| Control | Implementation | Audit Finding |
+|---------|----------------|---------------|
+| Input sanitization | `_sanitize_for_prompt()`: truncation, HTML escape, control char removal | BSO-SEC-AI-001 |
+| Output validation | `_validate_ai_output()`: injection pattern detection | BSO-SEC-AI-002 |
+| XML boundary isolation | User content in `<retrieved_context>` tags | BSO-SEC-AI-001 |
+| Error sanitization | `get_safe_error_detail()` on all AI error responses | BSO-SEC-LOG-003 |
+| Token budget | Per-request output caps + budget warnings | BSO-SEC-LOW-005 |
+
+### Feature Flags
+
+| Flag | Default | Scope |
+|------|---------|-------|
+| `ai_features_enabled` | `true` | Master toggle (disables all AI) |
+| `ai_copilot_enabled` | `true` | Copilot only |
+| `ai_code_review_enabled` | `true` | Code review only |
+| `ai_code_repair_enabled` | `true` | Code repair only |
+| `ai_invariant_enabled` | `true` | Invariant generation only |
+
+### Claude API Pricing (February 2026)
+
+| Model | Input (per MTok) | Output (per MTok) | Used By |
+|-------|------------------|-------------------|---------|
+| Claude Haiku 3.5 | $0.80 | $4.00 | Code Review, Economic Analysis |
+| Claude Sonnet 4 | $3.00 | $15.00 | Copilot, Code Repair, Invariants |
 
 ### Monthly Cost to BlockSecOps (Absorbed in Tier)
 
 | Tier | Typical AI Usage | Est. Monthly Cost |
 |------|------------------|-------------------|
 | Developer | 0 | $0 |
-| Team | 50 explanations + 10 invariants | ~$1.50 |
-| Growth | 200 explanations + 50 invariants | ~$7.00 |
+| Team | ~120 requests (mixed models) | ~$3-5 |
+| Growth | ~500 requests (mixed models) | ~$15-25 |
 | Enterprise | Variable | Usage-based billing |
 
 ### Implementation
 
-**Database Columns** (add to `user_quotas`):
-```sql
-monthly_ai_explanations_limit INTEGER DEFAULT 0
-monthly_ai_explanations_used INTEGER DEFAULT 0
-monthly_invariant_generations_limit INTEGER DEFAULT 0
-monthly_invariant_generations_used INTEGER DEFAULT 0
-monthly_nl_conversions_limit INTEGER DEFAULT 0
-monthly_nl_conversions_used INTEGER DEFAULT 0
-```
+**Vault Secret Path**: `secret/local/api-service/anthropic` (property: `api_key`)
 
-**Environment Variables**:
-```bash
-ANTHROPIC_API_KEY=sk-ant-...
-ECONOMIC_AI_MODEL=claude-3-haiku-20240307
-INVARIANT_AI_MODEL=claude-sonnet-4-20250514
-```
+**K8s Secret Flow**: Vault → ExternalSecret → `api-service-secret` → `ANTHROPIC_API_KEY` env var
 
-**Tier Gating**:
+**Configuration** (`src/infrastructure/config.py`):
 ```python
-@require_tier(TierName.DEVELOPER)
-@require_ai_quota("economic_explanation")
-async def explain_economic_risks(...):
-    ...
+anthropic_api_key: Optional[str]                     # From Vault
+anthropic_model_copilot: str = "claude-sonnet-4-20250514"
+anthropic_model_code_review: str = "claude-3-haiku-20240307"
+anthropic_model_code_repair: str = "claude-sonnet-4-20250514"
+anthropic_model_invariant: str = "claude-sonnet-4-20250514"
+anthropic_rate_limit_per_minute: int = 20
+anthropic_max_tokens_copilot: int = 2048
+anthropic_max_tokens_code_review: int = 2048
+anthropic_max_tokens_code_repair: int = 4096
+anthropic_max_tokens_invariant: int = 4096
 ```
+
+**Tier Gating Pattern** (all AI generation endpoints):
+```python
+@router.post("/generate")
+async def generate(
+    current_user=Depends(require_tier("team")),  # Developer blocked
+    ...
+):
+```
+
+### Related AI Documentation
+
+- [AI Features Workflow](../workflows/ai-features-workflow.md) — End-to-end workflow
+- [AI Copilot Pipeline](../pipelines/ai-copilot-pipeline.md) — Copilot details
+- [AI Code Review Pipeline](../pipelines/ai-code-review-pipeline.md) — Code review details
+- [AI Code Repair Pipeline](../pipelines/ai-code-repair-pipeline.md) — Code repair details
+- [AI Invariant Pipeline](../pipelines/ai-invariant-generation-pipeline.md) — Invariant details
+- [AI Economic Analysis Pipeline](../pipelines/ai-economic-analysis-pipeline.md) — Economic analysis details
 
 ---
 
@@ -552,6 +588,7 @@ monthly_nl_conversions_limit = -1
 
 | Date | Change | Author |
 |------|--------|--------|
+| 2026-02-07 | **v3.3**: AI Features now ACTIVE (v0.28.2). Updated all AI quotas to match implementation. Added security controls, feature flags, rate limits, Vault secret path, and related pipeline documentation links. | Claude Code |
 | 2026-01-26 | **v3.1**: Added Phase 5 AI feature quotas (AI Copilot, Code Review, Code Repair, Compliance assessments) for upcoming AI/ML implementation. | Claude Code |
 | 2026-01-20 | **v3.0**: Updated to 4-tier model (Developer, Team, Growth, Enterprise). New pricing: $0/$299/$699/$1,999+. Updated limits to contracts (not scans). Added 25+ scanners, private repos, multi-chain, continuous monitoring features. Updated x402 to credit packages (Starter/Builder/Pro/Bulk). | Claude Code |
 | 2026-01-11 | **v2.1**: Added AI Features section with tier quotas (AI Explanations, Invariant Generations, NL Conversions). Claude API costs documented. Database schema updated. | Claude Code |
