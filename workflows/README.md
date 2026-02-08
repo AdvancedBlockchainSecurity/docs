@@ -19,6 +19,7 @@ This directory contains comprehensive documentation of key workflows in the Bloc
 | [Deduplication Workflow](./deduplication-workflow.md) | Multi-tier deduplication with semantic matching | Active |
 | [ML Training Workflow](./ml-training-workflow.md) | False positive classifier training and evaluation | Active |
 | [AI Features Workflow](./ai-features-workflow.md) | All AI-powered features (Copilot, Code Review, Code Repair, Invariants, Economic Analysis) | Active |
+| [Subscription Workflow](./subscription-workflow.md) | Stripe billing lifecycle, tier changes, x402 pay-per-scan, credit packages | Active |
 
 ---
 

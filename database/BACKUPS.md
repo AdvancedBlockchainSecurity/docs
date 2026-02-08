@@ -613,3 +613,87 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 
 ---
 
+## February 8, 2026 - Pre Organization Cleanup (Single-Owner Enforcement)
+
+### Backup Details
+**Filename:** `solidity_security_pre_org_cleanup_20260208.sql`
+**Location:** `/home/pwner/Git/docs/database/backups/solidity_security_pre_org_cleanup_20260208.sql`
+**Created:** February 8, 2026
+**Size:** 4.5MB
+**Database Version:** PostgreSQL 15.4
+**Backup Method:** kubectl exec pg_dump from within cluster
+
+### Database State Before Migration
+**Tables:**
+- `organizations`: 3 records (all owned by same user — the bug)
+- `organization_members`: 3 records
+- `users`: 6 records
+- `contracts`: 76 records
+- `scans`: 207 records
+- `vulnerabilities`: 1,781 records
+
+**Schema Version:** Migration 072 (add_default_org_to_users)
+
+**Organizations State:**
+| ID | Name | Owner | Created |
+|----|------|-------|---------|
+| `9b914d23-...` | Test Organization | jasonbrailowbizop@mail.com | 2025-12-27 |
+| `946cc483-...` | teste | jasonbrailowbizop@mail.com | 2026-01-22 |
+| `7ec4a955-...` | Worm Org | jasonbrailowbizop@mail.com | 2026-02-05 |
+
+### Reason for Backup
+Created before running migration 073 to enforce single organization ownership per user. The migration:
+1. Soft-deletes "teste" and "Worm Org" (sets `is_active = false`)
+2. Removes organization_members records for deactivated orgs
+3. Sets `default_organization_id` to "Test Organization" for the affected user
+
+This accompanies the API change in `organizations.py` that now prevents creating multiple organizations.
+
+### Changes Applied After This Backup
+```sql
+-- Migration 073_enforce_single_org_ownership:
+-- Deactivate extra organizations
+UPDATE organizations SET is_active = false WHERE id IN (
+    '946cc483-2d05-4c82-9841-1f3f3447976c',  -- "teste"
+    '7ec4a955-ce3e-4b5b-96dd-f6ed9d6a4c9c'   -- "Worm Org"
+);
+
+-- Remove memberships for deactivated orgs
+DELETE FROM organization_members WHERE organization_id IN (
+    '946cc483-2d05-4c82-9841-1f3f3447976c',
+    '7ec4a955-ce3e-4b5b-96dd-f6ed9d6a4c9c'
+);
+
+-- Set default org for affected user
+UPDATE users SET default_organization_id = '9b914d23-f5f8-47f8-b816-3b56535b8c5a'
+WHERE id = '66f28736-4c19-43ec-8560-e70c645f1893';
+```
+
+### Restore Command
+```bash
+# Stop API service to prevent concurrent access
+kubectl scale deployment/api-service -n api-service-local --replicas=0
+
+# Restore database
+kubectl cp /home/pwner/Git/docs/database/backups/solidity_security_pre_org_cleanup_20260208.sql \
+  postgresql-local/postgresql-0:/tmp/restore.sql
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U blocksecops -d solidity_security -f /tmp/restore.sql
+
+# Restart API service
+kubectl scale deployment/api-service -n api-service-local --replicas=1
+
+# Verify restoration
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U blocksecops -d solidity_security \
+  -c "SELECT o.id, o.name, o.is_active FROM organizations o ORDER BY o.created_at;"
+```
+
+### Related Documentation
+- Migration File: `blocksecops-api-service/alembic/versions/20260208_1000-073_enforce_single_org_ownership.py`
+- API Change: `blocksecops-api-service/src/presentation/api/v1/endpoints/organizations.py` (single-owner check)
+- Subscription Workflow: `docs/workflows/subscription-workflow.md`
+- Subscription Pipeline: `docs/pipelines/subscription-pipeline.md`
+
+---
+
