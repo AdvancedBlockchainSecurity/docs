@@ -216,7 +216,7 @@ done
 | dashboard | 0.39.1 | 0.40.0 |
 | admin-portal | 0.2.0 | 0.3.0 |
 | tool-integration | 0.3.14 | - |
-| orchestration | 0.9.5 | - |
+| orchestration | 0.9.10 | - |
 | notification | 0.1.2 | - |
 | intelligence-engine | 0.2.1 | - |
 | data-service | 0.2.0 | - |

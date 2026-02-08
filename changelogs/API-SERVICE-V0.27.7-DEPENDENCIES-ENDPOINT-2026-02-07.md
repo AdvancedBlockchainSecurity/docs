@@ -35,8 +35,8 @@ Added `GET /admin/dependencies` endpoint that reports installed Python package v
       {
         "service": "orchestration",
         "name": "orchestration",
-        "current_version": "0.9.5",
-        "latest_version": "0.9.5"
+        "current_version": "0.9.10",
+        "latest_version": "0.9.10"
       }
     ]
   }

@@ -5870,8 +5870,8 @@ Get installed Python package versions and latest available versions from PyPI, p
     {
       "service": "orchestration",
       "name": "orchestration",
-      "current_version": "0.9.5",
-      "latest_version": "0.9.5"
+      "current_version": "0.9.10",
+      "latest_version": "0.9.10"
     }
   ]
 }
