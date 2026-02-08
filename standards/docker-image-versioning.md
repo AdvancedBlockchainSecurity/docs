@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 3.3.0
-**Last Updated:** February 6, 2026
+**Version:** 3.4.0
+**Last Updated:** February 7, 2026
 
 ## Single Source of Truth
 
@@ -247,6 +247,59 @@ CI/CD handles everything automatically:
 3. CI builds and pushes to Artifact Registry
 4. CI updates kustomization `newTag`
 5. ArgoCD detects change and deploys
+
+---
+
+## Immutable Tag Policy
+
+**MANDATORY:** All image tags in Harbor are immutable. Once a tag is pushed, it cannot be overwritten or deleted.
+
+### Why Immutable Tags
+
+| Concern | How Immutable Tags Help |
+|---------|------------------------|
+| Accidental overwrites | Cannot push same tag with different content |
+| Accidental deletions | Cannot delete tags that are referenced by deployments |
+| Reproducibility | Tag always resolves to the same image digest |
+| Audit trail | Every version is permanently traceable |
+| Environment parity | Same tag in local overlay translates to same content in GCP overlay |
+
+### Harbor Configuration
+
+Immutable tags are enforced at the Harbor project level via tag immutability rules:
+
+```bash
+# Verify immutable tag rule exists
+curl -s -k -u admin:${HARBOR_PASSWORD} \
+  https://harbor.blocksecops.local/api/v2.0/projects/blocksecops/immutabletagrules | jq
+```
+
+The rule matches all repositories (`**`) and all tags (`**`) in the `blocksecops` project.
+
+### Version Bump Required for Changes
+
+Because tags are immutable, any image change requires a version bump:
+
+```bash
+# Cannot do this (tag already exists, push will fail):
+docker push harbor.blocksecops.local/blocksecops/api-service:0.28.2
+
+# Must bump version first:
+# 1. Update pyproject.toml: version = "0.28.3"
+# 2. Update kustomization.yaml: newTag: "0.28.3"
+# 3. Build and push with new tag
+docker push harbor.blocksecops.local/blocksecops/api-service:0.28.3
+```
+
+### GCP Equivalent
+
+In GCP Artifact Registry, immutability is enforced differently:
+
+- **IAM policies** restrict delete permissions to admin roles only
+- **Binary Authorization** can enforce that only signed/approved images are deployed
+- **Vulnerability scanning** automatically scans pushed images
+
+The workflow is the same: always bump the version, never overwrite a tag.
 
 ---
 
