@@ -327,7 +327,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
-| orchestration | 0.9.7 | `k8s/overlays/local/` | Uses pre-built base image |
+| orchestration | 0.9.8 | `k8s/overlays/local/` | Uses pre-built base image |
 | tool-integration | 0.3.14 | `k8s/overlays/local/` | |
 
 All services are `0.x.x` (development phase). Version `1.0.0` indicates stable, production-ready API.
