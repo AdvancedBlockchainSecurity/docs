@@ -323,11 +323,11 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | admin-portal | 0.4.0 | `k8s/overlays/local/` | Supabase build args required |
 | api-service | 0.28.4 | `k8s/overlays/local/api-service/` | Single-org ownership enforcement, migration 073 backfill |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.40.0 | `k8s/overlays/local/` | Requires parent context |
+| dashboard | 0.41.1 | `k8s/overlays/local/` | Requires parent context |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
-| orchestration | 0.9.5 | `k8s/overlays/local/` | Uses pre-built base image |
+| orchestration | 0.9.7 | `k8s/overlays/local/` | Uses pre-built base image |
 | tool-integration | 0.3.14 | `k8s/overlays/local/` | |
 
 All services are `0.x.x` (development phase). Version `1.0.0` indicates stable, production-ready API.
