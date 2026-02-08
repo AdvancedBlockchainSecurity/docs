@@ -1,7 +1,7 @@
 # Playbook: Create Organization
 
-**Version:** 1.0.0
-**Last Updated:** February 1, 2026
+**Version:** 1.1.0
+**Last Updated:** February 8, 2026
 **Audience:** Admin | Enterprise User
 
 ## Overview
@@ -14,8 +14,11 @@ This playbook guides enterprise users through creating an organization in BlockS
 
 - [ ] Active BlockSecOps account with verified email
 - [ ] Enterprise tier subscription (required for organizations)
+- [ ] No existing organization owned by this account (one organization per owner)
 - [ ] Organization name and purpose defined
 - [ ] Initial team structure planned
+
+> **Important:** Each user can own only one organization. This is enforced by the API (returns 400 if you already own an organization). Use teams within your organization to subdivide work. If you need to manage multiple organizations, use separate accounts or transfer ownership.
 
 ---
 
@@ -232,6 +235,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/roles" \
 | Issue | Cause | Solution |
 |-------|-------|----------|
 | "Organizations not available" | Not on Enterprise tier | Upgrade subscription to Enterprise |
+| "You already own an organization" | One org per owner limit | Use teams within your existing org, or transfer ownership first |
 | "Organization name already exists" | Name taken by another org | Choose a different unique name |
 | "Cannot invite member" | User already in different org | User must leave current org first |
 | Invite email not received | Email delivery issue | Check spam folder, resend invite |
