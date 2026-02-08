@@ -252,18 +252,27 @@ celery_app.start([
 ])
 ```
 
+**Lock Recovery (v0.9.10)**: RedBeat uses a Redis distributed lock to ensure only one beat instance runs at a time. The default lock timeout (1500s/25 min) and retry interval (300s/5 min) are too long for Kubernetes pod rollouts. The following settings in `celery_app.py` ensure beat recovers within ~45 seconds after a pod rollout:
+
+```python
+celery_app.conf.update(
+    redbeat_lock_timeout=30,        # Lock TTL: 30s (default 1500s)
+    beat_max_loop_interval=10,      # Lock retry: 10s (default 300s)
+)
+```
+
 ## Resource Configuration
 
-### Worker Pod
+### Worker Pod (v0.9.10)
 
 ```yaml
 resources:
   requests:
-    memory: "512Mi"
-    cpu: "250m"
-  limits:
-    memory: "1Gi"
+    memory: "2Gi"
     cpu: "500m"
+  limits:
+    memory: "8Gi"
+    cpu: "4000m"
 ```
 
 ### Beat Scheduler Pod
@@ -271,8 +280,8 @@ resources:
 ```yaml
 resources:
   requests:
-    memory: "256Mi"
-    cpu: "100m"
+    memory: "128Mi"
+    cpu: "50m"
   limits:
     memory: "512Mi"
     cpu: "250m"
@@ -283,11 +292,11 @@ resources:
 ```yaml
 resources:
   requests:
-    memory: "128Mi"
-    cpu: "100m"
+    memory: "64Mi"
+    cpu: "25m"
   limits:
     memory: "256Mi"
-    cpu: "200m"
+    cpu: "100m"
 ```
 
 ## Monitoring

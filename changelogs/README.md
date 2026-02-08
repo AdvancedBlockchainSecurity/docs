@@ -1,7 +1,7 @@
 # BlockSecOps Changelogs
 
 **Purpose:** Centralized changelog directory for all BlockSecOps platform changes
-**Last Updated:** February 6, 2026
+**Last Updated:** February 8, 2026
 **Status:** Active
 
 ---
@@ -18,7 +18,21 @@ Changelogs are organized by component and maintained chronologically. Each chang
 
 ## Available Changelogs
 
-### 0. API Service v0.27.5 - NetworkPolicy Rewrite & CronJob Secret Fix (`API-SERVICE-V0.27.5-SECURITY-FIXES-2026-02-06.md`)
+### 0. Orchestration v0.9.10 - RedBeat Fix & Load Test Validation (`ORCHESTRATION-V0.9.10-REDBEAT-LOAD-TEST-2026-02-08.md`)
+
+**Component:** blocksecops-orchestration
+**Scope:** RedBeat lock recovery, solc installation, echidna fix, worker concurrency, resource tuning
+**Date:** February 8, 2026
+
+**Key Changes:**
+- Fixed RedBeat lock stuck after pod rollouts (lock timeout 1500s to 30s, retry interval 300s to 10s)
+- Fixed solc installation (direct wget + SHA256 instead of rate-limited GitHub API)
+- Fixed echidna .sol suffix stripping for contract names
+- Fixed worker concurrency to read from WORKER_CONCURRENCY env var
+- Tuned worker resources (memory 256Mi to 2Gi request, 1Gi to 8Gi limit)
+- Validated all 15 scanners via load test (15/15 pass)
+
+### 0a. API Service v0.27.5 - NetworkPolicy Rewrite & CronJob Secret Fix (`API-SERVICE-V0.27.5-SECURITY-FIXES-2026-02-06.md`)
 
 **Component:** blocksecops-api-service
 **Scope:** NetworkPolicy rewrite with correct selectors, full service egress coverage, CronJob secret fix
