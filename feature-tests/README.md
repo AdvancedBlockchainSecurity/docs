@@ -257,7 +257,7 @@ ML embedding generation moved from api-service to intelligence-engine:
 | Service | Before | After |
 |---------|--------|-------|
 | api-service | 12.6 GB (had PyTorch) | **934 MB** (lightweight HTTP client) |
-| intelligence-engine | 3 GB | 3 GB (hosts `/api/v1/embeddings`) |
+| intelligence-engine | 3 GB | **1.89 GB** (hosts `/api/v1/embeddings`, trimmed Feb 8 2026) |
 
 **Result:** 93% reduction in api-service image size. Deduplication functionality unchanged.
 

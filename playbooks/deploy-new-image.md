@@ -75,21 +75,21 @@ VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
 
 # Build using base image (fast: ~2-3 min for code changes)
 docker build \
-  --build-arg BASE_IMAGE_TAG=latest \
+  --build-arg BASE_IMAGE_TAG=1.0.0-ac02c353 \
   --build-arg SERVICE_VERSION=$VERSION \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
   -t harbor.blocksecops.local/blocksecops/orchestration:$VERSION .
 ```
 
-**Note:** Base images are stored in Harbor:
-- `harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:latest`
-- `harbor.blocksecops.local/blocksecops/blocksecops-intelligence-base-cpu:latest`
+**Note:** Base images are stored in Harbor (use versioned tags, not `latest` — Harbor enforces immutable tags):
+- `harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353`
+- `harbor.blocksecops.local/blocksecops/blocksecops-intelligence-base-cpu:1.0.0-5ede3c61`
 
 To rebuild base images (only needed for dependency changes):
 ```bash
 ./docker/build-base-image.sh
-docker push harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:latest
+docker push harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353
 ```
 
 ### API Service (Python)

@@ -321,11 +321,11 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.4.0 | `k8s/overlays/local/` | Supabase build args required |
-| api-service | 0.28.2 | `k8s/overlays/local/api-service/` | Security audit remediation |
+| api-service | 0.28.4 | `k8s/overlays/local/api-service/` | Single-org ownership enforcement, migration 073 backfill |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.40.0 | `k8s/overlays/local/` | Requires parent context |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
-| intelligence-engine | 0.2.1 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
+| intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
 | orchestration | 0.9.5 | `k8s/overlays/local/` | Uses pre-built base image |
 | tool-integration | 0.3.14 | `k8s/overlays/local/` | |
@@ -439,13 +439,13 @@ Some services use pre-built base images to optimize build times. See [Docker Bas
 
 ```
 {version}-{dockerfile-hash}
-Example: 1.0.0-e4beef6a
+Example: 1.0.0-5ede3c61
 ```
 
 Base images are stored in Harbor and referenced by application Dockerfiles:
 
 ```dockerfile
-ARG BASE_IMAGE_TAG=latest
+ARG BASE_IMAGE_TAG=1.0.0-ac02c353
 FROM harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:${BASE_IMAGE_TAG} AS builder
 ```
 
