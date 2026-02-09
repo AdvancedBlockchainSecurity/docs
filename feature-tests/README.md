@@ -70,6 +70,7 @@ Manual testing checklists for all user-facing features.
 | [52-dual-payment-options.md](./52-dual-payment-options.md) | **NEW** - Dual Payment Options: Stripe + x402 crypto, payment method selector, pricing page integration |
 | [58-platform-v0.27-v0.40-v0.3-fixes.md](./58-platform-v0.27-v0.40-v0.3-fixes.md) | **NEW** - Platform-wide bug fixes - info severity removal, pending→queued, auto-apply filters, dark mode, admin portal enhancements |
 | [59-admin-portal-v0.4.0.md](./59-admin-portal-v0.4.0.md) | **NEW** - Admin Portal v0.4.0: GCP Cost Estimator, Scanners page, Dependencies endpoint, defensive metrics |
+| [60-collapsible-sidebar-quick-access.md](./60-collapsible-sidebar-quick-access.md) | **NEW** - Collapsible sidebar (w-64 ↔ w-16), quick access page pins (max 5), localStorage persistence (v0.41.4 Dashboard) |
 
 ---
 
@@ -324,6 +325,7 @@ GDPR/LGPD compliance features for ML data collection:
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-02-09 | Claude Code | 60-collapsible-sidebar-quick-access.md | NEW - Collapsible sidebar + quick access page pins, localStorage persistence (v0.41.4 Dashboard)
 2026-02-07 | Claude Code | 59-admin-portal-v0.4.0.md | NEW - Admin Portal v0.4.0: GCP Cost Estimator, Scanners page, Dependencies endpoint (v0.4.0 Admin Portal, v0.27.7 API)
 2026-02-01 | Claude Code | 52-dual-payment-options.md | NEW - Dual Payment Options: Stripe + x402 crypto payment selector on pricing page (v0.36.0 Dashboard)
 2026-02-01 | Claude Code | 51-kubernetes-security.md | NEW - Kubernetes Security: revisionHistoryLimit, security contexts, NetworkPolicies, pod lifecycle (GCP Launch Phase 2)
