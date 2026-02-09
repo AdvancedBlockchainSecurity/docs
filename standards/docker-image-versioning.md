@@ -321,7 +321,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.4.0 | `k8s/overlays/local/` | Supabase build args required |
-| api-service | 0.28.17 | `k8s/overlays/local/api-service/` | Fix dedup pipeline: all 18 tasks error isolation, scanner count comment, CronJob secret key, model columns, weak label enum, active learning date math |
+| api-service | 0.28.18 | `k8s/overlays/local/api-service/` | Fix CronJob missing INTELLIGENCE_ENGINE_URL, add dedup-maintenance NetworkPolicies, fix semantic_deduplicator fallback port, pin scanner versions |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.41.5 | `k8s/overlays/local/` | Fix deduplication 422 (empty severity param), collapsible sidebar, quick access pins |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
