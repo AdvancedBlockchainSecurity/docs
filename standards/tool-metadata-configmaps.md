@@ -1,7 +1,7 @@
 # Tool Metadata Management via ConfigMaps
 
-**Version:** 1.8.0
-**Last Updated:** October 20, 2025
+**Version:** 1.9.0
+**Last Updated:** February 9, 2026
 **Status:** Active
 
 ## Overview
@@ -135,10 +135,10 @@ data:
       }
     }
 
-  # Tool Docker image tags (used by orchestration service)
+  # Tool Docker image tags (used by KubernetesJobManager)
   SCANNER_IMAGE_SLITHER: "scanner-slither:0.3.1"
-  SCANNER_IMAGE_MYTHRIL: "mythril/myth:latest"
-  SCANNER_IMAGE_ADERYN: "scanner-aderyn:0.1.0"
+  SCANNER_IMAGE_MYTHRIL: "scanner-mythril:0.2.0"
+  SCANNER_IMAGE_ADERYN: "scanner-aderyn:0.7.0"
 ```
 
 **Benefits:**
@@ -483,6 +483,46 @@ kubectl logs deployment/api-service | grep "Loaded metadata"
 # Test health endpoint shows correct versions
 curl http://localhost:8000/api/v1/health/metadata | jq '.scanners'
 ```
+
+## Two-Version Model: Tool Version vs Image Version
+
+Scanner ConfigMaps track two independent version numbers:
+
+| Concept | ConfigMap Key | Tracks | Example |
+|---------|--------------|--------|---------|
+| **Tool version** | `SCANNER_METADATA` → `"version"` | Version of the upstream scanner tool | slither `0.11.5` |
+| **Image version** | `SCANNER_IMAGE_*` tag | Version of our Docker wrapper image | `scanner-slither:0.3.1` |
+
+These are independent:
+- **Bump image version** when: wrapper script changes, base image updates, dependency fixes
+- **Bump tool version** when: upstream scanner releases a new version (requires image rebuild too)
+
+**Both must use semantic versioning.** `SCANNER_IMAGE_*` tags are used directly by `KubernetesJobManager._get_scanner_image()` — Kubernetes pulls exactly what the ConfigMap specifies.
+
+### Why Pin Image Tags
+
+| | `:latest` | Pinned (e.g., `0.3.1`) |
+|---|---|---|
+| Reproducibility | Unknown which build ran | Exact build traceable |
+| Stability | Rebuild silently changes what runs | Explicit ConfigMap update required |
+| Audit trail | No version in Git history | Version change visible in Git diff |
+| Rollback | Cannot roll back to previous build | Change ConfigMap tag to previous version |
+| Harbor compatibility | Conflicts with immutable tag policy | Works with immutable tags |
+
+### Pinning Third-Party Base Images
+
+When a scanner Dockerfile uses a third-party base image, pin with **tag + digest**:
+
+```dockerfile
+# GOOD: Pinned to version tag AND SHA256 digest
+ARG SEC3_XRAY_VERSION=v0.0.6
+FROM ghcr.io/sec3-product/x-ray:${SEC3_XRAY_VERSION}@sha256:543dc6a984d4...
+
+# BAD: Unpinned upstream image
+FROM ghcr.io/sec3-product/x-ray:latest
+```
+
+The tag provides readability; the digest provides immutability. Even if upstream re-pushes the same tag with different content, the digest ensures the exact same image is used.
 
 ## When to Use This Pattern
 
