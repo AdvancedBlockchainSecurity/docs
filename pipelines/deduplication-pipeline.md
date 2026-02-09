@@ -206,7 +206,22 @@ securityContext:
 volumeMounts:
   - /tmp                         # Scratch space (emptyDir)
   - /app/src/ml/models           # ML model storage (emptyDir, writable)
+env:
+  - ENVIRONMENT                  # From ConfigMap (api-service-config)
+  - LOG_LEVEL                    # From ConfigMap (api-service-config)
+  - DATABASE_URL                 # From Secret (api-service-secret)
+  - INTELLIGENCE_ENGINE_URL      # From ConfigMap (api-service-config) — required for semantic fingerprints
 ```
+
+### CronJob NetworkPolicies
+
+The CronJob pods use label `app.kubernetes.io/name: deduplication-maintenance` (not `app: api-service`), so they have their own NetworkPolicies:
+
+| Policy | Target | Port |
+|--------|--------|------|
+| `dedup-maintenance-to-dns` | kube-dns | 53 UDP/TCP |
+| `dedup-maintenance-to-postgresql` | PostgreSQL | 5432 |
+| `dedup-maintenance-to-intelligence` | Intelligence Engine | 80 |
 
 ## Monitoring
 
