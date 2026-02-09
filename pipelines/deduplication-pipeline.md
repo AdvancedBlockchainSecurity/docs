@@ -76,20 +76,25 @@ All matching is scoped by contract and detector type to prevent cross-type group
 
 ## Scanner Priority
 
-Canonical finding selection uses dynamic priorities (from quality metrics) with static fallbacks:
+Canonical finding selection uses dynamic priorities (from quality metrics) with static fallbacks. Static priorities are derived from the scanner registry order in `src/infrastructure/scanner_config/scanners.py`:
 
-| Scanner | Default Priority | Notes |
-|---------|-----------------|-------|
-| slither | 1 | Highest priority |
-| aderyn | 2 | |
-| mythril | 3 | |
-| semgrep | 4 | |
-| solhint | 5 | |
-| soliditydefend | 6 | |
-| wake | 7 | |
-| echidna | 8 | |
-| medusa | 9 | |
-| halmos | 10 | Lowest priority |
+| Scanner | Default Priority | Language | Notes |
+|---------|-----------------|----------|-------|
+| slither | 1 | Solidity | Highest priority |
+| aderyn | 2 | Solidity | |
+| semgrep | 3 | Solidity | |
+| solhint | 4 | Solidity | |
+| halmos | 5 | Solidity | Formal verification |
+| echidna | 6 | Solidity | Fuzzing |
+| wake | 7 | Solidity | |
+| medusa | 8 | Solidity | Fuzzing |
+| soliditydefend | 9 | Solidity | |
+| vyper | 10 | Vyper | |
+| moccasin | 11 | Vyper | |
+| sol-azy | 12 | Solana | |
+| sec3-xray | 13 | Solana | |
+| trident | 14 | Solana | Fuzzing |
+| cargo-fuzz-solana | 15 | Solana | Fuzzing |
 
 Lower number = higher priority for canonical selection. Dynamic priorities override static defaults when sufficient quality data exists (10+ labeled findings per scanner).
 
@@ -147,12 +152,14 @@ Priority mapping: quality 1.0 → priority 1, quality 0.0 → priority 20.
 
 ## Error Handling
 
-Each of the 18 maintenance tasks runs independently with its own try-catch block. A failure in one task does not prevent others from running. All tasks log statistics (processed, updated, remaining, errors) for monitoring.
+Each of the 18 maintenance tasks runs independently with its own try-catch block and `db.rollback()` on failure. A failure in one task does not prevent others from running. Failed tasks return an error dict with `"error"` key; successful tasks return statistics for monitoring.
 
 **Graceful degradation:**
 - Embedding service timeout → semantic fingerprints skipped, other tasks continue
 - Intelligence engine unavailable → consensus scores deferred
-- ML model missing/unsigned → training trigger check skipped
+- ML model missing/unsigned → training trigger uses dev fallback key
+- Read-only filesystem → ML models volume mounted as writable emptyDir
+- Failed DB query → transaction rolled back, next task starts with clean session
 
 ## Database Tables
 
@@ -176,6 +183,11 @@ backoffLimit: 2                  # Retry up to 2 times on failure
 resources:
   requests: { cpu: 100m, memory: 256Mi }
   limits:   { cpu: 500m, memory: 512Mi }
+securityContext:
+  readOnlyRootFilesystem: true   # Hardened container
+volumeMounts:
+  - /tmp                         # Scratch space (emptyDir)
+  - /app/src/ml/models           # ML model storage (emptyDir, writable)
 ```
 
 ## Monitoring
