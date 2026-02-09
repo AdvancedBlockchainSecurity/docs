@@ -430,7 +430,7 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
 **Solana Scanners:** ✅ All in Harbor (January 19, 2026)
 - sol-azy (latest) - harbor.blocksecops.local/blocksecops/scanner-sol-azy:0.2.0 ✅
 - sec3-xray (0.0.6) - harbor.blocksecops.local/blocksecops/scanner-sec3-xray:0.2.0 ✅
-- trident (0.12.0) - harbor.blocksecops.local/blocksecops/scanner-trident:0.2.0 ✅
+- trident (0.12.0) - harbor.blocksecops.local/blocksecops/scanner-trident:0.3.0 ✅
 - cargo-fuzz-solana (0.13.1) - harbor.blocksecops.local/blocksecops/scanner-cargo-fuzz-solana:0.2.0 ✅
 
 **Cairo/StarkNet Scanners:** ⚠️ NOT integrated - patterns defined but no scanner integration
