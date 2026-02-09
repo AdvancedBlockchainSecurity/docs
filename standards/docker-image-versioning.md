@@ -321,9 +321,9 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.4.0 | `k8s/overlays/local/` | Supabase build args required |
-| api-service | 0.28.10 | `k8s/overlays/local/api-service/` | Remove enterprise-only restriction from org creation |
+| api-service | 0.28.11 | `k8s/overlays/local/api-service/` | Fix dedup CronJob secret key, weak label enum, active learning date math |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.41.3 | `k8s/overlays/local/` | Remove Personal Workspace, add org/member info to Billing, fix upgrade banner flash |
+| dashboard | 0.41.5 | `k8s/overlays/local/` | Fix deduplication 422 (empty severity param), collapsible sidebar, quick access pins |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |

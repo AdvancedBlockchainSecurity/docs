@@ -1,7 +1,7 @@
 # BlockSecOps Changelogs
 
 **Purpose:** Centralized changelog directory for all BlockSecOps platform changes
-**Last Updated:** February 8, 2026
+**Last Updated:** February 9, 2026
 **Status:** Active
 
 ---
@@ -17,6 +17,24 @@ Changelogs are organized by component and maintained chronologically. Each chang
 ---
 
 ## Available Changelogs
+
+### 0. Dashboard v0.41.4 - Collapsible Sidebar & Quick Access (`DASHBOARD-V0.41.4-COLLAPSIBLE-SIDEBAR-2026-02-09.md`)
+
+**Component:** blocksecops-dashboard
+**Scope:** Collapsible sidebar, quick access page pins, 118 TypeScript strict mode fixes
+**Date:** February 9, 2026
+
+**Key Changes:**
+- Collapsible sidebar (w-64 expanded, w-16 collapsed) with CSS transition
+- Quick access page pinning (max 5, localStorage persistence)
+- 118 pre-existing TypeScript errors fixed across 30+ files
+- Dockerfile build command changed from `build:no-check` to `build:force`
+- Type declaration stubs for missing packages (@blocksecops/tier-config, @stripe/*)
+
+**Use When:**
+- Understanding sidebar collapse/expand implementation
+- Reviewing TypeScript strict mode fixes
+- Documenting localStorage persistence patterns
 
 ### 0. Orchestration v0.9.10 - RedBeat Fix & Load Test Validation (`ORCHESTRATION-V0.9.10-REDBEAT-LOAD-TEST-2026-02-08.md`)
 
