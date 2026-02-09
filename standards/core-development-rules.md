@@ -44,47 +44,37 @@ This document defines the critical rules and codebase-first development workflow
 
 **Violations of this rule are considered CRITICAL incidents.**
 
-### Rule 2: Local Development Endpoint
+### Rule 2: Platform Access via Domain
 
-**MANDATORY:** Always use `127.0.0.1` to access the dashboard for local development.
+**MANDATORY:** Always access the platform through its domain with HTTPS.
 
 ```
 ✅ CORRECT:
-- Dashboard access: http://127.0.0.1:3000
-- API access: http://127.0.0.1:8000
-- Port forwards: kubectl port-forward svc/api-service 8000:8000
+- Server:     https://app.blocksecops.local
+- Production: https://app.blocksecops.com
 
 ❌ INCORRECT:
-- Dashboard access: http://localhost:3000
-- API access: http://localhost:8000
+- http://127.0.0.1:3000
+- http://localhost:8000
+- http://app.blocksecops.local (HTTP — must use HTTPS)
 ```
 
-**CORS Configuration Requirement:**
+All traffic goes through Traefik ingress with TLS. HTTP automatically redirects to HTTPS.
 
-All backend services MUST include `127.0.0.1` in CORS allowed origins:
+**CORS Configuration:**
 
-```python
-# Python FastAPI example
-from fastapi.middleware.cors import CORSMiddleware
+CORS origins are managed via ConfigMap (source of truth), not hardcoded in application code:
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://127.0.0.1:3000",  # MANDATORY for local development
-        "http://localhost:3000",   # Optional for compatibility
-        "https://app.blocksecops.com",  # Production
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+```yaml
+# k8s/overlays/local/api-service/configmap-patch.yaml
+cors_origins: "https://app.blocksecops.local"
+allowed_hosts: "app.blocksecops.local"
+dashboard_base_url: "https://app.blocksecops.local"
 ```
 
-**Why `127.0.0.1` instead of `localhost`:**
-- **DNS Resolution:** Avoids IPv4/IPv6 resolution issues
-- **Consistency:** Same behavior across all systems
-- **Performance:** Bypasses DNS lookups
-- **CORS Clarity:** Explicit IP-based origin
+The base deployment (`k8s/base/api-service/deployment.yaml`) maps these ConfigMap keys to environment variables. Application defaults in `config.py` target production (`app.blocksecops.com`).
+
+See [Domain Management Standards](./domain-management.md) for the full source of truth chain and switching between environments.
 
 ### Rule 3: Restart Pods After Code Changes
 
