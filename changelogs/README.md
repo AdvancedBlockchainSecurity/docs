@@ -18,6 +18,23 @@ Changelogs are organized by component and maintained chronologically. Each chang
 
 ## Available Changelogs
 
+### 0. API Service v0.28.11-v0.28.17 - Dedup Pipeline Fixes (`API-SERVICE-V0.28.11-V0.28.17-DEDUP-PIPELINE-FIXES-2026-02-09.md`)
+
+**Component:** blocksecops-api-service
+**Scope:** Deduplication pipeline error isolation for all 18 tasks, structural test suite, scanner count comment fix
+**Date:** February 9, 2026
+
+**Key Changes:**
+- Fixed missing error isolation on tasks 12-18 (added incrementally without try-catch)
+- Added 46-test regression suite enforcing orchestrator structural invariants
+- Fixed CronJob secret key, weak label enum, active learning date arithmetic
+- Root cause: zero test coverage on orchestrator allowed regressions when tasks added
+
+**Use When:**
+- Understanding deduplication pipeline error handling
+- Adding new maintenance tasks (must pass structural tests)
+- Investigating pipeline failure modes
+
 ### 0. Dashboard v0.41.4 - Collapsible Sidebar & Quick Access (`DASHBOARD-V0.41.4-COLLAPSIBLE-SIDEBAR-2026-02-09.md`)
 
 **Component:** blocksecops-dashboard

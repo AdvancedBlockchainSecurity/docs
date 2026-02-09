@@ -134,6 +134,7 @@ Priority mapping: quality 1.0 → priority 1, quality 0.0 → priority 20.
 | `blocksecops-api-service/src/ml/weak_label_generator.py` | Weak label generation from vulnerability status |
 | `blocksecops-api-service/src/ml/active_learning.py` | Active learning queue management |
 | `blocksecops-api-service/k8s/base/api-service/cronjob-deduplication.yaml` | Kubernetes CronJob definition |
+| `blocksecops-api-service/tests/unit/infrastructure/test_deduplication_maintenance.py` | Structural regression tests (46 tests) |
 
 ## API Endpoints
 
@@ -152,7 +153,7 @@ Priority mapping: quality 1.0 → priority 1, quality 0.0 → priority 20.
 
 ## Error Handling
 
-Each of the 18 maintenance tasks runs independently with its own try-catch block and `db.rollback()` on failure. A failure in one task does not prevent others from running. Failed tasks return an error dict with `"error"` key; successful tasks return statistics for monitoring.
+Each of the 18 maintenance tasks runs independently with its own try-catch block and `await db.rollback()` on failure. A failure in one task does not prevent others from running. Failed tasks return an error dict with `"error"` key; successful tasks return statistics for monitoring.
 
 **Graceful degradation:**
 - Embedding service timeout → semantic fingerprints skipped, other tasks continue
@@ -160,6 +161,23 @@ Each of the 18 maintenance tasks runs independently with its own try-catch block
 - ML model missing/unsigned → training trigger uses dev fallback key
 - Read-only filesystem → ML models volume mounted as writable emptyDir
 - Failed DB query → transaction rolled back, next task starts with clean session
+
+## Test Suite
+
+Structural regression tests in `tests/unit/infrastructure/test_deduplication_maintenance.py` enforce invariants on the orchestrator. These tests parse the source file directly (no module import needed) and will fail if a new task is added without proper error isolation.
+
+| Test Class | Purpose |
+|------------|---------|
+| TestOrchestratorStructure | All 18 markers present, each has try-block + rollback, return dict complete |
+| TestTaskFunctionsExist | All 18 async functions defined with `db` parameter |
+| TestConstants | EMPTY_FINGERPRINT_HASH, scanner priority derivation, consensus thresholds |
+| TestErrorIsolation | Mock-based failure isolation and rollback verification (requires asyncpg) |
+
+Run locally:
+```bash
+python3 -m pytest tests/unit/infrastructure/test_deduplication_maintenance.py -v \
+  --override-ini="addopts=-v --tb=short -ra"
+```
 
 ## Database Tables
 
