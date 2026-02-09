@@ -321,9 +321,9 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.4.0 | `k8s/overlays/local/` | Supabase build args required |
-| api-service | 0.28.4 | `k8s/overlays/local/api-service/` | Single-org ownership enforcement, migration 073 backfill |
+| api-service | 0.28.10 | `k8s/overlays/local/api-service/` | Remove enterprise-only restriction from org creation |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.41.1 | `k8s/overlays/local/` | Requires parent context |
+| dashboard | 0.41.3 | `k8s/overlays/local/` | Remove Personal Workspace, add org/member info to Billing, fix upgrade banner flash |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |

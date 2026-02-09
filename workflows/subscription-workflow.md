@@ -267,6 +267,31 @@ See [Docker Image Versioning](../standards/docker-image-versioning.md) and [Kust
 
 ---
 
+## Organization Creation (Enterprise Only)
+
+Organization creation is tied exclusively to Enterprise tier subscriptions. There is no user-facing "Create Organization" UI button — organizations are provisioned as part of the Enterprise subscription workflow.
+
+| Rule | Description |
+|------|-------------|
+| Enterprise tier required | `create_organization` endpoint uses `dependencies=[Depends(require_tier("enterprise"))]` |
+| Admin-initiated | Organization creation is initiated by the subscribing admin, not general users |
+| One org per owner | A user can only own one active organization |
+| No UI page | The dashboard has no Organizations page; org membership is managed via the TopBar OrgSelector |
+| API-only creation | Enterprise users can create orgs via `POST /organizations` API endpoint |
+
+### Organization Provisioning Flow
+
+| Step | Description |
+|------|-------------|
+| Enterprise subscription active | User has active Enterprise tier Stripe subscription |
+| Admin calls API | `POST /organizations` with org name, optional slug/description |
+| Org created | Organization record created with `tier=enterprise`, `owner_id=current_user` |
+| Default roles | System roles created: owner, admin, developer, auditor, guest |
+| Owner assigned | Creating user added as member with owner role |
+| Default team | "General" team auto-created, owner added as team lead |
+
+---
+
 ## Related Documentation
 
 - [Subscription Pipeline](../pipelines/subscription-pipeline.md) — Technical implementation details

@@ -144,6 +144,50 @@ ALTER TABLE users ADD COLUMN default_organization_id UUID REFERENCES organizatio
 | VulnerabilitiesList.tsx | `['vulnerabilities', currentOrgId, ...]` | React Query |
 | Projects.tsx | `['projects', 'list', currentOrgId, ...]` | Via useProjects hook |
 
+## Ownership & Role Management Rules
+
+### Ownership Rules (BSO-SEC-016)
+
+| Rule | Enforcement | Endpoint |
+|------|-------------|----------|
+| One owner per org | Owner set at org creation only | `create_organization` |
+| Cannot assign owner role | All add/update member endpoints reject `role.name == "owner"` | `add_member`, `update_member`, `add_current_organization_user`, `update_current_organization_user` |
+| Owner cannot be removed | Owner removal blocked | `remove_member`, `remove_current_organization_user` |
+| Owner role cannot be changed | Owner role change blocked | `update_member`, `update_current_organization_user` |
+| Always at least one owner | Owner is permanent for org lifetime | All member management endpoints |
+
+### Role Hierarchy
+
+| Role | Permissions | Member Management |
+|------|-------------|-------------------|
+| **Owner** | Full access (`*`) + billing | Can manage all members |
+| **Admin** | All management except billing | Can add/remove/update members (except owner) |
+| **Developer** | Create/manage contracts and scans | Cannot manage members |
+| **Auditor** | Read-only access | Cannot manage members |
+| **Guest** | Limited read-only | Cannot manage members |
+
+### Permission Checks (BSO-SEC-016)
+
+All member management endpoints use `verify_member_management_permission()`:
+
+```python
+# Checks performed:
+# 1. User must be active org member
+# 2. User must be org owner OR have admin-like role
+# 3. Logs denial for security monitoring
+```
+
+| Endpoint | Permission Check | Owner Role Guard |
+|----------|-----------------|-----------------|
+| `POST /current/users` | `verify_member_management_permission` | Rejects owner role |
+| `PATCH /current/users/{id}` | `verify_member_management_permission` | Rejects owner role, blocks owner change |
+| `DELETE /current/users/{id}` | `verify_member_management_permission` | Blocks owner removal |
+| `POST /{org_id}/members` | `verify_member_management_permission` | Rejects owner role |
+| `PATCH /{org_id}/members/{id}` | `verify_member_management_permission` | Rejects owner role, blocks owner change |
+| `DELETE /{org_id}/members/{id}` | `verify_member_management_permission` | Blocks owner removal |
+
+---
+
 ## Backward Compatibility
 
 - All `organization_id` columns are **nullable** — existing data stays `NULL`

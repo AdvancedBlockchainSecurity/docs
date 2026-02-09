@@ -20,54 +20,16 @@ Each environment has its own always-available access method:
 
 | Environment | Method | Access Pattern | Setup |
 |-------------|--------|----------------|-------|
-| **Local (minikube)** | `minikube tunnel` + LoadBalancer | `http://127.0.0.1:3000` | One-time background service |
-| **Server (kubeadm)** | hostPort 80/443 + Traefik | `http://app.blocksecops.local` | DNS entry only |
+| **Server (kubeadm)** | hostPort 80/443 + Traefik (TLS) | `https://app.blocksecops.local` | DNS entry only |
 | **Production (GCP)** | GCP Load Balancer | `https://app.blocksecops.com` | Managed by infrastructure |
-
-### Local Development (minikube) - Always Available
-
-**Standard Pattern:** Use `minikube tunnel` as a background service for automatic LoadBalancer IP allocation.
-
-**One-Time Setup:**
-```bash
-# Start minikube tunnel (requires sudo, runs persistently)
-# Option 1: Run in background terminal
-minikube tunnel
-
-# Option 2: Run as nohup background process
-nohup minikube tunnel > /tmp/minikube-tunnel.log 2>&1 &
-
-# Option 3: Run in tmux session (recommended)
-tmux new -s tunnel -d 'minikube tunnel'
-```
-
-**Daily Workflow:** None required. With tunnel running, services are immediately accessible.
-
-**Access URLs:**
-| Service | URL |
-|---------|-----|
-| Dashboard | http://127.0.0.1:3000 |
-| API | http://127.0.0.1:3000/api/v1/... |
-
-**Service Type:** Services must use `type: LoadBalancer` to work with minikube tunnel.
 
 ### Server Environment (kubeadm) - Always Available
 
-**Standard Pattern:** Traefik with hostPort 80/443 provides standard HTTP/HTTPS access.
+**Standard Pattern:** Traefik with hostPort 80/443 provides HTTPS access via self-signed TLS (cert-manager + local CA). HTTP redirects to HTTPS automatically.
 
-**Node IP:** 192.168.86.225
-**Domain:** `app.blocksecops.local`
-
-**One-Time Setup (Client machines):**
+**One-Time Setup (client machines):**
 ```bash
-# Add to /etc/hosts on any machine that needs to access the server
 echo "192.168.86.225  app.blocksecops.local" | sudo tee -a /etc/hosts
-```
-
-**One-Time Setup (Server itself):**
-```bash
-# Add to /etc/hosts so server can resolve its own domain (required for local API testing)
-echo "127.0.0.1  app.blocksecops.local" | sudo tee -a /etc/hosts
 ```
 
 **Daily Workflow:** None required. Services are accessible immediately after cluster start.
@@ -75,11 +37,12 @@ echo "127.0.0.1  app.blocksecops.local" | sudo tee -a /etc/hosts
 **Access URLs:**
 | Service | URL |
 |---------|-----|
-| Dashboard | http://app.blocksecops.local |
-| API | http://app.blocksecops.local/api/v1/... |
-| Direct IP | http://192.168.86.225 |
+| Dashboard | https://app.blocksecops.local |
+| API | https://app.blocksecops.local/api/v1/... |
 
-**Kustomize Overlay:** `blocksecops-gcp-infrastructure/k8s/overlays/server/`
+**Kustomize Overlay:** `blocksecops-gcp-infrastructure/k8s/overlays/local/`
+
+See [Domain Management Standards](./domain-management.md) for the full source of truth chain for platform URLs.
 
 ### Production (GCP) - Always Available
 
@@ -367,11 +330,10 @@ routes:
         port: 3000
 ```
 
-**API Service IngressRoute** (`k8s/overlays/local/api-service/ingressroute.yaml`):
+**API Service IngressRoute** (`gcp-infrastructure/k8s/overlays/local/api-service/ingressroute.yaml`):
 ```yaml
 routes:
-  # Use /api/v1 specifically to avoid catching dashboard routes like /api-keys
-  - match: (Host(`localhost`) || Host(`127.0.0.1`)) && PathPrefix(`/api/v1`)
+  - match: Host(`app.blocksecops.local`) && PathPrefix(`/api/v1`)
     kind: Rule
     services:
       - name: api-service
@@ -379,11 +341,10 @@ routes:
 ```
 
 **Routing Logic**:
-- `http://127.0.0.1:3000` → Dashboard UI
-- `http://127.0.0.1:3000/api-keys` → Dashboard UI (page route)
-- `http://127.0.0.1:3000/audit-logs` → Dashboard UI (page route)
-- `http://127.0.0.1:3000/api/v1/...` → API Service (matches PathPrefix `/api/v1`)
-- This mirrors production where all traffic goes through a single ingress point
+- `https://app.blocksecops.local` → Dashboard UI
+- `https://app.blocksecops.local/api-keys` → Dashboard UI (page route)
+- `https://app.blocksecops.local/api/v1/...` → API Service (matches PathPrefix `/api/v1`)
+- All traffic goes through Traefik's `websecure` entrypoint (HTTPS, port 443)
 
 **Important**: Use `/api/v1` (not `/api`) for API routing to avoid catching dashboard page routes that start with `/api-*` (like `/api-keys`).
 
@@ -497,30 +458,25 @@ If you get "error forwarding port ... connection refused":
 **Symptoms**: Dashboard shows network errors, 404 on `/api/v1/*` requests
 
 **Solution**:
-1. Verify Traefik port-forward on 3000 is active:
+1. Test Traefik routing to dashboard:
    ```bash
-   lsof -i :3000 | grep LISTEN
+   curl -k https://app.blocksecops.local
    ```
 
-2. Test Traefik routing to dashboard:
+2. Test Traefik routing to API:
    ```bash
-   curl http://127.0.0.1:3000
+   curl -k https://app.blocksecops.local/api/v1/health/live
    ```
 
-3. Test Traefik routing to API:
-   ```bash
-   curl http://127.0.0.1:3000/api/v1/scanners
-   ```
-
-4. If missing, create Traefik port-forward:
-   ```bash
-   kubectl port-forward -n traefik-local svc/traefik 3000:80 &
-   ```
-
-5. Verify IngressRoutes are configured:
+3. Verify IngressRoutes are configured:
    ```bash
    kubectl get ingressroute -n dashboard-local
    kubectl get ingressroute -n api-service-local
+   ```
+
+4. Check Traefik is running with hostPort 80/443:
+   ```bash
+   kubectl get pods -n traefik-local
    ```
 
 ## Monitoring Port-Forwards
@@ -637,16 +593,6 @@ If you add a new service that needs a port-forward:
 
 ### Always-Available Access (Standard)
 
-**Local (minikube):**
-```bash
-# One-time setup: Start tunnel in tmux
-tmux new -s tunnel -d 'minikube tunnel'
-
-# Access (no daily commands needed)
-curl http://127.0.0.1:3000                    # Dashboard
-curl http://127.0.0.1:3000/api/v1/health/live # API
-```
-
 **Server (kubeadm):**
 ```bash
 # One-time setup: Add DNS entries
@@ -655,17 +601,14 @@ echo "127.0.0.1  app.blocksecops.local" | sudo tee -a /etc/hosts
 # On client:
 echo "192.168.86.225  app.blocksecops.local" | sudo tee -a /etc/hosts
 
-# Access (no daily commands needed)
-curl http://app.blocksecops.local                    # Dashboard
-curl http://app.blocksecops.local/api/v1/health/live # API
+# Access (no daily commands needed, use -k for self-signed cert)
+curl -k https://app.blocksecops.local                    # Dashboard
+curl -k https://app.blocksecops.local/api/v1/health/live # API
 ```
 
 ### Debugging (Port-Forwards)
 
-**Setup Port-Forwards (debugging only):**
-```bash
-./scripts/setup-port-forwards.sh
-```
+Port-forwards are only needed for direct access to internal services (database, Redis, Vault).
 
 **Kill All Port-Forwards:**
 ```bash
@@ -674,19 +617,15 @@ pkill -f "kubectl port-forward"
 
 ### Build Images
 
-**Local Development (minikube):**
+**Server (kubeadm with Harbor):**
 ```bash
-eval $(minikube docker-env)
-docker build -t <service>:<version> .
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
+docker build -t harbor.blocksecops.local/blocksecops/<service>:${VERSION} .
+docker push harbor.blocksecops.local/blocksecops/<service>:${VERSION}
 kubectl apply -k k8s/overlays/local/<service>/
 ```
 
-**Server (kubeadm with containerd):**
-```bash
-docker build -t blocksecops-<service>:<version> .
-docker save blocksecops-<service>:<version> | sudo ctr -n k8s.io images import -
-kubectl apply -k k8s/overlays/server/
-```
+See [Docker Image Versioning](./docker-image-versioning.md) for service-specific build requirements (e.g., dashboard requires parent directory context).
 
 ---
 

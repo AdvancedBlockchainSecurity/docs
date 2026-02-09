@@ -188,6 +188,52 @@ Client wallet
 
 ---
 
+## Organization Provisioning
+
+Organization creation is part of the Enterprise tier activation flow. When an Enterprise subscription becomes active, the admin can provision an organization via the API.
+
+### Provisioning Pipeline
+
+```
+Enterprise Subscription Active
+  │
+  ├── 1. Admin calls POST /organizations
+  │       → require_tier("enterprise") middleware validates tier
+  │       → Checks user doesn't already own an org
+  │
+  ├── 2. Organization created
+  │       → OrganizationModel with tier=enterprise, owner_id=current_user
+  │       → Unique slug generated/validated
+  │
+  ├── 3. Default system roles created
+  │       → owner, admin, developer, auditor, guest
+  │       → Each with predefined permission sets
+  │
+  ├── 4. Owner membership established
+  │       → OrganizationMemberModel with owner role
+  │       → User becomes org owner
+  │
+  ├── 5. Default team created
+  │       → "General" team with is_default=True
+  │       → Owner added as team lead
+  │
+  └── 6. Org ready for member management
+          → Admin can add members via API
+          → Members added to default team automatically
+```
+
+### Ownership Rules
+
+| Rule | Enforcement |
+|------|-------------|
+| One owner per org | Set at creation, cannot be changed |
+| Cannot add additional owners | `add_member`/`update_member` reject owner role assignment |
+| Owner cannot self-remove | `remove_current_organization_user` blocks owner removal |
+| Owner role immutable | `update_current_organization_user` blocks owner role change |
+| Admin as alternative | Admin role has all management permissions except billing |
+
+---
+
 ## Security Controls
 
 ### Stripe Webhook Security

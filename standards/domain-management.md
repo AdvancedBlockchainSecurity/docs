@@ -1,217 +1,186 @@
 # Domain Management Standards
 
-**Version:** 1.1.0
-**Last Updated:** January 15, 2026
+**Version:** 2.0.0
+**Last Updated:** February 8, 2026
 **Status:** Active
 
 ## Overview
 
-This document defines the domain configuration strategy for BlockSecOps across environments:
+This document defines the domain configuration strategy for BlockSecOps across environments.
 
-| Environment | Domain | Purpose |
-|-------------|--------|---------|
-| **Local (minikube)** | `127.0.0.1`, `localhost` | Developer laptops |
-| **Server (kubeadm)** | `app.blocksecops.local` | Pre-production testing on PowerEdge R720 |
-| **Production (GCP)** | `app.blocksecops.com` | Production deployment |
+| Environment | Domain | TLS | Purpose |
+|-------------|--------|-----|---------|
+| **Server (kubeadm)** | `app.blocksecops.local` | Self-signed (cert-manager + local CA) | Pre-production testing on PowerEdge R720 |
+| **Production (GCP)** | `app.blocksecops.com` | Let's Encrypt (cert-manager) | Production deployment |
 
-## Architecture
+---
 
-BlockSecOps uses **Kustomize overlays** to manage environment-specific configurations. Domain/host values are NOT hardcoded in application code - they are injected via:
+## Source of Truth
 
-1. **Traefik IngressRoutes** - Route traffic based on hostname
-2. **ConfigMaps** - Environment variables for services
-3. **CORS Configuration** - API allowed origins
+### Platform URL Configuration
+
+The platform URL flows through a single chain of trust:
 
 ```
-k8s/overlays/
-├── local/          # minikube (127.0.0.1, localhost)
-├── server/         # PowerEdge R720 (app.blocksecops.local) [NEW]
-├── staging/        # GCP staging (staging.blocksecops.com)
-└── production/     # GCP production (app.blocksecops.com)
+config.py defaults (production)     →  app.blocksecops.com (used when no ConfigMap)
+        ↓ overridden by
+ConfigMap per environment            →  app.blocksecops.local (local overlay)
+        ↓ read by
+Base deployment (env var mappings)   →  CORS_ORIGINS, ALLOWED_HOSTS, DASHBOARD_BASE_URL
+        ↓ injected into
+Application (pydantic-settings)      →  Settings.cors_origins, .allowed_hosts, .dashboard_base_url
 ```
+
+| Layer | File | Role |
+|-------|------|------|
+| **Application defaults** | `api-service/src/infrastructure/config.py` | Production-first defaults (`app.blocksecops.com`) |
+| **Env var mappings** | `api-service/k8s/base/api-service/deployment.yaml` | Maps ConfigMap keys → env vars (single source of truth for all environments) |
+| **Environment values** | `api-service/k8s/overlays/local/api-service/configmap-patch.yaml` | Per-environment overrides (`app.blocksecops.local`) |
+| **Ingress routing** | `gcp-infrastructure/k8s/overlays/local/*/ingressroute.yaml` | Traefik Host rules + TLS |
+| **Ingress CORS** | `gcp-infrastructure/k8s/overlays/local/*/middleware-cors.yaml` | Traefik CORS allowed origins |
+| **Supabase** | Supabase Dashboard → Authentication → URL Configuration | Email verification redirect URL (external) |
+
+### Key Principles
+
+1. **Production is the default** — `config.py` defaults target `app.blocksecops.com`. No ConfigMap needed for production.
+2. **ConfigMap is the local override** — The local overlay ConfigMap sets `app.blocksecops.local` values.
+3. **Base deployment owns env mappings** — All env var → ConfigMap mappings live in the base deployment, never in overlay patches.
+4. **No hardcoded URLs in overlays** — Overlay deployment patches must not contain hardcoded URL values; use `valueFrom.configMapKeyRef` in the base.
+
+### Platform URL Variables
+
+| ConfigMap Key | Env Var | config.py Default | Local Override |
+|---------------|---------|-------------------|----------------|
+| `cors_origins` | `CORS_ORIGINS` | `https://app.blocksecops.com` | `https://app.blocksecops.local` |
+| `allowed_hosts` | `ALLOWED_HOSTS` | `app.blocksecops.com` | `app.blocksecops.local` |
+| `dashboard_base_url` | `DASHBOARD_BASE_URL` | `https://app.blocksecops.com` | `https://app.blocksecops.local` |
+
+### Switching from .local to .com
+
+To switch environments, update these locations:
+
+| Location | What to Change |
+|----------|----------------|
+| API Service ConfigMap | `cors_origins`, `allowed_hosts`, `dashboard_base_url` |
+| Traefik IngressRoutes | Host match rules |
+| Traefik CORS Middlewares | `accessControlAllowOriginList` |
+| Traefik TLS Certificates | `dnsNames` in Certificate resource |
+| Supabase Dashboard | Site URL + Redirect URLs |
+| Dashboard Dockerfile | `VITE_WS_URL` build arg (if WebSocket domain differs) |
+
+For production, the API Service ConfigMap entries for `cors_origins`, `allowed_hosts`, and `dashboard_base_url` can be omitted — the `config.py` defaults will be used.
 
 ---
 
 ## Environment Configuration
 
-### Local Development (minikube)
+### Server (PowerEdge R720)
 
-**Access:** `http://127.0.0.1:3000`
-
-Uses `minikube tunnel` with LoadBalancer services. No DNS required.
-
-**Setup (one-time):**
-```bash
-# Start minikube tunnel in tmux (recommended)
-tmux new -s tunnel -d 'minikube tunnel'
-```
-
-**Daily Workflow:** None required - services are always available with tunnel running.
-
-**Verification:**
-```bash
-# Test dashboard
-curl http://127.0.0.1:3000
-
-# Test API
-curl http://127.0.0.1:3000/api/v1/health/live
-```
-
-**Files:**
-- `k8s/overlays/local/*/ingressroute.yaml` - Host rules for `localhost` and `127.0.0.1`
-- `k8s/overlays/local/api-service/configmap-patch.yaml` - CORS origins
-
-### Server Testing (PowerEdge R720)
-
-**Access:** `http://app.blocksecops.local` (after DNS/hosts setup)
+**Access:** `https://app.blocksecops.local`
 
 **Node IP:** `192.168.86.225`
 
-**Domain Access (standard, with hostPort 80):**
+**TLS:** Self-signed certificate via cert-manager with local CA issuer. HTTP (port 80) redirects to HTTPS (port 443).
+
 | Service | URL |
 |---------|-----|
-| Dashboard | `http://app.blocksecops.local` |
-| API | `http://app.blocksecops.local/api/v1/...` |
-| Direct IP | `http://192.168.86.225` |
+| Dashboard | `https://app.blocksecops.local` |
+| API | `https://app.blocksecops.local/api/v1/...` |
+| Harbor | `https://harbor.blocksecops.local` |
 
-**Setup for app.blocksecops.local:**
+**DNS Setup (one-time):**
 
-1. **Add to /etc/hosts on SERVER itself (REQUIRED for local API testing):**
-   ```bash
-   # SSH to server and add entry so server can resolve its own domain
-   echo "127.0.0.1  app.blocksecops.local" | sudo tee -a /etc/hosts
-   ```
+```bash
+# On server (required for local API testing and health checks)
+echo "127.0.0.1  app.blocksecops.local harbor.blocksecops.local" | sudo tee -a /etc/hosts
 
-   > **Why this is required:** Without this entry, API calls from the server itself (e.g., `curl http://app.blocksecops.local`) fail with DNS resolution errors. This is needed for health checks, monitoring, and debugging.
-
-2. **Add to /etc/hosts on CLIENT machines:**
-   ```bash
-   # Add to /etc/hosts (Linux/Mac) or C:\Windows\System32\drivers\etc\hosts (Windows)
-   echo "192.168.86.225  app.blocksecops.local" | sudo tee -a /etc/hosts
-   ```
-
-3. **Server overlay is already created** at `blocksecops-gcp-infrastructure/k8s/overlays/server/`
+# On client machines
+echo "192.168.86.225  app.blocksecops.local harbor.blocksecops.local" | sudo tee -a /etc/hosts
+```
 
 **Verification:**
 ```bash
-# From server itself
-curl http://app.blocksecops.local/api/v1/health/live
+# From server (use -k for self-signed cert)
+curl -k https://app.blocksecops.local/api/v1/health/live
 
 # From client machine
-curl http://app.blocksecops.local/api/v1/health/live
+curl -k https://app.blocksecops.local/api/v1/health/live
 ```
+
+**Key Files:**
+
+| Repository | File | Purpose |
+|------------|------|---------|
+| blocksecops-api-service | `k8s/overlays/local/api-service/configmap-patch.yaml` | CORS, allowed hosts, dashboard URL |
+| blocksecops-api-service | `k8s/base/api-service/deployment.yaml` | Env var mappings (source of truth) |
+| blocksecops-gcp-infrastructure | `k8s/overlays/local/api-service/ingressroute.yaml` | API routing (`websecure` entrypoint) |
+| blocksecops-gcp-infrastructure | `k8s/overlays/local/dashboard/ingressroute.yaml` | Dashboard routing (`websecure` entrypoint) |
+| blocksecops-gcp-infrastructure | `k8s/overlays/local/api-service/middleware-cors.yaml` | Traefik CORS for API |
+| blocksecops-gcp-infrastructure | `k8s/overlays/local/dashboard/middleware-cors.yaml` | Traefik CORS for dashboard |
+| blocksecops-gcp-infrastructure | `k8s/overlays/local/traefik/certificate.yaml` | TLS cert for `app.blocksecops.local` |
+| blocksecops-gcp-infrastructure | `k8s/overlays/local/traefik/tlsstore.yaml` | Default TLS store |
+| blocksecops-gcp-infrastructure | `k8s/overlays/local/traefik/redirect-https.yaml` | HTTP → HTTPS redirect |
 
 ### Production (GCP)
 
 **Access:** `https://app.blocksecops.com`
 
-Uses GCP Load Balancer with TLS certificates via cert-manager.
+**TLS:** Let's Encrypt via cert-manager with `letsencrypt-prod` ClusterIssuer.
 
-**Daily Workflow:** None required - services are managed by infrastructure.
+| Service | URL |
+|---------|-----|
+| Dashboard | `https://app.blocksecops.com` |
+| API | `https://app.blocksecops.com/api/v1/...` |
 
-**Verification:**
-```bash
-# Test dashboard
-curl https://app.blocksecops.com
-
-# Test API
-curl https://app.blocksecops.com/api/v1/health/live
-```
-
-**Files:**
-- `k8s/overlays/gcp-production/*/ingressroute.yaml` - Host rules for `app.blocksecops.com`
-- `k8s/overlays/gcp-production/api-service/configmap-patch.yaml` - Production CORS
+**No ConfigMap overrides needed** for `cors_origins`, `allowed_hosts`, or `dashboard_base_url` — the `config.py` production defaults apply automatically.
 
 ---
 
-## Creating Server Overlay
+## TLS Architecture
 
-To transition from NodePort access to domain-based access on the PowerEdge server:
+### Server (Self-Signed)
 
-### Step 1: Create Server Overlay Directory
-
-```bash
-cd /home/pwner/Git/blocksecops-aws-infrastructure/k8s/overlays
-mkdir -p server/api-service server/dashboard server/traefik
+```
+cert-manager                     Traefik                        Browser
+────────────                     ───────                        ───────
+selfsigned-cluster-issuer   →    TLSStore (default cert)   →    Self-signed warning
+  ↓                              websecure entrypoint (443)      (accept for testing)
+local-ca-issuer             →    IngressRoutes use tls: {}
+  ↓
+Certificate: app-tls
+  secretName: app-tls-secret
+  dnsNames: [app.blocksecops.local]
 ```
 
-### Step 2: API Service Configuration
+### Production (Let's Encrypt)
 
-**File:** `k8s/overlays/server/api-service/kustomization.yaml`
-```yaml
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-
-resources:
-  - ../../base/api-service
-
-patches:
-  - path: configmap-patch.yaml
-  - path: ingressroute.yaml
+```
+cert-manager                     Traefik                        Browser
+────────────                     ───────                        ───────
+letsencrypt-prod issuer     →    TLSStore (default cert)   →    Valid certificate
+  ↓                              websecure entrypoint (443)
+Certificate: blocksecops-tls
+  secretName: blocksecops-tls-secret
+  dnsNames: [app.blocksecops.com]
 ```
 
-**File:** `k8s/overlays/server/api-service/configmap-patch.yaml`
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: api-service-config
-data:
-  cors_origins: "http://app.blocksecops.local,http://192.168.86.225:30300"
-  dashboard_base_url: "http://app.blocksecops.local"
-```
+---
 
-**File:** `k8s/overlays/server/api-service/ingressroute.yaml`
-```yaml
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
-metadata:
-  name: api-service
-  namespace: api-service-local
-spec:
-  entryPoints:
-    - web
-  routes:
-    - match: Host(`app.blocksecops.local`) && PathPrefix(`/api/v1`)
-      kind: Rule
-      services:
-        - name: api-service
-          port: 8000
-```
+## Supabase Project Settings (External)
 
-### Step 3: Dashboard Configuration
+Supabase email verification links redirect to the **Site URL** configured in the Supabase Dashboard. This is external to the codebase and must be updated manually when switching environments.
 
-**File:** `k8s/overlays/server/dashboard/ingressroute.yaml`
-```yaml
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
-metadata:
-  name: dashboard
-  namespace: dashboard-local
-spec:
-  entryPoints:
-    - web
-  routes:
-    - match: Host(`app.blocksecops.local`) && !PathPrefix(`/api/v1`)
-      kind: Rule
-      services:
-        - name: dashboard
-          port: 3000
-```
+| Setting | Location | Server Value | Production Value |
+|---------|----------|-------------|------------------|
+| Site URL | Authentication → URL Configuration | `https://app.blocksecops.local` | `https://app.blocksecops.com` |
+| Redirect URLs | Authentication → URL Configuration | `https://app.blocksecops.local/**` | `https://app.blocksecops.com/**` |
 
-### Step 4: Apply Server Overlay
+**How to update:**
+1. Go to [Supabase Dashboard](https://supabase.com/dashboard) → Select project
+2. Navigate to **Authentication** → **URL Configuration**
+3. Update **Site URL** and **Redirect URLs** to match the target environment
 
-```bash
-# Apply API service with server overlay
-kubectl apply -k k8s/overlays/server/api-service/
-
-# Apply dashboard with server overlay
-kubectl apply -k k8s/overlays/server/dashboard/
-
-# Restart deployments to pick up changes
-kubectl rollout restart deployment/api-service -n api-service-local
-kubectl rollout restart deployment/dashboard -n dashboard-local
-```
+See [Supabase User Creation Pipeline](../pipelines/supabase-user-creation-pipeline.md) for how the redirect URL affects the signup flow.
 
 ---
 
@@ -219,24 +188,31 @@ kubectl rollout restart deployment/dashboard -n dashboard-local
 
 When ready to deploy to GCP with `app.blocksecops.com`:
 
-> **Last Verified:** January 18, 2026 (SolidityDefend v1.10.3 verification)
-> See [Verification Report](/home/pwner/Git/docs/changelogs/SOLIDITYDEFEND-V1.10.3-VERIFICATION-2026-01-18.md) for details.
-
 ### Prerequisites
 
 - [ ] GCP project created
 - [ ] GKE cluster provisioned
 - [ ] DNS A record: `app.blocksecops.com` → GCP Load Balancer IP
-- [ ] DNS A record: `api.blocksecops.com` → GCP Load Balancer IP (if separate)
 
-### Infrastructure Migration (from January 2026 Verification)
+### Platform URL Changes
+
+| Component | Action | Notes |
+|-----------|--------|-------|
+| API Service ConfigMap | Remove `cors_origins`, `allowed_hosts`, `dashboard_base_url` overrides | Production defaults in config.py apply |
+| Traefik IngressRoutes | Update Host rules to `app.blocksecops.com` | New production overlay |
+| Traefik CORS Middlewares | Update origins to `https://app.blocksecops.com` | New production overlay |
+| Traefik TLS Certificate | Use `letsencrypt-prod` issuer, `dnsNames: [app.blocksecops.com]` | Replace self-signed |
+| Supabase Dashboard | Update Site URL to `https://app.blocksecops.com` | Manual, external |
+| Dashboard build | `VITE_WS_URL=wss://app.blocksecops.com/ws` | Build arg |
+
+### Infrastructure Migration
 
 **Priority 1 - Security:**
 
 | Current State | GCP Target | Action |
 |---------------|------------|--------|
-| Self-signed TLS certificates | GCP Certificate Manager | Replace with managed certificates |
-| Sensitive values in ConfigMaps | GCP Secret Manager | Migrate secrets (DB passwords, API keys) |
+| Self-signed TLS certificates | Let's Encrypt via cert-manager | Replace ClusterIssuer |
+| Sensitive values in ConfigMaps | GCP Secret Manager | Migrate secrets |
 
 **Priority 2 - Core Infrastructure:**
 
@@ -249,59 +225,8 @@ When ready to deploy to GCP with `app.blocksecops.com`:
 
 | Current State | GCP Target | Action |
 |---------------|------------|--------|
-| Supabase Auth | Keep Supabase OR Google Identity Platform | Evaluate based on feature needs |
+| Supabase Auth | Keep Supabase | Update Site URL and Redirect URLs |
 | Local logging | Cloud Monitoring + Cloud Logging | Integrate for centralized observability |
-
-### Configuration Updates
-
-1. **Verify Production Overlay Exists:**
-   ```bash
-   ls -la k8s/overlays/production/
-   ```
-
-2. **Update CORS Origins** (`k8s/overlays/production/api-service/configmap-patch.yaml`):
-   ```yaml
-   data:
-     CORS_ORIGINS: "https://app.blocksecops.com,https://www.blocksecops.com"
-     ALLOWED_HOSTS: "api.blocksecops.com,*.blocksecops.com"
-   ```
-
-3. **Verify IngressRoute** (`k8s/overlays/production/dashboard/ingressroute.yaml`):
-   ```yaml
-   spec:
-     routes:
-       - match: Host(`app.blocksecops.com`)
-         kind: Rule
-         services:
-           - name: dashboard
-             port: 3000
-   ```
-
-4. **Configure TLS with cert-manager:**
-   ```yaml
-   # k8s/overlays/production/certificate.yaml
-   apiVersion: cert-manager.io/v1
-   kind: Certificate
-   metadata:
-     name: blocksecops-tls
-   spec:
-     secretName: blocksecops-tls-secret
-     issuerRef:
-       name: letsencrypt-prod
-       kind: ClusterIssuer
-     dnsNames:
-       - app.blocksecops.com
-       - api.blocksecops.com
-   ```
-
-5. **Update Traefik to use TLS:**
-   ```yaml
-   spec:
-     entryPoints:
-       - websecure  # HTTPS instead of web
-     tls:
-       secretName: blocksecops-tls-secret
-   ```
 
 ### Deployment Steps
 
@@ -309,89 +234,18 @@ When ready to deploy to GCP with `app.blocksecops.com`:
 # 1. Connect to GKE cluster
 gcloud container clusters get-credentials blocksecops-prod --zone us-central1-a
 
-# 2. Set up GCP Secret Manager (migrate from ConfigMaps)
-gcloud secrets create db-password --data-file=./secrets/db-password.txt
-gcloud secrets create supabase-jwt-secret --data-file=./secrets/jwt-secret.txt
-# Configure External Secrets Operator for GCP Secret Manager
-
-# 3. Set up Cloud SQL (replaces local PostgreSQL)
-# Database name: solidity_security (NOT blocksecops)
-gcloud sql instances create blocksecops-prod \
-  --database-version=POSTGRES_15 \
-  --tier=db-standard-2 \
-  --region=us-central1
-gcloud sql databases create solidity_security --instance=blocksecops-prod
-
-# 4. Set up Artifact Registry (replaces Harbor)
-gcloud artifacts repositories create blocksecops \
-  --repository-format=docker \
-  --location=us-central1
-# Push images to: us-central1-docker.pkg.dev/PROJECT/blocksecops/
-
-# 5. Apply infrastructure (Redis, External Secrets)
-kubectl apply -k k8s/overlays/gcp-production/redis/
-kubectl apply -k k8s/overlays/gcp-production/external-secrets/
-
-# 6. Apply cert-manager and certificates (GCP-managed)
-kubectl apply -k k8s/overlays/gcp-production/cert-manager/
-
-# 7. Apply Traefik with TLS
-kubectl apply -k k8s/overlays/gcp-production/traefik/
-
-# 8. Apply application services
+# 2. Apply production overlays (no ConfigMap overrides needed for URLs)
 kubectl apply -k k8s/overlays/gcp-production/api-service/
 kubectl apply -k k8s/overlays/gcp-production/dashboard/
-kubectl apply -k k8s/overlays/gcp-production/tool-integration/
-# ... other services
 
-# 9. Verify TLS certificate
+# 3. Verify TLS certificate
 kubectl get certificate -A
-kubectl describe certificate blocksecops-tls -n traefik
 
-# 10. Test HTTPS access
+# 4. Test HTTPS access
 curl https://app.blocksecops.com/api/v1/health/live
 
-# 11. Run E2E verification (similar to January 2026 verification)
-# - Test scanner endpoints
-# - Run SolidityDefend scan
-# - Verify tier-based access controls
+# 5. Update Supabase Dashboard Site URL to https://app.blocksecops.com
 ```
-
-### Post-Migration Verification
-
-Based on January 2026 SolidityDefend verification, confirm:
-
-| Check | Command |
-|-------|---------|
-| Scanner ConfigMap | `kubectl get configmap scanner-soliditydefend -o yaml` |
-| API Endpoints | `curl https://app.blocksecops.com/api/v1/scanners` |
-| E2E Scan | Create scan and verify 4-second completion |
-| Database Stats | Verify scanners, contracts, scans, vulnerabilities counts |
-| Tier Access | Test `/audit-logs` (professional+), `/webhooks` (startup+) |
-
----
-
-## Configuration Reference
-
-### Files That Contain Domain Configuration
-
-| File | Purpose | Domains |
-|------|---------|---------|
-| `api-service/k8s/overlays/*/configmap-patch.yaml` | CORS origins | All allowed origins |
-| `api-service/src/infrastructure/config.py` | Default CORS | `localhost`, `127.0.0.1` |
-| `dashboard/k8s/overlays/*/ingressroute.yaml` | Dashboard routing | Host match rules |
-| `*/k8s/overlays/production/ingressroute.yaml` | Production routing | `app.blocksecops.com` |
-| `dashboard/src/utils/env.ts` | Frontend defaults | Fallback URLs |
-
-### Environment Variables
-
-| Variable | Service | Purpose |
-|----------|---------|---------|
-| `CORS_ORIGINS` | API Service | Allowed CORS origins (comma-separated) |
-| `ALLOWED_HOSTS` | API Service | Allowed Host headers |
-| `DASHBOARD_BASE_URL` | API Service | URL for notification links |
-| `VITE_API_URL` | Dashboard | API endpoint (build-time) |
-| `VITE_WS_URL` | Dashboard | WebSocket endpoint (build-time) |
 
 ---
 
@@ -402,55 +256,54 @@ Based on January 2026 SolidityDefend verification, confirm:
 **Symptom:** Browser console shows "Access-Control-Allow-Origin" errors
 
 **Solution:**
-1. Check API service logs: `kubectl logs -n api-service-local -l app.kubernetes.io/name=api-service`
-2. Verify CORS config: `kubectl get configmap api-service-config -n api-service-local -o yaml`
-3. Add missing origin to `cors_origins` in configmap
-4. Restart API service: `kubectl rollout restart deployment/api-service -n api-service-local`
+1. Check API service config: `kubectl exec -n api-service-local deployment/api-service -- env | grep CORS`
+2. Verify ConfigMap: `kubectl get configmap api-service-config -n api-service-local -o yaml | grep cors`
+3. Check Traefik middleware: `kubectl get middleware -n api-service-local -o yaml`
+4. Ensure all three match the current domain (including `https://` protocol)
 
 ### DNS Not Resolving
 
 **Symptom:** `app.blocksecops.local` doesn't resolve
 
 **Solution:**
-1. Verify /etc/hosts entry: `cat /etc/hosts | grep blocksecops`
-2. Flush DNS cache:
-   - Mac: `sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder`
-   - Linux: `sudo systemd-resolve --flush-caches`
-3. Test with IP directly: `curl http://192.168.86.225:30180`
+1. Verify /etc/hosts entry: `grep blocksecops /etc/hosts`
+2. Flush DNS cache: `sudo systemd-resolve --flush-caches`
+3. Test with IP directly: `curl -k https://192.168.86.225`
 
-### IngressRoute Not Matching
+### TLS Certificate Errors
 
-**Symptom:** 404 errors when accessing via domain
+**Symptom:** Browser shows certificate warning or curl fails with SSL error
 
 **Solution:**
-1. Check IngressRoute: `kubectl get ingressroute -A`
-2. Describe route: `kubectl describe ingressroute <name> -n <namespace>`
-3. Verify Traefik logs: `kubectl logs -n traefik-local -l app.kubernetes.io/name=traefik`
-4. Test Host header: `curl -H "Host: app.blocksecops.local" http://192.168.86.225:30180`
+1. Check certificate: `kubectl get certificate -n traefik-local`
+2. Check secret: `kubectl get secret app-tls-secret -n traefik-local`
+3. Use `-k` flag with curl for self-signed certs
+4. Import the local CA into browser trust store for persistent trust
 
 ---
 
 ## Security Considerations
 
+### All Environments
+
+1. **Always use HTTPS** — Both server and production use TLS
+2. **Restrict CORS origins** — Only allow the specific domain, never use `*`
+3. **Single origin per environment** — One domain in CORS, not multiple
+
 ### Production Requirements
 
-1. **Always use HTTPS in production** - Never expose HTTP endpoints publicly
-2. **Restrict CORS origins** - Only allow known domains, never use `*`
-3. **Use separate domains for API** - Consider `api.blocksecops.com` for API-only access
-4. **Enable HSTS** - Force HTTPS with Strict-Transport-Security header
-5. **CSP headers** - Configure Content-Security-Policy for frontend
-
-### Development Exceptions
-
-For local/server testing only:
-- HTTP is acceptable (no TLS certificates needed)
-- CORS can include multiple test origins
-- `.local` domains are fine for internal testing
+1. **Valid TLS certificates** — Let's Encrypt, not self-signed
+2. **HSTS headers** — Force HTTPS with Strict-Transport-Security
+3. **CSP headers** — Configure Content-Security-Policy for frontend
 
 ---
 
 **See Also:**
 - [Service Access Standards](./port-forwarding.md) - Always-available access patterns
-- [Service Availability](./service-availability.md) - Service availability principles
-- [Testing & Deployment](./testing-deployment.md) - Deployment procedures
+- [Kustomize Standards](./kustomize-standards.md) - Base/overlay patterns
+- [Supabase User Creation Pipeline](../pipelines/supabase-user-creation-pipeline.md) - Signup redirect flow
 - [Core Development Rules](./core-development-rules.md) - Development workflow
+
+---
+
+*Last Updated: February 8, 2026*
