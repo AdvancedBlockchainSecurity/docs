@@ -10,19 +10,6 @@ This directory contains comprehensive documentation of key workflows in the Bloc
 
 ---
 
-## Available Workflows
-
-| Workflow | Description | Status |
-|----------|-------------|--------|
-| [Smart Contract Scanning](./smart-contract-scanning-workflow.md) | Complete flow from contract upload to vulnerability display | Active |
-| [Intelligence Pipeline](./intelligence-pipeline-workflow.md) | Vulnerability classification, fingerprinting, and enrichment | Active |
-| [Deduplication Workflow](./deduplication-workflow.md) | Multi-tier deduplication with semantic matching | Active |
-| [ML Training Workflow](./ml-training-workflow.md) | False positive classifier training and evaluation | Active |
-| [AI Features Workflow](./ai-features-workflow.md) | All AI-powered features (Copilot, Code Review, Code Repair, Invariants, Economic Analysis) | Active |
-| [Subscription Workflow](./subscription-workflow.md) | Stripe billing lifecycle, tier changes, x402 pay-per-scan, credit packages | Active |
-
----
-
 ## Workflow Documentation Structure
 
 Each workflow document follows a standard structure:
