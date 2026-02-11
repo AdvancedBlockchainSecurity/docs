@@ -29,7 +29,7 @@ Phase 7: API VALIDATION       Phase 8: ML DATA REVIEW       Phase 9: REPORT
 Scanner list endpoint         Label distribution            Issue classification
 Scanner effectiveness         Per-scanner balance           Priority ranking
 Dedup severity filter         Training data sufficiency     Fix recommendations
-TI scanner health             Sol-azy/new scanner gaps      Checklist generation
+TI scanner health             new scanner gaps.             Checklist generation
 ```
 
 ## Trigger
