@@ -40,7 +40,7 @@ Query keys include orgId   stamp org_id on writes     personal workspace (NULL)
 |------|-------------|
 | User clicks org/personal | `switchOrganization(orgId \| null)` called |
 | API client updated | `setCurrentOrgIdForApi(orgId)` — all subsequent requests carry new header |
-| localStorage updated | `blocksecops-current-org` key set or removed |
+| localStorage updated | `blocksecops-current-org:{userId}` key set or removed (scoped by user ID since v0.42.0) |
 | Cache invalidated | All org-scoped query keys invalidated (dashboard, contracts, scans, vulnerabilities, projects, teams, members) |
 | Pages refetch | React Query triggers fresh API calls with new org scope |
 

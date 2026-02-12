@@ -38,14 +38,28 @@ flowchart LR
 
 ### Step 1: Navigate to Member Management
 
-**Dashboard:**
+**Option A — Billing Page (Quick Invite, v0.42.0+):**
+1. Navigate to **Billing** page
+2. Scroll to the **Invite Members** card (visible to org owner/admin only)
+3. Enter email and select role
+4. Click **Send Invite**
+
+**Option B — Organization Members:**
 1. Click your organization name in the top navigation
 2. Select **Members** from the dropdown
 3. Or navigate to **Organization > Members**
 
 ### Step 2: Send Invitation
 
-**Dashboard:**
+**Dashboard (Billing Page — v0.42.0+):**
+1. In the **Invite Members** card on the Billing page:
+   - Enter email address
+   - Select role (Developer, Auditor, Admin)
+   - Check seat availability (X / Y seats used)
+   - Click **Send Invite**
+2. Pending invitations appear below with cancel option
+
+**Dashboard (Organization Members):**
 1. Click **Invite Members** button
 2. Enter email address(es) - one per line or comma-separated
 3. Select the role for invited members:
@@ -379,6 +393,20 @@ Share with new members:
 - [ ] Invitees accepted and appear as active members
 - [ ] Team assignments confirmed
 - [ ] New members onboarded
+
+---
+
+## Billing Page Integration (v0.42.0)
+
+As of Dashboard v0.42.0, the Billing page includes an **Invite Members** card that provides a quick way to invite team members without navigating to the Organization settings:
+
+- **Visibility**: Only shown to organization owner or admin
+- **Seat indicator**: Shows current member count vs. tier limit (from `@blocksecops/tier-config`)
+- **Role selection**: Developer, Auditor, Admin
+- **Pending invites**: List with cancel buttons
+- **API**: Uses `POST /organizations/{id}/invites` and `GET /organizations/{id}/invites`
+
+**Component**: `src/components/billing/InviteMemberCard.tsx`
 
 ---
 

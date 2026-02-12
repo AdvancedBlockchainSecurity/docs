@@ -1,6 +1,6 @@
 # API Documentation
 
-**Last Updated**: December 23, 2025
+**Last Updated**: February 12, 2026
 **API Version**: v1.3
 **Base URL**: `https://api.blocksecops.com/api/v1`
 
@@ -63,6 +63,16 @@ Complete API reference and integration guides for the BlockSecOps Platform. This
   - HMAC-SHA256 signature verification
   - Delivery history and retry logic
   - See [Endpoints Reference](endpoints-reference.md#webhooks-phase-45---enterprise)
+
+### 💰 Billing API
+
+- **Stripe Subscription Billing** - Tier-based subscription management
+  - Checkout session creation (`POST /billing/checkout`)
+  - Subscription management (`/billing/subscription/*`)
+  - Tier changes with proration preview (`/billing/subscription/change-tier`)
+  - Invoice and billing history (`/billing/invoices`, `/billing/history`)
+  - Credit package purchases (`POST /billing/credits/checkout`)
+  - See [Endpoints Reference](endpoints-reference.md#billing) and [Subscription Workflow](../workflows/subscription-workflow.md)
 
 ### 🔧 Integration Guides
 
@@ -142,17 +152,17 @@ curl -X GET https://api.blocksecops.com/api/v1/scans/{scan_id}/results \
 - Formal verification (3 tools)
 - SBOM generation
 
-### Tier-Based Access
-- **Free**: 10 scans/month, 100 KB max file size
-- **Pro**: 100 scans/month, 1 MB max file size
-- **Enterprise**: Unlimited scans, 10 MB max file size
-- **Enterprise Broker**: Unlimited scans with white-label access
+### Tier-Based Access (source: `tiers.json` v3.2)
+- **Developer** (free): 3 contracts/month, 5 files/scan
+- **Team** ($299/mo): 15 contracts/month, 50 files/scan, export reports
+- **Growth** ($699/mo): 50 contracts/month, 100 files/scan, API access, multi-chain
+- **Enterprise** ($1,999+/mo): Unlimited contracts, SSO/SAML, dedicated support
 
 ### Pay-Per-Scan (x402)
 - **Alternative to subscriptions** - Pay per scan when quota exceeded
 - **USDC on Base** - Instant, fee-free blockchain payments
-- **Credit packages** - Volume discounts (20-40% off)
-- **Pricing tiers** - $0.50-$5.00 based on scan complexity
+- **Credit packages** - Volume discounts (17-50% off)
+- **Pricing tiers** - $3.00-$25.00 based on scan complexity
 
 ---
 
@@ -190,4 +200,4 @@ For API issues or questions:
 ---
 
 **Maintained by**: BlockSecOps Backend Team
-**Last Review**: December 23, 2025
+**Last Review**: February 12, 2026

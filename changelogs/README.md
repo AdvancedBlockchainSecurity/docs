@@ -18,6 +18,25 @@ Changelogs are organized by component and maintained chronologically. Each chang
 
 ## Available Changelogs
 
+### 0. Dashboard v0.42.0 - Billing Feature Fix, Data Isolation & Invite UI (`DASHBOARD-V0.42.0-BILLING-FIX-2026-02-12.md`)
+
+**Component:** blocksecops-dashboard
+**Scope:** Billing feature display fix (field name mismatch), localStorage data isolation (security), invite UI, tier-config integration
+**Date:** February 12, 2026
+
+**Key Changes:**
+- Fixed grey X for Export/Webhooks/API features on enterprise tier (field name mismatch between API and dashboard)
+- localStorage keys now scoped by userId to prevent cross-account data leakage (security fix)
+- Added InviteMemberCard on Billing page for quick team invites
+- Replaced hardcoded PLAN_TIERS/pricing with centralized `@blocksecops/tier-config` package
+- Added TierChangeModal for in-app plan changes with proration preview
+
+**Use When:**
+- Understanding billing page feature display logic
+- Working with localStorage data isolation patterns
+- Adding invite functionality to the platform
+- Updating pricing/tier data in the dashboard
+
 ### 0. API Service v0.28.11-v0.28.17 - Dedup Pipeline Fixes (`API-SERVICE-V0.28.11-V0.28.17-DEDUP-PIPELINE-FIXES-2026-02-09.md`)
 
 **Component:** blocksecops-api-service

@@ -295,6 +295,8 @@ Organization creation is tied exclusively to Enterprise tier subscriptions. Ther
 ## Related Documentation
 
 - [Subscription Pipeline](../pipelines/subscription-pipeline.md) — Technical implementation details
+- [Billing Subscription Workflow](./billing-subscription-workflow.md) — Dashboard feature resolution chain, field mapping, invite flow, localStorage isolation
+- [Billing Feature Pipeline](../pipelines/billing-feature-pipeline.md) — Step-by-step pipeline for tier feature changes
 - [Stripe Dashboard Purchase Workflow](./stripe-dashboard-purchase-workflow.md) — Testing Stripe payments locally
 - [Tier Standards](../standards/tier-standards.md) — Tier definitions, quotas, and pricing
 - [Organization Scoping Pipeline](../pipelines/organization-scoping-pipeline.md) — Org data isolation
@@ -306,4 +308,4 @@ Organization creation is tied exclusively to Enterprise tier subscriptions. Ther
 
 ---
 
-*Last Updated: February 7, 2026*
+*Last Updated: February 12, 2026*

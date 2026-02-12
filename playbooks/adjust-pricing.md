@@ -26,15 +26,20 @@ blocksecops-shared/tier-config/tiers.json  <-- SINGLE SOURCE OF TRUTH
     +---------------+---------------+
     |               |               |
     v               v               v
-Python Package   TypeScript      Database
-(loader.py)      (TODO)          (via Python)
+Python Package   TypeScript       Database
+(loader.py)      (@blocksecops/   (via Python)
+                  tier-config)
     |               |               |
     v               v               v
-API Service    Frontend         Alembic
-               (DUPLICATES!)    Migrations
+API Service    Dashboard +       Alembic
+               Pricing.tsx       Migrations
+               billing.ts
+               QuotaUsageCard
 ```
 
 **Important:** The `tiers.json` file is the authoritative source for all tier values. When values differ between systems, `tiers.json` is correct.
+
+**As of v0.42.0 (February 2026):** The TypeScript package (`@blocksecops/tier-config`) is fully implemented. The dashboard imports `PLAN_TIERS`, `getPricingTable()`, `generateFeatureComparisonRows()`, and `generateQuotaComparisonRows()` directly from the package. Manual frontend syncing is no longer required for dashboard components.
 
 ---
 
@@ -46,7 +51,10 @@ API Service    Frontend         Alembic
 | `blocksecops-shared/tier-config/schema/tier-config.schema.json` | JSON Schema validation |
 | `blocksecops-shared/tier-config/python/blocksecops_tier_config/models.py` | Pydantic models |
 | `blocksecops-shared/tier-config/python/blocksecops_tier_config/loader.py` | Python loader with caching |
-| `blocksecops_com/lib/pricing-data.ts` | Frontend (currently duplicates - should import) |
+| `blocksecops-shared/tier-config/typescript/index.ts` | TypeScript bindings (dashboard imports this) |
+| `blocksecops-dashboard/src/lib/api/billing.ts` | Dashboard PLAN_TIERS (derived from tier-config) |
+| `blocksecops-dashboard/src/pages/Pricing.tsx` | Dashboard pricing page (derived from tier-config) |
+| `blocksecops_com/lib/pricing-data.ts` | Marketing website (still requires manual sync) |
 | `docs/standards/tier-standards.md` | Human-readable tier documentation |
 
 ---
@@ -215,11 +223,34 @@ In Stripe Dashboard, archive old prices to prevent new subscriptions at old rate
 
 ---
 
-## Step 4: Update Frontend (Temporary)
+## Step 4: Update Frontend
 
-**Note:** The frontend currently duplicates pricing data. Until the TypeScript package is implemented, manual sync is required.
+### Dashboard (Automatic via tier-config)
 
-### Update pricing-data.ts
+**As of v0.42.0**, the dashboard automatically reads from `@blocksecops/tier-config`. After updating `tiers.json` and rebuilding the TypeScript bindings:
+
+```bash
+cd /home/pwner/Git/blocksecops-shared/tier-config/typescript
+npm run build
+
+cd /home/pwner/Git/blocksecops-dashboard
+npm install  # picks up updated tier-config
+npm run type-check  # ensure no type errors
+```
+
+Dashboard components that auto-sync:
+- `Pricing.tsx` — uses `getPricingTable()`, `generateFeatureComparisonRows()`, `generateQuotaComparisonRows()`
+- `billing.ts` — `PLAN_TIERS` derived from `getAllTiers()`
+- `SubscriptionCard.tsx` — plan display from `PLAN_TIERS`
+- `QuotaUsageCard.tsx` — supplementary data from `getTier()`
+
+See [Billing Feature Pipeline](/docs/pipelines/billing-feature-pipeline.md) for the full step-by-step process.
+
+### Marketing Website (Manual Sync Required)
+
+The marketing website (`blocksecops_com`) still duplicates pricing data. Manual sync is required.
+
+#### Update pricing-data.ts
 
 Edit `blocksecops_com/lib/pricing-data.ts` to match `tiers.json`:
 
@@ -352,7 +383,9 @@ After making changes, verify:
 - [ ] Python loader successfully loads config
 - [ ] Stripe prices created (if price changed)
 - [ ] Stripe price IDs updated in `tiers.json`
-- [ ] `pricing-data.ts` synced with `tiers.json`
+- [ ] Dashboard tier-config package rebuilt (`cd tier-config/typescript && npm run build`)
+- [ ] Dashboard `npm install && npm run type-check` passes
+- [ ] Marketing website `pricing-data.ts` synced with `tiers.json` (manual)
 - [ ] `tier-standards.md` documentation updated
 - [ ] API service restarted and healthy
 - [ ] Pricing page shows correct values
