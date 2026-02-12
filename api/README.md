@@ -130,7 +130,7 @@ curl -X GET https://api.blocksecops.com/api/v1/scans/{scan_id}/results \
 ## API Features
 
 ### Multi-Language Support
-- **Solidity** (11 scanners)
+- **Solidity** (12 scanners)
 - **Vyper** (2 scanners)
 - **Rust/Solana** (4 scanners)
 - **Cairo** (3 scanners)

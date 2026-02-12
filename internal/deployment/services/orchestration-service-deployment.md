@@ -121,7 +121,7 @@ kubectl create configmap orchestration-config \
 ```bash
 cd /path/to/blocksecops-orchestration
 
-# Build with all 11 scanner binaries
+# Build with all 12 scanner binaries
 docker build -t blocksecops-orchestration:0.7.0 .
 
 # For Minikube local development
@@ -145,8 +145,8 @@ kubectl logs -n orchestration-local deployment/orchestration --tail=50
 **Expected Output**:
 ```
 📡 Orchestration API starting up
-📦 Loaded 11 scanners (11 available)
-🔧 Loaded 11 parsers
+📦 Loaded 12 scanners (12 available)
+🔧 Loaded 12 parsers
 INFO:     Uvicorn running on http://0.0.0.0:8004 (Press CTRL+C to quit)
 ```
 

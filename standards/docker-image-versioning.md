@@ -321,13 +321,13 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.4.0 | `k8s/overlays/local/` | Supabase build args required |
-| api-service | 0.28.19 | `k8s/overlays/local/api-service/` | Production readiness: base ConfigMap intelligence_engine_url, production CronJob overlay, semgrep/medusa metadata alignment |
+| api-service | 0.28.20 | `k8s/overlays/local/api-service/` | Fix FK flush ordering in scanner upgrade service |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.41.5 | `k8s/overlays/local/` | Fix deduplication 422 (empty severity param), collapsible sidebar, quick access pins |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
-| orchestration | 0.9.10 | `k8s/overlays/local/` | Uses pre-built base image |
+| orchestration | 0.9.13 | `k8s/overlays/local/` | Uses pre-built base image |
 | tool-integration | 0.3.15 | `k8s/overlays/local/` | Production readiness: pin KJM defaults, scanner Job security context, medusa solc-select fix, sol-azy commit pin, production overlay sync |
 
 All services are `0.x.x` (development phase). Version `1.0.0` indicates stable, production-ready API.

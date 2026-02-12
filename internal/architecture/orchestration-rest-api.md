@@ -32,11 +32,11 @@
 
 ## Overview
 
-The **Orchestration REST API** provides programmatic access to all 11 security scanners in the BlockSecOps platform through a unified HTTP interface. Built with FastAPI integrated with Celery workers, it combines HTTP convenience with distributed execution capabilities.
+The **Orchestration REST API** provides programmatic access to all 12 security scanners in the BlockSecOps platform through a unified HTTP interface. Built with FastAPI integrated with Celery workers, it combines HTTP convenience with distributed execution capabilities.
 
 ### Key Features
 
-- **11 Security Scanners**: Slither, Aderyn, Mythril, Wake, Solhint, Semgrep, Echidna, Medusa, Foundry Fuzz, Halmos, 4naly3er
+- **12 Security Scanners**: Slither, Aderyn, Mythril, Wake, Solhint, Semgrep, Echidna, Medusa, Foundry Fuzz, Halmos, 4naly3er, SolidityDefend
 - **Database-Backed Queue**: Scans persisted to PostgreSQL with status tracking
 - **Celery Integration**: Distributed execution with automatic retries and monitoring
 - **Type-Safe API**: Pydantic models for request/response validation
@@ -978,7 +978,7 @@ resources:
 
 **Deployment Status** (v0.7.3):
 - ✅ All 4/4 containers running
-- ✅ 11 scanners available
+- ✅ 12 scanners available
 - ✅ Health probes passing
 - ✅ API endpoints validated
 - ✅ Database integration working
