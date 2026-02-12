@@ -261,16 +261,20 @@
 - [ ] Banner stays hidden for 7 days (default)
 - [ ] After 7 days, banner reappears
 - [ ] Dismissal stored in localStorage as timestamp
-- [ ] Storage key: `upgrade-banner-dismissed`
+- [ ] Storage key: `upgrade-banner-dismissed:{userId}` (scoped by user ID since v0.42.0)
+- [ ] Different users on same browser have independent dismissal state
 
 ### 8.5 Persistence Verification
 ```javascript
-// Check localStorage
-localStorage.getItem('upgrade-banner-dismissed')
+// Check localStorage (replace {userId} with actual user UUID)
+localStorage.getItem('upgrade-banner-dismissed:{userId}')
 // Returns timestamp (e.g., "1736784000000") or null
 
 // Force banner to reappear (testing)
-localStorage.removeItem('upgrade-banner-dismissed')
+localStorage.removeItem('upgrade-banner-dismissed:{userId}')
+
+// Legacy unscoped key is cleaned up on logout (v0.42.0)
+// localStorage.removeItem('upgrade-banner-dismissed')
 ```
 
 ### 8.6 Configuration Props

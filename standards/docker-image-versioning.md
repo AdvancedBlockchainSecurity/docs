@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
 **Version:** 3.4.0
-**Last Updated:** February 7, 2026
+**Last Updated:** February 12, 2026
 
 ## Single Source of Truth
 
@@ -104,8 +104,16 @@ kubectl apply -k blocksecops-dashboard/k8s/overlays/local/
 
 **Why parent directory context?**
 - Dashboard imports `@blocksecops/shared` from sibling `blocksecops-shared/typescript/`
+- Dashboard imports `@blocksecops/tier-config` from sibling `blocksecops-shared/tier-config/typescript/`
 - Dockerfile uses `COPY blocksecops-shared /workspace/blocksecops-shared`
+- Dockerfile builds `@blocksecops/tier-config` package inside Docker before dashboard `npm install`
 - Build context must include both directories
+
+**Build prerequisites:**
+- The root `.dockerignore` (`/home/pwner/Git/.dockerignore`) excludes `**/dist` and `**/node_modules`
+- Tier-config `dist/` is built inside Docker (not copied from host)
+- Dashboard `tsconfig.json` has `paths` mapping for `@blocksecops/tier-config` pointing to `../blocksecops-shared/tier-config/typescript/dist` for reliable type resolution in Docker builds
+- Do NOT create ambient `.d.ts` files in `src/types/` that redeclare `@blocksecops/tier-config` — this overrides the real package types and causes missing export errors
 
 ### API Service (blocksecops-api-service)
 
@@ -136,7 +144,7 @@ Most services follow the standard pattern (build from service directory):
 | Service | Build Context | Special Requirements |
 |---------|---------------|---------------------|
 | api-service | Service directory | None |
-| dashboard | **Parent directory** | Supabase build args, shared lib |
+| dashboard | **Parent directory** | Supabase build args, shared lib, tier-config build |
 | data-service | Service directory | None |
 | intelligence-engine | Service directory | None |
 | notification | Service directory | None |
@@ -323,7 +331,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | admin-portal | 0.4.0 | `k8s/overlays/local/` | Supabase build args required |
 | api-service | 0.28.20 | `k8s/overlays/local/api-service/` | Fix FK flush ordering in scanner upgrade service |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.41.5 | `k8s/overlays/local/` | Fix deduplication 422 (empty severity param), collapsible sidebar, quick access pins |
+| dashboard | 0.42.0 | `k8s/overlays/local/` | Fix billing feature display (field name mismatch), localStorage data isolation, invite UI, tier-config integration |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |

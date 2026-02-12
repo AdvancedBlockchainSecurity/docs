@@ -1,6 +1,6 @@
 # API Endpoints Reference
 
-**Last Updated**: 2026-02-07
+**Last Updated**: 2026-02-12
 **API Version**: v1
 **Base URL**: `http://localhost:8000/api/v1` (local) | `https://api.blocksecops.com/api/v1` (production)
 
@@ -716,15 +716,15 @@ When a user exceeds their tier-based scan quota, the API returns HTTP 402 with d
 {
   "detail": {
     "error": "quota_exceeded",
-    "message": "You've used all 10 scans for this month",
-    "tier": "free",
-    "scans_used": 10,
-    "scan_limit": 10,
+    "message": "You've used all 3 contracts for this month",
+    "tier": "developer",
+    "scans_used": 3,
+    "scan_limit": 3,
     "scans_remaining": 0,
     "reset_date": "2025-12-01T00:00:00+00:00",
     "days_until_reset": 17,
     "upgrade_url": "/pricing",
-    "upgrade_message": "Upgrade to Pro for unlimited scans or wait until your quota resets",
+    "upgrade_message": "Upgrade to Team for 15 contracts/month or wait until your quota resets",
     "payment_options": {
       "can_use_credits": true,
       "credit_balance": 5,
@@ -746,10 +746,10 @@ When a user exceeds their tier-based scan quota, the API returns HTTP 402 with d
 ```
 
 **Tier Limits**:
-- **Free**: 10 scans/month (enforced)
-- **Pro**: Unlimited scans
-- **Enterprise**: Unlimited scans
-- **Enterprise Broker**: Unlimited scans
+- **Developer** (free): 3 contracts/month (enforced)
+- **Team** ($299/mo): 15 contracts/month
+- **Growth** ($699/mo): 50 contracts/month
+- **Enterprise** ($1,999+/mo): Unlimited contracts
 
 **Payment Options** (Phase 3.4 - December 2025):
 The 402 response includes `payment_options` for x402 pay-per-scan integration:
@@ -766,7 +766,7 @@ The 402 response includes `payment_options` for x402 pay-per-scan integration:
 **Frontend Behavior**:
 - API client automatically intercepts 402 errors
 - QuotaExceededModal displays automatically showing quota info and upgrade options
-- Users can upgrade to Pro, purchase credits, or wait for monthly quota reset
+- Users can upgrade to a higher tier, purchase credits, or wait for monthly quota reset
 - If `can_use_credits` is true, users can use existing credits to run the scan
 
 ---
@@ -2569,44 +2569,46 @@ Get enhanced user profile with tier and quota information.
   "id": "uuid",
   "email": "user@example.com",
   "is_active": true,
-  "tier": "free",
-  "tier_updated_at": "2025-11-01T10:00:00Z",
-  "created_at": "2025-10-01T10:00:00Z",
+  "tier": "developer",
+  "tier_updated_at": "2026-01-15T10:00:00Z",
+  "created_at": "2026-01-01T10:00:00Z",
   "quota": {
-    "tier": "free",
-    "monthly_scan_limit": 10,
-    "monthly_scans_used": 3,
-    "scans_remaining": 7,
-    "percentage_used": 30.0,
-    "max_files_per_scan": 25,
+    "tier": "developer",
+    "monthly_scan_limit": 3,
+    "monthly_scans_used": 1,
+    "scans_remaining": 2,
+    "percentage_used": 33.3,
+    "max_files_per_scan": 5,
     "webhooks_enabled": false,
     "api_access_enabled": false,
-    "scan_priority": 25,
-    "quota_reset_at": "2025-12-01T00:00:00Z"
+    "export_enabled": false,
+    "scan_priority": 50,
+    "quota_reset_at": "2026-02-01T00:00:00Z"
   }
 }
 ```
 
 **Field Descriptions**:
-- `tier`: User tier (free, pro, enterprise, enterprise_broker)
-- `quota.monthly_scan_limit`: Monthly scan limit (-1 for unlimited)
-- `quota.monthly_scans_used`: Scans used this month
-- `quota.scans_remaining`: Remaining scans (null if unlimited)
+- `tier`: User tier (developer, team, growth, enterprise)
+- `quota.monthly_scan_limit`: Monthly contract limit (-1 for unlimited)
+- `quota.monthly_scans_used`: Contracts used this month
+- `quota.scans_remaining`: Remaining contracts (null if unlimited)
 - `quota.percentage_used`: Percentage of quota used (0-100)
 - `quota.max_files_per_scan`: Maximum files per scan (-1 for unlimited)
-- `quota.webhooks_enabled`: Webhooks feature enabled
-- `quota.api_access_enabled`: API access enabled
-- `quota.scan_priority`: Scan queue priority (0=highest, 100=lowest)
+- `quota.webhooks_enabled`: Webhooks feature enabled (growth+)
+- `quota.api_access_enabled`: API access enabled (growth+)
+- `quota.export_enabled`: Export reports feature enabled (team+)
+- `quota.scan_priority`: Scan queue priority (5=highest/enterprise, 50=lowest/developer)
 - `quota.quota_reset_at`: Next quota reset date
 
-**Tier Limits**:
+**Tier Limits** (source of truth: `tiers.json` v3.2):
 
-| Tier | Monthly Scans | Files/Scan | Priority | Webhooks | API Access |
-|------|--------------|------------|----------|----------|------------|
-| Free | 10 | 25 | 25 (low) | No | No |
-| Pro | Unlimited | 100 | 50 (medium) | Yes | Yes |
-| Enterprise | Unlimited | Unlimited | 75 (high) | Yes | Yes |
-| Enterprise Broker | Unlimited | Unlimited | 100 (highest) | Yes | Yes |
+| Tier | Contracts/Month | Files/Scan | Priority | Export | Webhooks | API Access |
+|------|----------------|------------|----------|--------|----------|------------|
+| Developer (free) | 3 | 5 | 50 (lowest) | No | No | No |
+| Team ($299/mo) | 15 | 50 | 30 | Yes | No | No |
+| Growth ($699/mo) | 50 | 100 | 15 | Yes | Yes | Yes |
+| Enterprise ($1,999+/mo) | Unlimited | Unlimited | 5 (highest) | Yes | Yes | Yes |
 
 **Status Codes**:
 - `200` OK - Enhanced profile retrieved
@@ -2627,16 +2629,17 @@ Get detailed quota information for current user.
 **Response** (200 OK):
 ```json
 {
-  "tier": "free",
-  "monthly_scan_limit": 10,
-  "monthly_scans_used": 8,
-  "scans_remaining": 2,
-  "percentage_used": 80.0,
-  "max_files_per_scan": 25,
+  "tier": "developer",
+  "monthly_scan_limit": 3,
+  "monthly_scans_used": 2,
+  "scans_remaining": 1,
+  "percentage_used": 66.7,
+  "max_files_per_scan": 5,
   "webhooks_enabled": false,
   "api_access_enabled": false,
-  "scan_priority": 25,
-  "quota_reset_at": "2025-12-01T00:00:00Z"
+  "export_enabled": false,
+  "scan_priority": 50,
+  "quota_reset_at": "2026-02-01T00:00:00Z"
 }
 ```
 
@@ -3233,7 +3236,7 @@ Create Stripe Checkout session for subscription purchase.
 **Request Body**:
 ```json
 {
-  "plan_tier": "startup",
+  "plan_tier": "team",
   "billing_interval": "monthly",
   "success_url": "https://app.blocksecops.com/billing?success=true",
   "cancel_url": "https://app.blocksecops.com/billing?canceled=true"
@@ -3242,7 +3245,7 @@ Create Stripe Checkout session for subscription purchase.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| plan_tier | string | Yes | Plan: developer, startup, professional |
+| plan_tier | string | Yes | Plan: team, growth, enterprise |
 | billing_interval | string | Yes | monthly or annual |
 | success_url | string | No | Redirect URL on success |
 | cancel_url | string | No | Redirect URL on cancel |
@@ -3296,7 +3299,7 @@ Get current user's subscription details.
 ```json
 {
   "id": "uuid",
-  "plan_tier": "startup",
+  "plan_tier": "team",
   "billing_interval": "monthly",
   "status": "active",
   "current_period_start": "2026-01-01T00:00:00Z",
@@ -3337,7 +3340,7 @@ Cancel current subscription.
 ```json
 {
   "id": "uuid",
-  "plan_tier": "startup",
+  "plan_tier": "team",
   "status": "active",
   "cancel_at_period_end": true,
   ...
@@ -3357,11 +3360,13 @@ Reactivate a subscription scheduled for cancellation.
 
 **Authentication**: Required (Supabase JWT)
 
+**Precondition**: Subscription must have `cancel_at_period_end: true` (deferred cancellation).
+
 **Response** (200 OK):
 ```json
 {
   "id": "uuid",
-  "plan_tier": "startup",
+  "plan_tier": "team",
   "status": "active",
   "cancel_at_period_end": false,
   ...
@@ -3371,6 +3376,146 @@ Reactivate a subscription scheduled for cancellation.
 **Status Codes**:
 - `200` OK - Subscription reactivated
 - `400` Bad Request - Subscription not scheduled for cancellation
+- `401` Unauthorized - Invalid token
+
+---
+
+### GET /billing/subscription/change-tier/preview
+
+Preview cost of changing subscription tier (proration calculation).
+
+**Authentication**: Required (Supabase JWT)
+
+**Query Parameters**:
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| new_tier | string | Yes | Target tier: team, growth, enterprise |
+| billing_interval | string | No | monthly or annual (defaults to current) |
+
+**Response** (200 OK):
+```json
+{
+  "current_tier": "team",
+  "new_tier": "growth",
+  "billing_interval": "monthly",
+  "proration_amount": 26633,
+  "proration_date": "2026-02-12T00:00:00Z",
+  "next_invoice_amount": 69900,
+  "effective": "immediate",
+  "currency": "usd"
+}
+```
+
+**Proration Behavior**:
+- **Upgrade**: Immediate proration — user charged prorated difference for remainder of billing period
+- **Downgrade**: Deferred — change takes effect at `current_period_end`, no immediate charge/refund
+
+**Status Codes**:
+- `200` OK - Preview calculated
+- `400` Bad Request - Invalid tier or no active subscription
+- `401` Unauthorized - Invalid token
+
+---
+
+### POST /billing/subscription/change-tier
+
+Change subscription tier (upgrade or downgrade).
+
+**Authentication**: Required (Supabase JWT)
+
+**Request Body**:
+```json
+{
+  "new_tier": "growth",
+  "billing_interval": "monthly"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| new_tier | string | Yes | Target tier: team, growth, enterprise |
+| billing_interval | string | No | monthly or annual (defaults to current) |
+
+**Response** (200 OK):
+```json
+{
+  "id": "uuid",
+  "plan_tier": "growth",
+  "billing_interval": "monthly",
+  "status": "active",
+  "current_period_start": "2026-02-01T00:00:00Z",
+  "current_period_end": "2026-03-01T00:00:00Z"
+}
+```
+
+**Behavior**:
+- Upgrade: Stripe subscription item updated immediately, `customer.subscription.updated` webhook fires
+- Downgrade: Scheduled for `current_period_end`, quotas reduced at that time
+- `sync_user_quotas_to_tier()` applies new limits after webhook processing
+
+**Status Codes**:
+- `200` OK - Tier changed (or scheduled)
+- `400` Bad Request - Invalid tier, already on that tier, or no subscription
+- `401` Unauthorized - Invalid token
+
+---
+
+### GET /billing/plan-limit
+
+Get current plan's scan/contract limit for quota display.
+
+**Authentication**: Required (Supabase JWT)
+
+**Response** (200 OK):
+```json
+{
+  "tier": "team",
+  "monthly_contract_limit": 15,
+  "contracts_used": 7,
+  "contracts_remaining": 8
+}
+```
+
+---
+
+### POST /billing/credits/checkout
+
+Create Stripe Checkout session for credit package purchase.
+
+**Authentication**: Required (Supabase JWT)
+
+**Request Body**:
+```json
+{
+  "package_id": "builder"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| package_id | string | Yes | Credit package: starter, builder, pro, bulk |
+
+**Credit Packages**:
+
+| Package | Credits | Price | Per-Credit |
+|---------|---------|-------|------------|
+| Starter | 10 | $30 | $3.00 |
+| Builder | 50 | $125 | $2.50 |
+| Pro | 200 | $400 | $2.00 |
+| Bulk | 1,000 | $1,500 | $1.50 |
+
+**Response** (200 OK):
+```json
+{
+  "checkout_url": "https://checkout.stripe.com/c/pay/cs_test_..."
+}
+```
+
+**Webhook Flow**: `checkout.session.completed` with `mode=payment` → `CreditService.add_credits()` → `ScanCreditModel.balance` updated. Idempotency enforced via `x402_payment_id` field.
+
+**Status Codes**:
+- `200` OK - Checkout session created
+- `400` Bad Request - Invalid package ID
 - `401` Unauthorized - Invalid token
 
 ---
@@ -3546,24 +3691,42 @@ Get available subscription plans with pricing (public endpoint).
 {
   "plans": [
     {
-      "tier": "free",
-      "name": "Free",
-      "scans_per_month": 5,
-      "price_monthly": 0,
-      "price_annual": 0,
-      "features": ["5 scans per month", "Basic vulnerability detection"]
-    },
-    {
       "tier": "developer",
       "name": "Developer",
+      "scans_per_month": 3,
+      "price_monthly": 0,
+      "price_annual": 0,
+      "features": ["3 contracts per month", "All 25+ scanners", "7-day retention"]
+    },
+    {
+      "tier": "team",
+      "name": "Team",
+      "scans_per_month": 15,
+      "price_monthly": 299,
+      "price_annual": 2988,
+      "features": ["15 contracts per month", "95% FP reduction", "3 private repos", "90-day retention"]
+    },
+    {
+      "tier": "growth",
+      "name": "Growth",
       "scans_per_month": 50,
-      "price_monthly": 29,
-      "price_annual": 290,
-      "features": ["50 scans per month", "All scanners", "API access"]
+      "price_monthly": 699,
+      "price_annual": 7188,
+      "features": ["50 contracts per month", "Multi-chain", "API access", "Continuous monitoring", "180-day retention"]
+    },
+    {
+      "tier": "enterprise",
+      "name": "Enterprise",
+      "scans_per_month": -1,
+      "price_monthly": 1999,
+      "price_annual": null,
+      "features": ["Unlimited contracts", "SSO/SAML", "Dedicated support", "Custom SLAs", "365-day retention"]
     }
   ]
 }
 ```
+
+**Note:** Plan data is sourced from `tiers.json` (centralized tier config). See [Billing Feature Pipeline](../pipelines/billing-feature-pipeline.md) for the update workflow.
 
 ---
 

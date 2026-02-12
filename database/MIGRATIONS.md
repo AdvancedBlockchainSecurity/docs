@@ -773,12 +773,16 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 - `GET /api/v1/billing/subscription` - Get current subscription
 - `POST /api/v1/billing/subscription/cancel` - Cancel subscription
 - `POST /api/v1/billing/subscription/reactivate` - Reactivate subscription
+- `POST /api/v1/billing/subscription/change-tier` - Upgrade or downgrade tier
+- `GET /api/v1/billing/subscription/change-tier/preview` - Preview tier change proration
 - `GET /api/v1/billing/invoices` - List Stripe invoices
 - `GET /api/v1/billing/invoices/{id}/pdf` - Get invoice PDF URL
 - `GET /api/v1/billing/details` - Get billing details
 - `PUT /api/v1/billing/details` - Update billing details
 - `GET /api/v1/billing/history` - Combined billing history (Stripe + x402)
-- `GET /api/v1/billing/plans` - Available subscription plans
+- `GET /api/v1/billing/plans` - Available subscription plans (sources from tiers.json v3.2)
+- `GET /api/v1/billing/plan-limit` - Current plan's contract limit
+- `POST /api/v1/billing/credits/checkout` - Stripe Checkout for credit packages
 - `POST /api/v1/webhooks/stripe` - Stripe webhook handler
 
 **Webhook Events Handled:**
@@ -1544,6 +1548,22 @@ asyncio.run(verify())
   - Beat Schedule: `blocksecops-orchestration/src/blocksecops_orchestration/core/celery_app.py`
   - Admin Portal Page: `blocksecops-admin-portal/src/pages/AdminScanMonitoring.tsx`
   - Admin Portal API Client: `blocksecops-admin-portal/src/lib/api/admin.ts`
+
+---
+
+### Migrations 068-072: Organization Scoping (Phase 4.5)
+- **Status**: ✅ Completed
+- **Created**: 2026-02-XX
+- **Description**: Add `organization_id` foreign key columns to core data tables for org-scoped data isolation. Also adds `is_default` flag to teams and `default_organization_id` to users.
+- **Migration 068**: Add `organization_id` (UUID, nullable, FK to organizations, ON DELETE SET NULL) to `contracts`, `scans`, and `projects` tables. Indexes on `organization_id` and composite `(organization_id, user_id)`.
+- **Migration 069**: Backfill `organization_id` for single-org users only.
+- **Migration 070**: Add `is_default` (BOOLEAN, NOT NULL, DEFAULT FALSE) to `teams` table.
+- **Migration 071**: (Reserved for future org-scoping extensions)
+- **Migration 072**: Add `default_organization_id` (UUID, nullable, FK to organizations, ON DELETE SET NULL) to `users` table.
+- **Nullable organization_id**: `NULL` = personal workspace (backward compatible). All API calls without `X-Organization-Id` header work as before.
+- **ON DELETE SET NULL**: Deleted org reverts data to personal workspace — no data loss.
+- **Security**: All data filtering at SQL layer via `WHERE organization_id = :org_id`. Membership validated on every request with `X-Organization-Id` header.
+- **Related Documentation**: [Organization Scoping Pipeline](../pipelines/organization-scoping-pipeline.md)
 
 ---
 

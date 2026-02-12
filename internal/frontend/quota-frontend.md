@@ -4,7 +4,7 @@
 **Version:** 0.5.7+
 **Port:** 3000
 **Status:** ✅ Production Ready
-**Last Updated:** November 25, 2025
+**Last Updated:** February 12, 2026
 
 ---
 
@@ -255,26 +255,19 @@ The `QuotaContext` provides an Axios interceptor that catches HTTP 402 (Payment 
 {
   "id": "uuid",
   "email": "user@example.com",
-  "tier": "free",
+  "tier": "developer",
   "quota": {
-    "tier": "free",
-    "monthly_scan_limit": 10,
-    "monthly_scans_used": 7,
-    "scans_remaining": 3,
-    "percentage_used": 70,
-    "monthly_api_calls_limit": 1000,
-    "monthly_api_calls_used": 150,
-    "storage_limit_gb": 1,
-    "storage_used_gb": 0.25,
-    "can_use_webhooks": false,
-    "can_export_reports": false,
-    "can_use_private_scanners": false,
-    "can_use_api": true,
-    "concurrent_scans_limit": 1,
-    "retention_days": 30,
-    "max_team_members": 1,
-    "support_level": "community",
-    "reset_date": "2025-12-01T00:00:00Z"
+    "tier": "developer",
+    "monthly_scan_limit": 3,
+    "monthly_scans_used": 1,
+    "scans_remaining": 2,
+    "percentage_used": 33.3,
+    "max_files_per_scan": 5,
+    "webhooks_enabled": false,
+    "export_enabled": false,
+    "api_access_enabled": false,
+    "scan_priority": 50,
+    "quota_reset_at": "2026-02-01T00:00:00Z"
   }
 }
 ```
@@ -289,9 +282,9 @@ The `useQuota` hook outputs debug logs:
 
 ```javascript
 [useQuota] user: {id: '...', email: '...', ...}
-[useQuota] user.quota: {tier: 'free', monthly_scan_limit: 10, ...}
+[useQuota] user.quota: {tier: 'developer', monthly_scan_limit: 3, ...}
 [useQuota] isInitializing: false
-[useQuota] Quota data found: {tier: 'free', ...}
+[useQuota] Quota data found: {tier: 'developer', ...}
 [useQuota] scanLimit: 10 scansUsed: 7
 ```
 

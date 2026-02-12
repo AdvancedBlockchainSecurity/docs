@@ -342,5 +342,5 @@ Contact the development team or create an issue in the `blocksecops-docs` reposi
 
 ---
 
-**Last Updated:** January 7, 2026
+**Last Updated:** February 12, 2026
 **Maintained By:** BlockSecOps Team

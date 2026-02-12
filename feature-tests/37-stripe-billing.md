@@ -306,6 +306,69 @@ WHERE user_id = 'user-uuid';
 
 ---
 
+### TC-37-014: Tier Change via Change Plan Modal (v0.42.0)
+**Priority**: High
+**Status**: ⏳ Pending
+
+**Steps**:
+1. Login with active subscription (e.g., Team plan)
+2. Navigate to Billing
+3. Click "Change Plan" button on SubscriptionCard
+4. TierChangeModal opens showing available tiers
+5. Select a different tier (e.g., Growth)
+6. Preview proration costs
+7. Confirm tier change
+
+**Expected Result**:
+- TierChangeModal shows all available tiers
+- Current tier is highlighted/indicated
+- Proration preview shows correct amounts via `GET /billing/subscription/change-tier/preview`
+- Confirmation executes `POST /billing/subscription/change-tier`
+- Subscription updates to new tier
+- SubscriptionCard reflects new plan after success callback
+
+---
+
+### TC-37-015: Billing Page Invite Members (v0.42.0)
+**Priority**: Medium
+**Status**: ⏳ Pending
+
+**Steps**:
+1. Login as organization owner/admin
+2. Navigate to Billing page
+3. Locate InviteMemberCard below Organization card
+4. Enter email address and select role
+5. Click "Send Invite"
+6. Verify pending invite appears in list
+7. Cancel pending invite
+
+**Expected Result**:
+- InviteMemberCard visible for owner/admin only
+- Seat usage indicator shows current/max members
+- Email + role form submits to `POST /organizations/{id}/invites`
+- Pending invitations list shows with cancel buttons
+- Cancel removes invite via `DELETE /organizations/{id}/invites/{inviteId}`
+
+---
+
+### TC-37-016: Billing Feature Display Fix (v0.42.0)
+**Priority**: High
+**Status**: ⏳ Pending
+
+**Steps**:
+1. Login as enterprise tier user
+2. Navigate to Billing > Subscription & Usage
+3. Check QuotaUsageCard feature list
+
+**Expected Result**:
+- Export Reports shows green check (not grey X)
+- Webhooks shows green check (not grey X)
+- API Access shows green check (not grey X)
+- Feature display sourced from API `export_enabled`, `webhooks_enabled`, `api_access_enabled` fields
+- Supplementary data (retention, team members, support) from `@blocksecops/tier-config`
+
+---
+
 ## Webhook Testing
 
 ### Simulate Webhooks (Stripe CLI)
@@ -360,3 +423,5 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 - [API Endpoints Reference](/docs/api/endpoints-reference.md#billing-phase-8a---stripe-integration)
 - [Phase 8a Task Docs](/TaskDocs-BlockSecOps/phases/08a-phase-8a-stripe-billing-invoices/)
 - [User Guide: Invoices & Receipts](/blocksecops-docs/billing/invoices-receipts.md)
+- [Billing Subscription Workflow](/docs/workflows/billing-subscription-workflow.md) - Feature resolution chain, field mapping, invite flow
+- [Billing Feature Pipeline](/docs/pipelines/billing-feature-pipeline.md) - Pipeline for tier feature changes

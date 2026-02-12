@@ -408,9 +408,10 @@
 **Dismissal Behavior:**
 - [ ] X button dismisses banner
 - [ ] Banner hidden for 7 days after dismissal
-- [ ] Dismissal stored in localStorage (`upgrade-banner-dismissed`)
+- [ ] Dismissal stored in localStorage (`upgrade-banner-dismissed:{userId}`) — scoped by user ID (v0.42.0)
 - [ ] After 7 days, banner reappears
 - [ ] Clearing localStorage makes banner reappear immediately
+- [ ] Different users on same browser have independent dismissal state (v0.42.0)
 
 ### 7.3 API Keys Page (`/api-keys`)
 

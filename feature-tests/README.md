@@ -325,6 +325,7 @@ GDPR/LGPD compliance features for ML data collection:
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-02-12 | Claude Code | 14-enterprise-features.md, 10-tier-upgrades.md, 37-stripe-billing.md | UPDATE - localStorage data isolation (userId-scoped keys), tier change modal tests, billing page invite card (v0.42.0 Dashboard)
 2026-02-09 | Claude Code | 60-collapsible-sidebar-quick-access.md | NEW - Collapsible sidebar + quick access page pins, localStorage persistence (v0.41.4 Dashboard)
 2026-02-07 | Claude Code | 59-admin-portal-v0.4.0.md | NEW - Admin Portal v0.4.0: GCP Cost Estimator, Scanners page, Dependencies endpoint (v0.4.0 Admin Portal, v0.27.7 API)
 2026-02-01 | Claude Code | 52-dual-payment-options.md | NEW - Dual Payment Options: Stripe + x402 crypto payment selector on pricing page (v0.36.0 Dashboard)
