@@ -117,7 +117,7 @@ ORDER BY count DESC;
 
 ### 2.2 Pattern-Tool Mappings
 
-**Expected:** 214+ mappings across 11 scanners
+**Expected:** 214+ mappings across 12 scanners
 
 ```sql
 SELECT

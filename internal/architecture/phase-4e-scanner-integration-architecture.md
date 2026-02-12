@@ -333,7 +333,7 @@ except subprocess.TimeoutExpired:
 1. Build new Docker image (v0.6.0)
 2. Load into Kubernetes
 3. Apply updated manifests
-4. Verify 11/11 scanners available
+4. Verify 12/12 scanners available
 
 **Rollback**:
 - Revert to v0.5.1 image

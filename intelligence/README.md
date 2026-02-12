@@ -187,10 +187,10 @@ Advanced vulnerability fingerprinting strategies:
 | Metric | Count | Notes |
 |--------|-------|-------|
 | **Total Patterns** | 397 | BVD vulnerability patterns |
-| **Pattern Mappings** | 214+ | Across 11 scanners |
+| **Pattern Mappings** | 214+ | Across 12 scanners |
 | **Seed File Version** | 3.13 | `seeds/vulnerability_patterns.json` |
 
-### Integrated Scanners (11)
+### Integrated Scanners (12)
 
 | Scanner | Mappings | Status |
 |---------|----------|--------|

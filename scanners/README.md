@@ -5,8 +5,8 @@
 **Parser Tests Passing**: December 20, 2025 (27 tests)
 **Fuzzer Filtering Tested**: December 29, 2025 (is_project filtering verified)
 **Fuzzer Results Display**: December 30, 2025 (end-to-end verified)
-**Active Scanners**: 17 available in orchestration (17 total registered)
-**Supported Languages**: Solidity (11 scanners), Vyper (2 scanners), Solana (4 scanners)
+**Active Scanners**: 18 available in orchestration (18 total registered)
+**Supported Languages**: Solidity (12 scanners), Vyper (2 scanners), Solana (4 scanners)
 **Execution Mode**: Docker-based execution for Solana scanners
 **Project Mode**: Foundry/Hardhat support enabled (Phase 3.2)
 **Scanner Effectiveness**: Available at `/analytics/scanner-effectiveness`
@@ -535,6 +535,6 @@ See: [Workflow Troubleshooting](SCANNER-WORKFLOW-TROUBLESHOOTING.md)
 ---
 
 **Maintained by**: BlockSecOps Scanner Integration Team
-**Active Scanners**: 17 operational (December 20, 2025)
-**Supported Languages**: Solidity (11 scanners), Vyper (2 scanners), Solana (4 scanners)
+**Active Scanners**: 18 operational (February 11, 2026)
+**Supported Languages**: Solidity (12 scanners), Vyper (2 scanners), Solana (4 scanners)
 **Total Detector Count**: 450+ and growing

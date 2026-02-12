@@ -27,7 +27,7 @@ The BlockSecOps Platform provides comprehensive security analysis for **3 blockc
 
 | Language | Extension | Market Share | Blockchain(s) | Scanners |
 |----------|-----------|--------------|---------------|----------|
-| **Solidity** | `.sol` | 65% | Ethereum, BSC, Polygon, Arbitrum | 11 scanners (see below) |
+| **Solidity** | `.sol` | 65% | Ethereum, BSC, Polygon, Arbitrum | 12 scanners (see below) |
 | **Vyper** | `.vy` | 5-8% | Ethereum (Python-based) | Vyper, Moccasin |
 | **Rust/Solana** | `.rs` | 15% | Solana (Anchor) | Sol-azy, Sec3 X-Ray, Trident, Cargo Fuzz |
 

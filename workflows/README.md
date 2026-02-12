@@ -37,7 +37,7 @@ Each workflow document follows a standard structure:
 - Dashboard - React UI for results display
 
 **Supported Languages:**
-- Solidity (11 scanners)
+- Solidity (12 scanners)
 - Vyper (2 scanners)
 - Solana/Rust (4 scanners - pending)
 
