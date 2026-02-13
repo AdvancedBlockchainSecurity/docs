@@ -97,6 +97,28 @@ All Python services expose Prometheus metrics via `prometheus-fastapi-instrument
 - `http_request_duration_seconds` - Request latency histogram
 - `http_requests_inprogress` - Currently in-flight requests
 
+### Tool Integration Custom Metrics
+
+The tool-integration service exposes scanner-specific metrics on port 9090:
+
+| Metric | Type | Labels | Description |
+|--------|------|--------|-------------|
+| `tool_integration_scan_trigger_total` | Counter | scanner, status | Scan trigger requests |
+| `tool_integration_scan_callback_total` | Counter | scanner, status | Result callbacks received |
+| `tool_integration_scan_callback_forward_total` | Counter | status | Result forwarding to API service |
+| `tool_integration_scan_callback_duration_seconds` | Histogram | scanner | Callback processing duration |
+| `tool_integration_job_conflict_total` | Counter | scanner | 409 Conflict errors during Job creation |
+| `tool_integration_vulnerabilities_parsed_total` | Counter | scanner, severity | Vulnerabilities parsed from results |
+
+**PrometheusRule alerts** are defined in `blocksecops-tool-integration/k8s/base/prometheus-rules.yaml`:
+- `ScannerHighFailureRate` - Scanner failure rate >25%
+- `ScannerPipelineStalled` - Triggers sent but no callbacks received
+- `JobConflictRateHigh` - High 409 Conflict rate
+- `CallbackForwardingFailure` - API result forwarding failing
+- `CallbackProcessingSlowP95` - p95 callback latency >30s
+- `ToolIntegrationNotReady` - <50% replicas available
+- `ScannerJobStuck` - Jobs running >15 minutes
+
 ### Database Exporter Metrics
 
 | Exporter | Namespace | Port | Key Metrics |
