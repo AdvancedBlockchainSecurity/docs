@@ -1,7 +1,7 @@
 # AI Features Workflow
 
-**Version:** 1.0.0
-**Last Updated:** February 7, 2026
+**Version:** 1.1.0
+**Last Updated:** February 13, 2026
 **Status:** Active
 
 ---
@@ -65,7 +65,7 @@ This document covers the end-to-end workflow for all AI-powered features in the 
 | **API Service** | AI endpoint gateway, tier gating, rate limiting | `endpoints/copilot.py`, `code_review.py`, `code_repair.py`, `invariants.py`, `economic_analysis.py` |
 | **Anthropic Claude API** | LLM inference for all AI features | External service, API key from Vault |
 | **PostgreSQL** | Quota tracking, conversation storage, result persistence | `user_quotas`, `copilot_messages`, etc. |
-| **Dashboard** | React UI for AI feature interactions | Chat panel, review buttons, repair buttons |
+| **Dashboard** | React UI for AI feature interactions | CopilotPage, VulnerabilityDetail AI Actions panel, TierGate component |
 
 ---
 
@@ -318,7 +318,7 @@ All error responses use `get_safe_error_detail()` to prevent internal informatio
 - [Secrets Management](../standards/secrets-management.md) — Vault → ExternalSecret workflow
 - [API Endpoint Authentication](../standards/api-endpoint-auth.md) — Auth dependency patterns
 
-### Source Files
+### Source Files — API Service
 - `blocksecops-api-service/src/presentation/api/v1/endpoints/copilot.py`
 - `blocksecops-api-service/src/presentation/api/v1/endpoints/code_review.py`
 - `blocksecops-api-service/src/presentation/api/v1/endpoints/code_repair.py`
@@ -326,6 +326,17 @@ All error responses use `get_safe_error_detail()` to prevent internal informatio
 - `blocksecops-api-service/src/presentation/api/v1/endpoints/economic_analysis.py`
 - `blocksecops-api-service/src/application/services/copilot_service.py`
 - `blocksecops-api-service/src/infrastructure/config.py`
+
+### Source Files — Dashboard (v0.42.8+)
+
+| Feature | Page/Component | Hooks | API Client |
+|---------|---------------|-------|------------|
+| Copilot | `src/pages/copilot/CopilotPage.tsx` | `useCopilotConversations`, `useCopilotMessages` | `src/lib/api/copilot.ts` |
+| Code Review | `src/pages/VulnerabilityDetail.tsx` (AI Actions panel) | `useGenerateReview`, `useSuggestionsForVulnerability` | `src/lib/api/codeReview.ts` |
+| Code Repair | `src/pages/VulnerabilityDetail.tsx` (AI Actions panel) | `useGenerateRepair`, `useVulnerabilityRepairs` | `src/lib/api/codeRepair.ts` |
+| Tier Gating | `src/components/TierGate.tsx` | — | — |
+
+Dashboard AI buttons are on the VulnerabilityDetail sidebar, wrapped in `<TierGate requiredTier="team">`. Copilot has a dedicated page at `/copilot`.
 
 ---
 

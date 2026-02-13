@@ -57,11 +57,21 @@ POST /code-repair/generate → 1. Authenticate (JWT)                            
 
 ## Files
 
+### API Service
 | File | Role |
 |------|------|
 | `src/presentation/api/v1/endpoints/code_repair.py` | Endpoint definitions, tier gating, rate limiting |
 | `src/application/services/code_repair_service.py` | Anthropic API integration, diff generation |
 | `src/infrastructure/config.py` | Model selection, token limits |
+
+### Dashboard (v0.42.8+)
+| File | Role |
+|------|------|
+| `src/pages/VulnerabilityDetail.tsx` | "Generate AI Repair" button in AI Actions panel |
+| `src/hooks/useCodeRepair.ts` | `useGenerateRepair`, `useVulnerabilityRepairs` hooks |
+| `src/lib/api/codeRepair.ts` | API client (`CodeRepair`, `RepairListResponse`) |
+
+The repair button is in the VulnerabilityDetail sidebar, wrapped in `<TierGate requiredTier="team">`. Disabled when no `code_snippet` is available on the vulnerability. Results show confidence score and status below the button.
 
 ## Error Handling
 

@@ -55,11 +55,21 @@ POST /review/suggestions →   1. Authenticate (JWT)                            
 
 ## Files
 
+### API Service
 | File | Role |
 |------|------|
 | `src/presentation/api/v1/endpoints/code_review.py` | Endpoint definitions, tier gating, rate limiting |
 | `src/application/services/code_review_service.py` | Anthropic API integration, context assembly |
 | `src/infrastructure/config.py` | Model selection, token limits |
+
+### Dashboard (v0.42.8+)
+| File | Role |
+|------|------|
+| `src/pages/VulnerabilityDetail.tsx` | "Generate AI Review" button in AI Actions panel |
+| `src/hooks/useCodeReview.ts` | `useGenerateReview`, `useSuggestionsForVulnerability` hooks |
+| `src/lib/api/codeReview.ts` | API client (`ReviewSuggestion`, `ReviewSuggestionListResponse`) |
+
+The review button is in the VulnerabilityDetail sidebar, wrapped in `<TierGate requiredTier="team">`. Results appear as summaries below the button, with a link to the full review page.
 
 ## Error Handling
 
