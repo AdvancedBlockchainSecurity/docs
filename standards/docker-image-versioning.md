@@ -336,7 +336,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
 | orchestration | 0.9.13 | `k8s/overlays/local/` | Uses pre-built base image |
-| tool-integration | 0.3.22 | `k8s/overlays/local/` | Scanner pipeline fixes: UID standardization, Alpine DNS fix, solhint JSON extraction, parser branches, aderyn curl retry, semgrep offline rules + LABEL fix |
+| tool-integration | 0.4.0 | `k8s/overlays/local/` | Scanner stability: 409 conflict fix, /ready endpoint, deepened /health, dead-letter queue, structured logging, Prometheus metrics, alerts, canary CronJob, port fixes, 346 tests |
 
 All services are `0.x.x` (development phase). Version `1.0.0` indicates stable, production-ready API.
 
