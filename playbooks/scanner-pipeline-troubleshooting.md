@@ -1,6 +1,6 @@
 # Playbook: Scanner Pipeline Troubleshooting
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Last Updated:** February 12, 2026
 
 ## Overview
@@ -222,6 +222,115 @@ print(resp.json())
 # Watch for results
 kubectl logs -n tool-integration-local deployment/tool-integration -f | grep "$SCAN_ID"
 ```
+
+---
+
+### Issue 8: 409 Conflict on Job Creation (Stale Jobs)
+
+**Symptoms:**
+- `Request failed with status code 409` when uploading a contract
+- Scanner Job creation fails with `ApiException(409)`
+- Retries of the same scan always fail
+
+**Root Cause:** Job names previously used `scan_id[:8]` (only 4 bytes of entropy from the UUID). This caused collisions between different scans and 409 Conflict errors when retrying the same scan (stale Job with the same truncated name still exists).
+
+**Fix (applied in kubernetes_job_manager.py):**
+1. Job names now use the full scan_id: `scan-{scanner}-{scan_id}` (max 59 chars, under K8s 63-char limit)
+2. ConfigMap names use the full scan_id: `scan-{scan_id}-source` (max 48 chars)
+3. Job creation handles 409 with a proper poll-based wait loop:
+
+```python
+except ApiException as e:
+    if e.status == 409:
+        self.delete_job(job_name, propagation_policy="Background")
+        for attempt in range(10):
+            time.sleep(2)
+            try:
+                self.batch_v1.read_namespaced_job(name=job_name, namespace=self.namespace)
+            except ApiException as check_err:
+                if check_err.status == 404:
+                    break  # Job is gone
+                raise
+        # Recreate the Job
+        self.batch_v1.create_namespaced_job(namespace=self.namespace, body=job)
+```
+
+**Verification:**
+```bash
+# Check job naming uses full scan_id (no truncation)
+grep 'job_name.*scan_id' src/scanners/kubernetes_job_manager.py
+
+# Run regression tests
+pytest tests/regression/test_job_name_collision.py -v
+```
+
+---
+
+### Issue 9: Failed Callback Results Lost (No Dead-Letter)
+
+**Symptoms:**
+- Scanner completes and sends results, but API service is temporarily down
+- Results forwarded by tool-integration get HTTP 5xx from api-service
+- Results are lost with only an error log entry
+
+**Fix (applied in main.py and dead_letter.py):**
+- Added `DeadLetterStore` that persists failed forwarding payloads to `/tmp/dead-letters/`
+- Failed forwards are automatically dead-lettered with scan_id, scanner, payload, and error
+- Management endpoints:
+  - `GET /api/v1/dead-letters` - List pending entries
+  - `POST /api/v1/dead-letters/{id}/retry` - Retry forwarding
+  - `DELETE /api/v1/dead-letters/{id}` - Discard entry
+- Dead-letter count appears in `/health` response
+
+**Verification:**
+```bash
+# Check dead-letter queue
+curl -s http://127.0.0.1:8005/api/v1/dead-letters | jq .count
+```
+
+---
+
+## Operational Improvements (February 2026)
+
+### Readiness Endpoint
+
+The `/ready` endpoint was missing from `main.py` despite being configured in the K8s readiness probe. Now implemented with checks for:
+- `job_manager` initialization
+- `collector_task` liveness (background polling running)
+
+Returns HTTP 503 with reasons when not ready.
+
+### Structured JSON Logging
+
+Logging switched from plain-text to structured JSON format with correlation IDs:
+```json
+{"ts": "2026-02-12 19:44:12", "level": "INFO", "logger": "src.main", "msg": "...", "request_id": "abc-123", "scan_id": "def-456"}
+```
+
+`X-Request-ID` header is propagated through requests and returned in responses. `scan_id` is extracted from URL paths automatically.
+
+### Prometheus Alerting Rules
+
+New `PrometheusRule` (`k8s/base/prometheus-rules.yaml`) with alerts:
+- `ScannerHighFailureRate` - >25% failure rate over 15 minutes
+- `ScannerPipelineStalled` - Triggers sent but no callbacks received
+- `JobConflictRateHigh` - High 409 Conflict rate
+- `CallbackForwardingFailure` - API forwarding failing >10%
+- `ScannerJobStuck` - Jobs running >15 minutes
+
+### Scanner Canary CronJob
+
+`k8s/base/canary-cronjob.yaml` runs every 30 minutes:
+1. Checks `/health` and `/ready` endpoints
+2. Triggers a lightweight slither scan with a minimal contract
+3. Verifies the trigger was accepted
+
+### Port Fixes
+
+Fixed mismatched ports in base K8s manifests:
+- `deployment.yaml`: Prometheus annotation `8001` corrected to `9090`
+- `ingress.yaml`: Backend service port `8001` corrected to `8005`
+- `network-policy.yaml`: Ingress rules `8000` corrected to `8005`
 
 ---
 
