@@ -287,22 +287,26 @@ _Record scanning test results here:_
 **API Version:** 0.6.2
 **Dashboard Version:** 0.17.1
 
-### 12.1 Single-File Upload (Fuzzers Hidden)
+### 12.1 Single-File Upload (Project-Required Scanners Disabled)
 
-Fuzzers require project structure with test harnesses to provide meaningful results. They are hidden from single-file uploads.
+Fuzzers and symbolic execution tools require project structure with test harnesses. On single-file contracts, these scanners are **visible but greyed out and disabled** with a "Requires Project" badge. This was changed from hiding them entirely (v0.42.4, February 2026).
 
-- [x] Upload .sol file → Echidna NOT in scanner list ✅ (verified 2025-12-29)
-- [x] Upload .sol file → Medusa NOT in scanner list ✅ (verified 2025-12-29)
-- [x] Upload .sol file → Halmos NOT in scanner list ✅ (verified 2025-12-29)
-- [x] Upload .vy file → Moccasin NOT in scanner list ✅ (verified 2025-12-29)
-- [x] Upload .rs file → Trident NOT in scanner list ✅ (verified 2025-12-29)
-- [x] Upload .rs file → cargo-fuzz-solana NOT in scanner list ✅ (verified 2025-12-29)
-- [x] Upload .rs file → sec3-xray NOT in scanner list ✅ (verified 2025-12-29)
+- [ ] Upload .sol file → Echidna visible but greyed out/disabled
+- [ ] Upload .sol file → Medusa visible but greyed out/disabled
+- [ ] Upload .sol file → Halmos visible but greyed out/disabled
+- [ ] Upload .vy file → Moccasin visible but greyed out/disabled
+- [ ] Upload .rs file → Trident visible but greyed out/disabled
+- [ ] Upload .rs file → cargo-fuzz-solana visible but greyed out/disabled
+- [ ] Upload .rs file → sec3-xray visible but greyed out/disabled
+- [ ] "Select All" skips disabled scanners
+- [ ] Presets exclude disabled scanners
+- [ ] Counter shows "X of Y" where Y = selectable scanners only
 
 **API Verification:**
 ```bash
-curl "http://api-service:8000/api/v1/scanners?is_project=false"
-# Should return 8 scanners (no fuzzers)
+# API returns all scanners (no is_project filter) — client handles disabling
+curl "http://api-service:8000/api/v1/scanners?language=solidity"
+# Returns all scanners; requires_project=true scanners greyed out in UI
 ```
 
 ### 12.2 Project Upload (Fuzzers Shown)
@@ -345,9 +349,10 @@ curl "http://api-service:8000/api/v1/scanners/echidna" | jq '.requires_project'
 
 ### 12.5 Dashboard UI
 
-- [x] Single-file contract: ScannerSelector shows informational notice about fuzzer requirements ✅ (code verified)
-- [x] Project upload: All scanners visible including fuzzers ✅ (verified 2025-12-29)
-- [ ] Scanner categories visible (static, fuzzing, symbolic, linting) (UI not manually tested)
+- [ ] Single-file contract: Project-required scanners greyed out with "Requires Project" badge
+- [ ] Single-file contract: Info box explains project upload requirement
+- [ ] Project upload: All scanners visible and selectable including fuzzers
+- [ ] Scanner categories visible (static, fuzzing, symbolic, linting)
 
 ### 12.6 Fuzzing Results Display
 
