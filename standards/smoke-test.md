@@ -208,19 +208,19 @@ for ns_svc in \
 done
 ```
 
-**Current versions (as of February 6, 2026):**
+**Current versions (as of February 12, 2026):**
 
-| Service | Version | Expected |
-|---------|---------|----------|
-| api-service | 0.26.1 | 0.27.0 |
-| dashboard | 0.39.1 | 0.40.0 |
-| admin-portal | 0.2.0 | 0.3.0 |
-| tool-integration | 0.3.14 | - |
-| orchestration | 0.9.13 | - |
-| notification | 0.1.2 | - |
-| intelligence-engine | 0.2.1 | - |
-| data-service | 0.2.0 | - |
-| contract-parser | 0.2.0 | - |
+| Service | Version |
+|---------|---------|
+| api-service | 0.28.20 |
+| dashboard | 0.42.0 |
+| admin-portal | 0.4.0 |
+| tool-integration | 0.3.22 |
+| orchestration | 0.9.13 |
+| notification | 0.1.2 |
+| intelligence-engine | 0.3.0 |
+| data-service | 0.2.0 |
+| contract-parser | 0.2.0 |
 
 ## Quick Full Smoke Test Script
 

@@ -59,12 +59,11 @@
 - [x] Scan jobs pull images from Harbor successfully
 - [x] No `ErrImageNeverPull` errors during scan execution
 
-**Verified:** SolidityDefend scan completed successfully (2026-01-31)
-- Scan ID: `7fb85269-a29f-4524-b0a8-ea64240e2831`
-- Image: `harbor.blocksecops.local/blocksecops/scanner-soliditydefend:0.5.0`
-- Tool Version: 1.10.3 (333 detectors)
-- Results: 34 findings (12 critical, 15 high, 4 medium, 3 low)
-- Duration: 4 seconds
+**Verified:** All 6 core scanners working end-to-end (2026-02-12)
+- All scanner images: slither:0.3.2, aderyn:0.7.2, semgrep:0.3.5, solhint:0.1.6, wake:0.3.6, soliditydefend:0.7.1
+- Image: `harbor.blocksecops.local/blocksecops/scanner-soliditydefend:0.7.1`
+- Tool Version: 1.10.13 (333 detectors)
+- Scanner pipeline fixes: UID standardization, Alpine DNS, offline rules, parser branches
 
 ### 3.2 Scanner Compatibility
 - [ ] Only compatible scanners shown per language

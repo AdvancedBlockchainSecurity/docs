@@ -483,9 +483,10 @@ data:
     }
 
   # Scanner Docker image tags (used by tool-integration)
-  SCANNER_IMAGE_SLITHER: "scanner-slither:0.2.0"
-  SCANNER_IMAGE_MYTHRIL: "mythril/myth:latest"
-  # ... other image tags
+  SCANNER_IMAGE_SLITHER: "scanner-slither:0.3.2"
+  SCANNER_IMAGE_ADERYN: "scanner-aderyn:0.7.2"
+  SCANNER_IMAGE_SEMGREP: "scanner-semgrep:0.3.5"
+  # ... see k8s/base/scanner-versions-configmap.yaml for all tags
 ```
 
 ### Integration with API Service

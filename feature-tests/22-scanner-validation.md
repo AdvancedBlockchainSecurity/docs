@@ -1,7 +1,7 @@
 # Scanner Validation Tests
 
 **Priority**: P0 - Critical
-**Last Tested**: January 19, 2026
+**Last Tested**: February 12, 2026
 **Active Scanners**: 17 (11 Solidity, 2 Vyper, 4 Solana)
 **Test Contract Location**: `/Users/pwner/Git/vulnerable-smart-contract-examples`
 **Registry**: Harbor (`harbor.blocksecops.local/blocksecops/scanner-*`)
@@ -34,23 +34,23 @@ docker images | grep "harbor.blocksecops.local.*scanner-"
 
 | Scanner | Harbor Image | Version | Status |
 |---------|--------------|---------|--------|
-| slither | harbor.blocksecops.local/blocksecops/scanner-slither | 0.2.0 | ✅ Verified |
-| aderyn | harbor.blocksecops.local/blocksecops/scanner-aderyn | 0.6.5 | ✅ Verified |
-| semgrep | harbor.blocksecops.local/blocksecops/scanner-semgrep | 0.3.0 | ✅ Verified |
-| solhint | harbor.blocksecops.local/blocksecops/scanner-solhint | 0.1.3 | ✅ Verified |
-| wake | harbor.blocksecops.local/blocksecops/scanner-wake | 0.3.4 | ✅ Verified |
-| soliditydefend | harbor.blocksecops.local/blocksecops/scanner-soliditydefend | 0.4.0 | ✅ Verified |
-| echidna | harbor.blocksecops.local/blocksecops/scanner-echidna | 0.2.0 | ✅ Verified |
-| medusa | harbor.blocksecops.local/blocksecops/scanner-medusa | 0.2.0 | ✅ Verified |
-| halmos | harbor.blocksecops.local/blocksecops/scanner-halmos | 0.2.0 | ✅ Verified |
-| vyper | harbor.blocksecops.local/blocksecops/scanner-vyper | 0.2.0 | ✅ Verified |
-| moccasin | harbor.blocksecops.local/blocksecops/scanner-moccasin | 0.2.0 | ✅ Verified |
-| sol-azy | harbor.blocksecops.local/blocksecops/scanner-sol-azy | 0.2.0 | ✅ Verified |
-| sec3-xray | harbor.blocksecops.local/blocksecops/scanner-sec3-xray | 0.2.0 | ✅ Verified |
-| trident | harbor.blocksecops.local/blocksecops/scanner-trident | 0.2.0 | ✅ Verified |
-| cargo-fuzz-solana | harbor.blocksecops.local/blocksecops/scanner-cargo-fuzz-solana | 0.2.0 | ✅ Verified |
+| slither | harbor.blocksecops.local/blocksecops/scanner-slither | 0.3.2 | ✅ Verified |
+| aderyn | harbor.blocksecops.local/blocksecops/scanner-aderyn | 0.7.2 | ✅ Verified |
+| semgrep | harbor.blocksecops.local/blocksecops/scanner-semgrep | 0.3.5 | ✅ Verified |
+| solhint | harbor.blocksecops.local/blocksecops/scanner-solhint | 0.1.6 | ✅ Verified |
+| wake | harbor.blocksecops.local/blocksecops/scanner-wake | 0.3.6 | ✅ Verified |
+| soliditydefend | harbor.blocksecops.local/blocksecops/scanner-soliditydefend | 0.7.1 | ✅ Verified |
+| echidna | harbor.blocksecops.local/blocksecops/scanner-echidna | 0.3.1 | ✅ Verified |
+| medusa | harbor.blocksecops.local/blocksecops/scanner-medusa | 0.3.1 | ✅ Verified |
+| halmos | harbor.blocksecops.local/blocksecops/scanner-halmos | 0.3.0 | ✅ Verified |
+| vyper | harbor.blocksecops.local/blocksecops/scanner-vyper | 0.3.0 | ✅ Verified |
+| moccasin | harbor.blocksecops.local/blocksecops/scanner-moccasin | 0.3.0 | ✅ Verified |
+| sol-azy | harbor.blocksecops.local/blocksecops/scanner-sol-azy | 0.4.0 | ✅ Verified |
+| sec3-xray | harbor.blocksecops.local/blocksecops/scanner-sec3-xray | 0.3.1 | ✅ Verified |
+| trident | harbor.blocksecops.local/blocksecops/scanner-trident | 0.3.0 | ✅ Verified |
+| cargo-fuzz-solana | harbor.blocksecops.local/blocksecops/scanner-cargo-fuzz-solana | 0.3.0 | ✅ Verified |
 
-**Last Verified:** January 19, 2026
+**Last Verified:** February 12, 2026
 
 - [ ] All Solidity scanner images present
 - [ ] All Vyper scanner images present
@@ -72,8 +72,8 @@ curl -s http://127.0.0.1:3000/api/v1/scanners | jq '.scanners[] | {id, name, is_
 
 #### Image Verification
 ```bash
-docker run --rm scanner-slither:0.2.0 --version
-# Expected: Slither version 0.10.x
+docker run --rm scanner-slither:0.3.2 --version
+# Expected: Slither version 0.11.x
 ```
 - [ ] Image runs without error
 - [ ] Version output correct
@@ -82,7 +82,7 @@ docker run --rm scanner-slither:0.2.0 --version
 ```bash
 # Use test contract from vulnerable-smart-contract-examples
 docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contracts \
-  scanner-slither:0.2.0 /contracts/solidity/reentrancy/ReentrancyVulnerable.sol --json -
+  scanner-slither:0.3.2 /contracts/solidity/reentrancy/ReentrancyVulnerable.sol --json -
 ```
 - [ ] Scanner executes without error
 - [ ] JSON output returned
@@ -104,8 +104,8 @@ docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contract
 
 #### Image Verification
 ```bash
-docker run --rm scanner-aderyn:0.6.5 --version
-# Expected: aderyn 0.6.x
+docker run --rm scanner-aderyn:0.7.2 --version
+# Expected: aderyn 0.6.7
 ```
 - [ ] Image runs without error
 - [ ] Version output correct
@@ -113,7 +113,7 @@ docker run --rm scanner-aderyn:0.6.5 --version
 #### Basic Analysis Test
 ```bash
 docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contracts \
-  scanner-aderyn:0.6.5 /contracts/solidity/access-control/UnprotectedAdmin.sol
+  scanner-aderyn:0.7.2 /contracts/solidity/access-control/UnprotectedAdmin.sol
 ```
 - [ ] Scanner executes without error
 - [ ] Findings output returned
@@ -164,7 +164,7 @@ docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contract
 
 #### Image Verification
 ```bash
-docker run --rm scanner-semgrep:0.3.0 semgrep --version
+docker run --rm scanner-semgrep:0.3.5 semgrep --version
 # Expected: semgrep 1.x.x
 ```
 - [ ] Image runs without error
@@ -173,7 +173,7 @@ docker run --rm scanner-semgrep:0.3.0 semgrep --version
 #### Basic Analysis Test
 ```bash
 docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contracts \
-  scanner-semgrep:0.3.0 semgrep --config=auto /contracts/solidity/
+  scanner-semgrep:0.3.5 semgrep --config=auto /contracts/solidity/
 ```
 - [ ] Scanner executes without error
 - [ ] Pattern matches returned
@@ -193,7 +193,7 @@ docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contract
 
 #### Image Verification
 ```bash
-docker run --rm scanner-solhint:0.1.3 solhint --version
+docker run --rm scanner-solhint:0.1.6 solhint --version
 # Expected: solhint 6.x.x
 ```
 - [ ] Image runs without error
@@ -202,7 +202,7 @@ docker run --rm scanner-solhint:0.1.3 solhint --version
 #### Basic Analysis Test
 ```bash
 docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contracts \
-  scanner-solhint:0.1.3 solhint /contracts/solidity/**/*.sol
+  scanner-solhint:0.1.6 solhint /contracts/solidity/**/*.sol
 ```
 - [ ] Scanner executes without error
 - [ ] Linting warnings returned
@@ -223,8 +223,8 @@ docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contract
 
 #### Image Verification
 ```bash
-docker run --rm scanner-wake:0.3.1 wake --version
-# Expected: wake 4.x.x
+docker run --rm scanner-wake:0.3.6 wake --version
+# Expected: wake 4.22.0
 ```
 - [ ] Image runs without error
 - [ ] Version output correct
@@ -232,7 +232,7 @@ docker run --rm scanner-wake:0.3.1 wake --version
 #### Basic Analysis Test
 ```bash
 docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contracts \
-  scanner-wake:0.3.1 wake detect /contracts/solidity/
+  scanner-wake:0.3.6 wake detect /contracts/solidity/
 ```
 - [ ] Scanner executes without error
 - [ ] Detection output returned
@@ -247,11 +247,11 @@ docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contract
 ---
 
 ### 1.7 SolidityDefend
-**Type**: Static Analysis | **Detectors**: 204+ | **Project Mode**: Foundry/Hardhat
+**Type**: Static Analysis | **Detectors**: 333 | **Project Mode**: Foundry/Hardhat
 
 #### Image Verification
 ```bash
-docker run --rm scanner-soliditydefend:0.2.1 --version
+docker run --rm scanner-soliditydefend:0.7.1 --version
 ```
 - [ ] Image runs without error
 - [ ] Version output correct
@@ -259,7 +259,7 @@ docker run --rm scanner-soliditydefend:0.2.1 --version
 #### Basic Analysis Test
 ```bash
 docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contracts \
-  scanner-soliditydefend:0.2.1 /contracts/solidity/reentrancy/ReentrancyVulnerable.sol
+  scanner-soliditydefend:0.7.1 /contracts/solidity/reentrancy/ReentrancyVulnerable.sol
 ```
 - [ ] Scanner executes without error
 - [ ] Comprehensive findings returned
@@ -270,7 +270,7 @@ docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contract
 2. Select SolidityDefend scanner
 3. Run scan
 - [ ] Scan completes successfully
-- [ ] 204+ detector coverage utilized
+- [ ] 333 detector coverage utilized
 - [ ] Detailed remediation suggestions shown
 
 ---
@@ -282,7 +282,7 @@ docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contract
 
 #### Image Verification
 ```bash
-docker run --rm scanner-echidna:0.2.0 echidna --version
+docker run --rm scanner-echidna:0.3.1 echidna --version
 # Expected: Echidna 2.x.x
 ```
 - [ ] Image runs without error
@@ -292,7 +292,7 @@ docker run --rm scanner-echidna:0.2.0 echidna --version
 ```bash
 # Requires contract with echidna test properties
 docker run --rm -v /path/to/echidna-test:/contracts \
-  scanner-echidna:0.2.0 echidna /contracts/EchidnaTest.sol --test-mode assertion
+  scanner-echidna:0.3.1 echidna /contracts/EchidnaTest.sol --test-mode assertion
 ```
 - [ ] Fuzzer executes without error
 - [ ] Fuzzing iterations run
@@ -313,7 +313,7 @@ docker run --rm -v /path/to/echidna-test:/contracts \
 
 #### Image Verification
 ```bash
-docker run --rm scanner-medusa:0.2.0 medusa --version
+docker run --rm scanner-medusa:0.3.1 medusa --version
 # Expected: medusa 0.x.x
 ```
 - [ ] Image runs without error
@@ -322,7 +322,7 @@ docker run --rm scanner-medusa:0.2.0 medusa --version
 #### Basic Fuzzing Test
 ```bash
 docker run --rm -v /path/to/medusa-test:/contracts \
-  scanner-medusa:0.2.0 medusa fuzz --target /contracts/
+  scanner-medusa:0.3.1 medusa fuzz --target /contracts/
 ```
 - [ ] Fuzzer executes without error
 - [ ] Corpus generated
@@ -343,7 +343,7 @@ docker run --rm -v /path/to/medusa-test:/contracts \
 
 #### Image Verification
 ```bash
-docker run --rm scanner-halmos:0.2.0 halmos --version
+docker run --rm scanner-halmos:0.3.0 halmos --version
 # Expected: halmos 0.x.x
 ```
 - [ ] Image runs without error
@@ -352,7 +352,7 @@ docker run --rm scanner-halmos:0.2.0 halmos --version
 #### Basic Symbolic Test
 ```bash
 docker run --rm -v /path/to/halmos-test:/contracts \
-  scanner-halmos:0.2.0 halmos --root /contracts/
+  scanner-halmos:0.3.0 halmos --root /contracts/
 ```
 - [ ] Symbolic execution runs
 - [ ] Assertions verified
@@ -375,10 +375,10 @@ docker run --rm -v /path/to/halmos-test:/contracts \
 
 #### Image Verification
 ```bash
-docker run --rm --entrypoint vyper scanner-vyper:0.2.0 --version
+docker run --rm --entrypoint vyper scanner-vyper:0.3.0 --version
 # Expected: 0.4.3+commit.bff19ea2
 
-docker run --rm scanner-vyper:0.2.0 --version
+docker run --rm scanner-vyper:0.3.0 --version
 # Expected: Slither 0.11.3
 ```
 - [ ] Vyper compiler version 0.4.3
@@ -399,7 +399,7 @@ def withdraw():
     send(msg.sender, self.balance)
 EOF
 
-docker run --rm -v /tmp:/contracts scanner-vyper:0.2.0 /contracts/test.vy --json -
+docker run --rm -v /tmp:/contracts scanner-vyper:0.3.0 /contracts/test.vy --json -
 ```
 - [ ] Scanner executes without error
 - [ ] JSON output returned
@@ -423,10 +423,10 @@ docker run --rm -v /tmp:/contracts scanner-vyper:0.2.0 /contracts/test.vy --json
 
 #### Image Verification
 ```bash
-docker run --rm scanner-moccasin:0.2.0
+docker run --rm scanner-moccasin:0.3.0
 # Expected: Moccasin fuzzing banner
 
-docker run --rm --entrypoint vyper scanner-moccasin:0.2.0 --version
+docker run --rm --entrypoint vyper scanner-moccasin:0.3.0 --version
 # Expected: 0.4.3
 ```
 - [ ] Image runs without error
@@ -436,7 +436,7 @@ docker run --rm --entrypoint vyper scanner-moccasin:0.2.0 --version
 ```bash
 # Moccasin requires project structure
 docker run --rm -v /path/to/moccasin-project:/project \
-  scanner-moccasin:0.2.0 mox test --fuzz
+  scanner-moccasin:0.3.0 mox test --fuzz
 ```
 - [ ] Fuzzer executes without error
 - [ ] Property tests run
@@ -462,7 +462,7 @@ docker run --rm -v /path/to/moccasin-project:/project \
 
 #### Image Verification
 ```bash
-docker run --rm scanner-sol-azy:0.2.0 --help
+docker run --rm scanner-sol-azy:0.4.0 --help
 ```
 - [ ] Image runs without error
 - [ ] Help output shows sol-azy options
@@ -491,7 +491,7 @@ pub struct Initialize<'info> {
 }
 EOF
 
-docker run --rm -v /tmp:/contracts scanner-sol-azy:0.2.0 /contracts/test.rs
+docker run --rm -v /tmp:/contracts scanner-sol-azy:0.4.0 /contracts/test.rs
 ```
 - [ ] Scanner executes without error
 - [ ] Findings returned
@@ -513,14 +513,14 @@ docker run --rm -v /tmp:/contracts scanner-sol-azy:0.2.0 /contracts/test.rs
 
 #### Image Verification
 ```bash
-docker run --rm scanner-sec3-xray:0.2.0 "x-ray-scan --help"
+docker run --rm scanner-sec3-xray:0.3.1 "x-ray-scan --help"
 ```
 - [ ] Image runs without error
 - [ ] Help output shows x-ray options
 
 #### Basic Analysis Test
 ```bash
-docker run --rm -v /tmp:/contracts scanner-sec3-xray:0.2.0 /contracts/test.rs
+docker run --rm -v /tmp:/contracts scanner-sec3-xray:0.3.1 /contracts/test.rs
 ```
 - [ ] Scanner executes without error
 - [ ] Security findings returned
@@ -541,7 +541,7 @@ docker run --rm -v /tmp:/contracts scanner-sec3-xray:0.2.0 /contracts/test.rs
 
 #### Image Verification
 ```bash
-docker run --rm scanner-trident:0.2.0 trident --help
+docker run --rm scanner-trident:0.3.0 trident --help
 ```
 - [ ] Image runs without error
 - [ ] Trident fuzzer help shown
@@ -549,7 +549,7 @@ docker run --rm scanner-trident:0.2.0 trident --help
 #### Basic Fuzzing Test
 ```bash
 docker run --rm -v /path/to/anchor-project:/project \
-  scanner-trident:0.2.0 trident fuzz run
+  scanner-trident:0.3.0 trident fuzz run
 ```
 - [ ] Fuzzer initializes
 - [ ] Fuzzing iterations run
@@ -570,7 +570,7 @@ docker run --rm -v /path/to/anchor-project:/project \
 
 #### Image Verification
 ```bash
-docker run --rm scanner-cargo-fuzz-solana:0.2.0 cargo fuzz --help
+docker run --rm scanner-cargo-fuzz-solana:0.3.0 cargo fuzz --help
 ```
 - [ ] Image runs without error
 - [ ] Cargo fuzz help shown
@@ -578,7 +578,7 @@ docker run --rm scanner-cargo-fuzz-solana:0.2.0 cargo fuzz --help
 #### Basic Fuzzing Test
 ```bash
 docker run --rm -v /path/to/fuzz-target:/project \
-  scanner-cargo-fuzz-solana:0.2.0 cargo fuzz run fuzz_target
+  scanner-cargo-fuzz-solana:0.3.0 cargo fuzz run fuzz_target
 ```
 - [ ] Fuzzer executes
 - [ ] libFuzzer runs
@@ -694,6 +694,15 @@ docker run --rm -v /path/to/fuzz-target:/project \
 
 ```
 [Date] | [Scanner] | [Test Type] | [Result] | [Notes]
+2026-02-12 | All 6 core | Platform E2E | PASS | All 6 scanners deliver callbacks with findings parsed
+2026-02-12 | slither | Platform scan | PASS | 12 vulnerabilities (ReentrancyVault.sol)
+2026-02-12 | aderyn | Platform scan | PASS | 13 vulnerabilities (ReentrancyVault.sol)
+2026-02-12 | semgrep | Platform scan | PASS | 4 findings (offline rules, ReentrancyVault.sol)
+2026-02-12 | solhint | Platform scan | PASS | 25 findings (ReentrancyVault.sol)
+2026-02-12 | wake | Platform scan | PASS | 5 vulnerabilities (ReentrancyVault.sol)
+2026-02-12 | soliditydefend | Platform scan | PASS | Results received and processed
+2026-02-12 | semgrep | Offline rules | PASS | Bundled rules as local YAML for air-gapped K8s
+2026-02-12 | aderyn/semgrep | Curl retry | PASS | --retry 3 --retry-delay 2 --retry-all-errors
 2026-01-20 | solhint | E2E scan | PASS | Callback fix verified - scan completed in 10s, status "completed"
 2026-01-20 | solhint | Callback POST | PASS | Results posted successfully (HTTP 200)
 2026-01-19 | All 15 scanners | Harbor image check | PASS | All images present in Harbor with correct versions
