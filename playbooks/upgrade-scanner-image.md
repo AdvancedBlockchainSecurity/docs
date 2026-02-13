@@ -1,7 +1,7 @@
 # Playbook: Upgrade Scanner Image
 
-**Version:** 1.2.0
-**Last Updated:** February 5, 2026
+**Version:** 1.3.0
+**Last Updated:** February 12, 2026
 
 ## Overview
 
@@ -363,6 +363,27 @@ kubectl get configmap scanner-versions -n tool-integration-local -o yaml | grep 
 # Force deployment restart
 kubectl rollout restart deployment/tool-integration -n tool-integration-local
 ```
+
+### Scanner Job Completes with 0 Findings (UID Mismatch)
+
+**Symptoms:** Scanner Job shows `status: completed`, but 0 vulnerabilities stored. Pod logs may show permission errors or empty results.
+
+**Root Cause:** K8s security context forces UID 1000, but Dockerfile may use UID 1001. Scanner can't write to output directories.
+
+**Fix:** Ensure all scanner Dockerfiles use UID 1000:
+```dockerfile
+RUN useradd -m -u 1000 scanner  # Must match K8s runAsUser: 1000
+```
+
+**See:** [Scanner Pipeline Troubleshooting](./scanner-pipeline-troubleshooting.md) for full diagnosis steps.
+
+### Scanner Callback Fails with HTTP 000 (Alpine DNS)
+
+**Symptoms:** Scanner completes and finds vulnerabilities, but callback POST fails. Only affects Alpine-based images.
+
+**Root Cause:** Alpine musl libc DNS bug. Fixed in `kubernetes_job_manager.py` with `dnsConfig` and trailing dot FQDN.
+
+**See:** [Scanner Pipeline Troubleshooting](./scanner-pipeline-troubleshooting.md#issue-2-callback-post-fails-alpine-dns)
 
 ### Scanner Job Fails with JSON Parse Error (HTTP 500)
 

@@ -411,27 +411,28 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
 
 ### Scanners Loaded
 
-**EVM/Solidity Scanners:**
-- slither (0.11.5, solc-select 1.1.0) - scanner-slither:0.3.1 - 101/101 detectors (100%) ✅
-- aderyn (0.6.7) - scanner-aderyn:0.7.0 (pre-built binary) - 87/87 detectors (100%) ✅
-- wake (eth-wake 4.21.0) - scanner-wake:0.3.4 ✅
-- semgrep (1.141.0) - scanner-semgrep:0.3.2 - 43/47 detectors (91.5%) - Fixed JSON generation bug (2026-02-05)
-- solhint (6.0.2) - scanner-solhint:0.3.0 - 16/20 detectors (80%) ✅ FIXED
-- echidna (2.2.7, solc-select 1.1.0) - scanner-echidna:0.2.0 - fuzzer
-- medusa (1.3.1) - scanner-medusa:0.2.0 - fuzzer
-- halmos (0.3.3) - scanner-halmos:0.2.0 - formal verification
+**EVM/Solidity Scanners:** ✅ All 6 core scanners E2E verified on platform (February 12, 2026)
+- slither (0.11.5, solc-select 1.1.0) - scanner-slither:0.3.2 - 101/101 detectors (100%) ✅
+- aderyn (0.6.7) - scanner-aderyn:0.7.2 (pre-built binary) - 88/88 detectors (100%) ✅
+- wake (eth-wake 4.22.0) - scanner-wake:0.3.6 ✅
+- semgrep (1.144.0) - scanner-semgrep:0.3.5 - 47 detectors - offline rules bundled as local YAML ✅
+- solhint (6.0.2) - scanner-solhint:0.1.6 - 20 detectors ✅
+- soliditydefend (1.10.13) - scanner-soliditydefend:0.7.1 - 333 detectors ✅
+- echidna (2.2.7, solc-select 1.1.0) - scanner-echidna:0.3.1 - fuzzer
+- medusa (1.5.0) - scanner-medusa:0.3.1 - fuzzer
+- halmos (0.3.3) - scanner-halmos:0.3.0 - formal verification
 - certora (8.3.1) - 0/5 rules integrated
 
 **EVM/Vyper Scanners:** ✅ All in Harbor, E2E verified (January 19, 2026)
-- vyper (0.4.3) - harbor.blocksecops.local/blocksecops/scanner-vyper:0.2.0 - uses slither 0.11.3 ✅
-- moccasin (latest, vyper 0.4.3) - harbor.blocksecops.local/blocksecops/scanner-moccasin:0.2.0 - fuzzer ✅
+- vyper (0.4.3) - harbor.blocksecops.local/blocksecops/scanner-vyper:0.3.0 - uses slither 0.11.3 ✅
+- moccasin (0.4.3, vyper 0.4.3) - harbor.blocksecops.local/blocksecops/scanner-moccasin:0.3.0 - fuzzer ✅
   - Note: Moccasin requires project structure (not shown for single-file contracts in UI)
 
-**Solana Scanners:** ✅ All in Harbor (January 19, 2026)
-- sol-azy (latest) - harbor.blocksecops.local/blocksecops/scanner-sol-azy:0.2.0 ✅
-- sec3-xray (0.0.6) - harbor.blocksecops.local/blocksecops/scanner-sec3-xray:0.2.0 ✅
+**Solana Scanners:** ✅ All in Harbor (February 9, 2026)
+- sol-azy (0.4.0) - harbor.blocksecops.local/blocksecops/scanner-sol-azy:0.4.0 ✅
+- sec3-xray (0.0.6) - harbor.blocksecops.local/blocksecops/scanner-sec3-xray:0.3.1 ✅
 - trident (0.12.0) - harbor.blocksecops.local/blocksecops/scanner-trident:0.3.0 ✅
-- cargo-fuzz-solana (0.13.1) - harbor.blocksecops.local/blocksecops/scanner-cargo-fuzz-solana:0.2.0 ✅
+- cargo-fuzz-solana (0.13.1) - harbor.blocksecops.local/blocksecops/scanner-cargo-fuzz-solana:0.3.0 ✅
 
 **Cairo/StarkNet Scanners:** ⚠️ NOT integrated - patterns defined but no scanner integration
 - caracal (0.2.3) - 0/14 detectors ❌ Unavailable (no Docker image)

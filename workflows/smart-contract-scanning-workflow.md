@@ -1,7 +1,7 @@
 # Smart Contract Scanning Workflow
 
-**Version:** 1.0.0
-**Last Updated:** January 31, 2026
+**Version:** 1.1.0
+**Last Updated:** February 12, 2026
 **Status:** Active
 
 ---
@@ -277,26 +277,47 @@ Receive trigger from API service
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: scan-{scan_id}-{scanner_id}
+  name: scan-{scanner}-{scan_id_prefix}
 spec:
   activeDeadlineSeconds: 300
   template:
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000      # All scanner Dockerfiles use UID 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      dnsConfig:
+        options:
+        - name: single-request-reopen  # Fix Alpine musl DNS bug
       containers:
       - name: scanner
-        image: blocksecops/{scanner}:latest
+        image: harbor.blocksecops.local/blocksecops/scanner-{scanner}:{version}
         env:
-        - name: API_CALLBACK_URL
-          value: "http://api-service:8000/api/v1/store-results"
+        - name: CALLBACK_URL
+          value: "http://tool-integration.{namespace}.svc.cluster.local.:8005/api/v1/scans/{scan_id}/results"
+        - name: SCAN_ID
+          value: "{scan_id}"
+        - name: CONTRACTS_DIR
+          value: "/contracts"
+        - name: WORK_DIR
+          value: "/contracts"
         volumeMounts:
         - name: source
-          mountPath: /source
+          mountPath: /contracts
       volumes:
       - name: source
         configMap:
-          name: contract-source-{scan_id}
+          name: scan-{scan_id_prefix}-source
       restartPolicy: Never
 ```
+
+**Key details:**
+- Scanner images use semantic versioning (e.g., `scanner-slither:0.3.2`), never `latest`
+- UID 1000 is enforced by both Dockerfile and K8s security context
+- Callback URL uses trailing dot FQDN to avoid K8s ndots:5 search domain expansion
+- `dnsConfig` with `single-request-reopen` fixes Alpine musl libc DNS bug
+- Scanner container POSTs results directly to tool-integration via CALLBACK_URL
 
 ---
 
@@ -742,7 +763,7 @@ data:
   scanners.json: |
     {
       "slither": {
-        "image": "blocksecops/slither:0.2.0",
+        "image": "blocksecops/slither:0.3.2",
         "language": "solidity",
         "type": "static_analysis",
         "timeout": 300
