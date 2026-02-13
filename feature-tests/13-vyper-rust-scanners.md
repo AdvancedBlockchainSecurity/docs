@@ -108,6 +108,8 @@ cd /Users/pwner/Git/ABS/blocksecops-tool-integration
 
 ```
 [Date] | [Test] | [Result] | [Notes]
+2026-02-13 | Sol-azy pipeline fix | PASS | UID 1000, Rust 1.88, build verification, curl retry, scan completed
+2026-02-13 | Sol-azy E2E scan | PASS | Scan completed with 0 findings (scanner limitation, not pipeline)
 2026-01-19 | Harbor image verification | PASS | All 15 scanner images in Harbor with correct versions
 2026-01-19 | ConfigMap Harbor refs | PASS | scanner-versions ConfigMap uses Harbor registry
 2026-01-19 | Vyper E2E scan | PASS | scan-vyper-0c35bf78 completed with 2 vulnerabilities
@@ -142,6 +144,19 @@ cd /Users/pwner/Git/ABS/blocksecops-tool-integration
 5. **Environment variables**: Added `CONTRACTS_DIR` and `OUTPUT_DIR` to K8s Job spec
 
 **Image Version**: `scanner-sol-azy:0.2.1`
+
+### Sol-azy Scanner Fixes (2026-02-13)
+
+**Issues Fixed:**
+1. **UID mismatch**: Dockerfile used UID 1001 but K8s security context forced UID 1000 → changed to UID 1000
+2. **Rust version**: `home@0.5.12` dependency requires Rust 1.88 → upgraded from 1.85 to 1.88
+3. **Silent build failure**: Build echoed error instead of `exit 1` → added build verification step (`sol-azy --help`)
+4. **Runtime git clone**: Fallback git clone fails in air-gapped K8s → removed, now fails fast with callback error POST
+5. **Curl retry**: Added `--retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 10` for callback reliability
+6. **/tmp ownership**: Pre-created `/tmp/solana-analysis` with scanner user ownership
+7. **Shell strictness**: Changed `set -e` to `set -euo pipefail`
+
+**Image Version**: `scanner-sol-azy:0.4.1`
 
 ### Vyper Scanner Fixes (2025-12-29)
 
