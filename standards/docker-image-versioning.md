@@ -329,7 +329,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.4.0 | `k8s/overlays/local/` | Supabase build args required |
-| api-service | 0.28.20 | `k8s/overlays/local/api-service/` | Fix FK flush ordering in scanner upgrade service |
+| api-service | 0.28.21 | `k8s/overlays/local/api-service/` | Register consent router (fix 404 on /consent/current) |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.42.1 | `k8s/overlays/local/` | Fix 409 duplicate contract handling (DuplicateContractModal), tier-config integration |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
