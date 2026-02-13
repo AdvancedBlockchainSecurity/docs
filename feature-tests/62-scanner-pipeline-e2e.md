@@ -1,14 +1,14 @@
 # Scanner Pipeline End-to-End Verification
 
 **Priority**: P0 - Critical
-**Last Tested**: February 12, 2026
-**Service**: tool-integration (0.3.22)
+**Last Tested**: February 13, 2026
+**Service**: tool-integration (0.4.1)
 
 ---
 
 ## Overview
 
-End-to-end verification of all 6 core Solidity scanner pipelines. Tests confirm that each scanner:
+End-to-end verification of all 6 core Solidity scanner pipelines plus sol-azy (Solana). Tests confirm that each scanner:
 1. Accepts a contract via the tool-integration API
 2. Creates a K8s Job with the correct scanner image
 3. Scanner container runs, analyzes the contract, and produces findings
@@ -40,6 +40,7 @@ End-to-end verification of all 6 core Solidity scanner pipelines. Tests confirm 
 - [x] scanner-solhint:0.1.6 present in Harbor
 - [x] scanner-wake:0.3.6 present in Harbor
 - [x] scanner-soliditydefend:0.7.1 present in Harbor
+- [ ] scanner-sol-azy:0.4.1 present in Harbor
 
 ### 1.2 Images Available in containerd (K8s)
 - [x] All 6 scanner images pullable by K8s Jobs
@@ -148,13 +149,19 @@ End-to-end verification of all 6 core Solidity scanner pipelines. Tests confirm 
 | Curl retry + timeout | aderyn, semgrep | Added --retry 3 --retry-all-errors --connect-timeout 10 to callback POST |
 | Offline rule bundling | semgrep | Download rules as local YAML during Docker build for air-gapped operation |
 | Rule cache fix | semgrep | Pre-cache was in root's home; now uses local files at /rules/ |
+| UID 1001→1000 | sol-azy | Dockerfile used UID 1001 but K8s security context forced UID 1000 |
+| Rust 1.85→1.88 | sol-azy | `home@0.5.12` dependency requires Rust 1.88+ |
+| Silent build failure | sol-azy | Build echoed error instead of `exit 1`; added post-build verification |
+| Runtime git clone removed | sol-azy | Fallback git clone fails in air-gapped K8s; now fails fast with callback error |
+| Curl retry on callback | sol-azy | Added --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 10 |
+| /tmp ownership | sol-azy | Pre-created /tmp/solana-analysis with correct scanner user ownership |
 
 ---
 
 ## Test Execution Date
 
 **Date**: February 13, 2026
-**Tool-Integration Version**: 0.4.0
+**Tool-Integration Version**: 0.4.1
 **Scanner Images Tested**:
 - scanner-slither:0.3.2
 - scanner-aderyn:0.7.2
@@ -162,6 +169,28 @@ End-to-end verification of all 6 core Solidity scanner pipelines. Tests confirm 
 - scanner-solhint:0.1.6
 - scanner-wake:0.3.6
 - scanner-soliditydefend:0.7.1
+- scanner-sol-azy:0.4.1
+
+### Sol-azy Pipeline Verification (February 13, 2026)
+
+Sol-azy (Solana static analyzer) pipeline fixed. Verify after deployment:
+
+- [ ] scanner-sol-azy:0.4.1 built with Rust 1.88, UID 1000, build verification
+- [ ] Image pushed to Harbor (`harbor.blocksecops.local/blocksecops/scanner-sol-azy:0.4.1`)
+- [ ] K8s Job created with correct image and security context
+- [ ] Scanner container starts without permission errors (UID 1000 match)
+- [ ] Scanner executes analysis and posts callback
+- [ ] Scan completed successfully (0 findings expected — scanner limitation on raw `invoke()` patterns)
+- [ ] ConfigMap and KJM default updated to 0.4.1
+
+**Fixes applied:**
+- UID 1001→1000 in Dockerfile (K8s security context match)
+- Rust 1.85→1.88 (dependency requirement for `home@0.5.12`)
+- Silent build failure → `exit 1` + post-build `sol-azy --help` verification
+- Runtime git clone fallback removed → fail fast with callback error POST
+- Added curl retry (`--retry 3 --retry-delay 2 --retry-all-errors`)
+- Pre-created `/tmp/solana-analysis` with scanner user ownership
+- Changed `set -e` to `set -euo pipefail`
 
 ### Live Scan Verification (February 13, 2026)
 

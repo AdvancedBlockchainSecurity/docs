@@ -1,12 +1,12 @@
 # Scanner Documentation
 
-**Last Updated**: December 30, 2025
-**API Pipeline Tested**: December 29, 2025
-**Parser Tests Passing**: December 20, 2025 (27 tests)
+**Last Updated**: February 13, 2026
+**API Pipeline Tested**: February 13, 2026
+**Parser Tests Passing**: February 13, 2026 (335 tests — unit, integration, regression)
 **Fuzzer Filtering Tested**: December 29, 2025 (is_project filtering verified)
 **Fuzzer Results Display**: December 30, 2025 (end-to-end verified)
 **Active Scanners**: 18 available in orchestration (18 total registered)
-**Supported Languages**: Solidity (12 scanners), Vyper (2 scanners), Solana (4 scanners)
+**Supported Languages**: Solidity (12 scanners), Vyper (2 scanners), Solana (4 scanners, 1 active)
 **Execution Mode**: Docker-based execution for Solana scanners
 **Project Mode**: Foundry/Hardhat support enabled (Phase 3.2)
 **Scanner Effectiveness**: Available at `/analytics/scanner-effectiveness`
@@ -85,7 +85,7 @@ Security scanner integration, management, and troubleshooting guides for the Blo
 
 ---
 
-## Active Scanners (14 Production-Ready)
+## Active Scanners (15 Production-Ready)
 
 ### Solidity Static Analysis (7)
 
@@ -138,16 +138,16 @@ Fuzzer scanners now properly store and display results in the dashboard:
 | **Vyper** | 0.2.0 | Compiler/Analyzer | ❌ No | ✅ Active |
 | **Moccasin** | 0.2.0 | Fuzzer | ✅ Yes | ✅ Active |
 
-### Solana/Rust Scanners (4) ⚠️ PENDING
+### Solana/Rust Scanners (4) — 1 Active, 3 Pending
 
-Docker images built but require Rust toolchain in orchestration pod. See Phase 3.5 scanner integration.
+Docker images built and deployed to Harbor. Sol-azy is fully operational on the platform pipeline. Remaining scanners require additional orchestration integration.
 
 | Scanner | Version | Type | Requires Project | Status |
 |---------|---------|------|------------------|--------|
-| **Sol-azy** | 0.2.0 | Static Analysis | ❌ No | ⏳ Unavailable |
-| **Sec3 X-Ray** | 0.2.0 | Static Analysis | ✅ Yes | ⏳ Unavailable |
-| **Trident** | 0.2.0 | Fuzzer | ✅ Yes | ⏳ Unavailable |
-| **cargo-fuzz-solana** | 0.2.0 | Fuzzer | ✅ Yes | ⏳ Unavailable |
+| **Sol-azy** | 0.4.1 | Static Analysis | ❌ No | ✅ Active |
+| **Sec3 X-Ray** | 0.3.1 | Static Analysis | ✅ Yes | ⏳ Unavailable |
+| **Trident** | 0.3.0 | Fuzzer | ✅ Yes | ⏳ Unavailable |
+| **cargo-fuzz-solana** | 0.3.0 | Fuzzer | ✅ Yes | ⏳ Unavailable |
 
 ### Removed Scanners (December 2025)
 
@@ -379,9 +379,12 @@ Parsers normalize scanner-specific severity levels:
 ### Parser Testing
 
 ```bash
-# Run parser unit tests (27 tests)
+# Run full test suite (335 tests — unit, integration, regression)
 cd /Users/pwner/Git/ABS/blocksecops-tool-integration
-.venv/bin/python3 -m pytest tests/unit/scanners/test_parsers.py -v
+.venv/bin/python3 -m pytest tests/ -v
+
+# Run parser unit tests only (68 tests)
+.venv/bin/python3 -m pytest tests/unit/scanners/ -v
 ```
 
 See: [Phase 3.5 Parser Changelog](/docs/changelogs/PHASE-3.5-PARSERS-2025-12-20.md)
@@ -438,7 +441,7 @@ See: [Scanner Integration Guide](SCANNER-INTEGRATION-GUIDE.md)
 |----------|----------------|--------|
 | **Solidity** | 10 | ✅ Full support |
 | **Vyper** | 2 | ✅ Full support |
-| **Rust/Solana** | 0 (4 pending) | ⏳ Docker images built, awaiting orchestration integration |
+| **Rust/Solana** | 1 (3 pending) | ⏳ Sol-azy active; 3 remaining awaiting orchestration integration |
 
 ### Detector Coverage
 
@@ -535,6 +538,6 @@ See: [Workflow Troubleshooting](SCANNER-WORKFLOW-TROUBLESHOOTING.md)
 ---
 
 **Maintained by**: BlockSecOps Scanner Integration Team
-**Active Scanners**: 18 operational (February 11, 2026)
-**Supported Languages**: Solidity (12 scanners), Vyper (2 scanners), Solana (4 scanners)
+**Active Scanners**: 18 operational (February 13, 2026)
+**Supported Languages**: Solidity (12 scanners), Vyper (2 scanners), Solana (4 scanners, 1 active)
 **Total Detector Count**: 450+ and growing
