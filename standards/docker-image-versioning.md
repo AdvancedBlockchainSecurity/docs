@@ -331,7 +331,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | admin-portal | 0.4.0 | `k8s/overlays/local/` | Supabase build args required |
 | api-service | 0.28.21 | `k8s/overlays/local/api-service/` | Register consent router (fix 404 on /consent/current) |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.42.1 | `k8s/overlays/local/` | Fix 409 duplicate contract handling (DuplicateContractModal), tier-config integration |
+| dashboard | 0.42.2 | `k8s/overlays/local/` | Suppress console warnings (Stripe, WebSocket, React Router v7 future flags), version label sync |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
