@@ -123,11 +123,41 @@ Save to DB: message content, tokens_input, tokens_output, model_used, generation
 
 ## Files
 
+### API Service
 | File | Role |
 |------|------|
 | `src/presentation/api/v1/endpoints/copilot.py` | Endpoint definitions, tier gating, feature flag checks |
 | `src/application/services/copilot_service.py` | Anthropic API integration, RAG retrieval, sanitization, validation |
+| `src/presentation/schemas/copilot.py` | Request/response schemas (ConversationCreate, MessageCreate, MessageRating) |
 | `src/infrastructure/config.py` | Model selection, token limits, feature flags |
+
+### Dashboard (v0.42.8+)
+| File | Role |
+|------|------|
+| `src/pages/copilot/CopilotPage.tsx` | Main chat page with error handling |
+| `src/components/copilot/ChatInterface.tsx` | Chat message input and display |
+| `src/components/copilot/ConversationList.tsx` | Sidebar conversation history list |
+| `src/lib/api/copilot.ts` | API client (endpoints, types) |
+| `src/hooks/useCopilot.ts` | React Query hooks for conversations and messages |
+
+## API Request Schemas
+
+**Create Conversation** (`POST /copilot/conversations`):
+```json
+{ "title": "string (required)", "scan_id": "uuid (optional)", "project_id": "uuid (optional)" }
+```
+Note: Creating a conversation does NOT send a message. After creation, send the first message via the messages endpoint.
+
+**Send Message** (`POST /copilot/conversations/{id}/messages`):
+```json
+{ "content": "string (required)" }
+```
+
+**Rate Message** (`POST /copilot/messages/{id}/rate`):
+```json
+{ "rating": 1-5, "feedback_text": "string (optional)" }
+```
+Note: Rating is numeric 1-5 (not string). The endpoint path uses `/copilot/messages/{id}/rate` (not nested under conversations).
 
 ## Database Tables
 
