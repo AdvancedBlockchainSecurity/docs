@@ -1,7 +1,7 @@
 # Project Mode Scanning
 
-**Version:** 1.0.0
-**Last Updated:** November 29, 2025
+**Version:** 1.1.0
+**Last Updated:** February 12, 2026
 **Phase:** 3.2 - Project Structure Support
 **Status:** Production Ready
 
@@ -384,6 +384,12 @@ my-project/
 ---
 
 ## Version History
+
+### v1.1.0 (February 12, 2026)
+- Project-required scanners now shown as **greyed out and disabled** on single-file contracts (Dashboard v0.42.4)
+- Previous behavior: project-required scanners hidden entirely from single-file contracts
+- Select All, presets, and manual toggle skip disabled scanners
+- "Requires Project" amber badge shown on disabled scanners
 
 ### v1.0.0 (November 29, 2025)
 - Initial documentation
