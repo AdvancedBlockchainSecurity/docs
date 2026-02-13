@@ -1,8 +1,10 @@
 # Scanner Execution Architecture - Kubernetes Jobs
 
+> **Note (February 2026):** This document captures the original architecture decision from October 2025. For the current implementation with 15 scanners, callback-based result collection, dead-letter queues, and Prometheus metrics, see [Scanner Job Execution Pipeline](/home/pwner/Git/docs/pipelines/scanner-job-execution-pipeline.md).
+
 ## Overview
 
-The Tool Integration service executes security scanners (Slither, Mythril, Aderyn) as isolated Kubernetes Jobs rather than embedded Python packages. This provides production-grade isolation, scalability, and security.
+The Tool Integration service executes security scanners as isolated Kubernetes Jobs rather than embedded Python packages. This provides production-grade isolation, scalability, and security.
 
 ## Architecture Decision
 
@@ -10,7 +12,7 @@ The Tool Integration service executes security scanners (Slither, Mythril, Adery
 
 **Date**: October 2025
 
-**Status**: Approved
+**Status**: Approved — Implemented with 15 scanner images (6 Solidity static, 3 Solidity fuzzing, 2 Vyper, 4 Solana/Rust)
 
 ## Rationale
 

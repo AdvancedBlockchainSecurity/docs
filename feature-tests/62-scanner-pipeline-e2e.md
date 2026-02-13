@@ -153,8 +153,8 @@ End-to-end verification of all 6 core Solidity scanner pipelines. Tests confirm 
 
 ## Test Execution Date
 
-**Date**: February 12, 2026
-**Tool-Integration Version**: 0.3.22
+**Date**: February 13, 2026
+**Tool-Integration Version**: 0.4.0
 **Scanner Images Tested**:
 - scanner-slither:0.3.2
 - scanner-aderyn:0.7.2
@@ -162,3 +162,27 @@ End-to-end verification of all 6 core Solidity scanner pipelines. Tests confirm 
 - scanner-solhint:0.1.6
 - scanner-wake:0.3.6
 - scanner-soliditydefend:0.7.1
+
+### Live Scan Verification (February 13, 2026)
+
+Full end-to-end scan on live platform with tool-integration v0.4.0:
+
+**Contract**: VulnerableAccountManagement_2 (Solidity, single-file, uploaded via web)
+**Scanners**: slither, semgrep, wake, solhint (4 of 6 core scanners)
+**Status**: Completed
+
+| Scanner | Critical | High | Medium | Low | Total |
+|---------|----------|------|--------|-----|-------|
+| slither | 6 | 0 | 13 | 22 | 41 |
+| semgrep | 0 | 0 | 0 | 75 | 75 |
+| wake | 0 | 0 | 2 | 0 | 2 |
+| solhint | 0 | 0 | 0 | 0 | 0 |
+| **Total** | **6** | **0** | **15** | **97** | **118** |
+
+- [x] All 4 scanner Jobs executed and posted callbacks
+- [x] Scan record counts (6/0/15/97) match vulnerability rows in database
+- [x] K8s Jobs auto-cleaned (TTL working)
+- [x] Slither criticals: 5 uninitialized state (0.9 confidence), 1 arbitrary ether send (0.7)
+- [x] Severity mapping correct: High→critical, Low→medium, Informational→low
+- [x] Line numbers and confidence scores populated across all scanners
+- [x] Solhint returned 0 findings (valid — contract follows linting conventions)

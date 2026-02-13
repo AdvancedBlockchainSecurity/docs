@@ -328,3 +328,4 @@ Success    Show Modal
 | Version | Date | Changes |
 |---------|------|---------|
 | 0.8.0 / 0.22.0 | 2025-12-31 | Initial implementation |
+| 0.42.1 | 2026-02-13 | Fix `isContractConflictError()` type guard: check `response.data.detail.error` instead of `response.data.error` (FastAPI wraps HTTPException in `detail` field). Fix both `onError` handlers in `ContractUploadModal.tsx` to read from `data.detail`. Verified with `VulnerableAccountManagement_2` rename flow. |

@@ -123,5 +123,6 @@ The `ScannerContext` dataclass contains everything a scanner needs:
 
 ## Related Pipelines
 
+- [Scanner Job Execution Pipeline](./scanner-job-execution-pipeline.md) — K8s Job lifecycle, callback result collection, parsing, and forwarding (tool-integration service)
 - [Intelligence Pipeline](./intelligence-pipeline.md) — processes raw findings after scan execution
 - [Deduplication Pipeline](./deduplication-pipeline.md) — maintains deduplication groups post-scan
