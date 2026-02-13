@@ -331,12 +331,12 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | admin-portal | 0.4.0 | `k8s/overlays/local/` | Supabase build args required |
 | api-service | 0.28.21 | `k8s/overlays/local/api-service/` | Register consent router (fix 404 on /consent/current) |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.42.2 | `k8s/overlays/local/` | Suppress console warnings (Stripe, WebSocket, React Router v7 future flags), version label sync |
+| dashboard | 0.42.3 | `k8s/overlays/local/` | Show all scanners with project badge instead of hiding, fix aderyn visibility |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
 | orchestration | 0.9.13 | `k8s/overlays/local/` | Uses pre-built base image |
-| tool-integration | 0.4.0 | `k8s/overlays/local/` | Scanner stability: 409 conflict fix, /ready endpoint, deepened /health, dead-letter queue, structured logging, Prometheus metrics, alerts, canary CronJob, port fixes, 346 tests |
+| tool-integration | 0.4.1 | `k8s/overlays/local/` | Fix soliditydefend parser (handle both findings/vulnerabilities keys) |
 
 All services are `0.x.x` (development phase). Version `1.0.0` indicates stable, production-ready API.
 
