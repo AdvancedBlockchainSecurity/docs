@@ -53,6 +53,16 @@ POST /review/suggestions →   1. Authenticate (JWT)                            
 | GET | `/review/feedback/{suggestion_id}` | JWT | Get feedback for suggestion |
 | GET | `/review/stats` | JWT | User review statistics |
 
+## Dashboard Display (v0.45.3)
+
+All review results are displayed **inline on the vulnerability detail page** — no separate `/code-review` page navigation required. Each review card shows:
+
+- Type badge (security/gas_optimization/best_practice/code_quality) + severity badge + confidence %
+- Full suggestion text and risk explanation
+- Expandable `<details>` blocks for attack scenario, recommended fix, and code comparison
+- Original code (red-tinted) vs suggested code (green-tinted) in side-by-side concept
+- Footer with model used, generation date, and feedback rating
+
 ## Files
 
 | File | Role |
