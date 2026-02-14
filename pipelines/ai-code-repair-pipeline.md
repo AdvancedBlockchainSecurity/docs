@@ -55,6 +55,19 @@ POST /code-repair/generate → 1. Authenticate (JWT)                            
 | DELETE | `/code-repair/repairs/{repair_id}` | JWT | Delete repair |
 | GET | `/code-repair/statistics` | JWT | Repair statistics |
 
+## Dashboard Display (v0.45.3)
+
+All repair results are displayed **inline on the vulnerability detail page** — no separate `/code-repair` page navigation required. Each repair card shows:
+
+- Fix type badge + status badge + confidence percentage
+- Full explanation text
+- Expandable `<details>` blocks for original code (red-tinted), fixed code (green-tinted), and diff
+- Footer with model used, applied status, and generation date
+
+## Auth Middleware (v0.28.32)
+
+**Fixed:** `code_repair.py` now imports `get_current_user` from `src.infrastructure.auth.middleware` (the unified auth module with HS256 fallback) instead of `src.infrastructure.security.dependencies` (the legacy strict RS256-only module). This resolved 401 errors on GET endpoints when using Supabase JWTs without a `kid` header.
+
 ## Files
 
 | File | Role |
@@ -62,6 +75,7 @@ POST /code-repair/generate → 1. Authenticate (JWT)                            
 | `src/presentation/api/v1/endpoints/code_repair.py` | Endpoint definitions, tier gating, rate limiting |
 | `src/application/services/code_repair_service.py` | Anthropic API integration, diff generation |
 | `src/infrastructure/config.py` | Model selection, token limits |
+| `src/infrastructure/auth/middleware.py` | Unified JWT auth (RS256 JWKS + HS256 fallback) |
 
 ## Error Handling
 

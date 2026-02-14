@@ -328,10 +328,10 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
-| admin-portal | 0.5.0 | `k8s/overlays/local/` | Supabase build args required; circuit breaker resilience |
-| api-service | 0.28.28 | `k8s/overlays/local/api-service/` | Add vulnerability title/severity to review suggestion responses |
+| admin-portal | 0.7.0 | `k8s/overlays/local/` | Add dedicated Review Queue labeling page |
+| api-service | 0.28.32 | `k8s/overlays/local/api-service/` | Fix auth middleware consistency (code-repair, copilot endpoints) |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.42.15 | `k8s/overlays/local/` | Optimistic copilot message display while waiting for AI response |
+| dashboard | 0.45.3 | `k8s/overlays/local/` | Expand Code Review & Code Repair inline results on vulnerability detail |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |

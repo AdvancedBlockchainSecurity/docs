@@ -71,6 +71,7 @@ Manual testing checklists for all user-facing features.
 | [58-platform-v0.27-v0.40-v0.3-fixes.md](./58-platform-v0.27-v0.40-v0.3-fixes.md) | **NEW** - Platform-wide bug fixes - info severity removal, pending→queued, auto-apply filters, dark mode, admin portal enhancements |
 | [59-admin-portal-v0.4.0.md](./59-admin-portal-v0.4.0.md) | **NEW** - Admin Portal v0.4.0: GCP Cost Estimator, Scanners page, Dependencies endpoint, defensive metrics |
 | [60-collapsible-sidebar-quick-access.md](./60-collapsible-sidebar-quick-access.md) | **NEW** - Collapsible sidebar (w-64 ↔ w-16), quick access page pins (max 5), localStorage persistence (v0.41.4 Dashboard) |
+| [61-ai-inline-results.md](./61-ai-inline-results.md) | **NEW** - AI inline results: Code Review & Code Repair display fully inline on vulnerability detail, auth fix for code-repair endpoints (v0.45.3 Dashboard, v0.28.32 API) |
 
 ---
 
@@ -325,6 +326,7 @@ GDPR/LGPD compliance features for ML data collection:
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-02-14 | Automated | 61-ai-inline-results.md | NEW - AI inline results: Code Review & Code Repair fully inline on vulnerability detail page, auth middleware fix for code-repair/copilot endpoints (v0.45.3 Dashboard, v0.28.32 API)
 2026-02-12 | Claude Code | 14-enterprise-features.md, 10-tier-upgrades.md, 37-stripe-billing.md | UPDATE - localStorage data isolation (userId-scoped keys), tier change modal tests, billing page invite card (v0.42.0 Dashboard)
 2026-02-09 | Claude Code | 60-collapsible-sidebar-quick-access.md | NEW - Collapsible sidebar + quick access page pins, localStorage persistence (v0.41.4 Dashboard)
 2026-02-07 | Claude Code | 59-admin-portal-v0.4.0.md | NEW - Admin Portal v0.4.0: GCP Cost Estimator, Scanners page, Dependencies endpoint (v0.4.0 Admin Portal, v0.27.7 API)

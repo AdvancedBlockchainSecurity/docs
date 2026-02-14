@@ -1,7 +1,7 @@
 # AI Features Workflow
 
-**Version:** 1.0.0
-**Last Updated:** February 7, 2026
+**Version:** 1.1.0
+**Last Updated:** February 14, 2026
 **Status:** Active
 
 ---
@@ -62,22 +62,24 @@ This document covers the end-to-end workflow for all AI-powered features in the 
 
 | Service | Purpose | Key Components |
 |---------|---------|----------------|
-| **API Service** | AI endpoint gateway, tier gating, rate limiting | `endpoints/copilot.py`, `code_review.py`, `code_repair.py`, `invariants.py`, `economic_analysis.py` |
+| **API Service** | AI endpoint gateway, tier gating, rate limiting | `endpoints/copilot.py`, `code_review.py`, `code_repair.py`, `invariants.py`, `exploits.py`, `economic_analysis.py` |
 | **Anthropic Claude API** | LLM inference for all AI features | External service, API key from Vault |
 | **PostgreSQL** | Quota tracking, conversation storage, result persistence | `user_quotas`, `copilot_messages`, etc. |
-| **Dashboard** | React UI for AI feature interactions | Chat panel, review buttons, repair buttons |
+| **Dashboard** | React UI for AI feature interactions | Chat panel, vulnerability detail AI actions |
+| **Admin Portal** | ML model management, review queue labeling | `AdminMLModels.tsx`, `AdminReviewQueue.tsx` |
 
 ---
 
 ## AI Feature Summary
 
-| Feature | Endpoint Prefix | Model | Max Tokens | Use Case |
-|---------|-----------------|-------|------------|----------|
-| **Copilot** | `/copilot/` | Sonnet 4 | 2,048 | Conversational Q&A about contract security |
-| **Code Review** | `/review/` | Haiku 3.5 | 2,048 | Risk analysis and attack scenarios for findings |
-| **Code Repair** | `/code-repair/` | Sonnet 4 | 4,096 | Generate patched code for vulnerabilities |
-| **Invariants** | `/invariants/` | Sonnet 4 | 4,096 | Generate Foundry invariant test properties |
-| **Economic Analysis** | `/economic-analysis/` | Haiku 3.5 | N/A | Economic risk explanations for DeFi findings |
+| Feature | Endpoint Prefix | Model | Max Tokens | Use Case | Entry Point |
+|---------|-----------------|-------|------------|----------|-------------|
+| **Copilot** | `/copilot/` | Sonnet 4 | 2,048 | Conversational Q&A about contract security | Dedicated page (`/copilot`) |
+| **Code Review** | `/review/` | Haiku 3.5 | 2,048 | Risk analysis and attack scenarios for findings | Vulnerability Detail AI Actions |
+| **Code Repair** | `/code-repair/` | Sonnet 4 | 4,096 | Generate patched code for vulnerabilities | Vulnerability Detail AI Actions |
+| **Invariants** | `/invariants/` | Sonnet 4 | 4,096 | Generate Foundry invariant test properties | Vulnerability Detail AI Actions |
+| **PoC Exploits** | `/exploits/` | Sonnet 4 | 8,192 | Proof-of-concept exploit generation | Vulnerability Detail AI Actions |
+| **Economic Analysis** | `/economic-analysis/` | Haiku 3.5 | N/A | Economic risk explanations for DeFi findings | Scan results economic tab |
 
 ---
 
@@ -98,50 +100,98 @@ scan/project (optional)           → System prompt built → Claude API called
                                   User can rate response quality
 ```
 
-### 2. Code Review (Finding Analysis)
+### 2. Vulnerability Detail — AI Actions Hub
+
+All vulnerability-level AI features are accessed from the Vulnerability Detail page (`/vulnerabilities/:id`) in the right sidebar "AI Actions" panel. This provides a unified workflow where users analyze a vulnerability and trigger AI assistance with all context auto-populated.
 
 ```
-User views vulnerability → Clicks "AI Review"
+User views vulnerability detail → Right sidebar "AI Actions" panel
+     │
+     ├──▶ "Generate AI Review" (Team+, indigo button)
+     │         → Vulnerability + contract context → Claude Haiku → Risk analysis + attack scenario
+     │
+     ├──▶ "Generate AI Repair" (Team+, purple button)
+     │         → Original code + vulnerability context → Claude Sonnet → Patched code + explanation
+     │
+     ├──▶ "Generate PoC Exploit" (Growth+, red button)
+     │         → contract_code + vulnerability_description → Claude Sonnet → Exploit + test code
+     │
+     └──▶ "Generate Invariants" (Growth+, teal button)
+              → contract_id + contract_code + default types → Claude Sonnet → Foundry invariant tests
+```
+
+**Key design principle:** Users never need to manually copy/paste contract code or vulnerability descriptions. All fields are auto-populated from the vulnerability and its associated contract.
+
+### 3. Code Review (Finding Analysis)
+
+```
+User views vulnerability → Clicks "Generate AI Review" in AI Actions panel
      │
      ▼
 Vulnerability + contract context loaded → Claude Haiku API called
      │
      ▼
 Risk explanation + attack scenario + suggested fix returned
-User can provide feedback (rating, was_helpful, was_applied)
+     │
+     ▼
+ALL reviews displayed inline on vulnerability page (v0.45.3):
+  - Type badge (security/gas_optimization/best_practice/code_quality)
+  - Severity badge + confidence %
+  - Full suggestion text and risk explanation
+  - Expandable: attack scenario, recommended fix
+  - Expandable: original code (red) vs suggested code (green)
+  - Footer: model used, generation date, feedback
 ```
 
-### 3. Code Repair (Fix Generation)
+### 4. Code Repair (Fix Generation)
 
 ```
-User views vulnerability → Clicks "AI Repair"
+User views vulnerability → Clicks "Generate AI Repair" in AI Actions panel
      │
      ▼
 Original code + vulnerability context → Claude Sonnet API called
      │
      ▼
 Repaired code + explanation + diff returned
-User can mark as "applied" and provide feedback
-```
-
-### 4. Invariant Generation
-
-```
-User views contract → Clicks "Generate Invariants"
      │
      ▼
-Selects invariant types (property, boundary, state_transition, access_control, economic)
-     │
-     ▼
-Contract code validated (50KB max) → Injection detection
-→ Quota + cooldown checked → Claude Sonnet API called
-     │
-     ▼
-Foundry test code + explanations returned
-User can apply invariants to test suite
+ALL repairs displayed inline on vulnerability page (v0.45.3):
+  - Fix type badge + status badge (pending/generating/ready/applied/rejected)
+  - Confidence percentage
+  - Full explanation text
+  - Expandable: original code (red), fixed code (green), diff
+  - Footer: model used, applied status, generation date
 ```
 
-### 5. Economic Analysis
+### 5. PoC Exploit Generation
+
+```
+User views vulnerability → Clicks "Generate PoC Exploit" in AI Actions panel
+     │
+     ▼
+contract_code (from contract or code_snippet) + vulnerability_description → Tier check (Growth+)
+→ Quota + cooldown → Claude Sonnet API → Safety validation
+     │
+     ▼
+Exploit code + setup code + test code + explanation returned
+Existing exploits shown inline with expandable code blocks
+```
+
+### 6. Invariant Generation
+
+```
+User views vulnerability → Clicks "Generate Invariants" in AI Actions panel
+     │
+     ▼
+contract_id + contract_code auto-populated → Default types: state, access, arithmetic, reentrancy
+→ Tier check (Growth+) → Quota + cooldown → Claude Sonnet API
+     │
+     ▼
+Foundry invariant test code + explanations returned
+Existing invariants for the contract shown inline with type, confidence, applied status
+```
+
+### 7. Economic Analysis
 
 ```
 Scan completes with economic findings → User opens Economic Analysis tab
@@ -311,7 +361,9 @@ All error responses use `get_safe_error_detail()` to prevent internal informatio
 - [AI Code Review Pipeline](../pipelines/ai-code-review-pipeline.md)
 - [AI Code Repair Pipeline](../pipelines/ai-code-repair-pipeline.md)
 - [AI Invariant Generation Pipeline](../pipelines/ai-invariant-generation-pipeline.md)
+- [AI PoC Exploit Pipeline](../pipelines/ai-poc-exploit-pipeline.md)
 - [AI Economic Analysis Pipeline](../pipelines/ai-economic-analysis-pipeline.md)
+- [ML Review Queue Pipeline](../pipelines/ml-review-queue-pipeline.md) — Admin Portal only
 
 ### Standards
 - [Tier Standards](../standards/tier-standards.md) — Quotas, pricing, rate limits
@@ -319,13 +371,29 @@ All error responses use `get_safe_error_detail()` to prevent internal informatio
 - [API Endpoint Authentication](../standards/api-endpoint-auth.md) — Auth dependency patterns
 
 ### Source Files
+
+**API Service (Backend):**
 - `blocksecops-api-service/src/presentation/api/v1/endpoints/copilot.py`
 - `blocksecops-api-service/src/presentation/api/v1/endpoints/code_review.py`
 - `blocksecops-api-service/src/presentation/api/v1/endpoints/code_repair.py`
 - `blocksecops-api-service/src/presentation/api/v1/endpoints/invariants.py`
+- `blocksecops-api-service/src/presentation/api/v1/endpoints/exploits.py`
 - `blocksecops-api-service/src/presentation/api/v1/endpoints/economic_analysis.py`
 - `blocksecops-api-service/src/application/services/copilot_service.py`
+- `blocksecops-api-service/src/application/services/exploit_service.py`
+- `blocksecops-api-service/src/application/services/invariant_service.py`
 - `blocksecops-api-service/src/infrastructure/config.py`
+
+**Dashboard (Frontend — AI Actions on Vulnerability Detail):**
+- `blocksecops-dashboard/src/pages/VulnerabilityDetail.tsx` — AI Actions panel (review, repair, exploit, invariants)
+- `blocksecops-dashboard/src/hooks/useCodeReview.ts` — `useGenerateReview`, `useSuggestionsForVulnerability`
+- `blocksecops-dashboard/src/hooks/useCodeRepair.ts` — `useGenerateRepair`, `useVulnerabilityRepairs`
+- `blocksecops-dashboard/src/hooks/useExploits.ts` — `useGenerateExploit`, `useVulnerabilityExploits`
+- `blocksecops-dashboard/src/hooks/useInvariants.ts` — `useGenerateInvariants`, `useContractInvariants`
+
+**Admin Portal (ML Review Queue):**
+- `blocksecops-admin-portal/src/pages/AdminReviewQueue.tsx` — Review Queue labeling interface
+- `blocksecops-admin-portal/src/lib/api/admin.ts` — `getNextReviewItem`, `labelReviewItem`
 
 ---
 
