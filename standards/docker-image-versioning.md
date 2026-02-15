@@ -331,7 +331,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | admin-portal | 0.7.0 | `k8s/overlays/local/` | Add dedicated Review Queue labeling page |
 | api-service | 0.28.32 | `k8s/overlays/local/api-service/` | Fix auth middleware consistency (code-repair, copilot endpoints) |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.45.3 | `k8s/overlays/local/` | Expand Code Review & Code Repair inline results on vulnerability detail |
+| dashboard | 0.45.6 | `k8s/overlays/local/` | Full markdown rendering: fenced code blocks, tables, h1 headers; scan results UX: pagination, search filter |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
