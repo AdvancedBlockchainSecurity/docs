@@ -25,17 +25,17 @@ check() {
   local name="$1" expected="$2" actual="$3"
   if [ "$actual" = "$expected" ]; then
     echo "  PASS: $name"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL: $name (expected=$expected, got=$actual)"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 }
 
 warn() {
   local name="$1" msg="$2"
   echo "  WARN: $name ($msg)"
-  ((WARN++))
+  WARN=$((WARN + 1))
 }
 
 echo "=============================================="
@@ -96,10 +96,10 @@ for ns in "${NAMESPACES[@]}"; do
   NP_COUNT=$(kubectl get networkpolicy -n "$ns" --no-headers 2>/dev/null | wc -l | tr -d ' ')
   if [ "$NP_COUNT" -ge 1 ]; then
     echo "  PASS: $ns has $NP_COUNT NetworkPolicy(ies)"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL: $ns has 0 NetworkPolicies"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 done
 
@@ -128,10 +128,10 @@ for ns in "${NAMESPACES[@]}"; do
 
   if [ -n "$CPU_LIMIT" ] && [ -n "$MEM_LIMIT" ]; then
     echo "  PASS: $ns/$DEPLOY limits: cpu=$CPU_LIMIT mem=$MEM_LIMIT"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL: $ns/$DEPLOY missing limits (cpu=$CPU_LIMIT, mem=$MEM_LIMIT)"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 done
 
@@ -139,13 +139,13 @@ done
 echo ""
 echo "=== 7.10 Image Tags: no :latest ==="
 
-LATEST_COUNT=$(kubectl get pods -A -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}' 2>/dev/null | grep ":latest" | wc -l | tr -d ' ')
+LATEST_COUNT=$(kubectl get pods -A -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}' 2>/dev/null | { grep ":latest" || true; } | wc -l | tr -d ' ')
 if [ "$LATEST_COUNT" -eq 0 ]; then
   echo "  PASS: No :latest image tags found"
-  ((PASS++))
+  PASS=$((PASS + 1))
 else
   echo "  FAIL: $LATEST_COUNT containers using :latest tag"
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
   kubectl get pods -A -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}: {.spec.containers[*].image}{"\n"}{end}' 2>/dev/null | grep ":latest"
 fi
 
@@ -160,10 +160,10 @@ if [ -d "blocksecops-gcp-infrastructure/k8s" ]; then
     grep -v "ExternalSecret\|SecretStore\|kind: Secret" | wc -l | tr -d ' ')
   if [ "$SECRET_HITS" -eq 0 ]; then
     echo "  PASS: No plaintext secrets in k8s manifests"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  WARN: $SECRET_HITS files may contain secrets (review manually)"
-    ((WARN++))
+    WARN=$((WARN + 1))
   fi
 else
   warn "Secrets check" "blocksecops-gcp-infrastructure/k8s not found"

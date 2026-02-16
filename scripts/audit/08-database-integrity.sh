@@ -22,10 +22,10 @@ check() {
   actual=$(echo "$actual" | tr -d '[:space:]')
   if [ "$actual" = "$expected" ]; then
     echo "  PASS: $name"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL: $name (expected=$expected, got=$actual)"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 }
 
@@ -34,10 +34,10 @@ check_gte() {
   actual=$(echo "$actual" | tr -d '[:space:]')
   if [ -n "$actual" ] && [ "$actual" -ge "$min" ] 2>/dev/null; then
     echo "  PASS: $name (count=$actual, min=$min)"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL: $name (count=$actual, expected >= $min)"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 }
 
@@ -74,14 +74,14 @@ echo "=== 8.4 Audit Log Immutability ==="
 AUDIT_TABLE=$(psql_exec "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'audit_logs';")
 if [ "$(echo "$AUDIT_TABLE" | tr -d '[:space:]')" = "1" ]; then
   echo "  PASS: audit_logs table exists"
-  ((PASS++))
+  PASS=$((PASS + 1))
 
   # Check for triggers on audit_logs
   TRIGGER_COUNT=$(psql_exec "SELECT COUNT(*) FROM information_schema.triggers WHERE event_object_table = 'audit_logs';")
   check_gte "audit_logs has protection triggers" "1" "$TRIGGER_COUNT"
 else
   echo "  FAIL: audit_logs table not found"
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
 fi
 
 # --- 8.6 Soft Delete ---
@@ -117,10 +117,10 @@ EXPLAIN_RESULT=$(psql_exec "
 
 if echo "$EXPLAIN_RESULT" | grep -qi "index\|bitmap"; then
   echo "  PASS: Vulnerability severity query uses index"
-  ((PASS++))
+  PASS=$((PASS + 1))
 else
   echo "  WARN: Vulnerability severity query may not use index"
-  ((WARN++))
+  WARN=$((WARN + 1))
 fi
 
 # --- 8.9 BVD Pattern Seed ---

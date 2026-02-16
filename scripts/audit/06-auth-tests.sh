@@ -14,10 +14,10 @@ check() {
   local name="$1" expected="$2" actual="$3"
   if [ "$actual" = "$expected" ]; then
     echo "  PASS: $name"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL: $name (expected=$expected, got=$actual)"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 }
 
@@ -40,7 +40,7 @@ if [ -n "${SUPABASE_URL:-}" ] && [ -n "${SUPABASE_KEY:-}" ] && [ -n "${TEST_EMAI
   TOKEN=$(echo "$LOGIN_RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))" 2>/dev/null || echo "")
   if [ -n "$TOKEN" ]; then
     echo "  PASS: Supabase login successful, JWT received"
-    ((PASS++))
+    PASS=$((PASS + 1))
 
     # Test authenticated endpoint
     ME_STATUS=$(curl $CURL_FLAGS -o /dev/null -w "%{http_code}" \
@@ -49,7 +49,7 @@ if [ -n "${SUPABASE_URL:-}" ] && [ -n "${SUPABASE_KEY:-}" ] && [ -n "${TEST_EMAI
     check "JWT accepted by API" "200" "$ME_STATUS"
   else
     echo "  FAIL: Supabase login failed"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 else
   echo "  SKIP: Supabase credentials not set"
@@ -91,10 +91,10 @@ CORS_RESP=$(curl $CURL_FLAGS -s -D - -o /dev/null \
 
 if echo "$CORS_RESP" | grep -qi "access-control-allow-origin: https://evil.com"; then
   echo "  FAIL: CORS allows https://evil.com"
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
 else
   echo "  PASS: CORS blocks https://evil.com"
-  ((PASS++))
+  PASS=$((PASS + 1))
 fi
 
 # Test authorized origin
@@ -106,10 +106,10 @@ CORS_VALID=$(curl $CURL_FLAGS -s -D - -o /dev/null \
 
 if echo "$CORS_VALID" | grep -qi "access-control-allow-origin"; then
   echo "  PASS: CORS allows authorized origin"
-  ((PASS++))
+  PASS=$((PASS + 1))
 else
   echo "  WARN: CORS response missing for authorized origin"
-  ((WARN++))
+  WARN=$((WARN + 1))
 fi
 
 # --- 6.12 Scope-Based Authorization ---
@@ -128,10 +128,10 @@ if [ -n "${TOKEN:-}" ]; then
     -H "Authorization: Bearer $TOKEN" 2>/dev/null)
   if [ "$ADMIN_STATUS" = "403" ] || [ "$ADMIN_STATUS" = "404" ]; then
     echo "  PASS: Non-admin can't access admin endpoints (HTTP $ADMIN_STATUS)"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  WARN: Admin endpoint returned HTTP $ADMIN_STATUS (expected 403 or 404)"
-    ((WARN++))
+    WARN=$((WARN + 1))
   fi
 fi
 
@@ -143,18 +143,18 @@ COOKIE_HEADERS=$(curl $CURL_FLAGS -D - -o /dev/null "$BASE_URL/" 2>/dev/null | g
 if [ -n "$COOKIE_HEADERS" ]; then
   if echo "$COOKIE_HEADERS" | grep -qi "httponly"; then
     echo "  PASS: Cookies have HttpOnly flag"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  WARN: Cookies may not have HttpOnly flag"
-    ((WARN++))
+    WARN=$((WARN + 1))
   fi
 
   if echo "$COOKIE_HEADERS" | grep -qi "secure"; then
     echo "  PASS: Cookies have Secure flag"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  WARN: Cookies may not have Secure flag"
-    ((WARN++))
+    WARN=$((WARN + 1))
   fi
 else
   echo "  INFO: No Set-Cookie headers on root page (auth cookies set on login)"

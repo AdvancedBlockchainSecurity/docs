@@ -14,10 +14,10 @@ check() {
   local name="$1" expected="$2" actual="$3"
   if [ "$actual" = "$expected" ]; then
     echo "  PASS: $name"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL: $name (expected=$expected, got=$actual)"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 }
 
@@ -41,10 +41,10 @@ if [ -n "${TOKEN:-}" ]; then
       -d "{\"query\":\"$payload\",\"limit\":5}" 2>/dev/null)
     if [ "$RESP" = "200" ] || [ "$RESP" = "422" ]; then
       echo "  PASS: SQLi payload handled safely (HTTP $RESP)"
-      ((PASS++))
+      PASS=$((PASS + 1))
     else
       echo "  WARN: SQLi payload returned unexpected HTTP $RESP"
-      ((WARN++))
+      WARN=$((WARN + 1))
     fi
   done
 else
@@ -67,10 +67,10 @@ if [ -n "${TOKEN:-}" ]; then
     rm -f "$TMPFILE"
     if [ "$RESP" = "400" ] || [ "$RESP" = "422" ] || [ "$RESP" = "415" ]; then
       echo "  PASS: .$ext upload rejected (HTTP $RESP)"
-      ((PASS++))
+      PASS=$((PASS + 1))
     else
       echo "  FAIL: .$ext upload returned HTTP $RESP (expected 400/422/415)"
-      ((FAIL++))
+      FAIL=$((FAIL + 1))
     fi
   done
 else
@@ -91,11 +91,11 @@ if [ -n "${TOKEN:-}" ]; then
   for pattern in "Traceback" "File \"/" "/home/" "/app/src/" "sqlalchemy" "psycopg"; do
     if echo "$ERROR_BODY" | grep -qi "$pattern"; then
       echo "  FAIL: Error response contains internal detail: $pattern"
-      ((FAIL++))
+      FAIL=$((FAIL + 1))
     fi
   done
   echo "  PASS: Error response does not leak internals"
-  ((PASS++))
+  PASS=$((PASS + 1))
 else
   echo "  SKIP: TOKEN not set"
 fi
@@ -118,10 +118,10 @@ for header in "${!REQUIRED_HEADERS[@]}"; do
   if echo "$HEADERS" | grep -qi "^$header:"; then
     VALUE=$(echo "$HEADERS" | grep -i "^$header:" | head -1 | cut -d: -f2- | tr -d '\r')
     echo "  PASS: $header:$VALUE"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL: $header header missing (${REQUIRED_HEADERS[$header]})"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 done
 
@@ -139,14 +139,14 @@ for i in $(seq 1 20); do
   if [ "$RESP" = "429" ]; then
     RATE_LIMITED=true
     echo "  PASS: Rate limited after $i attempts (HTTP 429)"
-    ((PASS++))
+    PASS=$((PASS + 1))
     break
   fi
 done
 
 if [ "$RATE_LIMITED" = "false" ]; then
   echo "  WARN: No rate limiting detected after 20 login attempts"
-  ((WARN++))
+  WARN=$((WARN + 1))
 fi
 
 # --- 9.10 CORS Validation ---
@@ -161,10 +161,10 @@ CORS_RESP=$(curl $CURL_FLAGS -D - -o /dev/null \
 
 if echo "$CORS_RESP" | grep -qi "access-control-allow-origin: https://evil.com"; then
   echo "  FAIL: CORS allows unauthorized origin https://evil.com"
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
 else
   echo "  PASS: CORS blocks unauthorized origin"
-  ((PASS++))
+  PASS=$((PASS + 1))
 fi
 
 # --- 9.9 Dependency Audit ---
@@ -189,13 +189,13 @@ except:
 
   if [ "$HIGH_COUNT" = "0" ]; then
     echo "  PASS: Dashboard npm audit clean (0 high/critical)"
-    ((PASS++))
+    PASS=$((PASS + 1))
   elif [ "$HIGH_COUNT" = "unknown" ]; then
     echo "  WARN: Could not parse npm audit output"
-    ((WARN++))
+    WARN=$((WARN + 1))
   else
     echo "  FAIL: Dashboard has $HIGH_COUNT high/critical npm vulnerabilities"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 else
   echo "  SKIP: blocksecops-dashboard not found"

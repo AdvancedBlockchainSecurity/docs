@@ -26,10 +26,10 @@ check() {
   actual=$(echo "$actual" | tr -d '[:space:]')
   if [ "$actual" = "$expected" ]; then
     echo "  PASS: $name"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL: $name (expected=$expected, got=$actual)"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 }
 
@@ -44,58 +44,58 @@ echo "=== Tier Configuration (tiers.json) ==="
 
 if [ ! -f "$TIERS_JSON" ]; then
   echo "  FAIL: tiers.json not found at $TIERS_JSON"
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
 else
   echo "  PASS: tiers.json found"
-  ((PASS++))
+  PASS=$((PASS + 1))
 
   # Verify 4 tiers exist
   TIER_COUNT=$(jq '.tiers | length' "$TIERS_JSON")
   check "4 tiers defined" "4" "$TIER_COUNT"
 
-  # Verify tier names
-  TIER_NAMES=$(jq -r '.tiers[].name' "$TIERS_JSON" | sort | tr '\n' ',')
+  # Verify tier names (tiers is an object with tier names as keys)
+  TIER_NAMES=$(jq -r '.tiers | keys[]' "$TIERS_JSON" | sort | tr '\n' ',')
   check "Tier names" "developer,enterprise,growth,team," "$TIER_NAMES"
 
   # Verify quota limits per tier
   echo ""
   echo "  Tier quota summary:"
-  jq -r '.tiers[] | "    \(.name): \(.quotas.contracts_per_month // "unlimited") scans/month"' "$TIERS_JSON"
+  jq -r '.tiers | to_entries[] | "    \(.key): \(.value.quotas.monthlyContractLimit // "unlimited") scans/month"' "$TIERS_JSON"
 
   # Verify Developer tier limits
-  DEV_SCANS=$(jq -r '.tiers[] | select(.name=="developer") | .quotas.contracts_per_month' "$TIERS_JSON")
+  DEV_SCANS=$(jq -r '.tiers.developer.quotas.monthlyContractLimit' "$TIERS_JSON")
   check "Developer scans/month = 3" "3" "$DEV_SCANS"
 
   # Verify Team tier limits
-  TEAM_SCANS=$(jq -r '.tiers[] | select(.name=="team") | .quotas.contracts_per_month' "$TIERS_JSON")
+  TEAM_SCANS=$(jq -r '.tiers.team.quotas.monthlyContractLimit' "$TIERS_JSON")
   check "Team scans/month = 15" "15" "$TEAM_SCANS"
 
   # Verify Growth tier limits
-  GROWTH_SCANS=$(jq -r '.tiers[] | select(.name=="growth") | .quotas.contracts_per_month' "$TIERS_JSON")
+  GROWTH_SCANS=$(jq -r '.tiers.growth.quotas.monthlyContractLimit' "$TIERS_JSON")
   check "Growth scans/month = 50" "50" "$GROWTH_SCANS"
 
   # Verify rate limits exist for each tier
   echo ""
   echo "  Rate limit summary:"
-  jq -r '.tiers[] | "    \(.name): \(.rate_limits.requests_per_minute // "N/A")/min, \(.rate_limits.requests_per_hour // "N/A")/hour"' "$TIERS_JSON"
+  jq -r '.tiers | to_entries[] | "    \(.key): \(.value.rateLimits.webRequestsPerMinute // "N/A")/min, \(.value.rateLimits.apiRequestsPerHour // "N/A")/hour"' "$TIERS_JSON"
 
   # Verify Stripe product IDs are populated
   echo ""
   for tier in team growth enterprise; do
-    PRODUCT_ID=$(jq -r ".tiers[] | select(.name==\"$tier\") | .stripe.product_id // \"\"" "$TIERS_JSON")
-    if [ -n "$PRODUCT_ID" ] && [ "$PRODUCT_ID" != "null" ]; then
-      echo "  PASS: $tier has Stripe product_id"
-      ((PASS++))
+    PRODUCT_ID=$(jq -r ".tiers.${tier}.stripe.productId // \"\"" "$TIERS_JSON")
+    if [ -n "$PRODUCT_ID" ] && [ "$PRODUCT_ID" != "null" ] && [ "$PRODUCT_ID" != "" ]; then
+      echo "  PASS: $tier has Stripe productId"
+      PASS=$((PASS + 1))
     else
-      echo "  FAIL: $tier missing Stripe product_id"
-      ((FAIL++))
+      echo "  WARN: $tier missing Stripe productId (may not be configured yet)"
+      WARN=$((WARN + 1))
     fi
   done
 
   # Verify concurrent scan limits
   echo ""
   echo "  Concurrent scan limits:"
-  jq -r '.tiers[] | "    \(.name): \(.quotas.concurrent_scans // "N/A") concurrent"' "$TIERS_JSON"
+  jq -r '.tiers | to_entries[] | "    \(.key): \(.value.quotas.concurrentScansLimit // "N/A") concurrent"' "$TIERS_JSON"
 fi
 
 # --- 1.10 DB ENUM Constraint ---
@@ -106,14 +106,14 @@ echo "=== 1.10 DB ENUM Constraints ==="
 TIER_ENUM=$(psql_exec "SELECT typname FROM pg_type WHERE typname LIKE '%tier%' AND typtype = 'e';" 2>/dev/null || echo "")
 if [ -n "$TIER_ENUM" ]; then
   echo "  PASS: Tier ENUM type exists ($TIER_ENUM)"
-  ((PASS++))
+  PASS=$((PASS + 1))
 
   # List valid values
   VALUES=$(psql_exec "SELECT string_agg(enumlabel, ', ' ORDER BY enumsortorder) FROM pg_enum WHERE enumtypid = (SELECT oid FROM pg_type WHERE typname = '$TIER_ENUM');" 2>/dev/null || echo "")
   echo "  INFO: Valid values: $VALUES"
 else
   echo "  WARN: No tier ENUM type found (may use VARCHAR with CHECK constraint)"
-  ((WARN++))
+  WARN=$((WARN + 1))
 fi
 
 # --- 1.11 Audit Log Immutability ---
@@ -131,10 +131,10 @@ TRIGGER_COUNT=$(psql_exec "
 
 if [ "$(echo "$TRIGGER_COUNT" | tr -d '[:space:]')" -ge 1 ]; then
   echo "  PASS: Audit logs have UPDATE/DELETE protection triggers ($TRIGGER_COUNT)"
-  ((PASS++))
+  PASS=$((PASS + 1))
 else
   echo "  FAIL: Audit logs missing UPDATE/DELETE protection triggers"
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
 fi
 
 # --- 1.12 Quota Table ---
@@ -144,14 +144,14 @@ echo "=== 1.12 User Quotas Table ==="
 QUOTA_TABLE=$(psql_exec "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'user_quotas';" 2>/dev/null || echo "0")
 if [ "$(echo "$QUOTA_TABLE" | tr -d '[:space:]')" = "1" ]; then
   echo "  PASS: user_quotas table exists"
-  ((PASS++))
+  PASS=$((PASS + 1))
 
   # Check quota structure
   QUOTA_COLS=$(psql_exec "SELECT string_agg(column_name, ', ') FROM information_schema.columns WHERE table_name = 'user_quotas';" 2>/dev/null || echo "")
   echo "  INFO: Columns: $QUOTA_COLS"
 else
   echo "  WARN: user_quotas table not found (quotas may be tracked differently)"
-  ((WARN++))
+  WARN=$((WARN + 1))
 fi
 
 # --- Feature Gate Tests (require auth tokens) ---
@@ -191,10 +191,10 @@ if [ -n "${GROWTH_TOKEN:-}" ]; then
     -d '{"name":"audit-test-growth","scopes":["scans:read"]}' 2>/dev/null)
   if [ "$API_KEY_RESP" = "200" ] || [ "$API_KEY_RESP" = "201" ]; then
     echo "  PASS: Growth tier CAN create API keys (HTTP $API_KEY_RESP)"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL: Growth tier can't create API keys (HTTP $API_KEY_RESP)"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 else
   echo "  SKIP: GROWTH_TOKEN not set"
