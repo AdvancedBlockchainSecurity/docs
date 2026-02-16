@@ -16,10 +16,10 @@ check() {
   local name="$1" expected="$2" actual="$3"
   if [ "$actual" = "$expected" ]; then
     echo "  PASS: $name"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL: $name (expected=$expected, got=$actual)"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 }
 
@@ -27,10 +27,10 @@ check_contains() {
   local name="$1" substring="$2" actual="$3"
   if echo "$actual" | grep -q "$substring"; then
     echo "  PASS: $name"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL: $name (expected to contain '$substring')"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 }
 
@@ -47,10 +47,10 @@ echo "=== 14.1 Pre-Flight: Pod Health ==="
 UNHEALTHY=$(kubectl get pods -A --no-headers 2>/dev/null | grep -v "Running\|Completed" | grep -v "kube-system" | wc -l | tr -d ' ')
 if [ "$UNHEALTHY" -eq 0 ]; then
   echo "  PASS: All pods healthy (Running/Completed)"
-  ((PASS++))
+  PASS=$((PASS + 1))
 else
   echo "  FAIL: $UNHEALTHY unhealthy pods found"
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
   kubectl get pods -A --no-headers | grep -v "Running\|Completed" | grep -v "kube-system"
 fi
 
@@ -82,14 +82,14 @@ if echo "$READY_BODY" | grep -q '"database"'; then
   DB_STATUS=$(echo "$READY_BODY" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('database', d.get('checks', {}).get('database', 'unknown')))" 2>/dev/null || echo "unknown")
   if [ "$DB_STATUS" != "unknown" ]; then
     echo "  PASS: Database connectivity confirmed via /health/ready"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  WARN: Could not parse database status from health check"
-    ((WARN++))
+    WARN=$((WARN + 1))
   fi
 else
   echo "  WARN: Health endpoint does not report database status"
-  ((WARN++))
+  WARN=$((WARN + 1))
 fi
 
 # --- 14.4 Redis Connectivity ---
@@ -99,10 +99,10 @@ echo "=== 14.4 Redis Connectivity ==="
 # Check via health endpoint if available
 if echo "$READY_BODY" | grep -qi "redis\|cache"; then
   echo "  PASS: Redis/cache status reported in health check"
-  ((PASS++))
+  PASS=$((PASS + 1))
 else
   echo "  WARN: Redis status not visible in health endpoint (check separately)"
-  ((WARN++))
+  WARN=$((WARN + 1))
 fi
 
 # --- 14.5 Ingress: Dashboard Loads ---
@@ -116,10 +116,10 @@ check "Dashboard loads (HTTPS)" "200" "$DASH_STATUS"
 TLS_INFO=$(curl $CURL_FLAGS -vI "$BASE_URL/" 2>&1 | grep -i "SSL certificate\|subject:" | head -2)
 if [ -n "$TLS_INFO" ]; then
   echo "  PASS: TLS certificate present"
-  ((PASS++))
+  PASS=$((PASS + 1))
 else
   echo "  WARN: Could not verify TLS certificate details"
-  ((WARN++))
+  WARN=$((WARN + 1))
 fi
 
 # --- 14.6 Auth Flow ---
@@ -176,10 +176,10 @@ if [ -n "$ADMIN_URL" ]; then
   ADMIN_STATUS=$(curl $CURL_FLAGS -o /dev/null -w "%{http_code}" "$ADMIN_URL/" 2>/dev/null)
   if [ "$ADMIN_STATUS" = "200" ] || [ "$ADMIN_STATUS" = "401" ] || [ "$ADMIN_STATUS" = "302" ]; then
     echo "  PASS: Admin portal responds ($ADMIN_STATUS)"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL: Admin portal returned $ADMIN_STATUS"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 else
   echo "  SKIP: ADMIN_URL not set"
@@ -203,10 +203,10 @@ HEADERS=$(curl $CURL_FLAGS -D - -o /dev/null "$BASE_URL/" 2>/dev/null)
 for header in "x-frame-options" "content-security-policy" "strict-transport-security" "x-content-type-options"; do
   if echo "$HEADERS" | grep -qi "$header"; then
     echo "  PASS: $header header present"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL: $header header missing"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 done
 
@@ -218,10 +218,10 @@ for endpoint in "api/v1/health/live" "api/v1/health/ready"; do
   TIME=$(curl $CURL_FLAGS -o /dev/null -w "%{time_total}" "$BASE_URL/$endpoint" 2>/dev/null)
   if [ "$(echo "$TIME < 1.0" | bc -l 2>/dev/null || echo 1)" = "1" ]; then
     echo "  PASS: $endpoint responded in ${TIME}s"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  WARN: $endpoint slow (${TIME}s)"
-    ((WARN++))
+    WARN=$((WARN + 1))
   fi
 done
 
