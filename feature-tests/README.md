@@ -322,10 +322,20 @@ GDPR/LGPD compliance features for ML data collection:
 
 ---
 
+## Go-Live Audit
+
+For the comprehensive GCP production launch audit (cross-cutting, integration-level, and production-readiness validation), see:
+
+- **[Go-Live Audit Testing Checklist](../audits/GO-LIVE-AUDIT-TESTING-CHECKLIST.md)** - 14 sections, 140+ tests
+- **Automation scripts:** `scripts/audit/` (tier quotas, auth, K8s security, database integrity, AppSec, smoke test)
+
+---
+
 ## Test Notes
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-02-16 | Claude Code | GO-LIVE-AUDIT-TESTING-CHECKLIST.md | NEW - GCP production launch audit: 14 sections, 140+ cross-cutting tests, 6 automation scripts
 2026-02-14 | Automated | 61-ai-inline-results.md | NEW - AI inline results: Code Review & Code Repair fully inline on vulnerability detail page, auth middleware fix for code-repair/copilot endpoints (v0.45.3 Dashboard, v0.28.32 API)
 2026-02-12 | Claude Code | 14-enterprise-features.md, 10-tier-upgrades.md, 37-stripe-billing.md | UPDATE - localStorage data isolation (userId-scoped keys), tier change modal tests, billing page invite card (v0.42.0 Dashboard)
 2026-02-09 | Claude Code | 60-collapsible-sidebar-quick-access.md | NEW - Collapsible sidebar + quick access page pins, localStorage persistence (v0.41.4 Dashboard)
