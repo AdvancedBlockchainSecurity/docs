@@ -1,7 +1,7 @@
 # SolidityDefend Scanner
 
-**Version:** 1.10.13 (Updated February 12, 2026)
-**Docker Image:** scanner-soliditydefend:0.7.1
+**Version:** 2.0.1 (Updated February 14, 2026)
+**Docker Image:** scanner-soliditydefend:0.8.0
 **Language:** Rust
 **Target:** Solidity Smart Contracts
 **Status:** Fully Integrated and Verified (Single-file + Project Mode)
@@ -569,8 +569,8 @@ Full platform verification completed. See [Verification Report](/home/pwner/Git/
 
 | Metric | Result |
 |--------|--------|
-| Version | 1.10.13 |
-| Image | scanner-soliditydefend:0.7.1 |
+| Version | 2.0.1 |
+| Image | scanner-soliditydefend:0.8.0 |
 | Detectors | 333 |
 | E2E Scan Time | 4 seconds |
 | Test Findings | 13 (3 critical, 8 high, 1 medium, 1 low) |

@@ -60,9 +60,9 @@
 - [x] No `ErrImageNeverPull` errors during scan execution
 
 **Verified:** All 6 core scanners working end-to-end (2026-02-12)
-- All scanner images: slither:0.3.2, aderyn:0.7.2, semgrep:0.3.5, solhint:0.1.6, wake:0.3.6, soliditydefend:0.7.1
-- Image: `harbor.blocksecops.local/blocksecops/scanner-soliditydefend:0.7.1`
-- Tool Version: 1.10.13 (333 detectors)
+- All scanner images: slither:0.3.2, aderyn:0.7.2, semgrep:0.3.5, solhint:0.1.6, wake:0.3.6, soliditydefend:0.8.0
+- Image: `harbor.blocksecops.local/blocksecops/scanner-soliditydefend:0.8.0`
+- Tool Version: 2.0.1 (detectors reworked, FP reduction)
 - Scanner pipeline fixes: UID standardization, Alpine DNS, offline rules, parser branches
 
 ### 3.2 Scanner Compatibility

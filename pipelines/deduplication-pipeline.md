@@ -37,7 +37,7 @@ Scheduled trigger →        Phase 1: Cleanup & Fingerprints           vulnerabi
 
 | # | Task | Function | Description |
 |---|------|----------|-------------|
-| 7 | Update orphaned vulnerabilities | `update_orphaned_vulnerabilities()` | Assign ungrouped vulnerabilities to existing or new deduplication groups |
+| 7 | Update orphaned vulnerabilities | `update_orphaned_vulnerabilities()` | Assign ungrouped vulnerabilities to existing or new deduplication groups using 5-level `DeduplicationMatcher` (EXACT→HIGH→MEDIUM→LOW→SEMANTIC) |
 | 8 | Update pattern codes | `update_pattern_codes()` | Apply `pattern_tool_mappings` to assign `pattern_code` where missing |
 | 9 | Recalculate canonical findings | `recalculate_canonical_findings()` | Select best representative per group using dynamic scanner priority |
 | 10 | Update group statistics | `update_group_statistics()` | Refresh finding_count, scanner_count, first_seen, last_seen per group |
@@ -156,15 +156,17 @@ Priority mapping: quality 1.0 → priority 1, quality 0.0 → priority 20.
 Each of the 18 maintenance tasks runs independently with its own try-catch block and `await db.rollback()` on failure. A failure in one task does not prevent others from running. Failed tasks return an error dict with `"error"` key; successful tasks return statistics for monitoring.
 
 **Graceful degradation:**
-- Embedding service timeout → semantic fingerprints skipped, other tasks continue
-- Intelligence engine unavailable → consensus scores deferred
+- Embedding service timeout → semantic fingerprints retried with exponential backoff (max 3 retries, 2s/4s delay, 30s cap), then skipped
+- Intelligence engine unavailable → consensus scores deferred; Task 7 uses fingerprint-only matching (EXACT→HIGH→MEDIUM→LOW) without SEMANTIC level
 - ML model missing/unsigned → training trigger uses dev fallback key
 - Read-only filesystem → ML models volume mounted as writable emptyDir
 - Failed DB query → transaction rolled back, next task starts with clean session
 
 ## Test Suite
 
-Structural regression tests in `tests/unit/infrastructure/test_deduplication_maintenance.py` enforce invariants on the orchestrator. These tests parse the source file directly (no module import needed) and will fail if a new task is added without proper error isolation.
+### Structural Tests (`test_deduplication_maintenance.py`)
+
+Structural regression tests enforce invariants on the orchestrator. These tests parse the source file directly (no module import needed) and will fail if a new task is added without proper error isolation.
 
 | Test Class | Purpose |
 |------------|---------|
@@ -173,10 +175,32 @@ Structural regression tests in `tests/unit/infrastructure/test_deduplication_mai
 | TestConstants | EMPTY_FINGERPRINT_HASH, scanner priority derivation, consensus thresholds |
 | TestErrorIsolation | Mock-based failure isolation and rollback verification (requires asyncpg) |
 
+### Multi-Level Matching Tests (`test_dedup_multilevel_matching.py`)
+
+Regression and security tests for the 5-level matching audit (February 15, 2026). Verify that all automated dedup paths use correct matching strategies with proper scoping.
+
+| Test Class | Tests | Purpose |
+|------------|-------|---------|
+| TestTask7UsesDeduplicationMatcher | 7 | Task 7 uses DeduplicationMatcher, not hardcoded "location" |
+| TestCrossScanDedupLevels | 11 | All 5 levels present in cross-scan dedup (EXACT→HIGH→MEDIUM→LOW→SEMANTIC) |
+| TestIntraScanDedupScoping | 3 | detector_id in GROUP BY prevents cross-type grouping |
+| TestSemanticFingerprintRetry | 5 | Retry with exponential backoff for IE failures |
+| TestScannerIdValidation | 2 | Empty scanner_id prevention guard |
+| TestSecurityRegressions | 5 | Cross-contract, cross-type, hierarchical priority invariants |
+| TestIntraScanDedupStructure | 2 | Structural verification of GROUP BY and security comment |
+
 Run locally:
 ```bash
-python3 -m pytest tests/unit/infrastructure/test_deduplication_maintenance.py -v \
-  --override-ini="addopts=-v --tb=short -ra"
+# Structural tests
+python3 -m pytest tests/unit/infrastructure/test_deduplication_maintenance.py -v -o "addopts="
+
+# Multi-level matching tests
+python3 -m pytest tests/unit/infrastructure/test_dedup_multilevel_matching.py -v -o "addopts="
+
+# All dedup tests
+python3 -m pytest tests/unit/infrastructure/test_dedup_multilevel_matching.py \
+  tests/unit/domain/test_deduplication_matcher.py \
+  tests/unit/infrastructure/test_deduplication_maintenance.py -v -o "addopts="
 ```
 
 ## Database Tables

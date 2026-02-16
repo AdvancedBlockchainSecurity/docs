@@ -5,32 +5,33 @@ AI-powered Foundry invariant test generation for smart contracts. Generates form
 ## Overview
 
 ```
-Dashboard (Contract Detail)  API Service (invariants.py → InvariantService)     External
-──────────────────────────   ──────────────────────────────────────────────     ────────
-POST /invariants/generate →  1. Authenticate (JWT)                              PostgreSQL
-                             2. Validate tier (team+)
-                             3. Check feature flag
-                             4. Check monthly + daily quota
-                             5. Check cooldown (5s between requests)
-                             6. Validate contract size (50KB max)
-                             7. Detect prompt injection
-                             8. Call Anthropic Claude API
-                             9. Validate AI output
-                             10. Store invariants
-                      ←      Return InvariantGenerationResponse (201)           Anthropic API
+Dashboard (Vulnerability Detail)  API Service (invariants.py → InvariantService)     External
+────────────────────────────────  ──────────────────────────────────────────────     ────────
+POST /invariants/generate →       1. Authenticate (JWT)                              PostgreSQL
+                                  2. Validate tier (growth+)
+                                  3. Check feature flag
+                                  4. Check monthly + daily quota
+                                  5. Check cooldown (5s between requests)
+                                  6. Validate contract size (50KB max)
+                                  7. Detect prompt injection
+                                  8. Call Anthropic Claude API
+                                  9. Validate AI output
+                                  10. Store invariants
+                           ←      Return InvariantGenerationResponse (201)           Anthropic API
 ```
 
 ## Trigger
 
-- **Dashboard**: User clicks "Generate Invariants" on a contract
-- **Input**: `contract_id`, `contract_code`, `invariant_types[]`, optional `function_names[]`
+- **Dashboard**: User clicks "Generate Invariants" in the AI Actions panel on the Vulnerability Detail page (`/vulnerabilities/:id`)
+- **Input**: `contract_id` and `contract_code` are auto-populated from the vulnerability's associated contract. Default `invariant_types`: `['state', 'access', 'arithmetic', 'reentrancy']`
+- **Note**: Standalone invariant generation pages (`/invariants`) have been removed. Invariants are now part of the vulnerability analysis workflow alongside Code Review, Code Repair, and PoC Exploit generation.
 
 ## Pipeline Steps
 
 | # | Step | Component | Description |
 |---|------|-----------|-------------|
 | 1 | Authentication | `get_current_user` | JWT required |
-| 2 | Tier gate | `require_tier("team")` | Developer tier explicitly blocked with upgrade message |
+| 2 | Tier gate | `require_tier("growth")` | Developer and Team tiers blocked with upgrade message |
 | 3 | Feature flag | `settings.ai_features_enabled` | Returns 503 if disabled |
 | 4 | Quota check | Monthly (tier-based) + daily (500 enterprise cap) | Returns 429 with quota details |
 | 5 | Cooldown check | 5-second minimum between requests | Returns 429 with `Retry-After` header |
@@ -85,21 +86,27 @@ Error responses for quota exhaustion:
 
 ## Invariant Types
 
-| Type | Description |
-|------|-------------|
-| `property` | State invariants (e.g., "total supply never exceeds cap") |
-| `boundary` | Input/output bounds checking |
-| `state_transition` | Valid state machine transitions |
-| `access_control` | Permission and role invariants |
-| `economic` | Economic/DeFi property invariants |
+| Type | Description | Default |
+|------|-------------|---------|
+| `state` | State variable invariants (e.g., "total supply never exceeds cap") | Yes |
+| `access` | Permission and role invariants | Yes |
+| `arithmetic` | Overflow/underflow guards | Yes |
+| `economic` | Economic/DeFi property invariants | No |
+| `reentrancy` | Reentrancy protection invariants | Yes |
+| `custom` | User-defined custom invariants | No |
+
+**Note:** When triggered from the Vulnerability Detail page, the default types are `state`, `access`, `arithmetic`, and `reentrancy`.
 
 ## Files
 
-| File | Role |
-|------|------|
-| `src/presentation/api/v1/endpoints/invariants.py` | Endpoints, tier gating, quota checks, rate limiting |
-| `src/application/services/invariant_service.py` | Anthropic API integration, quota enforcement, template management |
-| `src/infrastructure/config.py` | Model selection, token limits, cooldown settings |
+| File | Repo | Role |
+|------|------|------|
+| `src/presentation/api/v1/endpoints/invariants.py` | api-service | Endpoints, tier gating, quota checks, rate limiting |
+| `src/application/services/invariant_service.py` | api-service | Anthropic API integration, quota enforcement, template management |
+| `src/infrastructure/config.py` | api-service | Model selection, token limits, cooldown settings |
+| `src/pages/VulnerabilityDetail.tsx` | dashboard | "Generate Invariants" button in AI Actions panel |
+| `src/hooks/useInvariants.ts` | dashboard | `useGenerateInvariants`, `useContractInvariants` React Query hooks |
+| `src/lib/api/invariants.ts` | dashboard | API client methods |
 
 ## Error Handling
 

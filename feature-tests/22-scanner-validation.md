@@ -39,7 +39,7 @@ docker images | grep "harbor.blocksecops.local.*scanner-"
 | semgrep | harbor.blocksecops.local/blocksecops/scanner-semgrep | 0.3.5 | ✅ Verified |
 | solhint | harbor.blocksecops.local/blocksecops/scanner-solhint | 0.1.6 | ✅ Verified |
 | wake | harbor.blocksecops.local/blocksecops/scanner-wake | 0.3.6 | ✅ Verified |
-| soliditydefend | harbor.blocksecops.local/blocksecops/scanner-soliditydefend | 0.7.1 | ✅ Verified |
+| soliditydefend | harbor.blocksecops.local/blocksecops/scanner-soliditydefend | 0.8.0 | ✅ Verified |
 | echidna | harbor.blocksecops.local/blocksecops/scanner-echidna | 0.3.1 | ✅ Verified |
 | medusa | harbor.blocksecops.local/blocksecops/scanner-medusa | 0.3.1 | ✅ Verified |
 | halmos | harbor.blocksecops.local/blocksecops/scanner-halmos | 0.3.0 | ✅ Verified |
@@ -251,7 +251,7 @@ docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contract
 
 #### Image Verification
 ```bash
-docker run --rm scanner-soliditydefend:0.7.1 --version
+docker run --rm scanner-soliditydefend:0.8.0 --version
 ```
 - [ ] Image runs without error
 - [ ] Version output correct
@@ -259,7 +259,7 @@ docker run --rm scanner-soliditydefend:0.7.1 --version
 #### Basic Analysis Test
 ```bash
 docker run --rm -v /Users/pwner/Git/vulnerable-smart-contract-examples:/contracts \
-  scanner-soliditydefend:0.7.1 /contracts/solidity/reentrancy/ReentrancyVulnerable.sol
+  scanner-soliditydefend:0.8.0 /contracts/solidity/reentrancy/ReentrancyVulnerable.sol
 ```
 - [ ] Scanner executes without error
 - [ ] Comprehensive findings returned

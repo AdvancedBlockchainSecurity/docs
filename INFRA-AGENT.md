@@ -111,7 +111,7 @@ Scanner actual memory requirements:
 | echidna 2.2.7 | 1Gi | 2-3Gi | Property fuzzer (50k tests, 300s timeout) |
 | medusa 0.2.0 | 1.5Gi | 3-4Gi | Parallel fuzzer (4 workers, 100k tests) |
 | halmos 0.3.3 | 512Mi | 1-2Gi | Symbolic testing (Z3 solver) |
-| soliditydefend 1.10.13 | 256Mi | 512Mi | Static analysis |
+| soliditydefend 2.0.1 | 256Mi | 512Mi | Static analysis |
 | solhint 6.0.2 | 128Mi | 256Mi | Linter |
 | wake 4.21.0 | 512Mi | 1Gi | Static analysis |
 

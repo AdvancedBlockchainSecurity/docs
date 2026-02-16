@@ -74,7 +74,7 @@ SCANNER_IMAGES[aderyn]="scanner-aderyn:0.7.2"
 SCANNER_IMAGES[semgrep]="scanner-semgrep:0.3.5"
 SCANNER_IMAGES[solhint]="scanner-solhint:0.1.6"
 SCANNER_IMAGES[wake]="scanner-wake:0.3.6"
-SCANNER_IMAGES[soliditydefend]="scanner-soliditydefend:0.7.1"
+SCANNER_IMAGES[soliditydefend]="scanner-soliditydefend:0.8.0"
 
 ALL_SCANNERS=(slither aderyn semgrep solhint wake soliditydefend)
 
