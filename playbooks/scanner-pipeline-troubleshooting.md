@@ -192,7 +192,7 @@ curl -s -w "\n%{http_code}" -X POST "$CALLBACK_URL" \
 | semgrep | scanner-semgrep | 0.3.5 | python:3.11-slim | 1000 |
 | solhint | scanner-solhint | 0.1.6 | node:20-alpine | 1000 (node) |
 | wake | scanner-wake | 0.3.6 | python:3.11-slim | 1000 |
-| soliditydefend | scanner-soliditydefend | 0.7.1 | python:3.11-slim | 1000 |
+| soliditydefend | scanner-soliditydefend | 0.8.0 | debian:bookworm-slim | 1000 |
 
 ---
 

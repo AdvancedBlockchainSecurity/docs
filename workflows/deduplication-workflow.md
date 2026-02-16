@@ -1,8 +1,8 @@
 # Deduplication Workflow
 
-**Last Updated:** February 9, 2026
+**Last Updated:** February 15, 2026
 **Status:** Active
-**API Version:** 0.28.17
+**API Version:** 0.28.32+
 
 ---
 
@@ -72,26 +72,35 @@ The `DeduplicationMatcher` implements hierarchical matching from most precise to
 
 **Algorithm:**
 1. Find vulnerabilities with matching `fingerprint_location` within the scan
-2. Group by `fingerprint_location`
+2. Group by `detector_id` + `fingerprint_location` (prevents cross-type grouping — e.g., reentrancy and integer-overflow at the same location are not grouped together)
 3. Select canonical finding (highest priority scanner)
 4. Create `DeduplicationGroup` with all findings
 
 **Scanner Priority (for canonical selection):**
+
+Derived from scanner registry order in `src/infrastructure/scanner_config/scanners.py`. Lower number = higher priority.
+
 ```python
-SCANNER_PRIORITY = {
-    "slither": 1,      # Highest priority
-    "mythril": 2,
-    "securify2": 3,
-    "oyente": 4,
-    "smartcheck": 5,
-    "solhint": 6,
-    "soliditydefend": 7,
-    "wake": 8,
-    "echidna": 9,
-    "medusa": 10,
-    "halmos": 11,
+DEFAULT_SCANNER_PRIORITY = {
+    "slither": 1,           # Highest priority (Solidity)
+    "aderyn": 2,            # Solidity
+    "semgrep": 3,           # Solidity
+    "solhint": 4,           # Solidity
+    "halmos": 5,            # Formal verification
+    "echidna": 6,           # Fuzzing
+    "wake": 7,              # Solidity
+    "medusa": 8,            # Fuzzing
+    "soliditydefend": 9,    # Solidity (BlockSecOps)
+    "vyper": 10,            # Vyper
+    "moccasin": 11,         # Vyper
+    "sol-azy": 12,          # Solana
+    "sec3-xray": 13,        # Solana
+    "trident": 14,          # Solana fuzzing
+    "cargo-fuzz-solana": 15,# Solana fuzzing
 }
 ```
+
+Dynamic priorities from `DynamicScannerPriority` override static defaults when sufficient quality data exists (10+ labeled findings per scanner).
 
 **Location:** `src/presentation/api/v1/endpoints/scans.py` → `_process_scan_deduplication()`
 
@@ -106,9 +115,11 @@ SCANNER_PRIORITY = {
 **Algorithm:**
 1. Query existing vulnerabilities from prior scans (same contract_id)
 2. For each new vulnerability (including those with intra-scan groups):
-   - **Level 1 (EXACT):** Match `fingerprint_code`
-   - **Level 2 (HIGH):** Match `fingerprint_location` + same detector
-   - **Level 3 (SEMANTIC):** Use Intelligence Engine embeddings
+   - **Level 1 (EXACT, 99%):** Match `fingerprint_code` + `fingerprint_location`
+   - **Level 2 (HIGH, 95%):** Match `fingerprint_code` + `fingerprint_location_fuzzy`
+   - **Level 3 (MEDIUM, 85%):** Match `fingerprint_ast` + `fingerprint_location_fuzzy` (same detector)
+   - **Level 4 (LOW, 75%):** Match `pattern_code` + `fingerprint_location_fuzzy` (same detector)
+   - **Level 5 (SEMANTIC, 80%+):** Use Intelligence Engine embeddings (cosine similarity)
 
 3. On match found:
    - Link to existing `deduplication_group_id`
@@ -408,6 +419,22 @@ See: [Deduplication & Metadata Audit Fixes Changelog](/docs/changelogs/DEDUPLICA
 
 ---
 
+## Multi-Level Matching Audit Fixes (February 15, 2026)
+
+The multi-level matching audit discovered that the `DeduplicationMatcher` (5-level) was never used by automated paths. Key fixes:
+
+| Fix | Impact |
+|-----|--------|
+| Task 7 uses `DeduplicationMatcher` | Orphan grouping now uses all 5 levels instead of location-only |
+| Cross-scan MEDIUM + LOW levels added | Missing AST (85%) and pattern (75%) matching levels restored |
+| Intra-scan `detector_id` scoping | Prevents cross-type grouping (e.g., reentrancy + integer-overflow) |
+| Semantic fingerprint retry | Exponential backoff for transient IE failures (max 3 retries, 30s cap) |
+| Scanner ID validation guard | Prevents empty `scanner_id` in scan ingest |
+
+See: [Multi-Level Matching Audit Changelog](/docs/changelogs/API-SERVICE-DEDUP-MULTILEVEL-MATCHING-AUDIT-2026-02-15.md)
+
+---
+
 ## Related Documentation
 
 - [Intelligence Pipeline Workflow](./intelligence-pipeline-workflow.md)
@@ -415,3 +442,4 @@ See: [Deduplication & Metadata Audit Fixes Changelog](/docs/changelogs/DEDUPLICA
 - [Smart Contract Scanning Workflow](./smart-contract-scanning-workflow.md)
 - [Cross-Scan Deduplication Implementation](../../TaskDocs-BlockSecOps/blocksecops/cross-scan-deduplication-implementation.md)
 - [Deduplication & Metadata Audit Fixes](/docs/changelogs/DEDUPLICATION-METADATA-AUDIT-FIXES-2026-02-04.md)
+- [Multi-Level Matching Audit](/docs/changelogs/API-SERVICE-DEDUP-MULTILEVEL-MATCHING-AUDIT-2026-02-15.md)

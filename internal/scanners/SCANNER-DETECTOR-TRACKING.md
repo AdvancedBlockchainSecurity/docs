@@ -406,8 +406,8 @@ This document tracks the integration status of security detectors across all sca
 #### SolidityDefend
 | Category | Count | Details |
 |----------|-------|---------|
-| **Total Native Detectors** | 333 | Rust-based SAST scanner (v1.10.13) |
-| **Platform Integration** | ✅ Operational | scanner-soliditydefend:0.7.1 |
+| **Total Native Detectors** | 333 | Rust-based SAST scanner (v2.0.1) |
+| **Platform Integration** | ✅ Operational | scanner-soliditydefend:0.8.0 |
 | **Intelligence Integration** | 333 detectors | ✅ 100% COMPLETE |
 | **Integration %** | 100% | 333/333 detectors |
 | **Remaining Gap** | 0 detectors | All detectors mapped |

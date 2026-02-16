@@ -1,7 +1,7 @@
 # Tier Standards - Source of Truth
 
-**Last Updated**: February 7, 2026
-**Version**: 3.3 (AI Features Active)
+**Last Updated**: February 13, 2026
+**Version**: 3.4 (AI Features Active + PoC Exploit Generation)
 **Status**: Official
 **Owner**: Product Team
 
@@ -286,7 +286,7 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 **Added**: January 11, 2026
 **Deployed**: February 7, 2026
 
-AI-powered features use the Anthropic Claude API and are tier-gated with monthly quotas. All AI endpoints require Team tier or above (`require_tier("team")`).
+AI-powered features use the Anthropic Claude API and are tier-gated with monthly quotas. Most AI endpoints require Team tier or above (`require_tier("team")`). PoC Exploit Generation requires Growth tier or above (`require_tier("growth")`).
 
 ### AI Feature Overview
 
@@ -297,6 +297,7 @@ AI-powered features use the Anthropic Claude API and are tier-gated with monthly
 | **Code Repair** | `/code-repair/` | Claude Sonnet 4 | 4,096 | ~$0.06-0.15 |
 | **Invariant Generation** | `/invariants/` | Claude Sonnet 4 | 4,096 | ~$0.09 |
 | **Economic Analysis** | `/economic-analysis/` | Claude Haiku 3.5 | N/A | ~$0.012 |
+| **PoC Exploit Generation** | `/exploits/` | Claude Sonnet 4 | 8,192 | ~$0.09-0.18 |
 
 ### AI Quota Summary (Monthly)
 
@@ -306,11 +307,12 @@ AI-powered features use the Anthropic Claude API and are tier-gated with monthly
 | Code Review requests | 0 | 25 | 100 | -1 |
 | Code Repair requests | 0 | 10 | 50 | -1 |
 | Invariant Generations | 0 | 10 | 50 | -1 |
+| PoC Exploit Generations | 0 | 0 | 5 | 50 |
 | AI Explanations | 0 | 50 | 200 | -1 |
 | NL Conversions | 0 | 25 | 100 | -1 |
 | Priority Queue | No | No | No | Yes |
 
-**Note:** `-1` means unlimited. Enterprise has a daily cap of 500 invariant generations to prevent runaway usage.
+**Note:** `-1` means unlimited. Enterprise has a daily cap of 500 invariant generations and 100 exploit generations to prevent runaway usage. PoC exploit generation requires Growth+ tier (Developer/Team blocked) due to its security-sensitive nature.
 
 ### AI Rate Limits
 
@@ -319,6 +321,7 @@ AI-powered features use the Anthropic Claude API and are tier-gated with monthly
 | Global per-user rate | 20 req/min | All AI endpoints combined |
 | Per-feature rate limit | Tier-based via `get_rate_limit_string("ai", <feature>)` | Individual features |
 | Invariant cooldown | 5 seconds between requests | Invariant generation only |
+| Exploit cooldown | 10 seconds between requests | PoC exploit generation only |
 
 ### Security Controls
 
@@ -329,6 +332,7 @@ AI-powered features use the Anthropic Claude API and are tier-gated with monthly
 | XML boundary isolation | User content in `<retrieved_context>` tags | BSO-SEC-AI-001 |
 | Error sanitization | `get_safe_error_detail()` on all AI error responses | BSO-SEC-LOG-003 |
 | Token budget | Per-request output caps + budget warnings | BSO-SEC-LOW-005 |
+| Exploit output safety | `_validate_output_safety()`: reject selfdestruct, private keys, broadcast flags | BSO-SEC-AI-003 |
 
 ### Feature Flags
 
@@ -588,6 +592,7 @@ monthly_nl_conversions_limit = -1
 
 | Date | Change | Author |
 |------|--------|--------|
+| 2026-02-13 | **v3.4**: Added PoC Exploit Generation (Growth+ tier, 10s cooldown, output safety validation). Tier-config v3.3 updated with `monthlyAiExploitsLimit`. | Claude Code |
 | 2026-02-07 | **v3.3**: AI Features now ACTIVE (v0.28.2). Updated all AI quotas to match implementation. Added security controls, feature flags, rate limits, Vault secret path, and related pipeline documentation links. | Claude Code |
 | 2026-01-26 | **v3.1**: Added Phase 5 AI feature quotas (AI Copilot, Code Review, Code Repair, Compliance assessments) for upcoming AI/ML implementation. | Claude Code |
 | 2026-01-20 | **v3.0**: Updated to 4-tier model (Developer, Team, Growth, Enterprise). New pricing: $0/$299/$699/$1,999+. Updated limits to contracts (not scans). Added 25+ scanners, private repos, multi-chain, continuous monitoring features. Updated x402 to credit packages (Starter/Builder/Pro/Bulk). | Claude Code |

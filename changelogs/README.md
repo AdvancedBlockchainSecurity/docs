@@ -1,7 +1,7 @@
 # BlockSecOps Changelogs
 
 **Purpose:** Centralized changelog directory for all BlockSecOps platform changes
-**Last Updated:** February 9, 2026
+**Last Updated:** February 15, 2026
 **Status:** Active
 
 ---
@@ -17,6 +17,26 @@ Changelogs are organized by component and maintained chronologically. Each chang
 ---
 
 ## Available Changelogs
+
+### 0. API Service - Dedup Multi-Level Matching Audit (`API-SERVICE-DEDUP-MULTILEVEL-MATCHING-AUDIT-2026-02-15.md`)
+
+**Component:** blocksecops-api-service
+**Scope:** 5-level DeduplicationMatcher integration, cross-scan/intra-scan matching fixes, IE retry resilience, scanner_id validation
+**Date:** February 15, 2026
+
+**Key Changes:**
+- Critical: DeduplicationMatcher (5-level) was never used by automated dedup paths — now wired into Task 7
+- Added MEDIUM (AST, 85%) and LOW (pattern, 75%) levels to cross-scan dedup
+- Added detector_id scoping to intra-scan dedup (prevents cross-type grouping)
+- Added exponential backoff retry for semantic fingerprint IE calls
+- Fixed 79 vulns with empty scanner_id, added validation guard
+- 35 new regression tests covering all fixes and security invariants
+
+**Use When:**
+- Understanding deduplication matching strategy implementation
+- Debugging why vulnerabilities are (or aren't) being grouped
+- Adding new matching levels or modifying grouping logic
+- Investigating IE connectivity issues during CronJob
 
 ### 0. Dashboard v0.42.0 - Billing Feature Fix, Data Isolation & Invite UI (`DASHBOARD-V0.42.0-BILLING-FIX-2026-02-12.md`)
 

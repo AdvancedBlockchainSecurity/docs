@@ -39,7 +39,7 @@ End-to-end verification of all 6 core Solidity scanner pipelines plus sol-azy (S
 - [x] scanner-semgrep:0.3.5 present in Harbor
 - [x] scanner-solhint:0.1.6 present in Harbor
 - [x] scanner-wake:0.3.6 present in Harbor
-- [x] scanner-soliditydefend:0.7.1 present in Harbor
+- [x] scanner-soliditydefend:0.8.0 present in Harbor
 - [ ] scanner-sol-azy:0.4.1 present in Harbor
 
 ### 1.2 Images Available in containerd (K8s)
@@ -82,7 +82,7 @@ End-to-end verification of all 6 core Solidity scanner pipelines plus sol-azy (S
 - [x] Platform results show 5 + 2 = 7 findings across contracts
 - [ ] Some contracts fail when solc download is needed (air-gapped cluster)
 
-### 2.6 SolidityDefend (scanner-soliditydefend:0.7.1)
+### 2.6 SolidityDefend (scanner-soliditydefend:0.8.0)
 - [x] Produces findings on platform
 - [x] Callback mechanism working
 - [x] Results received by tool-integration
@@ -168,7 +168,7 @@ End-to-end verification of all 6 core Solidity scanner pipelines plus sol-azy (S
 - scanner-semgrep:0.3.5
 - scanner-solhint:0.1.6
 - scanner-wake:0.3.6
-- scanner-soliditydefend:0.7.1
+- scanner-soliditydefend:0.8.0
 - scanner-sol-azy:0.4.1
 
 ### Sol-azy Pipeline Verification (February 13, 2026)

@@ -177,7 +177,7 @@ capabilities:
 | semgrep | 1.144.0 | scanner-semgrep:0.3.5 | 1Gi | Semgrep Inc |
 | solhint | 6.0.2 | scanner-solhint:0.1.6 | 512Mi | Protofire |
 | wake | 4.22.0 | scanner-wake:0.3.6 | 1Gi | Ackee Blockchain |
-| soliditydefend | 1.10.13 | scanner-soliditydefend:0.7.1 | 1Gi | BlockSecOps |
+| soliditydefend | 2.0.1 | scanner-soliditydefend:0.8.0 | 1Gi | BlockSecOps |
 
 ### Solidity Fuzzing & Symbolic (3)
 
