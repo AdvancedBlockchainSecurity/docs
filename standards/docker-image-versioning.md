@@ -336,7 +336,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
 | orchestration | 0.9.13 | `k8s/overlays/local/` | Uses pre-built base image |
-| tool-integration | 0.4.1 | `k8s/overlays/local/` | SolidityDefend v2.0.1 upgrade (scanner image 0.8.0, ConfigMap only) |
+| tool-integration | 0.4.1 | `k8s/overlays/local/` | SolidityDefend v2.0.8 upgrade (scanner image 0.9.0, 100% precision) |
 
 All services are `0.x.x` (development phase). Version `1.0.0` indicates stable, production-ready API.
 
