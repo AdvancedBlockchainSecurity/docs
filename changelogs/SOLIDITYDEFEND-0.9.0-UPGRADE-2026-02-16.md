@@ -52,6 +52,73 @@ The clean-slate data reset was performed on February 14, 2026 during the v2.0.1 
 
 ---
 
+## Scanner Accuracy Validation (Post-Upgrade)
+
+After completing the version bump, a scanner accuracy review was performed on the wrapper script, callback handler, and test fixtures. The following issues were discovered and fixed:
+
+### Bug 1: File Attribution (CRITICAL)
+
+**File:** `scanner-images/soliditydefend/soliditydefend-scan`
+**Issue:** The jq filter used `$scan_results.metadata.files[0]` for file paths, but v2.0.8's `metadata` object has no `files` array. This caused ALL findings to report `"contract.sol"` as the file path, losing per-finding file attribution from `location.file`.
+**Fix:** Changed to `(.location.file) // "contract.sol"` to read file path directly from each finding's location object.
+
+### Bug 2: Missing Fields in Wrapper (HIGH)
+
+**File:** `scanner-images/soliditydefend/soliditydefend-scan`
+**Issue:** The jq transformation did not extract `swc`, `contract_name`, `function_name`, or `code_snippet` fields from v2.0.8 output, despite the tool producing them.
+**Fix:** Added all four fields to the jq filter mapping.
+
+### Bug 3: Incorrect Confidence in Callback Handler (MEDIUM)
+
+**File:** `src/main.py` (soliditydefend callback handler)
+**Issue:** Confidence was hardcoded at `0.7` (generic value). SolidityDefend v2.0.8 achieves 100% precision with 67 high-confidence detectors, warranting `0.95`.
+**Fix:** Updated both native and transformed format branches to use `confidence: 0.95`.
+
+### Bug 4: Missing CWE/SWC in Callback Handler (MEDIUM)
+
+**File:** `src/main.py` (soliditydefend callback handler)
+**Issue:** The transformed format branch (non-native output) did not extract `cwe`, `swc`, `contract_name`, or `function_name` fields, even though the native branch did.
+**Fix:** Added all four fields to the transformed format branch.
+
+### Bug 5: Stale Test Fixture (LOW)
+
+**File:** `tests/fixtures/scanner_outputs/soliditydefend_output.json`
+**Issue:** Fixture had only 2 findings and lacked v2.0.8 fields (`cwe`, `swc`, `contract_name`, `function_name`, `fix_suggestion`, `metadata`, `statistics`). Was missing the `"scanner"` routing field.
+**Fix:** Rewrote fixture with 5 findings across 3 files (VulnerableToken.sol, SelfdestructAbuse.sol, PriceManipulation.sol) covering critical/high/medium severities with full v2.0.8 field coverage.
+
+### Bug 6: Wrapper Curl Retry/Timeout (LOW)
+
+**File:** `scanner-images/soliditydefend/soliditydefend-scan`
+**Issue:** Callback POST used a single curl attempt with no connect timeout or retry logic.
+**Fix:** Added retry loop (3 attempts, 5s delay) with `--connect-timeout 10` and `--max-time 30`.
+
+### Test Coverage Added
+
+| Test | Validates |
+|------|-----------|
+| `test_soliditydefend_cwe_and_swc_extracted` | CWE-841 and SWC-107 extracted from findings |
+| `test_soliditydefend_confidence_reflects_precision` | Confidence == 0.95 (100% precision tool) |
+| `test_soliditydefend_multi_file_attribution` | Per-finding file paths preserved (3 different .sol files) |
+| `test_soliditydefend_severity_distribution` | 1 critical, 2 high, 2 medium matches fixture |
+
+### Files Modified
+
+| File | Repo | Change |
+|------|------|--------|
+| `scanner-images/soliditydefend/soliditydefend-scan` | tool-integration | Fixed file attribution, added fields, curl retry |
+| `src/main.py` | tool-integration | Confidence 0.95, CWE/SWC extraction, added fields |
+| `tests/fixtures/scanner_outputs/soliditydefend_output.json` | tool-integration | Rewrote with 5 findings, v2.0.8 format |
+| `tests/integration/test_callback_endpoint.py` | tool-integration | Added 4 new accuracy tests, updated count |
+
+### Test Results
+
+```
+tests/integration/test_callback_endpoint.py::TestSolidityDefendCallback - 8/8 passed
+Full tool-integration suite: 360 passed, 14 skipped, 5 xfailed
+```
+
+---
+
 ## Verification
 
 - [x] Cargo.toml version = "2.0.8"
