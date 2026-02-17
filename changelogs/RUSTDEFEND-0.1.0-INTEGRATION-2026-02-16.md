@@ -1,8 +1,8 @@
 # RustDefend Scanner Integration Changelog
 
-**Date:** 2026-02-16 (initial), 2026-02-17 (v0.3.1 hotfix, v0.3.3 reliability fix)
-**Scanner Image Version:** 0.3.3
-**Tool Version:** 0.3.1 (50 detectors)
+**Date:** 2026-02-16 (initial), 2026-02-17 (v0.3.1 hotfix, v0.3.3 reliability fix, v0.4.0 title field + FP fixes)
+**Scanner Image Version:** 0.4.0
+**Tool Version:** 0.4.0 (50 detectors)
 **Platform:** BlockSecOps
 
 ---
@@ -29,6 +29,18 @@ RustDefend is a proprietary Rust smart contract static analysis scanner integrat
 ---
 
 ## Version History
+
+### v0.4.0 (2026-02-17) -- Title Field + FP Fixes
+
+**Root Cause:** Dashboard showed detector IDs (e.g., "SOL-002") instead of vulnerability names. Upstream false positives polluted ML data and dedup groups.
+
+**Fixes:**
+| Fix | File | Details |
+|-----|------|---------|
+| Title field support | `src/main.py` | Prefer scanner's `title` field over hardcoded `detector_names` dict |
+| FP fixes | Upstream RustDefend v0.4.0 | False positive fixes in upstream tool |
+| Clean slate | Database | FP-heavy clean slate procedure to remove old findings |
+| Version bump | All 4 locations | Tool 0.3.1→0.4.0, image 0.3.3→0.4.0 |
 
 ### v0.3.3 (2026-02-17) -- Scanner Reliability Fix
 
