@@ -1,8 +1,8 @@
 # Scanner Validation Tests
 
 **Priority**: P0 - Critical
-**Last Tested**: February 12, 2026
-**Active Scanners**: 17 (11 Solidity, 2 Vyper, 4 Solana)
+**Last Tested**: February 17, 2026
+**Active Scanners**: 17 (10 Solidity, 2 Vyper, 5 Rust/Solana)
 **Test Contract Location**: `/Users/pwner/Git/vulnerable-smart-contract-examples`
 **Registry**: Harbor (`harbor.blocksecops.local/blocksecops/scanner-*`)
 
@@ -14,7 +14,7 @@
 |----------|----------|--------|
 | Solidity | slither, aderyn, mythril, semgrep, solhint, wake, soliditydefend, echidna, medusa, halmos | Active |
 | Vyper | vyper, moccasin | Active |
-| Solana | sol-azy, sec3-xray, trident, cargo-fuzz-solana | Pending |
+| Solana | sol-azy, sec3-xray, trident, cargo-fuzz-solana, rustdefend | Active |
 
 ---
 
@@ -23,7 +23,7 @@
 ### 0.1 Scanner Images Exist in Harbor
 ```bash
 # Check all scanner images in Harbor registry
-for scanner in slither aderyn semgrep solhint wake soliditydefend echidna medusa halmos vyper moccasin sol-azy sec3-xray trident cargo-fuzz-solana; do
+for scanner in slither aderyn semgrep solhint wake soliditydefend echidna medusa halmos vyper moccasin sol-azy sec3-xray trident cargo-fuzz-solana rustdefend; do
     result=$(curl -sk "https://harbor.blocksecops.local/api/v2.0/projects/blocksecops/repositories/scanner-${scanner}/artifacts" | jq -r '.[].tags[]?.name // empty' | head -1)
     echo "scanner-${scanner}: ${result:-MISSING}"
 done
@@ -36,29 +36,30 @@ docker images | grep "harbor.blocksecops.local.*scanner-"
 |---------|--------------|---------|--------|
 | slither | harbor.blocksecops.local/blocksecops/scanner-slither | 0.3.2 | ✅ Verified |
 | aderyn | harbor.blocksecops.local/blocksecops/scanner-aderyn | 0.7.2 | ✅ Verified |
-| semgrep | harbor.blocksecops.local/blocksecops/scanner-semgrep | 0.3.5 | ✅ Verified |
+| semgrep | harbor.blocksecops.local/blocksecops/scanner-semgrep | 0.3.7 | ✅ Verified |
 | solhint | harbor.blocksecops.local/blocksecops/scanner-solhint | 0.1.6 | ✅ Verified |
 | wake | harbor.blocksecops.local/blocksecops/scanner-wake | 0.3.6 | ✅ Verified |
-| soliditydefend | harbor.blocksecops.local/blocksecops/scanner-soliditydefend | 0.8.0 | ✅ Verified |
+| soliditydefend | harbor.blocksecops.local/blocksecops/scanner-soliditydefend | 0.9.0 | ✅ Verified |
 | echidna | harbor.blocksecops.local/blocksecops/scanner-echidna | 0.3.1 | ✅ Verified |
 | medusa | harbor.blocksecops.local/blocksecops/scanner-medusa | 0.3.1 | ✅ Verified |
 | halmos | harbor.blocksecops.local/blocksecops/scanner-halmos | 0.3.0 | ✅ Verified |
 | vyper | harbor.blocksecops.local/blocksecops/scanner-vyper | 0.3.0 | ✅ Verified |
 | moccasin | harbor.blocksecops.local/blocksecops/scanner-moccasin | 0.3.0 | ✅ Verified |
-| sol-azy | harbor.blocksecops.local/blocksecops/scanner-sol-azy | 0.4.0 | ✅ Verified |
+| sol-azy | harbor.blocksecops.local/blocksecops/scanner-sol-azy | 0.4.1 | ✅ Verified |
 | sec3-xray | harbor.blocksecops.local/blocksecops/scanner-sec3-xray | 0.3.1 | ✅ Verified |
 | trident | harbor.blocksecops.local/blocksecops/scanner-trident | 0.3.0 | ✅ Verified |
 | cargo-fuzz-solana | harbor.blocksecops.local/blocksecops/scanner-cargo-fuzz-solana | 0.3.0 | ✅ Verified |
+| rustdefend | harbor.blocksecops.local/blocksecops/scanner-rustdefend | 0.3.1 | ✅ Verified |
 
-**Last Verified:** February 12, 2026
+**Last Verified:** February 17, 2026
 
-- [ ] All Solidity scanner images present
-- [ ] All Vyper scanner images present
-- [ ] All Solana scanner images present
+- [x] All Solidity scanner images present
+- [x] All Vyper scanner images present
+- [x] All Solana scanner images present
 
 ### 0.2 Scanner Registry
 ```bash
-curl -s http://127.0.0.1:3000/api/v1/scanners | jq '.scanners[] | {id, name, is_available}'
+curl -sk https://app.blocksecops.local/api/v1/scanners | jq '.scanners[] | {id, name, is_available}'
 ```
 - [ ] 17 scanners registered
 - [ ] All scanners show `is_available: true`
@@ -452,10 +453,7 @@ docker run --rm -v /path/to/moccasin-project:/project \
 
 ---
 
-## 4. Solana/Rust Scanners (Pending Integration)
-
-> **Note**: These scanners have Docker images built but are pending orchestration integration.
-> Status shows "Unavailable" until Phase 3.5 integration complete.
+## 4. Solana/Rust Scanners
 
 ### 4.1 Sol-azy
 **Type**: Static Analysis | **Language**: Rust/Solana
@@ -591,6 +589,70 @@ docker run --rm -v /path/to/fuzz-target:/project \
 - [ ] Fuzzing executes
 - [ ] Results displayed
 - [ ] Memory/crash issues highlighted
+
+---
+
+### 4.5 RustDefend
+**Type**: Static Analysis | **Language**: Rust (Solana/CosmWasm/NEAR/Ink!) | **Detectors**: 50
+
+#### Image Verification
+```bash
+docker run --rm scanner-rustdefend:0.3.1 rustdefend --version
+# Expected: rustdefend 0.3.0
+```
+- [x] Image runs without error
+- [x] Version output correct
+
+#### Basic Analysis Test
+```bash
+# Test with ConfigMap-style symlink mount (matches K8s behavior)
+TMPDIR=$(mktemp -d)
+mkdir -p "$TMPDIR/..2026_02_17_data"
+cat > "$TMPDIR/..2026_02_17_data/contract.rs" << 'RUST'
+use anchor_lang::prelude::*;
+declare_id!("Test111111111111111111111111111111111111111");
+#[program]
+pub mod vulnerable {
+    use super::*;
+    pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
+        let balance = ctx.accounts.vault.amount;
+        let new_balance = balance - amount;  // Integer overflow
+        Ok(())
+    }
+}
+#[derive(Accounts)]
+pub struct Withdraw<'info> {
+    #[account(mut)]
+    pub vault: Account<'info, TokenAccount>,
+}
+RUST
+ln -sf "..2026_02_17_data" "$TMPDIR/..data"
+ln -sf "..data/contract.rs" "$TMPDIR/contract.rs"
+
+docker run --rm -v "$TMPDIR:/contracts" scanner-rustdefend:0.3.1
+```
+- [x] Scanner executes without error
+- [x] JSON findings returned
+- [x] Finds files through ConfigMap symlinks (`find -L`)
+- [x] Filters hidden directory duplicate paths
+- [x] Detectors triggered: SOL-001 (Missing Signer Check), SOL-003 (Integer Overflow)
+
+#### Dashboard Test
+1. Upload `.rs` Solana program via dashboard
+2. Select RustDefend scanner
+3. Run scan
+- [x] Scan completes successfully
+- [x] AST-based findings displayed with detector IDs
+- [x] Severity and confidence correctly mapped
+- [x] Chain field preserved (solana/cosmwasm/near/ink)
+- [x] Code snippets and line numbers accurate
+
+#### Known Issues (Fixed in v0.3.1)
+| Issue | Version | Fix |
+|-------|---------|-----|
+| 0 findings in K8s | v0.1.0-v0.3.0 | `find -L` for ConfigMap symlinks |
+| code_snippet null | v0.1.0-v0.3.0 | Read `code_snippet` or `snippet` field |
+| confidence always 0.7 | v0.1.0-v0.3.0 | Read confidence from scanner output |
 
 ---
 

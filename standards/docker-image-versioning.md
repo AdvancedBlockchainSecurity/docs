@@ -328,15 +328,16 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
-| admin-portal | 0.7.0 | `k8s/overlays/local/` | Add dedicated Review Queue labeling page |
-| api-service | 0.28.35 | `k8s/overlays/local/api-service/` | Dedup audit: decode_embedding dimension guard, corrupted semantic FP cleanup, workflow doc scanner priority fix |
+| admin-portal | 0.7.1 | `k8s/overlays/local/` | Add RustDefend to scanner admin page |
+| api-service | 0.28.37 | `k8s/overlays/local/api-service/` | Add RustDefend scanner config, presets, metadata |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.45.8 | `k8s/overlays/local/` | Security audit fixes: removed localStorage token storage, deleted deprecated auth/scanner files, fixed WebSocket reconnect auth, added chat input validation, replaced non-null assertions |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
 | orchestration | 0.9.13 | `k8s/overlays/local/` | Uses pre-built base image |
-| tool-integration | 0.4.1 | `k8s/overlays/local/` | SolidityDefend v2.0.8 upgrade (scanner image 0.9.0, 100% precision) |
+| tool-integration | 0.4.4 | `k8s/overlays/local/` | RustDefend callback, parser, valid_scanners, scanner_configs integration |
+| scanner-rustdefend | 0.3.1 | N/A (scanner image) | RustDefend v0.3.0, 50 AST-based detectors, Solana/CosmWasm/NEAR/Ink! |
 
 All services are `0.x.x` (development phase). Version `1.0.0` indicates stable, production-ready API.
 
