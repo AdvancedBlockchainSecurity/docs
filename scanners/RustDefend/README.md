@@ -10,12 +10,12 @@ RustDefend is a BlockSecOps proprietary Rust smart contract static analysis scan
 
 | Property | Value |
 |----------|-------|
-| **Tool Version** | 0.2.0 |
-| **Docker Image** | `scanner-rustdefend:0.1.0` |
+| **Tool Version** | 0.3.1 |
+| **Docker Image** | `scanner-rustdefend:0.3.3` |
 | **Language** | Rust |
 | **Analysis Method** | AST-based static analysis via `syn` crate |
 | **Output Format** | JSON array of findings |
-| **Total Detectors** | 45 |
+| **Total Detectors** | 50 |
 
 ---
 
@@ -24,11 +24,11 @@ RustDefend is a BlockSecOps proprietary Rust smart contract static analysis scan
 | Ecosystem | Detector Count |
 |-----------|---------------|
 | Solana | 14 |
-| CosmWasm | 9 |
-| NEAR | 10 |
-| Ink! | 10 |
+| CosmWasm | 11 |
+| NEAR | 12 |
+| Ink! | 11 |
 | Cross-chain / Dependency | 2 |
-| **Total** | **45** |
+| **Total** | **50** |
 
 ---
 
@@ -132,14 +132,14 @@ RustDefend outputs a JSON array of finding objects:
 | Property | Value |
 |----------|-------|
 | **Image Name** | `scanner-rustdefend` |
-| **Tag** | `0.1.0` |
-| **Base Image** | Multi-stage Rust toolchain |
-| **Entrypoint** | `/usr/local/bin/wrapper.sh` |
+| **Tag** | `0.3.3` |
+| **Base Image** | `rust:1.85-slim-bookworm` (builder), `debian:bookworm-slim` (runtime) |
+| **Entrypoint** | `/usr/local/bin/rustdefend-scan` |
 
 ### Running via Docker
 
 ```bash
-docker run --rm -v $(pwd)/contracts:/workspace scanner-rustdefend:0.1.0 scan /workspace --format json
+docker run --rm -v $(pwd)/contracts:/workspace scanner-rustdefend:0.3.3 scan /workspace --format json
 ```
 
 ---
@@ -148,7 +148,7 @@ docker run --rm -v $(pwd)/contracts:/workspace scanner-rustdefend:0.1.0 scan /wo
 
 ### Kubernetes (ConfigMap + KJM)
 - Registered in base, local, and production ConfigMap overlays.
-- KJM configuration defines: image, command, memory_limit (2Gi), memory_request (512Mi), timeout (600s).
+- KJM configuration defines: image, command, memory_limit (1Gi), memory_request (512Mi), timeout (300s).
 
 ### Output Parser
 - Custom parser (`rustdefend_parser.py`) transforms JSON findings into BlockSecOps normalized format.
@@ -193,7 +193,7 @@ docker run --rm -v $(pwd)/contracts:/workspace scanner-rustdefend:0.1.0 scan /wo
 | `solana-deprecated-api` | Medium | Use of deprecated Solana API calls |
 | `solana-hardcoded-pubkey` | Medium | Hardcoded public keys in source |
 
-### CosmWasm (9 Detectors)
+### CosmWasm (11 Detectors)
 
 | Detector ID | Severity | Description |
 |-------------|----------|-------------|
@@ -206,8 +206,10 @@ docker run --rm -v $(pwd)/contracts:/workspace scanner-rustdefend:0.1.0 scan /wo
 | `cosmwasm-missing-migration` | Medium | Contract upgrade without migration handler |
 | `cosmwasm-unused-reply` | Medium | Unhandled reply entry point |
 | `cosmwasm-hardcoded-denom` | Medium | Hardcoded token denomination |
+| `cosmwasm-unchecked-reply-id` | High | Reply ID not validated in reply entry point |
+| `cosmwasm-admin-takeover` | Critical | Admin can be changed without proper authorization |
 
-### NEAR (10 Detectors)
+### NEAR (12 Detectors)
 
 | Detector ID | Severity | Description |
 |-------------|----------|-------------|
@@ -221,8 +223,10 @@ docker run --rm -v $(pwd)/contracts:/workspace scanner-rustdefend:0.1.0 scan /wo
 | `near-unnecessary-public` | Medium | Unnecessarily public contract method |
 | `near-storage-bloat` | Medium | Unbounded collection growth risk |
 | `near-deprecated-api` | Medium | Use of deprecated NEAR SDK calls |
+| `near-missing-assert-one-yocto` | High | Missing 1 yoctoNEAR deposit assertion for sensitive operations |
+| `near-public-key-validation` | Medium | Missing public key format validation |
 
-### Ink! (10 Detectors)
+### Ink! (11 Detectors)
 
 | Detector ID | Severity | Description |
 |-------------|----------|-------------|
@@ -236,6 +240,7 @@ docker run --rm -v $(pwd)/contracts:/workspace scanner-rustdefend:0.1.0 scan /wo
 | `ink-unused-return` | Medium | Unhandled return values from cross-contract calls |
 | `ink-deprecated-api` | Medium | Use of deprecated Ink! API calls |
 | `ink-hardcoded-hash` | Medium | Hardcoded code hash for delegate calls |
+| `ink-missing-transfer-check` | High | Missing balance check before transfer |
 
 ### Cross-chain / Dependency (2 Detectors)
 

@@ -1,7 +1,7 @@
 # BlockSecOps Changelogs
 
 **Purpose:** Centralized changelog directory for all BlockSecOps platform changes
-**Last Updated:** February 15, 2026
+**Last Updated:** February 17, 2026
 **Status:** Active
 
 ---
@@ -17,6 +17,27 @@ Changelogs are organized by component and maintained chronologically. Each chang
 ---
 
 ## Available Changelogs
+
+### 0. Scanner Reliability & RustDefend Fix (`SCANNER-RELIABILITY-RUSTDEFEND-FIX-2026-02-17.md`)
+
+**Component:** blocksecops-tool-integration, blocksecops-api-service
+**Scope:** ConfigMap race condition fix, scanner timeout increases, RustDefend wrapper hardening, vulnerability API filtering
+**Date:** February 17, 2026
+
+**Key Changes:**
+- Critical: ConfigMap race condition — concurrent scanners destroyed each other's mounts (delete-recreate on 409 replaced with reuse)
+- Scanner timeouts increased: solhint 60→180s, soliditydefend 60→180s, aderyn 120→300s, rustdefend 120→300s
+- RustDefend wrapper: cleanup trap, HTTP code capture on all curl paths, sed error masking removed
+- Vulnerability API: contract_id and scan_id query params now functional with UUID validation
+- Detector ID normalization and hidden directory filter alignment in callback handler
+- 35 new tests across 3 test files
+- scanner-rustdefend image 0.3.2 → 0.3.3
+
+**Use When:**
+- Understanding ConfigMap race condition fix for concurrent scanners
+- Debugging scanner timeout issues
+- Using vulnerability API contract_id/scan_id filters
+- Reviewing RustDefend wrapper error handling
 
 ### 0. API Service - Dedup Multi-Level Matching Audit (`API-SERVICE-DEDUP-MULTILEVEL-MATCHING-AUDIT-2026-02-15.md`)
 
