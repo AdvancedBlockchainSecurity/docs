@@ -10,8 +10,8 @@ RustDefend is a BlockSecOps proprietary Rust smart contract static analysis scan
 
 | Property | Value |
 |----------|-------|
-| **Tool Version** | 0.3.1 |
-| **Docker Image** | `scanner-rustdefend:0.3.3` |
+| **Tool Version** | 0.4.0 |
+| **Docker Image** | `scanner-rustdefend:0.4.0` |
 | **Language** | Rust |
 | **Analysis Method** | AST-based static analysis via `syn` crate |
 | **Output Format** | JSON array of findings |
@@ -132,14 +132,14 @@ RustDefend outputs a JSON array of finding objects:
 | Property | Value |
 |----------|-------|
 | **Image Name** | `scanner-rustdefend` |
-| **Tag** | `0.3.3` |
+| **Tag** | `0.4.0` |
 | **Base Image** | `rust:1.85-slim-bookworm` (builder), `debian:bookworm-slim` (runtime) |
 | **Entrypoint** | `/usr/local/bin/rustdefend-scan` |
 
 ### Running via Docker
 
 ```bash
-docker run --rm -v $(pwd)/contracts:/workspace scanner-rustdefend:0.3.3 scan /workspace --format json
+docker run --rm -v $(pwd)/contracts:/workspace scanner-rustdefend:0.4.0 scan /workspace --format json
 ```
 
 ---
