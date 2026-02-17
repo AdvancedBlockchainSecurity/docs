@@ -1,8 +1,8 @@
 # RustDefend Scanner Integration Changelog
 
-**Date:** 2026-02-16 (initial), 2026-02-17 (v0.3.1 hotfix)
-**Scanner Image Version:** 0.3.1
-**Tool Version:** 0.3.0 (50 detectors)
+**Date:** 2026-02-16 (initial), 2026-02-17 (v0.3.1 hotfix, v0.3.3 reliability fix)
+**Scanner Image Version:** 0.3.3
+**Tool Version:** 0.3.1 (50 detectors)
 **Platform:** BlockSecOps
 
 ---
@@ -29,6 +29,24 @@ RustDefend is a proprietary Rust smart contract static analysis scanner integrat
 ---
 
 ## Version History
+
+### v0.3.3 (2026-02-17) -- Scanner Reliability Fix
+
+**Root Cause:** ConfigMap race condition destroyed mounts for concurrent scanners. Job timeout (120s) too low — Kubernetes killed pods before results could be posted.
+
+**Fixes:**
+| Fix | File | Details |
+|-----|------|---------|
+| ConfigMap race condition | `src/scanners/kubernetes_job_manager.py` | Replace delete-recreate on 409 with create-or-reuse pattern |
+| Job timeout increase | `src/scanners/kubernetes_job_manager.py` | 120s → 300s (also solhint 60→180, soliditydefend 60→180, aderyn 120→300) |
+| Cleanup trap | `scanner-images/rustdefend/rustdefend-scan` | `trap cleanup EXIT` replaces individual `rm -f` calls |
+| Curl error handling | `scanner-images/rustdefend/rustdefend-scan` | All 4 curl paths use HTTP code capture instead of `|| true` |
+| Sed error masking | `scanner-images/rustdefend/rustdefend-scan` | Removed `|| true` from JSON extraction sed commands |
+| Detector ID normalization | `src/main.py` | `.strip().upper().replace(" ", "-").replace("_", "-")` |
+| Hidden dir filter | `src/main.py` | Aligned with shell script symlink exclusion pattern |
+| Version propagation | ConfigMaps + KJM fallback | All 4 version locations updated (base, local, prod, KJM) |
+
+**Tests Added:** 35 new tests (5 ConfigMap race, 20 timeout validation, 10 vulnerability filters)
 
 ### v0.3.1 (2026-02-17) -- Hotfix
 
@@ -134,7 +152,7 @@ RustDefend is a proprietary Rust smart contract static analysis scanner integrat
 ## Integration Points
 
 ### Docker
-- Image: `scanner-rustdefend:0.3.1`
+- Image: `scanner-rustdefend:0.3.3`
 - Base: `rust:1.85-slim-bookworm` (builder), `debian:bookworm-slim` (runtime)
 - Entrypoint: `rustdefend-scan` wrapper script
 - Non-root user: `scanner` (UID 1000)
@@ -143,11 +161,11 @@ RustDefend is a proprietary Rust smart contract static analysis scanner integrat
 ### Kubernetes
 - ConfigMap registration across base, local (Harbor), and production (GCP AR) overlays
 - KJM configuration:
-  - `image`: `scanner-rustdefend:0.3.1` (env var `SCANNER_IMAGE_RUSTDEFEND`)
+  - `image`: `scanner-rustdefend:0.3.3` (env var `SCANNER_IMAGE_RUSTDEFEND`)
   - `command`: `None` (wrapper is entrypoint)
   - `memory_limit`: `1Gi`
   - `memory_request`: `512Mi`
-  - `timeout`: `120s`
+  - `timeout`: `300s`
 
 ### Callback Handler
 - Dedicated `elif scanner_type == "rustdefend":` branch in `src/main.py`

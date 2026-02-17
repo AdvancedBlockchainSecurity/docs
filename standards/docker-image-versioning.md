@@ -351,7 +351,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | scanner-sol-azy | 0.4.2 | N/A (scanner image) | find -L symlink fix |
 | scanner-cargo-fuzz-solana | 0.3.1 | N/A (scanner image) | find -L symlink fix |
 | scanner-trident | 0.3.1 | N/A (scanner image) | find -L symlink fix |
-| scanner-rustdefend | 0.3.2 | N/A (scanner image) | RustDefend v0.3.1 binary, vulnerability names |
+| scanner-rustdefend | 0.3.3 | N/A (scanner image) | Cleanup trap, curl error handling, timeout 300s |
 
 All services are `0.x.x` (development phase). Version `1.0.0` indicates stable, production-ready API.
 

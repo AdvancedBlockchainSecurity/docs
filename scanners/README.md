@@ -1,12 +1,12 @@
 # Scanner Documentation
 
-**Last Updated**: February 13, 2026
+**Last Updated**: February 17, 2026
 **API Pipeline Tested**: February 13, 2026
 **Parser Tests Passing**: February 13, 2026 (335 tests — unit, integration, regression)
 **Fuzzer Filtering Tested**: December 29, 2025 (is_project filtering verified)
 **Fuzzer Results Display**: December 30, 2025 (end-to-end verified)
 **Active Scanners**: 18 available in orchestration (18 total registered)
-**Supported Languages**: Solidity (12 scanners), Vyper (2 scanners), Solana (4 scanners, 1 active)
+**Supported Languages**: Solidity (12 scanners), Vyper (2 scanners), Solana (4 scanners, 2 active)
 **Execution Mode**: Docker-based execution for Solana scanners
 **Project Mode**: Foundry/Hardhat support enabled (Phase 3.2)
 **Scanner Effectiveness**: Available at `/analytics/scanner-effectiveness`
@@ -138,14 +138,14 @@ Fuzzer scanners now properly store and display results in the dashboard:
 | **Vyper** | 0.2.0 | Compiler/Analyzer | ❌ No | ✅ Active |
 | **Moccasin** | 0.2.0 | Fuzzer | ✅ Yes | ✅ Active |
 
-### Solana/Rust Scanners (4) — 1 Active, 3 Pending
+### Solana/Rust Scanners (4) — 2 Active, 2 Pending
 
-Docker images built and deployed to Harbor. Sol-azy is fully operational on the platform pipeline. Remaining scanners require additional orchestration integration.
+Docker images built and deployed to Harbor. Sol-azy and RustDefend are fully operational on the platform pipeline. Remaining scanners require additional orchestration integration.
 
 | Scanner | Version | Type | Requires Project | Status |
 |---------|---------|------|------------------|--------|
 | **Sol-azy** | 0.4.1 | Static Analysis | ❌ No | ✅ Active |
-| **Sec3 X-Ray** | 0.3.1 | Static Analysis | ✅ Yes | ⏳ Unavailable |
+| **RustDefend** | 0.3.3 | Static Analysis (AST) | ❌ No | ✅ Active |
 | **Trident** | 0.3.0 | Fuzzer | ✅ Yes | ⏳ Unavailable |
 | **cargo-fuzz-solana** | 0.3.0 | Fuzzer | ✅ Yes | ⏳ Unavailable |
 
@@ -178,7 +178,7 @@ Docker images built and deployed to Harbor. Sol-azy is fully operational on the 
 Analyzes source code without execution:
 - **Pros**: Fast, comprehensive coverage, no execution environment needed
 - **Cons**: May have false positives, limited to known patterns
-- **Examples**: Slither, Aderyn, Semgrep, SolidityDefend, Sol-azy, Sec3 X-Ray
+- **Examples**: Slither, Aderyn, Semgrep, SolidityDefend, Sol-azy, RustDefend, Sec3 X-Ray
 
 ### Fuzzing (5 scanners)
 Generates test inputs to find edge cases:
@@ -441,7 +441,7 @@ See: [Scanner Integration Guide](SCANNER-INTEGRATION-GUIDE.md)
 |----------|----------------|--------|
 | **Solidity** | 10 | ✅ Full support |
 | **Vyper** | 2 | ✅ Full support |
-| **Rust/Solana** | 1 (3 pending) | ⏳ Sol-azy active; 3 remaining awaiting orchestration integration |
+| **Rust/Solana** | 2 (2 pending) | ✅ Sol-azy + RustDefend active; 2 remaining awaiting orchestration integration |
 
 ### Detector Coverage
 
@@ -538,6 +538,6 @@ See: [Workflow Troubleshooting](SCANNER-WORKFLOW-TROUBLESHOOTING.md)
 ---
 
 **Maintained by**: BlockSecOps Scanner Integration Team
-**Active Scanners**: 18 operational (February 13, 2026)
-**Supported Languages**: Solidity (12 scanners), Vyper (2 scanners), Solana (4 scanners, 1 active)
-**Total Detector Count**: 450+ and growing
+**Active Scanners**: 18 operational (February 17, 2026)
+**Supported Languages**: Solidity (12 scanners), Vyper (2 scanners), Solana (4 scanners, 2 active)
+**Total Detector Count**: 500+ and growing

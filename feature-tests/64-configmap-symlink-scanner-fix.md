@@ -48,7 +48,7 @@ The `find` command without `-L` does not follow symlinks, so `find /contracts -n
 | sol-azy | 0.4.2 | `Dockerfile` (embedded entrypoint) |
 | cargo-fuzz-solana | 0.3.1 | `Dockerfile` (embedded entrypoint) |
 | trident | 0.3.1 | `Dockerfile` (embedded entrypoint) |
-| rustdefend | 0.3.2 | Already had fix from initial integration |
+| rustdefend | 0.3.3 | Symlink fix + cleanup trap, curl error handling, timeout 300s |
 
 ---
 
