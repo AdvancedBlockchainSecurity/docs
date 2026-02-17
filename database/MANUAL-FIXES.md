@@ -915,6 +915,74 @@ WHERE EXISTS (SELECT 1 FROM vulnerabilities v WHERE v.scan_id = s.id);"
 
 ---
 
+## February 17, 2026 - Fix deduplication_groups.canonical_finding_id NOT NULL Constraint
+
+### Issue
+Scan deletion from the dashboard UI failed silently. Clicking "Delete" in the confirmation modal had no effect.
+
+**Symptom:** DELETE `/api/v1/scans` returned 500 Internal Server Error when scans had vulnerabilities linked to deduplication groups.
+
+### Root Cause
+- The `deduplication_groups.canonical_finding_id` column had a `NOT NULL` constraint in the database
+- The foreign key was defined as `ON DELETE SET NULL`
+- When deleting a scan's vulnerabilities, PostgreSQL tried to set `canonical_finding_id = NULL` but the NOT NULL constraint blocked it
+- The SQLAlchemy model already declared the column as `nullable=True` -- the database constraint didn't match
+
+### Fix Applied
+```sql
+ALTER TABLE deduplication_groups ALTER COLUMN canonical_finding_id DROP NOT NULL;
+```
+
+### Verification
+```sql
+SELECT column_name, is_nullable
+FROM information_schema.columns
+WHERE table_name = 'deduplication_groups' AND column_name = 'canonical_finding_id';
+-- Expected: is_nullable = 'YES'
+```
+
+### How to Reproduce Fix
+```bash
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U blocksecops -d solidity_security \
+  -c "ALTER TABLE deduplication_groups ALTER COLUMN canonical_finding_id DROP NOT NULL;"
+```
+
+### Related Files
+- Model: `blocksecops-api-service/src/infrastructure/database/specialized_models/intelligence.py:128`
+- Scan delete endpoint: `blocksecops-api-service/src/presentation/api/v1/endpoints/scans.py:2707`
+- Detailed writeup: `docs/database/MANUAL-FIXES-2026-02-17-DEDUP-NULLABLE.md`
+
+### Impact
+- **Before Fix:** All scan deletions from UI failed (API 500 error)
+- **After Fix:** Scan deletion works correctly
+
+### Prevention
+1. Ensure database column nullable constraints match SQLAlchemy model definitions
+2. Test scan deletion after any deduplication schema changes
+3. Add integration test for scan deletion with dedup groups
+
+---
+
+## February 17, 2026 - Clean RustDefend Findings for ML Data Quality
+
+### Issue
+RustDefend v0.3.0 findings showed detector IDs (e.g., "SOL-002") instead of vulnerability names. These findings would poison ML models if used for training.
+
+### Fix Applied
+```sql
+-- Backup taken first
+DELETE FROM deduplication_groups WHERE scanner_distribution::text LIKE '%rustdefend%';
+DELETE FROM vulnerabilities WHERE scanner_id = 'rustdefend';
+DELETE FROM scans WHERE 'rustdefend' = ANY(scanners_used);
+```
+Deleted: 10 vulnerabilities, 5 deduplication groups, 3 scans.
+
+### How to Reproduce Fix
+Not needed -- RustDefend v0.3.1 (image 0.3.2) now produces proper vulnerability names.
+
+---
+
 ## Template for Future Manual Fixes
 
 ### [Date] - [Brief Description]
