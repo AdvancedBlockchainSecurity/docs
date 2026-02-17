@@ -337,7 +337,21 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
 | orchestration | 0.9.13 | `k8s/overlays/local/` | Uses pre-built base image |
 | tool-integration | 0.4.4 | `k8s/overlays/local/` | RustDefend callback, parser, valid_scanners, scanner_configs integration |
-| scanner-rustdefend | 0.3.1 | N/A (scanner image) | RustDefend v0.3.0, 50 AST-based detectors, Solana/CosmWasm/NEAR/Ink! |
+| scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
+| scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
+| scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |
+| scanner-solhint | 0.1.7 | N/A (scanner image) | find -L symlink fix |
+| scanner-vyper | 0.3.1 | N/A (scanner image) | find -L symlink fix |
+| scanner-moccasin | 0.3.1 | N/A (scanner image) | find -L symlink fix |
+| scanner-halmos | 0.3.1 | N/A (scanner image) | find -L symlink fix |
+| scanner-echidna | 0.3.2 | N/A (scanner image) | find -L symlink fix |
+| scanner-medusa | 0.3.2 | N/A (scanner image) | find -L symlink fix |
+| scanner-wake | 0.3.8 | N/A (scanner image) | find -L symlink fix |
+| scanner-soliditydefend | 0.9.1 | N/A (scanner image) | find -L fix + code snippet extraction |
+| scanner-sol-azy | 0.4.2 | N/A (scanner image) | find -L symlink fix |
+| scanner-cargo-fuzz-solana | 0.3.1 | N/A (scanner image) | find -L symlink fix |
+| scanner-trident | 0.3.1 | N/A (scanner image) | find -L symlink fix |
+| scanner-rustdefend | 0.3.2 | N/A (scanner image) | RustDefend v0.3.1 binary, vulnerability names |
 
 All services are `0.x.x` (development phase). Version `1.0.0` indicates stable, production-ready API.
 
