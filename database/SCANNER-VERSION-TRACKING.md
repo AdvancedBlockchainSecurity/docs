@@ -428,11 +428,12 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
 - moccasin (0.4.3, vyper 0.4.3) - harbor.blocksecops.local/blocksecops/scanner-moccasin:0.3.0 - fuzzer ✅
   - Note: Moccasin requires project structure (not shown for single-file contracts in UI)
 
-**Solana Scanners:** ✅ All in Harbor (February 9, 2026)
+**Solana Scanners:** ✅ All in Harbor (February 18, 2026)
 - sol-azy (0.4.0) - harbor.blocksecops.local/blocksecops/scanner-sol-azy:0.4.0 ✅
 - sec3-xray (0.0.6) - harbor.blocksecops.local/blocksecops/scanner-sec3-xray:0.3.1 ✅
 - trident (0.12.0) - harbor.blocksecops.local/blocksecops/scanner-trident:0.3.0 ✅
 - cargo-fuzz-solana (0.13.1) - harbor.blocksecops.local/blocksecops/scanner-cargo-fuzz-solana:0.3.0 ✅
+- rustdefend (0.5.1) - harbor.blocksecops.local/blocksecops/scanner-rustdefend:0.4.2 ✅ (clean-slate: 46 findings across 13 contracts, 100% pattern coverage)
 
 **Cairo/StarkNet Scanners:** ⚠️ NOT integrated - patterns defined but no scanner integration
 - caracal (0.2.3) - 0/14 detectors ❌ Unavailable (no Docker image)
@@ -441,7 +442,11 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
 
 ### Recent Updates Recorded
 
-- **2026-02-18**: Scanner Ecosystem Audit + RustDefend v0.5.1 Upgrade
+- **2026-02-18**: RustDefend v0.5.1 Clean-Slate Upgrade + Scanner Ecosystem Audit
+  - **RustDefend clean-slate**: Deleted all old findings (9 vulns, 5 scans, 4 dedup groups) due to high FP rate in previous version
+  - **RustDefend rescans**: 13/14 Rust contracts scanned, 46 findings (25 critical, 20 high, 1 medium), v2-rs clean (0 findings)
+  - **Pattern seeding**: 11 active mappings covering 9 detector IDs (SOL-002, SOL-003, SOL-004, SOL-005, SOL-006, SOL-007, SOL-010, SOL-017, SOL-020)
+  - **Audit validation**: 100% coverage (46/46 mapped), 0 unmapped, 0 orphaned, 0 missing fingerprints
   - **RustDefend**: Tool 0.3.0 → 0.5.1, Image 0.3.1 → 0.4.2 (61 detectors, 347 fewer FPs, custom rules engine)
   - **RustDefend repo**: Migrated from `github.com/BlockSecOps/RustDefend` to `github.com/0xStarBridge/RustDefend`
   - **Orchestration**: ConfigMap rebuilt with correct env var names and pinned versions, removed 3 deprecated scanners (mythril, foundry-fuzz, 4naly3er)

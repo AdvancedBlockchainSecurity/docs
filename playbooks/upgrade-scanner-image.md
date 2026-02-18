@@ -1,7 +1,7 @@
 # Playbook: Upgrade Scanner Image
 
-**Version:** 1.3.0
-**Last Updated:** February 12, 2026
+**Version:** 1.4.0
+**Last Updated:** February 18, 2026
 
 ## Overview
 
@@ -105,7 +105,7 @@ kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity
 
 # Clean deduplication groups
 kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -c \
-  "DELETE FROM deduplication_groups WHERE canonical_id NOT IN (SELECT id FROM vulnerabilities);"
+  "DELETE FROM deduplication_groups WHERE canonical_finding_id NOT IN (SELECT id FROM vulnerabilities);"
 ```
 
 ---
