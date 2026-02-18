@@ -221,6 +221,28 @@ All CRITICAL and HIGH issues resolved. Remaining issues are hardening improvemen
 
 ---
 
+## Follow-Up Audit: Rate Limiting & Auth Scope (February 18, 2026)
+
+A follow-up security audit identified 20 additional issues (3 critical, 6 high, 7 medium, 4 low) focused on rate limiting gaps and auth scope enforcement. **15 of 20 issues resolved in v0.28.42.**
+
+### Key Fixes
+- 28 write/mutation endpoints now rate-limited via centralized tier configuration
+- 5 analytics endpoints converted to dual-auth (JWT + API key)
+- Staging kustomize overlay changed from mutable `staging-latest` to immutable versioned tag
+- BuildKit cache mount IDs isolated per Dockerfile stage
+- `webhooks` rate limit category added to shared tier-config model
+
+### Remaining (5 deferred)
+- Core GET endpoints per-tier rate limiting (middleware change)
+- SecurityHeadersMiddleware content verification (manual review)
+- Internal service key strength verification (deployment review)
+- API key rate limit cap at 300 (enhancement)
+- Production overlay placeholder registry (expected)
+
+**Full details:** See `changelogs/API-SERVICE-SECURITY-AUDIT-RATE-LIMITING-2026-02-18.md`
+
+---
+
 ## Next Steps
 
 1. Review and prioritize open findings based on business impact
