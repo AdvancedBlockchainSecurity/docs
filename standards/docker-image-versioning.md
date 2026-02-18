@@ -329,7 +329,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.1 | `k8s/overlays/local/` | Add RustDefend to scanner admin page |
-| api-service | 0.28.43 | `k8s/overlays/local/api-service/` | Scanner ecosystem audit: sync ConfigMap to source of truth, remove duplicates |
+| api-service | 0.28.44 | `k8s/overlays/local/api-service/` | Scanner ecosystem audit + update RustDefend repo URL to 0xStarBridge |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.45.8 | `k8s/overlays/local/` | Security audit fixes: removed localStorage token storage, deleted deprecated auth/scanner files, fixed WebSocket reconnect auth, added chat input validation, replaced non-null assertions |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
