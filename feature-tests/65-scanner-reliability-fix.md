@@ -123,7 +123,7 @@ python3 -m pytest tests/unit/test_vulnerability_filters.py -v -o "addopts="
 # Check scanner image versions in ConfigMap
 kubectl exec -n tool-integration-local deployment/tool-integration -- \
   env | grep SCANNER_IMAGE_RUSTDEFEND
-# Expected: scanner-rustdefend:0.3.3 (or Harbor/GCP prefixed)
+# Expected: scanner-rustdefend:0.4.0 (or Harbor/GCP prefixed)
 
 # Verify RustDefend job timeout in KJM source
 grep -A2 '"rustdefend"' /home/pwner/Git/blocksecops-tool-integration/src/scanners/kubernetes_job_manager.py | grep timeout

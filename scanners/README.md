@@ -145,7 +145,7 @@ Docker images built and deployed to Harbor. Sol-azy and RustDefend are fully ope
 | Scanner | Version | Type | Requires Project | Status |
 |---------|---------|------|------------------|--------|
 | **Sol-azy** | 0.4.1 | Static Analysis | ❌ No | ✅ Active |
-| **RustDefend** | 0.3.3 | Static Analysis (AST) | ❌ No | ✅ Active |
+| **RustDefend** | 0.4.0 | Static Analysis (AST) | ❌ No | ✅ Active |
 | **Trident** | 0.3.0 | Fuzzer | ✅ Yes | ⏳ Unavailable |
 | **cargo-fuzz-solana** | 0.3.0 | Fuzzer | ✅ Yes | ⏳ Unavailable |
 
