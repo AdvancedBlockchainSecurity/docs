@@ -329,18 +329,18 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.1 | `k8s/overlays/local/` | Add RustDefend to scanner admin page |
-| api-service | 0.28.37 | `k8s/overlays/local/api-service/` | Add RustDefend scanner config, presets, metadata |
+| api-service | 0.28.38 | `k8s/overlays/local/api-service/` | Stale scan recovery endpoint, code snippet extraction fallback |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.45.8 | `k8s/overlays/local/` | Security audit fixes: removed localStorage token storage, deleted deprecated auth/scanner files, fixed WebSocket reconnect auth, added chat input validation, replaced non-null assertions |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
 | orchestration | 0.9.13 | `k8s/overlays/local/` | Uses pre-built base image |
-| tool-integration | 0.4.4 | `k8s/overlays/local/` | RustDefend callback, parser, valid_scanners, scanner_configs integration |
+| tool-integration | 0.4.6 | `k8s/overlays/local/` | Vyper scanner_id fix, solhint logging, canary UUID fix |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |
-| scanner-solhint | 0.1.7 | N/A (scanner image) | find -L symlink fix |
+| scanner-solhint | 0.1.8 | N/A (scanner image) | Robust JSON extraction fix |
 | scanner-vyper | 0.3.1 | N/A (scanner image) | find -L symlink fix |
 | scanner-moccasin | 0.3.1 | N/A (scanner image) | find -L symlink fix |
 | scanner-halmos | 0.3.1 | N/A (scanner image) | find -L symlink fix |
