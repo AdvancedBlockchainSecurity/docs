@@ -72,6 +72,7 @@ Manual testing checklists for all user-facing features.
 | [59-admin-portal-v0.4.0.md](./59-admin-portal-v0.4.0.md) | **NEW** - Admin Portal v0.4.0: GCP Cost Estimator, Scanners page, Dependencies endpoint, defensive metrics |
 | [60-collapsible-sidebar-quick-access.md](./60-collapsible-sidebar-quick-access.md) | **NEW** - Collapsible sidebar (w-64 ↔ w-16), quick access page pins (max 5), localStorage persistence (v0.41.4 Dashboard) |
 | [61-ai-inline-results.md](./61-ai-inline-results.md) | **NEW** - AI inline results: Code Review & Code Repair display fully inline on vulnerability detail, auth fix for code-repair endpoints (v0.45.3 Dashboard, v0.28.32 API) |
+| [66-scanner-audit-fixes.md](./66-scanner-audit-fixes.md) | **NEW** - Scanner audit fixes: solhint JSON extraction, vyper scanner_id attribution, stale scan recovery, canary UUID, code snippet fallback |
 
 ---
 

@@ -140,6 +140,23 @@ After taking action:
 - [ ] Auto-refresh updates every 30 seconds
 - [ ] All actions appear in audit logs
 
+## API Service Maintenance Endpoint (v0.28.38+)
+
+In addition to the admin portal-based recovery above, a maintenance endpoint exists for automated recovery:
+
+```bash
+# Recover scans stuck in queued/running for >1 hour
+# Marks scans as failed and resets contract status from "scanning" to "scanned"
+curl -sk -X POST https://app.blocksecops.local/api/v1/scans/maintenance/recover-stale-scans \
+  -H "X-Internal-Service: true"
+```
+
+This endpoint is designed to be called by the deduplication maintenance CronJob (runs every 6 hours). It handles a different failure mode than the orchestration-based stale scan recovery: scanner jobs that complete without posting results back to the API (container crash, network error, callback failure).
+
+**See also:** [Database manual fix for existing stuck contracts](../database/MANUAL-FIXES-2026-02-17-STALE-SCANS.md)
+
+---
+
 ## Related Playbooks
 
 - [upgrade-scanner-image.md](./upgrade-scanner-image.md) — Scanner upgrade procedures
