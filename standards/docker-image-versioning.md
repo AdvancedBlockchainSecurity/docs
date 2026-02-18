@@ -329,14 +329,14 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.1 | `k8s/overlays/local/` | Add RustDefend to scanner admin page |
-| api-service | 0.28.42 | `k8s/overlays/local/api-service/` | Security audit: rate limiting on 28 endpoints, analytics dual-auth, Dockerfile cache IDs, webhooks model fix |
+| api-service | 0.28.44 | `k8s/overlays/local/api-service/` | Scanner ecosystem audit + update RustDefend repo URL to 0xStarBridge |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.45.8 | `k8s/overlays/local/` | Security audit fixes: removed localStorage token storage, deleted deprecated auth/scanner files, fixed WebSocket reconnect auth, added chat input validation, replaced non-null assertions |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
-| orchestration | 0.9.13 | `k8s/overlays/local/` | Uses pre-built base image |
-| tool-integration | 0.4.6 | `k8s/overlays/local/` | Vyper scanner_id fix, solhint logging, canary UUID fix |
+| orchestration | 0.9.14 | `k8s/overlays/local/` | Scanner ecosystem audit: rebuild ConfigMap, remove deprecated scanners |
+| tool-integration | 0.4.7 | `k8s/overlays/local/` | Scanner ecosystem audit: add HalmosParser, SolidityDefendParser, mark MythrilParser legacy |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |
@@ -351,7 +351,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | scanner-sol-azy | 0.4.2 | N/A (scanner image) | find -L symlink fix |
 | scanner-cargo-fuzz-solana | 0.3.1 | N/A (scanner image) | find -L symlink fix |
 | scanner-trident | 0.3.1 | N/A (scanner image) | find -L symlink fix |
-| scanner-rustdefend | 0.3.3 | N/A (scanner image) | Cleanup trap, curl error handling, timeout 300s |
+| scanner-rustdefend | 0.4.2 | N/A (scanner image) | v0.5.1: FP reduction (347 fewer), 61 detectors, custom rules engine |
 
 All services are `0.x.x` (development phase). Version `1.0.0` indicates stable, production-ready API.
 

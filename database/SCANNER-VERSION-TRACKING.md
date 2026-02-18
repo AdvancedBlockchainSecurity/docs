@@ -389,11 +389,11 @@ The database provides the **history** and **analytics** that ConfigMap cannot.
 
 ---
 
-## Data Current as of 2026-01-19
+## Data Current as of 2026-02-18
 
-### Scanner Images in Harbor Registry (Verified January 19, 2026)
+### Scanner Images in Harbor Registry (Verified February 18, 2026)
 
-All 15 scanner images are now in Harbor at `harbor.blocksecops.local/blocksecops/`:
+All 16 scanner images are now in Harbor at `harbor.blocksecops.local/blocksecops/`:
 
 ### Automated Version Checking
 
@@ -440,6 +440,16 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
 - starknet-foundry (0.50.0) - fuzzer ❌ Unavailable (no Docker image)
 
 ### Recent Updates Recorded
+
+- **2026-02-18**: Scanner Ecosystem Audit + RustDefend v0.5.1 Upgrade
+  - **RustDefend**: Tool 0.3.0 → 0.5.1, Image 0.3.1 → 0.4.2 (61 detectors, 347 fewer FPs, custom rules engine)
+  - **RustDefend repo**: Migrated from `github.com/BlockSecOps/RustDefend` to `github.com/0xStarBridge/RustDefend`
+  - **Orchestration**: ConfigMap rebuilt with correct env var names and pinned versions, removed 3 deprecated scanners (mythril, foundry-fuzz, 4naly3er)
+  - **API Service**: ConfigMap synced to source of truth, SOLHINT 0.1.7 → 0.1.8, removed duplicates
+  - **Tool Integration**: Added HalmosParser, SolidityDefendParser, marked MythrilParser legacy
+  - **SolidityDefend**: Image 0.8.0 → 0.9.1
+  - Service versions: api-service 0.28.44, orchestration 0.9.14, tool-integration 0.4.7
+  - See: `TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-18-SCANNER-ECOSYSTEM-AUDIT.md`
 
 - **2026-02-05**: Semgrep Scanner Wrapper 0.3.2 Bug Fix
   - **Semgrep**: Image 0.3.1 → 0.3.2 (tool version remains 1.141.0)
@@ -658,5 +668,5 @@ SELECT record_scanner_update('scanner_name', 'new_version', 'new_image_tag');
 ---
 
 **Created**: 2025-10-30
-**Last Updated**: 2026-02-05
+**Last Updated**: 2026-02-18
 **Maintained By**: BlockSecOps Platform Team
