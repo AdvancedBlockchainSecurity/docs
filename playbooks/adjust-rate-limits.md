@@ -16,10 +16,11 @@ Endpoint rate limits are centralized in `blocksecops-shared/tier-config/tiers.js
 
 | Category | Endpoints | Purpose |
 |----------|-----------|---------|
-| `auth` | login, register, mfaVerify, walletNonce, solanaNonce | Authentication protection |
+| `auth` | login, register, mfaVerify, walletNonce, solanaNonce, walletVerify, walletLink | Authentication protection |
 | `ai` | codeReview, codeRepair, invariants, explanations | AI token/cost control |
-| `operations` | scanCreate, auditLogSearch | Resource-intensive operations |
-| `general` | default | Fallback rate limit |
+| `operations` | scanCreate, auditLogSearch, batchScan, storeResults, storeFuzzingResults, recoverStaleScans, contractCreate/Update/Delete/BatchDelete, fileUpload, projectCreate/Update/Delete | Resource-intensive operations |
+| `webhooks` | webhookCreate, webhookUpdate, webhookDelete, webhookSecretRotate | Webhook management |
+| `general` | default, userProfileUpdate, invariantApply/Feedback/Delete | Fallback and general endpoints |
 
 ## Workflow Diagram
 
