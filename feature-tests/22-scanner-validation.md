@@ -49,7 +49,7 @@ docker images | grep "harbor.blocksecops.local.*scanner-"
 | sec3-xray | harbor.blocksecops.local/blocksecops/scanner-sec3-xray | 0.3.1 | ✅ Verified |
 | trident | harbor.blocksecops.local/blocksecops/scanner-trident | 0.3.0 | ✅ Verified |
 | cargo-fuzz-solana | harbor.blocksecops.local/blocksecops/scanner-cargo-fuzz-solana | 0.3.0 | ✅ Verified |
-| rustdefend | harbor.blocksecops.local/blocksecops/scanner-rustdefend | 0.3.1 | ✅ Verified |
+| rustdefend | harbor.blocksecops.local/blocksecops/scanner-rustdefend | 0.4.0 | ✅ Verified |
 
 **Last Verified:** February 17, 2026
 
@@ -597,8 +597,8 @@ docker run --rm -v /path/to/fuzz-target:/project \
 
 #### Image Verification
 ```bash
-docker run --rm scanner-rustdefend:0.3.1 rustdefend --version
-# Expected: rustdefend 0.3.0
+docker run --rm scanner-rustdefend:0.4.0 rustdefend --version
+# Expected: rustdefend 0.4.0
 ```
 - [x] Image runs without error
 - [x] Version output correct
