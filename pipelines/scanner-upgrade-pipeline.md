@@ -1,7 +1,7 @@
 # Scanner Upgrade Pipeline
 
-**Last Updated:** February 6, 2026
-**API Version:** 0.27.1
+**Last Updated:** February 18, 2026
+**API Version:** 0.28.44
 
 Full pipeline that runs when an admin clicks "Upgrade" on a scanner in the Admin Portal.
 
@@ -419,6 +419,17 @@ kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity
 | Scans still show scanner in UI after cleanup | `scanners_used` array still contains the scanner name | Remove scanner from array with `array_remove()` (Step 8) |
 | CronJob dedup maintenance fails to start | Pod requires `api-service-secrets` which may not exist as a raw Secret (managed by ExternalSecrets/Vault) | Use the API endpoint `POST /deduplication/maintenance/run-full-backfill` instead (Step 10) |
 | `canonical_id` column does not exist | Actual column name is `canonical_finding_id` | Use `canonical_finding_id` in all queries |
+
+### Gotchas Discovered During RustDefend Clean Slate (2026-02-18)
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| `is_canonical` column does not exist | Actual column name is `is_primary` | Use `is_primary` in all UPDATE statements |
+| `scanner_id` not on `scans` table | `scanner_id` is on `vulnerabilities`, `scans` uses `scanners_used` array | Join through `vulnerabilities` or use `scanners_used = ANY(...)` |
+| PostgreSQL pod has no `psql` or `pg_dump` | Minimal container image | Run database operations via api-service pod using asyncpg |
+| Pattern seeding creates mappings with title-derived detector IDs | Seeding script matches by title keywords (e.g., `integer-overflow`) but actual findings use coded IDs (e.g., `SOL-003`) | Create additional mappings for actual detector IDs and backfill `pattern_code` on existing records |
+| API rate limiting during bulk rescans | 10 requests/minute rate limit | Stagger scan requests with 60s wait between batches |
+| New detector types discovered after rescans | Clean-slate + rescan reveals detectors not present in old data | Run pattern seeding again after rescans complete, map to existing BVD patterns where possible |
 
 ### Post-Cleanup Verification Checklist
 

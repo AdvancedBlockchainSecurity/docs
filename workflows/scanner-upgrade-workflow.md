@@ -1,8 +1,8 @@
 # Scanner Upgrade Workflow
 
-**Last Updated:** February 6, 2026
+**Last Updated:** February 18, 2026
 **Status:** Active
-**API Version:** 0.27.1
+**API Version:** 0.28.44
 
 ---
 
@@ -294,7 +294,11 @@ When a scanner upgrade fixes a large number of false positives (>20% of findings
 
 **Use the Clean-Slate Procedure** documented in the [Scanner Upgrade Pipeline — FP-Heavy Scanner Upgrade](../pipelines/scanner-upgrade-pipeline.md#fp-heavy-scanner-upgrade-clean-slate).
 
-This applies to maturing scanners like SolidityDefend where upstream releases may fix large batches of FPs. It does NOT apply to mature scanners (slither, aderyn, wake) where upgrades typically add detectors rather than fix FPs.
+This applies to maturing scanners like SolidityDefend and RustDefend where upstream releases may fix large batches of FPs. It does NOT apply to mature scanners (slither, aderyn, wake) where upgrades typically add detectors rather than fix FPs.
+
+**Completed clean-slate upgrades:**
+- **SolidityDefend** (2026-02-06): 10,515 old findings deleted, 34 new findings after rescan
+- **RustDefend** (2026-02-18): 9 old findings deleted, 46 new findings across 13 contracts, 100% pattern coverage
 
 **Summary of clean-slate steps:**
 1. Database backup
