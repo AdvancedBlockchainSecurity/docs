@@ -58,6 +58,18 @@ POST /scans         →      Queue scan task      execute_scanners()          Sc
 | Intelligence pipeline | Process through [Intelligence Pipeline](./intelligence-pipeline.md) |
 | Store findings | Insert enriched vulnerabilities into database |
 | Update scan | Set scan status to `completed` with summary statistics |
+| Persist duration | Calculate `duration_seconds = completed_at - started_at` and store on scan record |
+
+### Scan Duration Tracking
+
+`duration_seconds` is calculated and persisted at every scan completion point (success, failure, stale recovery, admin force-fail) in both the API service and orchestration service. The calculation uses `int((completed_at - started_at).total_seconds())` and is only set when `started_at` is non-null.
+
+Existing scans without `duration_seconds` can be backfilled:
+
+```sql
+UPDATE scans SET duration_seconds = EXTRACT(EPOCH FROM (completed_at - started_at))::int
+WHERE started_at IS NOT NULL AND completed_at IS NOT NULL AND duration_seconds IS NULL;
+```
 
 ## Scanner Context
 

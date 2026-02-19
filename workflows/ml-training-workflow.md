@@ -38,6 +38,8 @@ The ML training workflow collects labeled vulnerability data and trains a Random
 | **Features** | 30+ (scanner, code context, pattern) |
 | **Output** | False positive probability (0.0-1.0) |
 | **Requirements** | CPU-only (no GPU needed) |
+| **Model Storage** | `$ML_MODEL_DIR/fp_classifier_v1.joblib` (default: `src/ml/models/`) |
+| **K8s Model Dir** | `/app/.cache/ml-models` (writable `emptyDir` volume) |
 | **Minimum Samples** | 50 (200+ recommended) |
 
 ---

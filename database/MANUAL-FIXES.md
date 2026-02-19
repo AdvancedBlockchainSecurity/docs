@@ -983,6 +983,140 @@ Not needed -- RustDefend v0.3.1 (image 0.3.2) now produces proper vulnerability 
 
 ---
 
+## February 19, 2026 - Backfill Scan duration_seconds
+
+### Issue
+Scan `duration_seconds` field was always NULL because it was calculated on-the-fly in the API but never persisted to the database.
+
+**Symptom:** API returned `duration_seconds: null` for all scans despite `started_at` and `completed_at` being populated.
+
+### Root Cause
+- The scan completion code never stored `duration_seconds` in the DB
+- It was calculated at response time but not committed
+- Fixed in api-service 0.28.53 and orchestration 0.9.16 (persist at all completion points)
+
+### Fix Applied
+```sql
+-- Backfill duration_seconds for all completed scans
+UPDATE scans
+SET duration_seconds = EXTRACT(EPOCH FROM (completed_at - started_at))::integer
+WHERE started_at IS NOT NULL
+  AND completed_at IS NOT NULL
+  AND duration_seconds IS NULL;
+-- Updated 219 rows
+```
+
+### Verification
+```sql
+SELECT COUNT(*) as missing_duration
+FROM scans
+WHERE started_at IS NOT NULL AND completed_at IS NOT NULL AND duration_seconds IS NULL;
+-- Expected: 0
+```
+
+### How to Reproduce Fix
+```bash
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U postgres -d solidity_security \
+  -c "UPDATE scans SET duration_seconds = EXTRACT(EPOCH FROM (completed_at - started_at))::integer WHERE started_at IS NOT NULL AND completed_at IS NOT NULL AND duration_seconds IS NULL;"
+```
+
+### Related Files
+- `blocksecops-api-service/src/presentation/api/v1/endpoints/scans.py` (lines ~1984, ~2184, ~2875)
+- `blocksecops-api-service/src/presentation/api/v1/endpoints/admin/scan_monitoring.py` (line ~362)
+- `blocksecops-orchestration/src/blocksecops_orchestration/tasks/scan_tasks_sync.py` (6 completion points)
+
+### Impact
+- **Before Fix:** All scans returned `duration_seconds: null`
+- **After Fix:** 219 existing scans have duration; new scans persist duration automatically
+
+### Prevention
+Code fix in api-service 0.28.53 and orchestration 0.9.16 persists `duration_seconds` at every scan completion point.
+
+---
+
+## February 19, 2026 - Backfill Solana Pattern CWE IDs
+
+### Issue
+32 Solana vulnerability patterns had `cwe_id = NULL` despite the source JSON containing CWE mappings.
+
+**Symptom:** Solana patterns missing CWE ID associations in pattern detail pages and audit reports.
+
+### Root Cause
+- `seed_solana_direct.py` ON CONFLICT clause did not include `cwe_id` in the UPDATE set
+- Patterns were initially seeded without CWE IDs, and subsequent re-seeds didn't update the field
+
+### Fix Applied
+```sql
+-- Updated 32 Solana patterns with CWE IDs from source JSON
+-- Examples:
+UPDATE vulnerability_patterns SET cwe_id = 'CWE-20' WHERE id = 'BVD-SOLANA-VAL-001';
+UPDATE vulnerability_patterns SET cwe_id = 'CWE-664' WHERE id = 'BVD-SOLANA-ACC-001';
+-- ... (32 total patterns)
+```
+
+### Verification
+```sql
+SELECT COUNT(*) as missing_cwe
+FROM vulnerability_patterns
+WHERE id LIKE 'BVD-SOLANA%' AND cwe_id IS NULL;
+-- Expected: 0
+```
+
+### Related Files
+- `blocksecops-api-service/scripts/intelligence/seed_solana_direct.py` (ON CONFLICT clause fixed)
+- `blocksecops-api-service/seeds/solana_vulnerability_patterns.json` (source data with cwe_ids)
+
+### Impact
+- **Before Fix:** 32 Solana patterns had no CWE mapping
+- **After Fix:** All Solana patterns have CWE IDs (CWE-20, CWE-664, CWE-682, etc.)
+
+### Prevention
+Fixed `seed_solana_direct.py` to include `cwe_id` in ON CONFLICT UPDATE clause.
+
+---
+
+## February 19, 2026 - ML False Positive Model Training and Batch Prediction
+
+### Issue
+`false_positive_score` field was NULL for all vulnerabilities because no ML model had been trained.
+
+**Symptom:** API returned `false_positive_score: null` for all vulnerabilities.
+
+### Operations Performed
+```sql
+-- No direct SQL; operations performed via API endpoints:
+-- 1. POST /api/v1/ml/train-false-positive (trained model on 384 labeled samples)
+-- 2. POST /api/v1/ml/predict-false-positive (batch predicted 763 vulnerabilities)
+```
+
+### Results
+- Model: Random Forest classifier
+- Training samples: 384
+- Accuracy: 97.4%
+- AUC: 0.995
+- Vulnerabilities predicted: 763
+- Model stored at: `/app/.cache/ml-models/fp_classifier_v1.joblib`
+
+### Prerequisites
+- `ML_MODEL_DIR=/app/.cache/ml-models` env var in deployment-patch.yaml (added in 0.28.53)
+- Enterprise user with sufficient labeled vulnerabilities (200+ minimum)
+- Temporary `platform_admin` role was granted then revoked for training endpoint access
+
+### Verification
+```sql
+SELECT COUNT(*) as has_fp_score
+FROM vulnerabilities
+WHERE false_positive_score IS NOT NULL;
+-- Expected: 763
+```
+
+### Impact
+- **Before Fix:** No ML predictions available
+- **After Fix:** 763 vulnerabilities have false positive probability scores
+
+---
+
 ## Template for Future Manual Fixes
 
 ### [Date] - [Brief Description]

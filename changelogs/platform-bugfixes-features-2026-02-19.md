@@ -6,9 +6,9 @@
 
 | Service | Version |
 |---------|---------|
-| api-service | 0.28.52 |
+| api-service | 0.28.54 |
 | dashboard | 0.45.12 |
-| orchestration | 0.9.15 |
+| orchestration | 0.9.16 |
 | tool-integration | 0.4.8 |
 
 ## Bug Fixes
@@ -89,6 +89,23 @@
 - SCM service: branch name sanitization, tokens never logged
 - Upload middleware: path-based exemption preserves tier enforcement
 
+## Post-Deployment Audit Fixes (API 0.28.53 → 0.28.54, Orchestration 0.9.16)
+
+### API Service 0.28.53 → 0.28.54
+- **Scan duration_seconds persistence:** Added `duration_seconds` calculation at all scan completion points (success, failure, stale recovery, admin force-fail). Pattern: `scan.duration_seconds = int((completed_at - started_at).total_seconds())`
+- **Vulnerability pagination tie-breaker:** Added secondary sort by `id DESC` to offset-based pagination to prevent duplicate/missing rows across pages
+- **VulnerabilityResponse schema:** Added `file_path` and `false_positive_score` fields to Pydantic response schema (columns existed in DB but were missing from API response)
+- **ML model writable directory:** Made `MODEL_DIR` configurable via `ML_MODEL_DIR` env var (default: `/app/.cache/ml-models`) since container filesystem is read-only
+- **Solana CWE seed fix:** Updated `seed_solana_direct.py` ON CONFLICT clause to include `cwe_id` in upsert
+
+### Orchestration 0.9.16
+- **Scan duration_seconds persistence:** Added `duration_seconds` calculation at 6 completion points in `scan_tasks_sync.py` (success, failure, stale, no-source, timeout, error)
+
+### Data Backfills Applied
+- **219 existing scans:** Backfilled `duration_seconds` from `started_at`/`completed_at` timestamps
+- **32 Solana patterns:** Updated `cwe_id` from source JSON (e.g., CWE-20, CWE-664, CWE-682)
+- **763 vulnerabilities:** Batch-predicted `false_positive_score` using trained ML model (97.4% accuracy, 0.995 AUC)
+
 ## Post-Deployment Fixes (API 0.28.47 → 0.28.52, Dashboard 0.45.9 → 0.45.12)
 
 ### API Service Fixes
@@ -113,4 +130,10 @@
 
 ## Database
 
-No migrations required. All changes use existing columns and tables.
+No Alembic migrations required. All changes use existing columns and tables.
+
+### Manual Data Operations (2026-02-19)
+- Backfilled `scans.duration_seconds` for 219 existing scans
+- Updated `vulnerability_patterns.cwe_id` for 32 Solana patterns
+- ML model trained on 384 labeled samples, batch-predicted 763 vulnerabilities with `false_positive_score`
+- Temporary `platform_admin` role granted/revoked for ML training (enterprise user)

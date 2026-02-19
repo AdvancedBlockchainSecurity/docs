@@ -173,6 +173,20 @@ vulnerability = VulnerabilityModel(
 
 ---
 
+## Vulnerability Response Schema
+
+The API response (`GET /api/v1/vulnerabilities`) includes these intelligence fields:
+
+- `file_path` — file where vulnerability was detected (set by scanner parsers)
+- `cwe_id` — CWE identifier from pattern mapping (all Solana patterns have CWE)
+- `false_positive_score` — ML prediction (0.0-1.0), requires trained model
+- `pattern_code` — BVD code classification
+- `user_classification` — user label (`confirmed`, `false_positive`)
+
+**Pagination:** Offset-based queries use `ORDER BY detected_at DESC, id DESC` for stable results.
+
+---
+
 ## Pattern Database
 
 ### Vulnerability Patterns (397 total)

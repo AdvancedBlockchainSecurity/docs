@@ -62,8 +62,10 @@ The `FeatureExtractor` produces 30+ features from each vulnerability:
 
 | Backend | Location | Config |
 |---------|----------|--------|
-| Local (default) | `src/ml/models/fp_classifier_v1.joblib` | `ML_STORAGE_BACKEND=local` |
+| Local (default) | `$ML_MODEL_DIR/fp_classifier_v1.joblib` | `ML_STORAGE_BACKEND=local` |
 | GCS | Google Cloud Storage bucket | `ML_STORAGE_BACKEND=gcs` |
+
+**Kubernetes deployment:** The `ML_MODEL_DIR` env var points to `/app/.cache/ml-models` (writable `emptyDir` volume). The container filesystem is read-only; without `ML_MODEL_DIR`, legacy save falls back to `src/ml/models/` which fails with `EROFS`. Default (unset): `src/ml/models/` (development only).
 
 ## Training Thresholds
 

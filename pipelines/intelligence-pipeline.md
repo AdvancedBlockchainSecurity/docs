@@ -89,9 +89,40 @@ Each finding is processed independently. If a single finding fails any stage, it
 | GET | `/admin/patterns/mappings/audit` | Find unmapped (scanner_id, detector_id) pairs |
 | POST | `/admin/patterns/{target_id}/merge` | Merge source pattern into target (moves vulns + mappings, deactivates source) |
 
+## Vulnerability API Response Fields
+
+The `VulnerabilityResponse` schema includes the following intelligence fields returned by `GET /vulnerabilities`:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `file_path` | `str?` | File path where vulnerability was detected |
+| `cwe_id` | `str?` | CWE identifier (e.g., `CWE-107`) |
+| `false_positive_score` | `float?` | ML-predicted FP probability (0.0-1.0), populated after model training |
+| `pattern_id` | `str?` | Matched BVD pattern UUID |
+| `pattern_code` | `str?` | BVD code (e.g., `BVD-SOLIDITY-REE-001`) |
+| `classification_confidence` | `float?` | Pattern classification confidence |
+| `fingerprint_code` | `str?` | SHA-256 code fingerprint |
+| `deduplication_group_id` | `UUID?` | Dedup group membership |
+| `user_classification` | `str?` | User label: `confirmed`, `false_positive`, `wont_fix`, `needs_review` |
+
+### Solana/Rust Pattern CWE Mapping
+
+Solana patterns (`BVD-SOLANA-*`) have CWE IDs mapped from source pattern files. The mapping flattens `cwe_ids` (array) from pattern JSON to `cwe_id` (string, first element) in the database. All 32 Solana patterns have CWE mappings.
+
+## Vulnerability Pagination
+
+Offset-based pagination uses a secondary sort by `id` (UUID) to ensure stable results when multiple vulnerabilities share the same `detected_at` timestamp. This prevents duplicate/missing rows across pages.
+
+```sql
+ORDER BY detected_at DESC, id DESC
+OFFSET :skip LIMIT :limit
+```
+
+Cursor-based pagination (recommended) uses keyset pagination with `(detected_at, id)` for guaranteed stability.
+
 ## Database Tables
 
 - `vulnerabilities` — enriched findings with intelligence columns (migration 006)
 - `deduplication_groups` — groups of duplicate findings with canonical selection
-- `vulnerability_patterns` — BVD pattern definitions
+- `vulnerability_patterns` — BVD pattern definitions (32 Solana patterns with CWE, 252 Solidity patterns with SWC/CWE)
 - `pattern_tool_mappings` — scanner detector → pattern mappings
