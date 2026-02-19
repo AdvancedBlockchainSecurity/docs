@@ -2,7 +2,7 @@
 
 **Version:** Dashboard 0.45.12 / API 0.28.54 / Orchestration 0.9.16 / Tool Integration 0.4.8
 **Date:** 2026-02-19
-**Status:** Tested (API)
+**Status:** Tested (API + Admin Verified)
 
 ## Prerequisites
 
@@ -241,11 +241,60 @@
 | Dedup confidence_level field | PASS | API returns `confidence_level` (property alias on model); original test expectation was wrong |
 | Dedup finding_count field | PASS | API returns `finding_count` (property alias on model); original test expectation was wrong |
 
+### Admin Pattern Audit/Merge Results (2026-02-19)
+
+| Test | Status | Notes |
+|------|--------|-------|
+| 13.1 Admin audit endpoint | PASS | Returns 5 unmapped (scanner_id, detector_id) pairs with finding counts |
+| 13.2 Non-admin blocked (404) | PASS | Security through obscurity — non-superusers get 404 |
+| 13.3 Developer tier gate (403) | PASS | `api_access_enabled=false` blocks at middleware |
+
+**Unmapped pairs found:**
+| Scanner | Detector | Findings |
+|---------|----------|----------|
+| slither | reentrancy-vulnerability | 3 |
+| aderyn | selfdestruct | 1 |
+| slither | unchecked-return-value | 1 |
+| sol-azy | saturating_math_operation_usage | 1 |
+| soliditydefend | eip4844-blob-validation | 1 |
+
+### E2E UI Test Setup
+
+**Services verified running:**
+- API service 0.28.54 (healthy)
+- Dashboard 0.45.12 (HTTP 200)
+- Orchestration 0.9.16 (4/4 containers)
+- Tool Integration 0.4.8 (2 replicas)
+
+**Test account:** `jasonbrailowbizop@mail.com` / `TestPass123` (enterprise tier)
+
 ### Admin Endpoint Test Setup
 
 The admin audit/merge endpoints require full admin authentication:
-1. `users.admin_role = 'platform_admin'`
-2. `users.admin_mfa_enabled = true`
-3. Valid `admin_sessions` row with `mfa_verified = true`, matching `ip_address`, and non-expired `expires_at`
-4. Session token passed via `X-Admin-Session` header (SHA-256 hashed in DB)
-5. IP must match — Traefik forwards as `10.244.0.1` (pod network), not `127.0.0.1`
+1. `users.is_superuser = true`
+2. `users.admin_role = 'platform_admin'`
+3. `users.admin_mfa_enabled = true`
+4. Valid `admin_sessions` row with `mfa_verified = true`, matching `ip_address`, and non-expired `expires_at`
+5. `session_token` column stores SHA-256 hex digest of the raw token
+6. Raw token passed via `X-Admin-Session` header or `admin_session` cookie
+7. IP must match — Traefik forwards as `10.244.0.1` (pod network), not `127.0.0.1`
+
+**Quick admin session setup for E2E testing:**
+```bash
+# 1. Grant admin role
+kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security \
+  -c "UPDATE users SET admin_role = 'platform_admin' WHERE email = 'jasonbrailowbizop@mail.com';"
+
+# 2. Create session (raw token → SHA-256 stored in DB)
+RAW_TOKEN="e2e-admin-test-token-$(date +%Y-%m-%d)"
+HASHED=$(echo -n "$RAW_TOKEN" | sha256sum | awk '{print $1}')
+kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -c "
+INSERT INTO admin_sessions (user_id, session_token, ip_address, mfa_verified, mfa_verified_at, expires_at, last_activity)
+SELECT id, '$HASHED', '10.244.0.1', true, NOW(), NOW() + INTERVAL '4 hours', NOW()
+FROM users WHERE email = 'jasonbrailowbizop@mail.com';"
+
+# 3. Test (pass raw token in header)
+curl -sk 'https://app.blocksecops.local/api/v1/admin/patterns/mappings/audit' \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "X-Admin-Session: $RAW_TOKEN"
+```
