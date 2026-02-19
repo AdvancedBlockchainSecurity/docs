@@ -338,6 +338,54 @@ WHERE dg.group_size != (
 
 ---
 
+## Phase 6b: Scan Duration Integrity
+
+### 6b.1 Find Scans Missing Duration
+
+```sql
+SELECT COUNT(*) AS missing_duration
+FROM scans
+WHERE started_at IS NOT NULL AND completed_at IS NOT NULL AND duration_seconds IS NULL;
+```
+
+### 6b.2 Fix: Backfill Duration Seconds
+
+```sql
+UPDATE scans SET duration_seconds = EXTRACT(EPOCH FROM (completed_at - started_at))::int
+WHERE started_at IS NOT NULL AND completed_at IS NOT NULL AND duration_seconds IS NULL;
+```
+
+**Expected:** 0 missing after backfill. New scans automatically persist `duration_seconds` at completion (API service 0.28.53+, orchestration 0.9.16+).
+
+---
+
+## Phase 6c: Solana Pattern CWE Coverage
+
+### 6c.1 Check CWE Coverage by Ecosystem
+
+```sql
+SELECT
+  CASE
+    WHEN id LIKE 'BVD-SOLANA-%' THEN 'Solana'
+    WHEN id LIKE 'BVD-SOLIDITY-%' THEN 'Solidity'
+    WHEN id LIKE 'BVD-EVM-%' THEN 'EVM'
+    ELSE 'Other'
+  END AS ecosystem,
+  COUNT(*) AS total,
+  COUNT(*) FILTER (WHERE cwe_id IS NOT NULL) AS has_cwe
+FROM vulnerability_patterns
+GROUP BY 1 ORDER BY 1;
+```
+
+**Expected:** All Solana patterns should have CWE IDs (mapped from `cwe_ids` array in pattern JSON). If missing, re-run the Solana CWE mapping:
+
+```bash
+cd /home/pwner/Git/blocksecops-api-service
+python3 scripts/intelligence/seed_solana_direct.py | kubectl exec -i -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security
+```
+
+---
+
 ## Phase 7: Scan Severity Count Accuracy
 
 ### 7.1 Find Scans with Wrong Counts

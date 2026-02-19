@@ -1,6 +1,6 @@
 # Feature Test 70: Platform Bug Fixes, Features & Security Hardening
 
-**Version:** Dashboard 0.45.12 / API 0.28.52 / Orchestration 0.9.15 / Tool Integration 0.4.8
+**Version:** Dashboard 0.45.12 / API 0.28.54 / Orchestration 0.9.16 / Tool Integration 0.4.8
 **Date:** 2026-02-19
 **Status:** Tested (API)
 
@@ -206,6 +206,8 @@
 | Date | Tester | Result | Notes |
 |------|--------|--------|-------|
 | 2026-02-19 | API test suite | 15 pass, 0 fail, 8 skip | API tests via Traefik HTTPS. Skips: UI tests (2.1, 3.1, 4.1, 5.1), file upload (6.1), Anthropic key (9.1, 11.1), SCM (15.1). Admin audit requires MFA session + IP match setup. |
+| 2026-02-19 | Full platform audit | 173 total, 166 pass, 7 fail | Post-deployment audit covering all endpoints. 7 failures addressed in api-service 0.28.53-0.28.54 and orchestration 0.9.16. |
+| 2026-02-19 | Audit fix verification | 7 pass, 0 fail | All 7 audit failures resolved. See audit fix results below. |
 
 ### API Test Results (2026-02-19)
 
@@ -226,6 +228,18 @@
 | 13.3 Developer tier gate (403) | PASS | api_access_enabled=false blocks at middleware |
 | S1 Sort injection safe | PASS | Invalid sort_by falls back to severity |
 | S2 Clean error messages | PASS | No internal details leaked |
+
+### Audit Fix Results (2026-02-19, API 0.28.54 / Orchestration 0.9.16)
+
+| Test | Status | Notes |
+|------|--------|-------|
+| Scan duration_seconds persisted | PASS | 219 existing scans backfilled; new scans persist duration at all completion points |
+| Vulnerability pagination stability | PASS | Secondary sort by `id DESC` prevents duplicate/missing rows across pages (verified 0 overlap) |
+| VulnerabilityResponse file_path | PASS | `file_path` field now returned in API response (verified: `./contract.rs`) |
+| VulnerabilityResponse false_positive_score | PASS | ML model trained (97.4% acc, 0.995 AUC), 763 vulns batch-predicted with FP scores |
+| Solana patterns CWE mapping | PASS | 32 patterns updated with CWE IDs (verified: CWE-20, CWE-664, CWE-682, etc.) |
+| Dedup confidence_level field | PASS | API returns `confidence_level` (property alias on model); original test expectation was wrong |
+| Dedup finding_count field | PASS | API returns `finding_count` (property alias on model); original test expectation was wrong |
 
 ### Admin Endpoint Test Setup
 

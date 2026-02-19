@@ -16,6 +16,7 @@ This playbook covers retraining the **False Positive Classifier** — a Random F
 - [ ] PostgreSQL database accessible
 - [ ] Sufficient labeled vulnerability data (see thresholds below)
 - [ ] Access to Admin Portal at `admin.blocksecops.local` or API endpoint
+- [ ] `ML_MODEL_DIR` env var set to a writable path (K8s: `/app/.cache/ml-models`)
 
 ---
 
