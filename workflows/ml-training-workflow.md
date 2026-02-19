@@ -54,6 +54,8 @@ Labels are collected from three sources (deduplicated):
 | API Labeling | `POST /api/v1/ml/label-vulnerability` | API |
 | Inline Updates | Direct `user_classification` field | Database |
 
+**Security:** The ML label endpoint verifies `contract.user_id == current_user.id` before allowing label saves. Secondary operations (provenance insert, scanner quality update, pattern FP update) use `db.begin_nested()` savepoints to prevent session corruption on partial failures.
+
 ### Label Values
 
 | Classification | is_real_vulnerability | Description |
@@ -420,6 +422,10 @@ curl -s http://127.0.0.1:8000/api/v1/ml/training-data-stats \
 1. Model may be undertrained
 2. Add 50+ more samples and retrain
 3. Check feature extraction logs
+
+### Label save failures (session corruption)
+
+The ML label endpoint uses `db.begin_nested()` savepoints for secondary operations. If a provenance insert or scanner quality update fails, only that savepoint is rolled back — the primary label save remains intact.
 
 ---
 

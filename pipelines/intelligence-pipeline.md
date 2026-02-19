@@ -77,6 +77,18 @@ Enriched Vulnerability Dict → INSERT into vulnerabilities table
 
 Each finding is processed independently. If a single finding fails any stage, it is logged and skipped — remaining findings continue processing.
 
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/patterns` | List patterns with `sort_by` and `sort_order` params (severity, name, category, false_positive_rate, created_at) |
+| GET | `/vulnerabilities` | List vulnerabilities with optional `pattern_id` filter |
+| GET | `/ml/pattern-stats` | Pattern statistics |
+| GET | `/ml/patterns/{pattern_id}` | Pattern lookup |
+| GET | `/ml/scanner-quality` | Scanner quality metrics |
+| GET | `/admin/patterns/mappings/audit` | Find unmapped (scanner_id, detector_id) pairs |
+| POST | `/admin/patterns/{target_id}/merge` | Merge source pattern into target (moves vulns + mappings, deactivates source) |
+
 ## Database Tables
 
 - `vulnerabilities` — enriched findings with intelligence columns (migration 006)

@@ -33,6 +33,8 @@ Inline labels      →         3. Deduplicate by vuln_id     6. Train RandomFore
 | 4 | Include soft-deleted | All sources | Soft-deleted vulnerabilities are included (labels preserved when contracts deleted) |
 | 5 | Deduplicate | By `vulnerability_id` | Keep one label per vulnerability (first seen wins) |
 
+**Security:** Label collection respects ownership verification — only labels from users who own the contract are accepted. The ML label endpoint verifies `contract.user_id == current_user.id` before allowing saves.
+
 ### Phase 2: Feature Extraction
 
 The `FeatureExtractor` produces 30+ features from each vulnerability:

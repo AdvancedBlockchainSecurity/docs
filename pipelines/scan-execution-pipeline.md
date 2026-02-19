@@ -54,6 +54,7 @@ POST /scans         →      Queue scan task      execute_scanners()          Sc
 | Step | Description |
 |------|-------------|
 | Parse findings | Extract raw vulnerability findings from each scanner result |
+| Validate snippets | Reject pragma-only snippets (`pragma solidity`) and line-1 outputs from SolidityDefend |
 | Intelligence pipeline | Process through [Intelligence Pipeline](./intelligence-pipeline.md) |
 | Store findings | Insert enriched vulnerabilities into database |
 | Update scan | Set scan status to `completed` with summary statistics |
@@ -103,6 +104,8 @@ The `ScannerContext` dataclass contains everything a scanner needs:
 | Sec3 X-Ray | Solana/Rust | Static Analysis | via K8s Job |
 | Trident | Solana/Rust | Fuzzer | via K8s Job |
 | Cargo Fuzz | Solana/Rust | Fuzzer | via K8s Job |
+| RustDefend | Solana/Rust | Static Analysis | via K8s Job |
+| Vyper | Vyper | Static Analysis | via K8s Job |
 
 ## Files
 

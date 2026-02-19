@@ -31,7 +31,7 @@ POST /invariants/generate →       1. Authenticate (JWT)                       
 | # | Step | Component | Description |
 |---|------|-----------|-------------|
 | 1 | Authentication | `get_current_user` | JWT required |
-| 2 | Tier gate | `require_tier("growth")` | Developer and Team tiers blocked with upgrade message |
+| 2 | Tier gate | `require_tier("team")` | Developer tier blocked with upgrade message |
 | 3 | Feature flag | `settings.ai_features_enabled` | Returns 503 if disabled |
 | 4 | Quota check | Monthly (tier-based) + daily (500 enterprise cap) | Returns 429 with quota details |
 | 5 | Cooldown check | 5-second minimum between requests | Returns 429 with `Retry-After` header |
@@ -119,4 +119,5 @@ Error responses for quota exhaustion:
 | Contract too large | 400 | Size limit exceeded |
 | Injection detected | 400 | Validation error |
 | Rate limited | 429 | Too many requests |
-| Anthropic API failure | 500 | Sanitized error |
+| Anthropic API key missing | 503 | "AI service not configured" |
+| Anthropic API failure | 503 | "AI service temporarily unavailable" (sanitized) |
