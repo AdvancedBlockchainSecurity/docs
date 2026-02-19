@@ -234,9 +234,9 @@ GET /api/v1/ml/scanner-quality
 
 ### Pattern Listing (with sorting)
 ```bash
-GET /api/v1/patterns?sort_by=severity&sort_order=desc
+GET /api/v1/intelligence/patterns?sort_by=severity&sort_order=desc
 ```
-Supported sort fields: `severity`, `name`, `category`, `false_positive_rate`, `created_at`. Column resolved via dict lookup (SQL injection safe).
+Supported sort fields: `severity`, `name`, `category`, `false_positive_rate`, `created_at`. Severity ordering: critical → high → medium → low → info → optimization → varies. Column resolved via dict lookup (SQL injection safe).
 
 ### Vulnerability Listing (with pattern filter)
 ```bash

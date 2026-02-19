@@ -221,6 +221,18 @@ asyncio.run(run_full_maintenance())
 
 ### 5.1 Find Unmapped Detectors
 
+**Via Admin API (recommended):**
+
+```bash
+curl -sk "https://app.blocksecops.local/api/v1/admin/patterns/mappings/audit?limit=100" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "X-Admin-Session: $ADMIN_SESSION_TOKEN" | jq '.unmapped[] | "\(.scanner_id) / \(.detector_id): \(.finding_count) findings"' -r
+```
+
+> **Note:** Requires `platform_admin` role with MFA-verified admin session. See [Admin Account Setup](admin-account-setup.md).
+
+**Via SQL (alternative):**
+
 ```sql
 SELECT v.scanner_id, v.category AS detector_id, COUNT(*) AS vuln_count
 FROM vulnerabilities v

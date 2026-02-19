@@ -329,7 +329,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.1 | `k8s/overlays/local/` | Add RustDefend to scanner admin page |
-| api-service | 0.28.49 | `k8s/overlays/local/api-service/` | Bug fixes, features & security hardening: pattern sorting (case-insensitive), pattern_id filter, code snippet validation, optional repair original_code, ML label savepoints, upload size exemption, admin pattern audit/merge, SCM PR creation, invariant Tier fix, import fix, address Form() fix |
+| api-service | 0.28.52 | `k8s/overlays/local/api-service/` | Bug fixes, features & security hardening: pattern sorting (case-insensitive, severity ordering fix), pattern_id filter, code snippet validation, optional repair original_code, ML label savepoints, upload size exemption, admin pattern audit/merge (log_admin_action fix), SCM PR creation, invariant Tier fix, import fix, address Form() fix |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.45.12 | `k8s/overlays/local/` | Fix: RecentScans link used /scan-results/ instead of /scans/ route; correct Supabase credentials |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |

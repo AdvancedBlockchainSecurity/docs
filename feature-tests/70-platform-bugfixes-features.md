@@ -1,8 +1,8 @@
 # Feature Test 70: Platform Bug Fixes, Features & Security Hardening
 
-**Version:** Dashboard 0.45.12 / API 0.28.49 / Orchestration 0.9.15 / Tool Integration 0.4.8
+**Version:** Dashboard 0.45.12 / API 0.28.52 / Orchestration 0.9.15 / Tool Integration 0.4.8
 **Date:** 2026-02-19
-**Status:** Ready for testing
+**Status:** Tested (API)
 
 ## Prerequisites
 
@@ -205,4 +205,33 @@
 
 | Date | Tester | Result | Notes |
 |------|--------|--------|-------|
-| | | | |
+| 2026-02-19 | API test suite | 15 pass, 0 fail, 8 skip | API tests via Traefik HTTPS. Skips: UI tests (2.1, 3.1, 4.1, 5.1), file upload (6.1), Anthropic key (9.1, 11.1), SCM (15.1). Admin audit requires MFA session + IP match setup. |
+
+### API Test Results (2026-02-19)
+
+| Test | Status | Notes |
+|------|--------|-------|
+| 1.1 Sort by severity (desc → critical first) | PASS | Fixed in 0.28.52 (severity case ordering) |
+| 1.2 Sort by name | PASS | |
+| 1.3 Sort by category | PASS | |
+| 1.4 Sort by false_positive_rate | PASS | |
+| 1.5 Sort by created_at | PASS | |
+| 1.6 Asc/desc produce different results | PASS | Fixed in 0.28.52 |
+| 1.7 Pagination (offset=0 vs offset=5) | PASS | |
+| 7.1 Pattern findings filter (pattern_id) | PASS | |
+| 8.1 Vulnerabilities accessible | PASS | |
+| 10.1 ML label save | PASS | |
+| 13.1 Admin audit endpoint | PASS | Fixed in 0.28.50 (log_admin_action params); requires admin_role + MFA + session |
+| 13.2 Non-admin blocked (404) | PASS | Security through obscurity |
+| 13.3 Developer tier gate (403) | PASS | api_access_enabled=false blocks at middleware |
+| S1 Sort injection safe | PASS | Invalid sort_by falls back to severity |
+| S2 Clean error messages | PASS | No internal details leaked |
+
+### Admin Endpoint Test Setup
+
+The admin audit/merge endpoints require full admin authentication:
+1. `users.admin_role = 'platform_admin'`
+2. `users.admin_mfa_enabled = true`
+3. Valid `admin_sessions` row with `mfa_verified = true`, matching `ip_address`, and non-expired `expires_at`
+4. Session token passed via `X-Admin-Session` header (SHA-256 hashed in DB)
+5. IP must match — Traefik forwards as `10.244.0.1` (pod network), not `127.0.0.1`

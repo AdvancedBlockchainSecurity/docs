@@ -1,7 +1,56 @@
 # API Endpoints Changelog
 
 **Source**: Consolidated from `blocksecops-docs/api/endpoints-reference.md`
-**Last Updated**: January 10, 2026
+**Last Updated**: February 19, 2026
+
+---
+
+## v1.5.0 (2026-02-19)
+
+**Added - Platform Bug Fixes, Features & Security Hardening**:
+
+**New Endpoints**:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/intelligence/patterns` | List patterns with sort/filter/pagination |
+| GET | `/api/v1/intelligence/patterns/{id}` | Get pattern details |
+| GET | `/api/v1/intelligence/patterns/{id}/statistics` | Pattern statistics (findings, scanners, severity) |
+| GET | `/api/v1/admin/patterns/mappings/audit` | Find unmapped (scanner_id, detector_id) pairs |
+| POST | `/api/v1/admin/patterns/{target_id}/merge` | Merge source pattern into target |
+| POST | `/api/v1/organizations/{org_id}/integrations/{id}/repositories/{repo_id}/pull-requests` | Create PR from AI repair |
+
+**Enhanced Endpoints**:
+| Method | Endpoint | Change |
+|--------|----------|--------|
+| GET | `/api/v1/vulnerabilities` | Added `pattern_id` query parameter |
+| POST | `/api/v1/upload` | Added `address` parameter with hex validation |
+| POST | `/api/v1/ml/label-vulnerability` | Added ownership verification (security fix) |
+| POST | `/api/v1/code-repair/generate` | Made `original_code` optional with source fallback |
+
+**Pattern Sorting Query Parameters** (`GET /intelligence/patterns`):
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `sort_by` | string | severity | Sort field: severity, name, category, false_positive_rate, created_at |
+| `sort_order` | string | desc | Sort direction: asc, desc |
+| `limit` | int | 50 | Results per page (1-500) |
+| `offset` | int | 0 | Pagination offset |
+| `ecosystem` | string | - | Filter: EVM, SOL, STA |
+| `category` | string | - | Filter by category |
+| `severity` | string | - | Filter by severity |
+| `search` | string | - | Search name/description |
+
+**Severity Sort Ordering**: critical → high → medium → low → info → optimization → varies
+
+**Security**:
+- Sort columns resolved via allowlist dict lookup (SQL injection safe)
+- Admin endpoints require `platform_admin` role + MFA + session (returns 404 for non-admins)
+- ML label ownership: `contract.user_id == current_user.id`
+- DB savepoints (`db.begin_nested()`) for secondary operations
+- Error sanitization via `get_safe_error_detail()`
+
+**Technical**:
+- API Service version 0.28.52
+- No database migrations required
 
 ---
 
