@@ -1,7 +1,7 @@
 # AI Features Workflow
 
-**Version:** 1.1.0
-**Last Updated:** February 14, 2026
+**Version:** 1.2.0
+**Last Updated:** February 19, 2026
 **Status:** Active
 
 ---
@@ -62,7 +62,7 @@ This document covers the end-to-end workflow for all AI-powered features in the 
 
 | Service | Purpose | Key Components |
 |---------|---------|----------------|
-| **API Service** | AI endpoint gateway, tier gating, rate limiting | `endpoints/copilot.py`, `code_review.py`, `code_repair.py`, `invariants.py`, `exploits.py`, `economic_analysis.py` |
+| **API Service** | AI endpoint gateway, tier gating, rate limiting | `endpoints/copilot.py`, `code_review.py`, `code_repair.py`, `invariants.py`, `exploits.py`, `economic_analysis.py`, `integrations.py` (SCM PR creation) |
 | **Anthropic Claude API** | LLM inference for all AI features | External service, API key from Vault |
 | **PostgreSQL** | Quota tracking, conversation storage, result persistence | `user_quotas`, `copilot_messages`, etc. |
 | **Dashboard** | React UI for AI feature interactions | Chat panel, vulnerability detail AI actions |
@@ -149,19 +149,51 @@ ALL reviews displayed inline on vulnerability page (v0.45.3):
 User views vulnerability → Clicks "Generate AI Repair" in AI Actions panel
      │
      ▼
-Original code + vulnerability context → Claude Sonnet API called
+Original code (or auto-extracted from contract source) + vulnerability context
+→ Claude Sonnet API called
      │
      ▼
 Repaired code + explanation + diff returned
      │
      ▼
-ALL repairs displayed inline on vulnerability page (v0.45.3):
+ALL repairs displayed inline on vulnerability page (v0.45.9):
   - Fix type badge + status badge (pending/generating/ready/applied/rejected)
   - Confidence percentage
   - Full explanation text
   - Expandable: original code (red), fixed code (green), diff
   - Footer: model used, applied status, generation date
+  - "Create Pull Request" button (if SCM integration connected + repair has file_path)
 ```
+
+> **v0.28.46 Enhancement:** `original_code` is now optional in the repair request. When not provided (e.g., manual uploads without code snippets), the backend extracts source from `ContractModel.source_code` or `ContractFileModel.file_content`. The dashboard enables the repair button whenever the vulnerability has a `code_snippet` OR the contract has `source_code`.
+
+### 4a. SCM Pull Request Creation (Post-Repair)
+
+```
+User generates repair → Clicks "Create Pull Request" on repair card
+     │
+     ▼
+Select repository + confirm branch name + review PR title/body
+     │
+     ▼
+POST /integrations/{id}/repositories/{repo_id}/pull-requests
+     │
+     ├──▶ Validate repair exists + integration connected
+     ├──▶ Decrypt OAuth token from IntegrationCredentialModel
+     ├──▶ SCMService: create branch → get file → commit fix → open PR
+     │
+     ▼
+PR URL returned → displayed on repair card
+```
+
+**Supported SCM Providers:**
+- GitHub (REST API v3)
+- GitLab (REST API v4)
+
+**Security:**
+- Branch names sanitized via regex (`[^a-zA-Z0-9._/-]` → `-`, max 100 chars)
+- OAuth tokens decrypted at use time, never logged
+- Integration must be `status="connected"` and user must have org membership
 
 ### 5. PoC Exploit Generation
 
@@ -379,9 +411,12 @@ All error responses use `get_safe_error_detail()` to prevent internal informatio
 - `blocksecops-api-service/src/presentation/api/v1/endpoints/invariants.py`
 - `blocksecops-api-service/src/presentation/api/v1/endpoints/exploits.py`
 - `blocksecops-api-service/src/presentation/api/v1/endpoints/economic_analysis.py`
+- `blocksecops-api-service/src/presentation/api/v1/endpoints/integrations.py` — SCM PR creation endpoint
 - `blocksecops-api-service/src/application/services/copilot_service.py`
 - `blocksecops-api-service/src/application/services/exploit_service.py`
 - `blocksecops-api-service/src/application/services/invariant_service.py`
+- `blocksecops-api-service/src/application/services/code_repair_service.py` — Optional `original_code` with contract source fallback
+- `blocksecops-api-service/src/application/services/scm_service.py` — GitHub/GitLab PR creation
 - `blocksecops-api-service/src/infrastructure/config.py`
 
 **Dashboard (Frontend — AI Actions on Vulnerability Detail):**

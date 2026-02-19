@@ -94,6 +94,7 @@ Step-by-step operational guides for common tasks.
 | Playbook | Description |
 |----------|-------------|
 | [AI/ML Comprehensive Audit](ai-ml-audit-playbook.md) | Audit all AI/ML features: patterns, deduplication, ML endpoints, frontend components |
+| [SCM PR Creation from AI Repair](scm-pr-creation.md) | Create GitHub/GitLab pull requests directly from AI-generated code repairs |
 
 ## Playbook Format
 
