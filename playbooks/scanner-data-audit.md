@@ -1,7 +1,7 @@
 # Playbook: Scanner Data Audit
 
-**Version:** 1.0.0
-**Last Updated:** February 6, 2026
+**Version:** 1.1.0
+**Last Updated:** February 19, 2026
 
 ## Overview
 
@@ -12,9 +12,10 @@ This playbook provides a systematic audit of scanner data integrity, pattern map
 ## Prerequisites
 
 - [ ] PostgreSQL accessible (kubectl exec or port-forward)
-- [ ] API service running
+- [ ] API service running (v0.28.54+)
 - [ ] Tool-integration service running
-- [ ] Valid JWT token for API authentication
+- [ ] Valid JWT token for API authentication (Supabase)
+- [ ] Admin session for pattern audit (see [Admin Session Setup](#admin-session-setup-for-pattern-audit))
 - [ ] Database backup created before any fixes
 
 ---
@@ -217,6 +218,35 @@ asyncio.run(run_full_maintenance())
 
 ---
 
+## Admin Session Setup for Pattern Audit
+
+The admin pattern audit endpoint requires full admin authentication. Set up before Phase 5:
+
+```bash
+# 1. Ensure user has admin flags
+kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -c "
+UPDATE users SET is_superuser = true, admin_role = 'platform_admin', admin_mfa_enabled = true
+WHERE email = '<ADMIN_EMAIL>';"
+
+# 2. Create MFA-verified admin session
+# Token is stored as SHA-256 hex digest; raw token passed in X-Admin-Session header
+RAW_TOKEN="admin-audit-$(date +%Y-%m-%d)"
+HASHED=$(echo -n "$RAW_TOKEN" | sha256sum | awk '{print $1}')
+kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -c "
+INSERT INTO admin_sessions (user_id, session_token, ip_address, mfa_verified, mfa_verified_at, expires_at, last_activity)
+SELECT id, '$HASHED', '10.244.0.1', true, NOW(), NOW() + INTERVAL '4 hours', NOW()
+FROM users WHERE email = '<ADMIN_EMAIL>';"
+
+# 3. Verify
+curl -sk 'https://app.blocksecops.local/api/v1/admin/patterns/mappings/audit' \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "X-Admin-Session: $RAW_TOKEN" | jq '.total_unmapped'
+```
+
+> **IP binding:** Traefik forwards client IP as `10.244.0.1` (pod network). The admin session must match this IP. If accessing directly (port-forward), use `127.0.0.1` instead.
+
+---
+
 ## Phase 5: Pattern Mapping Gaps
 
 ### 5.1 Find Unmapped Detectors
@@ -225,11 +255,11 @@ asyncio.run(run_full_maintenance())
 
 ```bash
 curl -sk "https://app.blocksecops.local/api/v1/admin/patterns/mappings/audit?limit=100" \
-  -H "Authorization: Bearer $ADMIN_TOKEN" \
-  -H "X-Admin-Session: $ADMIN_SESSION_TOKEN" | jq '.unmapped[] | "\(.scanner_id) / \(.detector_id): \(.finding_count) findings"' -r
+  -H "Authorization: Bearer $TOKEN" \
+  -H "X-Admin-Session: $RAW_TOKEN" | jq '.unmapped[] | "\(.scanner_id) / \(.detector_id): \(.finding_count) findings"' -r
 ```
 
-> **Note:** Requires `platform_admin` role with MFA-verified admin session. See [Admin Account Setup](admin-account-setup.md).
+> **Note:** Requires `is_superuser=true` + `admin_role='platform_admin'` + MFA-verified admin session with matching IP. See [Admin Session Setup](#admin-session-setup-for-pattern-audit) above.
 
 **Via SQL (alternative):**
 

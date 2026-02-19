@@ -78,6 +78,8 @@
 ### Admin Pattern Management
 - `GET /admin/patterns/mappings/audit` — finds unmapped (scanner_id, detector_id) pairs
 - `POST /admin/patterns/{target_id}/merge` — merges source pattern into target (moves vulns + mappings, deactivates source)
+- **Verified:** Audit returns 5 unmapped pairs (slither/reentrancy-vulnerability, aderyn/selfdestruct, slither/unchecked-return-value, sol-azy/saturating_math_operation_usage, soliditydefend/eip4844-blob-validation)
+- **Auth:** Requires `is_superuser=true` + `admin_role='platform_admin'` + MFA-verified admin session with IP binding (10.244.0.1 via Traefik)
 
 ## Security Hardening
 

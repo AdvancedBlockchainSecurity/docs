@@ -1,8 +1,8 @@
 # Playbook: Admin Session Management
 
-**Version**: 1.0.0
-**Last Updated**: 2026-01-25
-**Tested On**: api-service v0.11.11
+**Version**: 1.1.0
+**Last Updated**: 2026-02-19
+**Tested On**: api-service v0.28.54
 
 ---
 

@@ -260,12 +260,28 @@ GET /api/v1/vulnerabilities?pattern_id={pattern_id}
 ### Admin Pattern Audit
 ```bash
 GET /api/v1/admin/patterns/mappings/audit
+# Headers: Authorization: Bearer <JWT>, X-Admin-Session: <raw_token>
 ```
 Returns unmapped `(scanner_id, detector_id)` pairs with finding counts.
+
+**Auth requirements:** `is_superuser=true` + `admin_role='platform_admin'` + MFA-verified admin session. Non-admins receive 404 (security through obscurity). See [Scanner Data Audit Playbook](../playbooks/scanner-data-audit.md#admin-session-setup-for-pattern-audit) for session setup.
+
+**Example response (2026-02-19):**
+```json
+{
+  "unmapped": [
+    {"scanner_id": "slither", "detector_id": "reentrancy-vulnerability", "finding_count": 3},
+    {"scanner_id": "aderyn", "detector_id": "selfdestruct", "finding_count": 1}
+  ],
+  "total_unmapped": 5
+}
+```
 
 ### Admin Pattern Merge
 ```bash
 POST /api/v1/admin/patterns/{target_id}/merge
+Body: {"source_pattern_id": "<source_id>"}
+# Headers: Authorization: Bearer <JWT>, X-Admin-Session: <raw_token>
 ```
 Merges source pattern into target: moves vulnerabilities and tool mappings, deactivates source.
 
