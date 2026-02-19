@@ -442,6 +442,14 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
 
 ### Recent Updates Recorded
 
+- **2026-02-18**: Deduplication Pipeline Schedule Fix + Pattern Mapping Backfill
+  - **CronJob schedule**: Fixed from every 6 hours (`0 */6 * * *`) to daily at 2 AM UTC (`0 2 * * *`) per docs/pipelines/deduplication-pipeline.md
+  - **Pattern mappings**: Backfilled 40 missing `pattern_tool_mappings` entries (alias detector names from slither, aderyn, semgrep, wake, soliditydefend)
+  - Root cause: Seeds had 678 mappings but DB only had 667 — 40 mappings added for detector_id variants across scanner versions
+  - Addresses: 596 dedup groups without pattern_code, 1067 ungrouped vulnerabilities
+  - Service version: api-service 0.28.44 → 0.28.45
+  - See: `TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-18-DEDUP-SCHEDULE-DATA-FIX.md`
+
 - **2026-02-18**: RustDefend v0.5.1 Clean-Slate Upgrade + Scanner Ecosystem Audit
   - **RustDefend clean-slate**: Deleted all old findings (9 vulns, 5 scans, 4 dedup groups) due to high FP rate in previous version
   - **RustDefend rescans**: 13/14 Rust contracts scanned, 46 findings (25 critical, 20 high, 1 medium), v2-rs clean (0 findings)

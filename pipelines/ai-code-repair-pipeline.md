@@ -20,7 +20,9 @@ POST /code-repair/generate → 1. Authenticate (JWT)                            
 ## Trigger
 
 - **Dashboard**: User clicks "AI Repair" on a vulnerability finding
-- **Input**: `vulnerability_id`, `original_code`, `file_path`, `start_line`, `end_line`
+- **Input**: `vulnerability_id`, `original_code` (optional), `file_path`, `start_line`, `end_line`
+
+> **v0.28.46:** `original_code` is now optional. When omitted, the backend automatically extracts source code from `ContractModel.source_code` or `ContractFileModel.file_content` using the vulnerability's `file_path` and `line_number`. This enables repair generation for manually uploaded contracts that lack code snippets.
 
 ## Pipeline Steps
 
@@ -30,7 +32,7 @@ POST /code-repair/generate → 1. Authenticate (JWT)                            
 | 2 | Tier gate | `require_tier("team")` | Developer tier blocked |
 | 3 | Feature flags | `ai_features_enabled` + `ai_code_repair_enabled` | Returns 503 if disabled |
 | 4 | Rate limiting | `@limiter.limit(get_rate_limit_string("ai", "codeRepair"))` | Per-tier rate limits (BSO-SEC-AI-003) |
-| 5 | Load context | Database query | Fetch vulnerability details, surrounding code context |
+| 5 | Load context | Database query | Fetch vulnerability details, surrounding code context. If `original_code` not provided, extract from contract source |
 | 6 | Anthropic API call | `CodeRepairService.generate_repair()` | Model: `claude-sonnet-4-20250514`, max tokens: 4096 |
 | 7 | Store result | Database INSERT | Save repair with repaired_code, explanation, diff |
 
@@ -55,7 +57,7 @@ POST /code-repair/generate → 1. Authenticate (JWT)                            
 | DELETE | `/code-repair/repairs/{repair_id}` | JWT | Delete repair |
 | GET | `/code-repair/statistics` | JWT | Repair statistics |
 
-## Dashboard Display (v0.45.3)
+## Dashboard Display (v0.45.9)
 
 All repair results are displayed **inline on the vulnerability detail page** — no separate `/code-repair` page navigation required. Each repair card shows:
 
@@ -85,6 +87,7 @@ All repair results are displayed **inline on the vulnerability detail page** —
 | Tier insufficient | 403 | Tier gate rejection |
 | Rate limited | 429 | Too many requests |
 | Vulnerability not found | 404 | Standard not found |
+| No source code available | 400 | `"No source code available for repair"` |
 | Anthropic API failure | 500 | Sanitized error via `get_safe_error_detail()` |
 
 ## Tier Quotas

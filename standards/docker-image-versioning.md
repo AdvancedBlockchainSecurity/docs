@@ -329,14 +329,14 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.1 | `k8s/overlays/local/` | Add RustDefend to scanner admin page |
-| api-service | 0.28.44 | `k8s/overlays/local/api-service/` | Scanner ecosystem audit + update RustDefend repo URL to 0xStarBridge |
+| api-service | 0.28.49 | `k8s/overlays/local/api-service/` | Bug fixes, features & security hardening: pattern sorting (case-insensitive), pattern_id filter, code snippet validation, optional repair original_code, ML label savepoints, upload size exemption, admin pattern audit/merge, SCM PR creation, invariant Tier fix, import fix, address Form() fix |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.45.8 | `k8s/overlays/local/` | Security audit fixes: removed localStorage token storage, deleted deprecated auth/scanner files, fixed WebSocket reconnect auth, added chat input validation, replaced non-null assertions |
+| dashboard | 0.45.12 | `k8s/overlays/local/` | Fix: RecentScans link used /scan-results/ instead of /scans/ route; correct Supabase credentials |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
-| orchestration | 0.9.14 | `k8s/overlays/local/` | Scanner ecosystem audit: rebuild ConfigMap, remove deprecated scanners |
-| tool-integration | 0.4.7 | `k8s/overlays/local/` | Scanner ecosystem audit: add HalmosParser, SolidityDefendParser, mark MythrilParser legacy |
+| orchestration | 0.9.15 | `k8s/overlays/local/` | Code snippet validation: reject pragma-only snippets from SolidityDefend line=1 outputs |
+| tool-integration | 0.4.8 | `k8s/overlays/local/` | Code snippet validation: reject pragma-only snippets in SolidityDefendParser |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |
