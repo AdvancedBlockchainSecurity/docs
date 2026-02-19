@@ -6,7 +6,7 @@
 
 | Service | Version |
 |---------|---------|
-| api-service | 0.28.49 |
+| api-service | 0.28.52 |
 | dashboard | 0.45.12 |
 | orchestration | 0.9.15 |
 | tool-integration | 0.4.8 |
@@ -53,7 +53,7 @@
 - Sortable by: severity, name, category, false positive rate, date created
 - Ascending/descending toggle
 - Pagination with prev/next controls
-- Severity sort uses weighted ordering (critical=0, high=1, medium=2, low=3, info=4)
+- Severity sort uses weighted ordering (critical=0, high=1, medium=2, low=3, info=4, optimization=5, varies=6)
 - **Security:** Sort columns resolved via dict lookup (SQL injection safe)
 
 ### Patterns View in Scan Results
@@ -89,12 +89,15 @@
 - SCM service: branch name sanitization, tokens never logged
 - Upload middleware: path-based exemption preserves tier enforcement
 
-## Post-Deployment Fixes (API 0.28.47 → 0.28.49, Dashboard 0.45.9 → 0.45.12)
+## Post-Deployment Fixes (API 0.28.47 → 0.28.52, Dashboard 0.45.9 → 0.45.12)
 
 ### API Service Fixes
 - **0.28.47:** Case-insensitive pattern sort — added `func.lower()` for text columns (name, category)
 - **0.28.48:** Invariant tier fix — `get_tier()` returns Tier object, not dict; changed `.get('quotas')` to `.quotas.monthly_ai_invariants_limit`
 - **0.28.49:** Upload address parameter — changed bare `Optional[str] = None` to `Form(None)` for multipart form handling
+- **0.28.50:** Admin pattern audit/merge fix — `log_admin_action()` calls used wrong parameters (`admin_id` instead of `admin`, missing `request`), causing TypeError on endpoint access; added `Request` dependency to both endpoints
+- **0.28.51:** Severity sort completeness — added `optimization` and `varies` to severity ordering case statement (were falling to `else_=5`, appearing before `critical` in DESC)
+- **0.28.52:** Severity sort direction fix — inverted `asc()`/`desc()` on case values so DESC returns `critical` first (case value 0 → ascending) and ASC returns `varies` first
 
 ### Dashboard Fixes
 - **0.45.10:** React hooks ordering — moved `useMemo` for `patternAggregates` before early returns in `ScanResults.tsx` (was causing "Rendered more hooks than during the previous render" crash); Fixed `PatternDetail.tsx` to match actual API response shape (array `scanner_breakdown`, `severity_distribution` key, `scanners_detecting`/`most_common_scanner`/`active_findings` fields); Added project display badges to `ContractDetail.tsx`

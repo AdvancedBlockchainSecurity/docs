@@ -81,7 +81,7 @@ Each finding is processed independently. If a single finding fails any stage, it
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/patterns` | List patterns with `sort_by` and `sort_order` params (severity, name, category, false_positive_rate, created_at) |
+| GET | `/intelligence/patterns` | List patterns with `sort_by` and `sort_order` params (severity, name, category, false_positive_rate, created_at). Severity ordering: critical → high → medium → low → info → optimization → varies |
 | GET | `/vulnerabilities` | List vulnerabilities with optional `pattern_id` filter |
 | GET | `/ml/pattern-stats` | Pattern statistics |
 | GET | `/ml/patterns/{pattern_id}` | Pattern lookup |
