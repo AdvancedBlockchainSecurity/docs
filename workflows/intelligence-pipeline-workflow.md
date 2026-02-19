@@ -46,7 +46,7 @@ The Intelligence Pipeline processes raw scanner output through multiple stages t
 ```python
 @dataclass
 class NormalizedFinding:
-    scanner_id: str      # e.g., "slither", "mythril"
+    scanner_id: str      # e.g., "slither", "aderyn", "soliditydefend"
     detector_id: str     # Scanner's detector name
     title: str
     description: str
@@ -201,7 +201,7 @@ Maps scanner detectors to BVD patterns:
 }
 ```
 
-**Supported Scanners:** slither, mythril, securify2, oyente, smartcheck, solhint, soliditydefend, wake, echidna, medusa, halmos
+**Supported Scanners:** slither, aderyn, semgrep, solhint, soliditydefend, wake, echidna, medusa, halmos, vyper, moccasin, sol-azy, sec3-xray, trident, cargo-fuzz-solana, rustdefend
 
 ### Seeding Patterns
 
@@ -231,6 +231,29 @@ GET /api/v1/ml/patterns/{pattern_id}
 ```bash
 GET /api/v1/ml/scanner-quality
 ```
+
+### Pattern Listing (with sorting)
+```bash
+GET /api/v1/patterns?sort_by=severity&sort_order=desc
+```
+Supported sort fields: `severity`, `name`, `category`, `false_positive_rate`, `created_at`. Column resolved via dict lookup (SQL injection safe).
+
+### Vulnerability Listing (with pattern filter)
+```bash
+GET /api/v1/vulnerabilities?pattern_id={pattern_id}
+```
+
+### Admin Pattern Audit
+```bash
+GET /api/v1/admin/patterns/mappings/audit
+```
+Returns unmapped `(scanner_id, detector_id)` pairs with finding counts.
+
+### Admin Pattern Merge
+```bash
+POST /api/v1/admin/patterns/{target_id}/merge
+```
+Merges source pattern into target: moves vulnerabilities and tool mappings, deactivates source.
 
 ---
 

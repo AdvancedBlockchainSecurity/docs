@@ -60,13 +60,13 @@ Read-only endpoints (list, detail) accept both via `get_current_user_or_api_key`
 ## Data Flow
 
 ```
-ContractCreate (name, source_code, language?, files?)
+ContractCreate (name, source_code, language?, files?, address?)
       │
       ▼
 Language Detection (auto-detect or explicit)
       │
       ▼
-ContractModel (id, user_id, name, language, status="uploaded")
+ContractModel (id, user_id, name, language, address?, status="uploaded")
       │
       ▼
 ContractFileModel[] (for multi-file: path, content, is_main_file)
@@ -101,4 +101,5 @@ ContractResponse (id, vulnerabilities: {0,0,0,0}, projects, tags)
 | Duplicate name | 409 | Contract with same name already exists for user |
 | Invalid language | 400 | Language not in supported enum |
 | Auth failure | 401/403 | Invalid token/key or insufficient scope |
+| Invalid address | 400 | Address fails `^0x[0-9a-fA-F]{40}$` validation (silently ignored) |
 | Validation error | 422 | Missing required fields in request body |

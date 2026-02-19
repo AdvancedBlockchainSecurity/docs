@@ -76,6 +76,11 @@ User uploads file/archive
           │
           ▼
 ┌───────────────────┐
+│ Validate address  │ Optional: ^0x[0-9a-fA-F]{40}$ (silently ignored if invalid)
+└─────────┬─────────┘
+          │
+          ▼
+┌───────────────────┐
 │ LanguageDetector  │ Auto-detect: Solidity, Vyper, Rust, Move, Cairo
 └─────────┬─────────┘
           │
@@ -103,6 +108,8 @@ User uploads file/archive
 | Team | 10 MB | 50 MB |
 | Growth | 10 MB | 50 MB |
 | Enterprise | 20 MB | 100 MB |
+
+**Note:** The global `RequestSizeLimitMiddleware` (10MB) exempts the upload path (`/api/v1/upload`), allowing per-tier limits to be enforced by the upload endpoint itself.
 
 #### Supported File Types
 
@@ -545,7 +552,7 @@ def deduplicate_findings(findings: list[Vulnerability]) -> list[DeduplicationGro
 | Contract List | `/contracts` | All uploaded contracts |
 | Contract Detail | `/contracts/{id}` | Single contract with scans |
 | Scan List | `/scans` | All scans with status |
-| Scan Detail | `/scans/{id}` | Scan results and vulnerabilities |
+| Scan Detail | `/scans/{id}` | Scan results with Vulnerabilities and Patterns tabs |
 | Vulnerabilities | `/vulnerabilities` | Global vulnerability view |
 | Deduplication | `/deduplication` | Duplicate finding groups |
 
@@ -643,10 +650,11 @@ GET /api/v1/scans/compare?scan1={id1}&scan2={id2}
 
 | Scanner | Type | Estimated Time | Requires Project | Status |
 |---------|------|----------------|------------------|--------|
-| **sol-azy** | Static Analysis | 30s | No | Pending |
-| **sec3-xray** | Static Analysis | 60s | Yes | Pending |
-| **trident** | Fuzzer | 120s | Yes | Pending |
-| **cargo-fuzz-solana** | Fuzzer | 150s | Yes | Pending |
+| **sol-azy** | Static Analysis | 30s | No | Active |
+| **sec3-xray** | Static Analysis | 60s | Yes | Active |
+| **trident** | Fuzzer | 120s | Yes | Active |
+| **cargo-fuzz-solana** | Fuzzer | 150s | Yes | Active |
+| **rustdefend** | Static Analysis | 30s | No | Active |
 
 ### Scan Presets
 
@@ -804,4 +812,4 @@ data:
 ---
 
 **Maintained by:** BlockSecOps Platform Team
-**Last Audit:** January 31, 2026
+**Last Audit:** February 19, 2026

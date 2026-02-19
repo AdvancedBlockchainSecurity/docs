@@ -161,6 +161,7 @@ Each of the 18 maintenance tasks runs independently with its own try-catch block
 - ML model missing/unsigned → training trigger uses dev fallback key
 - Read-only filesystem → ML models volume mounted as writable emptyDir
 - Failed DB query → transaction rolled back, next task starts with clean session
+- ML label secondary operations → use `db.begin_nested()` savepoints to prevent session corruption on partial failures (ownership verified before save)
 
 ## Test Suite
 
