@@ -79,7 +79,7 @@ The dashboard requires:
 cd /home/pwner/Git  # Parent directory containing both repos
 
 VERSION=$(grep '"version"' blocksecops-dashboard/package.json | head -1 | cut -d'"' -f4)
-REGISTRY="harbor.blocksecops.local"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # Get Supabase credentials from existing ConfigMap
 SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')
@@ -123,7 +123,7 @@ Standard build from service directory:
 cd /home/pwner/Git/blocksecops-api-service
 
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
-REGISTRY="harbor.blocksecops.local"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # Build image
 docker build \
@@ -155,72 +155,28 @@ Most services follow the standard pattern (build from service directory):
 
 ## Environment-Specific Workflows
 
-### minikube (Recommended for Local Dev)
-
-minikube shares its Docker daemon, so builds are immediately available:
-
-```bash
-# One-time setup per terminal session
-eval $(minikube docker-env)
-
-# Build and deploy
-# Build and deploy
-VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
-docker build -t blocksecops-<service>:$VERSION .
-kubectl apply -k k8s/overlays/local/<service>/
-```
-
-### kubeadm with containerd
-
-kubeadm uses containerd directly, requiring an extra import step:
-
-```bash
-VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
-SERVICE="api-service"
-
-# Build in Docker
-docker build -t blocksecops-${SERVICE}:${VERSION} .
-
-# Bridge to containerd
-docker save blocksecops-${SERVICE}:${VERSION} | sudo ctr -n k8s.io images import -
-
-# Deploy
-kubectl apply -k k8s/overlays/local/${SERVICE}/
-```
-
-**Tip:** Create an alias to simplify:
-```bash
-# Add to ~/.bashrc
-build-and-import() {
-  local svc=$1
-  local ver=$(grep '^version' pyproject.toml | cut -d'"' -f2)
-  docker build -t blocksecops-${svc}:${ver} . && \
-  docker save blocksecops-${svc}:${ver} | sudo ctr -n k8s.io images import -
-}
-```
-
-### kubeadm with Harbor (Recommended for Server)
+### kubeadm with Harbor (Recommended)
 
 Harbor provides proper registry semantics that match production:
 
 ```bash
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
 SERVICE="api-service"
-REGISTRY="harbor.blocksecops.local"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # Build locally
 docker build -t ${REGISTRY}/blocksecops/${SERVICE}:${VERSION} .
 
-# Push to Harbor
+# Push to registry
 docker push ${REGISTRY}/blocksecops/${SERVICE}:${VERSION}
 
-# Deploy (Kubernetes pulls from Harbor)
+# Deploy (Kubernetes pulls from registry)
 kubectl apply -k k8s/overlays/local/${SERVICE}/
 ```
 
 **Note:** Services deployed on the server still use `k8s/overlays/local/` kustomization. The `server/` overlay in `blocksecops-gcp-infrastructure` only contains IngressRoutes and CORS middleware for the `app.blocksecops.local` domain.
 
-**Why Harbor instead of direct containerd import:**
+**Why a registry (Harbor/Artifact Registry) instead of direct containerd import:**
 - `imagePullPolicy: Always` actually works (triggers real pulls)
 - Digest tracking detects image updates
 - `:latest` tag behaves correctly
@@ -328,15 +284,15 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
-| admin-portal | 0.7.1 | `k8s/overlays/local/` | Add RustDefend to scanner admin page |
-| api-service | 0.28.54 | `k8s/overlays/local/api-service/` | Persist scan duration_seconds, vuln pagination tie-breaker (id secondary sort), VulnerabilityResponse: add file_path + false_positive_score, ML model writable dir (ML_MODEL_DIR) |
+| admin-portal | 0.7.3 | `k8s/overlays/local/` | Add total scans KPI and per-scanner scan counts to scanners page |
+| api-service | 0.29.2 | `k8s/overlays/local/api-service/` | Add scans_by_scanner aggregation to /admin/system/stats endpoint |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.45.15 | `k8s/overlays/local/` | Fix scan results race condition: auto-retry when vulns empty, increase fetch limit to 500, add useVulnerabilityRetry hook with regression tests |
+| dashboard | 0.46.1 | `k8s/overlays/local/` | Fix deduplication page default min_scanner_count filter from 2 to 1 so single-scanner groups are visible |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
-| notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
-| orchestration | 0.9.16 | `k8s/overlays/local/` | Persist scan duration_seconds at all completion points (success, failure, stale, no-source) |
-| tool-integration | 0.4.8 | `k8s/overlays/local/` | Code snippet validation: reject pragma-only snippets in SolidityDefendParser |
+| notification | 0.2.0 | `k8s/overlays/local/` | Race condition remediation: broadcast snapshot iteration, JWT validation, topic subscriptions, Redis list bounding, auth state machine |
+| orchestration | 0.10.0 | `k8s/overlays/local/` | Race condition remediation: atomic vuln count update, async_to_sync for dedup, atomic retry_count, enrichment singleton lock, dedup FOR UPDATE |
+| tool-integration | 0.5.0 | `k8s/overlays/local/` | Race condition remediation: asyncio.Lock on poll/cache/jobs, UUID job names, ConfigMap optimistic concurrency, dead letter atomic writes |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |
@@ -468,8 +424,9 @@ Example: 1.0.0-5ede3c61
 Base images are stored in Harbor and referenced by application Dockerfiles:
 
 ```dockerfile
+ARG BASE_REGISTRY=harbor.blocksecops.local
 ARG BASE_IMAGE_TAG=1.0.0-ac02c353
-FROM harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:${BASE_IMAGE_TAG} AS builder
+FROM ${BASE_REGISTRY}/blocksecops/blocksecops-orchestration-base:${BASE_IMAGE_TAG} AS builder
 ```
 
 ---

@@ -75,6 +75,7 @@ Manual testing checklists for all user-facing features.
 | [66-scanner-audit-fixes.md](./66-scanner-audit-fixes.md) | **NEW** - Scanner audit fixes: solhint JSON extraction, vyper scanner_id attribution, stale scan recovery, canary UUID, code snippet fallback |
 | [68-rate-limiting-security-audit.md](./68-rate-limiting-security-audit.md) | **NEW** - Rate limiting security audit: 28 endpoint rate limits, analytics dual-auth, webhook model fix (v0.28.42 API) |
 | [70-platform-bugfixes-features.md](./70-platform-bugfixes-features.md) | **NEW** - Platform bug fixes, features & security hardening: pattern sorting, patterns view, Rust scanners, contract overflow, project display, address persistence, pattern findings, code snippet validation, repair fallback, ML labeling, invariant errors, upload size, pattern merge/audit, SCM PR creation (v0.28.46 API, v0.45.9 Dashboard, v0.9.15 Orchestration, v0.4.8 Tool Integration) |
+| [71-admin-scanners-kpi-dedup-fix.md](./71-admin-scanners-kpi-dedup-fix.md) | **NEW** - Admin scanners KPI (Total Scans, per-scanner counts), deduplication page min_scanner_count filter fix (v0.29.2 API, v0.7.3 Admin Portal, v0.46.1 Dashboard) |
 | [api-key-scope-enforcement.md](./api-key-scope-enforcement.md) | API key scope enforcement tests |
 
 ---

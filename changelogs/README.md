@@ -1,7 +1,7 @@
 # BlockSecOps Changelogs
 
 **Purpose:** Centralized changelog directory for all BlockSecOps platform changes
-**Last Updated:** February 17, 2026
+**Last Updated:** February 20, 2026
 **Status:** Active
 
 ---
@@ -17,6 +17,38 @@ Changelogs are organized by component and maintained chronologically. Each chang
 ---
 
 ## Available Changelogs
+
+### 0. Admin Portal v0.7.3 - Scanners KPI (`ADMIN-PORTAL-V0.7.3-SCANNERS-KPI-2026-02-20.md`)
+
+**Component:** blocksecops-admin-portal, blocksecops-api-service
+**Scope:** Total Scans KPI card and per-scanner scan counts on admin scanners page
+**Date:** February 20, 2026
+
+**Key Changes:**
+- Backend: Added `scans_by_scanner` aggregation (UNNEST on `scanners_used` array) to `/admin/system/stats`
+- Frontend: Added "Total Scans" KPI card and per-scanner counts column to Scanner Registry table
+- 11 backend + 7 frontend unit tests added
+- api-service 0.29.0 → 0.29.2, admin-portal 0.7.2 → 0.7.3
+
+**Use When:**
+- Understanding scan-per-scanner aggregation
+- Adding KPI cards to admin pages
+- Reviewing UNNEST patterns in SQLAlchemy
+
+### 0. Dashboard v0.46.1 - Dedup Filter Fix (`DASHBOARD-V0.46.1-DEDUP-FILTER-FIX-2026-02-20.md`)
+
+**Component:** blocksecops-dashboard
+**Scope:** Fix deduplication page default min_scanner_count from 2 to 1
+**Date:** February 20, 2026
+
+**Key Changes:**
+- Changed default `min_scanner_count` from 2 to 1 in deduplication page filters
+- Single-scanner groups now visible by default (previously hidden)
+- dashboard 0.46.0 → 0.46.1
+
+**Use When:**
+- Debugging deduplication page showing no results
+- Understanding the min_scanner_count filter
 
 ### 0. Scanner Reliability & RustDefend Fix (`SCANNER-RELIABILITY-RUSTDEFEND-FIX-2026-02-17.md`)
 
