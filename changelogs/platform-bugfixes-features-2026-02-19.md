@@ -7,7 +7,7 @@
 | Service | Version |
 |---------|---------|
 | api-service | 0.28.54 |
-| dashboard | 0.45.12 |
+| dashboard | 0.45.13 |
 | orchestration | 0.9.16 |
 | tool-integration | 0.4.8 |
 
@@ -122,10 +122,11 @@
 - **0.45.10:** React hooks ordering — moved `useMemo` for `patternAggregates` before early returns in `ScanResults.tsx` (was causing "Rendered more hooks than during the previous render" crash); Fixed `PatternDetail.tsx` to match actual API response shape (array `scanner_breakdown`, `severity_distribution` key, `scanners_detecting`/`most_common_scanner`/`active_findings` fields); Added project display badges to `ContractDetail.tsx`
 - **0.45.11:** Rebuilt with correct Supabase credentials from ConfigMap (previous build used placeholders, breaking authentication)
 - **0.45.12:** Fixed `RecentScans.tsx` link from `/scan-results/:id` to `/scans/:id` (route mismatch caused blank page)
+- **0.45.13:** Contracts list column toggles — minimal default view (checkbox, contract, actions) with 8 optional columns toggled via "Columns" dropdown; localStorage persistence; icon-only action buttons; removed `table-fixed`/`<colgroup>`/`View →` column
 
 ## Infrastructure
 
-- Contract table overflow: fixed with `table-fixed`, `truncate`, `overflow-x-auto`
+- Contract table: column toggle system with minimal default view (replaced `table-fixed` overflow fix with auto-sizing columns + user-controlled visibility)
 - api-service kustomization: added full `app.kubernetes.io/*` label set (was missing)
 - tool-integration: version bump 0.4.7 -> 0.4.8 for pragma snippet fix
 - Dashboard builds: must source Supabase credentials from ConfigMap per `docs/standards/frontend-build-env.md`

@@ -221,6 +221,9 @@ This document provides a complete audit map of the BlockSecOps web application, 
 | Confirm delete | Modal button | `DELETE /contracts/{id}` | Contract deleted |
 | Click contract row | Table row | None | Navigate to `/contracts/{id}` |
 | Click project badge | Project link | None | Navigate to `/projects/{id}` |
+| Toggle column visibility | "Columns" dropdown | None (localStorage) | Optional columns shown/hidden |
+| Show all columns | "Show All" button | None (localStorage) | All 8 optional columns visible |
+| Hide all columns | "Hide All" button | None (localStorage) | Minimal view (checkbox, contract, actions) |
 
 ### 4.2 Contract Detail (`/contracts/:id`)
 **Component:** `src/pages/ContractDetail.tsx`
