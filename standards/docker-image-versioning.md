@@ -331,7 +331,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | admin-portal | 0.7.1 | `k8s/overlays/local/` | Add RustDefend to scanner admin page |
 | api-service | 0.28.54 | `k8s/overlays/local/api-service/` | Persist scan duration_seconds, vuln pagination tie-breaker (id secondary sort), VulnerabilityResponse: add file_path + false_positive_score, ML model writable dir (ML_MODEL_DIR) |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.45.13 | `k8s/overlays/local/` | Contracts list column toggles: minimal default view with 8 optional toggleable columns, localStorage persistence, icon-only action buttons |
+| dashboard | 0.45.14 | `k8s/overlays/local/` | Column toggles UX: default 4 columns on (Type, Language, Network, LoC), alphabetical dropdown, flat language filter, stats above controls |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.1.2 | `k8s/overlays/local/` | Port 8003 |
