@@ -1,87 +1,99 @@
 # Build Workflow
 
-**Version:** 3.0.0
-**Last Updated:** December 22, 2025
+**Version:** 4.0.0
+**Last Updated:** February 20, 2026
 
 ## Overview
 
-For local development, images are built directly into minikube's Docker daemon:
+Images are built locally with Docker, pushed to a container registry, and deployed via `kubectl apply`. The registry is configurable via the `REGISTRY` environment variable, defaulting to `harbor.blocksecops.local` for the server environment.
 
 ```
-eval $(minikube docker-env) → docker build → kubectl apply
+docker build → docker push ${REGISTRY}/blocksecops/<service>:<version> → kubectl apply -k
 ```
 
-This is the fastest workflow for rapid iteration during development.
+## Registry Configuration
 
-> **Note:** Harbor is deployed in the cluster but is **not used for local development**. Harbor is intended for staging/production CI/CD pipelines.
-
-## Local Development Workflow (Recommended)
-
-### Build and Deploy
+All build commands use the `REGISTRY` variable for registry-agnostic builds:
 
 ```bash
-# 1. Switch to minikube's Docker daemon (REQUIRED)
-eval $(minikube docker-env)
+# Default: Harbor (server environment)
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
-# 2. Build with versioned tag
-docker build -t <service>:<version> .
+# Override for GCP Artifact Registry
+REGISTRY="us-west1-docker.pkg.dev/blocksecops-prod/blocksecops"
 
-# 3. Tag as latest (for kustomization compatibility)
-docker tag <service>:<version> <service>:latest
+# Override for any other registry
+REGISTRY="my-registry.example.com"
+```
 
-# 4. Update kustomization.yaml with new version
-#    - Update images[].newTag
-#    - Update labels app.kubernetes.io/version
+**Why a variable?**
+- Supports Harbor (current server), GCP Artifact Registry (production), or any future registry
+- Build scripts, Dockerfiles, and CI/CD pipelines all use the same pattern
+- Switch environments by changing one variable
 
-# 5. Apply
+## Build and Deploy Workflow
+
+### Standard Service Build
+
+```bash
+cd /home/pwner/Git/blocksecops-<service>
+
+# Read version from source of truth
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)  # Python
+# or
+VERSION=$(grep '"version"' package.json | head -1 | cut -d'"' -f4)  # Node.js
+
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+
+# Build
+docker build \
+  --build-arg SERVICE_VERSION=${VERSION} \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(git rev-parse --short HEAD) \
+  -t ${REGISTRY}/blocksecops/<service>:${VERSION} .
+
+# Push to registry
+docker push ${REGISTRY}/blocksecops/<service>:${VERSION}
+
+# Deploy
 kubectl apply -k k8s/overlays/local/<service>/
 ```
 
-### Example: Building API Service
+### Using Build Scripts
+
+Each service has a build script that handles the registry variable:
 
 ```bash
-eval $(minikube docker-env)
-cd /Users/pwner/Git/ABS/blocksecops-api-service
+# Uses REGISTRY env var (defaults to harbor.blocksecops.local)
+./scripts/build-image.sh
 
-# Build
-docker build -t api-service:0.4.2 .
-docker tag api-service:0.4.2 api-service:latest
-
-# Update version in kustomization.yaml, then deploy
-kubectl apply -k k8s/overlays/local/
+# Override registry
+REGISTRY=us-west1-docker.pkg.dev/blocksecops-prod/blocksecops ./scripts/build-image.sh
 ```
 
 ### Kustomization Image Reference
 
-For local development, use simple image names (no registry prefix):
+Kustomization overlays specify the registry for their environment:
 
 ```yaml
-# k8s/overlays/local/<service>/kustomization.yaml
+# k8s/overlays/local/<service>/kustomization.yaml (Harbor)
 images:
 - name: <service>
-  newName: <service>
-  newTag: "<version>"
+  newName: harbor.blocksecops.local/blocksecops/<service>
+  newTag: "0.29.0"
+
+# k8s/overlays/gcp-production/<service>/kustomization.yaml (GCP)
+images:
+- name: <service>
+  newName: us-west1-docker.pkg.dev/blocksecops-prod/blocksecops/<service>
+  newTag: "0.29.0"
 ```
 
-## Why Minikube Docker (Not Harbor)
+## Service-Specific Build Requirements
 
-| Minikube Docker | Harbor Registry |
-|-----------------|-----------------|
-| No push/pull overhead | Requires push + pull |
-| Instant availability | Network transfer time |
-| Simple workflow | Requires socat proxy setup |
-| Good for rapid iteration | Better for CI/CD pipelines |
-
-## Verifying Images in Minikube
-
-```bash
-# List images in minikube's Docker
-eval $(minikube docker-env)
-docker images | grep <service>
-
-# Check what's running in cluster
-kubectl get pods -n <namespace> -o jsonpath='{.items[*].spec.containers[*].image}'
-```
+See [Docker Image Versioning](./docker-image-versioning.md) for detailed service-specific requirements, including:
+- **Dashboard**: Requires parent directory build context + Supabase build args
+- **Orchestration/Intelligence Engine**: Use pre-built base images from Harbor (see [Docker Base Images](./docker-base-images.md))
 
 ## Force Deployment Update
 
@@ -95,57 +107,61 @@ kubectl rollout restart deployment/<service> -n <namespace>
 kubectl set image deployment/<service> <service>=<service>:<new-version> -n <namespace>
 ```
 
-## Troubleshooting
+## Verifying Images
 
-### Image not found by Kubernetes
-
-Ensure you're building in minikube's Docker context:
 ```bash
-# Check current Docker context
-docker context show
-# Should NOT be "default" - use minikube's daemon instead
+# Check what's in the registry
+docker pull ${REGISTRY}/blocksecops/<service>:<version>
 
-# Switch to minikube's Docker
-eval $(minikube docker-env)
+# Check what's running in cluster
+kubectl get pods -n <namespace> -o jsonpath='{.items[*].spec.containers[*].image}'
 
-# Rebuild
-docker build -t <service>:<version> .
-```
-
-### Pod stuck in ImagePullBackOff
-
-Check the image exists in minikube:
-```bash
-eval $(minikube docker-env)
+# Check local Docker images
 docker images | grep <service>
 ```
 
-If missing, rebuild the image.
+## Troubleshooting
+
+### Pod stuck in ImagePullBackOff
+
+```bash
+# Check if image exists in registry
+docker pull ${REGISTRY}/blocksecops/<service>:<version>
+
+# Check pod events
+kubectl describe pod -n <namespace> <pod-name>
+
+# Verify imagePullPolicy
+kubectl get deployment -n <namespace> <service> -o jsonpath='{.spec.template.spec.containers[0].imagePullPolicy}'
+```
 
 ### Deployment not updating
 
-Force a rollout:
 ```bash
+# Force a rollout
 kubectl rollout restart deployment/<service> -n <namespace>
+
+# Wait for rollout
+kubectl rollout status deployment/<service> -n <namespace>
 ```
+
+### containerd Fallback (No Registry Available)
+
+If Harbor is unavailable, import directly to containerd:
+
+```bash
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
+docker build -t blocksecops-<service>:${VERSION} .
+docker save blocksecops-<service>:${VERSION} | sudo ctr -n k8s.io images import -
+kubectl apply -k k8s/overlays/local/<service>/
+```
+
+**Limitation:** No pull semantics - `imagePullPolicy: Always` won't re-pull updated images.
 
 ---
 
-## Harbor Workflow (Staging/Production Only)
+## Related Standards
 
-> **Note:** This section is for staging/production CI/CD pipelines. **Do not use Harbor for local development.**
-
-For CI/CD pipelines that need to push to Harbor:
-
-```bash
-# Build locally
-docker build -t <service>:<version> .
-
-# Tag for Harbor
-docker tag <service>:<version> <harbor-clusterip>:443/blocksecops/<service>:<version>
-
-# Push to Harbor
-docker push <harbor-clusterip>:443/blocksecops/<service>:<version>
-```
-
-Get Harbor's ClusterIP: `kubectl get svc harbor-core -n harbor-local -o jsonpath='{.spec.clusterIP}'`
+- [Docker Image Versioning](./docker-image-versioning.md) - Semantic versioning and service-specific builds
+- [Docker Base Images](./docker-base-images.md) - Pre-built base images for heavy dependencies
+- [Testing & Deployment](./testing-deployment.md) - Testing before deployment

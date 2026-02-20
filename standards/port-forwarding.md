@@ -98,7 +98,7 @@ These URLs are used for service-to-service health checks (e.g., Admin System pag
 
 **Note:** These URLs follow Kubernetes DNS format: `<service>.<namespace>.svc.cluster.local:<port>`
 
-> **Note:** Harbor is deployed but **not used for local development**. Images are built directly into minikube's Docker daemon using `eval $(minikube docker-env)`. See [Local Development Setup](./local-development-setup.md) for details.
+> **Note:** Images are built locally, pushed to Harbor, and deployed via `kubectl apply -k`. See [Build Workflow](./build-workflow.md) for details.
 
 ### Monitoring Services (PLG Stack) - DISABLED BY DEFAULT
 
@@ -149,7 +149,7 @@ kubectl scale deployment redis-exporter -n redis-local --replicas=1
 
 | Use Case | Recommended Approach |
 |----------|---------------------|
-| Regular development | **Always-available access** (minikube tunnel, hostPort) |
+| Regular development | **Always-available access** (hostPort + Traefik) |
 | Direct database access | Port-forward to PostgreSQL |
 | Direct Redis access | Port-forward to Redis |
 | Debugging specific service | Port-forward to that service |
@@ -193,9 +193,8 @@ kubectl port-forward -n redis-local svc/redis 6379:6379 &
 # Vault Secret Manager
 kubectl port-forward -n vault-local svc/vault 8200:8200 &
 
-# NOTE: Harbor is NOT used for local development
-# Images are built directly into minikube's Docker daemon
-# See local-development-setup.md for the build workflow
+# Images are built locally and pushed to Harbor
+# See build-workflow.md for the build workflow
 
 # NOTE: Monitoring services are DISABLED by default for local development
 # Uncomment below if you need monitoring:
@@ -221,7 +220,7 @@ echo "Monitoring (disabled by default):"
 echo "  Grafana:          http://127.0.0.1:3001 (admin/admin)"
 echo "  Prometheus:       http://127.0.0.1:9091"
 echo ""
-echo "Note: Harbor is NOT used for local dev. Build images with: eval \$(minikube docker-env)"
+echo "Build images: docker build && docker push \${REGISTRY}/blocksecops/<service>:<version>"
 ```
 
 ### Individual Service Commands
@@ -617,11 +616,11 @@ pkill -f "kubectl port-forward"
 
 ### Build Images
 
-**Server (kubeadm with Harbor):**
 ```bash
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
-docker build -t harbor.blocksecops.local/blocksecops/<service>:${VERSION} .
-docker push harbor.blocksecops.local/blocksecops/<service>:${VERSION}
+docker build -t ${REGISTRY}/blocksecops/<service>:${VERSION} .
+docker push ${REGISTRY}/blocksecops/<service>:${VERSION}
 kubectl apply -k k8s/overlays/local/<service>/
 ```
 

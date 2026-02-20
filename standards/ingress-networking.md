@@ -272,11 +272,11 @@ k8s/overlays/local/postgresql/
 
 ## Environment-Specific Configurations
 
-### Local Environment (Minikube)
+### Local Environment (kubeadm)
 
-**Access Pattern**: NodePort
-- HTTP: Port 30180
-- HTTPS: Port 30543
+**Access Pattern**: hostPort + Traefik
+- HTTP: Port 80 (redirects to HTTPS)
+- HTTPS: Port 443
 - PostgreSQL: Port 31432
 - Redis: Port 31379
 - Traefik Dashboard: Port 31080
@@ -312,7 +312,7 @@ spec:
 **Testing Local Routing**:
 ```bash
 # HTTP service test
-curl -H "Host: api.local.example.com" http://$(minikube ip):30180/
+curl -k -H "Host: app.blocksecops.local" https://127.0.0.1/api/v1/health/live
 
 # From inside cluster
 kubectl exec -n <namespace> <pod> -- \
@@ -573,7 +573,7 @@ Frontend applications should connect to WebSocket through Traefik, not directly 
 
 | Environment | WebSocket URL |
 |-------------|---------------|
-| Local (minikube) | `ws://127.0.0.1:3000/ws` (pure local dev) or `wss://app.blocksecops.local/ws` |
+| Local (kubeadm) | `wss://app.blocksecops.local/ws` |
 | Server (kubeadm) | `wss://app.blocksecops.local/ws` |
 | Production (GCP) | `wss://app.blocksecops.com/ws` |
 

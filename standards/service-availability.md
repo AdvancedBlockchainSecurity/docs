@@ -28,7 +28,7 @@ After cluster start, all services should be accessible immediately without runni
 
 | Environment | Method | Access Pattern | One-Time Setup |
 |-------------|--------|----------------|----------------|
-| **Local (minikube)** | `minikube tunnel` + LoadBalancer | `http://127.0.0.1:3000` | Start tunnel in tmux |
+| **Local (kubeadm)** | hostPort 80/443 + Traefik (TLS) | `https://app.blocksecops.local` | DNS entries |
 | **Server (kubeadm)** | hostPort 80/443 + Traefik | `http://app.blocksecops.local` | DNS entries |
 | **Production (GCP)** | GCP Load Balancer | `https://app.blocksecops.com` | None (managed) |
 
@@ -45,8 +45,8 @@ kubectl port-forward -n api-service-local svc/api-service 8000:8000 &
 # ... more port-forwards
 
 # RIGHT - Use always-available access
-# Local: minikube tunnel (one-time setup)
-# Server: hostPort with DNS (one-time setup)
+# Local: hostPort 80/443 + Traefik with DNS (one-time setup)
+# Server: hostPort 80/443 + Traefik with DNS (one-time setup)
 # Production: managed infrastructure
 ```
 
@@ -69,22 +69,25 @@ Use manual port-forwards only for:
 
 ## Setup Per Environment
 
-### Local Development (minikube)
+### Local Development (kubeadm)
 
 **One-Time Setup:**
 ```bash
-# Start minikube tunnel (runs persistently)
-tmux new -s tunnel -d 'minikube tunnel'
+# On the local machine (server resolves to itself)
+echo "127.0.0.1  app.blocksecops.local" | sudo tee -a /etc/hosts
+
+# On client machines accessing the server
+echo "192.168.86.225  app.blocksecops.local" | sudo tee -a /etc/hosts
 ```
 
 **Verification:**
 ```bash
-curl http://127.0.0.1:3000/api/v1/health/live
+curl -k https://app.blocksecops.local/api/v1/health/live
 ```
 
 **Requirements:**
-- Services must use `type: LoadBalancer`
-- minikube tunnel must be running
+- Traefik with hostPort 80/443 deployed
+- DNS entries configured
 
 ### Server Environment (kubeadm)
 
@@ -121,17 +124,17 @@ curl https://app.blocksecops.com/api/v1/health/live
 
 After cluster start or restart, verify services are accessible:
 
-### Local (minikube)
+### Local (kubeadm)
 
 ```bash
-# 1. Check tunnel is running
-pgrep -f "minikube tunnel" || echo "Tunnel not running!"
+# 1. Check Traefik is running
+kubectl get pods -n traefik-local
 
-# 2. Check services have external IPs
-kubectl get svc -A | grep LoadBalancer
+# 2. Check hostPort is active
+curl -k https://127.0.0.1/api/v1/health/live
 
-# 3. Test access
-curl http://127.0.0.1:3000/api/v1/health/live
+# 3. Test domain access
+curl -k https://app.blocksecops.local/api/v1/health/live
 ```
 
 ### Server (kubeadm)
@@ -163,10 +166,10 @@ curl https://app.blocksecops.com/api/v1/health/live
 
 ### Services Not Accessible After Cluster Start
 
-**Local (minikube):**
-1. Check if tunnel is running: `pgrep -f "minikube tunnel"`
-2. If not, start it: `tmux new -s tunnel -d 'minikube tunnel'`
-3. Check services have external IPs: `kubectl get svc -A`
+**Local (kubeadm):**
+1. Check Traefik is running: `kubectl get pods -n traefik-local`
+2. Check hostPort is active: `curl -k https://127.0.0.1/api/v1/health/live`
+3. If DNS fails, check /etc/hosts entry
 
 **Server (kubeadm):**
 1. Check Traefik is running: `kubectl get pods -n traefik-local`

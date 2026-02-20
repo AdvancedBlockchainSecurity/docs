@@ -20,7 +20,7 @@ This document defines the critical rules and codebase-first development workflow
 ```
 ✅ CORRECT WORKFLOW:
 1. Create/update configuration files in Git repo folder
-2. Apply changes to local Kubernetes cluster (minikube)
+2. Apply changes to local Kubernetes cluster
 3. Test and verify changes work as expected
 4. Fix any issues, repeat steps 2-3 until working
 5. Commit changes to version control

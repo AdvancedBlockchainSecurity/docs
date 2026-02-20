@@ -82,7 +82,7 @@ These standards help you set up and maintain your local development environment:
 
 8. **[Service Access Standards](./port-forwarding.md)**
    - **Always-available access patterns** (services must be accessible without manual setup)
-   - Environment-specific access: minikube tunnel, hostPort, GCP Load Balancer
+   - Environment-specific access: hostPort, GCP Load Balancer
    - Standard port mappings for all services
    - Port-forward commands for debugging only
    - Service configuration and access URLs
@@ -143,7 +143,7 @@ These standards ensure proper versioning and configuration management:
     - Local Docker build with Harbor registry
     - Build and deploy steps
     - Using build cache
-    - Why local Docker vs minikube Docker
+    - Registry-agnostic build workflow
 
 16. **[Frontend Build-Time Environment Variables](./frontend-build-env.md)**
     - Vite environment variable handling (baked at build time)

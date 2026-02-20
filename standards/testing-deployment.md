@@ -104,9 +104,9 @@ kubectl logs -n api-service-local -l app.kubernetes.io/name=api-service --tail=5
 vim src/presentation/api/v1/endpoints/analytics.py
 
 # 2. Build and deploy (DON'T COMMIT YET)
-eval $(minikube docker-env)
-docker build -t api-service:0.4.2 .
-docker tag api-service:0.4.2 blocksecops-api-service:latest
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+docker build -t ${REGISTRY}/blocksecops/api-service:0.4.2 .
+docker push ${REGISTRY}/blocksecops/api-service:0.4.2
 kubectl rollout restart deployment/api-service -n api-service-local
 kubectl rollout status deployment/api-service -n api-service-local
 
@@ -157,18 +157,15 @@ With the Harbor container registry:
 **Standard Build Workflow:**
 
 ```bash
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+
 # 1. Build with new version tag
-eval $(minikube docker-env)
-docker build -t api-service:0.4.1 .
+docker build -t ${REGISTRY}/blocksecops/api-service:0.4.1 .
 
-# 2. Tag for Harbor and as latest
-docker tag api-service:0.4.1 <harbor-clusterip>:443/blocksecops/api-service:0.4.1
-docker tag api-service:0.4.1 blocksecops-api-service:latest
+# 2. Push to registry
+docker push ${REGISTRY}/blocksecops/api-service:0.4.1
 
-# 3. Push to Harbor
-docker push <harbor-clusterip>:443/blocksecops/api-service:0.4.1
-
-# 4. Restart deployment
+# 3. Restart deployment
 kubectl rollout restart deployment/api-service -n api-service-local
 ```
 

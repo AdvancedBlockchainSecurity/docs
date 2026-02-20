@@ -142,8 +142,8 @@ VITE_USE_TESTNET=true
 # 1. Ensure .env.local exists with required values
 cat .env.local
 
-# 2. Switch to minikube's Docker daemon
-eval $(minikube docker-env)
+# 2. Set Harbor registry
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # 3. Source environment variables and build
 cd /Users/pwner/Git/ABS
@@ -154,11 +154,11 @@ docker build \
   --build-arg VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY \
   --build-arg VITE_WS_URL=$VITE_WS_URL \
   --build-arg VITE_WS_ENABLED=$VITE_WS_ENABLED \
-  -t blocksecops-dashboard:0.19.0 \
+  -t ${REGISTRY}/blocksecops/dashboard:0.19.0 \
   -f blocksecops-dashboard/Dockerfile .
 
-# 4. Tag as latest
-docker tag blocksecops-dashboard:0.19.0 blocksecops-dashboard:latest
+# 4. Push to Harbor registry
+docker push ${REGISTRY}/blocksecops/dashboard:0.19.0
 
 # 5. Deploy
 kubectl apply -k blocksecops-dashboard/k8s/overlays/local/

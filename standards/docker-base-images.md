@@ -39,12 +39,12 @@ Create separate base images containing pre-installed heavy dependencies, store t
 
 ## Registry Location
 
-Base images MUST be stored in Harbor to ensure availability and prevent deletion:
+Base images MUST be stored in a container registry to ensure availability and prevent deletion:
 
-| Environment | Registry | Example |
+| Environment | Registry (`REGISTRY` value) | Example |
 |-------------|----------|---------|
-| **Local/Server** | `harbor.blocksecops.local/blocksecops/` | `harbor.blocksecops.local/blocksecops/blocksecops-intelligence-base-cpu:1.0.0-<hash>` |
-| **Production** | GCP Artifact Registry | `us-central1-docker.pkg.dev/solidity-security/blocksecops/blocksecops-intelligence-base-cpu:1.0.0` |
+| **Local/Server** | `harbor.blocksecops.local` | `${REGISTRY}/blocksecops/blocksecops-intelligence-base-cpu:1.0.0-<hash>` |
+| **Production** | `us-central1-docker.pkg.dev/solidity-security` | `${REGISTRY}/blocksecops/blocksecops-intelligence-base-cpu:1.0.0` |
 
 ### Why Harbor for Base Images
 
@@ -221,19 +221,21 @@ The script:
 2. Builds image with tag `{version}-{hash}`
 3. Tags as `latest`
 
-### Step 2: Push to Harbor
+### Step 2: Push to Registry
 
 ```bash
-# Tag for Harbor
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+
+# Tag for registry
 docker tag blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353 \
-  harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353
+  ${REGISTRY}/blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353
 
 docker tag blocksecops/blocksecops-orchestration-base:latest \
-  harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:latest
+  ${REGISTRY}/blocksecops/blocksecops-orchestration-base:latest
 
-# Push to Harbor
-docker push harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353
-docker push harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:latest
+# Push to registry
+docker push ${REGISTRY}/blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353
+docker push ${REGISTRY}/blocksecops/blocksecops-orchestration-base:latest
 ```
 
 ### Step 3: Update Application Dockerfile
@@ -267,12 +269,13 @@ docker build \
   -t blocksecops-orchestration:${VERSION} .
 ```
 
-### Step 5: Push Application Image to Harbor
+### Step 5: Push Application Image to Registry
 
 ```bash
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 docker tag blocksecops-orchestration:${VERSION} \
-  harbor.blocksecops.local/blocksecops/orchestration:${VERSION}
-docker push harbor.blocksecops.local/blocksecops/orchestration:${VERSION}
+  ${REGISTRY}/blocksecops/orchestration:${VERSION}
+docker push ${REGISTRY}/blocksecops/orchestration:${VERSION}
 ```
 
 ---
@@ -285,7 +288,7 @@ docker push harbor.blocksecops.local/blocksecops/orchestration:${VERSION}
 |-------------|---------|-----|
 | Image pull policy | `imagePullPolicy: IfNotPresent` | Allows Harbor pulls (not `Never`) |
 | Kustomize labels | `includeSelectors: false` | Prevents immutable selector errors |
-| Kustomize newName | Full Harbor path | e.g., `harbor.blocksecops.local/blocksecops/intelligence-engine` |
+| Kustomize newName | Full registry path | e.g., `${REGISTRY}/blocksecops/intelligence-engine` |
 
 ### For ML Services (intelligence-engine)
 

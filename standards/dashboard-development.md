@@ -19,7 +19,7 @@
 | Ingress Controller | Traefik v3.6+ | Traefik v3.6+ | **YES** |
 | API Routing | Traefik routes `/api/*` to API service | Traefik routes `/api/*` to API service | **YES** |
 | Single Entry Point | All traffic through Traefik on port 3000 | All traffic through ingress | **YES** |
-| Container Runtime | Minikube Docker | AWS EKS | Similar |
+| Container Runtime | kubeadm + Harbor | AWS EKS | Similar |
 | TLS/SSL | Self-signed (optional) | cert-manager | Acceptable deviation |
 
 ### Deviation Notification Requirement
@@ -41,7 +41,7 @@ This ensures we catch production issues during local development, not after depl
 | Port-forward directly to dashboard | Bypasses Traefik, breaks API routing | Port-forward to Traefik: `kubectl port-forward -n traefik-local svc/traefik 3000:80` |
 | Port-forward directly to API on separate port | Doesn't test production routing paths | Access API through Traefik at `localhost:3000/api/v1/*` |
 | Direct API calls from localhost | Bypasses Traefik routing, doesn't test ingress paths | Access API through Traefik at `localhost:3000/api/v1/*` |
-| Building dashboard outside cluster | Images must be built in Minikube Docker context | Use `eval $(minikube docker-env)` before `docker build` |
+| Building dashboard outside cluster | Images must be pushed to Harbor registry | Use `docker build` and `docker push ${REGISTRY}/blocksecops/<service>:${VERSION}` |
 | CSP via HTML meta tags | `frame-ancestors` ignored, hardcoded URLs, less secure | Use Traefik middleware for HTTP headers |
 
 **The dashboard is NEVER started locally. It ALWAYS runs inside the Kubernetes cluster with a PRODUCTION BUILD.**
@@ -79,16 +79,16 @@ scans = await to_pydantic_list(db, scan_models, ScanResponse)
 
 ## Proper Dashboard Startup Procedure
 
-**CRITICAL:** The dashboard runs inside Minikube and is accessed via Traefik ingress. **DO NOT** run `npm run dev` locally - this will not work correctly with the API routing.
+**CRITICAL:** The dashboard runs inside the Kubernetes cluster and is accessed via Traefik ingress. **DO NOT** run `npm run dev` locally - this will not work correctly with the API routing.
 
-### Step 1: Start Minikube and Services
+### Step 1: Verify Cluster and Services
 
 ```bash
-# 1. Ensure Minikube is running
-minikube status
+# 1. Ensure the cluster is running
+kubectl get nodes
 
-# 2. If not running, start it
-minikube start
+# 2. If nodes are not Ready, check cluster status
+kubectl cluster-info
 
 # 3. Verify all services are deployed and running
 kubectl get pods -A | grep -E "api-service|dashboard|postgresql|redis|traefik"
@@ -250,7 +250,7 @@ kubectl get ingressroute -n api-service-local
 
 **Open browser to http://127.0.0.1:3000**
 
-The dashboard runs inside Minikube - you do NOT need to run `npm run dev` locally.
+The dashboard runs inside the Kubernetes cluster - you do NOT need to run `npm run dev` locally.
 
 **⚠️ COMMON MISTAKE:** Do NOT run `npm run dev` on your local machine!
 - The dashboard uses relative URLs (`/api/v1`) for API requests
@@ -424,8 +424,8 @@ kubectl get endpoints -n api-service-local api-service
 **Daily development workflow:**
 
 ```bash
-# 1. Verify Minikube is running
-minikube status
+# 1. Verify cluster is running
+kubectl get nodes
 
 # 2. Check all services are healthy
 kubectl get pods -A | grep -v "kube-system"
@@ -447,7 +447,7 @@ curl -s http://127.0.0.1:3000/api/v1/health/ready | jq '.status'
 # 6. Open browser to http://127.0.0.1:3000
 
 # 7. Develop and test features
-#    NOTE: Dashboard runs inside Minikube - do NOT run npm run dev locally!
+#    NOTE: Dashboard runs inside the cluster - do NOT run npm run dev locally!
 ```
 
 **After pulling code changes:**
@@ -457,13 +457,13 @@ curl -s http://127.0.0.1:3000/api/v1/health/ready | jq '.status'
 cd /Users/pwner/Git/ABS/blocksecops-api-service
 git pull
 
-# 2. Build new Docker image
-eval $(minikube docker-env)
-docker build -t api-service:0.3.20 .
-docker tag api-service:0.3.20 api-service:latest
+# 2. Build and push new Docker image to Harbor
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+docker build -t ${REGISTRY}/blocksecops/api-service:0.3.20 .
+docker push ${REGISTRY}/blocksecops/api-service:0.3.20
 
 # 3. Update deployment
-kubectl set image -n api-service-local deployment/api-service api-service=api-service:0.3.20
+kubectl set image -n api-service-local deployment/api-service api-service=${REGISTRY}/blocksecops/api-service:0.3.20
 
 # 4. Wait for rollout
 kubectl rollout status -n api-service-local deployment/api-service
@@ -481,8 +481,8 @@ curl -s http://127.0.0.1:3000/api/v1/health/live
 ### Build Command
 
 ```bash
-# 1. Switch to minikube's Docker daemon
-eval $(minikube docker-env)
+# 1. Set registry and source environment variables
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # 2. Source environment variables from .env.local
 cd /Users/pwner/Git/ABS
@@ -494,11 +494,11 @@ docker build --no-cache \
   --build-arg VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY \
   --build-arg VITE_WS_URL=$VITE_WS_URL \
   --build-arg VITE_WS_ENABLED=$VITE_WS_ENABLED \
-  -t blocksecops-dashboard:0.19.0 \
+  -t ${REGISTRY}/blocksecops/dashboard:0.19.0 \
   -f blocksecops-dashboard/Dockerfile .
 
-# 4. Tag as latest
-docker tag blocksecops-dashboard:0.19.0 blocksecops-dashboard:latest
+# 4. Push to Harbor registry
+docker push ${REGISTRY}/blocksecops/dashboard:0.19.0
 
 # 5. Update kustomization.yaml version
 # Edit blocksecops-dashboard/k8s/overlays/local/kustomization.yaml
@@ -604,7 +604,7 @@ curl -I http://127.0.0.1:3000 2>&1 | grep -i "content-security-policy\|x-frame-o
 
 **Before starting development:**
 
-- [ ] Minikube running (`minikube status`)
+- [ ] Cluster nodes ready (`kubectl get nodes`)
 - [ ] All services deployed and healthy (`kubectl get pods -A`)
 - [ ] All services have endpoints (`kubectl get endpoints -A | grep -v kube-system`)
 - [ ] Traefik port-forward active on 3000 (`lsof -i :3000 | grep LISTEN`)
@@ -614,7 +614,7 @@ curl -I http://127.0.0.1:3000 2>&1 | grep -i "content-security-policy\|x-frame-o
 - [ ] API health check passing via Traefik (`curl http://127.0.0.1:3000/api/v1/health/ready`)
 - [ ] Can access dashboard at `http://127.0.0.1:3000`
 - [ ] No console errors in browser (F12 → Console tab)
-- [ ] **NOT running `npm run dev` locally** (dashboard runs inside Minikube!)
+- [ ] **NOT running `npm run dev` locally** (dashboard runs inside the cluster!)
 
 **After code changes:**
 

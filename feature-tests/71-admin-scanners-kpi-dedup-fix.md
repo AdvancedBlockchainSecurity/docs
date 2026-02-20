@@ -72,9 +72,12 @@
 ## 4. Automated Test Coverage
 
 ### 4.1 Backend Tests (pytest)
-- [ ] `tests/unit/test_scans_by_scanner.py` — 11 tests passing
-- [ ] Tests cover: dict comprehension, empty results, single scanner, ordering, special characters, response structure
-- [ ] Tests cover: scanner_count from distribution, None/empty handling, min_scanner_count filter logic
+- [ ] `tests/unit/test_scans_by_scanner.py` — 18 tests passing
+- [ ] Tests import actual `DeduplicationGroupModel.scanner_count` property from source
+- [ ] Tests cover: multiple/single/empty/None/non-dict distributions, hyphenated names, many scanners
+- [ ] Tests cover: min_scanner_count filter at threshold 2 (old bug), threshold 1 (fix), empty distribution exclusion
+- [ ] Tests cover: endpoint source verification (UNNEST, GROUP BY, ORDER BY, literal_column, null filter, scans_by_scanner in response)
+- [ ] Tests cover: deduplication endpoint min_scanner_count parameter and post-query filter
 
 ### 4.2 Frontend Tests (vitest)
 - [ ] `src/pages/__tests__/AdminScanners.test.tsx` — 7 tests passing
@@ -87,3 +90,4 @@
 | Date | Tester | Result | Notes |
 |------|--------|--------|-------|
 | 2026-02-20 | - | DEPLOY | api-service v0.29.2, admin-portal v0.7.3, dashboard v0.46.1 deployed |
+| 2026-02-20 | - | FIX | api-service v0.29.3: pytest coverage config fix, tests rewritten (11->18), malformed scanners_used data repaired |
