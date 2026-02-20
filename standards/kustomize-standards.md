@@ -24,7 +24,7 @@ k8s/
 │   ├── configmap.yaml
 │   └── serviceaccount.yaml
 └── overlays/
-    ├── local/                  # Local development (minikube/kubeadm)
+    ├── local/                  # Local development (kubeadm + Harbor)
     │   ├── kustomization.yaml
     │   ├── deployment-patch.yaml
     │   └── configmap-patch.yaml
@@ -185,7 +185,7 @@ patches:
 
 ## Environment-Specific Patterns
 
-### Local Development (minikube)
+### Local Development (kubeadm + Harbor)
 
 ```yaml
 # k8s/overlays/local/kustomization.yaml
@@ -193,14 +193,15 @@ namespace: <service>-local
 
 images:
   - name: <service>
-    newName: blocksecops-<service>  # Direct image name (no registry)
+    newName: harbor.blocksecops.local/blocksecops/<service>
     newTag: "0.1.0"
 ```
 
 **Build command:**
 ```bash
-eval $(minikube docker-env)
-docker build -t blocksecops-<service>:0.1.0 .
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+docker build -t ${REGISTRY}/blocksecops/<service>:0.1.0 .
+docker push ${REGISTRY}/blocksecops/<service>:0.1.0
 kubectl apply -k k8s/overlays/local/
 ```
 

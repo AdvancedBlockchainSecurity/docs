@@ -18,6 +18,23 @@ Changelogs are organized by component and maintained chronologically. Each chang
 
 ## Available Changelogs
 
+### 0. API Service v0.29.3 - Test Coverage & Data Fix (`API-SERVICE-V0.29.3-TEST-COVERAGE-DATA-FIX-2026-02-20.md`)
+
+**Component:** blocksecops-api-service
+**Scope:** Fix pytest coverage config, rewrite tests to import actual source, repair malformed scanners_used data
+**Date:** February 20, 2026
+
+**Key Changes:**
+- Moved `--cov-fail-under=80` from pytest.ini addopts to Makefile targets (test-unit, test-all)
+- Rewrote `test_scans_by_scanner.py` to import actual `DeduplicationGroupModel.scanner_count` property (11 -> 18 tests)
+- Fixed malformed `scanners_used` entry: space-delimited string -> proper array elements
+- api-service 0.29.2 -> 0.29.3
+
+**Use When:**
+- Debugging pytest coverage failures on individual test files
+- Investigating malformed scanners_used array entries
+- Testing SQLAlchemy model properties without database session
+
 ### 0. Admin Portal v0.7.3 - Scanners KPI (`ADMIN-PORTAL-V0.7.3-SCANNERS-KPI-2026-02-20.md`)
 
 **Component:** blocksecops-admin-portal, blocksecops-api-service

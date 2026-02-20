@@ -35,8 +35,8 @@ The BlockSecOps Frontend is a React + TypeScript application built with Vite tha
 **CRITICAL:** API Service must be running and healthy BEFORE starting frontend.
 
 ```bash
-# 1. Verify Minikube is running
-minikube status
+# 1. Verify cluster is running
+kubectl get nodes
 
 # 2. Check API Service is deployed and running
 kubectl get pods -n api-service-local
@@ -223,21 +223,18 @@ curl -s http://127.0.0.1:3002 | grep "<title>"
 
 ## Accessing Frontend in Kubernetes
 
-### Deploy Frontend to Minikube
+### Deploy Frontend to Kubernetes
 
 ```bash
 # 1. Build Docker image (follow docker-image-versioning.md)
 cd /Users/pwner/Git/ABS/blocksecops-frontend
-docker build --no-cache -t frontend:0.1.0 -f Dockerfile .
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+docker build --no-cache -t ${REGISTRY}/blocksecops/frontend:0.1.0 -f Dockerfile .
 
-# 2. Tag as latest
-docker tag frontend:0.1.0 frontend:latest
+# 2. Push to Harbor registry
+docker push ${REGISTRY}/blocksecops/frontend:0.1.0
 
-# 3. Load into minikube
-minikube image load frontend:0.1.0
-minikube image load frontend:latest
-
-# 4. Deploy to Kubernetes
+# 3. Deploy to Kubernetes
 kubectl apply -k k8s/overlays/local/
 
 # 5. Verify deployment
@@ -333,8 +330,9 @@ kubectl exec -n frontend-local deployment/frontend -- ls -la /usr/share/nginx/ht
 
 # 3. Rebuild and redeploy if files are missing
 cd /Users/pwner/Git/ABS/blocksecops-frontend
-docker build --no-cache -t frontend:0.1.0 -f Dockerfile .
-minikube image load frontend:0.1.0
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+docker build --no-cache -t ${REGISTRY}/blocksecops/frontend:0.1.0 -f Dockerfile .
+docker push ${REGISTRY}/blocksecops/frontend:0.1.0
 kubectl rollout restart deployment/frontend -n frontend-local
 ```
 
@@ -399,8 +397,8 @@ curl -s http://127.0.0.1:8000/api/v1/health/live
 ### Daily development workflow:
 
 ```bash
-# 1. Verify Minikube is running
-minikube status
+# 1. Verify cluster is running
+kubectl get nodes
 
 # 2. Check API Service is healthy
 kubectl get pods -n api-service-local
@@ -438,12 +436,11 @@ git add .
 git commit -m "feat: add new feature"
 
 # 2. Build new Docker image (increment version)
-docker build --no-cache -t frontend:0.1.1 -f Dockerfile .
-docker tag frontend:0.1.1 frontend:latest
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+docker build --no-cache -t ${REGISTRY}/blocksecops/frontend:0.1.1 -f Dockerfile .
 
-# 3. Load into minikube
-minikube image load frontend:0.1.1
-minikube image load frontend:latest
+# 3. Push to Harbor registry
+docker push ${REGISTRY}/blocksecops/frontend:0.1.1
 
 # 4. Update kustomization.yaml with new version
 vim k8s/base/frontend/kustomization.yaml
@@ -468,7 +465,7 @@ curl -s http://127.0.0.1:3002/health
 
 **Before starting development:**
 
-- [ ] Minikube running (`minikube status`)
+- [ ] Cluster nodes ready (`kubectl get nodes`)
 - [ ] API Service deployed and healthy (`kubectl get pods -n api-service-local`)
 - [ ] API Service has endpoints (`kubectl get endpoints -n api-service-local api-service`)
 - [ ] API port-forward active on 8000 (use deployment, not service!)
@@ -483,7 +480,7 @@ curl -s http://127.0.0.1:3002/health
 
 - [ ] Code changes committed to Git
 - [ ] Docker image built with incremented version
-- [ ] Image loaded into minikube
+- [ ] Image pushed to Harbor registry
 - [ ] Kustomization updated with new version
 - [ ] Deployment updated and rolled out successfully
 - [ ] Health check passing (`curl http://127.0.0.1:3002/health`)

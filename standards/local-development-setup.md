@@ -8,7 +8,7 @@
 >
 > **Previous (v2.7.0):** Added External Service Integrations section with Stripe CLI webhook forwarding for local billing development.
 >
-> **Major Update (v2.6.0):** Simplified local development workflow. Harbor is no longer used for local development - images are built directly into minikube's Docker daemon for faster iteration.
+> **Major Update (v2.6.0):** Simplified local development workflow. Images are built locally and pushed to Harbor registry for deployment.
 >
 > **Previous (v2.5.0):** Vault now uses persistent file storage with auto-unseal. Secrets persist across cluster restarts.
 >
@@ -24,7 +24,7 @@
 |--------|-------|
 | **Active Overlay** | `k8s/overlays/local/` |
 | **Namespace Suffix** | `-local` (e.g., `api-service-local`) |
-| **Deployment Target** | Minikube |
+| **Deployment Target** | kubeadm cluster |
 
 ### Development Rules
 
@@ -96,7 +96,7 @@ k8s/
 | Ingress Controller | Traefik v3.6+ | Traefik v3.6+ | **YES** |
 | API Routing | Traefik routes `/api/*` to API service | Traefik routes `/api/*` to API service | **YES** |
 | Single Entry Point | All traffic through Traefik on port 3000 | All traffic through ingress | **YES** |
-| Container Runtime | Minikube Docker | AWS EKS | Similar |
+| Container Runtime | kubeadm + containerd | AWS EKS | Similar |
 | TLS/SSL | Self-signed (optional) | cert-manager | Acceptable deviation |
 
 ### Why Production Parity Matters
@@ -115,7 +115,7 @@ k8s/
 
 This ensures we catch production issues during local development, not after deployment.
 
-## Minikube Configuration
+## Kubernetes Cluster Configuration (kubeadm)
 
 **MANDATORY resource requirements for local Kubernetes cluster:**
 
@@ -127,34 +127,32 @@ This ensures we catch production issues during local development, not after depl
 
 ### Initial Setup
 
+The local development cluster runs on kubeadm with Harbor as the container registry.
+
 ```bash
-# Configure minikube with required resources
-minikube config set memory 10240
-minikube config set cpus 6
+# Verify cluster is running
+kubectl cluster-info
 
-# Start minikube (first time)
-minikube start --memory=10240 --cpus=6
+# Check node status and resources
+kubectl get nodes -o wide
 
-# Verify configuration
-minikube config view
+# Verify Harbor registry is accessible
+curl -sk https://harbor.blocksecops.local/api/v2.0/health
 ```
 
 ### Important Notes
 
-1. **Resource changes require cluster recreation:**
+1. **Cluster management via kubeadm:**
    ```bash
-   # Cannot change resources on existing cluster
-   minikube stop
-   minikube delete
-   minikube start --memory=10240 --cpus=6
+   # Check cluster status
+   kubectl get nodes
+   kubectl get componentstatuses
    ```
 
-2. **Docker Desktop memory limit:** Ensure Docker Desktop has at least 10GB allocated in Settings → Resources → Advanced. Minikube cannot exceed Docker Desktop's memory allocation.
-
-3. **Verify resources after start:**
+2. **Verify resources:**
    ```bash
    kubectl top nodes
-   # Should show ~10GB allocatable memory
+   # Should show adequate allocatable memory and CPU
    ```
 
 ### Troubleshooting Resource Issues
@@ -166,10 +164,10 @@ minikube config view
 kubectl describe pod <pod-name> -n <namespace> | tail -20
 
 # Check node allocatable vs requested resources
-kubectl describe node minikube | grep -A 10 "Allocated resources"
+kubectl describe node | grep -A 10 "Allocated resources"
 ```
 
-**Fix:** Either increase minikube resources (requires cluster recreation) or scale down non-essential services:
+**Fix:** Scale down non-essential services to free resources:
 
 ```bash
 # Scale down non-essential services to free memory
@@ -213,7 +211,7 @@ kubectl get configmap coredns -n kube-system -o json | \
 kubectl delete pod -n kube-system -l k8s-app=kube-dns
 
 # 3. Add control-plane hostname (if kube-proxy failing)
-minikube ssh "echo '192.168.49.2 control-plane.minikube.internal' | sudo tee -a /etc/hosts"
+# On the cluster node, ensure /etc/hosts has the correct control-plane entry
 
 # 4. Restart affected pods
 kubectl rollout restart deployment/api-service -n api-service-local
@@ -229,21 +227,19 @@ kubectl exec -n api-service-local deployment/api-service -- \
 
 ## Docker Image Build Workflow
 
-For local development, images are built directly into minikube's Docker daemon. This is faster and simpler than using a registry.
-
-> **Note:** Harbor is deployed in the cluster but is **not used for local development** due to the overhead of pushing/pulling images. Harbor is intended for staging/production workflows.
+For local development, images are built with Docker and pushed to Harbor registry. The kubeadm cluster pulls images from Harbor during deployment.
 
 ### Build and Deploy Workflow
 
 ```bash
-# 1. Use minikube's Docker daemon (REQUIRED)
-eval $(minikube docker-env)
+# 1. Set registry variable
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # 2. Build with versioned tag
-docker build -t <service>:<version> .
+docker build -t ${REGISTRY}/blocksecops/<service>:<version> .
 
-# 3. Tag as the name expected by kustomization
-docker tag <service>:<version> <service>:latest
+# 3. Push to Harbor
+docker push ${REGISTRY}/blocksecops/<service>:<version>
 
 # 4. Update kustomization.yaml with new version
 #    - Update images[].newTag
@@ -256,27 +252,29 @@ kubectl apply -k k8s/overlays/local/<service>/
 ### Example: Building API Service
 
 ```bash
-eval $(minikube docker-env)
-cd /Users/pwner/Git/ABS/blocksecops-api-service
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+cd /home/pwner/Git/blocksecops-api-service
 
-# Build and tag
-docker build -t api-service:0.4.1 .
-docker tag api-service:0.4.1 api-service:latest
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
+
+# Build and push
+docker build -t ${REGISTRY}/blocksecops/api-service:${VERSION} .
+docker push ${REGISTRY}/blocksecops/api-service:${VERSION}
 
 # Deploy
-kubectl apply -k k8s/overlays/local/
+kubectl apply -k k8s/overlays/local/api-service/
 ```
 
-### Why Direct Minikube Docker (Not Harbor)
+### Why Harbor Registry
 
-| Direct Minikube Docker | Harbor Registry |
-|------------------------|-----------------|
-| No push/pull overhead | Requires push + pull |
-| Instant availability | Network transfer time |
-| Simple workflow | Requires socat proxy setup |
-| Good for rapid iteration | Better for CI/CD pipelines |
+| Harbor Registry | containerd Direct Import (Fallback) |
+|-----------------|-------------------------------------|
+| `imagePullPolicy: Always` works correctly | No pull semantics |
+| Digest tracking detects updates | Requires manual re-import |
+| Matches production workflow | Development-only workaround |
+| Immutable tags enforced | No tag immutability |
 
-**When to use Harbor:** Staging/production environments, CI/CD pipelines, or when testing registry-based deployments.
+**Fallback (Harbor unavailable):** Use `docker save | sudo ctr -n k8s.io images import -` to import directly to containerd. See [Docker Image Versioning](./docker-image-versioning.md) for details.
 
 ## Prometheus Metrics Instrumentation
 
@@ -331,7 +329,7 @@ kubectl exec -n redis-local deployment/redis-exporter -- curl -s localhost:9121/
 |---------|----------|-------|
 | Grafana | `http://127.0.0.1:3001` | Monitoring (disabled by default) |
 | Prometheus | `http://127.0.0.1:9090` | Metrics (disabled by default) |
-| Harbor | N/A | Not used for local dev (images built in minikube) |
+| Harbor | `https://harbor.blocksecops.local` | Container registry for image builds |
 
 ## Port Forward Standards
 
@@ -370,9 +368,8 @@ echo "✅ Notification: http://127.0.0.1:8003"
 # kubectl port-forward -n monitoring svc/monitoring-grafana 3001:80 > /tmp/pf-grafana.log 2>&1 &
 # echo "✅ Grafana: http://127.0.0.1:3001"
 
-# Harbor Container Registry (NOT USED for local dev - images built directly in minikube)
-# kubectl port-forward -n harbor-local svc/harbor-core 8080:80 > /tmp/pf-harbor.log 2>&1 &
-# echo "✅ Harbor: http://127.0.0.1:8080"
+# Harbor Container Registry (accessed via https://harbor.blocksecops.local)
+# Port-forward not needed - Harbor is accessed directly via Traefik ingress
 
 sleep 3
 echo ""
@@ -432,7 +429,7 @@ pkill -f "kubectl port-forward"
 kubectl port-forward -n traefik-local svc/traefik 3000:80 &
 ```
 
-> **⚠️ IMPORTANT:** Do NOT run `npm run dev` locally for the dashboard. The dashboard runs inside Minikube and is accessed via Traefik. See [Dashboard Development Standards](./dashboard-development.md).
+> **⚠️ IMPORTANT:** Do NOT run `npm run dev` locally for the dashboard. The dashboard runs inside the kubeadm cluster and is accessed via Traefik. See [Dashboard Development Standards](./dashboard-development.md).
 
 ## Kubernetes Service Selector Standards
 
@@ -734,19 +731,23 @@ VITE_WALLETCONNECT_PROJECT_ID=your-project-id-here
 Build the dashboard with the project ID:
 
 ```bash
-eval $(minikube docker-env)
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 source blocksecops-dashboard/.env.local
+VERSION=$(grep '"version"' blocksecops-dashboard/package.json | head -1 | cut -d'"' -f4)
+
 docker build --no-cache \
   --build-arg VITE_SUPABASE_URL="$VITE_SUPABASE_URL" \
   --build-arg VITE_SUPABASE_ANON_KEY="$VITE_SUPABASE_ANON_KEY" \
   --build-arg VITE_WALLETCONNECT_PROJECT_ID="$VITE_WALLETCONNECT_PROJECT_ID" \
-  -t blocksecops-dashboard:latest \
+  -t ${REGISTRY}/blocksecops/dashboard:${VERSION} \
   -f blocksecops-dashboard/Dockerfile .
+
+docker push ${REGISTRY}/blocksecops/dashboard:${VERSION}
 ```
 
 **Dashboard environment** (built into container):
 
-The dashboard is built with relative URL configuration and runs inside Minikube. The API client (`src/lib/api/client.ts`) uses:
+The dashboard is built with relative URL configuration and runs inside the kubeadm cluster. The API client (`src/lib/api/client.ts`) uses:
 ```typescript
 const API_PREFIX = '/api/v1';  // Relative URL - routed by Traefik
 ```
@@ -853,13 +854,13 @@ stripe trigger invoice.paid
 
 Before starting development work:
 
-- [ ] Minikube cluster is running with adequate resources (10GB memory, 6 CPUs)
+- [ ] kubeadm cluster is running with adequate resources (10GB memory, 6 CPUs)
 - [ ] All required services deployed and healthy (`kubectl get pods -A`)
 - [ ] All services have endpoints: `kubectl get endpoints -A | grep -v kube-system`
 - [ ] Traefik port-forward active on 3000: `lsof -i :3000 | grep LISTEN`
 - [ ] Dashboard accessible via Traefik: `curl -s http://127.0.0.1:3000 | head -1`
 - [ ] API health passing via Traefik: `curl http://127.0.0.1:3000/api/v1/health/ready`
-- [ ] **NOT running `npm run dev` locally** (dashboard runs inside Minikube!)
+- [ ] **NOT running `npm run dev` locally** (dashboard runs inside the kubeadm cluster!)
 - [ ] Can access dashboard at `http://127.0.0.1:3000`
 - [ ] Can access API docs at `http://127.0.0.1:3000/api/v1/docs`
 - [ ] No console errors in browser (F12 → Console tab)

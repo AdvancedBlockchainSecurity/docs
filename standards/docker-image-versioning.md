@@ -285,7 +285,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.3 | `k8s/overlays/local/` | Add total scans KPI and per-scanner scan counts to scanners page |
-| api-service | 0.29.2 | `k8s/overlays/local/api-service/` | Add scans_by_scanner aggregation to /admin/system/stats endpoint |
+| api-service | 0.29.3 | `k8s/overlays/local/api-service/` | Fix coverage config, rewrite tests to import actual source code |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.46.1 | `k8s/overlays/local/` | Fix deduplication page default min_scanner_count filter from 2 to 1 so single-scanner groups are visible |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
