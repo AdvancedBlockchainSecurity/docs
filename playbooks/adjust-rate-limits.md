@@ -22,6 +22,8 @@ Endpoint rate limits are centralized in `blocksecops-shared/tier-config/tiers.js
 | `webhooks` | webhookCreate, webhookUpdate, webhookDelete, webhookSecretRotate | Webhook management |
 | `general` | default, userProfileUpdate, invariantApply/Feedback/Delete | Fallback and general endpoints |
 
+> **Note (v0.29.4):** As of the February 2026 security audit, 27 additional endpoint files now use rate limiting via `get_rate_limit_string("general", "default")`. Fixed-rate endpoints include `oauth_callbacks.py` (10/min), `admin/impersonation.py` (5/min), and `gdpr.py` (5/min). See [Feature Test 68](../feature-tests/68-rate-limiting-security-audit.md) for the complete list.
+
 ## Workflow Diagram
 
 ```mermaid

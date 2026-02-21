@@ -18,6 +18,24 @@ Changelogs are organized by component and maintained chronologically. Each chang
 
 ## Available Changelogs
 
+### 0. API Service v0.29.4 - Security Audit Fixes (`API-SERVICE-V0.29.4-SECURITY-AUDIT-FIXES-2026-02-20.md`)
+
+**Component:** blocksecops-api-service, blocksecops-gcp-infrastructure
+**Scope:** CORS duplication fix, rate limiting on 27 endpoint files, JWKS cache TTL
+**Date:** February 20, 2026
+
+**Key Changes:**
+- Removed Traefik CORS middleware (FastAPI handles CORS); fixes duplicate headers and hardcoded IP
+- Set explicit CORS max-age=3600 in FastAPI CORSMiddleware
+- Added rate limiting to 27 previously unprotected endpoint files (payments, billing, organizations, etc.)
+- Replaced indefinite `@lru_cache` JWKS cache with 1-hour TTL cache in both customer and admin Supabase clients
+- api-service 0.29.3 -> 0.29.4
+
+**Use When:**
+- Understanding CORS configuration (FastAPI is sole handler)
+- Reviewing rate limiting coverage across endpoints
+- Debugging JWKS key rotation issues
+
 ### 0. API Service v0.29.3 - Test Coverage & Data Fix (`API-SERVICE-V0.29.3-TEST-COVERAGE-DATA-FIX-2026-02-20.md`)
 
 **Component:** blocksecops-api-service

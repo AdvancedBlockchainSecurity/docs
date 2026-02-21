@@ -1,18 +1,20 @@
-# Feature Test: Rate Limiting Security Audit (v0.28.42)
+# Feature Test: Rate Limiting Security Audit (v0.29.4)
 
-**Feature:** Endpoint Rate Limiting for Write/Mutation Operations
-**Version:** API Service 0.28.42+
-**Last Updated:** February 18, 2026
+**Feature:** Endpoint Rate Limiting for All API Operations
+**Version:** API Service 0.29.4+
+**Last Updated:** February 20, 2026
 
 ## Overview
 
-All write and mutation endpoints must be rate-limited via the centralized tier configuration (`tiers.json`). Rate limits are enforced by slowapi decorators and return `429 Too Many Requests` when exceeded.
+All API endpoints must be rate-limited via the centralized tier configuration (`tiers.json`). Rate limits are enforced by slowapi decorators and return `429 Too Many Requests` when exceeded.
+
+As of v0.29.4, rate limiting coverage was expanded from write/mutation endpoints only to include all 27 previously unprotected endpoint files (~170+ endpoints total), covering read operations, search, analytics, and CRUD operations.
 
 ---
 
 ## Prerequisites
 
-1. API service running v0.28.42+
+1. API service running v0.29.4+
 2. Authenticated user session (JWT token)
 3. Access to `https://app.blocksecops.local`
 
@@ -201,6 +203,8 @@ done
 
 ## Rate Limit Reference
 
+### Pre-existing Rate-Limited Endpoints (v0.28.42)
+
 | Category | Endpoint | Limit | HTTP Method | Path |
 |----------|----------|-------|-------------|------|
 | operations | batchScan | 3/min | POST | `/api/v1/scans/batch` |
@@ -225,3 +229,49 @@ done
 | general | invariantApply | 10/min | POST | `/api/v1/invariants/{id}/apply` |
 | general | invariantFeedback | 20/min | POST | `/api/v1/invariants/{id}/feedback` |
 | general | invariantDelete | 10/min | DELETE | `/api/v1/invariants/{id}` |
+
+### New Rate-Limited Endpoints (v0.29.4 Security Audit)
+
+The following 27 endpoint files were added during the v0.29.4 security audit. All use tier-based rate limiting via `get_rate_limit_string("general", "default")` (60/min default) unless noted.
+
+| Endpoint File | Endpoints Covered | Rate Limit | Notes |
+|---------------|-------------------|------------|-------|
+| `payments.py` | Payment operations | Tier-based (60/min) | |
+| `billing.py` | Billing operations | Tier-based (60/min) | |
+| `organizations.py` | Organization CRUD | Tier-based (60/min) | |
+| `teams.py` | Team management | Tier-based (60/min) | |
+| `intelligence.py` | Intelligence queries | Tier-based (60/min) | |
+| `search.py` | Search endpoints | Tier-based (60/min) | |
+| `vulnerabilities.py` | Vulnerability queries | Tier-based (60/min) | |
+| `deduplication.py` | Dedup queries | Tier-based (60/min) | |
+| `annotations.py` | Annotation CRUD | Tier-based (60/min) | |
+| `comments.py` | Comment CRUD | Tier-based (60/min) | |
+| `favorites.py` | Favorites CRUD | Tier-based (60/min) | |
+| `tags.py` | Tag operations | Tier-based (60/min) | |
+| `integrations.py` | Integration management | Tier-based (60/min) | |
+| `analytics.py` | Analytics queries | Tier-based (60/min) | |
+| `statistics.py` | Statistics queries | Tier-based (60/min) | |
+| `patterns.py` | Pattern queries | Tier-based (60/min) | |
+| `scan_results.py` | Scan result queries | Tier-based (60/min) | |
+| `assignments.py` | Assignment operations | Tier-based (60/min) | |
+| `quality_gates.py` | Quality gate operations | Tier-based (60/min) | |
+| `saved_searches.py` | Saved search CRUD | Tier-based (60/min) | |
+| `notification_channels.py` | Channel management | Tier-based (60/min) | |
+| `consent.py` | Consent operations | Tier-based (60/min) | |
+| `feedback.py` | Feedback submission | Tier-based (60/min) | |
+| `support_tickets.py` | Support ticket CRUD | Tier-based (60/min) | |
+| `oauth_callbacks.py` | OAuth token exchange | Fixed: 10/minute | Sensitive auth flow |
+| `admin/impersonation.py` | Admin impersonation | Fixed: 5/minute | Admin-only, high risk |
+| `gdpr.py` | GDPR data requests | Fixed: 5/minute | Resource-intensive |
+
+### Endpoints Intentionally NOT Rate-Limited
+
+| Endpoint File | Reason |
+|---------------|--------|
+| `health.py` | Must remain unthrottled for Kubernetes liveness/readiness probes |
+| `websocket.py` | WebSocket connections, not HTTP request/response |
+| `monitoring.py` | Internal monitoring endpoints |
+| `admin/scan_monitoring.py` | Admin-only with MFA enforcement |
+| `admin/system.py` | Admin-only with MFA enforcement |
+| `admin/audit.py` | Admin-only with MFA enforcement |
+| `admin/support.py` | Admin-only with MFA enforcement |

@@ -241,7 +241,103 @@ Rate limiting must use trusted proxy validation, not raw `X-Forwarded-For`:
 
 ---
 
-## 6. Verification Checklist
+## 6. CORS Configuration (v0.29.4)
+
+### Overview
+
+As of v0.29.4, CORS is handled exclusively by FastAPI CORSMiddleware. Traefik CORS middleware files were removed to eliminate duplicate `Access-Control-*` headers.
+
+### Configuration
+
+CORS origins are configured via ConfigMap environment variables (not hardcoded):
+
+```yaml
+# k8s/overlays/local/api-service/configmap-patch.yaml
+cors_origins: "https://app.blocksecops.local"
+```
+
+FastAPI CORSMiddleware settings in `src/main.py`:
+
+```python
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID",
+                   "X-API-Key", "X-Organization-Id", "Accept", "Origin"],
+    expose_headers=["X-Request-ID"],
+    max_age=3600,  # 1 hour preflight cache
+)
+```
+
+### Key Points
+
+- **No Traefik CORS middleware** - `middleware-cors.yaml` files were deleted from both api-service and dashboard overlays
+- **No GCP backend CORS headers** - `customResponseHeaders` removed from `backend-config-api.yaml`
+- **max_age=3600** - Reduces preflight requests (browsers cache OPTIONS response for 1 hour)
+- **Single CORS header set** - `Access-Control-Allow-Origin` must appear exactly once in responses
+
+### Verification
+
+```bash
+# Verify CORS headers (should show single set from FastAPI)
+curl -sk -X OPTIONS https://app.blocksecops.local/api/v1/contracts \
+  -H "Origin: https://app.blocksecops.local" \
+  -H "Access-Control-Request-Method: POST" \
+  -D - -o /dev/null 2>&1 | grep -i "access-control"
+
+# Verify max-age
+curl -sk -X OPTIONS https://app.blocksecops.local/api/v1/contracts \
+  -H "Origin: https://app.blocksecops.local" \
+  -H "Access-Control-Request-Method: POST" \
+  -D - -o /dev/null 2>&1 | grep -i "max-age"
+# Expected: access-control-max-age: 3600
+```
+
+---
+
+## 7. JWKS Cache TTL (v0.29.4)
+
+### Overview
+
+JWKS (JSON Web Key Set) keys used for Supabase JWT verification are cached with a 1-hour TTL. Previously, `@lru_cache` was used with no TTL, meaning keys were cached indefinitely until service restart.
+
+### Configuration
+
+No environment variables needed. The TTL is set in code:
+
+```python
+JWKS_CACHE_TTL = 3600  # 1 hour
+```
+
+Applies to both:
+- `src/infrastructure/auth/supabase_client.py` (customer auth)
+- `src/infrastructure/auth/admin_supabase_client.py` (admin auth)
+
+### Behavior
+
+- JWKS keys are fetched from Supabase on first request
+- Subsequent requests use cached keys for up to 1 hour
+- After TTL expires, next request fetches fresh keys from Supabase
+- If Supabase rotates keys, they will be picked up within 1 hour automatically
+
+### Verification
+
+```bash
+# Check service starts and authenticates correctly
+curl -sk https://app.blocksecops.local/api/v1/health/ready
+# Expected: {"status": "healthy", ...}
+
+# Verify authenticated requests work
+curl -sk -H "Authorization: Bearer $TOKEN" \
+  https://app.blocksecops.local/api/v1/users/me
+# Expected: 200 with user data (not 401)
+```
+
+---
+
+## 8. Verification Checklist
 
 ### Pre-Deployment
 
