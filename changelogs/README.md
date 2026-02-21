@@ -18,6 +18,22 @@ Changelogs are organized by component and maintained chronologically. Each chang
 
 ## Available Changelogs
 
+### 0. API Service v0.29.5 - Security Audit Fixes (`API-SERVICE-V0.29.5-SECURITY-AUDIT-FIXES-2026-02-20.md`)
+
+**Component:** blocksecops-api-service
+**Scope:** Rate limiting on 10 additional endpoint files (55+ endpoints)
+**Date:** February 20, 2026
+
+**Key Changes:**
+- Added `@limiter.limit()` decorator to 10 previously unprotected endpoint files (economic_analysis, contract_structure, service_accounts, invites, project_access, copilot, ml, roles, scanners, ide_integrations)
+- 55+ endpoints now rate-limited using tier-based infrastructure
+- Public invite endpoints use fixed 10/minute rate limit
+- api-service 0.29.4 -> 0.29.5
+
+**Use When:**
+- Reviewing rate limiting coverage across all endpoints
+- Understanding which endpoints use tier-based vs fixed rate limits
+
 ### 0. API Service v0.29.4 - Security Audit Fixes (`API-SERVICE-V0.29.4-SECURITY-AUDIT-FIXES-2026-02-20.md`)
 
 **Component:** blocksecops-api-service, blocksecops-gcp-infrastructure
