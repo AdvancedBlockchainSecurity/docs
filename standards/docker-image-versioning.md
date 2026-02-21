@@ -309,6 +309,13 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | scanner-trident | 0.3.1 | N/A (scanner image) | find -L symlink fix |
 | scanner-rustdefend | 0.4.2 | N/A (scanner image) | v0.5.1: FP reduction (347 fewer), 61 detectors, custom rules engine |
 
+### Infrastructure Images (Harbor)
+
+| Image | Version | Harbor Path | Notes |
+|-------|---------|-------------|-------|
+| prometheus | v3.2.1 | `blocksecops/prometheus` | Metrics collection, disabled by default |
+| prometheus-adapter | v0.11.2 | `blocksecops/prometheus-adapter` | HPA custom metrics bridge |
+
 All services are `0.x.x` (development phase). Version `1.0.0` indicates stable, production-ready API.
 
 ---
