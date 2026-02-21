@@ -73,7 +73,7 @@ Manual testing checklists for all user-facing features.
 | [60-collapsible-sidebar-quick-access.md](./60-collapsible-sidebar-quick-access.md) | **NEW** - Collapsible sidebar (w-64 ↔ w-16), quick access page pins (max 5), localStorage persistence (v0.41.4 Dashboard) |
 | [61-ai-inline-results.md](./61-ai-inline-results.md) | **NEW** - AI inline results: Code Review & Code Repair display fully inline on vulnerability detail, auth fix for code-repair endpoints (v0.45.3 Dashboard, v0.28.32 API) |
 | [66-scanner-audit-fixes.md](./66-scanner-audit-fixes.md) | **NEW** - Scanner audit fixes: solhint JSON extraction, vyper scanner_id attribution, stale scan recovery, canary UUID, code snippet fallback |
-| [68-rate-limiting-security-audit.md](./68-rate-limiting-security-audit.md) | **NEW** - Rate limiting security audit: 28 endpoint rate limits, analytics dual-auth, webhook model fix (v0.28.42 API) |
+| [68-rate-limiting-security-audit.md](./68-rate-limiting-security-audit.md) | **UPDATED** - Rate limiting security audit: 37 endpoint files rate-limited (225+ endpoints), analytics dual-auth (v0.29.5 API) |
 | [70-platform-bugfixes-features.md](./70-platform-bugfixes-features.md) | **NEW** - Platform bug fixes, features & security hardening: pattern sorting, patterns view, Rust scanners, contract overflow, project display, address persistence, pattern findings, code snippet validation, repair fallback, ML labeling, invariant errors, upload size, pattern merge/audit, SCM PR creation (v0.28.46 API, v0.45.9 Dashboard, v0.9.15 Orchestration, v0.4.8 Tool Integration) |
 | [71-admin-scanners-kpi-dedup-fix.md](./71-admin-scanners-kpi-dedup-fix.md) | **NEW** - Admin scanners KPI (Total Scans, per-scanner counts), deduplication page min_scanner_count filter fix (v0.29.2 API, v0.7.3 Admin Portal, v0.46.1 Dashboard) |
 | [api-key-scope-enforcement.md](./api-key-scope-enforcement.md) | API key scope enforcement tests |
@@ -361,7 +361,8 @@ For the comprehensive GCP production launch audit (cross-cutting, integration-le
 2026-01-12 | Claude Code | 40-quality-gates.md | IMPLEMENTED - Quality Gates, ProjectDetail integration, contracts search, advanced-search rename (v0.10.2 API, v0.29.0 Dashboard)
 2026-01-12 | Claude Code | 25-dark-mode-global-search.md | UPDATED - Added Test 9-11 for advanced search, contracts search, contract links (v0.29.0 Dashboard)
 2026-01-12 | Claude Code | 39-economic-security-analysis.md | IMPLEMENTED - Economic panel, flash loan/MEV/DeFi detection, AI explanations (v0.10.0 API, v0.28.0 Dashboard)
-2026-02-19 | Claude Code | 70-platform-bugfixes-features.md | NEW - Platform bug fixes & features: 16 tasks across 4 services, pattern sorting, patterns view toggle, SCM PR creation, ML label fix, security hardening (v0.28.46 API, v0.45.9 Dashboard, v0.9.15 Orchestration, v0.4.8 Tool Integration)
+2026-02-20 | Manual | 68-rate-limiting-security-audit.md | UPDATE - Added 10 remaining endpoint files (55+ endpoints) to rate limiting coverage, completing all non-exempt files (v0.29.5 API)
+2026-02-19 | Manual | 70-platform-bugfixes-features.md | NEW - Platform bug fixes & features: 16 tasks across 4 services, pattern sorting, patterns view toggle, SCM PR creation, ML label fix, security hardening (v0.28.46 API, v0.45.9 Dashboard, v0.9.15 Orchestration, v0.4.8 Tool Integration)
 2026-02-18 | Manual | 68-rate-limiting-security-audit.md | IMPLEMENTED - 28 rate limit decorators, 5 analytics dual-auth, webhook model fix (v0.28.42 API)
 2026-01-10 | Manual | 38-cursor-pagination.md | VERIFIED - Migration 029 applied, indexes used in queries, cursor encode/decode working
 2026-01-04 | Claude Code | 36-cicd-integration.md | IMPLEMENTED - GitHub Actions, GitLab CI, Jenkins, Azure Pipelines integration tests

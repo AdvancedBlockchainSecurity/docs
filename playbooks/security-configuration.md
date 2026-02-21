@@ -241,7 +241,7 @@ Rate limiting must use trusted proxy validation, not raw `X-Forwarded-For`:
 
 ---
 
-## 6. CORS Configuration (v0.29.4)
+## 6. CORS Configuration (v0.29.4+)
 
 ### Overview
 
@@ -337,7 +337,61 @@ curl -sk -H "Authorization: Bearer $TOKEN" \
 
 ---
 
-## 8. Verification Checklist
+## 8. Rate Limiting Coverage (v0.29.5)
+
+### Overview
+
+As of v0.29.5, all non-exempt API endpoint files have rate limiting decorators. Rate limits are enforced by slowapi and configured via the centralized tier configuration (`tiers.json`).
+
+### Coverage Summary
+
+| Version | Files Added | Total Files | Total Endpoints |
+|---------|-------------|-------------|-----------------|
+| Pre-audit | 15 (write/mutation) | 15 | ~50 |
+| v0.29.4 | 27 (read/search/CRUD) | 42 | ~170 |
+| v0.29.5 | 10 (remaining) | 52 | ~225+ |
+
+### v0.29.5 Additions
+
+The following 10 files were rate-limited in v0.29.5:
+
+- `economic_analysis.py` (5 endpoints)
+- `contract_structure.py` (5 endpoints)
+- `service_accounts.py` (7 endpoints)
+- `invites.py` (5 endpoints - public endpoints use fixed 10/min)
+- `project_access.py` (7 endpoints)
+- `copilot.py` (9 endpoints)
+- `ml.py` (25 endpoints)
+- `roles.py` (1 endpoint)
+- `scanners.py` (4 endpoints)
+- `ide_integrations.py` (8 endpoints)
+
+### Exempt Endpoints
+
+| File | Reason |
+|------|--------|
+| `health.py` | Kubernetes probes must remain unthrottled |
+| `websocket.py` | WebSocket connections, not HTTP |
+| `monitoring.py` | Internal monitoring |
+| `stripe_webhook.py` | Stripe signature-verified |
+| `admin/*.py` | All admin endpoints are MFA-protected |
+
+### Verification
+
+```bash
+# Verify rate limit headers present on authenticated requests
+curl -sk -v \
+  -H "Authorization: Bearer $TOKEN" \
+  "https://app.blocksecops.local/api/v1/contracts" \
+  2>&1 | grep -i "x-ratelimit"
+# Expected: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+```
+
+See [Adjust Rate Limits](adjust-rate-limits.md) for modifying rate limit values.
+
+---
+
+## 9. Verification Checklist
 
 ### Pre-Deployment
 
