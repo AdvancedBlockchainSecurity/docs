@@ -292,7 +292,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | intelligence-engine | 0.3.1 | `k8s/overlays/local/` | Probe timeout fix for dev cluster stability |
 | notification | 0.2.0 | `k8s/overlays/local/` | Race condition remediation: broadcast snapshot iteration, JWT validation, topic subscriptions, Redis list bounding, auth state machine |
 | orchestration | 0.10.1 | `k8s/overlays/local/` | Race condition fixes, Harbor registry refs, SCANNER_REGISTRY prefix, asgiref async_to_sync, enrichment singleton lock, dedup FOR UPDATE, atomic retry_count |
-| tool-integration | 0.5.1 | `k8s/overlays/local/` | Race condition fixes, SCANNER_REGISTRY prefix, UUID job names, ConfigMap optimistic concurrency, dead letter atomic writes, poll/cache locks |
+| tool-integration | 0.5.2 | `k8s/overlays/local/` | Remove deprecated MythrilParser, add canary dry-run mode to prevent 404 errors |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |
