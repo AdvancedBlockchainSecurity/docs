@@ -291,8 +291,8 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
 | notification | 0.2.0 | `k8s/overlays/local/` | Race condition remediation: broadcast snapshot iteration, JWT validation, topic subscriptions, Redis list bounding, auth state machine |
-| orchestration | 0.10.0 | `k8s/overlays/local/` | Race condition remediation: atomic vuln count update, async_to_sync for dedup, atomic retry_count, enrichment singleton lock, dedup FOR UPDATE |
-| tool-integration | 0.5.0 | `k8s/overlays/local/` | Race condition remediation: asyncio.Lock on poll/cache/jobs, UUID job names, ConfigMap optimistic concurrency, dead letter atomic writes |
+| orchestration | 0.10.1 | `k8s/overlays/local/` | Race condition fixes, Harbor registry refs, SCANNER_REGISTRY prefix, asgiref async_to_sync, enrichment singleton lock, dedup FOR UPDATE, atomic retry_count |
+| tool-integration | 0.5.1 | `k8s/overlays/local/` | Race condition fixes, SCANNER_REGISTRY prefix, UUID job names, ConfigMap optimistic concurrency, dead letter atomic writes, poll/cache locks |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |
