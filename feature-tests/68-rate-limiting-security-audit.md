@@ -1,14 +1,14 @@
-# Feature Test: Rate Limiting Security Audit (v0.29.4)
+# Feature Test: Rate Limiting Security Audit (v0.29.5)
 
 **Feature:** Endpoint Rate Limiting for All API Operations
-**Version:** API Service 0.29.4+
+**Version:** API Service 0.29.5+
 **Last Updated:** February 20, 2026
 
 ## Overview
 
 All API endpoints must be rate-limited via the centralized tier configuration (`tiers.json`). Rate limits are enforced by slowapi decorators and return `429 Too Many Requests` when exceeded.
 
-As of v0.29.4, rate limiting coverage was expanded from write/mutation endpoints only to include all 27 previously unprotected endpoint files (~170+ endpoints total), covering read operations, search, analytics, and CRUD operations.
+As of v0.29.5, rate limiting coverage is complete across all non-exempt endpoint files. v0.29.4 added rate limiting to 27 endpoint files, and v0.29.5 added the remaining 10 files (55+ additional endpoints), bringing total coverage to 37 endpoint files (~225+ endpoints).
 
 ---
 
@@ -264,6 +264,23 @@ The following 27 endpoint files were added during the v0.29.4 security audit. Al
 | `admin/impersonation.py` | Admin impersonation | Fixed: 5/minute | Admin-only, high risk |
 | `gdpr.py` | GDPR data requests | Fixed: 5/minute | Resource-intensive |
 
+### Remaining Rate-Limited Endpoints (v0.29.5 Security Audit)
+
+The following 10 endpoint files were added during the v0.29.5 security audit, completing rate limiting coverage across all non-exempt endpoint files.
+
+| Endpoint File | Endpoints Covered | Rate Limit | Notes |
+|---------------|-------------------|------------|-------|
+| `economic_analysis.py` | 5 endpoints | Tier-based (60/min) | |
+| `contract_structure.py` | 5 endpoints | Tier-based (60/min) | |
+| `service_accounts.py` | 7 endpoints | Tier-based (60/min) | |
+| `invites.py` | 3 org + 2 public | Tier-based / Fixed (10/min for public) | Public invite endpoints use fixed rate |
+| `project_access.py` | 7 endpoints | Tier-based (60/min) | |
+| `copilot.py` | 9 endpoints | Tier-based (60/min) | |
+| `ml.py` | 25 endpoints | Tier-based (60/min) | |
+| `roles.py` | 1 endpoint | Tier-based (60/min) | |
+| `scanners.py` | 4 endpoints | Tier-based (60/min) | |
+| `ide_integrations.py` | 8 endpoints | Tier-based (60/min) | |
+
 ### Endpoints Intentionally NOT Rate-Limited
 
 | Endpoint File | Reason |
@@ -271,7 +288,14 @@ The following 27 endpoint files were added during the v0.29.4 security audit. Al
 | `health.py` | Must remain unthrottled for Kubernetes liveness/readiness probes |
 | `websocket.py` | WebSocket connections, not HTTP request/response |
 | `monitoring.py` | Internal monitoring endpoints |
+| `stripe_webhook.py` | External Stripe webhooks (signature-verified) |
 | `admin/scan_monitoring.py` | Admin-only with MFA enforcement |
 | `admin/system.py` | Admin-only with MFA enforcement |
 | `admin/audit.py` | Admin-only with MFA enforcement |
 | `admin/support.py` | Admin-only with MFA enforcement |
+| `admin/patterns.py` | Admin-only with MFA enforcement |
+| `admin/utils.py` | Admin-only with MFA enforcement |
+| `admin/organizations.py` | Admin-only with MFA enforcement |
+| `admin/users.py` | Admin-only with MFA enforcement |
+| `admin/dependencies.py` | Admin-only with MFA enforcement |
+| `admin/purchases.py` | Admin-only with MFA enforcement |
