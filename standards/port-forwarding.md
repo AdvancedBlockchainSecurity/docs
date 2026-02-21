@@ -100,15 +100,17 @@ These URLs are used for service-to-service health checks (e.g., Admin System pag
 
 > **Note:** Images are built locally, pushed to Harbor, and deployed via `kubectl apply -k`. See [Build Workflow](./build-workflow.md) for details.
 
-### Monitoring Services (PLG Stack) - DISABLED BY DEFAULT
+### Monitoring Services - DISABLED BY DEFAULT
 
-**Note:** Monitoring services are **disabled by default** for local development to reduce resource usage and improve performance. The platform functions fully without them.
+**Note:** Monitoring services are **disabled by default** for local development to reduce resource usage and improve performance. The platform functions fully without them. However, Prometheus and prometheus-adapter are required for HPA custom metrics (`database_connections_active`, `tool_execution_queue_length`).
 
 | Local Port | Service | Namespace | Target Port | Purpose |
 |------------|---------|-----------|-------------|---------|
 | **3001** | Grafana | `monitoring-local` | 3000 | Dashboards & visualization |
 | **9091** | Prometheus | `monitoring-local` | 9090 | Metrics collection |
 | **9093** | Loki | `monitoring-local` | 3100 | Log aggregation |
+
+**IaC:** Prometheus and prometheus-adapter manifests are managed in `blocksecops-monitoring` repo (`k8s/base/prometheus/`, `k8s/base/prometheus-adapter/`). Deploy with `kubectl apply -k k8s/overlays/local/` from the monitoring repo.
 
 ### Database Exporters - DISABLED BY DEFAULT
 

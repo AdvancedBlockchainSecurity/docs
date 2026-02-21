@@ -289,7 +289,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.46.1 | `k8s/overlays/local/` | Fix deduplication page default min_scanner_count filter from 2 to 1 so single-scanner groups are visible |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
-| intelligence-engine | 0.3.0 | `k8s/overlays/local/` | Hosts `/api/v1/embeddings` |
+| intelligence-engine | 0.3.1 | `k8s/overlays/local/` | Probe timeout fix for dev cluster stability |
 | notification | 0.2.0 | `k8s/overlays/local/` | Race condition remediation: broadcast snapshot iteration, JWT validation, topic subscriptions, Redis list bounding, auth state machine |
 | orchestration | 0.10.1 | `k8s/overlays/local/` | Race condition fixes, Harbor registry refs, SCANNER_REGISTRY prefix, asgiref async_to_sync, enrichment singleton lock, dedup FOR UPDATE, atomic retry_count |
 | tool-integration | 0.5.1 | `k8s/overlays/local/` | Race condition fixes, SCANNER_REGISTRY prefix, UUID job names, ConfigMap optimistic concurrency, dead letter atomic writes, poll/cache locks |
