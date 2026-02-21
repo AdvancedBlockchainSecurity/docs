@@ -3,7 +3,7 @@
 **Feature ID**: 28
 **Version**: 1.1.0
 **Added**: v0.1.6 (API), v0.17.1 (Dashboard)
-**Last Updated**: 2026-01-13
+**Last Updated**: 2026-02-20
 
 ---
 
@@ -15,10 +15,12 @@ Test guide for web application security features including security headers, COR
 
 ## Prerequisites
 
-- [ ] API service running at http://127.0.0.1:8000
-- [ ] Dashboard running at http://127.0.0.1:3000
+- [ ] API service running (accessible via `https://app.blocksecops.local/api/v1/`)
+- [ ] Dashboard running (accessible via `https://app.blocksecops.local`)
 - [ ] Access to application logs
 - [ ] curl or similar HTTP client
+
+> **Note (v0.29.4):** As of the February 2026 security audit, CORS is handled exclusively by FastAPI CORSMiddleware. Traefik CORS middleware was removed to eliminate duplicate header issues. CORS `max_age` is set to 3600 seconds (1 hour) to reduce preflight requests.
 
 ---
 
@@ -28,7 +30,7 @@ Test guide for web application security features including security headers, COR
 
 | Step | Action | Expected Result | Status |
 |------|--------|-----------------|--------|
-| 1 | `curl -I http://127.0.0.1:8000/api/v1/health/ready` | Response includes security headers | [ ] |
+| 1 | `curl -skI https://app.blocksecops.local/api/v1/health/ready` | Response includes security headers | [ ] |
 | 2 | Check X-Content-Type-Options | `nosniff` | [ ] |
 | 3 | Check X-Frame-Options | `DENY` | [ ] |
 | 4 | Check X-XSS-Protection | `1; mode=block` | [ ] |
@@ -49,6 +51,8 @@ Test guide for web application security features including security headers, COR
 
 ## Test 2: CORS Configuration
 
+> **Architecture Note (v0.29.4):** CORS is handled solely by FastAPI CORSMiddleware. Traefik CORS middleware files were removed to prevent duplicate `Access-Control-*` headers. The CORS `max_age` is set to 3600 seconds.
+
 ### 2.1 Allowed Methods
 
 | Step | Action | Expected Result | Status |
@@ -60,8 +64,8 @@ Test guide for web application security features including security headers, COR
 | 5 | Send OPTIONS preflight for DELETE | Allowed | [ ] |
 
 ```bash
-curl -X OPTIONS http://127.0.0.1:8000/api/v1/contracts \
-  -H "Origin: http://127.0.0.1:3000" \
+curl -sk -X OPTIONS https://app.blocksecops.local/api/v1/contracts \
+  -H "Origin: https://app.blocksecops.local" \
   -H "Access-Control-Request-Method: POST" \
   -H "Access-Control-Request-Headers: Authorization,Content-Type" \
   -v
@@ -75,10 +79,25 @@ curl -X OPTIONS http://127.0.0.1:8000/api/v1/contracts \
 | Content-Type | Allowed | [ ] |
 | X-Request-ID | Allowed | [ ] |
 | X-API-Key | Allowed | [ ] |
+| X-Organization-Id | Allowed | [ ] |
 | Accept | Allowed | [ ] |
 | Origin | Allowed | [ ] |
 
-### 2.3 Blocked Methods/Headers
+### 2.3 CORS max-age (v0.29.4)
+
+| Step | Action | Expected Result | Status |
+|------|--------|-----------------|--------|
+| 1 | Send OPTIONS preflight request | `Access-Control-Max-Age: 3600` in response | [ ] |
+| 2 | Verify single CORS header set | `Access-Control-Allow-Origin` appears exactly once | [ ] |
+
+```bash
+curl -sk -X OPTIONS https://app.blocksecops.local/api/v1/contracts \
+  -H "Origin: https://app.blocksecops.local" \
+  -H "Access-Control-Request-Method: POST" \
+  -D - -o /dev/null 2>&1 | grep -i "access-control"
+```
+
+### 2.4 Blocked Methods/Headers
 
 | Step | Action | Expected Result | Status |
 |------|--------|-----------------|--------|
@@ -307,7 +326,7 @@ echo ""
 
 # Test 1: API Security Headers
 echo "1. Testing API Security Headers..."
-HEADERS=$(curl -sI http://127.0.0.1:8000/api/v1/health/ready)
+HEADERS=$(curl -skI https://app.blocksecops.local/api/v1/health/ready)
 echo "$HEADERS" | grep -q "x-content-type-options: nosniff" && echo "   ✓ X-Content-Type-Options" || echo "   ✗ X-Content-Type-Options MISSING"
 echo "$HEADERS" | grep -q "x-frame-options: DENY" && echo "   ✓ X-Frame-Options" || echo "   ✗ X-Frame-Options MISSING"
 echo "$HEADERS" | grep -q "x-xss-protection: 1; mode=block" && echo "   ✓ X-XSS-Protection" || echo "   ✗ X-XSS-Protection MISSING"
@@ -330,16 +349,20 @@ else
 fi
 echo ""
 
-# Test 2: CORS Configuration
+# Test 2: CORS Configuration (FastAPI-only since v0.29.4)
 echo "2. Testing CORS Configuration..."
-CORS=$(curl -sX OPTIONS http://127.0.0.1:8000/api/v1/contracts \
-  -H "Origin: http://127.0.0.1:3000" \
+CORS=$(curl -sk -X OPTIONS https://app.blocksecops.local/api/v1/contracts \
+  -H "Origin: https://app.blocksecops.local" \
   -H "Access-Control-Request-Method: POST" \
   -H "Access-Control-Request-Headers: Authorization,Content-Type" \
   -i 2>&1)
-echo "$CORS" | grep -q "access-control-allow-origin: http://127.0.0.1:3000" && echo "   ✓ CORS Origin Allowed" || echo "   ✗ CORS Origin FAILED"
+echo "$CORS" | grep -q "access-control-allow-origin: https://app.blocksecops.local" && echo "   ✓ CORS Origin Allowed" || echo "   ✗ CORS Origin FAILED"
 echo "$CORS" | grep -q "access-control-allow-methods:" && echo "   ✓ CORS Methods Configured" || echo "   ✗ CORS Methods MISSING"
 echo "$CORS" | grep -q "access-control-allow-headers:" && echo "   ✓ CORS Headers Configured" || echo "   ✗ CORS Headers MISSING"
+echo "$CORS" | grep -q "access-control-max-age: 3600" && echo "   ✓ CORS Max-Age 3600" || echo "   ✗ CORS Max-Age MISSING"
+# Verify no duplicate CORS headers (Traefik middleware removed in v0.29.4)
+ORIGIN_COUNT=$(echo "$CORS" | grep -ci "access-control-allow-origin:")
+[ "$ORIGIN_COUNT" -eq 1 ] && echo "   ✓ No Duplicate CORS Headers" || echo "   ✗ DUPLICATE CORS Headers ($ORIGIN_COUNT occurrences)"
 echo ""
 
 # Test 3: Request Size Limit
@@ -373,30 +396,30 @@ echo "=== Security Tests Complete ==="
 
 ```bash
 # Test security headers
-curl -I http://127.0.0.1:8000/api/v1/health/ready
+curl -skI https://app.blocksecops.local/api/v1/health/ready
 
-# Test CORS preflight
-curl -X OPTIONS http://127.0.0.1:8000/api/v1/contracts \
-  -H "Origin: http://127.0.0.1:3000" \
+# Test CORS preflight (FastAPI-only since v0.29.4, max-age=3600)
+curl -sk -X OPTIONS https://app.blocksecops.local/api/v1/contracts \
+  -H "Origin: https://app.blocksecops.local" \
   -H "Access-Control-Request-Method: POST" \
   -H "Access-Control-Request-Headers: Authorization,Content-Type" \
   -i 2>&1 | grep -i "access-control"
 
 # Test request size limit (15MB > 10MB limit)
 dd if=/dev/zero of=/tmp/large.bin bs=1M count=15 2>/dev/null && \
-curl -X POST http://127.0.0.1:8000/api/v1/upload \
+curl -sk -X POST https://app.blocksecops.local/api/v1/upload \
   -H "Content-Type: application/octet-stream" \
   --data-binary @/tmp/large.bin -w "\nHTTP: %{http_code}" && \
 rm /tmp/large.bin
 
-# Test rate limiting (run multiple times quickly)
-for i in {1..100}; do curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8000/api/v1/health/ready; done | sort | uniq -c
+# Test rate limiting - verify X-RateLimit headers present
+curl -sk -v https://app.blocksecops.local/api/v1/health/ready 2>&1 | grep -i "x-ratelimit"
 
 # Test error handling
-curl -s http://127.0.0.1:8000/api/v1/nonexistent | jq .
+curl -sk https://app.blocksecops.local/api/v1/nonexistent | jq .
 
 # Test auth failure
-curl -s http://127.0.0.1:8000/api/v1/users/me -H "Authorization: Bearer invalid" | jq .
+curl -sk https://app.blocksecops.local/api/v1/users/me -H "Authorization: Bearer invalid" | jq .
 ```
 
 ---
