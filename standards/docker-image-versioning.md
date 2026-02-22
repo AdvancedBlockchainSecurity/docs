@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
 **Version:** 3.4.0
-**Last Updated:** February 12, 2026
+**Last Updated:** February 21, 2026
 
 ## Single Source of Truth
 
@@ -285,14 +285,14 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.3 | `k8s/overlays/local/` | Add total scans KPI and per-scanner scan counts to scanners page |
-| api-service | 0.29.5 | `k8s/overlays/local/api-service/` | Security audit: rate limiting on 10 additional endpoint files (55+ endpoints) |
+| api-service | 0.29.6 | `k8s/overlays/local/api-service/` | Fix EmailStr response validation, slowapi Response parameter on 17 endpoints, remove server header disclosure |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.46.1 | `k8s/overlays/local/` | Fix deduplication page default min_scanner_count filter from 2 to 1 so single-scanner groups are visible |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
 | intelligence-engine | 0.3.1 | `k8s/overlays/local/` | Probe timeout fix for dev cluster stability |
 | notification | 0.2.0 | `k8s/overlays/local/` | Race condition remediation: broadcast snapshot iteration, JWT validation, topic subscriptions, Redis list bounding, auth state machine |
 | orchestration | 0.10.1 | `k8s/overlays/local/` | Race condition fixes, Harbor registry refs, SCANNER_REGISTRY prefix, asgiref async_to_sync, enrichment singleton lock, dedup FOR UPDATE, atomic retry_count |
-| tool-integration | 0.5.2 | `k8s/overlays/local/` | Remove deprecated MythrilParser, add canary dry-run mode to prevent 404 errors |
+| tool-integration | 0.5.3 | `k8s/overlays/local/` | Remove canary CronJob and dry_run parameter |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |

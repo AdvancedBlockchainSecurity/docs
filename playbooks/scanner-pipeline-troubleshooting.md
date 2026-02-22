@@ -1,7 +1,7 @@
 # Playbook: Scanner Pipeline Troubleshooting
 
-**Version:** 1.1.0
-**Last Updated:** February 12, 2026
+**Version:** 1.2.0
+**Last Updated:** February 22, 2026
 
 ## Overview
 
@@ -187,12 +187,12 @@ curl -s -w "\n%{http_code}" -X POST "$CALLBACK_URL" \
 
 | Scanner | Image | Version | Base | UID |
 |---------|-------|---------|------|-----|
-| slither | scanner-slither | 0.3.2 | python:3.11-slim | 1000 |
-| aderyn | scanner-aderyn | 0.7.2 | debian:bookworm-slim | 1000 |
-| semgrep | scanner-semgrep | 0.3.5 | python:3.11-slim | 1000 |
-| solhint | scanner-solhint | 0.1.6 | node:20-alpine | 1000 (node) |
-| wake | scanner-wake | 0.3.6 | python:3.11-slim | 1000 |
-| soliditydefend | scanner-soliditydefend | 0.8.0 | debian:bookworm-slim | 1000 |
+| slither | scanner-slither | 0.3.3 | python:3.11-slim | 1000 |
+| aderyn | scanner-aderyn | 0.7.3 | debian:bookworm-slim | 1000 |
+| semgrep | scanner-semgrep | 0.3.8 | python:3.11-slim | 1000 |
+| solhint | scanner-solhint | 0.1.8 | node:20-alpine | 1000 (node) |
+| wake | scanner-wake | 0.3.8 | python:3.11-slim | 1000 |
+| soliditydefend | scanner-soliditydefend | 0.9.1 | debian:bookworm-slim | 1000 |
 
 ---
 
@@ -317,13 +317,6 @@ New `PrometheusRule` (`k8s/base/prometheus-rules.yaml`) with alerts:
 - `JobConflictRateHigh` - High 409 Conflict rate
 - `CallbackForwardingFailure` - API forwarding failing >10%
 - `ScannerJobStuck` - Jobs running >15 minutes
-
-### Scanner Canary CronJob
-
-`k8s/base/canary-cronjob.yaml` runs every 30 minutes:
-1. Checks `/health` and `/ready` endpoints
-2. Triggers a lightweight slither scan with a minimal contract
-3. Verifies the trigger was accepted
 
 ### Port Fixes
 
