@@ -285,7 +285,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.3 | `k8s/overlays/local/` | Add total scans KPI and per-scanner scan counts to scanners page |
-| api-service | 0.29.6 | `k8s/overlays/local/api-service/` | Fix EmailStr response validation, slowapi Response parameter on 17 endpoints, remove server header disclosure |
+| api-service | 0.29.7 | `k8s/overlays/local/api-service/` | Fix EmailStr response validation, slowapi Response parameter, remove duplicate response params |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.46.1 | `k8s/overlays/local/` | Fix deduplication page default min_scanner_count filter from 2 to 1 so single-scanner groups are visible |
 | data-service | 0.2.0 | `k8s/overlays/local/` | |
