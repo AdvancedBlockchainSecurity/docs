@@ -1,8 +1,8 @@
 # Feature Test: Economic Security Analysis
 
 **Feature**: Economic Security Analysis Panel (Phase 5.5a)
-**Version**: 0.10.0 (API), 0.28.0 (Dashboard)
-**Date**: January 12, 2026
+**Version**: 0.29.10 (API), 0.46.2 (Dashboard)
+**Date**: January 12, 2026 (created), February 23, 2026 (updated)
 **Status**: Implemented
 
 ---
@@ -403,3 +403,23 @@ Returns aggregated economic risk across all project scans.
 | Team | $299/mo | 10 | Monthly |
 | Growth | $699/mo | 100 | Monthly |
 | Enterprise | $1,999+/mo | -1 (unlimited) | N/A |
+
+---
+
+## Known Issues (Fixed)
+
+### Slowapi Response Parameter Bug (Fixed v0.29.9)
+
+**Issue:** All 5 economic analysis endpoints returned 500 Internal Server Error because the `@limiter.limit()` decorator from slowapi requires a `response: Response` parameter in the endpoint function signature. Without it, slowapi raises a TypeError.
+
+**Fix:** Added `response: Response` parameter to all 5 endpoint functions in `economic_analysis.py`.
+
+**Verified:** February 23, 2026 — All endpoints return proper HTTP status codes (200, 400, 402, 403, 404).
+
+### Dashboard Error Handling Security Hardening (Fixed v0.46.2)
+
+**Issue:** The `EconomicSecurityPanel.tsx` component detected 403 and 402 errors using fragile string matching (`err.message.includes('403')`), which could false-positive on any error message containing those digits.
+
+**Fix:** Replaced with `getErrorStatus(err) === 403` using proper AxiosError status code inspection via the new `getErrorStatus()` helper in `client.ts`. Error fallback now uses hardcoded safe message instead of raw error text.
+
+**Verified:** February 23, 2026 — Economic Security panel correctly shows upgrade prompt for developer tier and data for team+ tiers.
