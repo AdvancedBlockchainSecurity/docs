@@ -1567,6 +1567,25 @@ asyncio.run(verify())
 
 ---
 
+### Migration Compatibility Check (Deduplication Maintenance Job)
+
+**Added:** February 22, 2026
+
+The deduplication maintenance CronJob now includes a migration compatibility check that runs before the main deduplication logic. This prevents the job from failing with cryptic database errors when the schema has changed but migrations have not been applied.
+
+**How it works:**
+- Before executing deduplication queries, the job checks that expected tables and columns exist
+- If a required table or column is missing, the job logs a clear error message and exits gracefully instead of crashing
+- This is particularly important because CronJobs run on a schedule and may execute after a code deploy but before migrations are applied
+
+**Affected CronJob:** `deduplication-maintenance` in `api-service-local` namespace
+
+**Configuration:**
+- `startingDeadlineSeconds: 600` prevents missed schedules from queuing up
+- Job runs with the same image version as the api-service Deployment (enforced by kustomize `images` block)
+
+---
+
 ### Creating Migrations
 ```bash
 # Generate migration from models

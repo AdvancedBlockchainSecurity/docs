@@ -1,7 +1,7 @@
 # Platform Smoke Test Standards
 
-**Version:** 1.0.0
-**Last Updated:** February 6, 2026
+**Version:** 1.1.0
+**Last Updated:** February 22, 2026
 **Status:** Active
 
 ## Overview
@@ -40,6 +40,10 @@ kubectl exec -n vault-local vault-0 -- vault status -format=json 2>/dev/null | p
 
 # 4. Database accessible
 kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -c "SELECT 1;" 2>/dev/null
+
+# 5. Version drift check (all services)
+/home/pwner/Git/scripts/check-version-drift.sh
+# Expected: all services show "OK" (source == kustomize == cluster)
 ```
 
 ## Service Health Checks
@@ -71,10 +75,10 @@ Run from any pod in the cluster. The API service pod is a good choice:
 # All 6 internal services in one loop
 for check in \
   "tool-integration.tool-integration-local.svc.cluster.local:8005/health" \
-  "orchestration.orchestration-local.svc.cluster.local:8004/api/v1/health/live" \
-  "notification.notification-local.svc.cluster.local:8003/api/v1/health/live" \
+  "orchestration.orchestration-local.svc.cluster.local:8004/health" \
+  "notification.notification-local.svc.cluster.local:8003/health" \
   "intelligence-engine.intelligence-engine-local.svc.cluster.local:80/health" \
-  "data-service.data-service-local.svc.cluster.local:8001/" \
+  "data-service.data-service-local.svc.cluster.local:8001/health" \
   "contract-parser.contract-parser-local.svc.cluster.local:80/health" \
 ; do
   svc=$(echo "$check" | cut -d. -f1)
@@ -208,18 +212,43 @@ for ns_svc in \
 done
 ```
 
-**Current versions (as of February 12, 2026):**
+### CronJob Version Drift Check
+
+**CRITICAL:** CronJobs must use the same image version as their parent Deployment. If `kubectl apply -k` is missed after a version bump, CronJobs silently run old code while Deployments may appear updated.
+
+```bash
+# Check CronJob images match Deployment images
+echo "=== CronJob Version Drift Check ==="
+for ns in $(kubectl get cronjob -A --no-headers 2>/dev/null | awk '{print $1}' | sort -u); do
+  for cj in $(kubectl get cronjob -n "$ns" --no-headers 2>/dev/null | awk '{print $1}'); do
+    CJ_IMG=$(kubectl get cronjob -n "$ns" "$cj" -o jsonpath='{.spec.jobTemplate.spec.template.spec.containers[0].image}' 2>/dev/null)
+    CJ_TAG=$(echo "$CJ_IMG" | rev | cut -d: -f1 | rev)
+    # Find matching deployment by image name
+    IMG_NAME=$(echo "$CJ_IMG" | rev | cut -d: -f2- | rev)
+    DEP_TAG=$(kubectl get deployment -n "$ns" -o jsonpath="{range .items[*]}{.spec.template.spec.containers[0].image}{'\n'}{end}" 2>/dev/null | grep "$IMG_NAME" | rev | cut -d: -f1 | rev)
+    if [ -n "$DEP_TAG" ] && [ "$CJ_TAG" != "$DEP_TAG" ]; then
+      echo "  DRIFT: $ns/$cj CronJob=$CJ_TAG Deployment=$DEP_TAG"
+    elif [ -n "$DEP_TAG" ]; then
+      echo "  OK:    $ns/$cj = $CJ_TAG"
+    else
+      echo "  INFO:  $ns/$cj = $CJ_TAG (no matching deployment)"
+    fi
+  done
+done
+```
+
+**Current versions (as of February 22, 2026):**
 
 | Service | Version |
 |---------|---------|
-| api-service | 0.28.20 |
-| dashboard | 0.42.0 |
-| admin-portal | 0.4.0 |
-| tool-integration | 0.3.22 |
-| orchestration | 0.9.13 |
-| notification | 0.1.2 |
-| intelligence-engine | 0.3.0 |
-| data-service | 0.2.0 |
+| api-service | 0.29.8 |
+| dashboard | 0.46.1 |
+| admin-portal | 0.7.3 |
+| tool-integration | 0.5.4 |
+| orchestration | 0.10.2 |
+| notification | 0.2.1 |
+| intelligence-engine | 0.3.1 |
+| data-service | 0.2.1 |
 | contract-parser | 0.2.0 |
 
 ## Quick Full Smoke Test Script
@@ -266,7 +295,7 @@ for svc_url in \
   "orchestration|orchestration.orchestration-local.svc.cluster.local:8004/api/v1/health/live" \
   "notification|notification.notification-local.svc.cluster.local:8003/api/v1/health/live" \
   "intelligence|intelligence-engine.intelligence-engine-local.svc.cluster.local:80/health" \
-  "data-service|data-service.data-service-local.svc.cluster.local:8001/" \
+  "data-service|data-service.data-service-local.svc.cluster.local:8001/health" \
   "contract-parser|contract-parser.contract-parser-local.svc.cluster.local:80/health" \
 ; do
   svc=$(echo "$svc_url" | cut -d'|' -f1)
@@ -304,9 +333,16 @@ echo "  Failed: $FAIL"
 | Daily (morning check) | Recommended |
 | After cluster reboot | Yes |
 
+**Pre-smoke-test:** Run the version drift checker first to catch stale deploys:
+
+```bash
+/home/pwner/Git/scripts/check-version-drift.sh
+```
+
 ---
 
 **See Also:**
 - [Testing & Deployment](./testing-deployment.md) — Build and deploy workflow
 - [Port Forwarding / Service Access](./port-forwarding.md) — Service URLs and ports
 - [Docker Image Versioning](./docker-image-versioning.md) — Version bump workflow
+- [Build Workflow](./build-workflow.md) — Deploy script and drift checker

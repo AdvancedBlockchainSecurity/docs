@@ -17,10 +17,10 @@ BlockSecOps is a blockchain/smart-contract security analysis platform with 12 mi
 | blocksecops-api-service | Backend API (FastAPI) | 8000 | Python |
 | blocksecops-orchestration | Celery workers + beat + API | 8003 (flower), 8004 (API) | Python |
 | blocksecops-tool-integration | Scanner execution engine | 8005 | Python |
-| blocksecops-data-service | Data service | 8000 | Python |
+| blocksecops-data-service | Data service | 8001 | Python |
 | blocksecops-intelligence-engine | ML/pattern engine | 8000 | Python |
 | blocksecops-contract-parser | Contract parser (Rust) | 9000 | Rust |
-| blocksecops-notification | Notifications + WebSocket | 3000, 3001 (ws) | Node.js |
+| blocksecops-notification | Notifications + WebSocket | 8003 | Python |
 | blocksecops-dashboard | Main UI | 3000 | TypeScript/Vite |
 | blocksecops-admin-portal | Admin UI | 3000 | TypeScript |
 | blocksecops-findings | Findings static site | 80 | nginx |

@@ -291,10 +291,28 @@ images:
 kubectl kustomize k8s/overlays/local | grep -A2 "image:"
 ```
 
-**Common Issue:** If the kustomization version is outdated, CronJobs will run with old code while Deployments run new code. This can cause:
+**Common Issue:** If `kubectl apply -k` is not re-run after a version bump, CronJobs will run with old code while Deployments may appear updated (via `kubectl rollout restart`). This can cause:
 - Data inconsistencies between scheduled jobs and API
 - Failed jobs due to schema mismatches
 - Hard-to-debug production issues
+
+**Root Cause (February 2026 incident):** During rapid version iteration (30+ bumps in 4 days), `kubectl apply -k` was missed after bumping from 0.29.5 to 0.29.7. The CronJob continued running 0.29.5 for 2 days, producing failed jobs. The Deployment also remained at 0.29.5 but appeared functional after a `kubectl rollout restart`.
+
+**Prevention:** After every version bump, always run the full deploy cycle:
+```bash
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+docker build -t ${REGISTRY}/blocksecops/<service>:${VERSION} .
+docker push ${REGISTRY}/blocksecops/<service>:${VERSION}
+kubectl apply -k k8s/overlays/local/<service>/   # NEVER skip this step
+```
+
+**Post-deploy verification:**
+```bash
+# Verify CronJob image matches Deployment image
+kubectl get deployment -n <service>-local <service> -o jsonpath='{.spec.template.spec.containers[0].image}'
+kubectl get cronjob -n <service>-local -o jsonpath='{range .items[*]}{.metadata.name}: {.spec.jobTemplate.spec.template.spec.containers[0].image}{"\n"}{end}'
+```
 
 ---
 
@@ -410,7 +428,19 @@ kubectl apply -k k8s/overlays/local/ --dry-run=client
    # Use patches instead
    ```
 
-4. **Commit ExternalSecrets with values:**
+4. **Include cross-namespace resources in kustomization with `namespace:` set:**
+   ```yaml
+   # BAD - vault-policy.yaml has namespace: vault-local but kustomization overrides it
+   namespace: postgresql-local  # Overrides ALL resources including vault-policy
+   resources:
+     - vault-policy.yaml  # This Job needs vault-local, not postgresql-local!
+
+   # GOOD - apply cross-namespace resources separately
+   # Remove from kustomization, apply directly:
+   # kubectl apply -f vault-policy.yaml
+   ```
+
+5. **Commit ExternalSecrets with values:**
    ```yaml
    # BAD - in Git
    apiVersion: external-secrets.io/v1beta1
@@ -435,6 +465,7 @@ kubectl apply -k k8s/overlays/local/ --dry-run=client
 | Namespace conflict | Wrong overlay | Verify overlay path |
 | Image not found | Tag mismatch | Sync newTag with version file |
 | Patch not applied | Wrong path | Check strategic merge path |
+| Cross-namespace resource placed in wrong NS | `namespace:` field overrides all resources | Apply cross-namespace resources separately with `kubectl apply -f` |
 
 ### Debug Commands
 

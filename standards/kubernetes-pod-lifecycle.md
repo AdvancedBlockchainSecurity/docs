@@ -148,6 +148,33 @@ volumes:
 
 ---
 
+## InitContainer Patterns
+
+### TLS Certificate Permission Fixing
+
+Kubernetes secret volumes mount files as 0640 (group-readable) due to fsGroup projection, even when `defaultMode: 0600` is specified. PostgreSQL rejects TLS key files with permissions above 0600.
+
+**Solution:** Use an initContainer to copy certs to an emptyDir with correct permissions:
+
+```yaml
+initContainers:
+- name: fix-tls-permissions
+  image: busybox:1.36
+  command: ['sh', '-c', 'cp /tls-source/* /tls-target/ && chmod 600 /tls-target/tls.key && chmod 644 /tls-target/tls.crt /tls-target/ca.crt']
+  volumeMounts:
+  - name: tls-certs
+    mountPath: /tls-source
+    readOnly: true
+  - name: tls-fixed
+    mountPath: /tls-target
+```
+
+**Important:** Do NOT set `runAsUser: 0` on the initContainer if the pod has `runAsNonRoot: true`. The copy will work as the pod's default user (e.g., 999 for postgres), and file ownership will be correct via fsGroup.
+
+**Used by:** PostgreSQL StatefulSet (local overlay) for cert-manager TLS certificates.
+
+---
+
 ## NetworkPolicies
 
 ### Standard Pattern
