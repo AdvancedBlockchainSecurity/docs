@@ -1,9 +1,9 @@
 # Deduplication Pipeline Error Isolation
 
 **Priority**: P1 - High
-**Last Tested**: 2026-02-09
-**Scope**: All 18 maintenance tasks error isolation, rollback behavior, pipeline resilience
-**API Version**: 0.28.17
+**Last Tested**: 2026-02-23
+**Scope**: All 18 maintenance tasks error isolation, rollback behavior, pipeline resilience, inline post-scan error isolation
+**API Version**: 0.29.11
 
 ---
 
@@ -96,11 +96,36 @@ python3 -m pytest tests/unit/infrastructure/test_deduplication_maintenance.py -v
   --override-ini="addopts=-v --tb=short -ra"
 ```
 
-Expected: 25 passed, 21 skipped (asyncpg not installed locally)
+Expected: 120 passed, 0 skipped
 
 ---
 
-## 5. Regression Prevention
+## 5. Inline Post-Scan Error Isolation (v0.29.11)
+
+### 5.1 Post-Scan Maintenance Error Isolation
+
+- [x] `run_post_scan_maintenance` wraps each of 4 tasks in independent try/except
+- [x] Each failed task calls `await db.rollback()`
+- [x] Return dict contains 5 keys: `fuzzy_fingerprints`, `semantic_fingerprints`, `tool_consensus`, `orphan_grouping`, `elapsed_seconds`
+- [x] Single task failure does not affect other tasks (parametrized x4)
+- [x] All 4 failures still returns dict (no exception raised)
+
+### 5.2 Phase 3 Integration Error Isolation
+
+- [x] Phase 3 call in `store_scan_results()` wrapped in try/except
+- [x] Failure logs warning but does not break scan result storage
+- [x] Guarded by `created_vulnerability_ids` check (skipped if no vulns)
+
+### 5.3 Automated Tests
+
+| Test Class | Tests | File |
+|------------|-------|------|
+| TestPostScanMaintenanceErrorIsolation | 7 | test_deduplication_maintenance.py |
+| TestPhase3PostScanIntegration | 6 | test_scans_phase3.py |
+
+---
+
+## 6. Regression Prevention
 
 The test suite enforces that:
 1. **New tasks must have try-catch** — adding `# Task 19:` without try/except will fail `test_every_task_has_try_block`
