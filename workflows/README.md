@@ -1,6 +1,6 @@
 # Workflow Documentation
 
-**Last Updated:** February 7, 2026
+**Last Updated:** February 22, 2026
 
 ---
 
@@ -44,6 +44,20 @@ Each workflow document follows a standard structure:
 **Scan Flow:**
 ```
 Upload → Validate → Queue → Execute Scanners → Process Results → Display
+```
+
+---
+
+### Local Deployment Workflow
+
+**Key Components:**
+- deploy.sh script - Automated build-push-apply with CronJob safety
+- check-version-drift.sh - Platform-wide version alignment verification
+- Harbor registry - Immutable tag container image storage
+
+**Deploy Flow:**
+```
+Version check → CronJob suspend → Build → Push → Apply → Resume → Verify
 ```
 
 ---

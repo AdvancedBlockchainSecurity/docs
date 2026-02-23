@@ -97,7 +97,7 @@ k8s/
 | API Routing | Traefik routes `/api/*` to API service | Traefik routes `/api/*` to API service | **YES** |
 | Single Entry Point | All traffic through Traefik on port 3000 | All traffic through ingress | **YES** |
 | Container Runtime | kubeadm + containerd | AWS EKS | Similar |
-| TLS/SSL | Self-signed (optional) | cert-manager | Acceptable deviation |
+| TLS/SSL | cert-manager local CA (enabled) | cert-manager | **YES** - parity achieved |
 
 ### Why Production Parity Matters
 

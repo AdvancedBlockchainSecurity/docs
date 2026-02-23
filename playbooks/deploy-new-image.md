@@ -1,7 +1,7 @@
 # Playbook: Deploy New Image to Cluster
 
-**Version:** 1.1.0
-**Last Updated:** February 5, 2026
+**Version:** 1.2.0
+**Last Updated:** February 22, 2026
 
 ## Overview
 
@@ -19,6 +19,40 @@ This playbook covers deploying a new Docker image to the local Kubernetes cluste
 ---
 
 ## Quick Reference
+
+### Recommended: Using deploy.sh Script
+
+The `deploy.sh` script enforces the full build-push-apply cycle with CronJob safety:
+
+```bash
+cd /home/pwner/Git/blocksecops-<service>
+
+# Full deploy: version check → build → push → apply → verify
+./scripts/deploy.sh
+
+# Apply kustomization only (after manual build/push)
+./scripts/deploy.sh --skip-build
+
+# Preview what would happen
+./scripts/deploy.sh --dry-run
+
+# Or via Makefile (api-service)
+make deploy
+make deploy-apply
+make deploy-dry-run
+```
+
+The script automatically:
+1. Extracts version from `pyproject.toml`/`package.json`
+2. Verifies kustomization `newTag` matches source version (fails if mismatch)
+3. Suspends CronJobs during deploy to prevent stale image execution
+4. Builds and pushes Docker image to Harbor
+5. Runs `kubectl apply -k` (updates Deployments AND CronJobs)
+6. Resumes CronJobs after apply
+7. Waits for rollout completion
+8. Verifies all resource image tags match the source version
+
+### Manual Deployment Steps
 
 ```bash
 # Full deployment cycle

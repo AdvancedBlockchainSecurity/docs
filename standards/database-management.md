@@ -1,21 +1,50 @@
 # Database Management and Recovery Standards
 
-**Version:** 1.9.0
-**Last Updated:** January 18, 2026
+**Version:** 2.0.0
+**Last Updated:** February 22, 2026
 **Status:** Active
 
 ## Database Configuration
 
 | Setting | Value | Notes |
 |---------|-------|-------|
-| Database System | PostgreSQL 15.4 | |
+| Database System | PostgreSQL 15.4 (pgvector) | |
 | **Database Name** | `solidity_security` | NOT `blocksecops` - see note below |
-| Default User | postgres | Local development |
+| Default User | blocksecops | Via Vault/ExternalSecret |
 | Schema | public | |
+| **SSL** | **Enabled** | cert-manager local CA certs |
+| SSL Mode | `hostssl` required for cluster connections | `hostnossl` rejected |
+| TLS Certificates | `/etc/postgresql/certs-fixed/` | Copied from secret via initContainer |
+| TLS Min Protocol | TLSv1.2 | |
 
 > **Important:** The production database is named `solidity_security`, not `blocksecops`. This naming was established during initial platform development. All connection strings, scripts, and GCP migration plans should use this name.
 >
 > **Current Stats (January 18, 2026):** 15 scanners, 58 contracts, 115 scans, 6,317 vulnerabilities
+
+### SSL/TLS Configuration (Updated February 2026)
+
+PostgreSQL SSL is **enabled in all environments** including local development, using cert-manager generated certificates.
+
+**Connection behavior:**
+- Services using `asyncpg` connect with `ssl=prefer` by default, automatically upgrading to SSL when available
+- `pg_hba.conf` enforces `hostssl` for all Kubernetes cluster connections (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
+- Non-SSL connections from the network are rejected (`hostnossl ... reject`)
+- Local Unix socket connections use `trust` (no SSL needed for `kubectl exec` psql sessions)
+
+**TLS certificate handling:**
+- Certificates are issued by cert-manager local CA (`Certificate` resource `postgresql-certificate`)
+- Kubernetes secret volumes mount files as 0640; PostgreSQL requires key files at 0600
+- An `initContainer` (`fix-tls-permissions`) copies certs from the secret volume to an emptyDir with correct permissions before PostgreSQL starts
+
+**Verify SSL status:**
+```bash
+# Check SSL is enabled
+kubectl exec postgresql-0 -n postgresql-local -- psql -U blocksecops -c "SHOW ssl;"
+
+# Check active SSL connections from services
+kubectl exec postgresql-0 -n postgresql-local -- psql -U blocksecops -d solidity_security \
+  -c "SELECT pid, usename, datname, ssl, client_addr FROM pg_stat_ssl JOIN pg_stat_activity USING (pid) WHERE datname IS NOT NULL;"
+```
 
 ---
 

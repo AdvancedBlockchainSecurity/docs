@@ -90,10 +90,10 @@ These URLs are used for service-to-service health checks (e.g., Admin System pag
 | Service | Internal URL | Health Path | Response Key |
 |---------|--------------|-------------|--------------|
 | Tool Integration | `http://tool-integration.tool-integration-local.svc.cluster.local:8005` | `/health` | `status` |
-| Orchestration | `http://orchestration.orchestration-local.svc.cluster.local:8004` | `/api/v1/health/live` | `status` |
-| Notification | `http://notification.notification-local.svc.cluster.local:8003` | `/api/v1/health/live` | `status` |
+| Orchestration | `http://orchestration.orchestration-local.svc.cluster.local:8004` | `/health` | `status` |
+| Notification | `http://notification.notification-local.svc.cluster.local:8003` | `/health` | `status` |
 | Intelligence Engine | `http://intelligence-engine.intelligence-engine-local.svc.cluster.local:80` | `/health` | `status` |
-| Data Service | `http://data-service.data-service-local.svc.cluster.local:8001` | `/` | `status` |
+| Data Service | `http://data-service.data-service-local.svc.cluster.local:8001` | `/health` | `status` |
 | Contract Parser | `http://contract-parser.contract-parser-local.svc.cluster.local:80` | `/health` | `status` |
 
 **Note:** These URLs follow Kubernetes DNS format: `<service>.<namespace>.svc.cluster.local:<port>`

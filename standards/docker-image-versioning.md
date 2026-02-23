@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 3.4.0
-**Last Updated:** February 21, 2026
+**Version:** 3.5.0
+**Last Updated:** February 22, 2026
 
 ## Single Source of Truth
 
@@ -50,11 +50,36 @@ images:
 
 **Note:** The `app.kubernetes.io/version` label is optional and can be removed to reduce duplication.
 
-### Step 3: Build and Deploy
+### Step 3: Build, Push, and Apply
 
-See environment-specific workflows below.
+**All three steps are MANDATORY and must happen together:**
 
-### Step 4: Commit Together
+```bash
+VERSION="0.2.1"
+SERVICE="api-service"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+
+# Build and push
+docker build -t ${REGISTRY}/blocksecops/${SERVICE}:${VERSION} .
+docker push ${REGISTRY}/blocksecops/${SERVICE}:${VERSION}
+
+# Apply kustomization — updates BOTH Deployment AND CronJob
+kubectl apply -k k8s/overlays/local/${SERVICE}/
+```
+
+**CRITICAL:** `kubectl apply -k` must be run after every version bump. Without this step, Deployments and CronJobs in the cluster remain at the previously-applied version. This is especially dangerous for CronJobs, which will silently run old code on their next schedule while Deployments may appear updated after a `kubectl rollout restart`.
+
+### Step 4: Verify Deployment
+
+```bash
+# Verify Deployment image matches
+kubectl get deployment -n ${SERVICE}-local ${SERVICE} -o jsonpath='{.spec.template.spec.containers[0].image}'
+
+# Verify CronJob image matches (if service has CronJobs)
+kubectl get cronjob -n ${SERVICE}-local -o jsonpath='{range .items[*]}{.metadata.name}: {.spec.jobTemplate.spec.template.spec.containers[0].image}{"\n"}{end}'
+```
+
+### Step 5: Commit Together
 
 ```bash
 git add pyproject.toml k8s/overlays/local/
@@ -285,14 +310,14 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.3 | `k8s/overlays/local/` | Add total scans KPI and per-scanner scan counts to scanners page |
-| api-service | 0.29.7 | `k8s/overlays/local/api-service/` | Fix EmailStr response validation, slowapi Response parameter, remove duplicate response params |
+| api-service | 0.29.8 | `k8s/overlays/local/api-service/` | Fix analytics summary 500, auth 422→401, migration compatibility check, deploy automation |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.46.1 | `k8s/overlays/local/` | Fix deduplication page default min_scanner_count filter from 2 to 1 so single-scanner groups are visible |
-| data-service | 0.2.0 | `k8s/overlays/local/` | |
+| data-service | 0.2.1 | `k8s/overlays/local/` | Restore /health endpoint for Docker HEALTHCHECK and ALB ingress |
 | intelligence-engine | 0.3.1 | `k8s/overlays/local/` | Probe timeout fix for dev cluster stability |
-| notification | 0.2.0 | `k8s/overlays/local/` | Race condition remediation: broadcast snapshot iteration, JWT validation, topic subscriptions, Redis list bounding, auth state machine |
-| orchestration | 0.10.1 | `k8s/overlays/local/` | Race condition fixes, Harbor registry refs, SCANNER_REGISTRY prefix, asgiref async_to_sync, enrichment singleton lock, dedup FOR UPDATE, atomic retry_count |
-| tool-integration | 0.5.3 | `k8s/overlays/local/` | Remove canary CronJob and dry_run parameter |
+| notification | 0.2.1 | `k8s/overlays/local/` | Restore /health endpoint for Docker HEALTHCHECK and ALB ingress |
+| orchestration | 0.10.2 | `k8s/overlays/local/` | Restore /health endpoint for Docker HEALTHCHECK and GCP overlay probes |
+| tool-integration | 0.5.4 | `k8s/overlays/local/` | Version bump for health endpoint consistency |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |

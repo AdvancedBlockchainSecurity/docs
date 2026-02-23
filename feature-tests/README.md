@@ -77,6 +77,7 @@ Manual testing checklists for all user-facing features.
 | [70-platform-bugfixes-features.md](./70-platform-bugfixes-features.md) | **NEW** - Platform bug fixes, features & security hardening: pattern sorting, patterns view, Rust scanners, contract overflow, project display, address persistence, pattern findings, code snippet validation, repair fallback, ML labeling, invariant errors, upload size, pattern merge/audit, SCM PR creation (v0.28.46 API, v0.45.9 Dashboard, v0.9.15 Orchestration, v0.4.8 Tool Integration) |
 | [71-admin-scanners-kpi-dedup-fix.md](./71-admin-scanners-kpi-dedup-fix.md) | **NEW** - Admin scanners KPI (Total Scans, per-scanner counts), deduplication page min_scanner_count filter fix (v0.29.2 API, v0.7.3 Admin Portal, v0.46.1 Dashboard) |
 | [api-key-scope-enforcement.md](./api-key-scope-enforcement.md) | API key scope enforcement tests |
+| [SCAN-TEST-2026-02-22.md](./SCAN-TEST-2026-02-22.md) | **NEW** - Cluster health audit scan tests: single/multi/full scanner, deduplication verification, auth 401 fix validation |
 
 ---
 
