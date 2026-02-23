@@ -1,6 +1,6 @@
 # Platform Smoke Test Standards
 
-**Version:** 1.2.0
+**Version:** 1.3.0
 **Last Updated:** February 23, 2026
 **Status:** Active
 
@@ -97,7 +97,7 @@ done
 | orchestration | `"status":"alive"` |
 | notification | `"status":"alive"` |
 | intelligence-engine | `"status":"healthy"` |
-| data-service | `"status":"running"` |
+| data-service | `"status":"healthy"` |
 | contract-parser | `"status":"OK"` |
 
 ## Authenticated Endpoint Tests
