@@ -139,9 +139,23 @@ Save to DB: message content, tokens_input, tokens_output, model_used, generation
 | Error | HTTP | Response |
 |-------|------|----------|
 | Feature disabled | 503 | `{"detail": "AI Copilot is currently disabled"}` |
-| Tier insufficient | 403 | Tier gate rejection |
+| Tier insufficient | 429 | Rate limit / tier gate rejection |
 | Anthropic API failure | 500 | Sanitized error via `get_safe_error_detail()` |
 | Conversation not found | 404 | Standard not found |
+
+### Slowapi Requirement
+
+All endpoints in `copilot.py` use the `@limiter.limit()` decorator for rate limiting. This requires a `response: Response` parameter in the function signature. Missing this parameter causes a 500 error. Fixed in v0.29.10 (February 23, 2026).
+
+```python
+# Correct signature (response: Response required for slowapi)
+async def create_conversation(
+    request: Request,
+    response: Response,  # Required by @limiter.limit()
+    body: ConversationCreate,
+    ...
+):
+```
 
 ## Tier Quotas
 

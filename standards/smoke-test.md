@@ -1,7 +1,7 @@
 # Platform Smoke Test Standards
 
-**Version:** 1.1.0
-**Last Updated:** February 22, 2026
+**Version:** 1.2.0
+**Last Updated:** February 23, 2026
 **Status:** Active
 
 ## Overview
@@ -237,12 +237,12 @@ for ns in $(kubectl get cronjob -A --no-headers 2>/dev/null | awk '{print $1}' |
 done
 ```
 
-**Current versions (as of February 22, 2026):**
+**Current versions (as of February 23, 2026):**
 
 | Service | Version |
 |---------|---------|
-| api-service | 0.29.8 |
-| dashboard | 0.46.1 |
+| api-service | 0.29.10 |
+| dashboard | 0.46.2 |
 | admin-portal | 0.7.3 |
 | tool-integration | 0.5.4 |
 | orchestration | 0.10.2 |

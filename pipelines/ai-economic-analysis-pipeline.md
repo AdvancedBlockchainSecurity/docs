@@ -100,3 +100,11 @@ Returns **402 Payment Required** when quota is exhausted (not 429).
 | Quota exhausted | 402 | Payment required with quota details |
 | Scan not found | 404 | Standard not found |
 | Anthropic API failure | 500 | Sanitized error |
+
+### Slowapi Requirement
+
+All endpoints in `economic_analysis.py` use `@limiter.limit()` for rate limiting. This requires `response: Response` in the function signature. Missing this parameter causes 500 errors. Fixed in v0.29.9 (February 23, 2026).
+
+### Dashboard Error Handling
+
+The `EconomicSecurityPanel.tsx` component uses `getErrorStatus()` from `client.ts` to detect 403 (tier gate) and 402 (quota exhausted) errors. This replaces the previous string-matching approach for security. Fixed in dashboard v0.46.2.
