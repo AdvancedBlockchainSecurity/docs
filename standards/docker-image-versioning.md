@@ -310,7 +310,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.3 | `k8s/overlays/local/` | Add total scans KPI and per-scanner scan counts to scanners page |
-| api-service | 0.29.10 | `k8s/overlays/local/api-service/` | Fix slowapi response param across 70 endpoints (economic analysis, copilot, ML, IDE, etc.) |
+| api-service | 0.29.11 | `k8s/overlays/local/api-service/` | Hybrid dedup: scan-triggered inline + weekly CronJob housekeeping |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.46.2 | `k8s/overlays/local/` | CTA upgrade links, security-first error handling (getErrorStatus), upload button visibility fix |
 | data-service | 0.2.1 | `k8s/overlays/local/` | Restore /health endpoint for Docker HEALTHCHECK and ALB ingress |

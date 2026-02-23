@@ -1,26 +1,78 @@
 # Deduplication Maintenance Pipeline
 
-Daily background job that maintains data integrity across vulnerability fingerprints, deduplication groups, canonical findings, pattern codes, scanner quality metrics, and ML training feedback.
+**Last Updated:** February 23, 2026
+**API Version:** 0.29.11
+
+Hybrid deduplication system with two execution paths: inline post-scan maintenance (4 scoped tasks during scan ingestion) and weekly housekeeping (full 18-task sweep via CronJob).
 
 ## Overview
 
 ```
-CronJob (2 AM UTC)         deduplication_maintenance.py              Database
-──────────────────         ───────────────────────────               ────────
-Scheduled trigger →        Phase 1: Cleanup & Fingerprints           vulnerabilities
-                           Phase 2: Grouping & Mapping               deduplication_groups
-                           Phase 3: Analytics & Quality              pattern_tool_mappings
-                           Phase 4: ML Training Feedback             scanner_quality_metrics
-                                                                     active_learning_queue
+                         deduplication_maintenance.py              Database
+                         ───────────────────────────               ────────
+
+PATH 1: INLINE (per scan)
+store_scan_results() →   run_post_scan_maintenance()               vulnerabilities
+                           • fuzzy fingerprints (scan-scoped)
+                           • semantic fingerprints (scan-scoped)
+                           • tool consensus (contract-scoped)
+                           • orphan grouping (contract-scoped)
+
+PATH 2: WEEKLY HOUSEKEEPING
+CronJob (Sun 2 AM UTC) → run_weekly_housekeeping()                 vulnerabilities
+                           Phase 1: Cleanup & Fingerprints          deduplication_groups
+                           Phase 2: Grouping & Mapping              pattern_tool_mappings
+                           Phase 3: Analytics & Quality             scanner_quality_metrics
+                           Phase 4: ML Training Feedback            active_learning_queue
 ```
 
 ## Trigger
 
-- **Kubernetes CronJob**: Runs daily at 2 AM UTC (`k8s/base/api-service/cronjob-deduplication.yaml`)
-- **Manual**: `kubectl create job --from=cronjob/deduplication-maintenance deduplication-maintenance-manual -n api-service-local`
-- **Programmatic**: `python -m src.infrastructure.tasks.deduplication_maintenance`
+### Inline Post-Scan (Automatic)
 
-## Maintenance Tasks (18 Total)
+Triggered automatically by `store_scan_results()` in `scans.py` after vulnerabilities are created. Runs 4 critical tasks scoped to the current scan/contract:
+
+```python
+# Phase 3 in store_scan_results()
+post_scan_stats = await run_post_scan_maintenance(
+    db=db, scan_id=scan_id, contract_id=scan.contract_id,
+)
+```
+
+### Weekly Housekeeping (CronJob)
+
+- **Kubernetes CronJob**: Runs weekly Sunday at 2 AM UTC (`k8s/base/api-service/cronjob-deduplication.yaml`)
+- **Manual**: `kubectl create job --from=cronjob/deduplication-maintenance deduplication-maintenance-manual -n api-service-local`
+
+### CLI
+
+```bash
+# Weekly housekeeping (used by CronJob)
+python -m src.infrastructure.tasks.deduplication_maintenance --weekly
+
+# Post-scan for specific scan (manual testing)
+python -m src.infrastructure.tasks.deduplication_maintenance --scan-id UUID --contract-id UUID
+
+# Full sweep (legacy default)
+python -m src.infrastructure.tasks.deduplication_maintenance
+```
+
+## Inline Post-Scan Tasks (4 Tasks)
+
+| # | Task | Function | Scoped By | Description |
+|---|------|----------|-----------|-------------|
+| 1 | Fuzzy fingerprints | `generate_fuzzy_location_fingerprints(db, scan_id=)` | scan_id | Create `fingerprint_location_fuzzy` for new vulns |
+| 2 | Semantic fingerprints | `generate_semantic_fingerprints(db, scan_id=)` | scan_id | Create `fingerprint_semantic` via intelligence-engine |
+| 3 | Tool consensus | `calculate_tool_consensus_scores(db, contract_id=)` | contract_id | Update consensus scores for contract's vulns |
+| 4 | Orphan grouping | `update_orphaned_vulnerabilities(db, contract_id=)` | contract_id | Assign ungrouped vulns to dedup groups |
+
+**Performance:** Completes within the HTTP response time (sub-second for typical scans).
+
+**Error isolation:** Each task has independent try/except with `db.rollback()`. Failures do not affect the scan result response.
+
+## Weekly Housekeeping Tasks (18 Total)
+
+The weekly CronJob runs all 18 tasks as a full sweep across the entire database.
 
 ### Phase 1: Cleanup & Fingerprint Generation (Tasks 1-6)
 
@@ -134,7 +186,10 @@ Priority mapping: quality 1.0 → priority 1, quality 0.0 → priority 20.
 | `blocksecops-api-service/src/ml/weak_label_generator.py` | Weak label generation from vulnerability status |
 | `blocksecops-api-service/src/ml/active_learning.py` | Active learning queue management |
 | `blocksecops-api-service/k8s/base/api-service/cronjob-deduplication.yaml` | Kubernetes CronJob definition |
-| `blocksecops-api-service/tests/unit/infrastructure/test_deduplication_maintenance.py` | Structural regression tests (46 tests) |
+| `blocksecops-api-service/src/presentation/api/v1/endpoints/scans.py` | Phase 3: calls `run_post_scan_maintenance()` inline |
+| `blocksecops-api-service/tests/unit/infrastructure/test_deduplication_maintenance.py` | Structural + functional regression tests (120 tests) |
+| `blocksecops-api-service/tests/unit/presentation/test_scans_phase3.py` | Phase 3 integration structural tests |
+| `blocksecops-api-service/tests/unit/infrastructure/test_cronjob_manifest.py` | CronJob YAML validation tests |
 
 ## API Endpoints
 
@@ -165,16 +220,39 @@ Each of the 18 maintenance tasks runs independently with its own try-catch block
 
 ## Test Suite
 
-### Structural Tests (`test_deduplication_maintenance.py`)
+### Orchestrator Structural Tests (`test_deduplication_maintenance.py`)
 
 Structural regression tests enforce invariants on the orchestrator. These tests parse the source file directly (no module import needed) and will fail if a new task is added without proper error isolation.
 
-| Test Class | Purpose |
-|------------|---------|
-| TestOrchestratorStructure | All 18 markers present, each has try-block + rollback, return dict complete |
-| TestTaskFunctionsExist | All 18 async functions defined with `db` parameter |
-| TestConstants | EMPTY_FINGERPRINT_HASH, scanner priority derivation, consensus thresholds |
-| TestErrorIsolation | Mock-based failure isolation and rollback verification (requires asyncpg) |
+| Test Class | Tests | Purpose |
+|------------|-------|---------|
+| TestOrchestratorStructure | 7 | All 18 markers present, each has try-block + rollback, return dict complete |
+| TestTaskFunctionsExist | 2 | All 18 async functions defined with `db` parameter |
+| TestConstants | 3 | EMPTY_FINGERPRINT_HASH, scanner priority derivation, consensus thresholds |
+| TestErrorIsolation | 4 | Mock-based failure isolation and rollback verification (requires asyncpg) |
+
+### Hybrid Architecture Tests (`test_deduplication_maintenance.py`) [NEW v0.29.11]
+
+| Test Class | Tests | Purpose |
+|------------|-------|---------|
+| TestPostScanMaintenanceStructure | 7 | Function signature, 4 subtask calls, try/except, return dict keys |
+| TestWeeklyHousekeepingStructure | 6 | Delegation to full sweep, CLI entry points |
+| TestScopedParameterSignatures | 4 | Parametrized: each function accepts scoped param with `= None` default |
+| TestCLIArgparseStructure | 8 | `--weekly`, `--scan-id`, `--contract-id` flags, mutual requirements |
+| TestPostScanMaintenanceErrorIsolation | 7 | AsyncMock: error isolation, rollback, partial failures |
+| TestWeeklyHousekeepingIntegration | 1 | Delegation to `run_deduplication_maintenance` |
+
+### Phase 3 Integration Tests (`test_scans_phase3.py`) [NEW v0.29.11]
+
+| Test Class | Tests | Purpose |
+|------------|-------|---------|
+| TestPhase3PostScanIntegration | 6 | Import, call, try/except, guard, params, warning log |
+
+### CronJob Manifest Tests (`test_cronjob_manifest.py`) [NEW v0.29.11]
+
+| Test Class | Tests | Purpose |
+|------------|-------|---------|
+| TestCronJobScheduleAndCommand | 7 | Weekly schedule, deadline, --weekly flag, concurrency, restart policy |
 
 ### Multi-Level Matching Tests (`test_dedup_multilevel_matching.py`)
 
@@ -192,16 +270,12 @@ Regression and security tests for the 5-level matching audit (February 15, 2026)
 
 Run locally:
 ```bash
-# Structural tests
-python3 -m pytest tests/unit/infrastructure/test_deduplication_maintenance.py -v -o "addopts="
-
-# Multi-level matching tests
-python3 -m pytest tests/unit/infrastructure/test_dedup_multilevel_matching.py -v -o "addopts="
-
-# All dedup tests
-python3 -m pytest tests/unit/infrastructure/test_dedup_multilevel_matching.py \
-  tests/unit/domain/test_deduplication_matcher.py \
-  tests/unit/infrastructure/test_deduplication_maintenance.py -v -o "addopts="
+# All dedup tests (120 tests)
+python3 -m pytest tests/unit/infrastructure/test_deduplication_maintenance.py \
+  tests/unit/presentation/test_scans_phase3.py \
+  tests/unit/infrastructure/test_cronjob_manifest.py \
+  tests/unit/infrastructure/test_dedup_multilevel_matching.py \
+  tests/unit/domain/test_deduplication_matcher.py -v -o "addopts="
 ```
 
 ## Database Tables
@@ -219,10 +293,11 @@ python3 -m pytest tests/unit/infrastructure/test_dedup_multilevel_matching.py \
 ## CronJob Configuration
 
 ```yaml
-schedule: "0 2 * * *"          # Daily at 2 AM UTC
+schedule: "0 2 * * 0"          # Weekly Sunday at 2 AM UTC (changed from daily in v0.29.11)
 concurrencyPolicy: Forbid       # No overlapping jobs
-activeDeadlineSeconds: 3600      # 1 hour max runtime
+activeDeadlineSeconds: 7200      # 2 hour max runtime (increased from 1h for full sweep)
 backoffLimit: 2                  # Retry up to 2 times on failure
+command: ["python", "-m", "src.infrastructure.tasks.deduplication_maintenance", "--weekly"]
 resources:
   requests: { cpu: 100m, memory: 256Mi }
   limits:   { cpu: 500m, memory: 512Mi }

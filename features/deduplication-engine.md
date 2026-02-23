@@ -1,6 +1,6 @@
 # Deduplication Engine - Technical Documentation
 
-**Version**: v0.8.0
+**Version**: v0.8.0 (core), v0.29.11 (hybrid architecture)
 **Status**: Production Ready
 **Phase**: 4E - Intelligence Layer
 
@@ -690,5 +690,22 @@ Group: "State Variable Could Be Constant"
 
 ---
 
-**Last Updated**: December 26, 2025
+## Hybrid Architecture (v0.29.11 - February 23, 2026)
+
+Added inline post-scan maintenance that runs 4 scoped dedup tasks during scan result ingestion:
+
+| Task | Scoped By | Description |
+|------|-----------|-------------|
+| Fuzzy fingerprints | scan_id | Generate `fingerprint_location_fuzzy` for new vulns |
+| Semantic fingerprints | scan_id | Generate `fingerprint_semantic` via intelligence-engine |
+| Tool consensus | contract_id | Calculate cross-tool agreement scores |
+| Orphan grouping | contract_id | Assign ungrouped vulns to dedup groups |
+
+Weekly CronJob housekeeping continues running all 18 tasks for full-sweep maintenance.
+
+See: [Deduplication Pipeline](../pipelines/deduplication-pipeline.md) | [Changelog](/docs/changelogs/API-SERVICE-V0.29.11-HYBRID-DEDUPLICATION-2026-02-23.md)
+
+---
+
+**Last Updated**: February 23, 2026
 **Maintained By**: BlockSecOps Platform Team
