@@ -310,7 +310,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.3 | `k8s/overlays/local/` | Add total scans KPI and per-scanner scan counts to scanners page |
-| api-service | 0.29.25 | `k8s/overlays/local/api-service/` | Tier gate enforcement: 5 missing gates + 20 regression tests |
+| api-service | 0.29.26 | `k8s/overlays/local/api-service/` | Fix 5 stale unit tests; full suite 1032 passed, 0 failed |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.46.4 | `k8s/overlays/local/` | Frontend security hardening: URL validation, error sanitization, webhook domain checks |
 | data-service | 0.2.1 | `k8s/overlays/local/` | Restore /health endpoint for Docker HEALTHCHECK and ALB ingress |
