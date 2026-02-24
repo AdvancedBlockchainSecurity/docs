@@ -237,12 +237,12 @@ for ns in $(kubectl get cronjob -A --no-headers 2>/dev/null | awk '{print $1}' |
 done
 ```
 
-**Current versions (as of February 23, 2026):**
+**Current versions (as of February 24, 2026):**
 
 | Service | Version |
 |---------|---------|
-| api-service | 0.29.19 |
-| dashboard | 0.46.2 |
+| api-service | 0.29.20 |
+| dashboard | 0.46.3 |
 | admin-portal | 0.7.3 |
 | tool-integration | 0.5.4 |
 | orchestration | 0.10.2 |

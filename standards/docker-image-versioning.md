@@ -310,9 +310,9 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.3 | `k8s/overlays/local/` | Add total scans KPI and per-scanner scan counts to scanners page |
-| api-service | 0.29.19 | `k8s/overlays/local/api-service/` | Fix is_canonical schema alias, init-time callable defaults, Celery dedup workers |
+| api-service | 0.29.20 | `k8s/overlays/local/api-service/` | OAuth audit hardening: enforce encryption key, sanitize error messages |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.46.2 | `k8s/overlays/local/` | CTA upgrade links, security-first error handling (getErrorStatus), upload button visibility fix |
+| dashboard | 0.46.3 | `k8s/overlays/local/` | Fix Jenkins URL validation bypass in CI/CD integration tab |
 | data-service | 0.2.1 | `k8s/overlays/local/` | Restore /health endpoint for Docker HEALTHCHECK and ALB ingress |
 | intelligence-engine | 0.3.1 | `k8s/overlays/local/` | Probe timeout fix for dev cluster stability |
 | notification | 0.2.1 | `k8s/overlays/local/` | Restore /health endpoint for Docker HEALTHCHECK and ALB ingress |
