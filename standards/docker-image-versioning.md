@@ -310,9 +310,9 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.3 | `k8s/overlays/local/` | Add total scans KPI and per-scanner scan counts to scanners page |
-| api-service | 0.29.20 | `k8s/overlays/local/api-service/` | OAuth audit hardening: enforce encryption key, sanitize error messages |
+| api-service | 0.29.21 | `k8s/overlays/local/api-service/` | Integration security hardening: encrypt secrets at rest, SSRF validation, error sanitization |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.46.3 | `k8s/overlays/local/` | Fix Jenkins URL validation bypass in CI/CD integration tab |
+| dashboard | 0.46.4 | `k8s/overlays/local/` | Frontend security hardening: URL validation, error sanitization, webhook domain checks |
 | data-service | 0.2.1 | `k8s/overlays/local/` | Restore /health endpoint for Docker HEALTHCHECK and ALB ingress |
 | intelligence-engine | 0.3.1 | `k8s/overlays/local/` | Probe timeout fix for dev cluster stability |
 | notification | 0.2.1 | `k8s/overlays/local/` | Restore /health endpoint for Docker HEALTHCHECK and ALB ingress |
