@@ -16,7 +16,7 @@ Monitor and troubleshoot the hybrid deduplication maintenance system. Deduplicat
 ## Prerequisites
 
 - [ ] `kubectl` access to `api-service-local` namespace
-- [ ] API service running (v0.29.11+)
+- [ ] API service running (v0.29.12+)
 
 ---
 
