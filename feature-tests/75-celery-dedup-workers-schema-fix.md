@@ -104,25 +104,30 @@ curl -sk -H "Authorization: Bearer $TOKEN" \
 ### 4.1 Test Procedure
 
 ```bash
-# 1. Upload a contract with known vulnerabilities
-curl -sk -H "Authorization: Bearer $TOKEN" \
-  -F "name=DedupTestContract" \
-  -F "source_code=@test-contract.sol" \
-  "https://app.blocksecops.local/api/v1/contracts"
+# 1. Upload a contract with known vulnerabilities (API key auth)
+curl -sk -H "X-API-Key: $API_KEY" \
+  -F "file=@VulnerableE2E.sol" \
+  -F "contract_name=VulnerableE2E-IsCanonical-Test" \
+  -F "network=ethereum" \
+  "https://app.blocksecops.local/api/v1/upload"
 
 # 2. Create scan with multiple scanners
-curl -sk -H "Authorization: Bearer $TOKEN" \
+curl -sk -H "X-API-Key: $API_KEY" \
   -X POST -H "Content-Type: application/json" \
-  -d '{"contract_id":"<id>","scanner_ids":["slither","semgrep"]}' \
+  -d '{"contract_id":"<id>","scan_type":"custom","scanner_ids":["slither","semgrep","aderyn"],"scan_source":"cli"}' \
   "https://app.blocksecops.local/api/v1/scans"
 
-# 3. Wait for scan completion, then verify:
-#    a. Worker logs show dedup processing
-#    b. Vulnerabilities have is_canonical populated
-#    c. Dedup groups created for duplicates
+# 3. Query vulnerabilities and verify is_canonical
+curl -sk -H "X-API-Key: $API_KEY" \
+  "https://app.blocksecops.local/api/v1/vulnerabilities?scan_id=<id>&limit=20" | \
+  python3 -c "import sys,json; [print(f'{v[\"title\"][:40]}: is_canonical={v[\"is_canonical\"]}') for v in json.load(sys.stdin)['vulnerabilities']]"
+
+# 4. Verify in Celery worker logs
+kubectl logs -n api-service-local -l app.kubernetes.io/name=celery-worker --tail=30 | \
+  grep -i "celery-dedup"
 ```
 
-### 4.2 Results (February 24, 2026)
+### 4.2 Results — Initial Test (February 24, 2026)
 
 | Metric | Value |
 |--------|-------|
@@ -134,6 +139,32 @@ curl -sk -H "Authorization: Bearer $TOKEN" \
 | Duplicates identified | 1 |
 | Embeddings generated | 4 |
 | API pod healthy throughout | Yes |
+
+### 4.3 Results — is_canonical E2E Verification (February 24, 2026)
+
+| Metric | Value |
+|--------|-------|
+| Contract | VulnerableE2E-IsCanonical-Test (reentrancy, tx.origin, unchecked send) |
+| Scanners | slither + semgrep + aderyn |
+| Vulnerabilities found | 13 (2 critical, 2 high, 2 medium, 7 low) |
+| `is_canonical` in API response | `true` for all 13 findings |
+| `is_primary` leaked to response | **No** — field correctly aliased |
+| Fuzzy fingerprints | 13/13 |
+| Semantic fingerprints | 13/13 |
+| Celery cross-scan dedup | Completed (0 matches — first scan for contract) |
+| Celery post-scan maintenance | Completed in 1.8s |
+| API pod healthy throughout | Yes |
+
+**JSON field verification:**
+```json
+{
+  "title": "Reentrancy Attack (Ether)",
+  "severity": "critical",
+  "is_canonical": true,
+  "deduplication_group_id": null
+}
+// "is_primary" does NOT appear in response
+```
 
 ---
 
