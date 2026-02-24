@@ -241,8 +241,8 @@ done
 
 | Service | Version |
 |---------|---------|
-| api-service | 0.29.20 |
-| dashboard | 0.46.3 |
+| api-service | 0.29.21 |
+| dashboard | 0.46.4 |
 | admin-portal | 0.7.3 |
 | tool-integration | 0.5.4 |
 | orchestration | 0.10.2 |
