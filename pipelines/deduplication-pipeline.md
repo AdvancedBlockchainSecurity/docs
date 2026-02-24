@@ -1,7 +1,7 @@
 # Deduplication Maintenance Pipeline
 
 **Last Updated:** February 23, 2026
-**API Version:** 0.29.11
+**API Version:** 0.29.12
 
 Hybrid deduplication system with two execution paths: inline post-scan maintenance (4 scoped tasks during scan ingestion) and weekly housekeeping (full 18-task sweep via CronJob).
 
