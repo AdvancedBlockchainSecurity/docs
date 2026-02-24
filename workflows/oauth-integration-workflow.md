@@ -2,7 +2,7 @@
 
 **Last Updated:** February 24, 2026
 **Status:** Active
-**API Version:** 0.29.19+
+**API Version:** 0.29.22+
 
 ---
 
@@ -260,22 +260,45 @@ Currently, disconnecting an integration deletes the credential record but does n
 - Encryption is **mandatory in production** (API service fails to start without key)
 - Encrypted tokens prefixed with `gAAAAA` (Fernet format)
 
-### Error Handling
+### Error Handling (v0.29.22)
 
 - Error messages sanitized to prevent internal detail leaks
 - OAuth error details from providers logged but not exposed to users
-- `get_safe_error_detail()` used for all error storage in database
+- `OAuthServiceError` messages use static safe strings (no `str(e)` leaks)
+- `error_description` callback parameter capped at 500 characters
+- `last_error` stored truncated: `(error_description or error or "unknown")[:500]`
+
+### SSRF Protection (v0.29.22)
+
+- `repo_url` validated with `validate_webhook_url()` on creation
+- JIRA `base_url` validated before HTTP requests
+- Blocks private IP ranges (127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
+
+### Input Validation (v0.29.22)
+
+- Integration `settings` dict restricted to allowlisted keys, no nested objects
+- JIRA project key: `max_length=10`, pattern `^[A-Z][A-Z0-9_]+$`
+- JIRA project name: `max_length=255`
 
 ### Rate Limiting
 
 - All callback endpoints rate-limited to 10 requests per minute
-- Prevents brute-force attacks on callback endpoints
+- Webhook GET endpoints rate-limited to 30 requests per minute (v0.29.22)
+- Prevents brute-force attacks on callback and data endpoints
 
-### Access Control
+### Access Control (v0.29.22)
 
 - Only org admins can create/delete integrations
 - Org membership verified on all integration endpoints
+- `verify_org_admin` null role bypass fixed (`if not role or` instead of `if role and`)
 - Open redirect protection on dashboard redirect URLs
+
+### Frontend Security (v0.46.4)
+
+- `isValidOAuthUrl()` rejects non-allowlisted hosts (was returning true for all HTTPS)
+- External avatar URLs validated for `https://` protocol before rendering
+- JIRA site URLs validated for `https://` protocol before href
+- Error toasts use `getErrorMessage()` instead of raw `err?.response?.data?.detail`
 
 ---
 

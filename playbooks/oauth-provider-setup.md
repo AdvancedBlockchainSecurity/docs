@@ -12,8 +12,8 @@ This playbook guides you through configuring OAuth providers for BlockSecOps thi
 
 ## Prerequisites
 
-- [ ] BlockSecOps API service v0.29.19+ deployed
-- [ ] BlockSecOps dashboard v0.46.2+ deployed
+- [ ] BlockSecOps API service v0.29.22+ deployed
+- [ ] BlockSecOps dashboard v0.46.4+ deployed
 - [ ] Public domain with valid TLS (e.g., `app.blocksecops.com`)
 - [ ] Access to Vault or GCP Secret Manager
 - [ ] ExternalSecret Operator configured
