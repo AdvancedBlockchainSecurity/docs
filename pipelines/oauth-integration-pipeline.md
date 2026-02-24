@@ -1,7 +1,7 @@
 # OAuth Integration Pipeline
 
 **Last Updated:** February 24, 2026
-**API Version:** 0.29.19+
+**API Version:** 0.29.22+
 
 Pipeline for setting up OAuth third-party integrations (GitHub, GitLab, Bitbucket, JIRA, Jenkins) in a new environment. Primarily for GCP deployment but applicable to any environment.
 
@@ -41,8 +41,8 @@ Environment Setup Pipeline:
 |-------------|---------|
 | Public domain | `app.blocksecops.com` with valid TLS (OAuth providers must reach callback URLs) |
 | DNS configured | Domain resolves to GCP Load Balancer |
-| API service deployed | v0.29.19+ with OAuth endpoints |
-| Dashboard deployed | v0.46.2+ with integration UI |
+| API service deployed | v0.29.22+ with OAuth endpoints and security hardening |
+| Dashboard deployed | v0.46.4+ with integration UI and frontend security hardening |
 | Vault or GCP Secret Manager | For storing OAuth credentials |
 | ExternalSecret Operator | For syncing secrets to Kubernetes |
 
@@ -259,9 +259,18 @@ JOIN integrations i ON i.id = ic.integration_id;
 - [ ] `INTEGRATION_ENCRYPTION_KEY` generated and stored securely
 - [ ] Callback URLs use HTTPS only
 - [ ] Rate limiting enabled on callback endpoints (10/minute)
+- [ ] Rate limiting enabled on webhook GET endpoints (30/minute) (v0.29.22)
 - [ ] State JWT uses HMAC-SHA256 with 15-minute expiry
 - [ ] Error messages do not leak internal details or env var names
 - [ ] Open redirect protection on dashboard redirect URLs
+- [ ] SSRF validation on `repo_url`, JIRA `base_url`, monitoring `webhook_url` (v0.29.22)
+- [ ] `error_description` callback parameter capped at 500 chars (v0.29.22)
+- [ ] Webhook secrets encrypted at rest with Fernet (v0.29.22)
+- [ ] Notification channel webhook URLs masked in API responses (v0.29.22)
+- [ ] ExternalSecret entries have no `| default ""` fallbacks (v0.29.22)
+- [ ] `SUPABASE_SERVICE_KEY` in ExternalSecret, not ConfigMap (v0.29.22)
+- [ ] Frontend `isValidOAuthUrl()` rejects non-allowlisted hosts (v0.46.4)
+- [ ] Frontend validates `https://` protocol on avatar/JIRA/marketplace URLs (v0.46.4)
 
 ## Files
 

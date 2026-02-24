@@ -85,3 +85,7 @@ None. All changes are backward-compatible security improvements.
 - Requires Vault entries for `secret/data/api-service/supabase` (service_key, anon_key) and `secret/data/api-service/internal` (service_key)
 - Existing webhook secrets in database are plaintext; new/rotated secrets will be encrypted
 - ExternalSecret sync must succeed before pod starts (no more `| default ""` fallbacks)
+
+## Hotfix: v0.29.22
+
+The rate limiting on webhook GET endpoints was missing the `response: Response` parameter required by slowapi, causing 500 errors. Fixed in [v0.29.22](./API-SERVICE-V0.29.22-WEBHOOK-RATE-LIMIT-FIX-2026-02-24.md) (PR #257).

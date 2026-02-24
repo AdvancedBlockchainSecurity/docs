@@ -1,8 +1,24 @@
 # Feature Test: Integration Security Hardening
 
 **Feature:** Pre-GCP Integration Security Audit Fixes
-**Version:** api-service 0.29.21, dashboard 0.46.4
+**Version:** api-service 0.29.22, dashboard 0.46.4
 **Date:** February 24, 2026
+**Status:** Deployed and smoke-tested
+
+## Smoke Test Results (February 24, 2026)
+
+All platform services healthy after deployment:
+
+| Check | Result |
+|-------|--------|
+| API health/live | PASS (v0.29.22) |
+| API health/ready | PASS (database connected) |
+| Dashboard HTTPS | PASS (HTTP 200) |
+| All 6 internal services | PASS |
+| Version drift | 0 drift across 9 services |
+| Authenticated endpoints | 17/17 PASS |
+| Unauthenticated rejection | 401 confirmed |
+| Webhook GET endpoints | PASS (rate limit fix applied) |
 
 ## Backend Tests
 

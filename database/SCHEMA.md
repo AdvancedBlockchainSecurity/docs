@@ -8,7 +8,7 @@
 > **Important Note on Database Naming:**
 > The database is named `solidity_security`, NOT `blocksecops`. This name was established during initial platform development when the focus was solely on Solidity security scanning. The name has been retained for backward compatibility and to avoid migration complexity. All services, connection strings, and documentation should reference `solidity_security`.
 >
-> **Verified:** February 24, 2026 (Current stats: 184 contracts, 555 scans, 7,338 vulnerabilities, 14 users, 89 tables in `solidity_security` database)
+> **Verified:** February 24, 2026 (Current stats: 184 contracts, 555 scans, 7,342 vulnerabilities, 14 users, 89 tables in `solidity_security` database)
 
 ## Table of Contents
 
@@ -1635,7 +1635,7 @@ Webhook configuration for event notifications (Phase 4.5).
 | `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE CASCADE | Associated organization |
 | `name` | VARCHAR(255) | NOT NULL | Webhook name |
 | `url` | VARCHAR(2048) | NOT NULL | Delivery endpoint URL |
-| `secret` | VARCHAR(255) | NOT NULL | HMAC-SHA256 signing secret |
+| `secret` | VARCHAR(255) | NOT NULL | HMAC-SHA256 signing secret (**encrypted at rest** with Fernet AES-128-CBC since v0.29.21; plaintext returned only on create/rotate) |
 | `events` | JSONB | NOT NULL | Array of event types to subscribe |
 | `is_active` | BOOLEAN | NOT NULL, DEFAULT true | Active status |
 | `retry_count` | INTEGER | NOT NULL, DEFAULT 3 | Max delivery retries |
@@ -1712,9 +1712,9 @@ User-configured notification channels for Slack, Teams, and Discord webhook inte
 | `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE CASCADE, INDEX | Organization context |
 | `name` | VARCHAR(255) | NOT NULL | Channel display name |
 | `channel_type` | VARCHAR(50) | NOT NULL, INDEX | Channel type: `slack`, `teams`, `discord` |
-| `webhook_url` | VARCHAR(2048) | NOT NULL | Webhook endpoint URL |
+| `webhook_url` | VARCHAR(2048) | NOT NULL | Webhook endpoint URL (**masked in API responses** since v0.29.21; SSRF-validated on create/update) |
 | `events` | JSONB | NOT NULL | Event types to subscribe to (e.g., `["scan.completed", "vulnerability.critical"]`) |
-| `filters` | JSONB | NULLABLE | Optional filters (severity, project_id, etc.) |
+| `filters` | JSONB | NULLABLE | Optional filters (**typed as `Dict[str, str]`** since v0.29.21; allowed keys: `min_severity`, `project_id`) |
 | `is_active` | BOOLEAN | NOT NULL, DEFAULT true, INDEX | Channel active status |
 | `total_notifications` | INTEGER | NOT NULL, DEFAULT 0 | Total notifications sent |
 | `successful_notifications` | INTEGER | NOT NULL, DEFAULT 0 | Successful deliveries |
