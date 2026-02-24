@@ -1,24 +1,29 @@
 # Deduplication Maintenance Pipeline
 
-**Last Updated:** February 23, 2026
-**API Version:** 0.29.12
+**Last Updated:** February 24, 2026
+**API Version:** 0.29.19
 
-Hybrid deduplication system with two execution paths: inline post-scan maintenance (4 scoped tasks during scan ingestion) and weekly housekeeping (full 18-task sweep via CronJob).
+Hybrid deduplication system with three execution paths: Celery worker dedup (3 phases dispatched from API pod), post-scan maintenance (4 scoped tasks in worker), and weekly housekeeping (full 18-task sweep via CronJob).
 
 ## Overview
 
 ```
-                         deduplication_maintenance.py              Database
-                         ───────────────────────────               ────────
+                                                                    Database
+API Pod                  Celery Worker Pod                          ────────
+────────                 ─────────────────
+                         dedup_task.py + deduplication_maintenance.py
 
-PATH 1: INLINE (per scan)
-store_scan_results() →   run_post_scan_maintenance()               vulnerabilities
-                           • fuzzy fingerprints (scan-scoped)
-                           • semantic fingerprints (scan-scoped)
-                           • tool consensus (contract-scoped)
-                           • orphan grouping (contract-scoped)
+PATH 1: CELERY WORKER DEDUP (per scan, v0.29.13+)
+store_scan_results()     run_dedup_task() [from Redis queue]        vulnerabilities
+  └─ task.delay() ───►     Phase 1: intra-scan dedup                deduplication_groups
+     (non-blocking)        Phase 2: cross-scan dedup
+                           Phase 3: post-scan maintenance
+                             • fuzzy fingerprints (scan-scoped)
+                             • semantic fingerprints (scan-scoped)
+                             • tool consensus (contract-scoped)
+                             • orphan grouping (contract-scoped)
 
-PATH 2: WEEKLY HOUSEKEEPING
+PATH 2: WEEKLY HOUSEKEEPING (CronJob, separate pod)
 CronJob (Sun 2 AM UTC) → run_weekly_housekeeping()                 vulnerabilities
                            Phase 1: Cleanup & Fingerprints          deduplication_groups
                            Phase 2: Grouping & Mapping              pattern_tool_mappings
@@ -28,16 +33,30 @@ CronJob (Sun 2 AM UTC) → run_weekly_housekeeping()                 vulnerabili
 
 ## Trigger
 
-### Inline Post-Scan (Automatic)
+### Celery Worker Dedup (Automatic, v0.29.13+)
 
-Triggered automatically by `store_scan_results()` in `scans.py` after vulnerabilities are created. Runs 4 critical tasks scoped to the current scan/contract:
+Triggered automatically by `store_scan_results()` in `scans.py` after vulnerabilities are created. Dispatches a Celery task to an isolated worker pod via Redis:
 
 ```python
-# Phase 3 in store_scan_results()
-post_scan_stats = await run_post_scan_maintenance(
-    db=db, scan_id=scan_id, contract_id=scan.contract_id,
-)
+# In store_scan_results() — non-blocking dispatch
+if created_vulnerability_ids:
+    from src.infrastructure.tasks.dedup_task import run_dedup_task
+    run_dedup_task.delay(
+        scan_id=str(scan_id),
+        contract_id=str(scan.contract_id),
+        vulnerability_ids=[str(v) for v in created_vulnerability_ids],
+    )
 ```
+
+The worker runs all 3 dedup phases (intra-scan, cross-scan, post-scan maintenance) in its own process with its own DB connection pool. API pod is never blocked.
+
+**Celery configuration:**
+- Broker: `redis://redis-master.redis-local.svc.cluster.local:6379/1`
+- Result backend: `redis://redis-master.redis-local.svc.cluster.local:6379/2`
+- Queue: `dedup` (dedicated)
+- Concurrency: 3 workers
+- Retry: 2x with 30s backoff
+- Soft time limit: 5 min, hard kill: 10 min
 
 ### Weekly Housekeeping (CronJob)
 
@@ -186,9 +205,12 @@ Priority mapping: quality 1.0 → priority 1, quality 0.0 → priority 20.
 | `blocksecops-api-service/src/ml/weak_label_generator.py` | Weak label generation from vulnerability status |
 | `blocksecops-api-service/src/ml/active_learning.py` | Active learning queue management |
 | `blocksecops-api-service/k8s/base/api-service/cronjob-deduplication.yaml` | Kubernetes CronJob definition |
-| `blocksecops-api-service/src/presentation/api/v1/endpoints/scans.py` | Phase 3: calls `run_post_scan_maintenance()` inline |
+| `blocksecops-api-service/src/infrastructure/celery_app.py` | Celery app instance with queue/concurrency config (v0.29.13+) |
+| `blocksecops-api-service/src/infrastructure/tasks/dedup_task.py` | Celery task wrapping async dedup phases (v0.29.13+) |
+| `blocksecops-api-service/k8s/base/api-service/deployment-celery-worker.yaml` | Celery worker k8s deployment (v0.29.13+) |
+| `blocksecops-api-service/src/presentation/api/v1/endpoints/scans.py` | Dispatches `run_dedup_task.delay()` to Celery worker |
 | `blocksecops-api-service/tests/unit/infrastructure/test_deduplication_maintenance.py` | Structural + functional regression tests (120 tests) |
-| `blocksecops-api-service/tests/unit/presentation/test_scans_phase3.py` | Phase 3 integration structural tests |
+| `blocksecops-api-service/tests/unit/presentation/test_scans_phase3.py` | Celery dispatch + dedup_task structural tests |
 | `blocksecops-api-service/tests/unit/infrastructure/test_cronjob_manifest.py` | CronJob YAML validation tests |
 
 ## API Endpoints

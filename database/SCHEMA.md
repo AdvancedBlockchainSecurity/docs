@@ -8,7 +8,7 @@
 > **Important Note on Database Naming:**
 > The database is named `solidity_security`, NOT `blocksecops`. This name was established during initial platform development when the focus was solely on Solidity security scanning. The name has been retained for backward compatibility and to avoid migration complexity. All services, connection strings, and documentation should reference `solidity_security`.
 >
-> **Verified:** February 22, 2026 (Current stats: 155 contracts, 513 scans, 5,979 vulnerabilities, 13 users in `solidity_security` database)
+> **Verified:** February 24, 2026 (Current stats: 183 contracts, 554 scans, 7,313 vulnerabilities, 14 users, 89 tables in `solidity_security` database)
 
 ## Table of Contents
 
@@ -731,7 +731,7 @@ Detected security vulnerabilities and code issues.
 | `fingerprint_semantic` | VARCHAR(64) | NULLABLE | Semantic similarity fingerprint |
 | `fingerprint_composite` | VARCHAR(64) | NULLABLE | Composite hash of multiple fingerprints |
 | `deduplication_group_id` | UUID | NULLABLE | FK → deduplication_groups.id - Group of duplicate findings |
-| `is_primary` | BOOLEAN | NOT NULL, DEFAULT true | Primary instance in deduplication group |
+| `is_primary` | BOOLEAN | NOT NULL, DEFAULT true | Primary instance in deduplication group. **API alias:** Serialized as `is_canonical` in API responses (v0.29.19+, via Pydantic `validation_alias`) |
 | `duplicate_count` | INTEGER | NOT NULL, DEFAULT 0 | Number of duplicate findings |
 | `deduplication_strategy` | VARCHAR(20) | NULLABLE | Strategy used for deduplication ('exact', 'fuzzy', 'semantic') |
 | `similarity_score` | DOUBLE PRECISION | NULLABLE | Similarity score with primary finding (0.0 to 1.0) |
