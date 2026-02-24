@@ -1,6 +1,6 @@
 # Deduplication Engine - Technical Documentation
 
-**Version**: v0.8.0 (core), v0.29.12 (hybrid architecture + GCP audit)
+**Version**: v0.8.0 (core), v0.29.13 (hybrid architecture + GCP audit)
 **Status**: Production Ready
 **Phase**: 4E - Intelligence Layer
 

@@ -1,22 +1,25 @@
 # Playbook: Deduplication Maintenance
 
-**Version:** 1.0.0
-**Last Updated:** February 23, 2026
+**Version:** 2.0.0
+**Last Updated:** February 24, 2026
 **Audience:** Platform Operator | Developer
 
 ## Overview
 
-Monitor and troubleshoot the hybrid deduplication maintenance system. Deduplication runs via two paths:
+Monitor and troubleshoot the hybrid deduplication maintenance system. Deduplication runs via three paths:
 
-1. **Inline post-scan** — 4 scoped tasks run automatically during scan result ingestion (sub-second)
-2. **Weekly CronJob** — Full 18-task sweep runs Sunday 2 AM UTC
+1. **Celery worker dedup** — All 3 dedup phases dispatched to isolated worker pod via Redis (v0.29.13+)
+2. **Post-scan maintenance** — 4 scoped tasks run in the Celery worker after dedup phases
+3. **Weekly CronJob** — Full 18-task sweep runs Sunday 2 AM UTC
 
 ---
 
 ## Prerequisites
 
 - [ ] `kubectl` access to `api-service-local` namespace
-- [ ] API service running (v0.29.12+)
+- [ ] API service running (v0.29.19+)
+- [ ] Celery worker pod running (`celery-worker` deployment)
+- [ ] Redis running (broker for Celery tasks)
 
 ---
 
@@ -24,36 +27,60 @@ Monitor and troubleshoot the hybrid deduplication maintenance system. Deduplicat
 
 ```mermaid
 flowchart TD
-    A[Scanner Results Stored] --> B[Phase 1: Intra-Scan Dedup]
-    B --> C[Phase 2: Cross-Scan Dedup]
-    C --> D[Phase 3: Inline Maintenance]
-    D --> D1[Fuzzy Fingerprints scan-scoped]
-    D --> D2[Semantic Fingerprints scan-scoped]
-    D --> D3[Tool Consensus contract-scoped]
-    D --> D4[Orphan Grouping contract-scoped]
-    D1 & D2 & D3 & D4 --> E[API Response Returns]
+    A[Scanner Results Stored] -->|task.delay| B[Redis Queue]
+    B --> C[Celery Worker Pod]
+    C --> D[Phase 1: Intra-Scan Dedup]
+    D --> E[Phase 2: Cross-Scan Dedup]
+    E --> F[Phase 3: Post-Scan Maintenance]
+    F --> F1[Fuzzy Fingerprints scan-scoped]
+    F --> F2[Semantic Fingerprints scan-scoped]
+    F --> F3[Tool Consensus contract-scoped]
+    F --> F4[Orphan Grouping contract-scoped]
 
-    F[Weekly CronJob Sun 2AM] --> G[Full 18-Task Sweep]
-    G --> H[Cleanup + All Fingerprints]
-    H --> I[Grouping + Analytics]
-    I --> J[ML Feedback Loop]
+    G[Weekly CronJob Sun 2AM] --> H[Full 18-Task Sweep]
+    H --> I[Cleanup + All Fingerprints]
+    I --> J[Grouping + Analytics]
+    J --> K[ML Feedback Loop]
 ```
 
 ---
 
-## Monitoring the Inline Path
+## Monitoring the Celery Worker
 
-### Verify inline dedup runs after a scan
+### Verify worker is running
 
-After uploading a contract and receiving scan results:
+```bash
+# Check worker pod status
+kubectl get pods -n api-service-local -l app.kubernetes.io/name=celery-worker
+
+# Check worker logs for recent task processing
+kubectl logs -n api-service-local -l app.kubernetes.io/name=celery-worker --tail=50
+
+# Verify worker image matches API service
+kubectl get deployment -n api-service-local celery-worker \
+  -o jsonpath='{.spec.template.spec.containers[0].image}'
+```
+
+### Verify dedup runs after a scan
+
+After uploading a contract and receiving scan results, check **worker** logs (not API logs):
+
+```bash
+# Check worker processed the dedup task
+kubectl logs -n api-service-local -l app.kubernetes.io/name=celery-worker --tail=100 | \
+  grep -i "celery-dedup\|Intra-scan\|Cross-scan\|Maintenance"
+```
+
+Then verify DB state:
 
 ```sql
--- Check that new vulnerabilities have fingerprints
+-- Check that new vulnerabilities have fingerprints and groups
 SELECT title, severity,
        fingerprint_location_fuzzy IS NOT NULL as has_fuzzy,
        fingerprint_semantic IS NOT NULL as has_semantic,
        tool_consensus_score,
-       deduplication_group_id IS NOT NULL as has_group
+       deduplication_group_id IS NOT NULL as has_group,
+       is_primary
 FROM vulnerabilities
 WHERE scan_id = '<scan-uuid>'
 ORDER BY severity;
@@ -61,11 +88,11 @@ ORDER BY severity;
 
 **Expected:** All rows should have `has_fuzzy = true` and `has_semantic = true`.
 
-### Check API logs for inline processing
+### Check API pod dispatched the task
 
 ```bash
 kubectl logs -n api-service-local deploy/api-service --tail=100 | \
-  grep -i "post-scan\|maintenance completed"
+  grep -i "Dedup task dispatched"
 ```
 
 ---
@@ -104,12 +131,35 @@ kubectl get cronjob deduplication-maintenance -n api-service-local -o yaml | \
 
 ## Troubleshooting
 
+### Celery worker not processing tasks
+
+1. Check worker pod is running:
+   ```bash
+   kubectl get pods -n api-service-local -l app.kubernetes.io/name=celery-worker
+   ```
+
+2. Check Redis is running (Celery broker):
+   ```bash
+   kubectl get pods -n redis-local -l app.kubernetes.io/name=redis
+   ```
+
+3. Check worker can connect to Redis:
+   ```bash
+   kubectl logs -n api-service-local -l app.kubernetes.io/name=celery-worker --tail=20 | \
+     grep -i "connected\|error\|refused"
+   ```
+
+4. Verify CELERY_BROKER_URL in worker env:
+   ```bash
+   kubectl exec -n api-service-local deployment/celery-worker -- env | grep CELERY
+   ```
+
 ### Findings missing fingerprints after scan
 
-1. Check if Phase 3 ran (look for errors in logs):
+1. Check if worker processed the task (look for errors in **worker** logs):
    ```bash
-   kubectl logs -n api-service-local deploy/api-service --tail=200 | \
-     grep -i "warning.*post-scan\|error.*dedup"
+   kubectl logs -n api-service-local -l app.kubernetes.io/name=celery-worker --tail=200 | \
+     grep -i "warning\|error\|celery-dedup"
    ```
 
 2. Check Intelligence Engine is running (required for semantic fingerprints):
@@ -288,7 +338,10 @@ kubectl delete job <stuck-job-name> -n api-service-local
 
 ## Operational Checklist
 
-- [ ] Inline path: New scan findings have fingerprints immediately
+- [ ] Celery worker pod running (`celery-worker` deployment)
+- [ ] Celery worker image matches api-service image version
+- [ ] Redis running (Celery broker, db 1)
+- [ ] New scan findings have fingerprints after worker processes
 - [ ] Weekly CronJob: Scheduled `0 2 * * 0` with `--weekly` flag
 - [ ] CronJob image matches api-service image version
 - [ ] Intelligence Engine running (for semantic fingerprints)

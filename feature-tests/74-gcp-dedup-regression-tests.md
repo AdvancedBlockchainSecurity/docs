@@ -3,7 +3,7 @@
 **Priority**: P1 - High
 **Last Tested**: 2026-02-23
 **Scope**: GCP production readiness audit, regression test suite (267 tests), reliability documentation
-**API Version**: 0.29.12
+**API Version**: 0.29.13
 
 ---
 
@@ -153,6 +153,6 @@ python3 -m pytest \
 | Repository | Changes |
 |------------|---------|
 | blocksecops-api-service | Retry logic, URL resolution, 46 new tests, 2 modified test files |
-| blocksecops-gcp-infrastructure | GCP CronJob manifest, kustomization update, image tag 0.29.12 |
+| blocksecops-gcp-infrastructure | GCP CronJob manifest, kustomization update, image tag 0.29.13 |
 | docs | Pipeline, workflow, playbook updates + this feature-test |
 | TaskDocs-BlockSecOps | Implementation summary |

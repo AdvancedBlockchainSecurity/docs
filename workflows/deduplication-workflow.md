@@ -1,65 +1,52 @@
 # Deduplication Workflow
 
-**Last Updated:** February 23, 2026
+**Last Updated:** February 24, 2026
 **Status:** Active
-**API Version:** 0.29.12+
+**API Version:** 0.29.19+
 
 ---
 
 ## Overview
 
-The deduplication system uses a hybrid architecture with two execution paths:
+The deduplication system uses a hybrid architecture with three execution paths:
 
-1. **Inline post-scan maintenance** — 4 scoped tasks run during scan result ingestion (sub-second)
-2. **Weekly housekeeping** — Full 18-task sweep via CronJob (Sunday 2 AM UTC)
+1. **Celery worker dedup** — All 3 dedup phases dispatched to an isolated worker pod via Redis (v0.29.13+)
+2. **Post-scan maintenance** — 4 scoped tasks run in the Celery worker after dedup phases complete
+3. **Weekly housekeeping** — Full 18-task sweep via CronJob (Sunday 2 AM UTC)
 
-This ensures findings have fingerprints, consensus scores, and group assignments before the API response returns.
+Dedup processing is fully isolated from the API event loop, preventing health check starvation and pod restarts under heavy scan load.
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         DEDUPLICATION WORKFLOW                               │
-│                                                                             │
-│   Scanner Results Stored (store_scan_results)                               │
-│        │                                                                    │
-│        ▼                                                                    │
-│   ┌─────────────────────────────────────────────────────────────────────┐  │
-│   │ Phase 1: INTRA-SCAN DEDUPLICATION                                   │  │
-│   │ Groups duplicates within the same scan                              │  │
-│   │ Uses: fingerprint_location matching                                 │  │
-│   └─────────────────────────────────────────────────────────────────────┘  │
-│        │                                                                    │
-│        ▼                                                                    │
-│   ┌─────────────────────────────────────────────────────────────────────┐  │
-│   │ Phase 2: CROSS-SCAN DEDUPLICATION                                   │  │
-│   │ Groups duplicates across prior scans of same contract               │  │
-│   │ Uses: 5-tier matching (fingerprint + semantic)                      │  │
-│   └─────────────────────────────────────────────────────────────────────┘  │
-│        │                                                                    │
-│        ▼                                                                    │
-│   ┌─────────────────────────────────────────────────────────────────────┐  │
-│   │ Phase 3: INLINE POST-SCAN MAINTENANCE (v0.29.11)                    │  │
-│   │ Runs 4 scoped tasks immediately after vulns created:                │  │
-│   │ • Fuzzy fingerprints (scan-scoped)                                  │  │
-│   │ • Semantic fingerprints (scan-scoped)                               │  │
-│   │ • Tool consensus scores (contract-scoped)                           │  │
-│   │ • Orphan grouping (contract-scoped)                                 │  │
-│   └─────────────────────────────────────────────────────────────────────┘  │
-│        │                                                                    │
-│        ▼                                                                    │
-│   Vulnerabilities fully fingerprinted + grouped in response                 │
-│                                                                             │
-│ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─  │
-│                                                                             │
-│   Weekly CronJob (Sunday 2 AM UTC)                                          │
-│        │                                                                    │
-│        ▼                                                                    │
-│   ┌─────────────────────────────────────────────────────────────────────┐  │
-│   │ WEEKLY HOUSEKEEPING                                                 │  │
-│   │ Full 18-task sweep: cleanup, fingerprints, grouping, analytics,    │  │
-│   │ scanner quality, ML feedback, active learning                      │  │
-│   └─────────────────────────────────────────────────────────────────────┘  │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────┐     ┌─────────────────────────────────────────┐
+│       API Pod            │     │     Celery Worker Pod                    │
+│                          │     │                                         │
+│  store_scan_results()    │     │  run_dedup_task() [from Redis queue]    │
+│    └─ task.delay() ──────┼─────┼──►                                     │
+│       (non-blocking)     │     │  Phase 1: INTRA-SCAN DEDUPLICATION     │
+│                          │     │    Groups duplicates within same scan   │
+│  Event loop free for:    │     │    Uses: fingerprint_location matching  │
+│    • Health checks       │     │        │                               │
+│    • API requests        │     │        ▼                               │
+│    • Liveness probes     │     │  Phase 2: CROSS-SCAN DEDUPLICATION     │
+│                          │     │    Links to prior scans of same        │
+│                          │     │    contract via 5-tier matching         │
+└─────────────────────────┘     │        │                               │
+         │                       │        ▼                               │
+         └──── Redis (broker) ───│  Phase 3: POST-SCAN MAINTENANCE       │
+                                 │    • Fuzzy fingerprints (scan-scoped)  │
+                                 │    • Semantic fingerprints (scan)      │
+                                 │    • Tool consensus (contract-scoped)  │
+                                 │    • Orphan grouping (contract-scoped) │
+                                 └─────────────────────────────────────────┘
+
+─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+
+  Weekly CronJob (Sunday 2 AM UTC)
+       │
+       ▼
+  WEEKLY HOUSEKEEPING (separate pod, same image)
+    Full 18-task sweep: cleanup, fingerprints, grouping, analytics,
+    scanner quality, ML feedback, active learning
 ```
 
 ---
@@ -68,7 +55,9 @@ This ensures findings have fingerprints, consensus scores, and group assignments
 
 | Service | Role | Port |
 |---------|------|------|
-| API Service | Deduplication orchestration | 8000 |
+| API Service | Dispatches dedup tasks to Celery | 8000 |
+| Celery Worker | Runs all dedup processing in isolated pod | N/A (same image as API) |
+| Redis | Celery broker (db 1) and result backend (db 2) | 6379 |
 | Intelligence Engine | Embedding generation for semantic matching | 80 (internal) |
 | PostgreSQL | Vulnerability and group storage | 5432 |
 
@@ -333,36 +322,51 @@ GET /api/v1/deduplication/vulnerabilities/{vuln_id}/matches
 
 ## Processing Flow in Code
 
-### Scan Results Storage (scans.py)
+### API Pod: Scan Results Storage (scans.py)
 
 ```python
-# After vulnerabilities are created...
+# After vulnerabilities are created in store_scan_results()...
 
-# Phase 1: Intra-scan deduplication
-intra_stats = await _process_scan_deduplication(
-    db=db,
-    scan_id=scan_id,
-    contract_id=scan.contract_id,
-)
-# Groups duplicates within this scan
-
-# Phase 2: Cross-scan deduplication
-cross_stats = await _process_cross_scan_deduplication(
-    db=db,
-    scan_id=scan_id,
-    contract_id=scan.contract_id,
-    new_vulnerability_ids=created_vulnerability_ids,
-)
-# Links to existing groups from prior scans
-
-# Phase 3: Inline post-scan maintenance (v0.29.11)
-post_scan_stats = await run_post_scan_maintenance(
-    db=db,
-    scan_id=scan_id,
-    contract_id=scan.contract_id,
-)
-# Generates fingerprints, consensus scores, orphan groups inline
+# Dispatch all dedup to Celery worker (non-blocking)
+if created_vulnerability_ids:
+    from src.infrastructure.tasks.dedup_task import run_dedup_task
+    run_dedup_task.delay(
+        scan_id=str(scan_id),
+        contract_id=str(scan.contract_id),
+        vulnerability_ids=[str(v) for v in created_vulnerability_ids],
+    )
+    # Returns immediately — API response not blocked by dedup
 ```
+
+### Celery Worker: Dedup Task (dedup_task.py)
+
+```python
+@celery_app.task(bind=True, name="dedup.run_post_scan", max_retries=2, default_retry_delay=30)
+def run_dedup_task(self, scan_id: str, contract_id: str, vulnerability_ids: list[str]):
+    """Runs in isolated Celery worker process."""
+    asyncio.run(_run_dedup_async(scan_id, contract_id, vulnerability_ids))
+
+async def _run_dedup_async(...):
+    async with get_db_session() as db:
+        # Phase 1: Intra-scan deduplication
+        await _process_scan_deduplication(db, scan_id, contract_id)
+
+        # Phase 2: Cross-scan deduplication
+        await _process_cross_scan_deduplication(db, scan_id, contract_id, vulnerability_ids)
+
+        # Phase 3: Post-scan maintenance (fingerprints, consensus, orphan groups)
+        await run_post_scan_maintenance(db, scan_id, contract_id)
+```
+
+### Architecture Change (v0.29.13)
+
+| Aspect | Before (v0.29.12) | After (v0.29.13+) |
+|--------|--------------------|--------------------|
+| Execution | `asyncio.create_task()` in API event loop | `task.delay()` to Celery worker pod |
+| Isolation | Shared event loop with health checks | Separate process, own DB pool |
+| Failure mode | Event loop starvation → pod restart | Worker processes independently |
+| Retry | Silent data loss on crash | Celery retries 2x with 30s backoff |
+| Concurrency | Semaphore (3 concurrent tasks) | `worker_concurrency=3` |
 
 ---
 
@@ -486,6 +490,47 @@ See: [Hybrid Deduplication Changelog](/docs/changelogs/API-SERVICE-V0.29.11-HYBR
 
 ---
 
+## Celery Worker Migration (February 24, 2026)
+
+v0.29.13 moved all dedup processing from the API event loop to an isolated Celery worker pod. This was prompted by the API pod crashing when a contract with 386 findings (VulnerableAMM) triggered inline dedup that starved the event loop.
+
+| Change | Before (v0.29.12) | After (v0.29.13+) |
+|--------|--------------------|--------------------|
+| Dedup execution | `asyncio.create_task()` in API pod | Celery worker pod (separate process) |
+| Health check impact | Dedup blocks liveness probes | API pod fully responsive |
+| Failure handling | Silent data loss | Celery retries 2x with 30s backoff |
+| Concurrency | `_DEDUP_SEMAPHORE(3)` | `worker_concurrency=3` in Celery config |
+| Broker | N/A | Redis db 1 (`redis-master.redis-local.svc.cluster.local:6379/1`) |
+
+**New files:**
+- `src/infrastructure/celery_app.py` — Celery instance with queue config
+- `src/infrastructure/tasks/dedup_task.py` — Task wrapping async dedup phases
+- `k8s/base/api-service/deployment-celery-worker.yaml` — Worker k8s deployment
+
+**Worker configuration:**
+```yaml
+command: ["celery", "-A", "src.infrastructure.celery_app", "worker",
+          "--loglevel=info", "--queues=dedup", "--concurrency=3"]
+```
+
+**Verify worker:**
+```bash
+kubectl get pods -n api-service-local -l app.kubernetes.io/name=celery-worker
+kubectl logs -n api-service-local -l app.kubernetes.io/name=celery-worker --tail=20
+```
+
+See: [Celery Migration Changelog](/docs/changelogs/API-SERVICE-V0.29.13-V0.29.19-CELERY-DEDUP-SCHEMA-FIX-2026-02-24.md)
+
+---
+
+## is_canonical Schema Fix (February 24, 2026)
+
+v0.29.19 fixed a schema mismatch where `is_canonical` was always `None` in API responses. The DB column is `is_primary` but the response schema field was `is_canonical`. Added `validation_alias=AliasChoices("is_canonical", "is_primary")` to `VulnerabilityResponse` so Pydantic reads `is_primary` from the model and serializes it as `is_canonical` in JSON.
+
+See: [Schema Fix Changelog](/docs/changelogs/API-SERVICE-V0.29.13-V0.29.19-CELERY-DEDUP-SCHEMA-FIX-2026-02-24.md)
+
+---
+
 ## Testing & Regression Prevention
 
 ### Adding a New Task to the Pipeline
@@ -560,3 +605,4 @@ kubectl logs job/smoke-<id> -c cloud-sql-proxy -n api-service-gcp  # verify side
 - [Deduplication & Metadata Audit Fixes](/docs/changelogs/DEDUPLICATION-METADATA-AUDIT-FIXES-2026-02-04.md)
 - [Multi-Level Matching Audit](/docs/changelogs/API-SERVICE-DEDUP-MULTILEVEL-MATCHING-AUDIT-2026-02-15.md)
 - [Hybrid Deduplication Changelog](/docs/changelogs/API-SERVICE-V0.29.11-HYBRID-DEDUPLICATION-2026-02-23.md)
+- [Celery Migration Changelog](/docs/changelogs/API-SERVICE-V0.29.13-V0.29.19-CELERY-DEDUP-SCHEMA-FIX-2026-02-24.md)
