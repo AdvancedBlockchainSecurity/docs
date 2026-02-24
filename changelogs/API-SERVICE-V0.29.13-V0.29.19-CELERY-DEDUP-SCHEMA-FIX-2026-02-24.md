@@ -209,10 +209,10 @@ kubectl logs -n api-service-local -l app.kubernetes.io/name=celery-worker --tail
 All checks passed:
 - API healthy at v0.29.19, Celery worker at v0.29.19
 - All 6 internal services healthy
-- 89 DB tables, 7,313 vulnerabilities, 0 info-severity patterns
+- 89 DB tables, 7,338 vulnerabilities, 0 info-severity patterns
 - CronJob version matches deployment
 
-### E2E Test (February 24, 2026)
+### E2E Test — Initial (February 24, 2026)
 
 Uploaded `CeleryDedupTest` contract (reentrancy, tx.origin, unchecked returns):
 - Slither + Semgrep: 16 vulnerabilities found
@@ -221,7 +221,28 @@ Uploaded `CeleryDedupTest` contract (reentrancy, tx.origin, unchecked returns):
 - Cross-scan: 0 (first scan for contract)
 - Maintenance: 4 embeddings generated, 4.0s
 
-### is_canonical Verification (February 24, 2026)
+### E2E Test — is_canonical Verification (February 24, 2026)
+
+Full pipeline verification using API key authentication:
+- Uploaded `VulnerableE2E-IsCanonical-Test` contract via `POST /api/v1/upload`
+- Created scan with slither + semgrep + aderyn (3 scanners)
+- 13 vulnerabilities found (2 critical, 2 high, 2 medium, 7 low)
+- All 13 findings have `is_canonical: true` in API response
+- `is_primary` does **not** appear in API JSON (correctly aliased)
+- All 13 have fuzzy and semantic fingerprints
+- Celery worker processed cross-scan dedup + post-scan maintenance in 1.8s
+
+```json
+// Actual API response (v0.29.19)
+{
+  "title": "Reentrancy Attack (Ether)",
+  "severity": "critical",
+  "is_canonical": true,
+  "deduplication_group_id": null
+}
+```
+
+### is_canonical Unit Verification (February 24, 2026)
 
 ```python
 # From deployed v0.29.19 pod
