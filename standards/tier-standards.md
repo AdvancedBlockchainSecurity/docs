@@ -461,6 +461,29 @@ CREDIT_PACKAGE_BULK_CREDITS=1000
 
 ---
 
+## API Endpoint Tier Gates
+
+All premium API endpoints are protected by `require_tier()` dependencies. Core endpoints (scans, contracts, vulnerabilities) are accessible to all authenticated users regardless of tier.
+
+**Note:** Developer and Team tiers also have `api_access_enabled=false` in `user_quotas`, which causes the `APICallTrackerMiddleware` to return 429 before the tier gate is even reached. The tier gate provides defense-in-depth for tiers with API access.
+
+| Endpoint | Required Tier | Blocked Tiers |
+|----------|--------------|---------------|
+| `POST /api/v1/search` | team | developer |
+| `GET /api/v1/api-keys` | growth | developer, team |
+| `GET /api/v1/integrations` | growth | developer, team |
+| `GET /api/v1/notification-channels` | growth | developer, team |
+| `GET /api/v1/webhooks` | growth | developer, team |
+| `GET /api/v1/audit-logs` | growth | developer, team |
+| `POST /api/v1/economic-analysis/reports` | enterprise | developer, team, growth |
+| `POST /api/v1/economic-analysis/simulate` | enterprise | developer, team, growth |
+| AI generation endpoints | team | developer |
+| PoC exploit generation | growth | developer, team |
+
+**Regression tests:** 20 structural tests in `tests/unit/presentation/test_tier_gate_enforcement.py` verify these gates at the source level.
+
+---
+
 ## Implementation Reference
 
 ### Centralized Tier Config Package
@@ -592,6 +615,7 @@ monthly_nl_conversions_limit = -1
 
 | Date | Change | Author |
 |------|--------|--------|
+| 2026-02-24 | **v3.5**: Added API Endpoint Tier Gates section documenting all `require_tier()` enforcement. 5 missing gates fixed (search, api-keys, integrations, notification-channels, webhooks). 20 regression tests. | BlockSecOps Team |
 | 2026-02-13 | **v3.4**: Added PoC Exploit Generation (Growth+ tier, 10s cooldown, output safety validation). Tier-config v3.3 updated with `monthlyAiExploitsLimit`. | Claude Code |
 | 2026-02-07 | **v3.3**: AI Features now ACTIVE (v0.28.2). Updated all AI quotas to match implementation. Added security controls, feature flags, rate limits, Vault secret path, and related pipeline documentation links. | Claude Code |
 | 2026-01-26 | **v3.1**: Added Phase 5 AI feature quotas (AI Copilot, Code Review, Code Repair, Compliance assessments) for upcoming AI/ML implementation. | Claude Code |
