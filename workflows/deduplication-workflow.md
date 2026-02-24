@@ -486,6 +486,69 @@ See: [Hybrid Deduplication Changelog](/docs/changelogs/API-SERVICE-V0.29.11-HYBR
 
 ---
 
+## Testing & Regression Prevention
+
+### Adding a New Task to the Pipeline
+
+When adding Task 21+, these tests will catch missing invariants:
+
+1. Add try/except/rollback block — enforced by `test_every_task_has_try_block`
+2. Add `db.rollback()` in except — enforced by `test_every_task_has_rollback`
+3. Update task count — enforced by `test_all_20_tasks_present`
+4. Add result key to return dict — enforced by `test_return_dict_has_all_task_keys`
+5. Add function to task list — enforced by `TestTaskFunctionsExist`
+
+### Modifying Intelligence Engine Integration
+
+When changing IE URL, timeout, or retry behavior, these tests cover it:
+
+| Test File | What It Validates |
+|-----------|-------------------|
+| `test_semantic_deduplicator_config.py` | URL resolution structural tests (source parsing) |
+| `test_ie_url_resolution.py` | URL resolution functional tests (env var → config → fallback) |
+| `test_semantic_deduplicator_retry.py` | Retry behavior: backoff delays, max retries, error types |
+| `test_cronjob_gcp_overlay.py` | GCP IE URL uses correct namespace |
+
+### Modifying CronJob Configuration
+
+When changing schedule, resources, sidecar, or env vars:
+
+| Test File | What It Validates |
+|-----------|-------------------|
+| `test_cronjob_manifest.py` | Base CronJob invariants (schedule, deadline, env vars, security) |
+| `test_cronjob_production_overlay.py` | Production overlay (image tags, namespace) |
+| `test_cronjob_gcp_overlay.py` | GCP overlay (Cloud SQL Proxy, `--quitquitquit`, Workload Identity) |
+
+### CI/CD Integration
+
+```bash
+# All unit tests — no cluster or external services needed
+pytest tests/unit/ -v -o "addopts="
+
+# Cross-repo tests (GCP overlay) skip gracefully if sibling repo absent
+# pytestmark = pytest.mark.skipif(not _HAS_GCP_INFRA, ...)
+```
+
+### Post-Deployment Validation
+
+**Local:**
+```bash
+kubectl get cronjob deduplication-maintenance -n api-service-local
+kubectl create job --from=cronjob/deduplication-maintenance smoke-$(date +%s) -n api-service-local
+kubectl logs job/smoke-<id> -n api-service-local --follow
+# Verify "Maintenance completed" in logs
+```
+
+**GCP:**
+```bash
+kubectl get cronjob deduplication-maintenance -n api-service-gcp
+kubectl create job --from=cronjob/deduplication-maintenance smoke-$(date +%s) -n api-service-gcp
+kubectl logs job/smoke-<id> -c deduplication-job -n api-service-gcp --follow
+kubectl logs job/smoke-<id> -c cloud-sql-proxy -n api-service-gcp  # verify sidecar exits cleanly
+```
+
+---
+
 ## Related Documentation
 
 - [Intelligence Pipeline Workflow](./intelligence-pipeline-workflow.md)

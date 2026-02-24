@@ -323,15 +323,95 @@ The CronJob pods use label `app.kubernetes.io/name: deduplication-maintenance` (
 | `dedup-maintenance-to-postgresql` | PostgreSQL | 5432 |
 | `dedup-maintenance-to-intelligence` | Intelligence Engine | 80 |
 
+## GCP Deployment
+
+The CronJob requires a Cloud SQL Proxy sidecar in GCP (same pattern as the API Service Deployment).
+
+**Key differences from local:**
+
+| Setting | Local | GCP |
+|---------|-------|-----|
+| Namespace | `api-service-local` | `api-service-gcp` |
+| Database | Direct PostgreSQL connection | Cloud SQL Proxy sidecar (`localhost:5432`) |
+| Image registry | `harbor.blocksecops.local` | `us-west1-docker.pkg.dev/PROJECT/blocksecops` |
+| IE URL | ConfigMap → `.intelligence-engine-local.` | ConfigMap → `.intelligence-engine-gcp.` |
+| Auth | Kubernetes ServiceAccount | Workload Identity → GCP Service Account |
+| Cloud SQL Proxy | N/A | `--quitquitquit` flag (exits when Job container finishes) |
+
+**GCP overlay files:**
+- `blocksecops-gcp-infrastructure/k8s/overlays/gcp/services/api-service/cronjob-deduplication.yaml`
+- `blocksecops-gcp-infrastructure/k8s/overlays/gcp/services/api-service/kustomization.yaml` (includes CronJob)
+
+**Verify GCP kustomize build:**
+```bash
+kubectl kustomize blocksecops-gcp-infrastructure/k8s/overlays/gcp/services/api-service/ | grep -A5 "kind: CronJob"
+```
+
 ## Monitoring
 
 Check recent job status:
 ```bash
+# Local
 kubectl get jobs -n api-service-local | grep dedup
 kubectl logs -n api-service-local job/<job-name>
+
+# GCP
+kubectl get jobs -n api-service-gcp | grep dedup
+kubectl logs -n api-service-gcp job/<job-name>
 ```
 
 Manual trigger for testing:
 ```bash
+# Local
 kubectl create job --from=cronjob/deduplication-maintenance deduplication-maintenance-manual -n api-service-local
+
+# GCP
+kubectl create job --from=cronjob/deduplication-maintenance deduplication-maintenance-manual -n api-service-gcp
 ```
+
+## Reliability & Regression Prevention
+
+### SLO Targets
+
+| Path | Target | Current |
+|------|--------|---------|
+| Inline post-scan | <1s p99 | Sub-second |
+| Weekly CronJob | Completes within 2h activeDeadline | ~24min |
+| Error isolation | Zero cascade failures | Every task has independent try/except/rollback |
+
+### Test Layers (Defense in Depth)
+
+| Layer | File(s) | What It Catches |
+|-------|---------|-----------------|
+| **1. Structural** (source parsing, no imports) | `test_deduplication_maintenance.py` | Missing try/except/rollback, wrong return keys, broken function signatures |
+| **2. Manifest** (YAML parsing, no cluster) | `test_cronjob_manifest.py`, `test_cronjob_gcp_overlay.py` | Wrong schedule, missing env vars, missing Cloud SQL Proxy sidecar |
+| **3. Functional** (AsyncMock, no external deps) | `test_semantic_deduplicator_retry.py`, `test_ie_url_resolution.py` | Broken retry logic, wrong backoff delays, URL resolution regressions |
+| **4. Integration** (requires PostgreSQL + Redis) | CI pipeline | E2E scan flow with dedup |
+
+### Pre-Deployment Checklist
+
+```bash
+# All dedup tests (target: 220+)
+pytest tests/unit/infrastructure/test_deduplication_maintenance.py \
+       tests/unit/infrastructure/test_cronjob_manifest.py \
+       tests/unit/infrastructure/test_cronjob_gcp_overlay.py \
+       tests/unit/ml/test_semantic_deduplicator*.py \
+       tests/unit/ml/test_ie_url_resolution.py \
+       tests/unit/presentation/test_scans_phase3.py \
+       tests/unit/infrastructure/test_dedup_multilevel_matching.py \
+       tests/unit/domain/test_deduplication_matcher.py -v -o "addopts="
+```
+
+- [ ] All tests pass
+- [ ] Image tag in kustomization.yaml matches pyproject.toml version
+- [ ] GCP: Cloud SQL Proxy image in CronJob matches Deployment sidecar
+- [ ] GCP: IE URL points to `-gcp` namespace (not `-local`)
+
+### Monitoring & Alerting
+
+| Check | Command | Expected |
+|-------|---------|----------|
+| CronJob status | `kubectl get cronjob -n <namespace>` | LAST SCHEDULE within 7 days |
+| Job logs | `kubectl logs job/<name> -c deduplication-job` | "Maintenance completed" |
+| Cloud SQL Proxy (GCP) | `kubectl logs job/<name> -c cloud-sql-proxy` | Clean exit after main container |
+| Alert trigger | 2 consecutive CronJob failures | Investigate immediately |
