@@ -3214,4 +3214,87 @@ Columns added to `organizations` table for Enterprise AI opt-out:
 
 ---
 
-**Last Updated**: January 30, 2026
+## Phase 4.5: OAuth Integration Credentials (February 2026)
+
+**Phase 4.5: Third-Party Integrations** added OAuth credential storage for GitHub, GitLab, Bitbucket, JIRA, and Jenkins connections.
+
+### New Tables
+
+#### `integrations`
+
+Third-party integration connections storing OAuth state and provider metadata.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique integration identifier |
+| `organization_id` | UUID | NOT NULL, FK → organizations.id ON DELETE CASCADE, INDEX | Owner organization |
+| `provider` | VARCHAR(50) | NOT NULL, INDEX | `github`, `gitlab`, `bitbucket`, `jira`, `jenkins` |
+| `name` | VARCHAR(255) | NOT NULL | Display name |
+| `status` | VARCHAR(50) | NOT NULL, DEFAULT 'pending', INDEX | `pending`, `connected`, `expired`, `error` |
+| `external_account_id` | VARCHAR(255) | NULLABLE | Provider user/account ID |
+| `external_username` | VARCHAR(255) | NULLABLE | Provider username |
+| `external_avatar_url` | VARCHAR(2048) | NULLABLE | Provider avatar URL |
+| `jira_cloud_id` | VARCHAR(255) | NULLABLE | JIRA cloud instance ID |
+| `jira_site_url` | VARCHAR(2048) | NULLABLE | JIRA site URL |
+| `settings` | JSONB | NULLABLE, DEFAULT '{}' | Provider-specific settings |
+| `repos_synced` | INTEGER | NOT NULL, DEFAULT 0 | Count of synced repositories |
+| `last_sync_at` | TIMESTAMPTZ | NULLABLE | Last repository sync |
+| `last_error` | TEXT | NULLABLE | Last error message (sanitized, no internal details) |
+| `created_by` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL, INDEX | User who created |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_integrations_org_provider_unique` UNIQUE on (`organization_id`, `provider`)
+- `ix_integrations_organization_id` on `organization_id`
+- `ix_integrations_provider` on `provider`
+- `ix_integrations_status` on `status`
+- `ix_integrations_created_by` on `created_by`
+
+**Relationships:**
+- Many-to-one with `organizations` (organization_id, CASCADE DELETE)
+- Many-to-one with `users` (created_by, SET NULL)
+- One-to-one with `integration_credentials` (CASCADE DELETE)
+- One-to-many with `integration_repositories` (CASCADE DELETE)
+- One-to-many with `jira_project_mappings` (CASCADE DELETE)
+
+---
+
+#### `integration_credentials`
+
+Encrypted OAuth tokens for integration connections. Access and refresh tokens are encrypted with Fernet (AES-128-CBC + HMAC-SHA256) before storage.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique credential identifier |
+| `integration_id` | UUID | NOT NULL, UNIQUE, FK → integrations.id ON DELETE CASCADE, INDEX | Parent integration |
+| `access_token_encrypted` | TEXT | NOT NULL | Fernet-encrypted access token |
+| `refresh_token_encrypted` | TEXT | NULLABLE | Fernet-encrypted refresh token |
+| `token_type` | VARCHAR(50) | NOT NULL, DEFAULT 'Bearer' | OAuth token type |
+| `scopes` | JSONB | NULLABLE | List of granted OAuth scopes |
+| `expires_at` | TIMESTAMPTZ | NULLABLE | Token expiry time (UTC) |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_integration_credentials_integration_id` UNIQUE on `integration_id`
+
+**Relationships:**
+- One-to-one with `integrations` (integration_id, CASCADE DELETE)
+
+**Security Notes:**
+- Tokens encrypted with `INTEGRATION_ENCRYPTION_KEY` (Fernet, base64-encoded 32-byte key)
+- Encryption is **mandatory in production** — API service refuses to start without key
+- Encrypted values prefixed with `gAAAAA` (Fernet format)
+- Error messages stored in `integrations.last_error` are sanitized via `get_safe_error_detail()`
+
+### Related Documentation
+
+- **Feature Test**: `docs/feature-tests/76-oauth-audit-hardening.md`
+- **Pipeline**: `docs/pipelines/oauth-integration-pipeline.md`
+- **Workflow**: `docs/workflows/oauth-integration-workflow.md`
+- **Playbook**: `docs/playbooks/oauth-provider-setup.md`
+
+---
+
+**Last Updated**: February 24, 2026
