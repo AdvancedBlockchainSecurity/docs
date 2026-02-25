@@ -213,7 +213,7 @@ kubectl rollout restart deployment api-service -n api-service-local
 echo "SECURITY INCIDENT: Revoked compromised-key at $(date)" >> SECURITY.log
 
 # 6. Update codebase to remove references
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/api-service
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/api-service
 git rm externalsecret-compromised-key.yaml
 git commit -m "SECURITY: Revoke compromised API key
 

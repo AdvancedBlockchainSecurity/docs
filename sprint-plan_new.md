@@ -1048,7 +1048,7 @@
 - `blocksecops-shared` → Multi-language shared libraries and utilities
 
 ### Infrastructure & Operations (2 repositories)
-- `blocksecops-aws-infrastructure` → AWS resource provisioning and management
+- `blocksecops-gcp-infrastructure` → GCP resource provisioning and management
 - `blocksecops-monitoring` → Observability, monitoring configuration + Dependency monitoring service
 
 ### Support & Documentation (4 repositories)

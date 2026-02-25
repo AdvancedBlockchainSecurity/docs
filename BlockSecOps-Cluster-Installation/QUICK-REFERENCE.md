@@ -5,43 +5,43 @@
 ### Phase 1-2: Cluster & Metrics
 ```bash
 minikube start --cpus=8 --memory=11500
-kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/metrics-server/
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/metrics-server/
 ```
 
 ### Phase 3: Databases
 ```bash
-kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/postgresql/
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/postgresql/
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=postgresql -n postgresql-local --timeout=180s
 
-kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/redis/
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/redis/
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=redis -n redis-local --timeout=120s
 ```
 
 ### Phase 4: Security
 ```bash
 # Vault
-kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/vault/
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/vault/
 kubectl wait --for=condition=ready pod/vault-0 -n vault-local --timeout=120s
 /Users/pwner/Git/ABS/scripts/init-vault-local.sh
 
 # External Secrets
 kubectl apply -f https://raw.githubusercontent.com/external-secrets/external-secrets/main/deploy/crds/bundle.yaml
-kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/external-secrets/
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/external-secrets/
 
 # Cert-Manager
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.1/cert-manager.crds.yaml
-kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/cert-manager/
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/cert-manager/
 ```
 
 ### Phase 5: Networking
 ```bash
-kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/traefik/
-kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/network-policies/
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/traefik/
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/network-policies/
 ```
 
 ### Phase 6: Harbor Registry
 ```bash
-kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/harbor/
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/harbor/
 kubectl wait --for=condition=ready pod -l app=harbor -n harbor-local --timeout=300s
 
 # Start Harbor proxy
@@ -56,7 +56,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
   -n monitoring-local --create-namespace \
-  -f /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/monitoring/values.yaml
+  -f /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/monitoring/values.yaml
 ```
 
 ### Phase 8: Application Services

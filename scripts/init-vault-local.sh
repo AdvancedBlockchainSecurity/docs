@@ -28,7 +28,7 @@ echo -e "${YELLOW}Checking Vault status...${NC}"
 if ! kubectl get pod -n vault-local vault-0 &>/dev/null; then
     echo -e "${RED}Error: Vault pod not found in vault-local namespace${NC}"
     echo "Please deploy Vault first:"
-    echo "  kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/vault/"
+    echo "  kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/vault/"
     exit 1
 fi
 

@@ -1041,12 +1041,12 @@ blocksecops-shared/
 
 ### **Infrastructure Repositories (2 repos)**
 
-### 12. **`blocksecops-aws-infrastructure`**
-**AWS Infrastructure as Code repository**
+### 12. **`blocksecops-gcp-infrastructure`**
+**GCP Infrastructure as Code repository**
 ```
-Purpose: AWS cloud resource provisioning and management
-Tech Stack: Terraform, AWS CLI, CloudFormation
-Contains: VPC, EKS, PostgreSQL StatefulSets, ElastiCache, IAM configurations
+Purpose: GCP cloud resource provisioning and management
+Tech Stack: Terraform, gcloud CLI
+Contains: VPC, GKE, Cloud SQL, Memorystore, Workload Identity, IAM configurations
 ```
 
 ### **Monitoring & Operations (1 repo)**

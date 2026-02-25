@@ -26,7 +26,7 @@ The database reset was successfully completed, achieving a clean slate with prop
    - PostgreSQL 15.4 reinitialized successfully
 
 3. **Infrastructure Fixes Applied**
-   - File: `/Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/postgresql/statefulset-patch.yaml`
+   - File: `/Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/postgresql/statefulset-patch.yaml`
    - Changes:
      - Added `command: []` and `args: []` to remove postgres command override
      - Set `readOnlyRootFilesystem: false` for local development
@@ -138,7 +138,7 @@ The transaction was aborted by an earlier error before attempting to insert vuln
 
 ## Infrastructure Changes Committed
 
-### File: `/Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/postgresql/statefulset-patch.yaml`
+### File: `/Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/postgresql/statefulset-patch.yaml`
 
 **Before:**
 ```yaml
@@ -248,7 +248,7 @@ kubectl scale deployment/api-service -n api-service-local --replicas=1
 
 **Revert infrastructure changes:**
 ```bash
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 git diff k8s/overlays/local/postgresql/statefulset-patch.yaml
 git checkout k8s/overlays/local/postgresql/statefulset-patch.yaml
 kubectl apply -k k8s/overlays/local/postgresql/

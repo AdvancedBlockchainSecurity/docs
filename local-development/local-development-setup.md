@@ -27,7 +27,7 @@ This guide sets up a local minikube development environment for the SolidityOps 
 - `blocksecops-shared` - Multi-language utilities (7K LOC Rust/Python/TypeScript)
 
 ### Infrastructure Repositories (2 repos)
-- `blocksecops-aws-infrastructure` - Infrastructure as Code
+- `blocksecops-gcp-infrastructure` - Infrastructure as Code
 - `blocksecops-monitoring` - Observability configurations
 
 ### Supporting Repositories (3 repos)
@@ -203,7 +203,7 @@ The monitoring stack uses Prometheus + Loki + Grafana (PLG) deployed via Kustomi
 
 ```bash
 # Deploy PLG monitoring stack
-kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/monitoring/
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/monitoring/
 
 # Wait for pods to be ready
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=prometheus -n monitoring-local --timeout=120s

@@ -47,7 +47,7 @@ Dashboards connect to both Prometheus and Loki:
 
 1. **Deploy monitoring stack**:
    ```bash
-   kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/monitoring/
+   kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/monitoring/
    ```
 
 2. **Port forward to Grafana** (port 3001 to avoid Traefik conflict):

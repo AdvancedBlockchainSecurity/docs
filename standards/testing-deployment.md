@@ -22,7 +22,7 @@ docker build -t localhost:8080/library/api-service:0.3.7 .
 docker push localhost:8080/library/api-service:0.3.7
 
 # 4. Update Kubernetes manifests (commit first!)
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 vim k8s/overlays/local/api-service/kustomization.yaml
 git add .
 git commit -m "Update API service to v0.3.7"
@@ -212,7 +212,7 @@ kubectl rollout undo deployment api-service -n api-service-local
 kubectl rollout status deployment api-service -n api-service-local
 
 # 4. Update code to match deployed version
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 git revert HEAD
 git push
 
