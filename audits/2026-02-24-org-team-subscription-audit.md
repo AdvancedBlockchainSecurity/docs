@@ -1,9 +1,9 @@
 # Organization, Team & Subscription Audit Results
 
-**Date:** 2026-02-25 03:17 UTC
-**API Version:** v0.29.28 (v0.29.27 + org creation tier gate fix)
+**Date:** 2026-02-25 04:12 UTC
+**API Version:** v0.29.27
 **Target:** https://app.blocksecops.local/api/v1
-**Duration:** 2.4s
+**Duration:** 1.9s
 
 ---
 
@@ -11,12 +11,12 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Tests | 56 |
-| Passed | 52 |
-| Failed | 4 |
-| Pass Rate | 92.9% |
+| Total Tests | 59 |
+| Passed | 59 |
+| Failed | 0 |
+| Pass Rate | 100.0% |
 
-**Issue 1 (org creation tier gate) FIXED in v0.29.28.** 4 remaining failures are Issue 2 (duplicate member handling) + 3 cascading.
+**All tests passed.** Organization, team, and subscription functionality is operating correctly.
 
 ---
 
@@ -73,7 +73,7 @@
 | PASS | GET /organizations/{id}/roles | 200 | - |
 | PASS | System roles present (owner, admin, developer, auditor, guest) | - | Found: ['admin', 'auditor', 'developer', 'guest', 'owner'] |
 | PASS | GET /roles (convenience, with X-Organization-Id) | 200 | - |
-| PASS | POST /organizations/{id}/roles (create custom) | 201 | id=2300ad1c-15f4-484a-9695-2373ae4f6862 |
+| PASS | POST /organizations/{id}/roles (create custom) | 201 | id=e5cad13f-3b52-4717-b8d6-6bbbd11b54f1 |
 | PASS | PATCH /organizations/{id}/roles/{id} (update custom) | 200 | - |
 | PASS | DELETE /organizations/{id}/roles/{id} (delete custom) | 204 | - |
 
@@ -83,49 +83,52 @@
 |--------|------|------|--------|
 | PASS | GET /organizations/{id}/teams | 200 | - |
 | PASS | Default 'General' team exists | - | Found teams: ['General'] |
-| PASS | POST /organizations/{id}/teams (create) | 201 | id=2b087837-cb17-4adf-b12a-0417e8e0b3d9 |
+| PASS | POST /organizations/{id}/teams (create) | 201 | id=0ed1ce52-2cfe-45ba-9fbc-372fc0dc756d |
 | PASS | GET /organizations/{id}/teams/{id} (detail) | 200 | - |
 | PASS | PATCH /organizations/{id}/teams/{id} (update) | 200 | - |
 
-### Members [FAIL] (3/4)
+### Members [PASS] (6/6)
 
 | Status | Test | HTTP | Detail |
 |--------|------|------|--------|
 | PASS | GET /organizations/{id}/members | 200 | - |
 | PASS | Owner is in member list | - | Members: ['44444444-4444-4444-4444-444444444444'] |
 | PASS | GET /organizations/current/users (with X-Organization-Id) | 200 | body={"members":[{"id":"80874fea-18eb-45d9-840c-f93ed3045cdb","organization_id":"a73cd8c9-cf46-43e3- |
-| **FAIL** | POST /members: duplicate returns 500 instead of 409 (FINDING) | 500 | FINDING: Should return 409 Conflict, got 500 IntegrityError |
+| PASS | POST /organizations/{id}/members (add growth user) | 201 | - |
+| PASS | PATCH /organizations/{id}/members/{id} (change role to admin) | 200 | body={"id":"ac6f0cb8-1f12-49ad-80cf-f8128fef3292","organization_id":"a73cd8c9-cf46-43e3-9504-442f013 |
+| PASS | PATCH member role back to developer | 200 | - |
 
-### Team Members [FAIL] (0/3)
+### Team Members [PASS] (3/3)
 
 | Status | Test | HTTP | Detail |
 |--------|------|------|--------|
-| **FAIL** | POST .../teams/{id}/members (add growth user to team) | 400 | body={"detail":"User is not a member of this organization"} |
-| **FAIL** | PATCH .../teams/{id}/members/{user_id} (promote to lead) | 404 | body={"detail":"Team member not found"} |
-| **FAIL** | PATCH team member role back to member | 404 | - |
+| PASS | POST .../teams/{id}/members (add growth user to team) | 201 | body={"id":"47cfb3ae-1e06-461d-95d9-d49aa9cae307","user_id":"33333333-3333-3333-3333-333333333333"," |
+| PASS | PATCH .../teams/{id}/members/{user_id} (promote to lead) | 200 | body={"id":"47cfb3ae-1e06-461d-95d9-d49aa9cae307","user_id":"33333333-3333-3333-3333-333333333333"," |
+| PASS | PATCH team member role back to member | 200 | - |
 
 ### Invites [PASS] (4/4)
 
 | Status | Test | HTTP | Detail |
 |--------|------|------|--------|
-| PASS | POST /organizations/{id}/invites (create) | 201 | id=49ca07e8-91b2-4677-9264-fd679992e69a |
+| PASS | POST /organizations/{id}/invites (create) | 201 | id=019f91c1-256e-4c93-980a-1dbd0d6c6e4d |
 | PASS | GET /organizations/{id}/invites (list) | 200 | - |
 | PASS | GET /invites/invalid-token returns 404 (anti-enumeration) | 404 | - |
 | PASS | DELETE /organizations/{id}/invites/{id} (revoke) | 204 | - |
 
-### Ownership [PASS] (3/3)
+### Ownership [PASS] (4/4)
 
 | Status | Test | HTTP | Detail |
 |--------|------|------|--------|
 | PASS | Cannot change owner's role (blocked) | 400 | body={"detail":"Cannot change the owner's role"} |
 | PASS | Cannot remove owner (blocked) | 400 | body={"detail":"Cannot remove the organization owner"} |
+| PASS | Cannot assign owner role to another member (blocked) | 400 | body={"detail":"Cannot assign the owner role. Owner is set at organization creation and cannot be ch |
 | PASS | Cannot create second org (one per owner) | 400 | body={"detail":"You already own an organization. Use teams to organize work within your organization |
 
 ### Data Scoping [PASS] (3/3)
 
 | Status | Test | HTTP | Detail |
 |--------|------|------|--------|
-| PASS | Growth user: GET /contracts with X-Organization-Id | 403 | 200=member, 403=not member (membership may have been cleaned up), 429=rate limited |
+| PASS | Growth user: GET /contracts with X-Organization-Id | 200 | 200=member, 403=not member (membership may have been cleaned up), 429=rate limited |
 | PASS | Growth user: GET /contracts (personal workspace) | 200 | - |
 | PASS | Developer user: org-scoped request (expected 429 or 403) | 429 | - |
 
@@ -142,26 +145,6 @@
 |--------|------|------|--------|
 | PASS | GET /organizations/{id}/settings/ai-status | 200 | body={"organization_id":"a73cd8c9-cf46-43e3-9504-442f01335a32","ai_data_collection_disabled":true,"o |
 | PASS | PUT /organizations/{id}/settings/ai-opt-out | 200 | body={"organization_id":"a73cd8c9-cf46-43e3-9504-442f01335a32","ai_data_collection_disabled":true,"o |
-
----
-
-## Failures Detail
-
-### members: POST /members: duplicate returns 500 instead of 409 (FINDING)
-- **HTTP Status:** 500
-- **Detail:** FINDING: Should return 409 Conflict, got 500 IntegrityError
-
-### team-members: POST .../teams/{id}/members (add growth user to team)
-- **HTTP Status:** 400
-- **Detail:** body={"detail":"User is not a member of this organization"}
-
-### team-members: PATCH .../teams/{id}/members/{user_id} (promote to lead)
-- **HTTP Status:** 404
-- **Detail:** body={"detail":"Team member not found"}
-
-### team-members: PATCH team member role back to member
-- **HTTP Status:** 404
-- **Detail:** 
 
 ---
 

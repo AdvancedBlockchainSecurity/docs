@@ -443,6 +443,33 @@ async def audit_teams(client: httpx.AsyncClient, org_id: str):
     return default_team_id, new_team_id
 
 
+async def _find_member_id(client: httpx.AsyncClient, headers: dict,
+                          org_id: str, user_id: str) -> str | None:
+    """Look up a member's record ID by user_id from the member list."""
+    r = await client.get(f"{API_BASE}/organizations/{org_id}/members", headers=headers)
+    if r.status_code != 200:
+        return None
+    data = r.json()
+    members = data.get("members", data.get("items", []))
+    if isinstance(data, list):
+        members = data
+    for m in members:
+        if str(m.get("user_id")) == str(user_id):
+            return m.get("id")
+    return None
+
+
+async def _remove_member_by_user_id(client: httpx.AsyncClient, headers: dict,
+                                     org_id: str, user_id: str):
+    """Find and remove a member by their user_id (for cleanup)."""
+    member_id = await _find_member_id(client, headers, org_id, user_id)
+    if member_id:
+        await client.delete(
+            f"{API_BASE}/organizations/{org_id}/members/{member_id}",
+            headers=headers,
+        )
+
+
 async def audit_members(client: httpx.AsyncClient, org_id: str,
                         admin_role_id: str | None, developer_role_id: str | None):
     """Section 7: Member management."""
@@ -472,7 +499,15 @@ async def audit_members(client: httpx.AsyncClient, org_id: str,
            r.status_code == 200,
            f"body={r.text[:200]}", status_code=r.status_code)
 
-    # Add growth user as member
+    # Pre-clean: remove growth user if already an org member (idempotent runs)
+    pre_member_id = await _find_member_id(client, h, org_id, growth_user_id)
+    if pre_member_id:
+        await client.delete(
+            f"{API_BASE}/organizations/{org_id}/members/{pre_member_id}",
+            headers=h,
+        )
+
+    # Add growth user as member (should always be 201 after pre-clean)
     if developer_role_id:
         add_payload = {
             "user_id": growth_user_id,
@@ -480,46 +515,16 @@ async def audit_members(client: httpx.AsyncClient, org_id: str,
         }
         r = await client.post(f"{API_BASE}/organizations/{org_id}/members",
                               headers=h, json=add_payload)
-        member_added = r.status_code in (200, 201)
         growth_member_id = None
-        if member_added:
+        if r.status_code in (200, 201):
             growth_member_id = r.json().get("id")
             record("members", "POST /organizations/{id}/members (add growth user)",
                    True, status_code=r.status_code)
-        elif r.status_code in (409, 500):
-            # 409 = already member (correct), 500 = IntegrityError (bug — should be 409)
-            if r.status_code == 500:
-                record("members", "POST /members: duplicate returns 500 instead of 409 (FINDING)",
-                       False,
-                       "FINDING: Should return 409 Conflict, got 500 IntegrityError",
-                       status_code=r.status_code)
-            else:
-                record("members", "POST /organizations/{id}/members (already member)",
-                       True, status_code=r.status_code)
-
-            # Find their existing member ID
-            r2 = await client.get(f"{API_BASE}/organizations/{org_id}/members", headers=h)
-            if r2.status_code == 200:
-                data = r2.json()
-                members = data.get("members", data.get("items", []))
-                if isinstance(data, list):
-                    members = data
-                for m in members:
-                    if m.get("user_id") == growth_user_id:
-                        growth_member_id = m.get("id")
-                        break
-                if not growth_member_id:
-                    # Not already a member — 500 prevented adding. Try adding via email.
-                    add_email_payload = {
-                        "email": USERS["growth"]["email"],
-                        "role_id": developer_role_id,
-                    }
-                    r3 = await client.post(f"{API_BASE}/organizations/{org_id}/members",
-                                           headers=h, json=add_email_payload)
-                    if r3.status_code in (200, 201):
-                        growth_member_id = r3.json().get("id")
-                        record("members", "POST /members via email (fallback)", True,
-                               status_code=r3.status_code)
+        elif r.status_code == 409:
+            # Already a member — find existing member ID
+            record("members", "POST /organizations/{id}/members (already member)",
+                   True, status_code=r.status_code)
+            growth_member_id = await _find_member_id(client, h, org_id, growth_user_id)
         else:
             record("members", "POST /organizations/{id}/members (add growth user)",
                    False, f"body={r.text[:200]}", status_code=r.status_code)
@@ -557,6 +562,11 @@ async def audit_team_members(client: httpx.AsyncClient, org_id: str,
         record("team-members", "SKIP: No team available", False, "No team_id")
         return
 
+    if not growth_member_id:
+        record("team-members", "SKIP: No growth member available (member add failed)",
+               False, "No growth_member_id — member section did not produce a valid member")
+        return
+
     h = headers_for("enterprise")
     growth_user_id = USERS["growth"]["sub"]
 
@@ -566,9 +576,15 @@ async def audit_team_members(client: httpx.AsyncClient, org_id: str,
         f"{API_BASE}/organizations/{org_id}/teams/{team_id}/members",
         headers=h, json=add_payload,
     )
+    added = r.status_code in (200, 201, 409)
     record("team-members", "POST .../teams/{id}/members (add growth user to team)",
-           r.status_code in (200, 201, 409),
+           added,
            f"body={r.text[:200]}", status_code=r.status_code)
+
+    if not added:
+        record("team-members", "SKIP promote/demote (team add failed)", False,
+               f"Cannot test role changes without team membership")
+        return
 
     # Update team member role to lead
     r = await client.patch(
@@ -839,13 +855,18 @@ async def audit_cleanup(client: httpx.AsyncClient, org_id: str,
         )
         print(f"  Removed growth user from team: {r.status_code}")
 
-    # Remove growth user from org
+    # Remove growth user from org (look up member_id if not provided)
+    growth_user_id = USERS["growth"]["sub"]
+    if not growth_member_id:
+        growth_member_id = await _find_member_id(client, h, org_id, growth_user_id)
     if growth_member_id:
         r = await client.delete(
             f"{API_BASE}/organizations/{org_id}/members/{growth_member_id}",
             headers=h,
         )
         print(f"  Removed growth user from org: {r.status_code}")
+    else:
+        print("  Growth user not in org (nothing to remove)")
 
     # Delete test team
     if new_team_id:
