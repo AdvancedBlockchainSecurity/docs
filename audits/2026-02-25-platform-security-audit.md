@@ -87,15 +87,60 @@ Platform-wide security audit covering input validation, SQL injection, XSS, prom
 
 ---
 
+## Post-Audit Fixes
+
+### Security Headers (Dashboard)
+
+- Dashboard HTTPS IngressRoute (`dashboard-server`) was missing security-headers middleware
+- HSTS (`strict-transport-security`) was not configured in the middleware
+- **Fix:** Created `ingressroute-server.yaml` with middleware reference; added `stsSeconds`, `stsIncludeSubdomains`, `stsPreload` to middleware
+- **Verified:** AppSec audit 14/14 PASS (HSTS, CSP, X-Frame-Options, X-Content-Type-Options)
+
+### Codebase-First IngressRoute Codification
+
+Two IngressRoutes existed only in the cluster (not tracked in Git), violating codebase-first standards:
+
+1. **api-service-server** — HTTPS IngressRoute for `PathPrefix(/api/v1)` → codified in `blocksecops-api-service/k8s/overlays/local/api-service/ingressroute-server.yaml`
+2. **app-http-redirect + redirect-https middleware** — HTTP→HTTPS redirect → codified in `blocksecops-aws-infrastructure/k8s/overlays/local/traefik/`
+
+### Traefik hostPort Binding
+
+- Traefik was only accessible via NodePort (30543/30180), requiring volatile iptables NAT rules
+- **Fix:** Added `hostPort: 80` and `hostPort: 443` to Traefik deployment local overlay
+- **Result:** `https://app.blocksecops.local` accessible immediately after cluster start per service access standards
+
+### Audit Script Bug Fix
+
+- Database integrity audit section 8.10 queried nonexistent `scanner_pattern_mappings` table
+- Actual table is `pattern_tool_mappings` (707 rows, threshold 637)
+- **Fix:** Corrected table name in `scripts/audit/08-database-integrity.sh`
+
+---
+
+## Verification Results (All Suites)
+
+| Suite | Result |
+|-------|--------|
+| K8s Security (07) | 65/65 PASS |
+| AppSec (09) | 5/5 PASS |
+| Auth (06) | 3/3 PASS |
+| Database Integrity (08) | 8/8 PASS |
+| Auth x402 (Python) | 64/64 PASS |
+| **Total** | **145/145 PASS** |
+
+---
+
 ## Repos Modified
 
 | Repository | Changes |
 |------------|---------|
 | blocksecops-data-service | CORS fix, auth on data endpoints, query endpoint removed, version bump, security tests |
-| blocksecops-api-service | Dependency version bumps, Dockerfile SHA pinning |
+| blocksecops-api-service | Dependency version bumps, Dockerfile SHA pinning, IngressRoute codification |
 | blocksecops-orchestration | redis upper bound, sqlalchemy bump |
 | blocksecops-notification | jinja2 bump, slackclient removed, sqlalchemy bump |
 | blocksecops-tool-integration | sqlalchemy bump, Dockerfile SHA pinning |
 | blocksecops-intelligence-engine | ML package pin loosening, pydantic bump |
-| blocksecops-dashboard | DOMPurify bump |
+| blocksecops-dashboard | DOMPurify bump, security-headers middleware, HSTS, IngressRoute codification |
 | blocksecops-shared | Zod bump, --break-system-packages fix, Dockerfile SHA pinning |
+| blocksecops-aws-infrastructure | HTTP→HTTPS redirect codification, Traefik hostPort binding |
+| docs | Audit script table name fix, version updates, documentation |

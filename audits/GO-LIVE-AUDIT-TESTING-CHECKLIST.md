@@ -630,7 +630,7 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 # Verify scanner-to-pattern mappings
 kubectl exec -n postgresql-local postgresql-0 -- \
   psql -U blocksecops -d solidity_security -t -c \
-  "SELECT COUNT(*) FROM scanner_pattern_mappings;"
+  "SELECT COUNT(*) FROM pattern_tool_mappings;"
 # Expected: >= 637
 
 # Verify index usage for common queries

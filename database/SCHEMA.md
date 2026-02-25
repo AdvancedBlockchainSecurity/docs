@@ -116,8 +116,8 @@ The BlockSecOps database supports a comprehensive smart contract security scanni
 ```
 
 **Intelligence Layer Tables (Phase 1-4 - Nov 1, 2025)**:
-- `vulnerability_patterns`: 397 standardized patterns across 4 ecosystems
-- `pattern_tool_mappings`: 397 scanner detector → pattern mappings (12 scanners)
+- `vulnerability_patterns`: 415 standardized patterns across 4 ecosystems
+- `pattern_tool_mappings`: 707 scanner detector → pattern mappings (16 scanners)
 - `deduplication_groups`: Cross-scanner finding deduplication groups
 
 ---
