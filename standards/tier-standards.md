@@ -475,12 +475,14 @@ All premium API endpoints are protected by `require_tier()` dependencies. Core e
 | `GET /api/v1/notification-channels` | growth | developer, team |
 | `GET /api/v1/webhooks` | growth | developer, team |
 | `GET /api/v1/audit-logs` | growth | developer, team |
+| `POST /api/v1/organizations` | enterprise | developer, team, growth |
+| `PUT /api/v1/organizations/{id}/settings/ai-opt-out` | enterprise | developer, team, growth |
 | `POST /api/v1/economic-analysis/reports` | enterprise | developer, team, growth |
 | `POST /api/v1/economic-analysis/simulate` | enterprise | developer, team, growth |
 | AI generation endpoints | team | developer |
 | PoC exploit generation | growth | developer, team |
 
-**Regression tests:** 20 structural tests in `tests/unit/presentation/test_tier_gate_enforcement.py` verify these gates at the source level.
+**Regression tests:** 22 structural tests in `tests/unit/presentation/test_tier_gate_enforcement.py` verify these gates at the source level.
 
 ---
 
