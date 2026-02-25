@@ -134,8 +134,8 @@ check_gte "vulnerability_patterns loaded" "393" "$PATTERN_COUNT"
 echo ""
 echo "=== 8.10 Scanner-to-Pattern Mappings ==="
 
-MAPPING_COUNT=$(psql_exec "SELECT COUNT(*) FROM scanner_pattern_mappings;" 2>/dev/null || echo "0")
-check_gte "scanner_pattern_mappings loaded" "637" "$MAPPING_COUNT"
+MAPPING_COUNT=$(psql_exec "SELECT COUNT(*) FROM pattern_tool_mappings;" 2>/dev/null || echo "0")
+check_gte "pattern_tool_mappings loaded" "637" "$MAPPING_COUNT"
 
 # --- Table Count ---
 echo ""
