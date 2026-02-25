@@ -31,7 +31,7 @@ BlockSecOps is a blockchain/smart-contract security analysis platform with 12 mi
 
 | Repo | Purpose |
 |------|---------|
-| blocksecops-aws-infrastructure | Local infra (Vault, Redis, PostgreSQL, Traefik, ArgoCD, Harbor, Monitoring stack) |
+| blocksecops-gcp-infrastructure | Local + GCP infra (Vault, Redis, PostgreSQL, Traefik, ArgoCD, Harbor, Monitoring stack) |
 | blocksecops-gcp-infrastructure | GCP Terraform + GCP K8s overlays for all services |
 
 ---
@@ -298,7 +298,7 @@ Deployed in both local and GCP:
 
 ### Location
 ```
-blocksecops-aws-infrastructure/k8s/overlays/local/monitoring/
+blocksecops-gcp-infrastructure/k8s/overlays/local/monitoring/
 ```
 Namespace: `monitoring-local`
 
@@ -558,11 +558,11 @@ blocksecops-monitoring/k8s/overlays/local/
 ### Infrastructure (Local)
 
 ```
-blocksecops-aws-infrastructure/k8s/overlays/local/postgresql/
-blocksecops-aws-infrastructure/k8s/overlays/local/redis/
-blocksecops-aws-infrastructure/k8s/overlays/local/vault/
-blocksecops-aws-infrastructure/k8s/overlays/local/monitoring/    # Prometheus + Grafana + Loki + Promtail
-blocksecops-aws-infrastructure/k8s/overlays/local/argocd/
+blocksecops-gcp-infrastructure/k8s/overlays/local/postgresql/
+blocksecops-gcp-infrastructure/k8s/overlays/local/redis/
+blocksecops-gcp-infrastructure/k8s/overlays/local/vault/
+blocksecops-gcp-infrastructure/k8s/overlays/local/monitoring/    # Prometheus + Grafana + Loki + Promtail
+blocksecops-gcp-infrastructure/k8s/overlays/local/argocd/
 ```
 
 ### GCP Overlays (Target)

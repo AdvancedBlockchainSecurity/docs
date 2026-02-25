@@ -101,7 +101,7 @@ Platform-wide security audit covering input validation, SQL injection, XSS, prom
 Two IngressRoutes existed only in the cluster (not tracked in Git), violating codebase-first standards:
 
 1. **api-service-server** — HTTPS IngressRoute for `PathPrefix(/api/v1)` → codified in `blocksecops-api-service/k8s/overlays/local/api-service/ingressroute-server.yaml`
-2. **app-http-redirect + redirect-https middleware** — HTTP→HTTPS redirect → codified in `blocksecops-aws-infrastructure/k8s/overlays/local/traefik/`
+2. **app-http-redirect + redirect-https middleware** — HTTP→HTTPS redirect → codified in `blocksecops-gcp-infrastructure/k8s/overlays/local/traefik/`
 
 ### Traefik hostPort Binding
 
@@ -142,5 +142,5 @@ Two IngressRoutes existed only in the cluster (not tracked in Git), violating co
 | blocksecops-intelligence-engine | ML package pin loosening, pydantic bump |
 | blocksecops-dashboard | DOMPurify bump, security-headers middleware, HSTS, IngressRoute codification |
 | blocksecops-shared | Zod bump, --break-system-packages fix, Dockerfile SHA pinning |
-| blocksecops-aws-infrastructure | HTTP→HTTPS redirect codification, Traefik hostPort binding |
+| blocksecops-gcp-infrastructure | HTTP→HTTPS redirect codification, Traefik hostPort binding |
 | docs | Audit script table name fix, version updates, documentation |

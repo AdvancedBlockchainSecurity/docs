@@ -285,7 +285,7 @@ solidity-security-platform  # ← Pod label (OLD)
 ```bash
 # Delete and recreate deployment
 kubectl delete deployment redis -n redis-local
-kubectl apply -k blocksecops-aws-infrastructure/k8s/overlays/local/redis/
+kubectl apply -k blocksecops-gcp-infrastructure/k8s/overlays/local/redis/
 
 # Verify fix
 $ kubectl get endpoints redis -n redis-local

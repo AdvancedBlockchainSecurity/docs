@@ -60,7 +60,7 @@ Restored `/health` endpoints on three services that were removed in a previous s
 
 ## Files Modified
 
-### blocksecops-aws-infrastructure
+### blocksecops-gcp-infrastructure
 - `k8s/overlays/local/postgresql/configmap-patch.yaml` - SSL enabled, pg_hba.conf updated
 - `k8s/overlays/local/postgresql/statefulset-patch.yaml` - initContainer added, command restored
 - `k8s/overlays/local/postgresql/kustomization.yaml` - Removed vault-policy.yaml from resources

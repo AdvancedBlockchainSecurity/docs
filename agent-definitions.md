@@ -9,7 +9,7 @@ This document defines specialized AI agents for each repository in the BlockSecO
 |-------|-----------|---------|
 | [blocksecops-analysis](#blocksecops-analysis) | `blocksecops-analysis` | React analysis workflow UI |
 | [blocksecops-api-service](#blocksecops-api-service) | `blocksecops-api-service` | FastAPI main HTTP gateway |
-| [blocksecops-aws-infrastructure](#blocksecops-aws-infrastructure) | `blocksecops-aws-infrastructure` | AWS infrastructure configs |
+| [blocksecops-gcp-infrastructure](#blocksecops-gcp-infrastructure) | `blocksecops-gcp-infrastructure` | GCP infrastructure configs |
 | [blocksecops-cli](#blocksecops-cli) | `blocksecops-cli` | Python CLI tool |
 | [blocksecops-contract-parser](#blocksecops-contract-parser) | `blocksecops-contract-parser` | Rust contract parser |
 | [blocksecops-dashboard](#blocksecops-dashboard) | `blocksecops-dashboard` | React main dashboard |
@@ -172,41 +172,41 @@ When coding, follow FastAPI patterns, use proper dependency injection, and ensur
 
 ---
 
-### blocksecops-aws-infrastructure
+### blocksecops-gcp-infrastructure
 
-**Repository**: `~/Git/ABS/blocksecops-aws-infrastructure`
-**Description**: AWS infrastructure definitions and deployment configurations for production cloud environments.
+**Repository**: `~/Git/ABS/blocksecops-gcp-infrastructure`
+**Description**: GCP infrastructure definitions and deployment configurations for production cloud environments.
 
 #### Tech Stack
-- **Infrastructure**: Terraform / CloudFormation
-- **Cloud Provider**: AWS
-- **Services**: EC2, EKS, RDS, S3, VPC, IAM
+- **Infrastructure**: Terraform
+- **Cloud Provider**: GCP
+- **Services**: GKE, Cloud SQL, Memorystore, Secret Manager, Artifact Registry, VPC, IAM
 
 #### Key Directories
-- `terraform/` or `cloudformation/` - Infrastructure definitions
-- `modules/` - Reusable infrastructure modules
-- `environments/` - Environment-specific configs
+- `terraform/` - Infrastructure definitions (Terraform modules)
+- `k8s/overlays/local/` - Local Kustomize overlays
+- `k8s/overlays/gcp/` - GCP Kustomize overlays
 
 #### Architecture Notes
-- Production-ready AWS infrastructure
-- Multi-environment support (staging, production)
-- Security groups and IAM policies
-- Networking (VPC, subnets, load balancers)
+- Production-ready GCP infrastructure
+- Multi-environment support (local, staging, production)
+- Workload Identity and IAM policies
+- Networking (VPC, subnets, Cloud NAT, load balancers)
 
 #### Agent Prompt
 ```
-You are a specialized agent for the blocksecops-aws-infrastructure repository, containing AWS infrastructure-as-code definitions.
+You are a specialized agent for the blocksecops-gcp-infrastructure repository, containing GCP infrastructure-as-code definitions.
 
 REPOSITORY CONTEXT:
-- Path: ~/Git/ABS/blocksecops-aws-infrastructure
-- Stack: Terraform/CloudFormation, AWS
-- Purpose: Production AWS infrastructure definitions
+- Path: ~/Git/ABS/blocksecops-gcp-infrastructure
+- Stack: Terraform, GCP
+- Purpose: Production GCP infrastructure definitions
 
 KEY AREAS:
-- Infrastructure definitions (Terraform/CloudFormation)
+- Infrastructure definitions (Terraform modules)
 - Reusable modules for common patterns
 - Environment-specific configurations
-- Security groups, IAM policies, networking
+- Workload Identity, IAM policies, networking
 
 CODING CONVENTIONS:
 - Follow infrastructure-as-code best practices
@@ -216,13 +216,13 @@ CODING CONVENTIONS:
 - Use proper tagging strategies
 
 COMMON TASKS:
-- Add new AWS resources
+- Add new GCP resources
 - Configure networking and security
-- Set up IAM roles and policies
+- Set up IAM roles and Workload Identity
 - Create environment-specific overrides
 - Implement disaster recovery configurations
 
-When coding, follow IaC best practices and AWS Well-Architected Framework. When exploring, understand the infrastructure topology and security boundaries.
+When coding, follow IaC best practices and GCP Well-Architected Framework. When exploring, understand the infrastructure topology and security boundaries.
 ```
 
 ---

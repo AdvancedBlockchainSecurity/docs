@@ -203,7 +203,7 @@ kubectl port-forward -n api-service-local svc/api-service 8000:8000 > /tmp/pf-ap
 kubectl edit deployment api-service -n api-service-local  ❌
 
 # 2. ALWAYS do this instead
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/api-service
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/api-service
 
 # 3. Edit the manifest file
 vim deployment-patch.yaml
@@ -232,7 +232,7 @@ cd /Users/pwner/Git/ABS/blocksecops-api-service
 vim src/config.py
 
 # 2. Update corresponding ConfigMap
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/api-service
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/api-service
 vim configmap-patch.yaml
 
 # 3. Commit both changes together
@@ -250,7 +250,7 @@ docker build -t localhost:8080/library/api-service:0.3.7 .
 docker push localhost:8080/library/api-service:0.3.7
 
 # 5. Apply ConfigMap changes
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 kubectl apply -k k8s/overlays/local/api-service
 
 # 6. Restart deployment to pick up changes
@@ -270,7 +270,7 @@ kubectl patch deployment api-service -n api-service-local \
 echo "EMERGENCY HOTFIX: Increased API service memory to 2Gi at $(date)" >> HOTFIX.log
 
 # 3. Within 1 hour, update the codebase
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/api-service
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/api-service
 vim deployment-patch.yaml
 git add deployment-patch.yaml
 git commit -m "HOTFIX: Increase API service memory to 2Gi

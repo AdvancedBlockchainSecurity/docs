@@ -170,12 +170,12 @@ sudo kubeadm init --pod-network-cidr=10.244.0.0/16
 kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
 
 # 3. Deploy infrastructure (order matters)
-kubectl apply -k ~/Git/blocksecops-aws-infrastructure/k8s/overlays/local/cert-manager/
-kubectl apply -k ~/Git/blocksecops-aws-infrastructure/k8s/overlays/local/traefik/
-kubectl apply -k ~/Git/blocksecops-aws-infrastructure/k8s/overlays/local/vault/
-kubectl apply -k ~/Git/blocksecops-aws-infrastructure/k8s/overlays/local/external-secrets/
-kubectl apply -k ~/Git/blocksecops-aws-infrastructure/k8s/overlays/local/postgresql/
-kubectl apply -k ~/Git/blocksecops-aws-infrastructure/k8s/overlays/local/redis/
+kubectl apply -k ~/Git/blocksecops-gcp-infrastructure/k8s/overlays/local/cert-manager/
+kubectl apply -k ~/Git/blocksecops-gcp-infrastructure/k8s/overlays/local/traefik/
+kubectl apply -k ~/Git/blocksecops-gcp-infrastructure/k8s/overlays/local/vault/
+kubectl apply -k ~/Git/blocksecops-gcp-infrastructure/k8s/overlays/local/external-secrets/
+kubectl apply -k ~/Git/blocksecops-gcp-infrastructure/k8s/overlays/local/postgresql/
+kubectl apply -k ~/Git/blocksecops-gcp-infrastructure/k8s/overlays/local/redis/
 
 # 4. Seed Vault secrets
 ./docs/scripts/init-vault-local.sh

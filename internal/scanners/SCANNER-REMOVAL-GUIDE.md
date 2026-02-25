@@ -262,7 +262,7 @@ kubectl port-forward -n api-service-local deployment/api-service 8000:8000 > /tm
 
 ```bash
 # Update kustomization
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 vim k8s/overlays/production/api-service/kustomization.yaml
 # Change newTag to 0.2.0 AND app.kubernetes.io/version to 0.2.0
 
@@ -355,7 +355,7 @@ docker build -t blocksecops-orchestration:0.7.<N+1> .
 minikube image load blocksecops-orchestration:0.7.<N+1>
 
 # Update kustomization
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 vim k8s/overlays/local/orchestration/kustomization.yaml
 # Change newTag to 0.7.<N+1>
 
@@ -527,7 +527,7 @@ docker build -t api-service:0.3.<N+2> .
 minikube image load api-service:0.3.<N+2>
 
 # Update kustomization
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 vim k8s/overlays/local/api-service/kustomization.yaml
 # Change newTag to 0.3.<N+2>
 

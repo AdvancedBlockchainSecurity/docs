@@ -161,7 +161,7 @@ kubectl describe node minikube | grep -A 10 "Allocatable"
 ### 2.1 Install Metrics Server
 
 ```bash
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 
 # Apply metrics-server
 kubectl apply -k k8s/overlays/local/metrics-server/
@@ -187,7 +187,7 @@ kubectl top pods -A
 ### 3.1 Deploy PostgreSQL
 
 ```bash
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 
 # Create namespace and deploy PostgreSQL
 kubectl apply -k k8s/overlays/local/postgresql/
@@ -217,7 +217,7 @@ pkill -f "port-forward.*postgresql"
 ### 3.3 Deploy Redis
 
 ```bash
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 
 # Create namespace and deploy Redis
 kubectl apply -k k8s/overlays/local/redis/
@@ -250,7 +250,7 @@ pkill -f "port-forward.*redis"
 ### 4.1 Deploy Vault
 
 ```bash
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 
 # Deploy Vault
 kubectl apply -k k8s/overlays/local/vault/
@@ -294,7 +294,7 @@ kubectl exec -n vault-local vault-0 -- sh -c '
 ### 4.4 Deploy Cert-Manager (Required before External Secrets)
 
 ```bash
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 
 # Install cert-manager CRDs
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.1/cert-manager.crds.yaml
@@ -315,7 +315,7 @@ kubectl get pods -n cert-manager-local
 ### 4.5 Deploy External Secrets Operator
 
 ```bash
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 
 # Install External Secrets Operator CRDs first
 kubectl apply -f https://raw.githubusercontent.com/external-secrets/external-secrets/main/deploy/crds/bundle.yaml
@@ -353,7 +353,7 @@ kubectl logs -n external-secrets-local -l app.kubernetes.io/name=external-secret
 ### 5.1 Deploy Traefik Ingress Controller
 
 ```bash
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 
 # Deploy Traefik
 kubectl apply -k k8s/overlays/local/traefik/
@@ -369,7 +369,7 @@ kubectl get svc -n traefik-local
 ### 5.2 Deploy Network Policies
 
 ```bash
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 
 # Apply network policies
 kubectl apply -k k8s/overlays/local/network-policies/
@@ -385,7 +385,7 @@ kubectl get networkpolicies -A
 ### 6.1 Deploy Harbor Registry
 
 ```bash
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 
 # Deploy Harbor
 kubectl apply -k k8s/overlays/local/harbor/
@@ -441,7 +441,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 
 # Install kube-prometheus-stack
-cd /Users/pwner/Git/ABS/blocksecops-aws-infrastructure
+cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
 helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
   -n monitoring-local \
   --create-namespace \

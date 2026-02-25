@@ -414,7 +414,7 @@ jobs:
 
 ### 3d. Terraform
 
-**Applies to:** `gcp-infrastructure`, `aws-infrastructure`
+**Applies to:** `gcp-infrastructure`
 
 ```yaml
 # .github/workflows/terraform.yml

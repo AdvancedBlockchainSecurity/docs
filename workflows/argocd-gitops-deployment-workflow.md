@@ -705,5 +705,5 @@ From `docs/INFRA-AGENT.md`:
 | No scanner job retries (`JOB_BACKOFF_LIMIT: "0"`) | Single failure = permanent failure | Same file |
 | Job deadline 300s too short for fuzzers (600s internal timeout) | Jobs killed before completion | Same file |
 | Production overlays reduce resources below base values | Services underprovisioned in prod | `*/k8s/overlays/production/patches/resource-patch.yaml` |
-| No Prometheus alerting rules configured | No automated alerts | `blocksecops-aws-infrastructure/k8s/overlays/local/monitoring/` |
+| No Prometheus alerting rules configured | No automated alerts | `blocksecops-gcp-infrastructure/k8s/overlays/local/monitoring/` |
 | Missing orchestration PDB in local | No disruption protection | `blocksecops-orchestration/k8s/base/` |

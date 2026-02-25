@@ -85,4 +85,4 @@ No change needed.
 |-------|--------|
 | MFA backup codes | Significant feature addition - separate task |
 | User JWT blacklist | Standard JWT pattern, admin emergency revocation exists |
-| Traefik CORS middleware in aws-infrastructure | Old IngressRoute (soliditysecurity.dev), not actively deployed |
+| Traefik CORS middleware in gcp-infrastructure | Old IngressRoute (soliditysecurity.dev), not actively deployed |

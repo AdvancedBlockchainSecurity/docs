@@ -185,7 +185,7 @@ kubectl logs vault-0 -n vault-local -c vault-init
 kubectl logs vault-0 -n vault-local -c vault
 
 # If pod doesn't exist, deploy Vault
-kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/vault/
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/vault/
 ```
 
 ### Vault is Sealed
@@ -342,7 +342,7 @@ All secrets in the initialization script use predictable values like:
 minikube start
 
 # 2. Deploy all infrastructure (including Vault)
-kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/vault/
+kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/vault/
 
 # 3. Wait for Vault to initialize and unseal automatically
 kubectl wait --for=condition=ready pod/vault-0 -n vault-local --timeout=120s

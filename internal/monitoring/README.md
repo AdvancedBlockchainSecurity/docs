@@ -46,7 +46,7 @@ Service Instrumentation
 
 1. **Deploy Local Monitoring**:
    ```bash
-   kubectl apply -k /Users/pwner/Git/ABS/blocksecops-aws-infrastructure/k8s/overlays/local/monitoring/
+   kubectl apply -k /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/monitoring/
    ```
 
 2. **Setup Port-Forwards**:

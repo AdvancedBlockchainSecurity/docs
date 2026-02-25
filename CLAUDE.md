@@ -12,7 +12,7 @@ When working on specific repositories, use the appropriate agent by referencing 
 |------------|------------|---------|
 | blocksecops-analysis | @.claude/agents/blocksecops-analysis.md | React analysis workflow UI |
 | blocksecops-api-service | @.claude/agents/blocksecops-api-service.md | FastAPI main HTTP gateway |
-| blocksecops-aws-infrastructure | @.claude/agents/blocksecops-aws-infrastructure.md | AWS/Kubernetes infrastructure |
+| blocksecops-gcp-infrastructure | @.claude/agents/blocksecops-gcp-infrastructure.md | GCP/Kubernetes infrastructure |
 | blocksecops-cli | @.claude/agents/blocksecops-cli.md | Python CLI tool |
 | blocksecops-contract-parser | @.claude/agents/blocksecops-contract-parser.md | Rust contract parser |
 | blocksecops-dashboard | @.claude/agents/blocksecops-dashboard.md | React main dashboard |
@@ -96,7 +96,7 @@ Read @.claude/agents/blocksecops-dashboard.md and fix the vulnerability table fi
 Read @.claude/agents/soliditydefend.md and implement a new reentrancy detector
 
 # Working on infrastructure
-Read @.claude/agents/blocksecops-aws-infrastructure.md and add a new Kubernetes service
+Read @.claude/agents/blocksecops-gcp-infrastructure.md and add a new Kubernetes service for GCP
 ```
 
 ## Port Reference
