@@ -93,10 +93,51 @@ vault_kv_put "secret/local/api-service/jwt" \
 vault_kv_put "secret/local/api-service/session" \
     secret="local-dev-session-secret-change-in-production"
 
-# OAuth Configuration (optional)
-vault_kv_put "secret/local/api-service/oauth" \
-    client_id="local-dev-oauth-client-id" \
-    client_secret="local-dev-oauth-client-secret"
+# Per-Provider OAuth Credentials
+vault_kv_put "secret/local/api-service/oauth/github" \
+    client_id="local-dev-github-client-id" \
+    client_secret="local-dev-github-client-secret"
+
+vault_kv_put "secret/local/api-service/oauth/gitlab" \
+    client_id="local-dev-gitlab-client-id" \
+    client_secret="local-dev-gitlab-client-secret"
+
+vault_kv_put "secret/local/api-service/oauth/bitbucket" \
+    client_id="local-dev-bitbucket-client-id" \
+    client_secret="local-dev-bitbucket-client-secret"
+
+vault_kv_put "secret/local/api-service/oauth/jira" \
+    client_id="local-dev-jira-client-id" \
+    client_secret="local-dev-jira-client-secret"
+
+# Encryption key for MFA secrets and OAuth tokens
+vault_kv_put "secret/local/api-service/encryption" \
+    key="bG9jYWwtZGV2LWVuY3J5cHRpb24ta2V5LWNoYW5nZS1pbi1wcm9kdWN0aW9u"
+
+# Internal service-to-service authentication key
+vault_kv_put "secret/local/api-service/internal" \
+    service_key="local-dev-internal-service-key-change-in-production"
+
+# Supabase credentials (moved from ConfigMap for security)
+vault_kv_put "secret/local/api-service/supabase" \
+    anon_key="placeholder_update_with_real_key" \
+    service_key="placeholder_update_with_real_key"
+
+# Stripe billing
+vault_kv_put "secret/local/api-service/stripe" \
+    api_key="sk_test_placeholder" \
+    webhook_secret="whsec_placeholder"
+
+# JIRA support integration
+vault_kv_put "secret/local/api-service/jira" \
+    base_url="https://blocksecops.atlassian.net" \
+    api_email="support@blocksecops.com" \
+    api_token="placeholder" \
+    project_key="BSO"
+
+# Anthropic Claude API
+vault_kv_put "secret/local/api-service/anthropic" \
+    api_key="placeholder_update_with_real_key"
 
 echo -e "${GREEN}✓ API Service secrets populated${NC}"
 echo
@@ -243,6 +284,16 @@ SECRET_PATHS=(
     "secret/redis"
     "secret/local/api-service/jwt"
     "secret/local/api-service/session"
+    "secret/local/api-service/oauth/github"
+    "secret/local/api-service/oauth/gitlab"
+    "secret/local/api-service/oauth/bitbucket"
+    "secret/local/api-service/oauth/jira"
+    "secret/local/api-service/encryption"
+    "secret/local/api-service/internal"
+    "secret/local/api-service/supabase"
+    "secret/local/api-service/stripe"
+    "secret/local/api-service/jira"
+    "secret/local/api-service/anthropic"
     "secret/local/data-service/database"
     "secret/local/tool-integration/database"
     "secret/local/notification/database"
