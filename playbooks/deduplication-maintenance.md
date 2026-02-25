@@ -1,6 +1,6 @@
 # Playbook: Deduplication Maintenance
 
-**Version:** 2.0.0
+**Version:** 2.1.0
 **Last Updated:** February 24, 2026
 **Audience:** Platform Operator | Developer
 
@@ -129,6 +129,34 @@ kubectl get cronjob deduplication-maintenance -n api-service-local -o yaml | \
 
 ---
 
+## Liveness Probe Configuration (v0.29.27+)
+
+The celery worker liveness probe uses `celery inspect ping`, which spawns a subprocess with 4-5s Python/Celery import overhead. Probe settings must account for this:
+
+| Setting | Value | Rationale |
+|---------|-------|-----------|
+| `--timeout=10` | Celery subprocess timeout | 4-5s import + 2-3s ping + headroom |
+| `timeoutSeconds: 15` | Kubernetes probe timeout | Must exceed celery --timeout |
+| `periodSeconds: 120` | Probe frequency | Dedup tasks are long-running; 2 min sufficient |
+| `failureThreshold: 3` | Failures before kill | 3 failures = 6 min tolerance |
+| CPU request: 250m | Baseline CPU | 3 prefork workers + probe subprocess |
+
+### Check for probe failures
+
+```bash
+# Recent probe events
+kubectl get events -n api-service-local --field-selector type=Warning \
+  --sort-by='.lastTimestamp' | grep -i "liveness\|celery-worker"
+
+# Verify probe config on running pod
+kubectl get pod -n api-service-local -l app.kubernetes.io/name=celery-worker \
+  -o jsonpath='{.items[0].spec.containers[0].livenessProbe}' | python3 -m json.tool
+```
+
+If probe failures recur at these settings, investigate CPU throttling or worker deadlocks — do **not** simply increase timeouts further.
+
+---
+
 ## Troubleshooting
 
 ### Celery worker not processing tasks
@@ -153,6 +181,24 @@ kubectl get cronjob deduplication-maintenance -n api-service-local -o yaml | \
    ```bash
    kubectl exec -n api-service-local deployment/celery-worker -- env | grep CELERY
    ```
+
+### Celery worker restarting due to liveness probe
+
+If the worker pod shows restarts with `Liveness probe failed` events:
+
+1. Check CPU throttling (most common cause):
+   ```bash
+   kubectl top pod -n api-service-local -l app.kubernetes.io/name=celery-worker
+   ```
+
+2. If CPU usage is near the limit (500m), the probe subprocess can't start in time. Consider increasing the CPU request or reducing `--concurrency`.
+
+3. Check if the worker is deadlocked (no task progress):
+   ```bash
+   kubectl logs -n api-service-local -l app.kubernetes.io/name=celery-worker --tail=50
+   ```
+
+4. If tasks are progressing and only the probe is slow, the issue is resource contention — not a worker health problem.
 
 ### Findings missing fingerprints after scan
 
@@ -338,8 +384,9 @@ kubectl delete job <stuck-job-name> -n api-service-local
 
 ## Operational Checklist
 
-- [ ] Celery worker pod running (`celery-worker` deployment)
+- [ ] Celery worker pod running (`celery-worker` deployment), 0 recent restarts
 - [ ] Celery worker image matches api-service image version
+- [ ] No `Liveness probe failed` warning events in last 30 min
 - [ ] Redis running (Celery broker, db 1)
 - [ ] New scan findings have fingerprints after worker processes
 - [ ] Weekly CronJob: Scheduled `0 2 * * 0` with `--weekly` flag
