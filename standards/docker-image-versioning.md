@@ -310,14 +310,14 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.3 | `k8s/overlays/local/` | Add total scans KPI and per-scanner scan counts to scanners page |
-| api-service | 0.29.27 | `k8s/overlays/local/api-service/` | Fix celery worker liveness probe timeouts and CPU request |
+| api-service | 0.29.31 | `k8s/overlays/local/api-service/` | Security audit: dependency bumps, Dockerfile SHA pinning |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.46.4 | `k8s/overlays/local/` | Frontend security hardening: URL validation, error sanitization, webhook domain checks |
-| data-service | 0.2.1 | `k8s/overlays/local/` | Restore /health endpoint for Docker HEALTHCHECK and ALB ingress |
-| intelligence-engine | 0.3.1 | `k8s/overlays/local/` | Probe timeout fix for dev cluster stability |
-| notification | 0.2.1 | `k8s/overlays/local/` | Restore /health endpoint for Docker HEALTHCHECK and ALB ingress |
-| orchestration | 0.10.2 | `k8s/overlays/local/` | Restore /health endpoint for Docker HEALTHCHECK and GCP overlay probes |
-| tool-integration | 0.5.4 | `k8s/overlays/local/` | Version bump for health endpoint consistency |
+| dashboard | 0.46.5 | `k8s/overlays/local/` | Security audit: DOMPurify bump |
+| data-service | 0.2.2 | `k8s/overlays/local/` | Security audit: remove SQL injection endpoint, add auth, fix CORS |
+| intelligence-engine | 0.3.2 | `k8s/overlays/local/` | Security audit: loosen ML pins, pydantic bump |
+| notification | 0.2.2 | `k8s/overlays/local/` | Security audit: jinja2 bump, remove slackclient, Dockerfile SHA |
+| orchestration | 0.10.3 | `k8s/overlays/local/` | Security audit: sqlalchemy bump, redis upper bound |
+| tool-integration | 0.5.4 | `k8s/overlays/local/` | Security audit: sqlalchemy bump, Dockerfile SHA, detector_id fix |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |
