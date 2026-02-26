@@ -312,7 +312,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | admin-portal | 0.7.3 | `k8s/overlays/local/` | Add total scans KPI and per-scanner scan counts to scanners page |
 | api-service | 0.29.33 | `k8s/overlays/local/api-service/` | Security audit: admin endpoint rate limits (49 decorators across 8 files) |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.46.5 | `k8s/overlays/local/` | Security audit: DOMPurify bump |
+| dashboard | 0.46.6 | `k8s/overlays/local/` | Security audit: npm audit fix (0 critical/high, jspdf 4.2.0, react-syntax-highlighter 16.1.0) |
 | data-service | 0.2.4 | `k8s/overlays/local/` | Security audit: slowapi rate limiting middleware, health error sanitization |
 | intelligence-engine | 0.3.2 | `k8s/overlays/local/` | Security audit: loosen ML pins, pydantic bump |
 | notification | 0.2.3 | `k8s/overlays/local/` | Security audit: CORS fix, input validation, error sanitization, WebSocket JWT hardening |
