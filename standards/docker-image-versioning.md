@@ -314,7 +314,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.46.6 | `k8s/overlays/local/` | Security audit: npm audit fix (0 critical/high, jspdf 4.2.0, react-syntax-highlighter 16.1.0) |
 | data-service | 0.2.4 | `k8s/overlays/local/` | Security audit: slowapi rate limiting middleware, health error sanitization |
-| intelligence-engine | 0.3.2 | `k8s/overlays/local/` | Security audit: loosen ML pins, pydantic bump |
+| intelligence-engine | 0.3.3 | `k8s/overlays/local/` | Pre-download ML model into image, initContainer copy, HF_HUB_OFFLINE=1 |
 | notification | 0.2.3 | `k8s/overlays/local/` | Security audit: CORS fix, input validation, error sanitization, WebSocket JWT hardening |
 | orchestration | 0.10.4 | `k8s/overlays/local/` | Rebuild: fix missing module in 0.10.3 stale cache image |
 | tool-integration | 0.5.4 | `k8s/overlays/local/` | Security audit: sqlalchemy bump, Dockerfile SHA, detector_id fix |

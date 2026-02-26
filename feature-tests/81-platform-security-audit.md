@@ -143,9 +143,9 @@ Full platform security audit covering SQL injection, XSS, prompt injection, depe
 | L4: Redis list growth | LOW | ltrim already in place (RC-FIX-043, max 10,000 entries) |
 | Dashboard npm (32 remaining) | LOW/MODERATE | Deep transitive deps in wallet adapter (elliptic, lodash) — requires upstream fixes |
 
-### Known Issue
+### Resolved: Intelligence Engine ML Model (v0.3.3)
 
-**Intelligence engine ML model not in image**: The `all-MiniLM-L6-v2` model (~80MB) downloads from HuggingFace on every pod restart, causing readiness probe timeouts. Should be pre-downloaded during Docker build.
+The `all-MiniLM-L6-v2` model is now pre-downloaded into the Docker image at `/opt/ml-models` during build. An initContainer copies it to the `/app/models` emptyDir volume before the main container starts. `HF_HUB_OFFLINE=1` blocks all runtime HuggingFace network calls. Pod starts immediately without download delays.
 
 ## Pre-Existing Warnings (Not from this audit)
 
