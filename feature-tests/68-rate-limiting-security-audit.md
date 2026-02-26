@@ -281,6 +281,30 @@ The following 10 endpoint files were added during the v0.29.5 security audit, co
 | `scanners.py` | 4 endpoints | Tier-based (60/min) | |
 | `ide_integrations.py` | 8 endpoints | Tier-based (60/min) | |
 
+### Admin Endpoint Rate Limits (v0.29.33 Security Audit)
+
+As of v0.29.33, all admin endpoints are rate-limited in addition to MFA enforcement. 49 rate limit decorators were added across 8 admin endpoint files.
+
+| Endpoint File | Endpoints | Read Limit | Write Limit | Notes |
+|---------------|-----------|------------|-------------|-------|
+| `admin/audit.py` | 3 GET | 20/min | — | Audit log queries |
+| `admin/users.py` | 2 GET, 1 PATCH, 2 POST, 1 DELETE | 20/min | 5/min | User management |
+| `admin/organizations.py` | 2 GET, 1 PATCH, 1 DELETE | 20/min | 5/min | Org management |
+| `admin/support.py` | 5 GET | 20/min (10/min billing) | — | Support queries |
+| `admin/purchases.py` | 7 GET | 20/min | — | Transaction queries |
+| `admin/scan_monitoring.py` | 2 GET, 2 POST | 20/min | 5/min | Scan retry/force-fail |
+| `admin/patterns.py` | 1 GET, 1 POST | 20/min | 5/min | Pattern merge |
+| `admin/system.py` | 7 endpoints | 20/min (10/min config/metrics) | 3/min (upgrade/retrain) | Sensitive ops |
+
+### Data Service Rate Limits (v0.2.4 Security Audit)
+
+As of v0.2.4, the data service includes slowapi rate limiting middleware with Redis backing.
+
+| Endpoint File | Endpoints | Limit | Notes |
+|---------------|-----------|-------|-------|
+| `data.py` | 3 GET | 60/min | Data aggregation queries |
+| `cache.py` | 2 GET, 3 write | 60/min reads, 30/min writes | Cache operations |
+
 ### Endpoints Intentionally NOT Rate-Limited
 
 | Endpoint File | Reason |
@@ -289,13 +313,5 @@ The following 10 endpoint files were added during the v0.29.5 security audit, co
 | `websocket.py` | WebSocket connections, not HTTP request/response |
 | `monitoring.py` | Internal monitoring endpoints |
 | `stripe_webhook.py` | External Stripe webhooks (signature-verified) |
-| `admin/scan_monitoring.py` | Admin-only with MFA enforcement |
-| `admin/system.py` | Admin-only with MFA enforcement |
-| `admin/audit.py` | Admin-only with MFA enforcement |
-| `admin/support.py` | Admin-only with MFA enforcement |
-| `admin/patterns.py` | Admin-only with MFA enforcement |
-| `admin/utils.py` | Admin-only with MFA enforcement |
-| `admin/organizations.py` | Admin-only with MFA enforcement |
-| `admin/users.py` | Admin-only with MFA enforcement |
-| `admin/dependencies.py` | Admin-only with MFA enforcement |
-| `admin/purchases.py` | Admin-only with MFA enforcement |
+| `admin/utils.py` | Admin-only utility functions, no HTTP endpoints |
+| `admin/dependencies.py` | Admin-only with MFA enforcement, internal helpers |

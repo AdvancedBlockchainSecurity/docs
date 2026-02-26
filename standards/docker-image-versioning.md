@@ -310,12 +310,12 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.3 | `k8s/overlays/local/` | Add total scans KPI and per-scanner scan counts to scanners page |
-| api-service | 0.29.31 | `k8s/overlays/local/api-service/` | Security audit: dependency bumps, Dockerfile SHA pinning |
+| api-service | 0.29.33 | `k8s/overlays/local/api-service/` | Security audit: admin endpoint rate limits (49 decorators across 8 files) |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.46.5 | `k8s/overlays/local/` | Security audit: DOMPurify bump |
-| data-service | 0.2.2 | `k8s/overlays/local/` | Security audit: remove SQL injection endpoint, add auth, fix CORS |
+| data-service | 0.2.4 | `k8s/overlays/local/` | Security audit: slowapi rate limiting middleware, health error sanitization |
 | intelligence-engine | 0.3.2 | `k8s/overlays/local/` | Security audit: loosen ML pins, pydantic bump |
-| notification | 0.2.2 | `k8s/overlays/local/` | Security audit: jinja2 bump, remove slackclient, Dockerfile SHA |
+| notification | 0.2.3 | `k8s/overlays/local/` | Security audit: CORS fix, input validation, error sanitization, WebSocket JWT hardening |
 | orchestration | 0.10.3 | `k8s/overlays/local/` | Security audit: sqlalchemy bump, redis upper bound |
 | tool-integration | 0.5.4 | `k8s/overlays/local/` | Security audit: sqlalchemy bump, Dockerfile SHA, detector_id fix |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |

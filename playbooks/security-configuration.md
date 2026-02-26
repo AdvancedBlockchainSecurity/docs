@@ -350,6 +350,7 @@ As of v0.29.5, all non-exempt API endpoint files have rate limiting decorators. 
 | Pre-audit | 15 (write/mutation) | 15 | ~50 |
 | v0.29.4 | 27 (read/search/CRUD) | 42 | ~170 |
 | v0.29.5 | 10 (remaining) | 52 | ~225+ |
+| v0.29.33 | 8 (admin endpoints) | 60 | ~275+ |
 
 ### v0.29.5 Additions
 
@@ -374,7 +375,6 @@ The following 10 files were rate-limited in v0.29.5:
 | `websocket.py` | WebSocket connections, not HTTP |
 | `monitoring.py` | Internal monitoring |
 | `stripe_webhook.py` | Stripe signature-verified |
-| `admin/*.py` | All admin endpoints are MFA-protected |
 
 ### Verification
 

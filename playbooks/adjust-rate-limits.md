@@ -22,7 +22,7 @@ Endpoint rate limits are centralized in `blocksecops-shared/tier-config/tiers.js
 | `webhooks` | webhookCreate, webhookUpdate, webhookDelete, webhookSecretRotate | Webhook management |
 | `general` | default, userProfileUpdate, invariantApply/Feedback/Delete | Fallback and general endpoints |
 
-> **Note (v0.29.5):** As of the February 2026 security audit, all non-exempt endpoint files now use rate limiting. v0.29.4 added 27 endpoint files and v0.29.5 added the remaining 10 files (economic_analysis, contract_structure, service_accounts, invites, project_access, copilot, ml, roles, scanners, ide_integrations), bringing total coverage to 37 files (~225+ endpoints). Fixed-rate endpoints include `oauth_callbacks.py` (10/min), `admin/impersonation.py` (5/min), `gdpr.py` (5/min), and public invite endpoints (10/min). See [Feature Test 68](../feature-tests/68-rate-limiting-security-audit.md) for the complete list.
+> **Note (v0.29.33):** As of the February 2026 security audit, all endpoint files now use rate limiting, including admin endpoints. v0.29.4 added 27 endpoint files, v0.29.5 added 10 more files, and v0.29.33 added rate limits to all 8 admin endpoint files (49 decorators: 20/min reads, 5/min writes, 3/min sensitive ops like scanner upgrades and ML retraining). Total coverage: 45+ endpoint files (~275+ endpoints). The data service (v0.2.4) also has slowapi rate limiting with Redis backing (60/min reads, 30/min writes). See [Feature Test 68](../feature-tests/68-rate-limiting-security-audit.md) for the complete list.
 
 ## Workflow Diagram
 
@@ -223,6 +223,54 @@ except Exception as e:
 - [ ] API service redeployed/restarted
 - [ ] Rate limit verified in production
 - [ ] Monitoring alerts updated (if applicable)
+
+## Data Service Rate Limits
+
+The data service (v0.2.4+) uses its own slowapi middleware with Redis backing. Rate limits are configured in `blocksecops-data-service/src/rate_limit.py`.
+
+### Default Limits
+
+| Route File | Method | Limit | Description |
+|------------|--------|-------|-------------|
+| `data.py` | GET | 60/min | Data aggregation queries |
+| `cache.py` | GET | 60/min | Cache reads |
+| `cache.py` | POST/DELETE | 30/min | Cache writes |
+
+### Adjusting Data Service Limits
+
+Rate limits are hardcoded in route decorators (not centralized via `tiers.json`). To change:
+
+```bash
+cd blocksecops-data-service/src/routes
+vim data.py  # Edit @limiter.limit("60/minute") decorators
+vim cache.py # Edit @limiter.limit() decorators
+```
+
+After changing, bump the version in `pyproject.toml`, rebuild, push to Harbor, and restart:
+
+```bash
+cd blocksecops-data-service
+docker build -t harbor.blocksecops.local/blocksecops/data-service:X.Y.Z .
+docker push harbor.blocksecops.local/blocksecops/data-service:X.Y.Z
+kubectl rollout restart deployment/data-service -n data-service-local
+```
+
+## Admin Endpoint Rate Limits
+
+Admin endpoints (v0.29.33+) use fixed rate limits applied via `@limiter.limit()` decorators. These are not tier-based since admin endpoints are MFA-protected.
+
+### Standard Admin Limits
+
+| Operation Type | Limit | Examples |
+|----------------|-------|---------|
+| Read operations | 20/min | List users, view audit logs, get stats |
+| Write operations | 5/min | Update user, delete org, retry scan |
+| Billing/config queries | 10/min | Customer billing, system config, cluster metrics |
+| Sensitive operations | 3/min | Scanner upgrade, ML retrain |
+
+### Adjusting Admin Limits
+
+Edit the `@limiter.limit()` decorators in `blocksecops-api-service/src/presentation/api/v1/endpoints/admin/*.py`.
 
 ## Related Playbooks
 
