@@ -91,7 +91,36 @@ Full platform security audit covering SQL injection, XSS, prompt injection, depe
 | — | Traefik hostPort not configured | hostPort 80/443 added |
 | — | Audit script wrong table name | Corrected to pattern_tool_mappings |
 
+## Phase 2 Remediation (February 25, 2026)
+
+### Completed
+
+| Item | Severity | Fix Applied | PR |
+|------|----------|------------|-----|
+| M2: Admin endpoint rate limits | MEDIUM | 49 rate limit decorators across 8 admin files (20/min reads, 5/min writes, 3/min sensitive ops) | api-service #272 |
+| M5: Data service rate limiting | MEDIUM | slowapi middleware with Redis backing, 60/min reads, 30/min writes | data-service #33 |
+| M7: Network egress policies | MEDIUM | Default-deny egress added to postgresql, redis, vault namespaces | gcp-infrastructure #22 |
+| M8: Traefik RBAC | MEDIUM | Removed nodes, pods, configmaps from ClusterRole (kept services, endpoints, secrets for TLS) | gcp-infrastructure #22 |
+| H3: Notification CORS wildcard | HIGH | Replaced `allow_origins=["*"]` with environment-based origin list | notification #38 |
+| H5: Data service health info disclosure | HIGH | Generic "unhealthy" returned to client, error logged server-side | data-service #32 |
+| H6: Notification input validation | HIGH | Pydantic Field constraints (max_length, ge/le bounds) | notification #38 |
+| H7: Notification error leakage | HIGH | Generic error messages, details logged server-side | notification #38 |
+| M4: WebSocket JWT fallback | MEDIUM | Removed `verify_signature=False` fallback, connections rejected without secret | notification #38 |
+
+### Deployed Versions
+
+| Service | Version | Harbor Tag |
+|---------|---------|------------|
+| api-service | 0.29.33 | `blocksecops/api-service:0.29.33` |
+| data-service | 0.2.4 | `blocksecops/data-service:0.2.4` |
+| notification | 0.2.3 | `blocksecops/notification:0.2.3` |
+
+### Remaining
+
+| Item | Severity | Status |
+|------|----------|--------|
+| H1: Dashboard npm vulnerabilities | HIGH | Blocked (root-owned node_modules) |
+
 ## Pre-Existing Warnings (Not from this audit)
 
-- Rate limiting: No rate limiting detected after 20 login attempts (appsec)
 - CORS: Missing response for authorized origin (auth)
