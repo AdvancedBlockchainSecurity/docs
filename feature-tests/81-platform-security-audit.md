@@ -147,6 +147,20 @@ Full platform security audit covering SQL injection, XSS, prompt injection, depe
 
 The `all-MiniLM-L6-v2` model is now pre-downloaded into the Docker image at `/opt/ml-models` during build. An initContainer copies it to the `/app/models` emptyDir volume before the main container starts. `HF_HUB_OFFLINE=1` blocks all runtime HuggingFace network calls. Pod starts immediately without download delays.
 
+### Phase 4: Deduplication Security & UI Fixes (February 26, 2026)
+
+| Item | Severity | Fix Applied | PR |
+|------|----------|------------|-----|
+| BSO-SEC-015: Dedup endpoint org scoping | HIGH | All 8 dedup endpoints now enforce org-scoped access via ContractModel join | api-service #TBD |
+| Maintenance endpoints privilege escalation | HIGH | Changed from `get_current_user` to `get_current_active_superuser` | api-service #TBD |
+| Cross-contract merge validation | MEDIUM | Added contract_id check to prevent merging groups across projects | api-service #TBD |
+| Dedup UI: Compare Scanners not working | MEDIUM | Wired `onCompare` callback, renders ScannerComparisonView | dashboard #TBD |
+| Dedup UI: View toggle not working | MEDIUM | URL param-based view mode, ScannerComparisonView integration | dashboard #TBD |
+| Dedup UI: Dark mode gaps | MEDIUM | Added dark: variants to all dedup pages, error blocks, badges, filters | dashboard #TBD |
+| Source code viewer bright white bg | MEDIUM | Default theme set to dark, theme-aware inline highlight colors | dashboard #TBD |
+| Unsafe `as ViewMode` URL cast | LOW | Validated URL param before use instead of blind cast | dashboard #TBD |
+| Unsafe `as any` type cast | LOW | Refactored handleGroupClick to accept string directly | dashboard #TBD |
+
 ## Pre-Existing Warnings (Not from this audit)
 
 - CORS: Missing response for authorized origin (auth)
