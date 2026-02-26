@@ -177,6 +177,64 @@ The `all-MiniLM-L6-v2` model is now pre-downloaded into the Docker image at `/op
 | api-service | 0.29.36 | `blocksecops/api-service:0.29.36` |
 | tool-integration | 0.5.5 | `blocksecops/tool-integration:0.5.5` |
 
+---
+
+## Phase 6: Comprehensive Security Audit Remediation (February 26, 2026)
+
+Cross-service security audit against OWASP Top 10, encryption standards, authentication, authorization, and input validation. False positives validated against source code before fixes applied.
+
+### Critical Fixes
+
+| Finding | Severity | Fix | Service |
+|---------|----------|-----|---------|
+| C1: Wildcard CORS with credentials | CRITICAL | Replaced `allow_origins=["*"]` with env-var-based origins, `allow_credentials=False` | tool-integration |
+| C2: Auth bypass when no token configured | CRITICAL | Changed fail-open to fail-closed (503 if token not configured) | orchestration |
+| C3: JWT validation stub returns hardcoded data | CRITICAL | Replaced with deprecation error pointing to api-service JWT module | shared library |
+
+### High Fixes
+
+| Finding | Severity | Fix | Service |
+|---------|----------|-----|---------|
+| H1: Missing auth on POST /notifications/send | HIGH | Added X-Internal-Service-Token verification | notification |
+| H2: WebSocket broadcasts to unauthenticated | HIGH | Added `broadcast_authenticated()` method, updated `broadcast_notification()` | notification |
+| H3: print() bypasses log filtering | HIGH | Replaced all `print()` with `logger.info()` | orchestration |
+| H4: Table name not whitelisted | HIGH | Added explicit `_ALLOWED_TABLES` whitelist | data-service |
+| H5: dangerouslySetInnerHTML for recommendations | HIGH | Replaced with plain text `<p>` rendering | dashboard |
+| H6: Missing path traversal validation | HIGH | Added `pathlib.resolve()` + prefix validation in base.py and solidity_scanners.py | orchestration |
+
+### Medium Fixes
+
+| Finding | Severity | Fix | Service |
+|---------|----------|-----|---------|
+| M1: Archive compression ratio 100:1 | MEDIUM | Reduced to 10:1 per OWASP recommendation | api-service |
+| M2: Missing auth on /scans/{scan_id}/trigger | MEDIUM | Added `verify_internal_token` dependency | tool-integration |
+| M3: Missing input size validation on embeddings | MEDIUM | Added 10MB total payload size limit | intelligence-engine |
+| M4: Unbounded JSON parsing | MEDIUM | Added 50MB size check before `json.loads()` | tool-integration |
+| M5: Error messages leak response body | MEDIUM | Sanitized to log only HTTP status code | tool-integration |
+| M6: `unwrap()` on f64 conversion | MEDIUM | Replaced with `unwrap_or(0)` safe default | shared (Rust) |
+| M7: Missing bounds validation in risk score | MEDIUM | Added `clamp()` on all inputs to valid ranges | shared (Rust) |
+
+### False Positives Eliminated
+
+| Finding | Reason |
+|---------|--------|
+| Stripe webhook signature bypass | Already has `stripe.Webhook.construct_event()` verification |
+| Data service SQL injection | Uses parameterized query (`:table_name` binding) |
+| WebSocket auth missing | Already has JWT validation (RC-FIX-041/044) |
+| Notification error leakage | Already returns generic error message |
+
+### Phase 6 Deployed Versions
+
+| Service | Version | Harbor Tag |
+|---------|---------|------------|
+| api-service | 0.29.37 | `blocksecops/api-service:0.29.37` |
+| dashboard | 0.46.8 | `blocksecops/dashboard:0.46.8` |
+| data-service | 0.2.5 | `blocksecops/data-service:0.2.5` |
+| intelligence-engine | 0.3.4 | `blocksecops/intelligence-engine:0.3.4` |
+| notification | 0.2.4 | `blocksecops/notification:0.2.4` |
+| orchestration | 0.10.5 | `blocksecops/orchestration:0.10.5` |
+| tool-integration | 0.5.6 | `blocksecops/tool-integration:0.5.6` |
+
 ## Pre-Existing Warnings (Not from this audit)
 
 - CORS: Missing response for authorized origin (auth)
