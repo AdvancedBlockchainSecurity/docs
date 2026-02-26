@@ -206,14 +206,21 @@ These standards ensure proper versioning and configuration management:
     - Frontend, API, and container security requirements
     - Code review security checklist
 
-23. **[Tier Standards](./tier-standards.md)**
+23. **[Encryption Standards](./encryption-standards.md)** [NEW]
+    - Data in transit: TLS 1.2+ for all channels
+    - Data at rest: disk encryption, application-level AES-256-GCM
+    - Key management: Vault storage, rotation procedures
+    - Hashing standards: bcrypt for passwords, SHA-256 for fingerprints
+    - Prohibited algorithms and practices
+
+24. **[Tier Standards](./tier-standards.md)**
     - Tier-based feature access (free, growth, enterprise)
     - API key availability per tier
     - Rate limiting by tier
 
 ### ☸️ Kubernetes Standards
 
-24. **[Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md)** [NEW]
+25. **[Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md)** [NEW]
     - Revision history limits (`revisionHistoryLimit: 3`)
     - Pod-level and container-level security contexts
     - NetworkPolicy patterns (default-deny, ingress, egress)
@@ -221,7 +228,7 @@ These standards ensure proper versioning and configuration management:
     - Volume mounts for read-only root filesystem
     - Troubleshooting pod lifecycle issues
 
-25. **[Kustomize Standards](./kustomize-standards.md)** [NEW]
+26. **[Kustomize Standards](./kustomize-standards.md)** [NEW]
     - Base vs overlay directory structure
     - Patch file naming conventions
     - Environment-specific configuration patterns
@@ -231,13 +238,13 @@ These standards ensure proper versioning and configuration management:
 
 ### ✅ Compliance & Verification
 
-26. **[Compliance Checklist](./compliance-checklist.md)**
+27. **[Compliance Checklist](./compliance-checklist.md)**
     - Daily development checklist
     - Making changes checklist
     - Database configuration changes checklist
     - Code review checklist
 
-27. **[Smoke Test](./smoke-test.md)** [NEW]
+28. **[Smoke Test](./smoke-test.md)** [NEW]
     - Platform smoke test after deployments
     - Pre-flight infrastructure checks
     - External and internal service health checks
@@ -303,6 +310,7 @@ docs/standards/
 ├── kubernetes-pod-lifecycle.md    # NEW: Pod lifecycle, security contexts, NetworkPolicies
 ├── kustomize-standards.md         # NEW: Kustomize base/overlay patterns
 ├── secure-coding.md               # NEW: Security-first development, OWASP Top 10
+├── encryption-standards.md        # NEW: Encryption at rest, in transit, key management
 └── smoke-test.md                  # NEW: Platform smoke test procedures
 ```
 
