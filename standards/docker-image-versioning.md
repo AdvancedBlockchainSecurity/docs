@@ -310,14 +310,14 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.3 | `k8s/overlays/local/` | Add total scans KPI and per-scanner scan counts to scanners page |
-| api-service | 0.29.35 | `k8s/overlays/local/api-service/` | BSO-SEC-015: org-scoped dedup endpoints, superuser maintenance |
+| api-service | 0.29.36 | `k8s/overlays/local/api-service/` | BSO-JWT-002: HS256 key length validation at startup |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.46.7 | `k8s/overlays/local/` | Dedup UI fixes, source code dark mode, type safety improvements |
 | data-service | 0.2.4 | `k8s/overlays/local/` | Security audit: slowapi rate limiting middleware, health error sanitization |
 | intelligence-engine | 0.3.3 | `k8s/overlays/local/` | Pre-download ML model into image, initContainer copy, HF_HUB_OFFLINE=1 |
 | notification | 0.2.3 | `k8s/overlays/local/` | Security audit: CORS fix, input validation, error sanitization, WebSocket JWT hardening |
 | orchestration | 0.10.4 | `k8s/overlays/local/` | Rebuild: fix missing module in 0.10.3 stale cache image |
-| tool-integration | 0.5.4 | `k8s/overlays/local/` | Security audit: sqlalchemy bump, Dockerfile SHA, detector_id fix |
+| tool-integration | 0.5.5 | `k8s/overlays/local/` | BSO-ENC-005: Extract hardcoded API service URL to env var |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |

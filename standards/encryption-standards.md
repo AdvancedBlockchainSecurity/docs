@@ -118,7 +118,7 @@ Application-level encryption uses Fernet (AES-128-CBC + HMAC-SHA256, via `crypto
 | API key storage | SHA-256 | Keys displayed once at creation, stored as hash |
 | Fingerprints (dedup) | SHA-256 | Code, AST, location fingerprints |
 | CSRF tokens | `secrets.token_hex(32)` | Cryptographic randomness |
-| Temp directories | `secrets.token_hex(16)` | BSO-SEC-362 |
+| Temp directories | `secrets.token_hex(16)` or `tempfile.TemporaryDirectory()` | BSO-SEC-362; stdlib `tempfile` uses `os.urandom()` internally and is compliant |
 
 ### Prohibited
 

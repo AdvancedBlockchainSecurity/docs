@@ -161,6 +161,22 @@ The `all-MiniLM-L6-v2` model is now pre-downloaded into the Docker image at `/op
 | Unsafe `as ViewMode` URL cast | LOW | Validated URL param before use instead of blind cast | dashboard #TBD |
 | Unsafe `as any` type cast | LOW | Refactored handleGroupClick to accept string directly | dashboard #TBD |
 
+### Phase 5: Encryption Standards Compliance (February 26, 2026)
+
+| Item | Severity | Fix Applied | Service |
+|------|----------|------------|---------|
+| BSO-JWT-002: No runtime JWT key length validation | MEDIUM | Added min 256-bit (32-byte) check for HS256 keys at startup | api-service |
+| BSO-HASH-002: uuid4 instead of secrets module | MEDIUM | Replaced uuid4().hex with secrets.token_hex() for salts, API keys, sessions | shared library |
+| BSO-SEC-362: tempfile standard clarification | LOW | Updated encryption-standards.md: stdlib tempfile.TemporaryDirectory() is compliant | docs |
+| BSO-ENC-005: 10+ hardcoded http:// URLs | MEDIUM | Extracted to API_SERVICE_URL env var (already in ConfigMap), updated 3 files | tool-integration |
+
+### Phase 5 Deployed Versions
+
+| Service | Version | Harbor Tag |
+|---------|---------|------------|
+| api-service | 0.29.36 | `blocksecops/api-service:0.29.36` |
+| tool-integration | 0.5.5 | `blocksecops/tool-integration:0.5.5` |
+
 ## Pre-Existing Warnings (Not from this audit)
 
 - CORS: Missing response for authorized origin (auth)
