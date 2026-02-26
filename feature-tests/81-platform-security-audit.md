@@ -115,11 +115,37 @@ Full platform security audit covering SQL injection, XSS, prompt injection, depe
 | data-service | 0.2.4 | `blocksecops/data-service:0.2.4` |
 | notification | 0.2.3 | `blocksecops/notification:0.2.3` |
 
-### Remaining
+### Phase 3: Post-Audit Deployment Fixes (February 26, 2026)
+
+| Item | Severity | Fix Applied | PR |
+|------|----------|------------|-----|
+| H1: Dashboard npm vulnerabilities | HIGH | Reduced from 43 (1 critical, 3 high) to 32 (0 critical, 0 high). jspdf 4.2.0, react-syntax-highlighter 16.1.0 | dashboard #168 |
+| L2: OAuth security logging | LOW | Structured security event logging on all OAuth callback paths | api-service #273 |
+| Orchestration broken image | — | 0.10.3 had stale Docker cache (missing module), rebuilt as 0.10.4 | orchestration #83 |
+| Intelligence engine deploy | — | 0.3.2 image built and deployed (was stuck at 0.3.1) | — |
+| Postgres exporter fix | — | Changed user `postgres` → `blocksecops`, `sslmode=disable` → `sslmode=require` | gcp-infrastructure #23 |
+
+### Phase 3 Deployed Versions
+
+| Service | Version | Harbor Tag |
+|---------|---------|------------|
+| api-service | 0.29.34 | `blocksecops/api-service:0.29.34` |
+| dashboard | 0.46.6 | `blocksecops/dashboard:0.46.6` |
+| intelligence-engine | 0.3.2 | `blocksecops/intelligence-engine:0.3.2` |
+| orchestration | 0.10.4 | `blocksecops/orchestration:0.10.4` |
+
+### Remaining Low-Severity (Accepted Risk)
 
 | Item | Severity | Status |
 |------|----------|--------|
-| H1: Dashboard npm vulnerabilities | HIGH | Blocked (root-owned node_modules) |
+| L1: JWT refresh token rotation | LOW | N/A — Supabase handles token lifecycle |
+| L3: CORS docs alignment | LOW | Already aligned, no changes needed |
+| L4: Redis list growth | LOW | ltrim already in place (RC-FIX-043, max 10,000 entries) |
+| Dashboard npm (32 remaining) | LOW/MODERATE | Deep transitive deps in wallet adapter (elliptic, lodash) — requires upstream fixes |
+
+### Known Issue
+
+**Intelligence engine ML model not in image**: The `all-MiniLM-L6-v2` model (~80MB) downloads from HuggingFace on every pod restart, causing readiness probe timeouts. Should be pre-downloaded during Docker build.
 
 ## Pre-Existing Warnings (Not from this audit)
 

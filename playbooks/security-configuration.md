@@ -391,7 +391,51 @@ See [Adjust Rate Limits](adjust-rate-limits.md) for modifying rate limit values.
 
 ---
 
-## 9. Verification Checklist
+## 9. Postgres Exporter Configuration
+
+### Overview
+
+The postgres-exporter (`prometheuscommunity/postgres-exporter:v0.15.0`) provides PostgreSQL metrics to Prometheus via port 9187.
+
+### Configuration
+
+The exporter connects using the `DATA_SOURCE_NAME` environment variable:
+
+```
+postgresql://blocksecops:blocksecops-local-password@postgresql:5432/solidity_security?sslmode=require
+```
+
+### Key Requirements
+
+| Setting | Value | Why |
+|---------|-------|-----|
+| User | `blocksecops` | The `postgres` role does not exist; all access uses `blocksecops` |
+| SSL Mode | `require` | `pg_hba.conf` enforces `hostssl` for all cluster connections; `hostnossl` is rejected |
+| Database | `solidity_security` | Production database name (not `blocksecops`) |
+
+### File Location
+
+```
+blocksecops-gcp-infrastructure/k8s/overlays/local/postgresql/postgres-exporter.yaml
+```
+
+### Verification
+
+```bash
+# Check pg_up metric (should be 1)
+kubectl exec -n postgresql-local deploy/postgres-exporter -- \
+  wget -qO- http://localhost:9187/metrics | grep "^pg_up"
+# Expected: pg_up 1
+```
+
+### History
+
+- **Pre-Feb 26, 2026**: Configured with `postgres:postgres` and `sslmode=disable` — `pg_up=0` since Feb 21
+- **Feb 26, 2026**: Fixed to `blocksecops` user with `sslmode=require` (gcp-infrastructure PR #23)
+
+---
+
+## 10. Verification Checklist
 
 ### Pre-Deployment
 
