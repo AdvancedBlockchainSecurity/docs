@@ -1,8 +1,8 @@
 # Encryption Standards
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 1.0.0
-**Last Updated:** February 26, 2026
+**Version:** 1.1.0
+**Last Updated:** February 27, 2026
 **Status:** Active
 
 ## Overview
@@ -56,6 +56,23 @@ Client-side `ssl=prefer` is supplemented by server-side enforcement via `pg_hba.
 | Sensitive columns | Application-level encryption for PII (OAuth tokens, MFA secrets) |
 
 Application-level encryption uses Fernet (AES-128-CBC + HMAC-SHA256, via `cryptography` library) with keys stored in Vault at `secret/local/<service>/encryption/key`. New implementations SHOULD prefer AES-256-GCM where the library supports it.
+
+#### Fernet Key Format Requirements
+
+| Property | Requirement |
+|---|---|
+| Encoding | URL-safe base64 |
+| Decoded length | Exactly 32 bytes |
+| Generation | `python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'` |
+
+**Startup validation (v0.29.37+):** The `Settings` validator rejects invalid encryption keys in production/staging. A key that decodes to != 32 bytes will prevent startup with a clear error message. Local/test environments allow empty keys (encryption disabled with warning).
+
+**Regression context:** A 45-byte placeholder key (`bG9jYWwtZGV2LWVuY3J5cHRpb24ta2V5LWNoYW5nZS1pbi1wcm9kdWN0aW9u`) silently disabled encryption in production, causing MFA failures disguised as "invalid code" errors. The fix added startup validation and a health check (`/api/v1/health/ready` includes `encryption_configured: true/false`).
+
+**Test coverage:** 86 tests across 3 test files verify encryption behavior:
+- `tests/unit/security/test_encryption.py` — EncryptionService unit tests (key validation, encrypt/decrypt, disabled state)
+- `tests/unit/security/test_mfa.py` — MFA TOTP verification with encryption
+- `tests/security/test_encryption_integration.py` — Full integration tests (OAuth tokens, webhooks, MFA flow, key rotation, placeholder key regression)
 
 ### Object Storage / Backups
 

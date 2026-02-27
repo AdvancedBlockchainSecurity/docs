@@ -1,11 +1,11 @@
 # Playbook: Scan Stale Recovery & Monitoring
 
-**Version**: 1.0.0
-**Last Updated**: 2026-02-06
+**Version**: 2.0.0
+**Last Updated**: 2026-02-27
 
 ## Overview
 
-This playbook covers monitoring and recovering stale scans — scans stuck in `running` state due to worker preemption, crashes, or infrastructure issues. The platform includes automatic detection and recovery, but admins may need to intervene for scans that exceed retry limits.
+This playbook covers monitoring and recovering stale scans — scans stuck in `queued` or `running` state due to worker preemption, crashes, queue failures, or infrastructure issues. The platform includes automatic detection and recovery for both states, but admins may need to intervene for scans that exceed retry limits.
 
 **When to use this playbook:**
 - Investigating elevated stale scan counts
@@ -24,28 +24,30 @@ This playbook covers monitoring and recovering stale scans — scans stuck in `r
 ┌──────────────┐     ┌─────────────────┐     ┌──────────────┐
 │  Scan starts │────▶│  Running state   │────▶│  Completed   │
 │  (queued)    │     │  (started_at)    │     │              │
-└──────────────┘     └────────┬─────────┘     └──────────────┘
-                              │
-                              │ Worker killed (preemption/crash)
-                              │ Scan stuck in running state
-                              ▼
-                     ┌─────────────────┐
-                     │  Stale detected  │ (check_stale_scans, every 30s)
-                     │  started_at >    │
-                     │  stale_timeout   │
-                     └────────┬─────────┘
-                              │
-                    ┌─────────┴─────────┐
-                    │                   │
-              retry_count <        retry_count >=
-              retry_limit          retry_limit
-                    │                   │
-                    ▼                   ▼
-             ┌────────────┐    ┌──────────────┐
-             │  Requeued  │    │   Failed     │
-             │  (retry)   │    │  (max retry) │
-             └────────────┘    └──────────────┘
+└──────┬───────┘     └────────┬─────────┘     └──────────────┘
+       │                      │
+       │ Never picked up      │ Worker killed (preemption/crash)
+       │ (queue failure)      │ Scan stuck in running state
+       ▼                      ▼
+┌──────────────┐     ┌─────────────────┐
+│ Stale queued │     │  Stale running  │ (check_stale_scans, every 30s)
+│ created_at > │     │  started_at >   │
+│ stale_timeout│     │  stale_timeout  │
+└──────┬───────┘     └────────┬────────┘
+       │                      │
+       ▼               ┌──────┴──────┐
+┌──────────────┐       │             │
+│   Failed     │  retry_count < retry_count >=
+│ (never ran)  │  retry_limit   retry_limit
+└──────────────┘       │             │
+                       ▼             ▼
+                ┌────────────┐ ┌──────────────┐
+                │  Requeued  │ │   Failed     │
+                │  (retry)   │ │  (max retry) │
+                └────────────┘ └──────────────┘
 ```
+
+**Important (v0.10.6+):** Scans stuck in `queued` state (never picked up by a worker) are always failed immediately — they are not retried because the issue is queue/worker availability, not a transient scan failure. Running scans are retried up to `scan_retry_limit` times before being failed.
 
 **Configuration:**
 | Setting | Default | Description |
@@ -140,18 +142,39 @@ After taking action:
 - [ ] Auto-refresh updates every 30 seconds
 - [ ] All actions appear in audit logs
 
-## API Service Maintenance Endpoint (v0.28.38+)
+## Two Recovery Mechanisms
 
-In addition to the admin portal-based recovery above, a maintenance endpoint exists for automated recovery:
+The platform has two independent stale scan recovery mechanisms:
+
+### 1. Orchestration Celery Beat (Primary — v0.10.6+)
+
+Runs every 30 seconds via `check_stale_scans` task. Directly queries the database.
+
+- **Queued scans**: Failed immediately with `error_message: "Scan stuck in queued state — never picked up by worker"`
+- **Running scans (retries left)**: Requeued with incremented `retry_count`
+- **Running scans (max retries)**: Failed with `error_message: "Scan exceeded maximum retries after becoming unresponsive"`
+
+The outer exception handler in `execute_scan_analysis` also records `error_message` on unexpected failures, preventing NULL error messages on failed scans.
+
+### 2. API Service Maintenance Endpoint (Secondary — v0.28.38+)
+
+HTTP endpoint for recovery of scans that the orchestration beat may miss (e.g., scans where the callback never arrived):
 
 ```bash
 # Recover scans stuck in queued/running for >1 hour
-# Marks scans as failed and resets contract status from "scanning" to "scanned"
+# Records error_message with recovery context and original status
 curl -sk -X POST https://app.blocksecops.local/api/v1/scans/maintenance/recover-stale-scans \
   -H "X-Internal-Service: true"
 ```
 
-This endpoint is designed to be called by the deduplication maintenance CronJob (runs every 6 hours). It handles a different failure mode than the orchestration-based stale scan recovery: scanner jobs that complete without posting results back to the API (container crash, network error, callback failure).
+This endpoint records `error_message: "Recovered by maintenance: scan was stuck in '{status}' status for over 1 hour (created {timestamp})"` and resets associated contract status from `scanning` to `scanned`.
+
+### Key Difference
+
+| Mechanism | Interval | Timeout | Handles Queued | Retries Running | Records error_message |
+|---|---|---|---|---|---|
+| Orchestration beat | 30s | 600s (10m) | Yes (v0.10.6+) | Yes (up to 3) | Yes |
+| API maintenance endpoint | On-demand / CronJob | 3600s (1h) | Yes | No (fails immediately) | Yes (v0.29.37+) |
 
 **See also:** [Database manual fix for existing stuck contracts](../database/MANUAL-FIXES-2026-02-17-STALE-SCANS.md)
 

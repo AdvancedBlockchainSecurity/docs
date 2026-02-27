@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 3.5.0
-**Last Updated:** February 22, 2026
+**Version:** 3.6.0
+**Last Updated:** February 27, 2026
 
 ## Single Source of Truth
 
@@ -309,14 +309,14 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
-| admin-portal | 0.7.3 | `k8s/overlays/local/` | Add total scans KPI and per-scanner scan counts to scanners page |
-| api-service | 0.29.37 | `k8s/overlays/local/api-service/` | Security audit: archive compression ratio 10:1 (OWASP) |
+| admin-portal | 0.7.4 | `k8s/overlays/local/` | Rebuild from current source: fix stale bundle calling removed /admin/auth/login endpoint |
+| api-service | 0.29.37 | `k8s/overlays/local/api-service/` | Encryption key validation, health check, stale scan error_message |
 | contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
 | dashboard | 0.46.8 | `k8s/overlays/local/` | Security audit: remove dangerouslySetInnerHTML from recommendations |
 | data-service | 0.2.5 | `k8s/overlays/local/` | Security audit: table name whitelist for /data/table endpoint |
 | intelligence-engine | 0.3.4 | `k8s/overlays/local/` | Security audit: embeddings payload size validation |
 | notification | 0.2.4 | `k8s/overlays/local/` | Security audit: internal service auth, authenticated broadcast |
-| orchestration | 0.10.5 | `k8s/overlays/local/` | Security audit: fail-closed auth, logger, path traversal validation |
+| orchestration | 0.10.6 | `k8s/overlays/local/` | Stale scan recovery: queued scans, error_message on all failures |
 | tool-integration | 0.5.6 | `k8s/overlays/local/` | Security audit: CORS hardening, internal auth, error sanitization, JSON size limit |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |

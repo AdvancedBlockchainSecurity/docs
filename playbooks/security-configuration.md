@@ -435,7 +435,86 @@ kubectl exec -n postgresql-local deploy/postgres-exporter -- \
 
 ---
 
-## 10. Verification Checklist
+## 10. Encryption Key Configuration (v0.29.37+)
+
+### Overview
+
+The `INTEGRATION_ENCRYPTION_KEY` is used by the EncryptionService (Fernet) to encrypt OAuth tokens, MFA secrets, and webhook signing secrets. An invalid key silently disables encryption, causing MFA and OAuth failures.
+
+### Configuration
+
+```bash
+# Generate a valid Fernet key (must decode to exactly 32 bytes)
+python3 -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'
+
+# Store in Vault
+vault kv put secret/local/api-service/encryption key=<generated-key>
+```
+
+### Startup Validation
+
+| Environment | Behavior |
+|---|---|
+| production, staging | **Fails startup** if key is empty, invalid base64, or != 32 bytes decoded |
+| local, test | Allows empty key (encryption disabled with log warning) |
+
+### Health Check
+
+The readiness endpoint includes encryption status:
+
+```bash
+curl -sk https://app.blocksecops.local/api/v1/health/ready | python3 -c "
+import sys,json; d=json.load(sys.stdin)
+print('Encryption:', 'configured' if d['checks'].get('encryption_configured') else 'NOT configured')"
+```
+
+### Known Bad Keys
+
+| Key | Issue |
+|---|---|
+| `bG9jYWwtZGV2LWVuY3J5cHRpb24ta2V5LWNoYW5nZS1pbi1wcm9kdWN0aW9u` | Decodes to 45 bytes (not 32). Was the default placeholder that caused the Feb 2026 MFA outage. |
+
+### Verification
+
+```bash
+# Confirm encryption is active
+curl -sk https://app.blocksecops.local/api/v1/health/ready | grep encryption_configured
+# Expected: "encryption_configured": true
+
+# Check startup logs for encryption errors
+kubectl logs -n api-service-local deployment/api-service | grep -i "encryption"
+```
+
+---
+
+## 11. Resource Limits (v0.29.37+)
+
+### Overview
+
+All pods MUST have resource limits set. Unbounded pods (especially registries and databases) can consume all node memory via kernel page cache.
+
+### Harbor Registry
+
+Harbor was found using 8.9GB memory (page cache from 134GB of image blobs). Resource limits now set via Helm values:
+
+```bash
+helm upgrade harbor harbor -n harbor-local --repo https://helm.goharbor.io --reuse-values \
+  --set registry.registry.resources.limits.memory=2Gi \
+  --set core.resources.limits.memory=512Mi \
+  --set database.internal.resources.limits.memory=1Gi \
+  --set jobservice.resources.limits.memory=512Mi \
+  --set redis.internal.resources.limits.memory=256Mi \
+  --set portal.resources.limits.memory=256Mi \
+  --set trivy.resources.limits.memory=1Gi
+```
+
+### Monitoring Stack
+
+Prometheus and prometheus-adapter must NOT be scaled to 0. A PodDisruptionBudget with `minAvailable: 1` is recommended.
+
+---
+
+## 12. Verification Checklist
 
 ### Pre-Deployment
 

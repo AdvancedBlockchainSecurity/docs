@@ -1,7 +1,7 @@
 # Platform Smoke Test Standards
 
-**Version:** 1.4.0
-**Last Updated:** February 25, 2026
+**Version:** 1.5.0
+**Last Updated:** February 27, 2026
 **Status:** Active
 
 ## Overview
@@ -237,19 +237,71 @@ for ns in $(kubectl get cronjob -A --no-headers 2>/dev/null | awk '{print $1}' |
 done
 ```
 
-**Current versions (as of February 25, 2026):**
+**Current versions (as of February 27, 2026):**
 
 | Service | Version |
 |---------|---------|
-| api-service | 0.29.31 |
-| dashboard | 0.46.5 |
+| api-service | 0.29.37 |
+| dashboard | 0.46.8 |
 | admin-portal | 0.7.3 |
-| tool-integration | 0.5.4 |
-| orchestration | 0.10.3 |
-| notification | 0.2.2 |
-| intelligence-engine | 0.3.2 |
-| data-service | 0.2.2 |
+| tool-integration | 0.5.6 |
+| orchestration | 0.10.6 |
+| notification | 0.2.4 |
+| intelligence-engine | 0.3.4 |
+| data-service | 0.2.5 |
 | contract-parser | 0.2.0 |
+
+## Encryption & Security Checks
+
+```bash
+# Encryption service configured (readiness endpoint includes encryption check)
+curl -sk https://app.blocksecops.local/api/v1/health/ready | python3 -c "
+import sys,json; d=json.load(sys.stdin)
+print('PASS' if d.get('checks',{}).get('encryption_configured') else 'FAIL: encryption not configured')"
+
+# Vault unsealed
+kubectl exec -n vault-local vault-0 -- vault status -format=json 2>/dev/null | \
+  python3 -c "import sys,json; d=json.load(sys.stdin); print('PASS' if not d['sealed'] else 'FAIL: Vault sealed')"
+
+# All ExternalSecrets synced
+UNSYNCED=$(kubectl get externalsecret -A --no-headers 2>/dev/null | grep -v "SecretSynced" | wc -l)
+echo "ExternalSecrets unsynced: $UNSYNCED (expected: 0)"
+```
+
+## Scan Health Checks
+
+```bash
+# No scans stuck in queued/running for >1 hour (stale scan check)
+STALE=$(kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U blocksecops -d solidity_security -t -c \
+  "SELECT COUNT(*) FROM scans WHERE status IN ('queued','running') AND created_at < NOW() - INTERVAL '1 hour';" 2>/dev/null | tr -d ' ')
+echo "Stale scans: $STALE (expected: 0)"
+
+# No failed scans without error_message
+MISSING_ERR=$(kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U blocksecops -d solidity_security -t -c \
+  "SELECT COUNT(*) FROM scans WHERE status='failed' AND error_message IS NULL;" 2>/dev/null | tr -d ' ')
+echo "Failed scans missing error_message: $MISSING_ERR (expected: 0)"
+```
+
+## Infrastructure Health Checks
+
+```bash
+# Harbor health (registry should be under memory limit)
+HARBOR_MEM=$(kubectl top pod -n harbor-local -l app=harbor --no-headers 2>/dev/null | awk '{print $3}' | head -1)
+echo "Harbor registry memory: $HARBOR_MEM"
+
+# Prometheus and adapter running (required for HPA custom metrics)
+PROM=$(kubectl get pod -n monitoring-local -l app=prometheus --no-headers -o custom-columns=S:.status.phase 2>/dev/null | head -1)
+ADAPTER=$(kubectl get pod -n monitoring-local -l app=prometheus-adapter --no-headers -o custom-columns=S:.status.phase 2>/dev/null | head -1)
+echo "Prometheus: ${PROM:-NOT FOUND}  Adapter: ${ADAPTER:-NOT FOUND}"
+
+# HPA status (check all HPAs can read metrics)
+kubectl get hpa -A --no-headers 2>/dev/null | while read ns name _ _ _ _ _; do
+  CONDS=$(kubectl get hpa -n "$ns" "$name" -o jsonpath='{.status.conditions[?(@.type=="ScalingActive")].status}' 2>/dev/null)
+  echo "  HPA $ns/$name: ScalingActive=$CONDS"
+done
+```
 
 ## Quick Full Smoke Test Script
 
@@ -314,6 +366,25 @@ echo ""
 echo "=== Database ==="
 DB_OK=$(kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -t -c "SELECT 1;" 2>/dev/null | tr -d ' ')
 check "Database query" "1" "$DB_OK"
+
+echo ""
+echo "=== Encryption & Secrets ==="
+ENC_OK=$(curl -sk https://app.blocksecops.local/api/v1/health/ready 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print('true' if d.get('checks',{}).get('encryption_configured') else 'false')" 2>/dev/null)
+check "Encryption configured" "true" "$ENC_OK"
+
+VAULT_OK=$(kubectl exec -n vault-local vault-0 -- vault status -format=json 2>/dev/null | python3 -c "import sys,json; print('unsealed' if not json.load(sys.stdin)['sealed'] else 'sealed')" 2>/dev/null)
+check "Vault unsealed" "unsealed" "$VAULT_OK"
+
+UNSYNCED=$(kubectl get externalsecret -A --no-headers 2>/dev/null | grep -v "SecretSynced" | wc -l | tr -d ' ')
+check "ExternalSecrets synced" "0" "$UNSYNCED"
+
+echo ""
+echo "=== Scan Health ==="
+STALE=$(kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -t -c "SELECT COUNT(*) FROM scans WHERE status IN ('queued','running') AND created_at < NOW() - INTERVAL '1 hour';" 2>/dev/null | tr -d ' ')
+check "No stale scans" "0" "$STALE"
+
+MISSING_ERR=$(kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -t -c "SELECT COUNT(*) FROM scans WHERE status='failed' AND error_message IS NULL;" 2>/dev/null | tr -d ' ')
+check "Failed scans have error_message" "0" "$MISSING_ERR"
 
 echo ""
 echo "=== Summary ==="
