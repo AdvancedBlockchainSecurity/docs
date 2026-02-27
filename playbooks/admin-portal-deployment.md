@@ -1,8 +1,8 @@
 # Admin Portal Deployment Playbook
 
-**Version:** 1.2.0
+**Version:** 1.3.0
 **Created:** 2026-02-02
-**Updated:** 2026-02-05
+**Updated:** 2026-02-27
 **Component:** blocksecops-admin-portal
 
 ---
@@ -320,6 +320,14 @@ kubectl apply -k .
    ```bash
    python -m src.cli.admin reset-mfa-lockout --email admin@blocksecops.com
    ```
+
+See [Admin MFA Recovery & Lockout Reset](admin-mfa-lockout-reset.md) for full MFA recovery procedures including encryption key rotation impacts.
+
+### Stale JS Bundle (404 on /admin/auth/login)
+
+If the API logs show `POST /admin/auth/login` → 404, the admin portal is serving an old bundle. The current source uses Supabase-only auth (no `/login` endpoint).
+
+**Fix:** Rebuild the admin portal from current source. See [Admin MFA Recovery](admin-mfa-lockout-reset.md#admin-portal-stale-bundle-issues) for steps.
 
 ---
 

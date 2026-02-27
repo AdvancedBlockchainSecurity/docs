@@ -1,8 +1,8 @@
 # Kustomize Standards
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 1.1.0
-**Last Updated:** February 5, 2026
+**Version:** 1.2.0
+**Last Updated:** February 27, 2026
 **Status:** Active
 
 ## Overview
@@ -440,7 +440,18 @@ kubectl apply -k k8s/overlays/local/ --dry-run=client
    # kubectl apply -f vault-policy.yaml
    ```
 
-5. **Commit ExternalSecrets with values:**
+5. **Remove a container in deployment-patch without patching the Service:**
+   ```yaml
+   # BAD - deployment-patch.yaml removes a sidecar container that exposes port 50053
+   # but no service-patch.yaml removes port 50053 from the Service
+   # Result: Service defines a port with no backing container → connection refused
+
+   # GOOD - when deployment-patch removes a container/port, add a matching service-patch
+   # k8s/overlays/local/service-patch.yaml removes the dead port
+   # k8s/overlays/local/kustomization.yaml includes both patches
+   ```
+
+6. **Commit ExternalSecrets with values:**
    ```yaml
    # BAD - in Git
    apiVersion: external-secrets.io/v1beta1
