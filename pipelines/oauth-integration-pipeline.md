@@ -23,7 +23,7 @@ Environment Setup Pipeline:
    └─ Fernet key for AES-128-CBC + HMAC-SHA256 token encryption
 
 5. Set dashboard_base_url
-   └─ https://app.blocksecops.com (GCP) or https://app.blocksecops.local (server)
+   └─ https://app.0xapogee.com (GCP) or https://app.0xapogee.local (server)
 
 6. Deploy and verify callback endpoints
    └─ /api/v1/oauth/{provider}/callback must be reachable from provider
@@ -39,7 +39,7 @@ Environment Setup Pipeline:
 
 | Requirement | Details |
 |-------------|---------|
-| Public domain | `app.blocksecops.com` with valid TLS (OAuth providers must reach callback URLs) |
+| Public domain | `app.0xapogee.com` with valid TLS (OAuth providers must reach callback URLs) |
 | DNS configured | Domain resolves to GCP Load Balancer |
 | API service deployed | v0.29.22+ with OAuth endpoints and security hardening |
 | Dashboard deployed | v0.46.4+ with integration UI and frontend security hardening |
@@ -54,8 +54,8 @@ Environment Setup Pipeline:
 2. Click **New OAuth App**
 3. Configure:
    - **Application name:** `BlockSecOps`
-   - **Homepage URL:** `https://app.blocksecops.com`
-   - **Authorization callback URL:** `https://app.blocksecops.com/api/v1/oauth/github/callback`
+   - **Homepage URL:** `https://app.0xapogee.com`
+   - **Authorization callback URL:** `https://app.0xapogee.com/api/v1/oauth/github/callback`
 4. Save the **Client ID** and generate a **Client Secret**
 
 ### GitLab
@@ -64,7 +64,7 @@ Environment Setup Pipeline:
 2. Click **New application**
 3. Configure:
    - **Name:** `BlockSecOps`
-   - **Redirect URI:** `https://app.blocksecops.com/api/v1/oauth/gitlab/callback`
+   - **Redirect URI:** `https://app.0xapogee.com/api/v1/oauth/gitlab/callback`
    - **Scopes:** `api`, `read_user`, `read_repository`
 4. Save the **Application ID** and **Secret**
 
@@ -74,7 +74,7 @@ Environment Setup Pipeline:
 2. Click **Add consumer**
 3. Configure:
    - **Name:** `BlockSecOps`
-   - **Callback URL:** `https://app.blocksecops.com/api/v1/oauth/bitbucket/callback`
+   - **Callback URL:** `https://app.0xapogee.com/api/v1/oauth/bitbucket/callback`
    - **Permissions:** Repository (Read), Pull requests (Read), Webhooks (Read & Write)
 4. Save the **Key** (client_id) and **Secret** (client_secret)
 
@@ -84,7 +84,7 @@ Environment Setup Pipeline:
 2. Click **Create** > **OAuth 2.0 integration**
 3. Configure:
    - **Name:** `BlockSecOps`
-   - **Callback URL:** `https://app.blocksecops.com/api/v1/oauth/jira/callback`
+   - **Callback URL:** `https://app.0xapogee.com/api/v1/oauth/jira/callback`
    - **Scopes:** `read:jira-work`, `write:jira-work`, `read:jira-user`, `offline_access`
 4. Enable **Authorization code grants** with the callback URL
 5. Save the **Client ID** and **Secret**
@@ -182,7 +182,7 @@ The `dashboard_base_url` config determines:
 ```yaml
 # k8s/overlays/gcp-production/api-service/configmap-patch.yaml
 data:
-  dashboard_base_url: "https://app.blocksecops.com"
+  dashboard_base_url: "https://app.0xapogee.com"
 ```
 
 **Critical:** This URL must match the callback URLs registered with each OAuth provider.
@@ -202,7 +202,7 @@ kubectl get secret api-service-secret -n api-service -o json | \
 kubectl logs -n api-service -l app.kubernetes.io/name=api-service --tail=20
 
 # Test callback endpoint is reachable
-curl -s https://app.blocksecops.com/api/v1/oauth/github/callback?code=test&state=test
+curl -s https://app.0xapogee.com/api/v1/oauth/github/callback?code=test&state=test
 # Should return redirect (not 404)
 ```
 
@@ -234,13 +234,13 @@ JOIN integrations i ON i.id = ic.integration_id;
 
 | Provider | Callback URL |
 |----------|-------------|
-| GitHub | `https://app.blocksecops.com/api/v1/oauth/github/callback` |
-| GitLab | `https://app.blocksecops.com/api/v1/oauth/gitlab/callback` |
-| Bitbucket | `https://app.blocksecops.com/api/v1/oauth/bitbucket/callback` |
-| JIRA | `https://app.blocksecops.com/api/v1/oauth/jira/callback` |
-| Jenkins | `https://app.blocksecops.com/api/v1/oauth/jenkins/callback` |
+| GitHub | `https://app.0xapogee.com/api/v1/oauth/github/callback` |
+| GitLab | `https://app.0xapogee.com/api/v1/oauth/gitlab/callback` |
+| Bitbucket | `https://app.0xapogee.com/api/v1/oauth/bitbucket/callback` |
+| JIRA | `https://app.0xapogee.com/api/v1/oauth/jira/callback` |
+| Jenkins | `https://app.0xapogee.com/api/v1/oauth/jenkins/callback` |
 
-**Note:** Replace `app.blocksecops.com` with `app.blocksecops.local` for server environment. OAuth will only work on server environment if the providers can reach the callback URL (requires public DNS or tunneling).
+**Note:** Replace `app.0xapogee.com` with `app.0xapogee.local` for server environment. OAuth will only work on server environment if the providers can reach the callback URL (requires public DNS or tunneling).
 
 ## Troubleshooting
 

@@ -44,7 +44,7 @@ USER_ID="target-user-uuid"
 curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
   -H "Content-Type: application/json" \
-  "https://app.blocksecops.local/api/v1/admin/emergency/disable-user/${USER_ID}" \
+  "https://app.0xapogee.local/api/v1/admin/emergency/disable-user/${USER_ID}" \
   -d '{"reason": "Security incident - account potentially compromised, disabling pending investigation"}' | jq '.'
 ```
 
@@ -119,7 +119,7 @@ USER_ID="admin-user-uuid"
 curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
   -H "Content-Type: application/json" \
-  "https://app.blocksecops.local/api/v1/admin/emergency/revoke-admin/${USER_ID}" \
+  "https://app.0xapogee.local/api/v1/admin/emergency/revoke-admin/${USER_ID}" \
   -d '{"reason": "Security review - administrative access revoked pending investigation"}' | jq '.'
 ```
 
@@ -229,7 +229,7 @@ ADMIN_SESSION=$(cat /tmp/admin_session_token)
 # Get recent admin actions
 curl -sk -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
-  "https://app.blocksecops.local/api/v1/admin/audit/admin-actions?page=1&page_size=20" | jq '.entries[] | {action, admin_email: .admin_user.email, target_type, created_at}'
+  "https://app.0xapogee.local/api/v1/admin/audit/admin-actions?page=1&page_size=20" | jq '.entries[] | {action, admin_email: .admin_user.email, target_type, created_at}'
 ```
 
 ### Via Database

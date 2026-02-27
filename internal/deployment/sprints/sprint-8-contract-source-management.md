@@ -291,7 +291,7 @@ SCAN_ID=$(curl -X POST http://localhost:8000/api/v1/scans \
   -d "{\"contract_id\":\"$CONTRACT_ID\",\"scan_type\":\"full\"}" | jq -r .id)
 
 # 5. Monitor Job creation
-kubectl get jobs -n blocksecops --watch
+kubectl get jobs -n 0xapogee --watch
 
 # 6. Check ConfigMap created
 kubectl get configmaps -n blocksecops | grep scan-

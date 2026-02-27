@@ -50,13 +50,13 @@ This document defines the critical rules and codebase-first development workflow
 
 ```
 ✅ CORRECT:
-- Server:     https://app.blocksecops.local
-- Production: https://app.blocksecops.com
+- Server:     https://app.0xapogee.local
+- Production: https://app.0xapogee.com
 
 ❌ INCORRECT:
 - http://127.0.0.1:3000
 - http://localhost:8000
-- http://app.blocksecops.local (HTTP — must use HTTPS)
+- http://app.0xapogee.local (HTTP — must use HTTPS)
 ```
 
 All traffic goes through Traefik ingress with TLS. HTTP automatically redirects to HTTPS.
@@ -67,12 +67,12 @@ CORS origins are managed via ConfigMap (source of truth), not hardcoded in appli
 
 ```yaml
 # k8s/overlays/local/api-service/configmap-patch.yaml
-cors_origins: "https://app.blocksecops.local"
-allowed_hosts: "app.blocksecops.local"
-dashboard_base_url: "https://app.blocksecops.local"
+cors_origins: "https://app.0xapogee.local"
+allowed_hosts: "app.0xapogee.local"
+dashboard_base_url: "https://app.0xapogee.local"
 ```
 
-The base deployment (`k8s/base/api-service/deployment.yaml`) maps these ConfigMap keys to environment variables. Application defaults in `config.py` target production (`app.blocksecops.com`).
+The base deployment (`k8s/base/api-service/deployment.yaml`) maps these ConfigMap keys to environment variables. Application defaults in `config.py` target production (`app.0xapogee.com`).
 
 See [Domain Management Standards](./domain-management.md) for the full source of truth chain and switching between environments.
 

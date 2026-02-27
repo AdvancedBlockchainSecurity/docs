@@ -72,8 +72,8 @@ flowchart LR
 ```bash
 # Upload multiple contracts
 for CONTRACT in contracts/*.sol; do
-  curl -X POST "https://app.blocksecops.com/api/v1/contracts" \
-    -H "Authorization: Bearer $BLOCKSECOPS_API_KEY" \
+  curl -X POST "https://app.0xapogee.com/api/v1/contracts" \
+    -H "Authorization: Bearer $APOGEE_API_KEY" \
     -H "Content-Type: multipart/form-data" \
     -F "project_id=proj_abc123" \
     -F "file=@$CONTRACT"
@@ -84,12 +84,12 @@ done
 
 ```bash
 # Get all contract IDs in project
-CONTRACT_IDS=$(curl -s "https://app.blocksecops.com/api/v1/projects/proj_abc123/contracts" \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY" | jq -r '.[].id' | tr '\n' ',' | sed 's/,$//')
+CONTRACT_IDS=$(curl -s "https://app.0xapogee.com/api/v1/projects/proj_abc123/contracts" \
+  -H "Authorization: Bearer $APOGEE_API_KEY" | jq -r '.[].id' | tr '\n' ',' | sed 's/,$//')
 
 # Create batch scan
-curl -X POST "https://app.blocksecops.com/api/v1/scans/batch" \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY" \
+curl -X POST "https://app.0xapogee.com/api/v1/scans/batch" \
+  -H "Authorization: Bearer $APOGEE_API_KEY" \
   -H "Content-Type: application/json" \
   -d "{
     \"project_id\": \"proj_abc123\",
@@ -121,8 +121,8 @@ curl -X POST "https://app.blocksecops.com/api/v1/scans/batch" \
 
 ```bash
 # Check batch status
-curl -X GET "https://app.blocksecops.com/api/v1/scans/batch/batch_xyz789" \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY"
+curl -X GET "https://app.0xapogee.com/api/v1/scans/batch/batch_xyz789" \
+  -H "Authorization: Bearer $APOGEE_API_KEY"
 ```
 
 **Response:**
@@ -148,8 +148,8 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans/batch/batch_xyz789" \
 
 ```bash
 # Get batch results summary
-curl -X GET "https://app.blocksecops.com/api/v1/scans/batch/batch_xyz789/results" \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY"
+curl -X GET "https://app.0xapogee.com/api/v1/scans/batch/batch_xyz789/results" \
+  -H "Authorization: Bearer $APOGEE_API_KEY"
 ```
 
 **Response:**
@@ -195,10 +195,10 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans/batch/batch_xyz789/results
 
 ```bash
 # Scan entire directory
-blocksecops scan --path contracts/ --project "My Project"
+0xapogee scan --path contracts/ --project "My Project"
 
 # Scan multiple specific files
-blocksecops scan \
+0xapogee scan \
   --files contracts/Token.sol,contracts/Vault.sol,contracts/Governance.sol \
   --project "My Project"
 ```
@@ -206,7 +206,7 @@ blocksecops scan \
 ### Batch Scan with Options
 
 ```bash
-blocksecops scan \
+0xapogee scan \
   --path contracts/ \
   --project "Audit Q1 2026" \
   --scanners soliditydefend,slither,mythril \
@@ -220,7 +220,7 @@ blocksecops scan \
 
 ```bash
 # Scan all Solidity files recursively
-blocksecops scan \
+0xapogee scan \
   --path . \
   --include "**/*.sol" \
   --exclude "**/node_modules/**,**/test/**" \
@@ -241,7 +241,7 @@ blocksecops scan \
 
 ### Scan Configuration File
 
-Create `blocksecops.config.json`:
+Create `0xapogee.config.json`:
 
 ```json
 {
@@ -267,7 +267,7 @@ Create `blocksecops.config.json`:
 
 Use with CLI:
 ```bash
-blocksecops scan --config blocksecops.config.json
+0xapogee scan --config 0xapogee.config.json
 ```
 
 ---
@@ -285,7 +285,7 @@ find contracts/ -name "*.sol" | split -l 20 - chunk_
 # Scan each chunk
 for CHUNK in chunk_*; do
   FILES=$(cat $CHUNK | tr '\n' ',' | sed 's/,$//')
-  blocksecops scan --files "$FILES" --project "Large Project - Chunk $CHUNK"
+  0xapogee scan --files "$FILES" --project "Large Project - Chunk $CHUNK"
 done
 ```
 
@@ -295,13 +295,13 @@ Scan critical contracts first:
 
 ```bash
 # Scan critical contracts (tokens, vaults)
-blocksecops scan \
+0xapogee scan \
   --path contracts/core/ \
   --priority high \
   --project "Core Contracts"
 
 # Scan peripheral contracts
-blocksecops scan \
+0xapogee scan \
   --path contracts/periphery/ \
   --priority low \
   --project "Periphery Contracts"
@@ -315,8 +315,8 @@ blocksecops scan \
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/scans/batch/batch_xyz789/report" \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY" \
+curl -X POST "https://app.0xapogee.com/api/v1/scans/batch/batch_xyz789/report" \
+  -H "Authorization: Bearer $APOGEE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "format": "pdf",
@@ -327,7 +327,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/scans/batch/batch_xyz789/report
 
 **CLI:**
 ```bash
-blocksecops report \
+0xapogee report \
   --batch batch_xyz789 \
   --format pdf \
   --output audit-report.pdf
@@ -356,13 +356,13 @@ Confirm batch scan completed:
 **API:**
 ```bash
 # Verify batch completed
-curl -X GET "https://app.blocksecops.com/api/v1/scans/batch/batch_xyz789" \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY" | jq '.status'
+curl -X GET "https://app.0xapogee.com/api/v1/scans/batch/batch_xyz789" \
+  -H "Authorization: Bearer $APOGEE_API_KEY" | jq '.status'
 # Expected: "completed"
 
 # Count total vulnerabilities
-curl -X GET "https://app.blocksecops.com/api/v1/scans/batch/batch_xyz789/results" \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY" | jq '.summary.total_vulnerabilities'
+curl -X GET "https://app.0xapogee.com/api/v1/scans/batch/batch_xyz789/results" \
+  -H "Authorization: Bearer $APOGEE_API_KEY" | jq '.summary.total_vulnerabilities'
 ```
 
 ---
@@ -382,13 +382,13 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans/batch/batch_xyz789/results
 
 ```bash
 # Get failed scans
-FAILED=$(curl -s "https://app.blocksecops.com/api/v1/scans/batch/batch_xyz789" \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY" | jq -r '.scans[] | select(.status == "failed") | .contract_id')
+FAILED=$(curl -s "https://app.0xapogee.com/api/v1/scans/batch/batch_xyz789" \
+  -H "Authorization: Bearer $APOGEE_API_KEY" | jq -r '.scans[] | select(.status == "failed") | .contract_id')
 
 # Retry failed scans
 for CONTRACT_ID in $FAILED; do
-  curl -X POST "https://app.blocksecops.com/api/v1/scans" \
-    -H "Authorization: Bearer $BLOCKSECOPS_API_KEY" \
+  curl -X POST "https://app.0xapogee.com/api/v1/scans" \
+    -H "Authorization: Bearer $APOGEE_API_KEY" \
     -H "Content-Type: application/json" \
     -d "{\"contract_id\": \"$CONTRACT_ID\"}"
 done

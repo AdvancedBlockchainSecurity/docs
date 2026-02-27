@@ -2,7 +2,7 @@
 
 **Last Updated**: 2026-02-12
 **API Version**: v1
-**Base URL**: `http://localhost:8000/api/v1` (local) | `https://api.blocksecops.com/api/v1` (production)
+**Base URL**: `http://localhost:8000/api/v1` (local) | `https://api.0xapogee.com/api/v1` (production)
 
 ## Overview
 
@@ -14,18 +14,18 @@ BlockSecOps uses **Supabase Auth** for authentication. User registration, login,
 
 ### Authentication Flow
 
-#### 1. Frontend Authentication (app.blocksecops.com)
+#### 1. Frontend Authentication (app.0xapogee.com)
 Users authenticate through Supabase on the frontend:
 - **Email/Password**: Handled by Supabase Auth
 - **OAuth Providers**: Google, Microsoft, GitHub (configured in Supabase)
 - **Password Reset**: Email-based reset flow via Supabase
 - **Email Verification**: Automatic verification emails
 
-#### 2. API Authentication (api.blocksecops.com)
+#### 2. API Authentication (api.0xapogee.com)
 API endpoints require Bearer token in Authorization header:
 
 ```bash
-curl -X GET https://api.blocksecops.com/api/v1/users/me \
+curl -X GET https://api.0xapogee.com/api/v1/users/me \
   -H "Authorization: Bearer <supabase_access_token>"
 ```
 
@@ -64,7 +64,7 @@ const supabase = createClient(
 const { data: { session } } = await supabase.auth.getSession()
 
 // Make authenticated API call
-const response = await fetch('https://api.blocksecops.com/api/v1/users/me/enhanced', {
+const response = await fetch('https://api.0xapogee.com/api/v1/users/me/enhanced', {
   headers: {
     'Authorization': `Bearer ${session.access_token}`
   }
@@ -1153,13 +1153,13 @@ List all available security scanners with optional filtering by language, projec
 
 **Example - Get scanners for single-file upload**:
 ```bash
-curl "https://api.blocksecops.com/api/v1/scanners?language=solidity&is_project=false"
+curl "https://api.0xapogee.com/api/v1/scanners?language=solidity&is_project=false"
 # Returns: slither, aderyn, semgrep, solhint, wake, soliditydefend (6 scanners)
 ```
 
 **Example - Get scanners for project upload**:
 ```bash
-curl "https://api.blocksecops.com/api/v1/scanners?language=solidity&is_project=true"
+curl "https://api.0xapogee.com/api/v1/scanners?language=solidity&is_project=true"
 # Returns: all Solidity scanners including echidna, medusa, halmos (9 scanners)
 ```
 
@@ -3238,8 +3238,8 @@ Create Stripe Checkout session for subscription purchase.
 {
   "plan_tier": "team",
   "billing_interval": "monthly",
-  "success_url": "https://app.blocksecops.com/billing?success=true",
-  "cancel_url": "https://app.blocksecops.com/billing?canceled=true"
+  "success_url": "https://app.0xapogee.com/billing?success=true",
+  "cancel_url": "https://app.0xapogee.com/billing?canceled=true"
 }
 ```
 
@@ -5604,7 +5604,7 @@ Get AI-generated explanation of economic security risks for a scan.
   "detail": "AI explanation quota exceeded. Upgrade your plan for more explanations.",
   "quota_limit": 10,
   "quota_used": 10,
-  "upgrade_url": "https://app.blocksecops.com/settings/billing"
+  "upgrade_url": "https://app.0xapogee.com/settings/billing"
 }
 ```
 
@@ -5916,7 +5916,7 @@ Get current build status for CI/CD integration.
 **Usage in CI/CD**:
 ```bash
 # Check build status and fail if not passing
-STATUS=$(curl -s "https://api.blocksecops.com/api/v1/quality-gates/projects/$PROJECT_ID/build-status" \
+STATUS=$(curl -s "https://api.0xapogee.com/api/v1/quality-gates/projects/$PROJECT_ID/build-status" \
   -H "Authorization: Bearer $TOKEN" | jq -r '.status')
 
 if [ "$STATUS" != "passing" ]; then
@@ -5951,7 +5951,7 @@ Get SVG badge for build status (suitable for README files).
 
 **Usage in README**:
 ```markdown
-[![Security](https://api.blocksecops.com/api/v1/quality-gates/projects/YOUR_PROJECT_ID/badge.svg)](https://app.blocksecops.com/projects/YOUR_PROJECT_ID)
+[![Security](https://api.0xapogee.com/api/v1/quality-gates/projects/YOUR_PROJECT_ID/badge.svg)](https://app.0xapogee.com/projects/YOUR_PROJECT_ID)
 ```
 
 **Added**: January 2026 (Phase 5.5c)

@@ -58,7 +58,7 @@ flowchart LR
 1. Click your profile icon in the top-right corner
 2. Select **Settings** from the dropdown
 3. Click **API Keys** in the left sidebar
-4. Or navigate directly to `https://app.blocksecops.com/settings/api-keys`
+4. Or navigate directly to `https://app.0xapogee.com/settings/api-keys`
 
 ### Step 2: Create New API Key
 
@@ -69,7 +69,7 @@ flowchart LR
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/api_keys" \
+curl -X POST "https://app.0xapogee.com/api/v1/api_keys" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -144,7 +144,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/api_keys" \
 
 **API:**
 ```bash
-curl -X GET "https://app.blocksecops.com/api/v1/api_keys" \
+curl -X GET "https://app.0xapogee.com/api/v1/api_keys" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -152,7 +152,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/api_keys" \
 
 **API:**
 ```bash
-curl -X GET "https://app.blocksecops.com/api/v1/api_keys/{key_id}" \
+curl -X GET "https://app.0xapogee.com/api/v1/api_keys/{key_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -171,7 +171,7 @@ To rotate a key (create new, revoke old):
 **API (Manual Rotation):**
 ```bash
 # Step 1: Create new key with same scopes
-NEW_KEY=$(curl -X POST "https://app.blocksecops.com/api/v1/api_keys" \
+NEW_KEY=$(curl -X POST "https://app.0xapogee.com/api/v1/api_keys" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -183,7 +183,7 @@ NEW_KEY=$(curl -X POST "https://app.blocksecops.com/api/v1/api_keys" \
 # Step 2: Update applications with new key
 
 # Step 3: Revoke old key
-curl -X DELETE "https://app.blocksecops.com/api/v1/api_keys/{old_key_id}" \
+curl -X DELETE "https://app.0xapogee.com/api/v1/api_keys/{old_key_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -197,7 +197,7 @@ curl -X DELETE "https://app.blocksecops.com/api/v1/api_keys/{old_key_id}" \
 
 **API:**
 ```bash
-curl -X DELETE "https://app.blocksecops.com/api/v1/api_keys/{key_id}" \
+curl -X DELETE "https://app.0xapogee.com/api/v1/api_keys/{key_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -210,7 +210,7 @@ curl -X DELETE "https://app.blocksecops.com/api/v1/api_keys/{key_id}" \
 Include the API key in the `Authorization` header:
 
 ```bash
-curl -X GET "https://app.blocksecops.com/api/v1/scans" \
+curl -X GET "https://app.0xapogee.com/api/v1/scans" \
   -H "Authorization: Bearer bso_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
@@ -219,10 +219,10 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans" \
 Store API key in environment variable:
 
 ```bash
-export BLOCKSECOPS_API_KEY="bso_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+export APOGEE_API_KEY="bso_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
-curl -X GET "https://app.blocksecops.com/api/v1/scans" \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY"
+curl -X GET "https://app.0xapogee.com/api/v1/scans" \
+  -H "Authorization: Bearer $APOGEE_API_KEY"
 ```
 
 ### GitHub Actions Secret
@@ -230,7 +230,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans" \
 ```yaml
 # .github/workflows/security-scan.yml
 env:
-  BLOCKSECOPS_API_KEY: ${{ secrets.BLOCKSECOPS_API_KEY }}
+  APOGEE_API_KEY: ${{ secrets.APOGEE_API_KEY }}
 ```
 
 ---
@@ -242,8 +242,8 @@ Confirm API key works:
 **API:**
 ```bash
 # Test API key authentication
-curl -X GET "https://app.blocksecops.com/api/v1/users/me" \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY"
+curl -X GET "https://app.0xapogee.com/api/v1/users/me" \
+  -H "Authorization: Bearer $APOGEE_API_KEY"
 ```
 
 Expected response:
@@ -260,8 +260,8 @@ Expected response:
 
 ```bash
 # This will fail if key lacks write:scans scope
-curl -X POST "https://app.blocksecops.com/api/v1/scans" \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY" \
+curl -X POST "https://app.0xapogee.com/api/v1/scans" \
+  -H "Authorization: Bearer $APOGEE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"project_id": "proj_123", "contract_id": "contract_456"}'
 ```

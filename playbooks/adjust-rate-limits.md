@@ -250,8 +250,8 @@ After changing, bump the version in `pyproject.toml`, rebuild, push to Harbor, a
 
 ```bash
 cd blocksecops-data-service
-docker build -t harbor.blocksecops.local/blocksecops/data-service:X.Y.Z .
-docker push harbor.blocksecops.local/blocksecops/data-service:X.Y.Z
+docker build -t harbor.0xapogee.local/blocksecops/data-service:X.Y.Z .
+docker push harbor.0xapogee.local/blocksecops/data-service:X.Y.Z
 kubectl rollout restart deployment/data-service -n data-service-local
 ```
 

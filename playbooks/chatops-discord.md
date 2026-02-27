@@ -62,7 +62,7 @@ flowchart LR
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
+curl -X POST "https://app.0xapogee.com/api/v1/notification_channels" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -94,7 +94,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -116,7 +116,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/notification_channels/{channel
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}/test" \
+curl -X POST "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}/test" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -142,7 +142,7 @@ Discord messages use rich embeds:
       {"name": "Medium", "value": "12", "inline": true},
       {"name": "Low", "value": "8", "inline": true}
     ],
-    "url": "https://app.blocksecops.com/scans/abc123",
+    "url": "https://app.0xapogee.com/scans/abc123",
     "timestamp": "2026-02-01T10:30:00Z",
     "footer": {
       "text": "BlockSecOps Security Scanner"
@@ -165,7 +165,7 @@ Discord messages use rich embeds:
       {"name": "Line", "value": "142", "inline": true},
       {"name": "Severity", "value": "Critical", "inline": true}
     ],
-    "url": "https://app.blocksecops.com/vulnerabilities/xyz789",
+    "url": "https://app.0xapogee.com/vulnerabilities/xyz789",
     "timestamp": "2026-02-01T10:30:00Z"
   }]
 }
@@ -188,7 +188,7 @@ Discord messages use rich embeds:
       {"name": "Low", "value": "14", "inline": true},
       {"name": "Top Issues", "value": "1. Reentrancy (8)\n2. Unchecked Return (6)\n3. Integer Overflow (5)", "inline": false}
     ],
-    "url": "https://app.blocksecops.com/reports/weekly"
+    "url": "https://app.0xapogee.com/reports/weekly"
   }]
 }
 ```
@@ -215,7 +215,7 @@ Configure mentions for critical alerts:
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -234,7 +234,7 @@ To get a role ID in Discord:
 
 ```bash
 # Critical alerts with @here mention
-curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
+curl -X POST "https://app.0xapogee.com/api/v1/notification_channels" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -248,7 +248,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
   }'
 
 # Scan updates (no mentions)
-curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
+curl -X POST "https://app.0xapogee.com/api/v1/notification_channels" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -262,7 +262,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
 ### Filter by Project
 
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -275,13 +275,13 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/notification_channels/{channel
 ### Custom Bot Name and Avatar
 
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "config": {
       "username": "BlockSecOps Bot",
-      "avatar_url": "https://app.blocksecops.com/images/bot-avatar.png"
+      "avatar_url": "https://app.0xapogee.com/images/bot-avatar.png"
     }
   }'
 ```
@@ -300,7 +300,7 @@ Confirm the integration is working:
 **API:**
 ```bash
 # Check channel status
-curl -X GET "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}" \
+curl -X GET "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 

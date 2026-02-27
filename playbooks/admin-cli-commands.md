@@ -108,8 +108,8 @@ BlockSecOps Platform Admin Management
 
 Email                                    Role                 MFA      Created
 ------------------------------------------------------------------------------------------
-admin@blocksecops.com                    super_admin          Enabled  2026-01-15 10:30
-support@blocksecops.com                  support_admin        Pending  2026-01-20 14:15
+admin@0xapogee.com                    super_admin          Enabled  2026-01-15 10:30
+support@0xapogee.com                  support_admin        Pending  2026-01-20 14:15
 
 Total: 2 admin(s)
 ```

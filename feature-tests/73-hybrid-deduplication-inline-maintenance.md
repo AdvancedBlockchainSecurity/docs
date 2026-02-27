@@ -42,7 +42,7 @@ Test procedure:
 kubectl exec -n api-service-local deploy/api-service -- python3 -c "..."
 
 # 2. Submit scanner results
-curl -sk -X POST https://app.blocksecops.local/api/v1/scans/{scan_id}/results \
+curl -sk -X POST https://app.0xapogee.local/api/v1/scans/{scan_id}/results \
   -H "Content-Type: application/json" -d @scan-results.json
 
 # 3. Verify dedup fields populated
@@ -84,7 +84,7 @@ FROM vulnerabilities WHERE scan_id = '{scan_id}';
 - [x] Correct Python module in command (`src.infrastructure.tasks.deduplication_maintenance`)
 - [x] `runAsNonRoot: true`
 - [x] `restartPolicy`: OnFailure
-- [x] Image: `harbor.blocksecops.local/blocksecops/api-service:0.29.11`
+- [x] Image: `harbor.0xapogee.local/blocksecops/api-service:0.29.11`
 
 ---
 

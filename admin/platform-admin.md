@@ -22,8 +22,8 @@ The Platform Admin Panel provides BlockSecOps internal team with full administra
 
 | Component | Location |
 |-----------|----------|
-| **Customer Dashboard** | `blocksecops-dashboard` at `app.blocksecops.com` |
-| **Admin Portal** | `blocksecops-admin-portal` at `admin.blocksecops.com` |
+| **Customer Dashboard** | `blocksecops-dashboard` at `app.0xapogee.com` |
+| **Admin Portal** | `blocksecops-admin-portal` at `admin.0xapogee.com` |
 
 ### Authentication Isolation
 
@@ -31,7 +31,7 @@ The Platform Admin Panel provides BlockSecOps internal team with full administra
 |--------|-------------------|--------------|
 | Supabase Project | Customer Supabase | Same project (shared) |
 | JWT Verification | Customer JWKS | Same JWKS |
-| Cookie Domain | `app.blocksecops.com` | `admin.blocksecops.com` |
+| Cookie Domain | `app.0xapogee.com` | `admin.0xapogee.com` |
 | Token Storage | localStorage | **Memory only (XSS protection)** |
 | Network Access | Public | **IP allowlist (restricted)** |
 
@@ -66,7 +66,7 @@ Admin accounts are created **exclusively via CLI** on the server:
 cd /home/pwner/Git/blocksecops-api-service
 
 # Create the first super_admin
-python -m src.cli.admin create-admin --email admin@blocksecops.com --role super_admin
+python -m src.cli.admin create-admin --email admin@0xapogee.com --role super_admin
 ```
 
 The CLI will:
@@ -82,7 +82,7 @@ The CLI will:
 
 ### First Login
 
-**Admin Portal URL:** `https://admin.blocksecops.com` (production) or `http://admin.blocksecops.local:3000` (local)
+**Admin Portal URL:** `https://admin.0xapogee.com` (production) or `http://admin.0xapogee.local:3000` (local)
 
 1. Navigate to the Admin Portal URL
 2. Login with your admin credentials (separate Admin Supabase account)
@@ -270,13 +270,13 @@ For security incidents and urgent situations:
 
 ```bash
 # Create super_admin
-python -m src.cli.admin create-admin --email admin@blocksecops.com --role super_admin
+python -m src.cli.admin create-admin --email admin@0xapogee.com --role super_admin
 
 # Create platform_admin (tracks creator)
 python -m src.cli.admin create-admin \
-  --email support@blocksecops.com \
+  --email support@0xapogee.com \
   --role platform_admin \
-  --created-by admin@blocksecops.com
+  --created-by admin@0xapogee.com
 ```
 
 ### List Admins
@@ -289,8 +289,8 @@ Output:
 ```
 Email                              Role                 MFA      Created
 ================================================================================
-admin@blocksecops.com              super_admin          Enabled  2026-01-23 10:00
-support@blocksecops.com            platform_admin       Pending  2026-01-23 11:00
+admin@0xapogee.com              super_admin          Enabled  2026-01-23 10:00
+support@0xapogee.com            platform_admin       Pending  2026-01-23 11:00
 
 Total: 2 admin(s)
 ```
@@ -299,14 +299,14 @@ Total: 2 admin(s)
 
 ```bash
 python -m src.cli.admin revoke \
-  --email former-admin@blocksecops.com \
+  --email former-admin@0xapogee.com \
   --reason "Employee separation - access no longer required"
 ```
 
 ### Reset MFA (Lost Authenticator)
 
 ```bash
-python -m src.cli.admin reset-mfa --email admin@blocksecops.com
+python -m src.cli.admin reset-mfa --email admin@0xapogee.com
 ```
 
 This will:
@@ -508,7 +508,7 @@ Organization Management (`/admin/organizations`):
 
 **Major Architecture Change:**
 - Admin panel moved to separate repository: `blocksecops-admin-portal`
-- Separate subdomain: `admin.blocksecops.com`
+- Separate subdomain: `admin.0xapogee.com`
 - Separate Supabase project for complete authentication isolation
 - Admin code removed from customer dashboard
 

@@ -180,7 +180,7 @@ See [Upgrade Scanner Image Playbook](../playbooks/upgrade-scanner-image.md) for 
 **Key steps:**
 1. Update Dockerfile with new upstream version
 2. Build with `--no-cache` (or without, depending on requirements)
-3. Push to Harbor: `harbor.blocksecops.local/blocksecops/scanner-<name>:<version>`
+3. Push to Harbor: `harbor.0xapogee.local/blocksecops/scanner-<name>:<version>`
 4. Update ConfigMap `SCANNER_IMAGE_<NAME>` entry
 5. Restart tool-integration deployment
 

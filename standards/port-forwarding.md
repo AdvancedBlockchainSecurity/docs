@@ -20,8 +20,8 @@ Each environment has its own always-available access method:
 
 | Environment | Method | Access Pattern | Setup |
 |-------------|--------|----------------|-------|
-| **Server (kubeadm)** | hostPort 80/443 + Traefik (TLS) | `https://app.blocksecops.local` | DNS entry only |
-| **Production (GCP)** | GCP Load Balancer | `https://app.blocksecops.com` | Managed by infrastructure |
+| **Server (kubeadm)** | hostPort 80/443 + Traefik (TLS) | `https://app.0xapogee.local` | DNS entry only |
+| **Production (GCP)** | GCP Load Balancer | `https://app.0xapogee.com` | Managed by infrastructure |
 
 ### Server Environment (kubeadm) - Always Available
 
@@ -29,7 +29,7 @@ Each environment has its own always-available access method:
 
 **One-Time Setup (client machines):**
 ```bash
-echo "192.168.86.225  app.blocksecops.local" | sudo tee -a /etc/hosts
+echo "192.168.86.225  app.0xapogee.local" | sudo tee -a /etc/hosts
 ```
 
 **Daily Workflow:** None required. Services are accessible immediately after cluster start.
@@ -37,8 +37,8 @@ echo "192.168.86.225  app.blocksecops.local" | sudo tee -a /etc/hosts
 **Access URLs:**
 | Service | URL |
 |---------|-----|
-| Dashboard | https://app.blocksecops.local |
-| API | https://app.blocksecops.local/api/v1/... |
+| Dashboard | https://app.0xapogee.local |
+| API | https://app.0xapogee.local/api/v1/... |
 
 **Kustomize Overlay:** `blocksecops-gcp-infrastructure/k8s/overlays/local/`
 
@@ -48,13 +48,13 @@ See [Domain Management Standards](./domain-management.md) for the full source of
 
 **Standard Pattern:** GCP Load Balancer with managed TLS certificate.
 
-**Domain:** `app.blocksecops.com`
+**Domain:** `app.0xapogee.com`
 
 **Access URLs:**
 | Service | URL |
 |---------|-----|
-| Dashboard | https://app.blocksecops.com |
-| API | https://app.blocksecops.com/api/v1/... |
+| Dashboard | https://app.0xapogee.com |
+| API | https://app.0xapogee.com/api/v1/... |
 
 **Kustomize Overlay:** `blocksecops-gcp-infrastructure/k8s/overlays/gcp-production/`
 
@@ -211,7 +211,7 @@ echo ""
 echo "Service URLs:"
 echo "  Dashboard:        http://127.0.0.1:3000 (via Traefik)"
 echo "  API Service:      http://127.0.0.1:3000/api/v1 (via Traefik)"
-echo "  Notifications:    http://127.0.0.1:8003 (WebSocket: wss://app.blocksecops.local/ws)"
+echo "  Notifications:    http://127.0.0.1:8003 (WebSocket: wss://app.0xapogee.local/ws)"
 echo "  Vault:            http://127.0.0.1:8200"
 echo ""
 echo "Optional (for debugging):"
@@ -334,7 +334,7 @@ routes:
 **API Service IngressRoute** (`gcp-infrastructure/k8s/overlays/local/api-service/ingressroute.yaml`):
 ```yaml
 routes:
-  - match: Host(`app.blocksecops.local`) && PathPrefix(`/api/v1`)
+  - match: Host(`app.0xapogee.local`) && PathPrefix(`/api/v1`)
     kind: Rule
     services:
       - name: api-service
@@ -342,9 +342,9 @@ routes:
 ```
 
 **Routing Logic**:
-- `https://app.blocksecops.local` → Dashboard UI
-- `https://app.blocksecops.local/api-keys` → Dashboard UI (page route)
-- `https://app.blocksecops.local/api/v1/...` → API Service (matches PathPrefix `/api/v1`)
+- `https://app.0xapogee.local` → Dashboard UI
+- `https://app.0xapogee.local/api-keys` → Dashboard UI (page route)
+- `https://app.0xapogee.local/api/v1/...` → API Service (matches PathPrefix `/api/v1`)
 - All traffic goes through Traefik's `websecure` entrypoint (HTTPS, port 443)
 
 **Important**: Use `/api/v1` (not `/api`) for API routing to avoid catching dashboard page routes that start with `/api-*` (like `/api-keys`).
@@ -389,7 +389,7 @@ kubectl port-forward -n notification-local svc/notification 8003:8003
 | API-triggered notifications | Yes |
 
 **Note**: The Notification Service is **optional** for basic local development. The core workflow (creating scans, viewing vulnerabilities) works without it. Only port-forward when you need:
-- Real-time WebSocket updates in the dashboard (`wss://app.blocksecops.local/ws`)
+- Real-time WebSocket updates in the dashboard (`wss://app.0xapogee.local/ws`)
 - Webhook/notification testing for Phase 4.5 features
 
 ### API Service Ports
@@ -461,12 +461,12 @@ If you get "error forwarding port ... connection refused":
 **Solution**:
 1. Test Traefik routing to dashboard:
    ```bash
-   curl -k https://app.blocksecops.local
+   curl -k https://app.0xapogee.local
    ```
 
 2. Test Traefik routing to API:
    ```bash
-   curl -k https://app.blocksecops.local/api/v1/health/live
+   curl -k https://app.0xapogee.local/api/v1/health/live
    ```
 
 3. Verify IngressRoutes are configured:
@@ -598,13 +598,13 @@ If you add a new service that needs a port-forward:
 ```bash
 # One-time setup: Add DNS entries
 # On server:
-echo "127.0.0.1  app.blocksecops.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1  app.0xapogee.local" | sudo tee -a /etc/hosts
 # On client:
-echo "192.168.86.225  app.blocksecops.local" | sudo tee -a /etc/hosts
+echo "192.168.86.225  app.0xapogee.local" | sudo tee -a /etc/hosts
 
 # Access (no daily commands needed, use -k for self-signed cert)
-curl -k https://app.blocksecops.local                    # Dashboard
-curl -k https://app.blocksecops.local/api/v1/health/live # API
+curl -k https://app.0xapogee.local                    # Dashboard
+curl -k https://app.0xapogee.local/api/v1/health/live # API
 ```
 
 ### Debugging (Port-Forwards)
@@ -619,7 +619,7 @@ pkill -f "kubectl port-forward"
 ### Build Images
 
 ```bash
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
 docker build -t ${REGISTRY}/blocksecops/<service>:${VERSION} .
 docker push ${REGISTRY}/blocksecops/<service>:${VERSION}

@@ -46,7 +46,7 @@ For pattern `BVD-SOLIDITY-GAS-001`, all 17 groups had `scanner_distribution = {'
 
 ## Verification
 
-1. Navigate to `https://app.blocksecops.local/deduplication?pattern=BVD-SOLIDITY-GAS-001`
+1. Navigate to `https://app.0xapogee.local/deduplication?pattern=BVD-SOLIDITY-GAS-001`
 2. Page should show 17 deduplication groups (previously showed "No deduplication groups found")
 3. Filter dropdown defaults to "1+ scanners"
 4. Changing filter to "2+ scanners" correctly hides single-scanner groups

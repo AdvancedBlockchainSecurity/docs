@@ -41,7 +41,7 @@ The database reset was successfully completed, achieving a clean slate with prop
      - All 10 core tables created ✅
 
 5. **User Account Created**
-   - Email: `test-rebrand@blocksecops.com`
+   - Email: `test-rebrand@0xapogee.com`
    - Password: `TestPass123`
    - User ID: `b682867e-e716-4e83-a8c5-24b78bb462cf`
    - Method: API registration endpoint (proper bcrypt hashing)

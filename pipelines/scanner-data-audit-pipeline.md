@@ -56,7 +56,7 @@ TI scanner health             new scanner gaps.             Checklist generation
 
 | Step | Command | Expected |
 |------|---------|----------|
-| API health | `curl -sL https://app.blocksecops.local/api/v1/health/ready` | `{"ready": true}` |
+| API health | `curl -sL https://app.0xapogee.local/api/v1/health/ready` | `{"ready": true}` |
 | TI health | `kubectl exec ... -- curl -s http://localhost:8005/health` | `{"status": "healthy"}` |
 | DB connectivity | `kubectl exec ... -- psql -c "SELECT 1"` | `1` |
 | Backup | `pg_dump -F c -f pre_audit_backup.dump` | File created |

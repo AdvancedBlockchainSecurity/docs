@@ -275,14 +275,14 @@ pattern = vuln.pattern  # ORM navigation
 ```bash
 # API Service
 cd /home/pwner/Git/blocksecops-api-service
-docker build --no-cache -t harbor.blocksecops.local/blocksecops/api-service:0.25.1 .
-docker push harbor.blocksecops.local/blocksecops/api-service:0.25.1
+docker build --no-cache -t harbor.0xapogee.local/blocksecops/api-service:0.25.1 .
+docker push harbor.0xapogee.local/blocksecops/api-service:0.25.1
 kubectl rollout restart deployment/blocksecops-api-service -n blocksecops-api-service-local
 
 # Tool Integration
 cd /home/pwner/Git/blocksecops-tool-integration
-docker build --no-cache -t harbor.blocksecops.local/blocksecops/tool-integration:0.3.9 .
-docker push harbor.blocksecops.local/blocksecops/tool-integration:0.3.9
+docker build --no-cache -t harbor.0xapogee.local/blocksecops/tool-integration:0.3.9 .
+docker push harbor.0xapogee.local/blocksecops/tool-integration:0.3.9
 kubectl rollout restart deployment/tool-integration -n tool-integration-local
 ```
 

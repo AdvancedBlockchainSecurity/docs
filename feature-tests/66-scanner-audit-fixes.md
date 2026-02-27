@@ -24,7 +24,7 @@ Production fixes for 4 scanner audit issues: solhint 0 vulnerabilities, vyper sc
 
 ```bash
 # Check findings count for latest solhint scan
-curl -sk https://app.blocksecops.local/api/v1/vulnerabilities?scanner_id=solhint | jq '.total'
+curl -sk https://app.0xapogee.local/api/v1/vulnerabilities?scanner_id=solhint | jq '.total'
 # Should be > 0
 
 # Check tool-integration logs for extraction
@@ -50,7 +50,7 @@ kubectl logs -n tool-integration-local deployment/tool-integration --tail=50 | g
 
 ```bash
 # Check scanner_id on vyper findings
-curl -sk https://app.blocksecops.local/api/v1/vulnerabilities?scanner_id=vyper | jq '.total'
+curl -sk https://app.0xapogee.local/api/v1/vulnerabilities?scanner_id=vyper | jq '.total'
 
 # Verify no findings attributed to detector IDs instead of "vyper"
 kubectl logs -n tool-integration-local deployment/tool-integration --tail=50 | grep "Vyper scan"
@@ -80,7 +80,7 @@ PGPASSWORD=postgres psql -h 127.0.0.1 -p 5432 -U postgres -d solidity_security \
 # Should return 0
 
 # Trigger recovery endpoint (requires internal service auth)
-curl -sk -X POST https://app.blocksecops.local/api/v1/scans/maintenance/recover-stale-scans \
+curl -sk -X POST https://app.0xapogee.local/api/v1/scans/maintenance/recover-stale-scans \
   -H "X-Internal-Service: true"
 ```
 
@@ -123,7 +123,7 @@ kubectl logs -n tool-integration-local deployment/tool-integration --tail=100 | 
 
 ```bash
 # Check a vulnerability has code_snippet populated
-curl -sk https://app.blocksecops.local/api/v1/vulnerabilities?limit=5 | jq '.items[0].code_snippet'
+curl -sk https://app.0xapogee.local/api/v1/vulnerabilities?limit=5 | jq '.items[0].code_snippet'
 # Should NOT be null for vulnerabilities with line_number
 ```
 

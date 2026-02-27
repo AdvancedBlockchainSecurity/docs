@@ -2,7 +2,7 @@
 
 **Last Updated**: February 12, 2026
 **API Version**: v1.3
-**Base URL**: `https://api.blocksecops.com/api/v1`
+**Base URL**: `https://api.0xapogee.com/api/v1`
 
 ---
 
@@ -99,7 +99,7 @@ All API requests require Supabase Auth JWT token:
 const { data: { session } } = await supabase.auth.getSession()
 
 // Make API request
-const response = await fetch('https://api.blocksecops.com/api/v1/contracts', {
+const response = await fetch('https://api.0xapogee.com/api/v1/contracts', {
   headers: {
     'Authorization': `Bearer ${session.access_token}`,
     'Content-Type': 'application/json'
@@ -112,7 +112,7 @@ See **[Authentication System](../architecture/authentication-system.md)** for de
 ### 2. Upload Contract
 
 ```bash
-curl -X POST https://api.blocksecops.com/api/v1/contracts/upload \
+curl -X POST https://api.0xapogee.com/api/v1/contracts/upload \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -F "file=@MyContract.sol" \
   -F "name=MyContract" \
@@ -122,7 +122,7 @@ curl -X POST https://api.blocksecops.com/api/v1/contracts/upload \
 ### 3. Trigger Scan
 
 ```bash
-curl -X POST https://api.blocksecops.com/api/v1/scans \
+curl -X POST https://api.0xapogee.com/api/v1/scans \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"contract_id": "contract-uuid", "scanners": ["slither", "aderyn"]}'
@@ -131,7 +131,7 @@ curl -X POST https://api.blocksecops.com/api/v1/scans \
 ### 4. Get Results
 
 ```bash
-curl -X GET https://api.blocksecops.com/api/v1/scans/{scan_id}/results \
+curl -X GET https://api.0xapogee.com/api/v1/scans/{scan_id}/results \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -186,7 +186,7 @@ curl -X GET https://api.blocksecops.com/api/v1/scans/{scan_id}/results \
 
 Interactive API documentation available at:
 - **Local**: `http://localhost:8000/docs`
-- **Production**: `https://api.blocksecops.com/docs`
+- **Production**: `https://api.0xapogee.com/docs`
 
 ---
 
@@ -195,7 +195,7 @@ Interactive API documentation available at:
 For API issues or questions:
 - Check [Troubleshooting Guide](../deployment/README.md)
 - Review [Known Issues](../deployment/CHANGELOG.md)
-- Contact: support@blocksecops.com
+- Contact: support@0xapogee.com
 
 ---
 

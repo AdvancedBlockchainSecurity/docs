@@ -145,7 +145,7 @@ The OAuth integration system connects BlockSecOps to third-party services (GitHu
     - JIRA-specific: `cloud_id`, `site_url`
 
 13. **Redirect to dashboard** with success parameters
-    - `https://app.blocksecops.com/integrations?success=true&integration_id=...&provider=github`
+    - `https://app.0xapogee.com/integrations?success=true&integration_id=...&provider=github`
 
 ---
 

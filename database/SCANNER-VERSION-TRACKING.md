@@ -393,7 +393,7 @@ The database provides the **history** and **analytics** that ConfigMap cannot.
 
 ### Scanner Images in Harbor Registry (Verified February 18, 2026)
 
-All 16 scanner images are now in Harbor at `harbor.blocksecops.local/blocksecops/`:
+All 16 scanner images are now in Harbor at `harbor.0xapogee.local/blocksecops/`:
 
 ### Automated Version Checking
 
@@ -424,16 +424,16 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
 - certora (8.3.1) - 0/5 rules integrated
 
 **EVM/Vyper Scanners:** ✅ All in Harbor, E2E verified (January 19, 2026)
-- vyper (0.4.3) - harbor.blocksecops.local/blocksecops/scanner-vyper:0.3.0 - uses slither 0.11.3 ✅
-- moccasin (0.4.3, vyper 0.4.3) - harbor.blocksecops.local/blocksecops/scanner-moccasin:0.3.0 - fuzzer ✅
+- vyper (0.4.3) - harbor.0xapogee.local/blocksecops/scanner-vyper:0.3.0 - uses slither 0.11.3 ✅
+- moccasin (0.4.3, vyper 0.4.3) - harbor.0xapogee.local/blocksecops/scanner-moccasin:0.3.0 - fuzzer ✅
   - Note: Moccasin requires project structure (not shown for single-file contracts in UI)
 
 **Solana Scanners:** ✅ All in Harbor (February 18, 2026)
-- sol-azy (0.4.0) - harbor.blocksecops.local/blocksecops/scanner-sol-azy:0.4.0 ✅
-- sec3-xray (0.0.6) - harbor.blocksecops.local/blocksecops/scanner-sec3-xray:0.3.1 ✅
-- trident (0.12.0) - harbor.blocksecops.local/blocksecops/scanner-trident:0.3.0 ✅
-- cargo-fuzz-solana (0.13.1) - harbor.blocksecops.local/blocksecops/scanner-cargo-fuzz-solana:0.3.0 ✅
-- rustdefend (0.5.1) - harbor.blocksecops.local/blocksecops/scanner-rustdefend:0.4.2 ✅ (clean-slate: 46 findings across 13 contracts, 100% pattern coverage)
+- sol-azy (0.4.0) - harbor.0xapogee.local/blocksecops/scanner-sol-azy:0.4.0 ✅
+- sec3-xray (0.0.6) - harbor.0xapogee.local/blocksecops/scanner-sec3-xray:0.3.1 ✅
+- trident (0.12.0) - harbor.0xapogee.local/blocksecops/scanner-trident:0.3.0 ✅
+- cargo-fuzz-solana (0.13.1) - harbor.0xapogee.local/blocksecops/scanner-cargo-fuzz-solana:0.3.0 ✅
+- rustdefend (0.5.1) - harbor.0xapogee.local/blocksecops/scanner-rustdefend:0.4.2 ✅ (clean-slate: 46 findings across 13 contracts, 100% pattern coverage)
 
 **Cairo/StarkNet Scanners:** ⚠️ NOT integrated - patterns defined but no scanner integration
 - caracal (0.2.3) - 0/14 detectors ❌ Unavailable (no Docker image)

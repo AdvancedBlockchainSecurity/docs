@@ -9,7 +9,7 @@ End-to-end testing playbook for the smart contract upload, scan, and result pipe
 
 ## Prerequisites
 
-- API service running at `https://app.blocksecops.local`
+- API service running at `https://app.0xapogee.local`
 - Valid JWT token (HS256 local dev: requires `sub` + `email` claims)
 - User added to an organization
 - Test fixtures at `/tmp/audit-fixtures/`

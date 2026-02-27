@@ -458,7 +458,7 @@ Phase 8: Production Deployment (1-2 hours)
 5. **Verify Deployment**:
    ```bash
    # Health check
-   curl https://api.blocksecops.com/api/v1/health/ready
+   curl https://api.0xapogee.com/api/v1/health/ready
 
    # Pattern count
    kubectl exec -it deployment/postgresql -n production -- \

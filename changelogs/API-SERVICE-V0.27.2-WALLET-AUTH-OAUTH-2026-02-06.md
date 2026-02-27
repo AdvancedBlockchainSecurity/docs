@@ -29,7 +29,7 @@ Fixed wallet authentication nonce endpoints crashing due to slowapi rate limiter
 
 - **Per-provider OAuth secrets** in ExternalSecret - GitHub, GitLab, Bitbucket, Jira each get dedicated `client_id`/`client_secret` from separate Vault paths
 - **Per-provider OAuth env vars** in deployment-patch - 8 new env vars (`GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GITLAB_CLIENT_ID`, etc.)
-- **`DASHBOARD_BASE_URL`** env var - Set to `http://app.blocksecops.local` for OAuth callback URL construction
+- **`DASHBOARD_BASE_URL`** env var - Set to `http://app.0xapogee.local` for OAuth callback URL construction
 - **Vault paths** for OAuth secrets:
   - `secret/local/api-service/oauth/github`
   - `secret/local/api-service/oauth/gitlab`

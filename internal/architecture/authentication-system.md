@@ -42,7 +42,7 @@ BlockSecOps implements a secure authentication system using Supabase Auth with J
 ### User Registration Flow
 
 ```
-1. User → app.blocksecops.com/signup
+1. User → app.0xapogee.com/signup
    ↓
 2. Frontend → Supabase Auth (register)
    - Email/password OR OAuth provider
@@ -65,7 +65,7 @@ BlockSecOps implements a secure authentication system using Supabase Auth with J
 ### Login Flow
 
 ```
-1. User → app.blocksecops.com/login
+1. User → app.0xapogee.com/login
    ↓
 2. Frontend → Supabase Auth (login)
    ↓
@@ -505,7 +505,7 @@ logger.info(f"User {user.id} tier upgraded from {old_tier} to {new_tier}")
 
 ## Integration Points
 
-### Frontend (app.blocksecops.com)
+### Frontend (app.0xapogee.com)
 
 ```typescript
 import { createClient } from '@supabase/supabase-js'
@@ -515,8 +515,8 @@ const supabase = createClient(
   process.env.VITE_SUPABASE_ANON_KEY,
   {
     auth: {
-      redirectTo: 'https://app.blocksecops.com/auth/callback',
-      cookieDomain: '.blocksecops.com',
+      redirectTo: 'https://app.0xapogee.com/auth/callback',
+      cookieDomain: '.0xapogee.com',
       autoRefreshToken: true,
       persistSession: true,
     }
@@ -525,12 +525,12 @@ const supabase = createClient(
 
 // Get session and make authenticated request
 const { data: { session } } = await supabase.auth.getSession()
-const response = await fetch('https://api.blocksecops.com/api/v1/users/me/enhanced', {
+const response = await fetch('https://api.0xapogee.com/api/v1/users/me/enhanced', {
   headers: { 'Authorization': `Bearer ${session.access_token}` }
 })
 ```
 
-### Backend (api.blocksecops.com)
+### Backend (api.0xapogee.com)
 
 ```python
 from fastapi import Depends, HTTPException
@@ -586,7 +586,7 @@ VITE_WALLETCONNECT_PROJECT_ID=<project-id> # Get from cloud.walletconnect.com
 DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgresql:5432/solidity_security
 
 # CORS
-FRONTEND_URL=https://app.blocksecops.com
+FRONTEND_URL=https://app.0xapogee.com
 ```
 
 **Important**: `SUPABASE_SERVICE_KEY` is required for wallet authentication to work. Without it, the backend cannot create Supabase users/sessions for wallet-authenticated users.

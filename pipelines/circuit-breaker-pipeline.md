@@ -1,6 +1,6 @@
 # Circuit Breaker Pipeline
 
-Frontend circuit breaker implementation for the admin portal (`admin.blocksecops.local`), mirroring the backend `circuit_breaker.py` pattern for resilient API communication.
+Frontend circuit breaker implementation for the admin portal (`admin.0xapogee.local`), mirroring the backend `circuit_breaker.py` pattern for resilient API communication.
 
 ## Overview
 

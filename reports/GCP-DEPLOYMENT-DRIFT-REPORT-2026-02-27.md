@@ -102,7 +102,7 @@ Every K8s GCP overlay references the wrong names:
 | JWT secret | `blocksecops-gcp-jwt-secret` | `blocksecops-staging-jwt-secret` | Broken |
 | LB static IP | `blocksecops-gcp-ip` | `blocksecops-staging-lb-ip` | Broken |
 | Artifact Registry | `blocksecops/<service>` | `blocksecops-staging-docker/<service>` | Broken |
-| SSL cert domain | `app.0xApogee.com` (ingress) | `app.blocksecops.com` (tfvars) | Broken |
+| SSL cert domain | `app.0xApogee.com` (ingress) | `app.0xapogee.com` (tfvars) | Broken |
 | GCP project ref | `blocksecops-gcp` (ESO) | `project-8a2657b9-d96c-4c0a-a69` | Broken |
 
 **None of the GCP K8s overlays would work if deployed as-is.**

@@ -15,7 +15,7 @@ This playbook guides team leads and managers through the complete workflow for c
 - [ ] Enterprise tier subscription (required for organization creation)
 - [ ] API access token (obtained from user profile or login)
 - [ ] `curl` or API client for executing requests
-- [ ] Access to BlockSecOps API at `https://app.blocksecops.local/api/v1`
+- [ ] Access to BlockSecOps API at `https://app.0xapogee.local/api/v1`
 
 ---
 
@@ -97,7 +97,7 @@ Organizations require an Enterprise tier subscription.
 ### API Request
 
 ```bash
-curl -X POST "https://app.blocksecops.local/api/v1/organizations" \
+curl -X POST "https://app.0xapogee.local/api/v1/organizations" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -138,7 +138,7 @@ Before adding members, retrieve the available roles for your organization.
 Use the `/roles` convenience endpoint to get roles for your current organization:
 
 ```bash
-curl -X GET "https://app.blocksecops.local/api/v1/roles" \
+curl -X GET "https://app.0xapogee.local/api/v1/roles" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -147,7 +147,7 @@ curl -X GET "https://app.blocksecops.local/api/v1/roles" \
 Or specify the organization ID explicitly:
 
 ```bash
-curl -X GET "https://app.blocksecops.local/api/v1/organizations/{org_id}/roles" \
+curl -X GET "https://app.0xapogee.local/api/v1/organizations/{org_id}/roles" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -198,7 +198,7 @@ Add existing users to your organization with a specified role.
 Use the convenience endpoint to add members to your current organization:
 
 ```bash
-curl -X POST "https://app.blocksecops.local/api/v1/organizations/current/users" \
+curl -X POST "https://app.0xapogee.local/api/v1/organizations/current/users" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -214,7 +214,7 @@ curl -X POST "https://app.blocksecops.local/api/v1/organizations/current/users" 
 Or specify the organization ID explicitly:
 
 ```bash
-curl -X POST "https://app.blocksecops.local/api/v1/organizations/{org_id}/members" \
+curl -X POST "https://app.0xapogee.local/api/v1/organizations/{org_id}/members" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -241,19 +241,19 @@ For bulk operations, make sequential API calls:
 
 ```bash
 # Add developer
-curl -X POST "https://app.blocksecops.local/api/v1/organizations/{org_id}/members" \
+curl -X POST "https://app.0xapogee.local/api/v1/organizations/{org_id}/members" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"user_id": "user_001", "role": "developer"}'
 
 # Add auditor
-curl -X POST "https://app.blocksecops.local/api/v1/organizations/{org_id}/members" \
+curl -X POST "https://app.0xapogee.local/api/v1/organizations/{org_id}/members" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"user_id": "user_002", "role": "auditor"}'
 
 # Add admin
-curl -X POST "https://app.blocksecops.local/api/v1/organizations/{org_id}/members" \
+curl -X POST "https://app.0xapogee.local/api/v1/organizations/{org_id}/members" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"user_id": "user_003", "role": "admin"}'
@@ -276,7 +276,7 @@ Teams provide sub-groupings within organizations for project collaboration.
 ### API Request
 
 ```bash
-curl -X POST "https://app.blocksecops.local/api/v1/organizations/{org_id}/teams" \
+curl -X POST "https://app.0xapogee.local/api/v1/organizations/{org_id}/teams" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -316,7 +316,7 @@ Add organization members to specific teams.
 ### API Request
 
 ```bash
-curl -X POST "https://app.blocksecops.local/api/v1/teams/{team_id}/members" \
+curl -X POST "https://app.0xapogee.local/api/v1/teams/{team_id}/members" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -354,7 +354,7 @@ Projects contain smart contracts and scan configurations.
 ### API Request
 
 ```bash
-curl -X POST "https://app.blocksecops.local/api/v1/projects" \
+curl -X POST "https://app.0xapogee.local/api/v1/projects" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -386,7 +386,7 @@ Grant team members access to specific projects.
 ### API Request
 
 ```bash
-curl -X POST "https://app.blocksecops.local/api/v1/projects/{project_id}/access" \
+curl -X POST "https://app.0xapogee.local/api/v1/projects/{project_id}/access" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -421,12 +421,12 @@ Currently, project access must be granted individually to each user. To grant ac
 
 ```bash
 # Get team members
-TEAM_MEMBERS=$(curl -s "https://app.blocksecops.local/api/v1/teams/{team_id}/members" \
+TEAM_MEMBERS=$(curl -s "https://app.0xapogee.local/api/v1/teams/{team_id}/members" \
   -H "Authorization: Bearer $ACCESS_TOKEN" | jq -r '.[].user_id')
 
 # Grant access to each member
 for USER_ID in $TEAM_MEMBERS; do
-  curl -X POST "https://app.blocksecops.local/api/v1/projects/{project_id}/access" \
+  curl -X POST "https://app.0xapogee.local/api/v1/projects/{project_id}/access" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -H "Content-Type: application/json" \
     -d "{\"user_id\": \"$USER_ID\", \"access_level\": \"write\"}"
@@ -441,19 +441,19 @@ done
 
 ```bash
 # Get organization details
-curl -X GET "https://app.blocksecops.local/api/v1/organizations/{org_id}" \
+curl -X GET "https://app.0xapogee.local/api/v1/organizations/{org_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # List all organization members (convenience endpoint)
-curl -X GET "https://app.blocksecops.local/api/v1/organizations/current/users" \
+curl -X GET "https://app.0xapogee.local/api/v1/organizations/current/users" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # List available roles (convenience endpoint)
-curl -X GET "https://app.blocksecops.local/api/v1/roles" \
+curl -X GET "https://app.0xapogee.local/api/v1/roles" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # Or use explicit organization ID
-curl -X GET "https://app.blocksecops.local/api/v1/organizations/{org_id}/members" \
+curl -X GET "https://app.0xapogee.local/api/v1/organizations/{org_id}/members" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -461,11 +461,11 @@ curl -X GET "https://app.blocksecops.local/api/v1/organizations/{org_id}/members
 
 ```bash
 # List organization teams
-curl -X GET "https://app.blocksecops.local/api/v1/organizations/{org_id}/teams" \
+curl -X GET "https://app.0xapogee.local/api/v1/organizations/{org_id}/teams" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # Get team members
-curl -X GET "https://app.blocksecops.local/api/v1/teams/{team_id}/members" \
+curl -X GET "https://app.0xapogee.local/api/v1/teams/{team_id}/members" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -473,7 +473,7 @@ curl -X GET "https://app.blocksecops.local/api/v1/teams/{team_id}/members" \
 
 ```bash
 # List project access grants
-curl -X GET "https://app.blocksecops.local/api/v1/projects/{project_id}/access" \
+curl -X GET "https://app.0xapogee.local/api/v1/projects/{project_id}/access" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -484,28 +484,28 @@ curl -X GET "https://app.blocksecops.local/api/v1/projects/{project_id}/access" 
 ### Remove Member from Organization
 
 ```bash
-curl -X DELETE "https://app.blocksecops.local/api/v1/organizations/{org_id}/members/{user_id}" \
+curl -X DELETE "https://app.0xapogee.local/api/v1/organizations/{org_id}/members/{user_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
 ### Remove Member from Team
 
 ```bash
-curl -X DELETE "https://app.blocksecops.local/api/v1/teams/{team_id}/members/{user_id}" \
+curl -X DELETE "https://app.0xapogee.local/api/v1/teams/{team_id}/members/{user_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
 ### Revoke Project Access
 
 ```bash
-curl -X DELETE "https://app.blocksecops.local/api/v1/projects/{project_id}/access/{user_id}" \
+curl -X DELETE "https://app.0xapogee.local/api/v1/projects/{project_id}/access/{user_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
 ### Delete Team
 
 ```bash
-curl -X DELETE "https://app.blocksecops.local/api/v1/teams/{team_id}" \
+curl -X DELETE "https://app.0xapogee.local/api/v1/teams/{team_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -514,7 +514,7 @@ curl -X DELETE "https://app.blocksecops.local/api/v1/teams/{team_id}" \
 > **Warning:** This permanently deletes the organization and all associated teams.
 
 ```bash
-curl -X DELETE "https://app.blocksecops.local/api/v1/organizations/{org_id}" \
+curl -X DELETE "https://app.0xapogee.local/api/v1/organizations/{org_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 

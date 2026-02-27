@@ -332,7 +332,7 @@ kubectl exec -n admin-portal-local deployment/admin-portal -- \
 ```bash
 cd /home/pwner/Git/blocksecops-admin-portal
 VERSION=$(grep '"version"' package.json | head -1 | cut -d'"' -f4)
-REGISTRY="harbor.blocksecops.local"
+REGISTRY="harbor.0xapogee.local"
 SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')
 SUPABASE_KEY=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_anon_key}')
 

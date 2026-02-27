@@ -12,7 +12,7 @@ Fixed WebSocket connectivity for real-time notifications by routing WebSocket tr
 
 ### 1. WebSocket Routing Through Traefik
 
-**Problem:** Dashboard was trying to connect to `ws://127.0.0.1:8003/ws` directly instead of routing through Traefik at `ws://app.blocksecops.local/ws`. This caused WebSocket connection failures and the dashboard showing "Offline" status.
+**Problem:** Dashboard was trying to connect to `ws://127.0.0.1:8003/ws` directly instead of routing through Traefik at `ws://app.0xapogee.local/ws`. This caused WebSocket connection failures and the dashboard showing "Offline" status.
 
 **Solution:**
 - Created IngressRoute for WebSocket traffic at `/ws` path
@@ -27,8 +27,8 @@ Fixed WebSocket connectivity for real-time notifications by routing WebSocket tr
 | blocksecops-notification | `k8s/overlays/local/kustomization.yaml` | Added ingressroute-ws.yaml resource |
 | blocksecops-notification | `k8s/overlays/production/ingressroute-ws.yaml` | NEW - WebSocket IngressRoute for production |
 | blocksecops-notification | `k8s/overlays/production/kustomization.yaml` | Added ingressroute-ws.yaml resource |
-| blocksecops-dashboard | `Dockerfile` | Changed default VITE_WS_URL from `ws://127.0.0.1:8003/ws` to `ws://app.blocksecops.local/ws` |
-| blocksecops-dashboard | `k8s/overlays/local/configmap-patch.yaml` | Updated ws_url to `ws://app.blocksecops.local/ws` |
+| blocksecops-dashboard | `Dockerfile` | Changed default VITE_WS_URL from `ws://127.0.0.1:8003/ws` to `ws://app.0xapogee.local/ws` |
+| blocksecops-dashboard | `k8s/overlays/local/configmap-patch.yaml` | Updated ws_url to `ws://app.0xapogee.local/ws` |
 | blocksecops-gcp-infrastructure | `k8s/overlays/server/dashboard/ingressroute.yaml` | Added `!PathPrefix(/ws)` to exclude WebSocket from dashboard route |
 
 ### 2. Scanner Effectiveness KeyError Fix
@@ -73,7 +73,7 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`app.blocksecops.local`) && PathPrefix(`/ws`)
+    - match: Host(`app.0xapogee.local`) && PathPrefix(`/ws`)
       kind: Rule
       priority: 100
       services:
@@ -93,7 +93,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`app.blocksecops.com`) && PathPrefix(`/ws`)
+    - match: Host(`app.0xapogee.com`) && PathPrefix(`/ws`)
       kind: Rule
       services:
         - name: notification
@@ -109,7 +109,7 @@ spec:
 ```bash
 # Test WebSocket upgrade through Traefik
 curl -s -o /dev/null -w "%{http_code}" \
-  -H "Host: app.blocksecops.local" \
+  -H "Host: app.0xapogee.local" \
   -H "Connection: Upgrade" \
   -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Version: 13" \
@@ -124,7 +124,7 @@ curl -s -o /dev/null -w "%{http_code}" \
 ```bash
 # Test endpoint returns 200 (with valid auth)
 curl -s -o /dev/null -w "%{http_code}" \
-  -H "Host: app.blocksecops.local" \
+  -H "Host: app.0xapogee.local" \
   -H "Authorization: Bearer $TOKEN" \
   "http://127.0.0.1/api/v1/analytics/scanner-effectiveness?time_range=all_time"
 

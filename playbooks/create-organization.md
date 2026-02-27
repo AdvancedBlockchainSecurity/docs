@@ -47,7 +47,7 @@ flowchart LR
 **API:**
 ```bash
 # Check current tier
-curl -X GET "https://app.blocksecops.com/api/v1/users/me" \
+curl -X GET "https://app.0xapogee.com/api/v1/users/me" \
   -H "Authorization: Bearer $ACCESS_TOKEN" | jq '.subscription.tier'
 ```
 
@@ -67,7 +67,7 @@ Expected: `"enterprise"`
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/organizations" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -110,7 +110,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/organizations" \
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/organizations/{org_id}/settings" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/organizations/{org_id}/settings" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -144,7 +144,7 @@ For organizations using Single Sign-On:
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/sso" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/sso" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -170,7 +170,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/sso" \
 **API:**
 ```bash
 # If user exists in system
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/members" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/members" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -179,7 +179,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/members"
   }'
 
 # If inviting new user
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/invites" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -216,15 +216,15 @@ Confirm organization is set up correctly:
 **API:**
 ```bash
 # Get organization details
-curl -X GET "https://app.blocksecops.com/api/v1/organizations/{org_id}" \
+curl -X GET "https://app.0xapogee.com/api/v1/organizations/{org_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # List organization members
-curl -X GET "https://app.blocksecops.com/api/v1/organizations/{org_id}/members" \
+curl -X GET "https://app.0xapogee.com/api/v1/organizations/{org_id}/members" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # Check available roles
-curl -X GET "https://app.blocksecops.com/api/v1/roles" \
+curl -X GET "https://app.0xapogee.com/api/v1/roles" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 

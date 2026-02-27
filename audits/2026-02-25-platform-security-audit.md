@@ -107,7 +107,7 @@ Two IngressRoutes existed only in the cluster (not tracked in Git), violating co
 
 - Traefik was only accessible via NodePort (30543/30180), requiring volatile iptables NAT rules
 - **Fix:** Added `hostPort: 80` and `hostPort: 443` to Traefik deployment local overlay
-- **Result:** `https://app.blocksecops.local` accessible immediately after cluster start per service access standards
+- **Result:** `https://app.0xapogee.local` accessible immediately after cluster start per service access standards
 
 ### Audit Script Bug Fix
 

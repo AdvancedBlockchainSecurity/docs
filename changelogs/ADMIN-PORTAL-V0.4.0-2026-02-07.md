@@ -94,9 +94,9 @@ SUPABASE_KEY=$(kubectl get configmap -n admin-portal-local admin-portal-config -
 docker build \
   --build-arg VITE_ADMIN_SUPABASE_URL=${SUPABASE_URL} \
   --build-arg VITE_ADMIN_SUPABASE_ANON_KEY=${SUPABASE_KEY} \
-  -t harbor.blocksecops.local/blocksecops/admin-portal:0.4.0 .
+  -t harbor.0xapogee.local/blocksecops/admin-portal:0.4.0 .
 
-docker push harbor.blocksecops.local/blocksecops/admin-portal:0.4.0
+docker push harbor.0xapogee.local/blocksecops/admin-portal:0.4.0
 kubectl apply -k k8s/overlays/local/
 kubectl rollout restart deploy/admin-portal -n admin-portal-local
 ```

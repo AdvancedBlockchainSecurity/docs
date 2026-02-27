@@ -114,9 +114,9 @@ These standards help you set up and maintain your local development environment:
 
 12. **[Domain Management](./domain-management.md)**
     - Environment-specific domain configuration (local, server, GCP)
-    - Setting up `app.blocksecops.local` for server testing
+    - Setting up `app.0xapogee.local` for server testing
     - Server self-resolution requirement (server must resolve its own domain)
-    - GCP migration checklist for `app.blocksecops.com`
+    - GCP migration checklist for `app.0xapogee.com`
     - Kustomize overlay strategy for domains
     - CORS and IngressRoute configuration
     - Troubleshooting domain/DNS issues

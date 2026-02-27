@@ -51,7 +51,7 @@ sed -i "s/app.kubernetes.io\/version: \".*\"/app.kubernetes.io\/version: \"${VER
 Supabase credentials are sourced from the dashboard ConfigMap (same project):
 
 ```bash
-REGISTRY="harbor.blocksecops.local"
+REGISTRY="harbor.0xapogee.local"
 SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')
 SUPABASE_KEY=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_anon_key}')
 
@@ -78,7 +78,7 @@ kubectl rollout status deployment/admin-portal -n admin-portal-local --timeout=6
 
 ```bash
 # Health check
-curl -sk https://admin.blocksecops.local/ -o /dev/null -w "%{http_code}"
+curl -sk https://admin.0xapogee.local/ -o /dev/null -w "%{http_code}"
 # Expected: 200
 
 # Verify Supabase URL baked in
@@ -94,7 +94,7 @@ kubectl exec -n admin-portal-local deployment/admin-portal -- \
 # Verify image tag
 kubectl get deployment -n admin-portal-local admin-portal \
   -o jsonpath='{.spec.template.spec.containers[0].image}'
-# Expected: harbor.blocksecops.local/blocksecops/admin-portal:<VERSION>
+# Expected: harbor.0xapogee.local/blocksecops/admin-portal:<VERSION>
 ```
 
 ## Key Differences from Backend Services

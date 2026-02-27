@@ -6,7 +6,7 @@
 
 ## Overview
 
-This playbook guides you through installing and configuring the BlockSecOps CLI for command-line security scanning. The CLI enables scanning from terminals, scripts, and CI/CD pipelines.
+This playbook guides you through installing and configuring the Apogee CLI for command-line security scanning. The CLI enables scanning from terminals, scripts, and CI/CD pipelines.
 
 ---
 
@@ -37,10 +37,10 @@ flowchart LR
 
 ```bash
 # Install from PyPI
-pip install blocksecops-cli
+pip install 0xapogee-cli
 
 # Or with pipx for isolated installation
-pipx install blocksecops-cli
+pipx install 0xapogee-cli
 ```
 
 ### Method 2: Homebrew (macOS/Linux)
@@ -50,7 +50,7 @@ pipx install blocksecops-cli
 brew tap blocksecops/tap
 
 # Install CLI
-brew install blocksecops-cli
+brew install 0xapogee-cli
 ```
 
 ### Method 3: Docker
@@ -65,21 +65,21 @@ docker run --rm -v $(pwd):/workspace blocksecops/cli:latest scan --path /workspa
 
 ### Method 4: Binary Download
 
-Download pre-built binaries from [BlockSecOps Downloads](https://app.blocksecops.com/downloads/cli):
+Download pre-built binaries from [BlockSecOps Downloads](https://app.0xapogee.com/downloads/cli):
 
 ```bash
 # Linux (x64)
-curl -L https://app.blocksecops.com/downloads/cli/linux-x64/latest -o blocksecops
+curl -L https://app.0xapogee.com/downloads/cli/linux-x64/latest -o blocksecops
 chmod +x blocksecops
 sudo mv blocksecops /usr/local/bin/
 
 # macOS (Apple Silicon)
-curl -L https://app.blocksecops.com/downloads/cli/darwin-arm64/latest -o blocksecops
+curl -L https://app.0xapogee.com/downloads/cli/darwin-arm64/latest -o blocksecops
 chmod +x blocksecops
 sudo mv blocksecops /usr/local/bin/
 
 # macOS (Intel)
-curl -L https://app.blocksecops.com/downloads/cli/darwin-x64/latest -o blocksecops
+curl -L https://app.0xapogee.com/downloads/cli/darwin-x64/latest -o blocksecops
 chmod +x blocksecops
 sudo mv blocksecops /usr/local/bin/
 ```
@@ -103,7 +103,7 @@ sudo mv blocksecops /usr/local/bin/
 
 ```bash
 # Add to ~/.bashrc, ~/.zshrc, or ~/.profile
-export BLOCKSECOPS_API_KEY="bso_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+export APOGEE_API_KEY="bso_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 # Apply changes
 source ~/.bashrc
@@ -113,16 +113,16 @@ source ~/.bashrc
 
 ```bash
 # Create config file
-blocksecops config init
+0xapogee config init
 
 # Set API key
-blocksecops config set api_key bso_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+0xapogee config set api_key bso_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-Creates `~/.blocksecops/config.yaml`:
+Creates `~/.0xapogee/config.yaml`:
 ```yaml
 api_key: bso_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-api_url: https://app.blocksecops.com/api/v1
+api_url: https://app.0xapogee.com/api/v1
 default_scanners:
   - soliditydefend
   - slither
@@ -132,17 +132,17 @@ output_format: text
 **Option C: Command-Line Flag**
 
 ```bash
-blocksecops scan --api-key bso_live_xxxx --path contracts/
+0xapogee scan --api-key bso_live_xxxx --path contracts/
 ```
 
 ### Step 3: Verify Installation
 
 ```bash
 # Check version
-blocksecops --version
+0xapogee --version
 
 # Test authentication
-blocksecops auth test
+0xapogee auth test
 
 # Expected output:
 # ✓ Authenticated as: user@example.com
@@ -158,49 +158,49 @@ blocksecops auth test
 
 ```bash
 # Scan all Solidity files in directory
-blocksecops scan --path contracts/
+0xapogee scan --path contracts/
 
 # Scan with specific project name
-blocksecops scan --path contracts/ --project "My DeFi Project"
+0xapogee scan --path contracts/ --project "My DeFi Project"
 ```
 
 ### Scan Specific Files
 
 ```bash
 # Scan single file
-blocksecops scan --files contracts/Token.sol
+0xapogee scan --files contracts/Token.sol
 
 # Scan multiple files
-blocksecops scan --files contracts/Token.sol,contracts/Vault.sol
+0xapogee scan --files contracts/Token.sol,contracts/Vault.sol
 ```
 
 ### Select Scanners
 
 ```bash
 # Use specific scanners
-blocksecops scan --path contracts/ --scanners soliditydefend,slither
+0xapogee scan --path contracts/ --scanners soliditydefend,slither
 
 # Use all available scanners
-blocksecops scan --path contracts/ --scanners all
+0xapogee scan --path contracts/ --scanners all
 ```
 
 ### Output Formats
 
 ```bash
 # Text output (default)
-blocksecops scan --path contracts/ --output text
+0xapogee scan --path contracts/ --output text
 
 # JSON output
-blocksecops scan --path contracts/ --output json > results.json
+0xapogee scan --path contracts/ --output json > results.json
 
 # SARIF output (for IDE integration)
-blocksecops scan --path contracts/ --output sarif > results.sarif
+0xapogee scan --path contracts/ --output sarif > results.sarif
 
 # HTML report
-blocksecops scan --path contracts/ --output html > report.html
+0xapogee scan --path contracts/ --output html > report.html
 
 # Markdown report
-blocksecops scan --path contracts/ --output markdown > report.md
+0xapogee scan --path contracts/ --output markdown > report.md
 ```
 
 ---
@@ -211,22 +211,22 @@ blocksecops scan --path contracts/ --output markdown > report.md
 
 ```bash
 # Basic scan
-blocksecops scan --path contracts/
+0xapogee scan --path contracts/
 
 # Scan with failure threshold
-blocksecops scan --path contracts/ --fail-on critical,high
+0xapogee scan --path contracts/ --fail-on critical,high
 
 # Exclude paths
-blocksecops scan --path . --exclude "node_modules/**,test/**"
+0xapogee scan --path . --exclude "node_modules/**,test/**"
 
 # Set Solidity version
-blocksecops scan --path contracts/ --solc-version 0.8.19
+0xapogee scan --path contracts/ --solc-version 0.8.19
 
 # Verbose output
-blocksecops scan --path contracts/ --verbose
+0xapogee scan --path contracts/ --verbose
 
 # Quiet mode (only errors)
-blocksecops scan --path contracts/ --quiet
+0xapogee scan --path contracts/ --quiet
 ```
 
 ### Project Commands
@@ -265,17 +265,17 @@ blocksecops vulns update vuln_xyz789 --status confirmed
 
 ```bash
 # Initialize config
-blocksecops config init
+0xapogee config init
 
 # View current config
-blocksecops config show
+0xapogee config show
 
 # Set config value
-blocksecops config set api_key <key>
-blocksecops config set default_scanners soliditydefend,slither
+0xapogee config set api_key <key>
+0xapogee config set default_scanners soliditydefend,slither
 
 # Get config value
-blocksecops config get api_key
+0xapogee config get api_key
 ```
 
 ---
@@ -321,12 +321,12 @@ blocksecops config get api_key
 
 ## Configuration File
 
-Full `~/.blocksecops/config.yaml` example:
+Full `~/.0xapogee/config.yaml` example:
 
 ```yaml
 # API Configuration
 api_key: bso_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-api_url: https://app.blocksecops.com/api/v1
+api_url: https://app.0xapogee.com/api/v1
 
 # Default Scan Settings
 default_scanners:
@@ -366,13 +366,13 @@ timeout: 600
 ### GitHub Actions
 
 ```yaml
-- name: Install BlockSecOps CLI
-  run: pip install blocksecops-cli
+- name: Install Apogee CLI
+  run: pip install 0xapogee-cli
 
 - name: Run Security Scan
   env:
-    BLOCKSECOPS_API_KEY: ${{ secrets.BLOCKSECOPS_API_KEY }}
-  run: blocksecops scan --path contracts/ --fail-on critical,high
+    APOGEE_API_KEY: ${{ secrets.APOGEE_API_KEY }}
+  run: 0xapogee scan --path contracts/ --fail-on critical,high
 ```
 
 ### GitLab CI
@@ -380,8 +380,8 @@ timeout: 600
 ```yaml
 security-scan:
   script:
-    - pip install blocksecops-cli
-    - blocksecops scan --path contracts/ --fail-on critical,high
+    - pip install 0xapogee-cli
+    - 0xapogee scan --path contracts/ --fail-on critical,high
 ```
 
 ### Pre-commit Hook
@@ -394,7 +394,7 @@ repos:
     hooks:
       - id: blocksecops
         name: BlockSecOps Security Scan
-        entry: blocksecops scan --path . --fail-on critical
+        entry: 0xapogee scan --path . --fail-on critical
         language: system
         types: [solidity]
         pass_filenames: false
@@ -408,11 +408,11 @@ Confirm CLI is working:
 
 ```bash
 # Check installation
-blocksecops --version
-# Expected: blocksecops version 1.x.x
+0xapogee --version
+# Expected: 0xapogee version 1.x.x
 
 # Test authentication
-blocksecops auth test
+0xapogee auth test
 # Expected: ✓ Authenticated as: ...
 
 # Run test scan
@@ -424,7 +424,7 @@ contract Test {
     }
 }' > /tmp/test.sol
 
-blocksecops scan --files /tmp/test.sol
+0xapogee scan --files /tmp/test.sol
 # Expected: Scan results with vulnerabilities
 ```
 
@@ -446,23 +446,23 @@ blocksecops scan --files /tmp/test.sol
 
 ```bash
 # Enable debug output
-BLOCKSECOPS_DEBUG=1 blocksecops scan --path contracts/
+APOGEE_DEBUG=1 0xapogee scan --path contracts/
 
 # Or use verbose flag
-blocksecops scan --path contracts/ -vvv
+0xapogee scan --path contracts/ -vvv
 ```
 
 ### Update CLI
 
 ```bash
 # pip
-pip install --upgrade blocksecops-cli
+pip install --upgrade 0xapogee-cli
 
 # Homebrew
-brew upgrade blocksecops-cli
+brew upgrade 0xapogee-cli
 
 # pipx
-pipx upgrade blocksecops-cli
+pipx upgrade 0xapogee-cli
 ```
 
 ---
@@ -470,10 +470,10 @@ pipx upgrade blocksecops-cli
 ## Checklist
 
 - [ ] CLI installed (pip, Homebrew, or binary)
-- [ ] Version check passes (`blocksecops --version`)
+- [ ] Version check passes (`0xapogee --version`)
 - [ ] API key created with required scopes
 - [ ] API key configured (env var or config file)
-- [ ] Authentication test passes (`blocksecops auth test`)
+- [ ] Authentication test passes (`0xapogee auth test`)
 - [ ] Test scan completes successfully
 - [ ] Output format configured as needed
 - [ ] CI/CD integration set up (optional)

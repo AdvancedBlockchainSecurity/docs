@@ -213,11 +213,11 @@ Cost targets: ~$55-65/mo (tier0), ~$684/mo (staging), ~$2,078/mo (production)
 
 ### GCP Domains
 
-- Local: `*.blocksecops.local`
-- Staging: `*.staging.blocksecops.com`
-- Production: `*.blocksecops.com`
-- ArgoCD: `argocd.blocksecops.com`
-- App: `app.blocksecops.com`
+- Local: `*.0xapogee.local`
+- Staging: `*.staging.0xapogee.com`
+- Production: `*.0xapogee.com`
+- ArgoCD: `argocd.0xapogee.com`
+- App: `app.0xapogee.com`
 
 ### GCP Service Overlays
 

@@ -53,7 +53,7 @@ POST /api/v1/invariants/generate
 #### Example Request
 
 ```bash
-curl -X POST https://api.blocksecops.local/api/v1/invariants/generate \
+curl -X POST https://api.0xapogee.local/api/v1/invariants/generate \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -129,7 +129,7 @@ GET /api/v1/invariants/templates
 #### Example Request
 
 ```bash
-curl -X GET "https://api.blocksecops.local/api/v1/invariants/templates?category=reentrancy" \
+curl -X GET "https://api.0xapogee.local/api/v1/invariants/templates?category=reentrancy" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -166,7 +166,7 @@ GET /api/v1/invariants/quota
 #### Example Request
 
 ```bash
-curl -X GET https://api.blocksecops.local/api/v1/invariants/quota \
+curl -X GET https://api.0xapogee.local/api/v1/invariants/quota \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -205,7 +205,7 @@ GET /api/v1/invariants/{invariant_id}
 #### Example Request
 
 ```bash
-curl -X GET https://api.blocksecops.local/api/v1/invariants/inv_7f3a2b1c-4d5e-6f7a-8b9c-0d1e2f3a4b5c \
+curl -X GET https://api.0xapogee.local/api/v1/invariants/inv_7f3a2b1c-4d5e-6f7a-8b9c-0d1e2f3a4b5c \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -253,7 +253,7 @@ GET /api/v1/invariants/contract/{contract_id}
 #### Example Request
 
 ```bash
-curl -X GET "https://api.blocksecops.local/api/v1/invariants/contract/c961ca39-c568-4245-aa95-497d34b20c28?type=reentrancy" \
+curl -X GET "https://api.0xapogee.local/api/v1/invariants/contract/c961ca39-c568-4245-aa95-497d34b20c28?type=reentrancy" \
   -H "Authorization: Bearer $TOKEN"
 ```
 

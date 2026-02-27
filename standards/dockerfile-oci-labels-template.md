@@ -31,7 +31,7 @@ LABEL org.opencontainers.image.title="${SERVICE_NAME}" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.vendor="BlockSecOps" \
       org.opencontainers.image.source="https://github.com/blocksecops/${SERVICE_NAME}" \
-      org.opencontainers.image.authors="BlockSecOps Team <team@blocksecops.com>"
+      org.opencontainers.image.authors="BlockSecOps Team <team@0xapogee.com>"
 ```
 
 ---
@@ -47,7 +47,7 @@ LABEL org.opencontainers.image.title="${SERVICE_NAME}" \
 | `revision` | Git commit SHA | `abc1234` |
 | `vendor` | Organization name | `BlockSecOps` |
 | `source` | Repository URL | `https://github.com/blocksecops/blocksecops-api-service` |
-| `authors` | Maintainer contact | `BlockSecOps Team <team@blocksecops.com>` |
+| `authors` | Maintainer contact | `BlockSecOps Team <team@0xapogee.com>` |
 
 ---
 
@@ -81,7 +81,7 @@ docker build \
   --build-arg SERVICE_VERSION=$(grep 'version' pyproject.toml | head -1 | cut -d'"' -f2) \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
-  -t harbor.blocksecops.local/blocksecops/service-name:version .
+  -t harbor.0xapogee.local/blocksecops/service-name:version .
 ```
 
 ---
@@ -105,7 +105,7 @@ Expected output:
   "org.opencontainers.image.revision": "abc1234",
   "org.opencontainers.image.vendor": "BlockSecOps",
   "org.opencontainers.image.source": "https://github.com/blocksecops/blocksecops-api-service",
-  "org.opencontainers.image.authors": "BlockSecOps Team <team@blocksecops.com>"
+  "org.opencontainers.image.authors": "BlockSecOps Team <team@0xapogee.com>"
 }
 ```
 

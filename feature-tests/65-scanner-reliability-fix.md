@@ -66,17 +66,17 @@ python3 -m pytest tests/unit/scanners/test_job_timeouts.py -v
 CONTRACT_ID="ea2f0908-8f61-4edf-b735-a90e7c58329c"
 
 # Filter by contract_id
-curl -s -k "https://app.blocksecops.local/api/v1/vulnerabilities?contract_id=${CONTRACT_ID}" \
+curl -s -k "https://app.0xapogee.local/api/v1/vulnerabilities?contract_id=${CONTRACT_ID}" \
   -H "Authorization: Bearer $TOKEN" | jq '.total'
 # Expected: Returns only vulnerabilities for that contract
 
 # Filter by invalid UUID
-curl -s -k "https://app.blocksecops.local/api/v1/vulnerabilities?contract_id=not-a-uuid" \
+curl -s -k "https://app.0xapogee.local/api/v1/vulnerabilities?contract_id=not-a-uuid" \
   -H "Authorization: Bearer $TOKEN"
 # Expected: 400 Bad Request with "Invalid contract_id format (must be UUID)"
 
 # No filter (backwards compatibility)
-curl -s -k "https://app.blocksecops.local/api/v1/vulnerabilities" \
+curl -s -k "https://app.0xapogee.local/api/v1/vulnerabilities" \
   -H "Authorization: Bearer $TOKEN" | jq '.total'
 # Expected: Returns all vulnerabilities for the org
 ```
@@ -92,7 +92,7 @@ curl -s -k "https://app.blocksecops.local/api/v1/vulnerabilities" \
 ```bash
 # Check vulnerability types for a rustdefend scan
 SCAN_ID="<scan_id>"
-curl -s -k "https://app.blocksecops.local/api/v1/vulnerabilities?scan_id=${SCAN_ID}" \
+curl -s -k "https://app.0xapogee.local/api/v1/vulnerabilities?scan_id=${SCAN_ID}" \
   -H "Authorization: Bearer $TOKEN" | jq '.items[].vulnerability_type'
 # Expected: All values match pattern [A-Z]+-[A-Z0-9-]+
 ```

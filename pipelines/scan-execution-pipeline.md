@@ -22,7 +22,7 @@ POST /scans         →      Queue scan task      execute_scanners()          Sc
 
 - **Dashboard**: User clicks "Scan" on an uploaded contract
 - **API Key**: `POST /api/v1/scans` with contract_id and scanner selection
-- **CLI**: `blocksecops scan` command
+- **CLI**: `0xapogee scan` command
 
 ## Pipeline Phases
 

@@ -150,7 +150,7 @@ kubectl logs -f $(kubectl get pods -l app=postgresql -o name) -n default
 kubectl logs -f $(kubectl get pods -l app=redis -o name) -n default
 
 # Follow logs with timestamp
-kubectl logs -f deployment/api-service -n blocksecops --timestamps=true
+kubectl logs -f deployment/api-service -n 0xapogee --timestamps=true
 ```
 
 ### Database Access
@@ -200,7 +200,7 @@ kubectl apply -f service2/k8s/ -n blocksecops
 kubectl exec -it $(kubectl get pods -l app=api-service -o name) -- curl http://data-service:8001/health
 
 # Check service discovery
-kubectl exec -it $(kubectl get pods -l app=api-service -o name) -- nslookup data-service.blocksecops.svc.cluster.local
+kubectl exec -it $(kubectl get pods -l app=api-service -o name) -- nslookup data-service.0xapogee.svc.cluster.local
 ```
 
 ### End-to-End Testing
@@ -313,7 +313,7 @@ CREATE INDEX IF NOT EXISTS idx_vulnerabilities_created_at ON vulnerabilities(cre
 #### Updating Service Configuration
 ```bash
 # Update ConfigMap with new environment variables
-kubectl patch configmap service-config -n blocksecops --patch='
+kubectl patch configmap service-config -n 0xapogee --patch='
 data:
   NEW_ENV_VAR: "new_value"
   API_RATE_LIMIT: "1000"
@@ -330,7 +330,7 @@ kubectl exec $(kubectl get pods -l app=api-service -o name) -- env | grep NEW_EN
 #### Service-Specific Environment
 ```bash
 # Add environment variables to specific deployment
-kubectl patch deployment api-service -n blocksecops --patch='
+kubectl patch deployment api-service -n 0xapogee --patch='
 spec:
   template:
     spec:
@@ -369,7 +369,7 @@ curl -s http://localhost:5000/v2/_catalog >/dev/null && echo "✅ Registry" || e
 python3 -c "import solidity_shared" 2>/dev/null && echo "✅ Shared library" || echo "❌ Shared library"
 
 # Services (if deployed)
-kubectl get deployments -n blocksecops --no-headers 2>/dev/null | while read name ready uptodate available age; do
+kubectl get deployments -n 0xapogee --no-headers 2>/dev/null | while read name ready uptodate available age; do
   if [ "$ready" = "$available" ] && [ "$available" != "0" ]; then
     echo "✅ Service: $name"
   else
@@ -482,7 +482,7 @@ kubectl create deployment api-service-dev \
   -n blocksecops
 
 # Edit deployment to mount local volume (for development)
-kubectl patch deployment api-service-dev -n blocksecops --patch='
+kubectl patch deployment api-service-dev -n 0xapogee --patch='
 spec:
   template:
     spec:
@@ -610,7 +610,7 @@ kubectl set image deployment/service service=localhost:5000/service:dev -n block
 kubectl logs -f deployment/service -n blocksecops
 
 # Shell access
-kubectl exec -it deployment/service -n blocksecops -- /bin/bash
+kubectl exec -it deployment/service -n 0xapogee -- /bin/bash
 
 # Database access
 kubectl exec -it $(kubectl get pods -l app=postgresql -o name) -- psql -U postgres -d soliditysecurity

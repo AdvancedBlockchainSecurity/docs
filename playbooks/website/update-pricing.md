@@ -8,7 +8,7 @@
 
 ---
 
-Update pricing information on blocksecops.com.
+Update pricing information on 0xapogee.com.
 
 ## Prerequisites
 

@@ -73,7 +73,7 @@ flowchart LR
 **API:**
 ```bash
 # Get all roles for the organization
-curl -X GET "https://app.blocksecops.com/api/v1/roles" \
+curl -X GET "https://app.0xapogee.com/api/v1/roles" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -124,7 +124,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/roles" \
 **API:**
 ```bash
 # List all organization members with roles
-curl -X GET "https://app.blocksecops.com/api/v1/organizations/current/users" \
+curl -X GET "https://app.0xapogee.com/api/v1/organizations/current/users" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -140,7 +140,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/organizations/current/users" \
 **API:**
 ```bash
 # Update member role (convenience endpoint)
-curl -X PATCH "https://app.blocksecops.com/api/v1/organizations/current/users/{user_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/organizations/current/users/{user_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -148,7 +148,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/organizations/current/users/{u
   }'
 
 # Or using specific org ID
-curl -X PUT "https://app.blocksecops.com/api/v1/organizations/{org_id}/members/{user_id}" \
+curl -X PUT "https://app.0xapogee.com/api/v1/organizations/{org_id}/members/{user_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -172,7 +172,7 @@ for USER_DATA in "${USERS[@]}"; do
   USER_ID=$(echo $USER_DATA | jq -r '.user_id')
   ROLE=$(echo $USER_DATA | jq -r '.role')
 
-  curl -X PUT "https://app.blocksecops.com/api/v1/organizations/{org_id}/members/$USER_ID" \
+  curl -X PUT "https://app.0xapogee.com/api/v1/organizations/{org_id}/members/$USER_ID" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -H "Content-Type: application/json" \
     -d "{\"role\": \"$ROLE\"}"
@@ -200,7 +200,7 @@ done
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/teams/{team_id}/members/{user_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/teams/{team_id}/members/{user_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -231,7 +231,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/teams/{team_id}/members/{user_
 **API:**
 ```bash
 # Grant user access
-curl -X POST "https://app.blocksecops.com/api/v1/projects/{project_id}/access" \
+curl -X POST "https://app.0xapogee.com/api/v1/projects/{project_id}/access" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -240,7 +240,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/projects/{project_id}/access" \
   }'
 
 # Grant team access
-curl -X POST "https://app.blocksecops.com/api/v1/projects/{project_id}/teams" \
+curl -X POST "https://app.0xapogee.com/api/v1/projects/{project_id}/teams" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -303,11 +303,11 @@ Confirm role configuration:
 **API:**
 ```bash
 # Get specific member details
-curl -X GET "https://app.blocksecops.com/api/v1/organizations/{org_id}/members/{user_id}" \
+curl -X GET "https://app.0xapogee.com/api/v1/organizations/{org_id}/members/{user_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # Verify permissions
-curl -X GET "https://app.blocksecops.com/api/v1/users/{user_id}/permissions" \
+curl -X GET "https://app.0xapogee.com/api/v1/users/{user_id}/permissions" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -315,14 +315,14 @@ curl -X GET "https://app.blocksecops.com/api/v1/users/{user_id}/permissions" \
 
 ```bash
 # As auditor, try to create scan (should fail)
-curl -X POST "https://app.blocksecops.com/api/v1/scans" \
+curl -X POST "https://app.0xapogee.com/api/v1/scans" \
   -H "Authorization: Bearer $AUDITOR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"project_id": "proj_123"}'
 # Expected: 403 Forbidden
 
 # As developer, try to manage members (should fail)
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/members" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/members" \
   -H "Authorization: Bearer $DEVELOPER_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"user_id": "user_new", "role": "developer"}'

@@ -55,7 +55,7 @@ Step-by-step operational guides for common tasks.
 |----------|-------------|
 | [VS Code Extension Setup](ide-vscode.md) | Install and configure VS Code extension |
 | [JetBrains Plugin Setup](ide-jetbrains.md) | IntelliJ/WebStorm plugin setup |
-| [CLI Installation](cli-installation.md) | Install and configure BlockSecOps CLI |
+| [CLI Installation](cli-installation.md) | Install and configure Apogee CLI |
 
 ### Issue Tracking Integration
 

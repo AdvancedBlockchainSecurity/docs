@@ -23,7 +23,7 @@ The Developer tier API access and quota enforcement have been **verified and val
 
 | Setting | Value |
 |---------|-------|
-| API Base URL | `https://app.blocksecops.local/api/v1` |
+| API Base URL | `https://app.0xapogee.local/api/v1` |
 | Test User Email | `jasonbrailowbizop@mail.com` |
 | Original Tier | professional |
 | Test Tier | developer |

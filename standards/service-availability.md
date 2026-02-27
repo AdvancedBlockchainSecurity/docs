@@ -28,9 +28,9 @@ After cluster start, all services should be accessible immediately without runni
 
 | Environment | Method | Access Pattern | One-Time Setup |
 |-------------|--------|----------------|----------------|
-| **Local (kubeadm)** | hostPort 80/443 + Traefik (TLS) | `https://app.blocksecops.local` | DNS entries |
-| **Server (kubeadm)** | hostPort 80/443 + Traefik | `http://app.blocksecops.local` | DNS entries |
-| **Production (GCP)** | GCP Load Balancer | `https://app.blocksecops.com` | None (managed) |
+| **Local (kubeadm)** | hostPort 80/443 + Traefik (TLS) | `https://app.0xapogee.local` | DNS entries |
+| **Server (kubeadm)** | hostPort 80/443 + Traefik | `http://app.0xapogee.local` | DNS entries |
+| **Production (GCP)** | GCP Load Balancer | `https://app.0xapogee.com` | None (managed) |
 
 ---
 
@@ -74,15 +74,15 @@ Use manual port-forwards only for:
 **One-Time Setup:**
 ```bash
 # On the local machine (server resolves to itself)
-echo "127.0.0.1  app.blocksecops.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1  app.0xapogee.local" | sudo tee -a /etc/hosts
 
 # On client machines accessing the server
-echo "192.168.86.225  app.blocksecops.local" | sudo tee -a /etc/hosts
+echo "192.168.86.225  app.0xapogee.local" | sudo tee -a /etc/hosts
 ```
 
 **Verification:**
 ```bash
-curl -k https://app.blocksecops.local/api/v1/health/live
+curl -k https://app.0xapogee.local/api/v1/health/live
 ```
 
 **Requirements:**
@@ -94,15 +94,15 @@ curl -k https://app.blocksecops.local/api/v1/health/live
 **One-Time Setup:**
 ```bash
 # On server (for local API testing)
-echo "127.0.0.1  app.blocksecops.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1  app.0xapogee.local" | sudo tee -a /etc/hosts
 
 # On client machines
-echo "192.168.86.225  app.blocksecops.local" | sudo tee -a /etc/hosts
+echo "192.168.86.225  app.0xapogee.local" | sudo tee -a /etc/hosts
 ```
 
 **Verification:**
 ```bash
-curl http://app.blocksecops.local/api/v1/health/live
+curl http://app.0xapogee.local/api/v1/health/live
 ```
 
 **Requirements:**
@@ -115,7 +115,7 @@ curl http://app.blocksecops.local/api/v1/health/live
 
 **Verification:**
 ```bash
-curl https://app.blocksecops.com/api/v1/health/live
+curl https://app.0xapogee.com/api/v1/health/live
 ```
 
 ---
@@ -134,7 +134,7 @@ kubectl get pods -n traefik-local
 curl -k https://127.0.0.1/api/v1/health/live
 
 # 3. Test domain access
-curl -k https://app.blocksecops.local/api/v1/health/live
+curl -k https://app.0xapogee.local/api/v1/health/live
 ```
 
 ### Server (kubeadm)
@@ -147,7 +147,7 @@ kubectl get pods -n traefik-local
 curl http://127.0.0.1/api/v1/health/live
 
 # 3. Test domain access
-curl http://app.blocksecops.local/api/v1/health/live
+curl http://app.0xapogee.local/api/v1/health/live
 ```
 
 ### Production (GCP)
@@ -157,7 +157,7 @@ curl http://app.blocksecops.local/api/v1/health/live
 kubectl get svc -n traefik
 
 # 2. Test access
-curl https://app.blocksecops.com/api/v1/health/live
+curl https://app.0xapogee.com/api/v1/health/live
 ```
 
 ---
@@ -173,7 +173,7 @@ curl https://app.blocksecops.com/api/v1/health/live
 
 **Server (kubeadm):**
 1. Check Traefik is running: `kubectl get pods -n traefik-local`
-2. Check DNS resolves: `ping app.blocksecops.local`
+2. Check DNS resolves: `ping app.0xapogee.local`
 3. If DNS fails, check /etc/hosts entry
 
 ### Connection Refused Errors

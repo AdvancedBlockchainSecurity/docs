@@ -61,7 +61,7 @@ flowchart LR
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
+curl -X POST "https://app.0xapogee.com/api/v1/notification_channels" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -93,7 +93,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -115,7 +115,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/notification_channels/{channel
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}/test" \
+curl -X POST "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}/test" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -151,7 +151,7 @@ Teams messages use Adaptive Cards for rich formatting:
     "name": "View Report",
     "targets": [{
       "os": "default",
-      "uri": "https://app.blocksecops.com/scans/abc123"
+      "uri": "https://app.0xapogee.com/scans/abc123"
     }]
   }]
 }
@@ -180,7 +180,7 @@ Teams messages use Adaptive Cards for rich formatting:
     "name": "View Details",
     "targets": [{
       "os": "default",
-      "uri": "https://app.blocksecops.com/vulnerabilities/xyz789"
+      "uri": "https://app.0xapogee.com/vulnerabilities/xyz789"
     }]
   }]
 }
@@ -197,7 +197,7 @@ Configure different channels for different alert types:
 **API:**
 ```bash
 # Critical alerts to main channel
-curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
+curl -X POST "https://app.0xapogee.com/api/v1/notification_channels" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -208,7 +208,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
   }'
 
 # All updates to security channel
-curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
+curl -X POST "https://app.0xapogee.com/api/v1/notification_channels" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -222,7 +222,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
 ### Filter by Project
 
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -238,7 +238,7 @@ Configure quick actions in Teams messages:
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -263,11 +263,11 @@ Confirm the integration is working:
 **API:**
 ```bash
 # Check channel status
-curl -X GET "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}" \
+curl -X GET "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # View notification history
-curl -X GET "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}/history" \
+curl -X GET "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}/history" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 

@@ -65,7 +65,7 @@ flowchart LR
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/integrations" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/integrations" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -130,7 +130,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/integrat
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/integrations/{integration_id}/template" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/integrations/{integration_id}/template" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -156,7 +156,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/integrations/{integration_id}/
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/integrations/{integration_id}/settings" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/integrations/{integration_id}/settings" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -185,7 +185,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/integrations/{integration_id}/
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/vulnerabilities/{vuln_id}/github" \
+curl -X POST "https://app.0xapogee.com/api/v1/vulnerabilities/{vuln_id}/github" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -226,7 +226,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/vulnerabilities/{vuln_id}/githu
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/integrations/{integration_id}/sync" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/integrations/{integration_id}/sync" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -250,7 +250,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/integrations/{integration_id}/
 1. Go to repository **Settings > Webhooks**
 2. Click **Add webhook**
 3. Configure:
-   - **Payload URL:** `https://app.blocksecops.com/api/v1/webhooks/github/{integration_id}`
+   - **Payload URL:** `https://app.0xapogee.com/api/v1/webhooks/github/{integration_id}`
    - **Content type:** `application/json`
    - **Secret:** Generate and save a secret
    - **Events:** Select:
@@ -261,7 +261,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/integrations/{integration_id}/
 **Configure Secret in BlockSecOps:**
 
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/integrations/{integration_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/integrations/{integration_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -293,7 +293,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/integrations/{integration_id}"
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/integrations/{integration_id}/setup-labels" \
+curl -X POST "https://app.0xapogee.com/api/v1/integrations/{integration_id}/setup-labels" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -310,12 +310,12 @@ curl -X POST "https://app.blocksecops.com/api/v1/integrations/{integration_id}/s
 **API:**
 ```bash
 # Get all critical vulnerabilities
-VULNS=$(curl -s "https://app.blocksecops.com/api/v1/vulnerabilities?severity=critical&status=open" \
+VULNS=$(curl -s "https://app.0xapogee.com/api/v1/vulnerabilities?severity=critical&status=open" \
   -H "Authorization: Bearer $ACCESS_TOKEN" | jq -r '.[].id')
 
 # Create issues for each
 for VULN_ID in $VULNS; do
-  curl -X POST "https://app.blocksecops.com/api/v1/vulnerabilities/$VULN_ID/github" \
+  curl -X POST "https://app.0xapogee.com/api/v1/vulnerabilities/$VULN_ID/github" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{"repository": "owner/repo-name", "labels": ["security", "critical"]}'
@@ -326,7 +326,7 @@ done
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/integrations/{integration_id}/sync-all" \
+curl -X POST "https://app.0xapogee.com/api/v1/integrations/{integration_id}/sync-all" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -344,11 +344,11 @@ Confirm the integration is working:
 **API:**
 ```bash
 # Check integration status
-curl -X GET "https://app.blocksecops.com/api/v1/integrations/{integration_id}" \
+curl -X GET "https://app.0xapogee.com/api/v1/integrations/{integration_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # List linked issues
-curl -X GET "https://app.blocksecops.com/api/v1/integrations/{integration_id}/issues" \
+curl -X GET "https://app.0xapogee.com/api/v1/integrations/{integration_id}/issues" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 

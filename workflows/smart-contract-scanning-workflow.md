@@ -299,7 +299,7 @@ spec:
         - name: single-request-reopen  # Fix Alpine musl DNS bug
       containers:
       - name: scanner
-        image: harbor.blocksecops.local/blocksecops/scanner-{scanner}:{version}
+        image: harbor.0xapogee.local/blocksecops/scanner-{scanner}:{version}
         env:
         - name: CALLBACK_URL
           value: "http://tool-integration.{namespace}.svc.cluster.local.:8005/api/v1/scans/{scan_id}/results"

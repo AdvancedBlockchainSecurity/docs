@@ -38,8 +38,8 @@ Enforced single organization ownership per user. A test user owned 3 organizatio
 
 ```bash
 cd /home/pwner/Git/blocksecops-api-service
-docker build -t harbor.blocksecops.local/blocksecops/api-service:0.28.3 .
-docker push harbor.blocksecops.local/blocksecops/api-service:0.28.3
+docker build -t harbor.0xapogee.local/blocksecops/api-service:0.28.3 .
+docker push harbor.0xapogee.local/blocksecops/api-service:0.28.3
 kubectl apply -k k8s/overlays/local/api-service/
 kubectl rollout restart deployment/api-service -n api-service-local
 

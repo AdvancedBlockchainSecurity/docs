@@ -99,7 +99,7 @@ Regions:
 ```terraform
 # terraform/route53.tf
 resource "aws_route53_health_check" "us_east_1" {
-  fqdn              = "us-east-1.api.blocksecops.com"
+  fqdn              = "us-east-1.api.0xapogee.com"
   port              = 443
   type              = "HTTPS"
   resource_path     = "/health"
@@ -109,7 +109,7 @@ resource "aws_route53_health_check" "us_east_1" {
 
 resource "aws_route53_record" "api_geolocation_us" {
   zone_id = aws_route53_zone.main.zone_id
-  name    = "api.blocksecops.com"
+  name    = "api.0xapogee.com"
   type    = "A"
 
   geolocation_routing_policy {
@@ -127,7 +127,7 @@ resource "aws_route53_record" "api_geolocation_us" {
 
 resource "aws_route53_record" "api_geolocation_eu" {
   zone_id = aws_route53_zone.main.zone_id
-  name    = "api.blocksecops.com"
+  name    = "api.0xapogee.com"
   type    = "A"
 
   geolocation_routing_policy {

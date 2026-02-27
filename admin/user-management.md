@@ -41,14 +41,14 @@ User management covers:
 ### Get Current User
 
 ```bash
-curl -X GET https://api.blocksecops.com/api/v1/users/me \
+curl -X GET https://api.0xapogee.com/api/v1/users/me \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 ### Get Enhanced User Info
 
 ```bash
-curl -X GET https://api.blocksecops.com/api/v1/users/me/enhanced \
+curl -X GET https://api.0xapogee.com/api/v1/users/me/enhanced \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -66,7 +66,7 @@ Response includes:
 ### Viewing Quota Usage
 
 ```bash
-curl -X GET https://api.blocksecops.com/api/v1/users/me/quota \
+curl -X GET https://api.0xapogee.com/api/v1/users/me/quota \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -97,7 +97,7 @@ curl -X GET https://api.blocksecops.com/api/v1/users/me/quota \
 ### Creating a Team
 
 ```bash
-curl -X POST https://api.blocksecops.com/api/v1/teams \
+curl -X POST https://api.0xapogee.com/api/v1/teams \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -109,7 +109,7 @@ curl -X POST https://api.blocksecops.com/api/v1/teams \
 ### Inviting Members
 
 ```bash
-curl -X POST https://api.blocksecops.com/api/v1/teams/{team_id}/invites \
+curl -X POST https://api.0xapogee.com/api/v1/teams/{team_id}/invites \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -156,7 +156,7 @@ API keys can be scoped to specific permissions:
 ### Viewing Subscription
 
 ```bash
-curl -X GET https://api.blocksecops.com/api/v1/subscriptions/current \
+curl -X GET https://api.0xapogee.com/api/v1/subscriptions/current \
   -H "Authorization: Bearer $TOKEN"
 ```
 

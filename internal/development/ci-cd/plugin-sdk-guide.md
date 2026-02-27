@@ -630,7 +630,7 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 
 ```yaml
 # plugin.yaml
-apiVersion: blocksecops.io/v1
+apiVersion: 0xapogee.com/v1
 kind: ScannerPlugin
 metadata:
   name: my-custom-scanner
@@ -1326,11 +1326,11 @@ A: Yes, if network policies allow it. Use environment variables for API keys and
 
 ## Support
 
-- **Documentation**: https://docs.blocksecops.io/plugins
+- **Documentation**: https://docs.0xapogee.io/plugins
 - **SDK Repository**: https://github.com/SolidityOps/plugin-sdk
 - **Examples**: https://github.com/SolidityOps/plugin-examples
 - **Discord**: https://discord.gg/blocksecops
-- **Email**: plugins@blocksecops.io
+- **Email**: plugins@0xapogee.com
 
 ## Contributing
 

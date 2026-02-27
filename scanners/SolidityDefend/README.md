@@ -173,10 +173,10 @@ SolidityDefend is automatically included in BlockSecOps scan presets:
 
 ```bash
 # Standard scan (includes SolidityDefend)
-blocksecops scan --preset standard path/to/contracts/
+0xapogee scan --preset standard path/to/contracts/
 
 # Deep scan (includes SolidityDefend with enhanced checks)
-blocksecops scan --preset deep path/to/contracts/
+0xapogee scan --preset deep path/to/contracts/
 ```
 
 ### Scan Output

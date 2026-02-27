@@ -47,7 +47,7 @@ flowchart LR
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/api_keys" \
+curl -X POST "https://app.0xapogee.com/api/v1/api_keys" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -65,7 +65,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/api_keys" \
 3. Expand **Variables**
 4. Click **Add variable**
 5. Configure:
-   - **Key:** `BLOCKSECOPS_API_KEY`
+   - **Key:** `APOGEE_API_KEY`
    - **Value:** Paste the API key
    - **Type:** Variable
    - **Protect variable:** Enable (recommended)
@@ -81,16 +81,16 @@ stages:
   - security
 
 variables:
-  BLOCKSECOPS_API_URL: "https://app.blocksecops.com/api/v1"
+  APOGEE_API_URL: "https://app.0xapogee.com/api/v1"
 
 security-scan:
   stage: security
   image: python:3.11-slim
   before_script:
-    - pip install blocksecops-cli --quiet
+    - pip install 0xapogee-cli --quiet
   script:
     - |
-      blocksecops scan \
+      0xapogee scan \
         --path contracts/ \
         --project "$CI_PROJECT_PATH" \
         --output json \
@@ -145,7 +145,7 @@ security-report:
       BODY="${BODY}| High | $HIGH |\n"
       BODY="${BODY}| Medium | $MEDIUM |\n"
       BODY="${BODY}| Low | $LOW |\n\n"
-      BODY="${BODY}[View Full Report](https://app.blocksecops.com/scans/$SCAN_ID)"
+      BODY="${BODY}[View Full Report](https://app.0xapogee.com/scans/$SCAN_ID)"
 
       # Post comment to MR
       curl --request POST \
@@ -177,12 +177,12 @@ security-report:
   stage: security
   image: python:3.11-slim
   before_script:
-    - pip install blocksecops-cli --quiet
+    - pip install 0xapogee-cli --quiet
 
 scan-token:
   extends: .security-scan-template
   script:
-    - blocksecops scan --path contracts/token/ --fail-on critical,high
+    - 0xapogee scan --path contracts/token/ --fail-on critical,high
   rules:
     - changes:
         - contracts/token/**/*.sol
@@ -190,7 +190,7 @@ scan-token:
 scan-governance:
   extends: .security-scan-template
   script:
-    - blocksecops scan --path contracts/governance/ --fail-on critical,high
+    - 0xapogee scan --path contracts/governance/ --fail-on critical,high
   rules:
     - changes:
         - contracts/governance/**/*.sol
@@ -203,9 +203,9 @@ scheduled-security-scan:
   stage: security
   image: python:3.11-slim
   before_script:
-    - pip install blocksecops-cli --quiet
+    - pip install 0xapogee-cli --quiet
   script:
-    - blocksecops scan --path contracts/ --project "$CI_PROJECT_PATH-weekly"
+    - 0xapogee scan --path contracts/ --project "$CI_PROJECT_PATH-weekly"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
 ```
@@ -222,10 +222,10 @@ Create a schedule in GitLab:
 security-scan:
   script:
     # Only fail on critical
-    - blocksecops scan --path contracts/ --fail-on critical
+    - 0xapogee scan --path contracts/ --fail-on critical
 
     # Fail on critical, high, and medium
-    - blocksecops scan --path contracts/ --fail-on critical,high,medium
+    - 0xapogee scan --path contracts/ --fail-on critical,high,medium
 ```
 
 ### Using Docker-in-Docker for Custom Scanners
@@ -241,7 +241,7 @@ security-scan:
   script:
     - docker run --rm \
         -v $(pwd)/contracts:/contracts \
-        -e BLOCKSECOPS_API_KEY=$BLOCKSECOPS_API_KEY \
+        -e APOGEE_API_KEY=$APOGEE_API_KEY \
         blocksecops/cli:latest scan --path /contracts
 ```
 
@@ -256,9 +256,9 @@ security-scan:
   stage: security
   image: python:3.11-slim
   before_script:
-    - pip install blocksecops-cli --quiet
+    - pip install 0xapogee-cli --quiet
   script:
-    - blocksecops scan --path contracts/ --output gitlab-sast > gl-sast-report.json
+    - 0xapogee scan --path contracts/ --output gitlab-sast > gl-sast-report.json
   artifacts:
     reports:
       sast: gl-sast-report.json
@@ -279,8 +279,8 @@ Confirm the integration is working:
 
 **API Verification:**
 ```bash
-curl -X GET "https://app.blocksecops.com/api/v1/scans?project=group/project-name&limit=5" \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY"
+curl -X GET "https://app.0xapogee.com/api/v1/scans?project=group/project-name&limit=5" \
+  -H "Authorization: Bearer $APOGEE_API_KEY"
 ```
 
 ---
@@ -289,7 +289,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans?project=group/project-name
 
 | Issue | Cause | Solution |
 |-------|-------|----------|
-| "Variable not found" | `BLOCKSECOPS_API_KEY` not set | Add variable in CI/CD settings |
+| "Variable not found" | `APOGEE_API_KEY` not set | Add variable in CI/CD settings |
 | "Permission denied" | Protected variable on unprotected branch | Unprotect variable or run on protected branch |
 | Job not triggering | Rules not matching | Check `rules` configuration |
 | "blocksecops: command not found" | Installation failed | Add `pip install --upgrade pip` before install |
@@ -301,7 +301,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans?project=group/project-name
 ```yaml
 security-scan:
   script:
-    - blocksecops scan --path contracts/ --verbose --debug
+    - 0xapogee scan --path contracts/ --verbose --debug
 ```
 
 ---
@@ -309,7 +309,7 @@ security-scan:
 ## Checklist
 
 - [ ] API key created with correct scopes
-- [ ] GitLab CI/CD variable `BLOCKSECOPS_API_KEY` configured
+- [ ] GitLab CI/CD variable `APOGEE_API_KEY` configured
 - [ ] `.gitlab-ci.yml` created with security-scan job
 - [ ] Rules configured for MR and main branch
 - [ ] Test MR created and pipeline executed
@@ -325,4 +325,4 @@ security-scan:
 - [API Key Management](./api-key-management.md) - Create and manage API keys
 - [GitHub Actions Integration](./cicd-github-actions.md) - GitHub CI/CD
 - [Jenkins Integration](./cicd-jenkins.md) - Jenkins pipeline
-- [CLI Installation](./cli-installation.md) - BlockSecOps CLI setup
+- [CLI Installation](./cli-installation.md) - Apogee CLI setup

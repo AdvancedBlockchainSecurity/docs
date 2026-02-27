@@ -253,7 +253,7 @@ CORS origins are configured via ConfigMap environment variables (not hardcoded):
 
 ```yaml
 # k8s/overlays/local/api-service/configmap-patch.yaml
-cors_origins: "https://app.blocksecops.local"
+cors_origins: "https://app.0xapogee.local"
 ```
 
 FastAPI CORSMiddleware settings in `src/main.py`:
@@ -282,14 +282,14 @@ app.add_middleware(
 
 ```bash
 # Verify CORS headers (should show single set from FastAPI)
-curl -sk -X OPTIONS https://app.blocksecops.local/api/v1/contracts \
-  -H "Origin: https://app.blocksecops.local" \
+curl -sk -X OPTIONS https://app.0xapogee.local/api/v1/contracts \
+  -H "Origin: https://app.0xapogee.local" \
   -H "Access-Control-Request-Method: POST" \
   -D - -o /dev/null 2>&1 | grep -i "access-control"
 
 # Verify max-age
-curl -sk -X OPTIONS https://app.blocksecops.local/api/v1/contracts \
-  -H "Origin: https://app.blocksecops.local" \
+curl -sk -X OPTIONS https://app.0xapogee.local/api/v1/contracts \
+  -H "Origin: https://app.0xapogee.local" \
   -H "Access-Control-Request-Method: POST" \
   -D - -o /dev/null 2>&1 | grep -i "max-age"
 # Expected: access-control-max-age: 3600
@@ -326,12 +326,12 @@ Applies to both:
 
 ```bash
 # Check service starts and authenticates correctly
-curl -sk https://app.blocksecops.local/api/v1/health/ready
+curl -sk https://app.0xapogee.local/api/v1/health/ready
 # Expected: {"status": "healthy", ...}
 
 # Verify authenticated requests work
 curl -sk -H "Authorization: Bearer $TOKEN" \
-  https://app.blocksecops.local/api/v1/users/me
+  https://app.0xapogee.local/api/v1/users/me
 # Expected: 200 with user data (not 401)
 ```
 
@@ -382,7 +382,7 @@ The following 10 files were rate-limited in v0.29.5:
 # Verify rate limit headers present on authenticated requests
 curl -sk -v \
   -H "Authorization: Bearer $TOKEN" \
-  "https://app.blocksecops.local/api/v1/contracts" \
+  "https://app.0xapogee.local/api/v1/contracts" \
   2>&1 | grep -i "x-ratelimit"
 # Expected: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
 ```
@@ -463,7 +463,7 @@ vault kv put secret/local/api-service/encryption key=<generated-key>
 The readiness endpoint includes encryption status:
 
 ```bash
-curl -sk https://app.blocksecops.local/api/v1/health/ready | python3 -c "
+curl -sk https://app.0xapogee.local/api/v1/health/ready | python3 -c "
 import sys,json; d=json.load(sys.stdin)
 print('Encryption:', 'configured' if d['checks'].get('encryption_configured') else 'NOT configured')"
 ```
@@ -478,7 +478,7 @@ print('Encryption:', 'configured' if d['checks'].get('encryption_configured') el
 
 ```bash
 # Confirm encryption is active
-curl -sk https://app.blocksecops.local/api/v1/health/ready | grep encryption_configured
+curl -sk https://app.0xapogee.local/api/v1/health/ready | grep encryption_configured
 # Expected: "encryption_configured": true
 
 # Check startup logs for encryption errors
@@ -533,8 +533,8 @@ Prometheus and prometheus-adapter must NOT be scaled to 0. A PodDisruptionBudget
 kubectl logs -n api-service-local deployment/api-service | grep -i "config\|secret\|warning"
 
 # Verify health endpoints
-curl -sk https://app.blocksecops.local/api/v1/health/live
-curl -sk https://app.blocksecops.local/api/v1/health/ready
+curl -sk https://app.0xapogee.local/api/v1/health/live
+curl -sk https://app.0xapogee.local/api/v1/health/ready
 ```
 
 ---

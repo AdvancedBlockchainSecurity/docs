@@ -57,7 +57,7 @@ images:
 ```bash
 VERSION="0.2.1"
 SERVICE="api-service"
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 
 # Build and push
 docker build -t ${REGISTRY}/blocksecops/${SERVICE}:${VERSION} .
@@ -104,7 +104,7 @@ The dashboard requires:
 cd /home/pwner/Git  # Parent directory containing both repos
 
 VERSION=$(grep '"version"' blocksecops-dashboard/package.json | head -1 | cut -d'"' -f4)
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 
 # Get Supabase credentials from existing ConfigMap
 SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')
@@ -148,7 +148,7 @@ Standard build from service directory:
 cd /home/pwner/Git/blocksecops-api-service
 
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 
 # Build image
 docker build \
@@ -187,7 +187,7 @@ Harbor provides proper registry semantics that match production:
 ```bash
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
 SERVICE="api-service"
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 
 # Build locally
 docker build -t ${REGISTRY}/blocksecops/${SERVICE}:${VERSION} .
@@ -199,7 +199,7 @@ docker push ${REGISTRY}/blocksecops/${SERVICE}:${VERSION}
 kubectl apply -k k8s/overlays/local/${SERVICE}/
 ```
 
-**Note:** Services deployed on the server still use `k8s/overlays/local/` kustomization. The `server/` overlay in `blocksecops-gcp-infrastructure` only contains IngressRoutes and CORS middleware for the `app.blocksecops.local` domain.
+**Note:** Services deployed on the server still use `k8s/overlays/local/` kustomization. The `server/` overlay in `blocksecops-gcp-infrastructure` only contains IngressRoutes and CORS middleware for the `app.0xapogee.local` domain.
 
 **Why a registry (Harbor/Artifact Registry) instead of direct containerd import:**
 - `imagePullPolicy: Always` actually works (triggers real pulls)
@@ -260,7 +260,7 @@ Immutable tags are enforced at the Harbor project level via tag immutability rul
 ```bash
 # Verify immutable tag rule exists
 curl -s -k -u admin:${HARBOR_PASSWORD} \
-  https://harbor.blocksecops.local/api/v2.0/projects/blocksecops/immutabletagrules | jq
+  https://harbor.0xapogee.local/api/v2.0/projects/blocksecops/immutabletagrules | jq
 ```
 
 The rule matches all repositories (`**`) and all tags (`**`) in the `blocksecops` project.
@@ -271,13 +271,13 @@ Because tags are immutable, any image change requires a version bump:
 
 ```bash
 # Cannot do this (tag already exists, push will fail):
-docker push harbor.blocksecops.local/blocksecops/api-service:0.28.2
+docker push harbor.0xapogee.local/blocksecops/api-service:0.28.2
 
 # Must bump version first:
 # 1. Update pyproject.toml: version = "0.28.3"
 # 2. Update kustomization.yaml: newTag: "0.28.3"
 # 3. Build and push with new tag
-docker push harbor.blocksecops.local/blocksecops/api-service:0.28.3
+docker push harbor.0xapogee.local/blocksecops/api-service:0.28.3
 ```
 
 ### GCP Equivalent
@@ -456,7 +456,7 @@ Example: 1.0.0-5ede3c61
 Base images are stored in Harbor and referenced by application Dockerfiles:
 
 ```dockerfile
-ARG BASE_REGISTRY=harbor.blocksecops.local
+ARG BASE_REGISTRY=harbor.0xapogee.local
 ARG BASE_IMAGE_TAG=1.0.0-ac02c353
 FROM ${BASE_REGISTRY}/blocksecops/blocksecops-orchestration-base:${BASE_IMAGE_TAG} AS builder
 ```

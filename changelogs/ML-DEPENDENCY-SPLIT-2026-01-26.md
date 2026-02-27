@@ -88,7 +88,7 @@ Response:
 
 | Test | Result |
 |------|--------|
-| Dashboard (http://app.blocksecops.local/) | PASS |
+| Dashboard (http://app.0xapogee.local/) | PASS |
 | API Health (v0.13.4) | PASS |
 | API Scanners (15 scanners) | PASS |
 | Intelligence Embeddings (384-dim vectors) | PASS |

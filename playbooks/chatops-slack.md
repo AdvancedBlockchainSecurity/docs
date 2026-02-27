@@ -65,7 +65,7 @@ flowchart LR
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
+curl -X POST "https://app.0xapogee.com/api/v1/notification_channels" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -97,7 +97,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -124,7 +124,7 @@ For different notification types to different channels:
 **API:**
 ```bash
 # Critical alerts channel
-curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
+curl -X POST "https://app.0xapogee.com/api/v1/notification_channels" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -137,7 +137,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
   }'
 
 # Scan updates channel
-curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
+curl -X POST "https://app.0xapogee.com/api/v1/notification_channels" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -159,7 +159,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/notification_channels" \
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}/test" \
+curl -X POST "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}/test" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -181,7 +181,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/notification_channels/{channel_
 :yellow_circle: Medium: 12
 :white_circle: Low: 8
 
-<https://app.blocksecops.com/scans/abc123|View Full Report>
+<https://app.0xapogee.com/scans/abc123|View Full Report>
 ```
 
 ### Critical Vulnerability Alert
@@ -196,7 +196,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/notification_channels/{channel_
 
 *Description:* External call before state update allows reentrancy attack.
 
-<https://app.blocksecops.com/vulnerabilities/xyz789|View Details>
+<https://app.0xapogee.com/vulnerabilities/xyz789|View Details>
 ```
 
 ### Weekly Summary
@@ -219,7 +219,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/notification_channels/{channel_
 2. Unchecked Return Values (6 occurrences)
 3. Integer Overflow (5 occurrences)
 
-<https://app.blocksecops.com/reports/weekly|View Full Report>
+<https://app.0xapogee.com/reports/weekly|View Full Report>
 ```
 
 ---
@@ -232,7 +232,7 @@ Send notifications only for specific projects:
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -248,7 +248,7 @@ Only notify for specific severity levels:
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -264,7 +264,7 @@ Customize the Slack message format:
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -290,11 +290,11 @@ Confirm the integration is working:
 **API:**
 ```bash
 # Check channel status
-curl -X GET "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}" \
+curl -X GET "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # View notification history
-curl -X GET "https://app.blocksecops.com/api/v1/notification_channels/{channel_id}/history" \
+curl -X GET "https://app.0xapogee.com/api/v1/notification_channels/{channel_id}/history" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 

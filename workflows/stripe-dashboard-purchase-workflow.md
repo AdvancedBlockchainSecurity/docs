@@ -73,15 +73,15 @@ docker build --no-cache \
   --build-arg VITE_STRIPE_PUBLISHABLE_KEY=${STRIPE_PK} \
   --build-arg VITE_SUPABASE_URL=$(kubectl get cm dashboard-config -n dashboard-local -o jsonpath='{.data.supabase_url}') \
   --build-arg VITE_SUPABASE_ANON_KEY=$(kubectl get cm dashboard-config -n dashboard-local -o jsonpath='{.data.supabase_anon_key}') \
-  -t harbor.blocksecops.local/blocksecops/dashboard:latest .
+  -t harbor.0xapogee.local/blocksecops/dashboard:latest .
 
-docker push harbor.blocksecops.local/blocksecops/dashboard:latest
+docker push harbor.0xapogee.local/blocksecops/dashboard:latest
 kubectl rollout restart deployment/dashboard -n dashboard-local
 ```
 
 ### Step 4: Test Purchase
 
-1. Open dashboard: `http://app.blocksecops.local` or `http://127.0.0.1:3000`
+1. Open dashboard: `http://app.0xapogee.local` or `http://127.0.0.1:3000`
 2. Log in → Navigate to **Billing** or **Credits**
 3. Select a plan or credit package
 4. Click **Purchase** / **Subscribe**
@@ -171,8 +171,8 @@ kubectl logs deployment/api-service -n api-service-local --tail=50 | grep -i err
 | Environment | Dashboard URL | Webhook Endpoint |
 |-------------|--------------|------------------|
 | minikube | `http://127.0.0.1:3000` | `http://127.0.0.1:3000/api/v1/webhooks/stripe` |
-| kubeadm (server) | `http://app.blocksecops.local` | `http://192.168.86.225:30180/api/v1/webhooks/stripe` |
-| GCP Production | `https://app.blocksecops.com` | `https://app.blocksecops.com/api/v1/webhooks/stripe` |
+| kubeadm (server) | `http://app.0xapogee.local` | `http://192.168.86.225:30180/api/v1/webhooks/stripe` |
+| GCP Production | `https://app.0xapogee.com` | `https://app.0xapogee.com/api/v1/webhooks/stripe` |
 
 ---
 

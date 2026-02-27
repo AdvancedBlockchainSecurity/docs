@@ -46,7 +46,7 @@ Full platform smoke test after deployment (v0.29.27):
 - [x] No new `Liveness probe failed` events from current pod
 - [x] Old probe failure events are from terminated pod (pre-fix)
 - [x] Celery worker pod: 1/1 Running, 0 restarts
-- [x] Image: `harbor.blocksecops.local/blocksecops/api-service:0.29.27`
+- [x] Image: `harbor.0xapogee.local/blocksecops/api-service:0.29.27`
 
 ## ExternalSecret Sync
 

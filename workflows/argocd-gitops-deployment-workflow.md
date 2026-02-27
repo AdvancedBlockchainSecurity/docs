@@ -5,7 +5,7 @@
 This document defines the ArgoCD deployment workflow for the BlockSecOps platform, covering the ApplicationSet bootstrap process, sync wave ordering, GKE cluster registration, self-managing ArgoCD, and rollback procedures.
 
 **ArgoCD Instances:**
-- Bare-metal (local dev): v2.13.3 in `argocd-local` namespace, at https://argocd.blocksecops.local
+- Bare-metal (local dev): v2.13.3 in `argocd-local` namespace, at https://argocd.0xapogee.local
 - GCP (production): In `argocd-prod` namespace on GKE
 
 **GCP Deployment Pattern:** ApplicationSet with list generator (not app-of-apps with wave directories)
@@ -382,7 +382,7 @@ EOF
 #### Step 5: Verify
 
 ```bash
-argocd cluster list --server https://argocd.blocksecops.local
+argocd cluster list --server https://argocd.0xapogee.local
 
 # Expected:
 # SERVER                          NAME             STATUS
@@ -578,18 +578,18 @@ git checkout main  # Return to main for future changes
 ```bash
 # Disable for one application
 argocd app set api-service --sync-policy none \
-  --server https://argocd.blocksecops.local
+  --server https://argocd.0xapogee.local
 
 # Disable for ALL applications
-for app in $(argocd app list -o name --server https://argocd.blocksecops.local); do
+for app in $(argocd app list -o name --server https://argocd.0xapogee.local); do
   argocd app set "$app" --sync-policy none \
-    --server https://argocd.blocksecops.local
+    --server https://argocd.0xapogee.local
 done
 
 # Re-enable after fixing
 argocd app set api-service \
   --sync-policy automated --self-heal --auto-prune \
-  --server https://argocd.blocksecops.local
+  --server https://argocd.0xapogee.local
 ```
 
 ### 5e. Rollback Decision Tree

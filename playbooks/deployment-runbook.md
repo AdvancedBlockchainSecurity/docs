@@ -32,7 +32,7 @@ Standard operating procedures for deploying services to GKE production and local
 ```bash
 SERVICE="api-service"
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 
 # 1. Build and push
 docker build \
@@ -49,7 +49,7 @@ kubectl apply -k k8s/overlays/local/${SERVICE}/
 kubectl rollout status deployment/${SERVICE} -n ${SERVICE}-local --timeout=120s
 
 # 4. Verify
-curl -sk https://app.blocksecops.local/api/v1/health/ready
+curl -sk https://app.0xapogee.local/api/v1/health/ready
 ```
 
 ### Multiple Services
@@ -273,7 +273,7 @@ kubectl rollout undo deployment/api-service -n api-service-local
 
 # 3. Verify
 kubectl rollout status deployment/api-service -n api-service-local
-curl -sk https://app.blocksecops.local/api/v1/health/live
+curl -sk https://app.0xapogee.local/api/v1/health/live
 ```
 
 ### Kustomization Rollback
@@ -298,8 +298,8 @@ git commit -am "revert(api-service): rollback to v${PREV_VERSION}"
 
 ```bash
 # API health
-curl -sk https://app.blocksecops.local/api/v1/health/live
-curl -sk https://app.blocksecops.local/api/v1/health/ready
+curl -sk https://app.0xapogee.local/api/v1/health/live
+curl -sk https://app.0xapogee.local/api/v1/health/ready
 
 # Service health (all 7 services)
 for svc in data-service:8001 intelligence-engine:80 notification:8003 \
@@ -316,7 +316,7 @@ done
 
 ```bash
 # Verify deployed version
-curl -sk https://app.blocksecops.local/api/v1/health/live | python3 -c \
+curl -sk https://app.0xapogee.local/api/v1/health/live | python3 -c \
   "import sys,json; print(json.load(sys.stdin)['version'])"
 ```
 

@@ -24,7 +24,7 @@ This audit verifies that Free tier users cannot access the BlockSecOps API. The 
 **Test:** Created Free tier test user and verified quota defaults.
 
 **User Created:**
-- Email: `free-tier-audit@test.blocksecops.com`
+- Email: `free-tier-audit@test.0xapogee.com`
 - Tier: `free`
 - User ID: `d67f91b5-2dc1-4c52-b437-ca0f442a4381`
 

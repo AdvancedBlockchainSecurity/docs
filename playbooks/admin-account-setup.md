@@ -13,7 +13,7 @@ This playbook covers the complete process for setting up a Platform Admin accoun
 ## Prerequisites
 
 - Running Kubernetes cluster with api-service deployed
-- Access to the server via `https://app.blocksecops.local` (server) or `http://127.0.0.1:3000` (minikube)
+- Access to the server via `https://app.0xapogee.local` (server) or `http://127.0.0.1:3000` (minikube)
 - An existing Supabase user account (the user must register first)
 - Access to kubectl with api-service-local namespace permissions
 
@@ -150,7 +150,7 @@ TOKEN=$(/home/pwner/Git/docs/scripts/get_token_fixed.sh)
 
 ```bash
 curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
-  "https://app.blocksecops.local/api/v1/admin/auth/mfa/setup" | jq '.'
+  "https://app.0xapogee.local/api/v1/admin/auth/mfa/setup" | jq '.'
 ```
 
 ### Verify MFA Code
@@ -162,7 +162,7 @@ TOTP_CODE="123456"
 curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -d "{\"code\": \"${TOTP_CODE}\"}" \
-  "https://app.blocksecops.local/api/v1/admin/auth/mfa/verify" | jq '.'
+  "https://app.0xapogee.local/api/v1/admin/auth/mfa/verify" | jq '.'
 ```
 
 ### Expected Response
@@ -185,7 +185,7 @@ ADMIN_SESSION="your-session-token-from-step-5"
 
 curl -sk -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
-  "https://app.blocksecops.local/api/v1/admin/auth/session" | jq '.'
+  "https://app.0xapogee.local/api/v1/admin/auth/session" | jq '.'
 ```
 
 ### Expected Response
@@ -209,7 +209,7 @@ curl -sk -H "Authorization: Bearer ${TOKEN}" \
 ```bash
 curl -sk -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
-  "https://app.blocksecops.local/api/v1/admin/users?page=1&page_size=5" | jq '.'
+  "https://app.0xapogee.local/api/v1/admin/users?page=1&page_size=5" | jq '.'
 ```
 
 ### Get Platform Stats
@@ -217,7 +217,7 @@ curl -sk -H "Authorization: Bearer ${TOKEN}" \
 ```bash
 curl -sk -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
-  "https://app.blocksecops.local/api/v1/admin/system/stats" | jq '.'
+  "https://app.0xapogee.local/api/v1/admin/system/stats" | jq '.'
 ```
 
 ---
@@ -243,7 +243,7 @@ echo "TOTP Code: $TOTP_CODE"
 RESPONSE=$(curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -d "{\"code\": \"${TOTP_CODE}\"}" \
-  "https://app.blocksecops.local/api/v1/admin/auth/mfa/verify")
+  "https://app.0xapogee.local/api/v1/admin/auth/mfa/verify")
 
 ADMIN_SESSION=$(echo "$RESPONSE" | jq -r '.session_token')
 echo "Admin Session: ${ADMIN_SESSION:0:30}..."
@@ -251,7 +251,7 @@ echo "Admin Session: ${ADMIN_SESSION:0:30}..."
 # Test session
 curl -sk -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
-  "https://app.blocksecops.local/api/v1/admin/auth/session" | jq '.'
+  "https://app.0xapogee.local/api/v1/admin/auth/session" | jq '.'
 ```
 
 ---

@@ -594,4 +594,4 @@ No rate limiting is currently enforced on scanner results endpoints. However, it
 
 For questions or issues with the Scanner Results API:
 - GitHub Issues: https://github.com/blocksecops/api-service/issues
-- Documentation: https://docs.blocksecops.com/api
+- Documentation: https://docs.0xapogee.com/api

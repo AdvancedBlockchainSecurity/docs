@@ -46,7 +46,7 @@ flowchart LR
 
 **Command Line:**
 ```bash
-code --install-extension blocksecops.blocksecops-vscode
+code --install-extension blocksecops.0xapogee-vscode
 ```
 
 ### Step 2: Create API Key
@@ -60,7 +60,7 @@ code --install-extension blocksecops.blocksecops-vscode
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/api_keys" \
+curl -X POST "https://app.0xapogee.com/api/v1/api_keys" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -81,7 +81,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/api_keys" \
 ```json
 {
   "blocksecops.apiKey": "bso_live_xxxxxxxxxxxx",
-  "blocksecops.apiUrl": "https://app.blocksecops.com/api/v1",
+  "blocksecops.apiUrl": "https://app.0xapogee.com/api/v1",
   "blocksecops.autoScan": true,
   "blocksecops.scanOnSave": true,
   "blocksecops.showInlineWarnings": true,
@@ -168,7 +168,7 @@ For supported vulnerability types:
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `blocksecops.apiKey` | - | Your BlockSecOps API key |
-| `blocksecops.apiUrl` | `https://app.blocksecops.com/api/v1` | API endpoint |
+| `blocksecops.apiUrl` | `https://app.0xapogee.com/api/v1` | API endpoint |
 | `blocksecops.autoScan` | `true` | Enable real-time scanning |
 | `blocksecops.scanOnSave` | `true` | Scan when file saved |
 | `blocksecops.scanDelay` | `1000` | Delay (ms) before auto-scan |
@@ -203,7 +203,7 @@ For supported vulnerability types:
 
 ## Workspace Configuration
 
-Create `.blocksecops.json` in project root for project-specific settings:
+Create `.0xapogee.json` in project root for project-specific settings:
 
 ```json
 {
@@ -302,7 +302,7 @@ Compatible - Both tools work independently.
 Add to `.prettierignore`:
 ```
 # BlockSecOps config
-.blocksecops.json
+.0xapogee.json
 ```
 
 ---

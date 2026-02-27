@@ -246,7 +246,7 @@ kubectl rollout status deployment/[service-name] --namespace=production
 
 # 4. Verify health
 kubectl get pods -n production -l app=[service-name]
-curl -f https://api.blocksecops.com/health
+curl -f https://api.0xapogee.com/health
 ```
 
 ### Full Rollback (with database migrations)
@@ -446,7 +446,7 @@ echo "CVE-XXXX-YYYY" >> .trivyignore
 
 **Release Engineering Team**:
 - Slack: #releases
-- Email: releases@blocksecops.com
+- Email: releases@0xapogee.com
 - On-call: Check PagerDuty rotation
 
 **Escalation Path**:

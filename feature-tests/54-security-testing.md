@@ -408,12 +408,12 @@ Added February 7, 2026 from full API security audit.
 
 ```bash
 # Test alg=none attack
-curl -s http://app.blocksecops.local/api/v1/contracts \
+curl -s http://app.0xapogee.local/api/v1/contracts \
   -H "Authorization: Bearer eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiJ0ZXN0In0."
 # Expected: 401
 
 # Test expired token
-curl -s http://app.blocksecops.local/api/v1/contracts \
+curl -s http://app.0xapogee.local/api/v1/contracts \
   -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjF9.invalid"
 # Expected: 401
 ```
@@ -425,7 +425,7 @@ curl -s http://app.blocksecops.local/api/v1/contracts \
 for i in $(seq 1 15); do
   curl -s -o /dev/null -w "%{http_code}" \
     -H "X-Forwarded-For: 10.0.0.$i" \
-    http://app.blocksecops.local/api/v1/auth/wallet/nonce \
+    http://app.0xapogee.local/api/v1/auth/wallet/nonce \
     -H "Content-Type: application/json" \
     -d '{"wallet_address": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD00"}'
 done
@@ -436,7 +436,7 @@ done
 
 ```bash
 # Test internal IP rejection
-curl -s -X POST http://app.blocksecops.local/api/v1/notification-channels \
+curl -s -X POST http://app.0xapogee.local/api/v1/notification-channels \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name": "test", "type": "webhook", "webhook_url": "http://169.254.169.254/latest/meta-data/"}'
@@ -447,7 +447,7 @@ curl -s -X POST http://app.blocksecops.local/api/v1/notification-channels \
 
 ```bash
 # Trigger an error and verify no stack trace in response
-curl -s http://app.blocksecops.local/api/v1/quality-gates/00000000-0000-0000-0000-000000000000 \
+curl -s http://app.0xapogee.local/api/v1/quality-gates/00000000-0000-0000-0000-000000000000 \
   -H "Authorization: Bearer $TOKEN"
 # Expected: Generic error message, no Python traceback or internal details
 ```
@@ -456,7 +456,7 @@ curl -s http://app.blocksecops.local/api/v1/quality-gates/00000000-0000-0000-000
 
 ```bash
 # Access copilot without team tier
-curl -s http://app.blocksecops.local/api/v1/copilot/conversations \
+curl -s http://app.0xapogee.local/api/v1/copilot/conversations \
   -H "Authorization: Bearer $DEVELOPER_TIER_TOKEN"
 # Expected: 403 (requires team tier or higher)
 ```

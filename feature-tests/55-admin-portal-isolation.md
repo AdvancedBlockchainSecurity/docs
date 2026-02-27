@@ -8,7 +8,7 @@
 
 ## Overview
 
-Testing the separated admin portal at `admin.blocksecops.com` with network-level isolation (IP allowlist). Uses the same Supabase project as customer dashboard - security enforced through IP restrictions, MFA, and role-based access.
+Testing the separated admin portal at `admin.0xapogee.com` with network-level isolation (IP allowlist). Uses the same Supabase project as customer dashboard - security enforced through IP restrictions, MFA, and role-based access.
 
 ---
 
@@ -29,7 +29,7 @@ Testing the separated admin portal at `admin.blocksecops.com` with network-level
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 1 | Navigate to admin portal (`admin.blocksecops.com`) | Login page displayed |
+| 1 | Navigate to admin portal (`admin.0xapogee.com`) | Login page displayed |
 | 2 | Enter admin credentials (BlockSecOps account) | Redirected to MFA verification |
 | 3 | Enter invalid credentials | Generic error message (no username enumeration) |
 
@@ -51,7 +51,7 @@ Testing the separated admin portal at `admin.blocksecops.com` with network-level
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 1 | Login to admin portal | Session cookie set for `admin.blocksecops.com` |
+| 1 | Login to admin portal | Session cookie set for `admin.0xapogee.com` |
 | 2 | Check customer dashboard cookies | No admin session cookie visible |
 | 3 | Login to customer dashboard | Customer session cookie set |
 | 4 | Check admin portal | Admin session still valid |
@@ -178,7 +178,7 @@ Testing the separated admin portal at `admin.blocksecops.com` with network-level
 #### 7.1 Response Headers
 
 ```bash
-curl -I https://admin.blocksecops.com
+curl -I https://admin.0xapogee.com
 ```
 
 | Header | Expected Value |

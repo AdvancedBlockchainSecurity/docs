@@ -138,7 +138,7 @@ Organizations can enforce SSO for their domain:
     "idp_entity_id": "https://idp.example.com",
     "idp_sso_url": "https://idp.example.com/sso/saml",
     "idp_certificate": "-----BEGIN CERTIFICATE-----...",
-    "sp_entity_id": "https://blocksecops.com/saml/example-org"
+    "sp_entity_id": "https://0xapogee.com/saml/example-org"
   }
 }
 ```

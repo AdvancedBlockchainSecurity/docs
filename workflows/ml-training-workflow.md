@@ -139,7 +139,7 @@ As of API Service v0.26.0, model retraining is an **admin-only operation** perfo
 
 **Admin Portal UI:**
 
-Navigate to `admin.blocksecops.local/ml-models` and click **Retrain Model**.
+Navigate to `admin.0xapogee.local/ml-models` and click **Retrain Model**.
 
 **Admin API Endpoint:**
 

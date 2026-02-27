@@ -193,13 +193,13 @@ namespace: <service>-local
 
 images:
   - name: <service>
-    newName: harbor.blocksecops.local/blocksecops/<service>
+    newName: harbor.0xapogee.local/blocksecops/<service>
     newTag: "0.1.0"
 ```
 
 **Build command:**
 ```bash
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 docker build -t ${REGISTRY}/blocksecops/<service>:0.1.0 .
 docker push ${REGISTRY}/blocksecops/<service>:0.1.0
 kubectl apply -k k8s/overlays/local/
@@ -213,14 +213,14 @@ namespace: <service>-local  # Still uses -local suffix
 
 images:
   - name: <service>
-    newName: harbor.blocksecops.local/blocksecops/<service>
+    newName: harbor.0xapogee.local/blocksecops/<service>
     newTag: "0.1.0"
 ```
 
 **Build command:**
 ```bash
-docker build -t harbor.blocksecops.local/blocksecops/<service>:0.1.0 .
-docker push harbor.blocksecops.local/blocksecops/<service>:0.1.0
+docker build -t harbor.0xapogee.local/blocksecops/<service>:0.1.0 .
+docker push harbor.0xapogee.local/blocksecops/<service>:0.1.0
 kubectl apply -k k8s/overlays/local/  # Server uses local overlay for base
 ```
 
@@ -281,7 +281,7 @@ The **application version file** is the single source of truth:
 # This applies to BOTH deployment.yaml AND cronjob-*.yaml
 images:
   - name: blocksecops-api-service
-    newName: harbor.blocksecops.local/blocksecops/api-service
+    newName: harbor.0xapogee.local/blocksecops/api-service
     newTag: "0.25.7"  # Applied to Deployment AND CronJob
 ```
 
@@ -301,7 +301,7 @@ kubectl kustomize k8s/overlays/local | grep -A2 "image:"
 **Prevention:** After every version bump, always run the full deploy cycle:
 ```bash
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 docker build -t ${REGISTRY}/blocksecops/<service>:${VERSION} .
 docker push ${REGISTRY}/blocksecops/<service>:${VERSION}
 kubectl apply -k k8s/overlays/local/<service>/   # NEVER skip this step

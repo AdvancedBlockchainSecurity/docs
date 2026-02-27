@@ -12,10 +12,10 @@ Smoke tests verify the platform is operational after deployments, upgrades, or i
 
 | Setting | Value |
 |---------|-------|
-| **Server access** | `https://app.blocksecops.local` (Traefik with hostPort 80/443, HTTP redirects to HTTPS) |
-| **Admin access** | `http://admin.blocksecops.local` (Traefik hostPort 80) |
+| **Server access** | `https://app.0xapogee.local` (Traefik with hostPort 80/443, HTTP redirects to HTTPS) |
+| **Admin access** | `http://admin.0xapogee.local` (Traefik hostPort 80) |
 | **Cluster type** | kubeadm with containerd |
-| **Registry** | Harbor at `harbor.blocksecops.local` |
+| **Registry** | Harbor at `harbor.0xapogee.local` |
 | **Auth provider** | Supabase (external) |
 | **Database** | PostgreSQL 15.4, database name `solidity_security`, user `blocksecops` |
 | **curl flag** | Use `-sk` for HTTPS (self-signed cert) |
@@ -52,19 +52,19 @@ kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity
 
 ```bash
 # Dashboard - expect 200 with HTML
-curl -sk -o /dev/null -w "%{http_code}" https://app.blocksecops.local/
+curl -sk -o /dev/null -w "%{http_code}" https://app.0xapogee.local/
 
 # API Service - expect JSON with status "healthy"
-curl -sk https://app.blocksecops.local/api/v1/health/live
+curl -sk https://app.0xapogee.local/api/v1/health/live
 
 # API Readiness - expect ready:true with database:true
-curl -sk https://app.blocksecops.local/api/v1/health/ready
+curl -sk https://app.0xapogee.local/api/v1/health/ready
 
 # API OpenAPI docs - expect 200
-curl -sk -o /dev/null -w "%{http_code}" https://app.blocksecops.local/docs
+curl -sk -o /dev/null -w "%{http_code}" https://app.0xapogee.local/docs
 
 # Admin Portal - expect 200 with HTML (HTTP, not HTTPS)
-curl -s -o /dev/null -w "%{http_code}" http://admin.blocksecops.local/
+curl -s -o /dev/null -w "%{http_code}" http://admin.0xapogee.local/
 ```
 
 ### Internal Service Health (via kubectl exec)
@@ -127,22 +127,22 @@ All should return 200 with valid auth, 401 without:
 AUTH="-H 'Authorization: Bearer $TOKEN'"
 
 # Must return 200
-curl -sk $AUTH "https://app.blocksecops.local/api/v1/scans?limit=2"
-curl -sk $AUTH "https://app.blocksecops.local/api/v1/contracts?limit=2"
-curl -sk $AUTH "https://app.blocksecops.local/api/v1/vulnerabilities?limit=2"
-curl -sk $AUTH "https://app.blocksecops.local/api/v1/organizations"
-curl -sk $AUTH "https://app.blocksecops.local/api/v1/scanners"
-curl -sk $AUTH "https://app.blocksecops.local/api/v1/deduplication/groups"
-curl -sk $AUTH "https://app.blocksecops.local/api/v1/projects"
+curl -sk $AUTH "https://app.0xapogee.local/api/v1/scans?limit=2"
+curl -sk $AUTH "https://app.0xapogee.local/api/v1/contracts?limit=2"
+curl -sk $AUTH "https://app.0xapogee.local/api/v1/vulnerabilities?limit=2"
+curl -sk $AUTH "https://app.0xapogee.local/api/v1/organizations"
+curl -sk $AUTH "https://app.0xapogee.local/api/v1/scanners"
+curl -sk $AUTH "https://app.0xapogee.local/api/v1/deduplication/groups"
+curl -sk $AUTH "https://app.0xapogee.local/api/v1/projects"
 
 # Must return 401 without auth
-curl -sk -o /dev/null -w "%{http_code}" "https://app.blocksecops.local/api/v1/scans"
+curl -sk -o /dev/null -w "%{http_code}" "https://app.0xapogee.local/api/v1/scans"
 # Expected: 401
 
 # Search (POST)
 curl -sk $AUTH -X POST -H "Content-Type: application/json" \
   -d '{"query":"reentrancy","limit":5}' \
-  "https://app.blocksecops.local/api/v1/search"
+  "https://app.0xapogee.local/api/v1/search"
 ```
 
 ### Regression Tests (v0.27.0+)
@@ -151,19 +151,19 @@ These tests verify specific bug fixes. Expected behaviors after deploying v0.27.
 
 ```bash
 # A1: Info severity removed — expect 422 (not 500)
-curl -sk $AUTH "https://app.blocksecops.local/api/v1/deduplication/groups?severity=info"
+curl -sk $AUTH "https://app.0xapogee.local/api/v1/deduplication/groups?severity=info"
 
 # A2: Pending status mapped — expect 200 (mapped to queued) or 422 (not 500)
-curl -sk $AUTH "https://app.blocksecops.local/api/v1/scans?status=pending"
+curl -sk $AUTH "https://app.0xapogee.local/api/v1/scans?status=pending"
 
 # A3: Invalid severity validation — expect 422 (not 500)
-curl -sk $AUTH "https://app.blocksecops.local/api/v1/deduplication/groups?severity=INVALID"
+curl -sk $AUTH "https://app.0xapogee.local/api/v1/deduplication/groups?severity=INVALID"
 
 # A4: Audit logs — expect 200 or 403 (not 500)
-curl -sk $AUTH "https://app.blocksecops.local/api/v1/audit-logs"
+curl -sk $AUTH "https://app.0xapogee.local/api/v1/audit-logs"
 
 # A6: Scanner effectiveness — expect 200 with populated data
-curl -sk $AUTH "https://app.blocksecops.local/api/v1/analytics/scanner-effectiveness"
+curl -sk $AUTH "https://app.0xapogee.local/api/v1/analytics/scanner-effectiveness"
 ```
 
 ## Database Checks
@@ -255,7 +255,7 @@ done
 
 ```bash
 # Encryption service configured (readiness endpoint includes encryption check)
-curl -sk https://app.blocksecops.local/api/v1/health/ready | python3 -c "
+curl -sk https://app.0xapogee.local/api/v1/health/ready | python3 -c "
 import sys,json; d=json.load(sys.stdin)
 print('PASS' if d.get('checks',{}).get('encryption_configured') else 'FAIL: encryption not configured')"
 
@@ -335,10 +335,10 @@ check "Traefik running" "Running" "$(kubectl get pod -n traefik-local -l app.kub
 
 echo ""
 echo "=== External Access ==="
-check "Dashboard HTTPS" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.blocksecops.local/ 2>/dev/null)"
-check "API health" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.blocksecops.local/api/v1/health/live 2>/dev/null)"
-check "API ready" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.blocksecops.local/api/v1/health/ready 2>/dev/null)"
-check "Admin portal" "200" "$(curl -s -o /dev/null -w '%{http_code}' http://admin.blocksecops.local/ 2>/dev/null)"
+check "Dashboard HTTPS" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.local/ 2>/dev/null)"
+check "API health" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.local/api/v1/health/live 2>/dev/null)"
+check "API ready" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.local/api/v1/health/ready 2>/dev/null)"
+check "Admin portal" "200" "$(curl -s -o /dev/null -w '%{http_code}' http://admin.0xapogee.local/ 2>/dev/null)"
 
 echo ""
 echo "=== Internal Services ==="
@@ -369,7 +369,7 @@ check "Database query" "1" "$DB_OK"
 
 echo ""
 echo "=== Encryption & Secrets ==="
-ENC_OK=$(curl -sk https://app.blocksecops.local/api/v1/health/ready 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print('true' if d.get('checks',{}).get('encryption_configured') else 'false')" 2>/dev/null)
+ENC_OK=$(curl -sk https://app.0xapogee.local/api/v1/health/ready 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print('true' if d.get('checks',{}).get('encryption_configured') else 'false')" 2>/dev/null)
 check "Encryption configured" "true" "$ENC_OK"
 
 VAULT_OK=$(kubectl exec -n vault-local vault-0 -- vault status -format=json 2>/dev/null | python3 -c "import sys,json; print('unsealed' if not json.load(sys.stdin)['sealed'] else 'sealed')" 2>/dev/null)

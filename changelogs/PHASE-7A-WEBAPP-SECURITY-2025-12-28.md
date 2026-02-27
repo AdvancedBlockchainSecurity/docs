@@ -86,7 +86,7 @@ default-src 'self';
 script-src 'self';
 style-src 'self' 'unsafe-inline';
 img-src 'self' data: https:;
-connect-src 'self' https://api.blocksecops.com https://*.supabase.co wss://*.walletconnect.com;
+connect-src 'self' https://api.0xapogee.com https://*.supabase.co wss://*.walletconnect.com;
 frame-ancestors 'none';
 ```
 

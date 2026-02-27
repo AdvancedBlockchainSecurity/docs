@@ -72,7 +72,7 @@ Upload your Solidity contract to BlockSecOps as usual:
 
 ```bash
 # Via API
-curl -X POST https://api.blocksecops.io/api/v1/contracts \
+curl -X POST https://api.0xapogee.io/api/v1/contracts \
   -H "Authorization: Bearer $TOKEN" \
   -F "file=@MyToken.sol"
 ```
@@ -82,7 +82,7 @@ curl -X POST https://api.blocksecops.io/api/v1/contracts \
 When initiating a scan, select Echidna as one of your scanners:
 
 ```bash
-curl -X POST https://api.blocksecops.io/api/v1/scans \
+curl -X POST https://api.0xapogee.io/api/v1/scans \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
     "contract_id": "your-contract-id",
@@ -718,9 +718,9 @@ Use both for comprehensive testing!
 
 ## Support
 
-- **BlockSecOps Docs**: https://docs.blocksecops.io
+- **BlockSecOps Docs**: https://docs.0xapogee.io
 - **Discord**: https://discord.gg/blocksecops
-- **Email**: support@blocksecops.io
+- **Email**: support@0xapogee.com
 
 ---
 

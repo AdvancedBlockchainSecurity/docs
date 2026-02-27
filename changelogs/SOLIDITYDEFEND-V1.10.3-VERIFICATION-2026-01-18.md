@@ -20,7 +20,7 @@ Comprehensive verification of the SolidityDefend v1.10.3 deployment completed su
 | Component | Status | Details |
 |-----------|--------|---------|
 | Harbor Image | Verified | `scanner-soliditydefend:0.4.0` |
-| Registry | Harbor (local) | `harbor.blocksecops.local` |
+| Registry | Harbor (local) | `harbor.0xapogee.local` |
 
 ### Kubernetes Resources
 
@@ -211,14 +211,14 @@ kubectl get pods -n api-service-local
 
 # Test scanner endpoint
 curl -H "Authorization: Bearer $TOKEN" \
-  https://app.blocksecops.local/api/v1/scanners | jq '.[] | select(.id=="soliditydefend")'
+  https://app.0xapogee.local/api/v1/scanners | jq '.[] | select(.id=="soliditydefend")'
 
 # Run E2E scan test
 curl -X POST \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"contract_id": "<id>", "scanner_ids": ["soliditydefend"]}' \
-  https://app.blocksecops.local/api/v1/scans
+  https://app.0xapogee.local/api/v1/scans
 
 # Check database stats
 kubectl exec -n postgresql-local postgresql-0 -- \

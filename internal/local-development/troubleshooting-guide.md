@@ -363,10 +363,10 @@ kubectl delete pods --all -n api-service-local
 # Test API endpoint
 curl -X POST http://127.0.0.1:8000/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "test-rebrand@blocksecops.com", "password": "TestPass123"}'
+  -d '{"email": "test-rebrand@0xapogee.com", "password": "TestPass123"}'
 
 # Expected response:
-# {"message":"Login successful","user_id":"...","email":"test-rebrand@blocksecops.com"}
+# {"message":"Login successful","user_id":"...","email":"test-rebrand@0xapogee.com"}
 ```
 
 ### Prevention

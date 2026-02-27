@@ -240,7 +240,7 @@ Every scanner's output is normalized to this format before forwarding to the API
 
 | Variable | Value | Source |
 |----------|-------|--------|
-| `SCANNER_IMAGE_{NAME}` | `harbor.blocksecops.local/blocksecops/scanner-{name}:{version}` | scanner-versions ConfigMap |
+| `SCANNER_IMAGE_{NAME}` | `harbor.0xapogee.local/blocksecops/scanner-{name}:{version}` | scanner-versions ConfigMap |
 | `IMAGE_PULL_POLICY` | `IfNotPresent` | deployment env |
 | `API_SERVICE_URL` | `http://api-service.api-service-local.svc.cluster.local:8000` | configmap |
 
@@ -327,7 +327,7 @@ All log entries are JSON with fields: `timestamp`, `level`, `message`, `scan_id`
 |------|-------|-------|
 | Scanner image tags | `k8s/base/scanner-versions-configmap.yaml` | Single source of truth |
 | Scanner metadata (version, developer) | Same ConfigMap, `SCANNER_METADATA` JSON | Read by API service too |
-| Local Harbor overrides | `k8s/overlays/local/scanner-versions-patch.yaml` | Adds `harbor.blocksecops.local/blocksecops/` prefix |
+| Local Harbor overrides | `k8s/overlays/local/scanner-versions-patch.yaml` | Adds `harbor.0xapogee.local/blocksecops/` prefix |
 | Memory limits per scanner | `kubernetes_job_manager.py:_get_memory_limit()` | Varies by scanner type |
 | Job TTL, backoff, timeouts | `kubernetes_job_manager.py:create_scanner_job()` | TTL 3600s, backoff 3, timeout 600s |
 | API service URL | `result_collector.py` constructor | `http://api-service.api-service-local.svc.cluster.local:8000` |

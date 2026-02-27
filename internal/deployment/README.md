@@ -165,8 +165,8 @@ kubectl port-forward svc/grafana 3000:80 -n monitoring-local
 **Deployment**:
 ```bash
 # Tag and push images
-docker tag api-service:0.4.0 registry.blocksecops.com/api-service:0.4.0
-docker push registry.blocksecops.com/api-service:0.4.0
+docker tag api-service:0.4.0 registry.0xapogee.com/api-service:0.4.0
+docker push registry.0xapogee.com/api-service:0.4.0
 
 # Deploy via ArgoCD (GitOps)
 argocd app sync api-service-prod
@@ -265,9 +265,9 @@ All services require:
 
 **Production**:
 ```bash
-registry.blocksecops.com/api-service:0.4.12  # Specific version
-registry.blocksecops.com/api-service:0.4     # Minor version
-registry.blocksecops.com/api-service:latest  # Latest stable
+registry.0xapogee.com/api-service:0.4.12  # Specific version
+registry.0xapogee.com/api-service:0.4     # Minor version
+registry.0xapogee.com/api-service:latest  # Latest stable
 ```
 
 **Local Development**:
@@ -387,7 +387,7 @@ kubectl get configmaps -n api-service-prod | grep contract-source
 4. **Verify Deployment**:
    ```bash
    kubectl get pods -n api-service-prod
-   curl https://api.blocksecops.com/api/v1/health
+   curl https://api.0xapogee.com/api/v1/health
    ```
 
 5. **Update Changelog**:
@@ -427,4 +427,4 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
 **Maintained by**: BlockSecOps DevOps Team
 **Last Review**: November 21, 2025
-**Emergency Contact**: devops@blocksecops.com
+**Emergency Contact**: devops@0xapogee.com

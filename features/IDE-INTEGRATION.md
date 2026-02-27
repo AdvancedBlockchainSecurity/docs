@@ -19,7 +19,7 @@
 
 ## Overview
 
-IDE integrations bring BlockSecOps security scanning directly into developer workflows through VS Code, JetBrains (IntelliJ/WebStorm), and Vim/Neovim plugins. All integrations use the `blocksecops-cli` tool with local SolidityDefend scanning.
+IDE integrations bring BlockSecOps security scanning directly into developer workflows through VS Code, JetBrains (IntelliJ/WebStorm), and Vim/Neovim plugins. All integrations use the `0xapogee-cli` tool with local SolidityDefend scanning.
 
 ## Architecture
 
@@ -36,7 +36,7 @@ IDE integrations bring BlockSecOps security scanning directly into developer wor
 │                        │                                        │
 │                        ▼                                        │
 │              ┌─────────────────┐                                │
-│              │ blocksecops-cli │                                │
+│              │ 0xapogee-cli │                                │
 │              │  --local flag   │                                │
 │              │  --scan-source  │                                │
 │              └────────┬────────┘                                │
@@ -92,13 +92,13 @@ Each scan records its origin for analytics and filtering:
 
 ```bash
 # Local scanning with SolidityDefend
-blocksecops scan run contract.sol --local
+0xapogee scan run contract.sol --local
 
 # Specify scan source
-blocksecops scan run contract.sol --local --scan-source vscode
+0xapogee scan run contract.sol --local --scan-source vscode
 
 # Full example
-blocksecops scan run ./contracts/ --local --scan-source jetbrains --output json
+0xapogee scan run ./contracts/ --local --scan-source jetbrains --output json
 ```
 
 ### CLI Workflow
@@ -157,7 +157,7 @@ const sourceConfig = {
 
 ```bash
 # From marketplace (when published)
-code --install-extension blocksecops.blocksecops-vscode
+code --install-extension blocksecops.0xapogee-vscode
 
 # From VSIX
 code --install-extension blocksecops-vscode-1.0.0.vsix
@@ -177,7 +177,7 @@ code --install-extension blocksecops-vscode-1.0.0.vsix
   'blocksecops/blocksecops-nvim',
   config = function()
     require('blocksecops').setup({
-      api_key = os.getenv('BLOCKSECOPS_API_KEY'),
+      api_key = os.getenv('APOGEE_API_KEY'),
       scan_on_save = true,
     })
   end
@@ -216,7 +216,7 @@ Settings > Tools > BlockSecOps:
 
 ```lua
 require('blocksecops').setup({
-  api_key = os.getenv('BLOCKSECOPS_API_KEY'),
+  api_key = os.getenv('APOGEE_API_KEY'),
   cli_path = nil,  -- auto-detect
   scan_on_save = true,
   virtual_text = true,

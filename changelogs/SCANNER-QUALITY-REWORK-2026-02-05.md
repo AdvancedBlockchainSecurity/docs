@@ -98,7 +98,7 @@ No backend changes — UX copy improvement only.
 
 1. **Admin endpoint**: `POST /admin/system/ml/retrain` returns 403 for non-admin, works for platform_admin
 2. **Dashboard**: `/intelligence/scanner-quality` — no retrain button, quality metrics still visible, improved empty-state
-3. **Admin Portal**: `admin.blocksecops.local/ml-models` — page loads with model stats, retrain button works
+3. **Admin Portal**: `admin.0xapogee.local/ml-models` — page loads with model stats, retrain button works
 4. **Audit log**: `admin.ml.retrain` entry created on retrain
 5. **Pipeline docs**: 6 files in `docs/pipelines/` (1 existing + 5 new)
 

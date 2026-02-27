@@ -385,8 +385,8 @@ kubectl get ingress -A
 **Expected Output:**
 ```
 NAMESPACE    NAME                   CLASS   HOSTS                        ADDRESS        PORTS   AGE
-monitoring   blocksecops-ingress    nginx   grafana.blocksecops.local    192.168.49.2   80      10m
-default      vault-ingress          nginx   vault.blocksecops.local      192.168.49.2   80      10m
+monitoring   blocksecops-ingress    nginx   grafana.0xapogee.local    192.168.49.2   80      10m
+default      vault-ingress          nginx   vault.0xapogee.local      192.168.49.2   80      10m
 ```
 
 ## Performance and Resource Verification

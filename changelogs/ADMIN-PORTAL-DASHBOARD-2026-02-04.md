@@ -200,7 +200,7 @@ interface DeduplicationStatsResponse {
 
 ### Manual Verification
 
-1. Access admin portal at `http://localhost:5173` or `http://admin.blocksecops.local:3000`
+1. Access admin portal at `http://localhost:5173` or `http://admin.0xapogee.local:3000`
 2. Login with admin credentials
 3. Navigate to Dashboard (default landing page)
 4. Verify all metric cards display data
@@ -252,10 +252,10 @@ interface DeduplicationStatsResponse {
 cd /home/pwner/Git/blocksecops-admin-portal
 
 # Build Docker image
-docker build --no-cache -t harbor.blocksecops.local/blocksecops/admin-portal:0.1.5 .
+docker build --no-cache -t harbor.0xapogee.local/blocksecops/admin-portal:0.1.5 .
 
 # Push to Harbor
-docker push harbor.blocksecops.local/blocksecops/admin-portal:0.1.5
+docker push harbor.0xapogee.local/blocksecops/admin-portal:0.1.5
 
 # Deploy to Kubernetes
 kubectl apply -k k8s/overlays/local/

@@ -24,7 +24,7 @@ POST /scans         →       Trigger scan on uploaded contract          scans
 
 - **Dashboard**: User uploads a contract via the upload form
 - **API Key**: External tool calls `POST /api/v1/contracts` with `X-API-Key` header
-- **CLI**: `blocksecops-cli` uploads via API key
+- **CLI**: `0xapogee-cli` uploads via API key
 
 ## Pipeline Steps
 

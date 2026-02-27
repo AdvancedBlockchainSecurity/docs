@@ -38,14 +38,14 @@ Reports are saved to `scripts/audit/reports/`.
 ./scripts/audit/08-database-integrity.sh
 
 # Production smoke test
-BASE_URL=https://app.blocksecops.com ./scripts/audit/smoke-test-production.sh
+BASE_URL=https://app.0xapogee.com ./scripts/audit/smoke-test-production.sh
 ```
 
 ### Environment variables
 
 | Variable | Used By | Description |
 |----------|---------|-------------|
-| `BASE_URL` | All HTTP scripts | Platform URL (default: `https://app.blocksecops.com`) |
+| `BASE_URL` | All HTTP scripts | Platform URL (default: `https://app.0xapogee.com`) |
 | `ADMIN_URL` | smoke-test | Admin portal URL |
 | `CURL_FLAGS` | All HTTP scripts | curl flags (default: `-sk`) |
 | `TOKEN` | auth, smoke, appsec | JWT token for authenticated tests |
@@ -64,7 +64,7 @@ BASE_URL=https://app.blocksecops.com ./scripts/audit/smoke-test-production.sh
 ### Load testing
 
 ```bash
-k6 run --env BASE_URL=https://app.blocksecops.com \
+k6 run --env BASE_URL=https://app.0xapogee.com \
        --env TOKEN=<jwt_token> \
        scripts/audit/k6-api-load-test.js
 ```
