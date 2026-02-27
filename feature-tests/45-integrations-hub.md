@@ -332,7 +332,7 @@ The Unified Integrations Hub consolidates all platform integrations into a singl
 **API Request Example:**
 
 ```bash
-curl -X GET https://app.blocksecops.local/api/v1/contracts \
+curl -X GET https://app.0xapogee.local/api/v1/contracts \
   -H "X-Service-Account-Key: bso_sa_xxxxxxxxxxxxxxxx"
 ```
 

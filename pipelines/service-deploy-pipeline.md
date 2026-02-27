@@ -59,7 +59,7 @@ Step 3: Docker Build
         Build image with OCI labels (SERVICE_VERSION, BUILD_DATE, VCS_REF)
 
 Step 4: Docker Push
-        Push to ${REGISTRY:-harbor.blocksecops.local}/blocksecops/<service>:<version>
+        Push to ${REGISTRY:-harbor.0xapogee.local}/blocksecops/<service>:<version>
 
 Step 5: Suspend CronJobs                  ◄── SAFETY: prevents stale image execution
         Patch all CronJobs in namespace to suspend: true
@@ -297,7 +297,7 @@ spec:
 
 | Aspect | Dev Cluster (kubeadm) | GCP Production (GKE) |
 |--------|----------------------|---------------------|
-| Registry | Harbor (`harbor.blocksecops.local`) | GCP Artifact Registry |
+| Registry | Harbor (`harbor.0xapogee.local`) | GCP Artifact Registry |
 | Build trigger | Manual / `deploy.sh` | GitHub Actions on push to main |
 | Deploy trigger | `kubectl apply -k` | ArgoCD auto-sync |
 | CronJob safety | Script suspends/resumes | Sync waves + optional hooks |

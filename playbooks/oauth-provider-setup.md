@@ -14,7 +14,7 @@ This playbook guides you through configuring OAuth providers for BlockSecOps thi
 
 - [ ] BlockSecOps API service v0.29.22+ deployed
 - [ ] BlockSecOps dashboard v0.46.4+ deployed
-- [ ] Public domain with valid TLS (e.g., `app.blocksecops.com`)
+- [ ] Public domain with valid TLS (e.g., `app.0xapogee.com`)
 - [ ] Access to Vault or GCP Secret Manager
 - [ ] ExternalSecret Operator configured
 - [ ] `INTEGRATION_ENCRYPTION_KEY` generated and stored (see Step 0)
@@ -53,9 +53,9 @@ vault kv put secret/blocksecops/api-service/encryption \
    | Field | Value |
    |-------|-------|
    | Application name | `BlockSecOps` |
-   | Homepage URL | `https://app.blocksecops.com` |
+   | Homepage URL | `https://app.0xapogee.com` |
    | Application description | `Smart contract security platform` |
-   | Authorization callback URL | `https://app.blocksecops.com/api/v1/oauth/github/callback` |
+   | Authorization callback URL | `https://app.0xapogee.com/api/v1/oauth/github/callback` |
 
 4. Click **Register application**
 
@@ -108,7 +108,7 @@ echo -n "ghsecret_xxxxxxxxxxxx" | gcloud secrets create github-client-secret --d
    | Field | Value |
    |-------|-------|
    | Name | `BlockSecOps` |
-   | Redirect URI | `https://app.blocksecops.com/api/v1/oauth/gitlab/callback` |
+   | Redirect URI | `https://app.0xapogee.com/api/v1/oauth/gitlab/callback` |
    | Confidential | Yes (checked) |
    | Scopes | `api`, `read_user`, `read_repository` |
 
@@ -160,7 +160,7 @@ Currently, the API service hardcodes `gitlab.com` URLs. Self-hosted GitLab suppo
    | Field | Value |
    |-------|-------|
    | Name | `BlockSecOps` |
-   | Callback URL | `https://app.blocksecops.com/api/v1/oauth/bitbucket/callback` |
+   | Callback URL | `https://app.0xapogee.com/api/v1/oauth/bitbucket/callback` |
    | This is a private consumer | Yes (checked) |
    | Permissions | Repository: Read, Pull requests: Read, Webhooks: Read and Write |
 
@@ -210,7 +210,7 @@ Bitbucket uses HTTP Basic Authentication for the token exchange (client_id:clien
 
 5. Go to **Authorization** tab:
    - Click **Add** next to **OAuth 2.0 (3LO)**
-   - Callback URL: `https://app.blocksecops.com/api/v1/oauth/jira/callback`
+   - Callback URL: `https://app.0xapogee.com/api/v1/oauth/jira/callback`
 
 6. Go to **Settings** tab:
    - Copy the **Client ID** and **Secret**
@@ -301,8 +301,8 @@ Jenkins does not need OAuth client credentials in Vault. The user's API token is
 
 | Environment | Base URL | Example Callback |
 |-------------|----------|-----------------|
-| Server (local) | `https://app.blocksecops.local` | `https://app.blocksecops.local/api/v1/oauth/github/callback` |
-| Production (GCP) | `https://app.blocksecops.com` | `https://app.blocksecops.com/api/v1/oauth/github/callback` |
+| Server (local) | `https://app.0xapogee.local` | `https://app.0xapogee.local/api/v1/oauth/github/callback` |
+| Production (GCP) | `https://app.0xapogee.com` | `https://app.0xapogee.com/api/v1/oauth/github/callback` |
 
 **Important:** OAuth providers must be able to reach the callback URL. This means:
 - **Server environment** only works if the domain is publicly accessible (e.g., via tunnel)

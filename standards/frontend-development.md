@@ -228,7 +228,7 @@ curl -s http://127.0.0.1:3002 | grep "<title>"
 ```bash
 # 1. Build Docker image (follow docker-image-versioning.md)
 cd /Users/pwner/Git/ABS/blocksecops-frontend
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 docker build --no-cache -t ${REGISTRY}/blocksecops/frontend:0.1.0 -f Dockerfile .
 
 # 2. Push to Harbor registry
@@ -330,7 +330,7 @@ kubectl exec -n frontend-local deployment/frontend -- ls -la /usr/share/nginx/ht
 
 # 3. Rebuild and redeploy if files are missing
 cd /Users/pwner/Git/ABS/blocksecops-frontend
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 docker build --no-cache -t ${REGISTRY}/blocksecops/frontend:0.1.0 -f Dockerfile .
 docker push ${REGISTRY}/blocksecops/frontend:0.1.0
 kubectl rollout restart deployment/frontend -n frontend-local
@@ -436,7 +436,7 @@ git add .
 git commit -m "feat: add new feature"
 
 # 2. Build new Docker image (increment version)
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 docker build --no-cache -t ${REGISTRY}/blocksecops/frontend:0.1.1 -f Dockerfile .
 
 # 3. Push to Harbor registry

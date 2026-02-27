@@ -53,7 +53,7 @@ Full audit and remediation of scanner ecosystem across orchestration, api-servic
 | 9 | Running pod image version | Pass | api-service:0.28.44, 0 restarts |
 | 10 | Codebase grep for old URL | Pass | Zero references to BlockSecOps/RustDefend in api-service, tool-integration, orchestration |
 | 11 | New GitHub URL reachable | Pass | https://github.com/0xStarBridge/RustDefend returns HTTP 200 |
-| 12 | UI path via Traefik | Pass | https://app.blocksecops.local/api/v1/scanners returns updated URL |
+| 12 | UI path via Traefik | Pass | https://app.0xapogee.local/api/v1/scanners returns updated URL |
 
 ---
 
@@ -112,14 +112,14 @@ After initial testing, a clean-slate procedure was executed for RustDefend to re
 
 ```bash
 # Health check
-curl -sk https://app.blocksecops.local/api/v1/health/ready
+curl -sk https://app.0xapogee.local/api/v1/health/ready
 
 # Scanner count and deprecated check
-curl -sk https://app.blocksecops.local/api/v1/scanners | jq '.scanners | length'
-curl -sk https://app.blocksecops.local/api/v1/scanners | jq '[.scanners[].id] | sort'
+curl -sk https://app.0xapogee.local/api/v1/scanners | jq '.scanners | length'
+curl -sk https://app.0xapogee.local/api/v1/scanners | jq '[.scanners[].id] | sort'
 
 # RustDefend URL
-curl -sk https://app.blocksecops.local/api/v1/scanners | jq '.scanners[] | select(.id=="rustdefend") | .github_url'
+curl -sk https://app.0xapogee.local/api/v1/scanners | jq '.scanners[] | select(.id=="rustdefend") | .github_url'
 
 # ConfigMap verification
 kubectl get configmap scanner-images -n orchestration-local -o yaml

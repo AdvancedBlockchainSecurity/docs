@@ -403,7 +403,7 @@ The api-service `semantic_deduplicator.py` now uses httpx to call the intelligen
 
 ### 11.2 Scanner Quality Page (`/intelligence/scanner-quality`)
 
-**Note:** As of Dashboard v0.39.0, the Retrain Model button has been removed from the user dashboard. Retraining is now admin-only via the Admin Portal at `admin.blocksecops.local/ml-models`.
+**Note:** As of Dashboard v0.39.0, the Retrain Model button has been removed from the user dashboard. Retraining is now admin-only via the Admin Portal at `admin.0xapogee.local/ml-models`.
 
 | # | Test Case | Expected | Status |
 |---|-----------|----------|--------|

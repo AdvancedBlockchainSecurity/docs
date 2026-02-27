@@ -81,12 +81,12 @@ ALLOWED_HOSTS="localhost,127.0.0.1"
 
 ### Server (kubeadm)
 ```bash
-ALLOWED_HOSTS="app.blocksecops.local,192.168.86.225"
+ALLOWED_HOSTS="app.0xapogee.local,192.168.86.225"
 ```
 
 ### Production (GCP)
 ```bash
-ALLOWED_HOSTS="app.blocksecops.com,api.blocksecops.com"
+ALLOWED_HOSTS="app.0xapogee.com,api.0xapogee.com"
 ```
 
 ## Prevention

@@ -28,7 +28,7 @@ The pricing page now supports dual payment options allowing users to choose betw
 ```bash
 # Check dashboard version
 kubectl get deployment -n dashboard-local dashboard -o jsonpath='{.spec.template.spec.containers[0].image}'
-# Should show: harbor.blocksecops.local/blocksecops/dashboard:0.36.0
+# Should show: harbor.0xapogee.local/blocksecops/dashboard:0.36.0
 
 # Check Stripe key is configured
 kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.VITE_STRIPE_PUBLISHABLE_KEY}'

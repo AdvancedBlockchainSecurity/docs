@@ -116,7 +116,7 @@ WHERE pattern_code IS NOT NULL LIMIT 10;
 
 ### UI Verification
 
-1. Navigate to `http://app.blocksecops.local/deduplication`
+1. Navigate to `http://app.0xapogee.local/deduplication`
 2. Verify tiles show BVD codes instead of "Pattern pending classification"
 
 ## Rollback

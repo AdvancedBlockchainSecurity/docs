@@ -63,7 +63,7 @@ Args:   SERVICE_VERSION, BUILD_DATE, VCS_REF
 ```
 Input:  Tagged image in Docker daemon
 Output: Image in Harbor registry
-Target: harbor.blocksecops.local/blocksecops/<service>:<version>
+Target: harbor.0xapogee.local/blocksecops/<service>:<version>
 Note:   Harbor enforces immutable tags — cannot overwrite existing versions
 ```
 

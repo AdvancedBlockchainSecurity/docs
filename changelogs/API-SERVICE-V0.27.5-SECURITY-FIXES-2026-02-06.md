@@ -116,7 +116,7 @@ egress:
 - `kubectl get networkpolicy -n api-service-local` - 17 policies
 - `kubectl describe netpol api-service-to-vault -n api-service-local` - port 8200, vault-local, AND selector
 - `kubectl describe netpol api-service-egress-external-apis -n api-service-local` - ipBlock excludes RFC1918
-- `curl -sk https://app.blocksecops.local/api/v1/health/live` - `{"version":"0.27.5"}`
+- `curl -sk https://app.0xapogee.local/api/v1/health/live` - `{"version":"0.27.5"}`
 - Deduplication CronJob: no `CreateContainerConfigError`
 
 ### Impact

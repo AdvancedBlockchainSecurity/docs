@@ -1,6 +1,6 @@
 # CLI Deployment Guide
 
-Deploy and configure the BlockSecOps CLI tool across your organization.
+Deploy and configure the Apogee CLI tool across your organization.
 
 ## Overview
 
@@ -19,20 +19,20 @@ This guide covers organization-wide deployment strategies and administration.
 ### Method 1: pip (Recommended for most users)
 
 ```bash
-pip install blocksecops-cli
+pip install 0xapogee-cli
 ```
 
 ### Method 2: pipx (Isolated environment)
 
 ```bash
-pipx install blocksecops-cli
+pipx install 0xapogee-cli
 ```
 
 ### Method 3: From Source
 
 ```bash
-git clone https://github.com/blocksecops/blocksecops-cli
-cd blocksecops-cli
+git clone https://github.com/blocksecops/0xapogee-cli
+cd 0xapogee-cli
 pip install -e .
 ```
 
@@ -55,7 +55,7 @@ Create a shared configuration file for your organization:
 
 ```json
 {
-  "api_url": "https://api.blocksecops.com",
+  "api_url": "https://api.0xapogee.com",
   "default_output": "table",
   "default_fail_on": "high",
   "telemetry_enabled": false
@@ -68,10 +68,10 @@ Set organization-wide defaults via environment variables:
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `BLOCKSECOPS_API_URL` | API endpoint URL | `https://api.blocksecops.com` |
-| `BLOCKSECOPS_API_KEY` | Default API key | `bso_live_xxx...` |
-| `BLOCKSECOPS_FAIL_ON` | Default severity threshold | `high` |
-| `BLOCKSECOPS_OUTPUT` | Default output format | `sarif` |
+| `APOGEE_API_URL` | API endpoint URL | `https://api.0xapogee.com` |
+| `APOGEE_API_KEY` | Default API key | `bso_live_xxx...` |
+| `APOGEE_FAIL_ON` | Default severity threshold | `high` |
+| `APOGEE_OUTPUT` | Default output format | `sarif` |
 | `CI` | Enable CI mode (non-interactive) | `true` |
 
 ### Package Manager Integration
@@ -80,22 +80,22 @@ Set organization-wide defaults via environment variables:
 
 ```bash
 brew tap blocksecops/tap
-brew install blocksecops-cli
+brew install 0xapogee-cli
 ```
 
 #### Chocolatey (Windows)
 
 ```powershell
-choco install blocksecops-cli
+choco install 0xapogee-cli
 ```
 
 #### APT (Debian/Ubuntu)
 
 ```bash
-echo "deb https://apt.blocksecops.com stable main" | sudo tee /etc/apt/sources.list.d/blocksecops.list
-curl -fsSL https://apt.blocksecops.com/gpg.key | sudo apt-key add -
+echo "deb https://apt.0xapogee.com stable main" | sudo tee /etc/apt/sources.list.d/blocksecops.list
+curl -fsSL https://apt.0xapogee.com/gpg.key | sudo apt-key add -
 sudo apt update
-sudo apt install blocksecops-cli
+sudo apt install 0xapogee-cli
 ```
 
 ---
@@ -142,7 +142,7 @@ Rotate API keys periodically:
 ```yaml
 # .github/workflows/security.yml
 env:
-  BLOCKSECOPS_API_KEY: ${{ secrets.BLOCKSECOPS_API_KEY }}
+  APOGEE_API_KEY: ${{ secrets.APOGEE_API_KEY }}
 ```
 
 #### GitLab CI
@@ -150,15 +150,15 @@ env:
 ```yaml
 # .gitlab-ci.yml
 variables:
-  BLOCKSECOPS_API_KEY: $BLOCKSECOPS_API_KEY  # Set in CI/CD settings
+  APOGEE_API_KEY: $APOGEE_API_KEY  # Set in CI/CD settings
 ```
 
 #### Jenkins
 
 ```groovy
 // Jenkinsfile
-withCredentials([string(credentialsId: 'blocksecops-api-key', variable: 'BLOCKSECOPS_API_KEY')]) {
-    sh 'blocksecops scan run contracts/'
+withCredentials([string(credentialsId: 'blocksecops-api-key', variable: 'APOGEE_API_KEY')]) {
+    sh '0xapogee scan run contracts/'
 }
 ```
 
@@ -167,7 +167,7 @@ withCredentials([string(credentialsId: 'blocksecops-api-key', variable: 'BLOCKSE
 Use the keyring for secure local storage:
 
 ```bash
-blocksecops auth login --api-key bso_live_xxx
+0xapogee auth login --api-key bso_live_xxx
 # Key stored securely in system keyring
 ```
 
@@ -184,10 +184,10 @@ Add to your organization's repository template:
 **`.pre-commit-config.yaml`**:
 ```yaml
 repos:
-  - repo: https://github.com/blocksecops/blocksecops-cli
+  - repo: https://github.com/blocksecops/0xapogee-cli
     rev: v0.1.0
     hooks:
-      - id: blocksecops-scan
+      - id: 0xapogee-scan
         name: BlockSecOps Security Scan
         types: [solidity]
         args: ['--fail-on', 'high']
@@ -232,9 +232,9 @@ jobs:
 
 | Hook ID | Description | Default Behavior |
 |---------|-------------|------------------|
-| `blocksecops-scan` | Scan and fail on high+ | Blocks commit on high/critical |
-| `blocksecops-scan-critical` | Scan and fail on critical only | Blocks commit only on critical |
-| `blocksecops-scan-sarif` | Generate SARIF output | Outputs to `blocksecops.sarif` |
+| `0xapogee-scan` | Scan and fail on high+ | Blocks commit on high/critical |
+| `0xapogee-scan-critical` | Scan and fail on critical only | Blocks commit only on critical |
+| `0xapogee-scan-sarif` | Generate SARIF output | Outputs to `0xapogee.sarif` |
 
 ### Skipping Hooks
 
@@ -272,14 +272,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install BlockSecOps CLI
-        run: pip install blocksecops-cli
+      - name: Install Apogee CLI
+        run: pip install 0xapogee-cli
 
       - name: Run Security Scan
         env:
-          BLOCKSECOPS_API_KEY: ${{ secrets.BLOCKSECOPS_API_KEY }}
+          APOGEE_API_KEY: ${{ secrets.APOGEE_API_KEY }}
         run: |
-          blocksecops scan run contracts/ \
+          0xapogee scan run contracts/ \
             --output sarif \
             --output-file results.sarif \
             --fail-on high
@@ -297,9 +297,9 @@ security-scan:
   stage: test
   image: python:3.11
   before_script:
-    - pip install blocksecops-cli
+    - pip install 0xapogee-cli
   script:
-    - blocksecops scan run contracts/ --output junit --output-file report.xml --fail-on high
+    - 0xapogee scan run contracts/ --output junit --output-file report.xml --fail-on high
   artifacts:
     reports:
       junit: report.xml
@@ -317,15 +317,15 @@ pipeline {
     agent any
 
     environment {
-        BLOCKSECOPS_API_KEY = credentials('blocksecops-api-key')
+        APOGEE_API_KEY = credentials('blocksecops-api-key')
     }
 
     stages {
         stage('Security Scan') {
             steps {
-                sh 'pip install blocksecops-cli'
+                sh 'pip install 0xapogee-cli'
                 sh '''
-                    blocksecops scan run contracts/ \
+                    0xapogee scan run contracts/ \
                         --output junit \
                         --output-file results.xml \
                         --fail-on high
@@ -357,17 +357,17 @@ steps:
     inputs:
       versionSpec: '3.11'
 
-  - script: pip install blocksecops-cli
-    displayName: 'Install BlockSecOps CLI'
+  - script: pip install 0xapogee-cli
+    displayName: 'Install Apogee CLI'
 
   - script: |
-      blocksecops scan run contracts/ \
+      0xapogee scan run contracts/ \
         --output junit \
         --output-file $(System.DefaultWorkingDirectory)/results.xml \
         --fail-on high
     displayName: 'Run Security Scan'
     env:
-      BLOCKSECOPS_API_KEY: $(BLOCKSECOPS_API_KEY)
+      APOGEE_API_KEY: $(APOGEE_API_KEY)
 
   - task: PublishTestResults@2
     inputs:
@@ -382,7 +382,7 @@ steps:
 ### Table (Human-Readable)
 
 ```bash
-blocksecops scan run contract.sol --output table
+0xapogee scan run contract.sol --output table
 ```
 
 Best for: Local development, manual review
@@ -390,7 +390,7 @@ Best for: Local development, manual review
 ### JSON (Machine-Readable)
 
 ```bash
-blocksecops scan run contract.sol --output json
+0xapogee scan run contract.sol --output json
 ```
 
 Best for: Custom integrations, scripting
@@ -398,7 +398,7 @@ Best for: Custom integrations, scripting
 ### SARIF (GitHub/GitLab Code Scanning)
 
 ```bash
-blocksecops scan run contract.sol --output sarif --output-file results.sarif
+0xapogee scan run contract.sol --output sarif --output-file results.sarif
 ```
 
 Best for: GitHub Security tab, GitLab Code Quality
@@ -406,7 +406,7 @@ Best for: GitHub Security tab, GitLab Code Quality
 ### JUnit (CI Test Reports)
 
 ```bash
-blocksecops scan run contract.sol --output junit --output-file results.xml
+0xapogee scan run contract.sol --output junit --output-file results.xml
 ```
 
 Best for: Jenkins, Azure Pipelines, CircleCI test reporting
@@ -425,7 +425,7 @@ Best for: Jenkins, Azure Pipelines, CircleCI test reporting
 ### Using Exit Codes
 
 ```bash
-blocksecops scan run contract.sol --fail-on high
+0xapogee scan run contract.sol --fail-on high
 
 if [ $? -eq 1 ]; then
     echo "Security issues found!"
@@ -442,7 +442,7 @@ fi
 Track scan metrics via the API:
 
 ```bash
-curl -X GET https://api.blocksecops.com/api/v1/statistics \
+curl -X GET https://api.0xapogee.com/api/v1/statistics \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -458,7 +458,7 @@ curl -X GET https://api.blocksecops.com/api/v1/statistics \
 Configure notification channels to alert on scan failures:
 
 ```bash
-curl -X POST https://api.blocksecops.com/api/v1/notification-channels \
+curl -X POST https://api.0xapogee.com/api/v1/notification-channels \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
     "name": "CI Failures",
@@ -477,8 +477,8 @@ curl -X POST https://api.blocksecops.com/api/v1/notification-channels \
 **Symptom**: "Not authenticated" or "Invalid API key"
 
 **Solutions**:
-1. Verify API key is set: `echo $BLOCKSECOPS_API_KEY`
-2. Test key validity: `blocksecops auth status`
+1. Verify API key is set: `echo $APOGEE_API_KEY`
+2. Test key validity: `0xapogee auth status`
 3. Regenerate key if expired
 4. Check key permissions
 
@@ -487,9 +487,9 @@ curl -X POST https://api.blocksecops.com/api/v1/notification-channels \
 **Symptom**: "Connection refused" or timeout
 
 **Solutions**:
-1. Verify API URL: `blocksecops auth status`
+1. Verify API URL: `0xapogee auth status`
 2. Check network/firewall configuration
-3. Test connectivity: `curl https://api.blocksecops.com/health`
+3. Test connectivity: `curl https://api.0xapogee.com/health`
 
 ### Scan Failures
 
@@ -498,7 +498,7 @@ curl -X POST https://api.blocksecops.com/api/v1/notification-channels \
 **Solutions**:
 1. Check file size limits (max 10MB per file)
 2. Verify file format (must be valid Solidity/Vyper)
-3. Check quota limits: `blocksecops auth whoami`
+3. Check quota limits: `0xapogee auth whoami`
 
 ### Pre-commit Hook Issues
 
@@ -516,17 +516,17 @@ curl -X POST https://api.blocksecops.com/api/v1/notification-channels \
 ### Checking Version
 
 ```bash
-blocksecops version
+0xapogee version
 ```
 
 ### Upgrading
 
 ```bash
 # pip
-pip install --upgrade blocksecops-cli
+pip install --upgrade 0xapogee-cli
 
 # pipx
-pipx upgrade blocksecops-cli
+pipx upgrade 0xapogee-cli
 ```
 
 ### Version Pinning in CI
@@ -535,9 +535,9 @@ Pin to specific versions for reproducibility:
 
 ```yaml
 # requirements.txt
-blocksecops-cli==0.1.0
+0xapogee-cli==0.1.0
 ```
 
 ```bash
-pip install blocksecops-cli==0.1.0
+pip install 0xapogee-cli==0.1.0
 ```

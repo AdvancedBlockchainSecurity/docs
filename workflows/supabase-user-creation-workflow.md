@@ -80,12 +80,12 @@ Click email link    →    Validate token        →   Redirect to Site URL
 
 ### Blank Page After Email Verification
 
-**Cause:** Supabase Site URL points to wrong address (e.g., `http://127.0.0.1:3000` instead of `http://app.blocksecops.local`).
+**Cause:** Supabase Site URL points to wrong address (e.g., `http://127.0.0.1:3000` instead of `http://app.0xapogee.local`).
 
 **Fix:** Update Supabase project settings:
 1. Go to [Supabase Dashboard](https://supabase.com/dashboard) → Project → Authentication → URL Configuration
-2. Set **Site URL** to `http://app.blocksecops.local`
-3. Add `http://app.blocksecops.local/**` to **Redirect URLs**
+2. Set **Site URL** to `http://app.0xapogee.local`
+3. Add `http://app.0xapogee.local/**` to **Redirect URLs**
 
 ### User Not Appearing in Local Database
 

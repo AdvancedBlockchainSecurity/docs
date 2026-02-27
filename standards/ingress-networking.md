@@ -312,7 +312,7 @@ spec:
 **Testing Local Routing**:
 ```bash
 # HTTP service test
-curl -k -H "Host: app.blocksecops.local" https://127.0.0.1/api/v1/health/live
+curl -k -H "Host: app.0xapogee.local" https://127.0.0.1/api/v1/health/live
 
 # From inside cluster
 kubectl exec -n <namespace> <pod> -- \
@@ -454,7 +454,7 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`app.blocksecops.local`) && PathPrefix(`/ws`)
+    - match: Host(`app.0xapogee.local`) && PathPrefix(`/ws`)
       kind: Rule
       priority: 100
       services:
@@ -474,7 +474,7 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`app.blocksecops.local`) && PathPrefix(`/ws`)
+    - match: Host(`app.0xapogee.local`) && PathPrefix(`/ws`)
       kind: Rule
       priority: 100
       services:
@@ -496,13 +496,13 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`<domain>.blocksecops.local`) && PathPrefix(`/api/v1`)
+    - match: Host(`<domain>.0xapogee.local`) && PathPrefix(`/api/v1`)
       kind: Rule
       services:
         - name: api-service
           namespace: api-service-local
           port: 8000
-    - match: Host(`<domain>.blocksecops.local`) && !PathPrefix(`/api/v1`)
+    - match: Host(`<domain>.0xapogee.local`) && !PathPrefix(`/api/v1`)
       kind: Rule
       services:
         - name: <service>
@@ -527,7 +527,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`app.blocksecops.com`) && PathPrefix(`/ws`)
+    - match: Host(`app.0xapogee.com`) && PathPrefix(`/ws`)
       kind: Rule
       services:
         - name: notification
@@ -544,7 +544,7 @@ When adding a WebSocket route, update existing IngressRoutes to exclude the `/ws
 # Dashboard IngressRoute - Exclude /ws
 spec:
   routes:
-    - match: Host(`app.blocksecops.local`) && !PathPrefix(`/ws`) && !PathPrefix(`/api/v1`)
+    - match: Host(`app.0xapogee.local`) && !PathPrefix(`/ws`) && !PathPrefix(`/api/v1`)
       kind: Rule
       services:
         - name: dashboard
@@ -557,7 +557,7 @@ spec:
 ```bash
 # Test WebSocket upgrade returns 101 Switching Protocols
 curl -s -o /dev/null -w "%{http_code}" \
-  -H "Host: app.blocksecops.local" \
+  -H "Host: app.0xapogee.local" \
   -H "Connection: Upgrade" \
   -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Version: 13" \
@@ -573,9 +573,9 @@ Frontend applications should connect to WebSocket through Traefik, not directly 
 
 | Environment | WebSocket URL |
 |-------------|---------------|
-| Local (kubeadm) | `wss://app.blocksecops.local/ws` |
-| Server (kubeadm) | `wss://app.blocksecops.local/ws` |
-| Production (GCP) | `wss://app.blocksecops.com/ws` |
+| Local (kubeadm) | `wss://app.0xapogee.local/ws` |
+| Server (kubeadm) | `wss://app.0xapogee.local/ws` |
+| Production (GCP) | `wss://app.0xapogee.com/ws` |
 
 **Note:** Use `wss://` for all server/staging/production environments. `ws://localhost` is acceptable only for pure local development where traffic stays on the machine.
 

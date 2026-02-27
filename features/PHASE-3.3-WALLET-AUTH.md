@@ -43,12 +43,12 @@ Phase 3.3 introduces wallet-based authentication using the Sign-In with Ethereum
 ### SIWE Message Format (EIP-4361)
 
 ```
-blocksecops.com wants you to sign in with your Ethereum account:
+0xapogee.com wants you to sign in with your Ethereum account:
 0x1234...5678
 
 Sign in to BlockSecOps Security Platform
 
-URI: https://blocksecops.com
+URI: https://0xapogee.com
 Version: 1
 Chain ID: 1
 Nonce: abc123...
@@ -72,7 +72,7 @@ Response:
 ```json
 {
   "nonce": "a1b2c3d4e5f6...",
-  "message": "blocksecops.com wants you to sign in...",
+  "message": "0xapogee.com wants you to sign in...",
   "expires_at": "2025-11-30T18:05:00Z"
 }
 ```
@@ -85,7 +85,7 @@ Content-Type: application/json
 {
   "wallet_address": "0x1234567890abcdef1234567890abcdef12345678",
   "signature": "0xabcdef...",
-  "message": "blocksecops.com wants you to sign in..."
+  "message": "0xapogee.com wants you to sign in..."
 }
 ```
 
@@ -118,7 +118,7 @@ Content-Type: application/json
 {
   "wallet_address": "0x1234...",
   "signature": "0xabcdef...",
-  "message": "blocksecops.com wants you to sign in..."
+  "message": "0xapogee.com wants you to sign in..."
 }
 ```
 

@@ -74,7 +74,7 @@ flowchart LR
 **API:**
 ```bash
 # Invite single user
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/invites" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -85,7 +85,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites"
   }'
 
 # Invite multiple users
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites/batch" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/invites/batch" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -171,7 +171,7 @@ BlockSecOps - Smart Contract Security Platform
 
 **API:**
 ```bash
-curl -X GET "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites?status=pending" \
+curl -X GET "https://app.0xapogee.com/api/v1/organizations/{org_id}/invites?status=pending" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -183,7 +183,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites?s
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites/{invite_id}/resend" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/invites/{invite_id}/resend" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -196,7 +196,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites/
 
 **API:**
 ```bash
-curl -X DELETE "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites/{invite_id}" \
+curl -X DELETE "https://app.0xapogee.com/api/v1/organizations/{org_id}/invites/{invite_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -206,7 +206,7 @@ Before acceptance, you can change the assigned role:
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites/{invite_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/organizations/{org_id}/invites/{invite_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -237,7 +237,7 @@ carol@company.com,auditor,
 ### API Batch Invite
 
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites/batch" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/invites/batch" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -269,7 +269,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites/
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/organizations/{org_id}/settings" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/organizations/{org_id}/settings" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -287,7 +287,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/organizations/{org_id}/setting
 Restrict invitations to specific email domains:
 
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/organizations/{org_id}/settings" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/organizations/{org_id}/settings" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -312,11 +312,11 @@ Confirm invitations are working:
 **API:**
 ```bash
 # List all invites
-curl -X GET "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites" \
+curl -X GET "https://app.0xapogee.com/api/v1/organizations/{org_id}/invites" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # Check specific invite status
-curl -X GET "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites/{invite_id}" \
+curl -X GET "https://app.0xapogee.com/api/v1/organizations/{org_id}/invites/{invite_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -339,7 +339,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites/{
 **API:**
 ```bash
 # Get invitation email status
-curl -X GET "https://app.blocksecops.com/api/v1/organizations/{org_id}/invites/{invite_id}/status" \
+curl -X GET "https://app.0xapogee.com/api/v1/organizations/{org_id}/invites/{invite_id}/status" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 

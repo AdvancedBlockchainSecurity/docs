@@ -25,7 +25,7 @@ This playbook guides you through integrating BlockSecOps security scanning into 
 ```mermaid
 flowchart LR
     A[SCM Change] --> B[Jenkins Pipeline Triggered]
-    B --> C[Install BlockSecOps CLI]
+    B --> C[Install Apogee CLI]
     C --> D[Run Security Scan]
     D --> E{Critical Findings?}
     E -->|Yes| F[Fail Build]
@@ -71,7 +71,7 @@ pipeline {
     agent any
 
     environment {
-        BLOCKSECOPS_API_KEY = credentials('blocksecops-api-key')
+        APOGEE_API_KEY = credentials('blocksecops-api-key')
     }
 
     stages {
@@ -81,12 +81,12 @@ pipeline {
             }
         }
 
-        stage('Install BlockSecOps CLI') {
+        stage('Install Apogee CLI') {
             steps {
                 sh '''
                     python3 -m pip install --upgrade pip
-                    pip install blocksecops-cli
-                    blocksecops --version
+                    pip install 0xapogee-cli
+                    0xapogee --version
                 '''
             }
         }
@@ -94,7 +94,7 @@ pipeline {
         stage('Security Scan') {
             steps {
                 sh '''
-                    blocksecops scan \
+                    0xapogee scan \
                         --path contracts/ \
                         --project "${JOB_NAME}" \
                         --output json \
@@ -127,7 +127,7 @@ pipeline {
                     Medium:   ${medium}
                     Low:      ${low}
                     ======================================
-                    View full report: https://app.blocksecops.com/scans/${results.scan_id}
+                    View full report: https://app.0xapogee.com/scans/${results.scan_id}
                     """
 
                     if (critical > 0 || high > 0) {
@@ -167,7 +167,7 @@ pipeline {
     agent any
 
     environment {
-        BLOCKSECOPS_API_KEY = credentials('blocksecops-api-key')
+        APOGEE_API_KEY = credentials('blocksecops-api-key')
     }
 
     stages {
@@ -183,7 +183,7 @@ pipeline {
                 }
 
                 sh '''
-                    blocksecops scan \
+                    0xapogee scan \
                         --path contracts/ \
                         --project "${JOB_NAME}" \
                         --output json \
@@ -236,8 +236,8 @@ pipeline {
         stage('Security Scan') {
             steps {
                 sh '''
-                    pip install blocksecops-cli
-                    blocksecops scan --path contracts/ --fail-on critical,high
+                    pip install 0xapogee-cli
+                    0xapogee scan --path contracts/ --fail-on critical,high
                 '''
             }
         }
@@ -256,17 +256,17 @@ pipeline {
             parallel {
                 stage('Scan Token Contracts') {
                     steps {
-                        sh 'blocksecops scan --path contracts/token/'
+                        sh '0xapogee scan --path contracts/token/'
                     }
                 }
                 stage('Scan Governance Contracts') {
                     steps {
-                        sh 'blocksecops scan --path contracts/governance/'
+                        sh '0xapogee scan --path contracts/governance/'
                     }
                 }
                 stage('Scan Vault Contracts') {
                     steps {
-                        sh 'blocksecops scan --path contracts/vault/'
+                        sh '0xapogee scan --path contracts/vault/'
                     }
                 }
             }
@@ -288,7 +288,7 @@ pipeline {
     stages {
         stage('Weekly Security Scan') {
             steps {
-                sh 'blocksecops scan --path contracts/ --project weekly-audit'
+                sh '0xapogee scan --path contracts/ --project weekly-audit'
             }
         }
     }
@@ -330,7 +330,7 @@ pipeline {
         stage('Security Scan') {
             steps {
                 sh '''
-                    blocksecops scan \
+                    0xapogee scan \
                         --path contracts/ \
                         --output html \
                         > scan-report.html
@@ -366,10 +366,10 @@ def scan(Map config = [:]) {
     def failOn = config.failOn ?: 'critical,high'
     def project = config.project ?: env.JOB_NAME
 
-    withCredentials([string(credentialsId: 'blocksecops-api-key', variable: 'BLOCKSECOPS_API_KEY')]) {
+    withCredentials([string(credentialsId: 'blocksecops-api-key', variable: 'APOGEE_API_KEY')]) {
         sh """
-            pip install blocksecops-cli --quiet
-            blocksecops scan \
+            pip install 0xapogee-cli --quiet
+            0xapogee scan \
                 --path ${path} \
                 --project "${project}" \
                 --fail-on ${failOn} \
@@ -419,8 +419,8 @@ Confirm the integration is working:
 
 **API Verification:**
 ```bash
-curl -X GET "https://app.blocksecops.com/api/v1/scans?project=jenkins-job-name&limit=5" \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY"
+curl -X GET "https://app.0xapogee.com/api/v1/scans?project=jenkins-job-name&limit=5" \
+  -H "Authorization: Bearer $APOGEE_API_KEY"
 ```
 
 ---
@@ -442,8 +442,8 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans?project=jenkins-job-name&l
 stage('Security Scan') {
     steps {
         sh '''
-            export BLOCKSECOPS_DEBUG=1
-            blocksecops scan --path contracts/ --verbose
+            export APOGEE_DEBUG=1
+            0xapogee scan --path contracts/ --verbose
         '''
     }
 }

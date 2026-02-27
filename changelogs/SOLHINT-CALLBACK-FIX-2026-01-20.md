@@ -147,7 +147,7 @@ LABEL version="0.1.3"
 # Result: All tests passed!
 
 # Verify scan status
-curl -sL "http://app.blocksecops.local/api/v1/scans/8a04dc90-a280-4952-8928-f69dc799326e" \
+curl -sL "http://app.0xapogee.local/api/v1/scans/8a04dc90-a280-4952-8928-f69dc799326e" \
   -H "Authorization: Bearer ${TOKEN}" | jq '.status'
 # Result: "completed"
 
@@ -177,8 +177,8 @@ cd /home/pwner/Git/blocksecops-tool-integration/scanner-images
 ./build-kubeadm.sh solhint
 
 # Push to Harbor
-docker tag scanner-solhint:0.1.3 harbor.blocksecops.local/blocksecops/scanner-solhint:0.1.3
-docker push harbor.blocksecops.local/blocksecops/scanner-solhint:0.1.3
+docker tag scanner-solhint:0.1.3 harbor.0xapogee.local/blocksecops/scanner-solhint:0.1.3
+docker push harbor.0xapogee.local/blocksecops/scanner-solhint:0.1.3
 
 # Update ConfigMap and restart tool-integration
 kubectl apply -k /home/pwner/Git/blocksecops-tool-integration/k8s/overlays/local/

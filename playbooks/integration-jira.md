@@ -70,7 +70,7 @@ flowchart LR
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/integrations" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/integrations" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -112,7 +112,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/integrat
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/integrations/{integration_id}/mappings" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/integrations/{integration_id}/mappings" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -148,7 +148,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/integrations/{integration_id}/
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/integrations/{integration_id}/settings" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/integrations/{integration_id}/settings" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -173,7 +173,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/integrations/{integration_id}/
 **API:**
 ```bash
 # Create JIRA issue from vulnerability
-curl -X POST "https://app.blocksecops.com/api/v1/vulnerabilities/{vuln_id}/jira" \
+curl -X POST "https://app.0xapogee.com/api/v1/vulnerabilities/{vuln_id}/jira" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -203,7 +203,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/vulnerabilities/{vuln_id}/jira"
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/integrations/{integration_id}/sync" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/integrations/{integration_id}/sync" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -258,7 +258,7 @@ function withdraw() external {
 {code}
 
 h3. References
-* [BlockSecOps Vulnerability|https://app.blocksecops.com/vulnerabilities/xyz789]
+* [BlockSecOps Vulnerability|https://app.0xapogee.com/vulnerabilities/xyz789]
 * [SWC-107: Reentrancy|https://swcregistry.io/docs/SWC-107]
 
 ----
@@ -279,11 +279,11 @@ Confirm the integration is working:
 **API:**
 ```bash
 # Check integration status
-curl -X GET "https://app.blocksecops.com/api/v1/integrations/{integration_id}" \
+curl -X GET "https://app.0xapogee.com/api/v1/integrations/{integration_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # List created issues
-curl -X GET "https://app.blocksecops.com/api/v1/integrations/{integration_id}/issues" \
+curl -X GET "https://app.0xapogee.com/api/v1/integrations/{integration_id}/issues" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -319,7 +319,7 @@ curl -X GET "https://your-company.atlassian.net/rest/api/3/project/SEC" \
 
 ```bash
 # View sync logs
-curl -X GET "https://app.blocksecops.com/api/v1/integrations/{integration_id}/logs?type=sync" \
+curl -X GET "https://app.0xapogee.com/api/v1/integrations/{integration_id}/logs?type=sync" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -334,7 +334,7 @@ To enable sync from JIRA to BlockSecOps:
 2. Click **Create a WebHook**
 3. Configure:
    - **Name:** BlockSecOps Sync
-   - **URL:** `https://app.blocksecops.com/api/v1/webhooks/jira/{integration_id}`
+   - **URL:** `https://app.0xapogee.com/api/v1/webhooks/jira/{integration_id}`
    - **Events:** Issue updated, Issue deleted
 4. Save
 

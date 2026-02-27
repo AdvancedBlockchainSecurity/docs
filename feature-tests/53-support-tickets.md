@@ -138,7 +138,7 @@ The support ticket system allows authenticated users to submit support requests 
 
 **Test via API:**
 ```bash
-curl -X POST http://app.blocksecops.local/api/v1/support-tickets \
+curl -X POST http://app.0xapogee.local/api/v1/support-tickets \
   -H "Content-Type: application/json" \
   -d '{"category":"bug","priority":"medium","subject":"Test","description":"Test description for validation."}'
 ```
@@ -204,12 +204,12 @@ curl -X POST http://app.blocksecops.local/api/v1/support-tickets \
 
 ```bash
 # Get auth token
-TOKEN=$(curl -s -X POST http://app.blocksecops.local/api/v1/auth/login \
+TOKEN=$(curl -s -X POST http://app.0xapogee.local/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"password"}' | jq -r '.access_token')
 
 # Submit ticket
-curl -X POST http://app.blocksecops.local/api/v1/support-tickets \
+curl -X POST http://app.0xapogee.local/api/v1/support-tickets \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -237,7 +237,7 @@ curl -X POST http://app.blocksecops.local/api/v1/support-tickets \
 Submit 6 tickets in a row:
 ```bash
 for i in {1..6}; do
-  curl -s -X POST http://app.blocksecops.local/api/v1/support-tickets \
+  curl -s -X POST http://app.0xapogee.local/api/v1/support-tickets \
     -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json" \
     -d "{\"category\":\"general\",\"priority\":\"low\",\"subject\":\"Rate limit test $i\",\"description\":\"Testing rate limiting functionality ticket number $i.\"}" | jq -r '.success // .detail'
@@ -444,7 +444,7 @@ GROUP BY jira_sync_status;
 
 ```bash
 # List all tickets (page 1, 20 per page)
-curl -X GET "http://app.blocksecops.local/api/v1/support-tickets?page=1&page_size=20" \
+curl -X GET "http://app.0xapogee.local/api/v1/support-tickets?page=1&page_size=20" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -475,7 +475,7 @@ curl -X GET "http://app.blocksecops.local/api/v1/support-tickets?page=1&page_siz
 
 ```bash
 # Filter by status
-curl -X GET "http://app.blocksecops.local/api/v1/support-tickets?status=open" \
+curl -X GET "http://app.0xapogee.local/api/v1/support-tickets?status=open" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -483,7 +483,7 @@ curl -X GET "http://app.blocksecops.local/api/v1/support-tickets?status=open" \
 
 ```bash
 # Get specific ticket (includes live JIRA data)
-curl -X GET "http://app.blocksecops.local/api/v1/support-tickets/550e8400-e29b-41d4-a716-446655440000" \
+curl -X GET "http://app.0xapogee.local/api/v1/support-tickets/550e8400-e29b-41d4-a716-446655440000" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -523,7 +523,7 @@ curl -X GET "http://app.blocksecops.local/api/v1/support-tickets/550e8400-e29b-4
 
 ```bash
 # Attempting to view another user's ticket should return 404
-curl -X GET "http://app.blocksecops.local/api/v1/support-tickets/other-users-ticket-id" \
+curl -X GET "http://app.0xapogee.local/api/v1/support-tickets/other-users-ticket-id" \
   -H "Authorization: Bearer $TOKEN"
 ```
 

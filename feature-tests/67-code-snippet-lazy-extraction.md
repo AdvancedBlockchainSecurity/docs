@@ -16,13 +16,13 @@ Vulnerabilities with `line_number` but no valid `code_snippet` now have their co
 
 **Validates:** Lazy extraction populates code_snippet for vulnerabilities that had NULL.
 
-1. Navigate to `https://app.blocksecops.local/vulnerabilities/5bd16f06-1d70-401d-905d-c6876504509c`
+1. Navigate to `https://app.0xapogee.local/vulnerabilities/5bd16f06-1d70-401d-905d-c6876504509c`
 2. **Expected:** Code Location section shows a 5-line source code window with an arrow marker on the target line
 3. **Expected:** Format includes line numbers (e.g. `  45: uint256 balance = ...` with `-> 47: msg.sender.call{value: ...}`)
 
 ```bash
 # API check
-curl -sk https://app.blocksecops.local/api/v1/vulnerabilities/5bd16f06-1d70-401d-905d-c6876504509c \
+curl -sk https://app.0xapogee.local/api/v1/vulnerabilities/5bd16f06-1d70-401d-905d-c6876504509c \
   -H "Authorization: Bearer $TOKEN" | jq '.code_snippet'
 # Should return a non-null string with line numbers and arrow marker
 ```

@@ -125,7 +125,7 @@ Register the scanner image version in Kubernetes ConfigMaps across all deploymen
 | Layer | File | Registry |
 |-------|------|----------|
 | Base (defaults) | `blocksecops-tool-integration/k8s/base/scanner-versions-configmap.yaml` | No registry prefix (e.g., `scanner-<key>:<version>`) |
-| Local overlay | `blocksecops-tool-integration/k8s/overlays/local/scanner-versions-patch.yaml` | Harbor (`harbor.blocksecops.local/blocksecops/scanner-<key>:<version>`) |
+| Local overlay | `blocksecops-tool-integration/k8s/overlays/local/scanner-versions-patch.yaml` | Harbor (`harbor.0xapogee.local/blocksecops/scanner-<key>:<version>`) |
 | Production overlay | `blocksecops-tool-integration/k8s/overlays/production/scanner-versions-patch.yaml` | GCP Artifact Registry (`us-central1-docker.pkg.dev/solidity-security/blocksecops/scanner-<key>:<version>`) |
 
 ### ConfigMap Entry Format
@@ -624,11 +624,11 @@ Build the Docker image, push to Harbor, and deploy to the cluster.
 cd /home/pwner/Git/blocksecops-tool-integration
 
 # Build scanner image
-docker build -t harbor.blocksecops.local/blocksecops/scanner-<key>:<version> \
+docker build -t harbor.0xapogee.local/blocksecops/scanner-<key>:<version> \
   scanner-images/<key>/
 
 # Push to Harbor
-docker push harbor.blocksecops.local/blocksecops/scanner-<key>:<version>
+docker push harbor.0xapogee.local/blocksecops/scanner-<key>:<version>
 
 # Apply kustomize overlay (updates ConfigMap in cluster)
 kubectl apply -k k8s/overlays/local
@@ -645,7 +645,7 @@ kubectl exec -n tool-integration-local deployment/tool-integration -- \
   env | grep SCANNER_IMAGE_<KEY>
 
 # Run a test scan via API
-curl -sk -X POST "https://app.blocksecops.local/api/v1/scans/<scan-id>/trigger?scanner=<key>" \
+curl -sk -X POST "https://app.0xapogee.local/api/v1/scans/<scan-id>/trigger?scanner=<key>" \
   -H "Authorization: Bearer <TOKEN>" \
   -H "Content-Type: application/json" \
   -d '{"contract_source": "<test contract>"}'

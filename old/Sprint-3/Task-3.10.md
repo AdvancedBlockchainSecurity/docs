@@ -221,7 +221,7 @@ generate_local_certificates() {
 create_kubernetes_secret() {
     log_info "Creating Kubernetes secret for local SSL certificates..."
 
-    kubectl create namespace blocksecops --dry-run=client -o yaml | kubectl apply -f -
+    kubectl create namespace 0xapogee --dry-run=client -o yaml | kubectl apply -f -
 
     kubectl create secret tls local-dev-tls \
         --cert=./certs/local/local-dev.crt \
@@ -282,7 +282,7 @@ cleanup() {
     log_info "Cleaning up local SSL configuration..."
 
     # Remove Kubernetes secret
-    kubectl delete secret local-dev-tls --namespace=blocksecops --ignore-not-found=true
+    kubectl delete secret local-dev-tls --namespace=0xapogee --ignore-not-found=true
 
     # Remove certificates
     rm -rf ./certs/local

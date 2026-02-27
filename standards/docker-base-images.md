@@ -22,8 +22,8 @@ Create separate base images containing pre-installed heavy dependencies, store t
 
 | Service | Base Image (Harbor) |
 |---------|---------------------|
-| `blocksecops-intelligence-engine` | `harbor.blocksecops.local/blocksecops/blocksecops-intelligence-base-cpu` |
-| `blocksecops-orchestration` | `harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base` |
+| `blocksecops-intelligence-engine` | `harbor.0xapogee.local/blocksecops/blocksecops-intelligence-base-cpu` |
+| `blocksecops-orchestration` | `harbor.0xapogee.local/blocksecops/blocksecops-orchestration-base` |
 
 **Note:** GPU variant available: `blocksecops-intelligence-base-gpu`
 
@@ -43,7 +43,7 @@ Base images MUST be stored in a container registry to ensure availability and pr
 
 | Environment | Registry (`REGISTRY` value) | Example |
 |-------------|----------|---------|
-| **Local/Server** | `harbor.blocksecops.local` | `${REGISTRY}/blocksecops/blocksecops-intelligence-base-cpu:1.0.0-<hash>` |
+| **Local/Server** | `harbor.0xapogee.local` | `${REGISTRY}/blocksecops/blocksecops-intelligence-base-cpu:1.0.0-<hash>` |
 | **Production** | `us-central1-docker.pkg.dev/solidity-security` | `${REGISTRY}/blocksecops/blocksecops-intelligence-base-cpu:1.0.0` |
 
 ### Why Harbor for Base Images
@@ -224,7 +224,7 @@ The script:
 ### Step 2: Push to Registry
 
 ```bash
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 
 # Tag for registry
 docker tag blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353 \
@@ -243,7 +243,7 @@ docker push ${REGISTRY}/blocksecops/blocksecops-orchestration-base:latest
 Update the `FROM` line to reference Harbor using the `BASE_REGISTRY` ARG pattern:
 
 ```dockerfile
-ARG BASE_REGISTRY=harbor.blocksecops.local
+ARG BASE_REGISTRY=harbor.0xapogee.local
 ARG BASE_VARIANT=cpu
 ARG BASE_IMAGE_TAG=latest
 
@@ -272,7 +272,7 @@ docker build \
 ### Step 5: Push Application Image to Registry
 
 ```bash
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 docker tag blocksecops-orchestration:${VERSION} \
   ${REGISTRY}/blocksecops/orchestration:${VERSION}
 docker push ${REGISTRY}/blocksecops/orchestration:${VERSION}
@@ -357,7 +357,7 @@ The following services do not benefit from base images and should continue using
 | Problem | Symptom | Fix |
 |---------|---------|-----|
 | Tool not found | pipx tool missing | Check `which semgrep` shows `/opt/pipx/bin/semgrep` |
-| Base image not found | Build fails | `docker pull harbor.blocksecops.local/blocksecops/<base-image>:latest` |
+| Base image not found | Build fails | `docker pull harbor.0xapogee.local/blocksecops/<base-image>:latest` |
 | ErrImageNeverPull | Pod stuck | Change `imagePullPolicy` to `IfNotPresent`, verify image in Harbor |
 | Read-only filesystem | ML model cache error | Set `HF_HOME`, `TRANSFORMERS_CACHE`, `SENTENCE_TRANSFORMERS_HOME` to `/app/models` |
 | Selector immutable | Deployment fails | Add `includeSelectors: false` to kustomization labels |

@@ -4,7 +4,7 @@
 
 | Component | Service | Purpose |
 |-----------|---------|---------|
-| Email Hosting | Google Workspace | support@blocksecops.com inbox |
+| Email Hosting | Google Workspace | support@0xapogee.com inbox |
 | Ticketing | JIRA Service Management | Ticket management, SLAs, workflows |
 | Marketing | TBD (Mailchimp/Brevo) | Campaigns, newsletters |
 
@@ -16,8 +16,8 @@
 
 - [ ] Go to [workspace.google.com](https://workspace.google.com)
 - [ ] Start free trial (14 days) → $6/user/month after
-- [ ] Enter domain: `blocksecops.com`
-- [ ] Create first user: `support@blocksecops.com`
+- [ ] Enter domain: `0xapogee.com`
+- [ ] Create first user: `support@0xapogee.com`
 - [ ] Verify domain ownership (add TXT record to DNS)
 - [ ] Add MX records to DNS:
 
@@ -35,9 +35,9 @@ Priority  Host    Points to
 - [ ] In JSM: **Project Settings → Channels → Email**
 - [ ] Click **Connect email account**
 - [ ] Select **Google** integration
-- [ ] Sign in with `support@blocksecops.com`
+- [ ] Sign in with `support@0xapogee.com`
 - [ ] Grant permissions for JSM to read/send emails
-- [ ] Test: Send email to support@blocksecops.com → verify ticket created
+- [ ] Test: Send email to support@0xapogee.com → verify ticket created
 
 ### 3. Configure JSM Request Types
 
@@ -93,7 +93,7 @@ THEN: Send Slack/email notification to team
 │   Customer                                                  │
 │      │                                                      │
 │      ▼                                                      │
-│   support@blocksecops.com (Google Workspace)                │
+│   support@0xapogee.com (Google Workspace)                │
 │      │                                                      │
 │      ▼                                                      │
 │   JSM creates ticket (SD-XXX)                               │
@@ -214,8 +214,8 @@ When ready to add marketing campaigns:
 5. Set up automation (welcome series, etc.)
 
 **Recommended setup:**
-- Support email: `support@blocksecops.com` (Google Workspace → JSM)
-- Marketing email: `hello@blocksecops.com` or `news@blocksecops.com` (Marketing platform)
+- Support email: `support@0xapogee.com` (Google Workspace → JSM)
+- Marketing email: `hello@0xapogee.com` or `news@0xapogee.com` (Marketing platform)
 
 ---
 
@@ -223,6 +223,6 @@ When ready to add marketing campaigns:
 
 | Role | Name | Email |
 |------|------|-------|
-| Support Lead | TBD | support@blocksecops.com |
+| Support Lead | TBD | support@0xapogee.com |
 | Billing | TBD | |
 | Technical | TBD | |

@@ -10,8 +10,8 @@ This document defines the domain configuration strategy for BlockSecOps across e
 
 | Environment | Domain | TLS | Purpose |
 |-------------|--------|-----|---------|
-| **Server (kubeadm)** | `app.blocksecops.local` | Self-signed (cert-manager + local CA) | Pre-production testing on PowerEdge R720 |
-| **Production (GCP)** | `app.blocksecops.com` | Let's Encrypt (cert-manager) | Production deployment |
+| **Server (kubeadm)** | `app.0xapogee.local` | Self-signed (cert-manager + local CA) | Pre-production testing on PowerEdge R720 |
+| **Production (GCP)** | `app.0xapogee.com` | Let's Encrypt (cert-manager) | Production deployment |
 
 ---
 
@@ -22,9 +22,9 @@ This document defines the domain configuration strategy for BlockSecOps across e
 The platform URL flows through a single chain of trust:
 
 ```
-config.py defaults (production)     →  app.blocksecops.com (used when no ConfigMap)
+config.py defaults (production)     →  app.0xapogee.com (used when no ConfigMap)
         ↓ overridden by
-ConfigMap per environment            →  app.blocksecops.local (local overlay)
+ConfigMap per environment            →  app.0xapogee.local (local overlay)
         ↓ read by
 Base deployment (env var mappings)   →  CORS_ORIGINS, ALLOWED_HOSTS, DASHBOARD_BASE_URL
         ↓ injected into
@@ -33,17 +33,17 @@ Application (pydantic-settings)      →  Settings.cors_origins, .allowed_hosts,
 
 | Layer | File | Role |
 |-------|------|------|
-| **Application defaults** | `api-service/src/infrastructure/config.py` | Production-first defaults (`app.blocksecops.com`) |
+| **Application defaults** | `api-service/src/infrastructure/config.py` | Production-first defaults (`app.0xapogee.com`) |
 | **Env var mappings** | `api-service/k8s/base/api-service/deployment.yaml` | Maps ConfigMap keys → env vars (single source of truth for all environments) |
-| **Environment values** | `api-service/k8s/overlays/local/api-service/configmap-patch.yaml` | Per-environment overrides (`app.blocksecops.local`) |
+| **Environment values** | `api-service/k8s/overlays/local/api-service/configmap-patch.yaml` | Per-environment overrides (`app.0xapogee.local`) |
 | **Ingress routing** | `gcp-infrastructure/k8s/overlays/local/*/ingressroute.yaml` | Traefik Host rules + TLS |
 | **Ingress CORS** | `gcp-infrastructure/k8s/overlays/local/*/middleware-cors.yaml` | Traefik CORS allowed origins |
 | **Supabase** | Supabase Dashboard → Authentication → URL Configuration | Email verification redirect URL (external) |
 
 ### Key Principles
 
-1. **Production is the default** — `config.py` defaults target `app.blocksecops.com`. No ConfigMap needed for production.
-2. **ConfigMap is the local override** — The local overlay ConfigMap sets `app.blocksecops.local` values.
+1. **Production is the default** — `config.py` defaults target `app.0xapogee.com`. No ConfigMap needed for production.
+2. **ConfigMap is the local override** — The local overlay ConfigMap sets `app.0xapogee.local` values.
 3. **Base deployment owns env mappings** — All env var → ConfigMap mappings live in the base deployment, never in overlay patches.
 4. **No hardcoded URLs in overlays** — Overlay deployment patches must not contain hardcoded URL values; use `valueFrom.configMapKeyRef` in the base.
 
@@ -51,9 +51,9 @@ Application (pydantic-settings)      →  Settings.cors_origins, .allowed_hosts,
 
 | ConfigMap Key | Env Var | config.py Default | Local Override |
 |---------------|---------|-------------------|----------------|
-| `cors_origins` | `CORS_ORIGINS` | `https://app.blocksecops.com` | `https://app.blocksecops.local` |
-| `allowed_hosts` | `ALLOWED_HOSTS` | `app.blocksecops.com` | `app.blocksecops.local` |
-| `dashboard_base_url` | `DASHBOARD_BASE_URL` | `https://app.blocksecops.com` | `https://app.blocksecops.local` |
+| `cors_origins` | `CORS_ORIGINS` | `https://app.0xapogee.com` | `https://app.0xapogee.local` |
+| `allowed_hosts` | `ALLOWED_HOSTS` | `app.0xapogee.com` | `app.0xapogee.local` |
+| `dashboard_base_url` | `DASHBOARD_BASE_URL` | `https://app.0xapogee.com` | `https://app.0xapogee.local` |
 
 ### Switching from .local to .com
 
@@ -76,7 +76,7 @@ For production, the API Service ConfigMap entries for `cors_origins`, `allowed_h
 
 ### Server (PowerEdge R720)
 
-**Access:** `https://app.blocksecops.local`
+**Access:** `https://app.0xapogee.local`
 
 **Node IP:** `192.168.86.225`
 
@@ -84,27 +84,27 @@ For production, the API Service ConfigMap entries for `cors_origins`, `allowed_h
 
 | Service | URL |
 |---------|-----|
-| Dashboard | `https://app.blocksecops.local` |
-| API | `https://app.blocksecops.local/api/v1/...` |
-| Harbor | `https://harbor.blocksecops.local` |
+| Dashboard | `https://app.0xapogee.local` |
+| API | `https://app.0xapogee.local/api/v1/...` |
+| Harbor | `https://harbor.0xapogee.local` |
 
 **DNS Setup (one-time):**
 
 ```bash
 # On server (required for local API testing and health checks)
-echo "127.0.0.1  app.blocksecops.local harbor.blocksecops.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1  app.0xapogee.local harbor.0xapogee.local" | sudo tee -a /etc/hosts
 
 # On client machines
-echo "192.168.86.225  app.blocksecops.local harbor.blocksecops.local" | sudo tee -a /etc/hosts
+echo "192.168.86.225  app.0xapogee.local harbor.0xapogee.local" | sudo tee -a /etc/hosts
 ```
 
 **Verification:**
 ```bash
 # From server (use -k for self-signed cert)
-curl -k https://app.blocksecops.local/api/v1/health/live
+curl -k https://app.0xapogee.local/api/v1/health/live
 
 # From client machine
-curl -k https://app.blocksecops.local/api/v1/health/live
+curl -k https://app.0xapogee.local/api/v1/health/live
 ```
 
 **Key Files:**
@@ -117,20 +117,20 @@ curl -k https://app.blocksecops.local/api/v1/health/live
 | blocksecops-gcp-infrastructure | `k8s/overlays/local/dashboard/ingressroute.yaml` | Dashboard routing (`websecure` entrypoint) |
 | blocksecops-gcp-infrastructure | `k8s/overlays/local/api-service/middleware-cors.yaml` | Traefik CORS for API |
 | blocksecops-gcp-infrastructure | `k8s/overlays/local/dashboard/middleware-cors.yaml` | Traefik CORS for dashboard |
-| blocksecops-gcp-infrastructure | `k8s/overlays/local/traefik/certificate.yaml` | TLS cert for `app.blocksecops.local` |
+| blocksecops-gcp-infrastructure | `k8s/overlays/local/traefik/certificate.yaml` | TLS cert for `app.0xapogee.local` |
 | blocksecops-gcp-infrastructure | `k8s/overlays/local/traefik/tlsstore.yaml` | Default TLS store |
 | blocksecops-gcp-infrastructure | `k8s/overlays/local/traefik/redirect-https.yaml` | HTTP → HTTPS redirect |
 
 ### Production (GCP)
 
-**Access:** `https://app.blocksecops.com`
+**Access:** `https://app.0xapogee.com`
 
 **TLS:** Let's Encrypt via cert-manager with `letsencrypt-prod` ClusterIssuer.
 
 | Service | URL |
 |---------|-----|
-| Dashboard | `https://app.blocksecops.com` |
-| API | `https://app.blocksecops.com/api/v1/...` |
+| Dashboard | `https://app.0xapogee.com` |
+| API | `https://app.0xapogee.com/api/v1/...` |
 
 **No ConfigMap overrides needed** for `cors_origins`, `allowed_hosts`, or `dashboard_base_url` — the `config.py` production defaults apply automatically.
 
@@ -149,7 +149,7 @@ local-ca-issuer             →    IngressRoutes use tls: {}
   ↓
 Certificate: app-tls
   secretName: app-tls-secret
-  dnsNames: [app.blocksecops.local]
+  dnsNames: [app.0xapogee.local]
 ```
 
 ### Production (Let's Encrypt)
@@ -161,7 +161,7 @@ letsencrypt-prod issuer     →    TLSStore (default cert)   →    Valid certif
   ↓                              websecure entrypoint (443)
 Certificate: blocksecops-tls
   secretName: blocksecops-tls-secret
-  dnsNames: [app.blocksecops.com]
+  dnsNames: [app.0xapogee.com]
 ```
 
 ---
@@ -172,8 +172,8 @@ Supabase email verification links redirect to the **Site URL** configured in the
 
 | Setting | Location | Server Value | Production Value |
 |---------|----------|-------------|------------------|
-| Site URL | Authentication → URL Configuration | `https://app.blocksecops.local` | `https://app.blocksecops.com` |
-| Redirect URLs | Authentication → URL Configuration | `https://app.blocksecops.local/**` | `https://app.blocksecops.com/**` |
+| Site URL | Authentication → URL Configuration | `https://app.0xapogee.local` | `https://app.0xapogee.com` |
+| Redirect URLs | Authentication → URL Configuration | `https://app.0xapogee.local/**` | `https://app.0xapogee.com/**` |
 
 **How to update:**
 1. Go to [Supabase Dashboard](https://supabase.com/dashboard) → Select project
@@ -186,24 +186,24 @@ See [Supabase User Creation Pipeline](../pipelines/supabase-user-creation-pipeli
 
 ## GCP Migration Checklist
 
-When ready to deploy to GCP with `app.blocksecops.com`:
+When ready to deploy to GCP with `app.0xapogee.com`:
 
 ### Prerequisites
 
 - [ ] GCP project created
 - [ ] GKE cluster provisioned
-- [ ] DNS A record: `app.blocksecops.com` → GCP Load Balancer IP
+- [ ] DNS A record: `app.0xapogee.com` → GCP Load Balancer IP
 
 ### Platform URL Changes
 
 | Component | Action | Notes |
 |-----------|--------|-------|
 | API Service ConfigMap | Remove `cors_origins`, `allowed_hosts`, `dashboard_base_url` overrides | Production defaults in config.py apply |
-| Traefik IngressRoutes | Update Host rules to `app.blocksecops.com` | New production overlay |
-| Traefik CORS Middlewares | Update origins to `https://app.blocksecops.com` | New production overlay |
-| Traefik TLS Certificate | Use `letsencrypt-prod` issuer, `dnsNames: [app.blocksecops.com]` | Replace self-signed |
-| Supabase Dashboard | Update Site URL to `https://app.blocksecops.com` | Manual, external |
-| Dashboard build | `VITE_WS_URL=wss://app.blocksecops.com/ws` | Build arg |
+| Traefik IngressRoutes | Update Host rules to `app.0xapogee.com` | New production overlay |
+| Traefik CORS Middlewares | Update origins to `https://app.0xapogee.com` | New production overlay |
+| Traefik TLS Certificate | Use `letsencrypt-prod` issuer, `dnsNames: [app.0xapogee.com]` | Replace self-signed |
+| Supabase Dashboard | Update Site URL to `https://app.0xapogee.com` | Manual, external |
+| Dashboard build | `VITE_WS_URL=wss://app.0xapogee.com/ws` | Build arg |
 
 ### Infrastructure Migration
 
@@ -242,9 +242,9 @@ kubectl apply -k k8s/overlays/gcp-production/dashboard/
 kubectl get certificate -A
 
 # 4. Test HTTPS access
-curl https://app.blocksecops.com/api/v1/health/live
+curl https://app.0xapogee.com/api/v1/health/live
 
-# 5. Update Supabase Dashboard Site URL to https://app.blocksecops.com
+# 5. Update Supabase Dashboard Site URL to https://app.0xapogee.com
 ```
 
 ---
@@ -263,7 +263,7 @@ curl https://app.blocksecops.com/api/v1/health/live
 
 ### DNS Not Resolving
 
-**Symptom:** `app.blocksecops.local` doesn't resolve
+**Symptom:** `app.0xapogee.local` doesn't resolve
 
 **Solution:**
 1. Verify /etc/hosts entry: `grep blocksecops /etc/hosts`

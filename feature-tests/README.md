@@ -369,7 +369,7 @@ For the comprehensive GCP production launch audit (cross-cutting, integration-le
 2026-02-18 | Manual | 68-rate-limiting-security-audit.md | IMPLEMENTED - 28 rate limit decorators, 5 analytics dual-auth, webhook model fix (v0.28.42 API)
 2026-01-10 | Manual | 38-cursor-pagination.md | VERIFIED - Migration 029 applied, indexes used in queries, cursor encode/decode working
 2026-01-04 | Claude Code | 36-cicd-integration.md | IMPLEMENTED - GitHub Actions, GitLab CI, Jenkins, Azure Pipelines integration tests
-2026-01-04 | Claude Code | 35-cli-tool.md | IMPLEMENTED - blocksecops-cli v0.1.0, auth/scan commands, 4 output formats, pre-commit hooks
+2026-01-04 | Claude Code | 35-cli-tool.md | IMPLEMENTED - 0xapogee-cli v0.1.0, auth/scan commands, 4 output formats, pre-commit hooks
 2026-01-04 | Claude Code | 34-notification-channels.md | IMPLEMENTED - Migration 025, Slack/Teams/Discord notifiers, API endpoints (v0.7.1 API)
 2025-12-31 | Claude Code | 33-pricing-page-usage.md | IMPLEMENTED - CurrentPlanBanner, tier highlighting, WebSocket notification fix (v0.23.1 Dashboard)
 2025-12-31 | Claude Code | 32-contract-name-duplication.md | IMPLEMENTED - 409 conflict detection, DuplicateContractModal (v0.8.0 API, v0.22.0 Dashboard)

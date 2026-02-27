@@ -13,7 +13,7 @@ When working on specific repositories, use the appropriate agent by referencing 
 | blocksecops-analysis | @.claude/agents/blocksecops-analysis.md | React analysis workflow UI |
 | blocksecops-api-service | @.claude/agents/blocksecops-api-service.md | FastAPI main HTTP gateway |
 | blocksecops-gcp-infrastructure | @.claude/agents/blocksecops-gcp-infrastructure.md | GCP/Kubernetes infrastructure |
-| blocksecops-cli | @.claude/agents/blocksecops-cli.md | Python CLI tool |
+| 0xapogee-cli | @.claude/agents/0xapogee-cli.md | Python CLI tool |
 | blocksecops-contract-parser | @.claude/agents/blocksecops-contract-parser.md | Rust contract parser |
 | blocksecops-dashboard | @.claude/agents/blocksecops-dashboard.md | React main dashboard |
 | blocksecops-data-service | @.claude/agents/blocksecops-data-service.md | Database operations |

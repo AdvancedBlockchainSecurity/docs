@@ -37,7 +37,7 @@ flowchart LR
 ### Step 1: Log In to Your Account
 
 **Dashboard:**
-1. Go to `https://app.blocksecops.com`
+1. Go to `https://app.0xapogee.com`
 2. Log in with your email and password
 3. Complete 2FA if enabled
 
@@ -47,7 +47,7 @@ flowchart LR
 1. Click your profile icon in the top-right corner
 2. Select **Settings**
 3. Click **Wallet** in the left sidebar
-4. Or navigate directly to `https://app.blocksecops.com/settings/wallet`
+4. Or navigate directly to `https://app.0xapogee.com/settings/wallet`
 
 ### Step 3: Link New Wallet
 
@@ -90,7 +90,7 @@ After connecting, sign a verification message:
 **API:**
 ```bash
 # Step 1: Request linking nonce
-NONCE_RESPONSE=$(curl -X POST "https://app.blocksecops.com/api/v1/users/me/wallets/link" \
+NONCE_RESPONSE=$(curl -X POST "https://app.0xapogee.com/api/v1/users/me/wallets/link" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -103,7 +103,7 @@ MESSAGE=$(echo $NONCE_RESPONSE | jq -r '.message')
 # Step 2: Sign the message with your wallet (done off-chain)
 
 # Step 3: Confirm the link
-curl -X POST "https://app.blocksecops.com/api/v1/users/me/wallets/confirm" \
+curl -X POST "https://app.0xapogee.com/api/v1/users/me/wallets/confirm" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -137,7 +137,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/users/me/wallets/confirm" \
 
 **API:**
 ```bash
-curl -X GET "https://app.blocksecops.com/api/v1/users/me/wallets" \
+curl -X GET "https://app.0xapogee.com/api/v1/users/me/wallets" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -165,7 +165,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/users/me/wallets" \
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/users/me/wallets/{wallet_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/users/me/wallets/{wallet_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -182,7 +182,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/users/me/wallets/{wallet_id}" 
 
 **API:**
 ```bash
-curl -X DELETE "https://app.blocksecops.com/api/v1/users/me/wallets/{wallet_id}" \
+curl -X DELETE "https://app.0xapogee.com/api/v1/users/me/wallets/{wallet_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -224,7 +224,7 @@ With a linked wallet, enable x402 payments:
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/users/me/settings" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/users/me/settings" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -238,7 +238,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/users/me/settings" \
 
 **API:**
 ```bash
-curl -X GET "https://app.blocksecops.com/api/v1/users/me/x402/status" \
+curl -X GET "https://app.0xapogee.com/api/v1/users/me/x402/status" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -257,11 +257,11 @@ Confirm wallet is linked correctly:
 **API:**
 ```bash
 # List linked wallets
-curl -X GET "https://app.blocksecops.com/api/v1/users/me/wallets" \
+curl -X GET "https://app.0xapogee.com/api/v1/users/me/wallets" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # Verify wallet login works
-curl -X POST "https://app.blocksecops.com/api/v1/auth/wallet/verify" \
+curl -X POST "https://app.0xapogee.com/api/v1/auth/wallet/verify" \
   -H "Content-Type: application/json" \
   -d '{
     "address": "0xYourWalletAddress",
@@ -291,7 +291,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/auth/wallet/verify" \
 ### Best Practices
 
 1. **Only link wallets you control:** Never link shared or compromised wallets
-2. **Verify the domain:** Ensure you're on `app.blocksecops.com`
+2. **Verify the domain:** Ensure you're on `app.0xapogee.com`
 3. **Read the message:** Check the signing message is correct
 4. **Use hardware wallet:** For high-value accounts, use Ledger/Trezor
 5. **Enable 2FA:** Keep 2FA enabled even with wallet login

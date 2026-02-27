@@ -5,7 +5,7 @@
 **Status**: ✅ Phase 3.5 Complete - Full E2E Verified with Vulnerability Detection
 **Feature**: Vyper Scanner Integration, Solana/Rust Scanner Integration
 **Scanner Validation Tests**: See [22-scanner-validation.md](./22-scanner-validation.md)
-**Registry**: All scanner images now in Harbor (`harbor.blocksecops.local/blocksecops/`)
+**Registry**: All scanner images now in Harbor (`harbor.0xapogee.local/blocksecops/`)
 
 ---
 

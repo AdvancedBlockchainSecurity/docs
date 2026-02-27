@@ -418,8 +418,8 @@ curl -s "http://localhost:8000/api/v1/quality-gates/projects/$PROJECT_ID/history
 **Steps**:
 1. Copy example from docs/ci-cd/github-actions-example.yaml
 2. Set up repository secrets:
-   - `BLOCKSECOPS_API_KEY`
-   - `BLOCKSECOPS_PROJECT_ID`
+   - `APOGEE_API_KEY`
+   - `APOGEE_PROJECT_ID`
 3. Trigger workflow
 
 **Expected Results**:
@@ -520,7 +520,7 @@ See: `/docs/ci-cd/README.md`
 
 Add to README:
 ```markdown
-[![Security](https://api.blocksecops.com/api/v1/quality-gates/projects/YOUR_PROJECT_ID/badge.svg)](https://app.blocksecops.com/projects/YOUR_PROJECT_ID)
+[![Security](https://api.0xapogee.com/api/v1/quality-gates/projects/YOUR_PROJECT_ID/badge.svg)](https://app.0xapogee.com/projects/YOUR_PROJECT_ID)
 ```
 
 Note: Badge is cached for 5 minutes. Append `?t=timestamp` to force refresh.

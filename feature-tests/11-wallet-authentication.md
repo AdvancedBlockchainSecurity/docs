@@ -282,7 +282,7 @@ kubectl exec -n api-service-local deployment/api-service -- printenv | grep SUPA
 ### 13.1 Backend Creates Supabase User
 - [ ] New wallet authentication creates user in Supabase Auth
 - [ ] User metadata includes `wallet_type` and `wallet_address`
-- [ ] User email follows pattern: `{address}@{wallet_type}.wallet.blocksecops.io`
+- [ ] User email follows pattern: `{address}@{wallet_type}.wallet.0xapogee.io`
 
 ### 13.2 Session Token Validation
 - [ ] Returned `access_token` is valid Supabase JWT

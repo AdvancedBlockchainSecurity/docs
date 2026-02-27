@@ -78,7 +78,7 @@ which pg_dump
 which psql
 
 # Test backup command (dry run)
-pg_dump -U blocksecops -d blocksecops --schema-only -f /tmp/test_backup.sql
+pg_dump -U blocksecops -d 0xapogee --schema-only -f /tmp/test_backup.sql
 ```
 
 ---
@@ -303,7 +303,7 @@ curl http://localhost:8000/health
 # Check logs for any errors
 docker-compose logs -f api-service --tail=50
 # OR
-kubectl logs -f deployment/blocksecops-api-service -n blocksecops --tail=50
+kubectl logs -f deployment/blocksecops-api-service -n 0xapogee --tail=50
 ```
 
 ### Step 7: Post-Migration Verification (5 minutes)

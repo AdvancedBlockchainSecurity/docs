@@ -1,4 +1,4 @@
-# 35. CLI Tool (blocksecops-cli)
+# 35. CLI Tool (0xapogee-cli)
 
 Test the BlockSecOps command-line interface tool.
 
@@ -18,7 +18,7 @@ Test the BlockSecOps command-line interface tool.
 ### 1.1 Install via pip
 
 ```bash
-pip install blocksecops-cli
+pip install 0xapogee-cli
 ```
 
 - [ ] Package installs without errors
@@ -30,7 +30,7 @@ pip install blocksecops-cli
 ### 1.2 Install via pipx (isolated)
 
 ```bash
-pipx install blocksecops-cli
+pipx install 0xapogee-cli
 ```
 
 - [ ] Package installs in isolated environment
@@ -41,8 +41,8 @@ pipx install blocksecops-cli
 ### 1.3 Install from source
 
 ```bash
-git clone https://github.com/blocksecops/blocksecops-cli
-cd blocksecops-cli
+git clone https://github.com/blocksecops/0xapogee-cli
+cd 0xapogee-cli
 pip install -e .
 ```
 
@@ -56,7 +56,7 @@ pip install -e .
 ### 2.1 Login
 
 ```bash
-blocksecops auth login
+0xapogee auth login
 ```
 
 - [ ] Prompts for API key
@@ -69,7 +69,7 @@ blocksecops auth login
 ### 2.2 Login with Key Flag
 
 ```bash
-blocksecops auth login --api-key bso_live_xxx
+0xapogee auth login --api-key bso_live_xxx
 ```
 
 - [ ] Accepts key from flag
@@ -81,7 +81,7 @@ blocksecops auth login --api-key bso_live_xxx
 ### 2.3 Login with Custom URL
 
 ```bash
-blocksecops auth login --api-url http://localhost:8000
+0xapogee auth login --api-url http://localhost:8000
 ```
 
 - [ ] Saves custom API URL
@@ -92,7 +92,7 @@ blocksecops auth login --api-url http://localhost:8000
 ### 2.4 Whoami
 
 ```bash
-blocksecops auth whoami
+0xapogee auth whoami
 ```
 
 **Expected Output:**
@@ -103,7 +103,7 @@ blocksecops auth whoami
 │ Email: user@example.com                   │
 │ User ID: 529f5865-...                     │
 │ Plan: developer                           │
-│ API URL: https://api.blocksecops.com     │
+│ API URL: https://api.0xapogee.com     │
 └──────────────────────────────────────────┘
 ```
 
@@ -117,7 +117,7 @@ blocksecops auth whoami
 ### 2.5 Status
 
 ```bash
-blocksecops auth status
+0xapogee auth status
 ```
 
 - [ ] Shows API URL
@@ -129,7 +129,7 @@ blocksecops auth status
 ### 2.6 Logout
 
 ```bash
-blocksecops auth logout
+0xapogee auth logout
 ```
 
 - [ ] Removes stored credentials
@@ -143,7 +143,7 @@ blocksecops auth logout
 ### 3.1 Scan File
 
 ```bash
-blocksecops scan run contract.sol
+0xapogee scan run contract.sol
 ```
 
 - [ ] Uploads file to API
@@ -156,7 +156,7 @@ blocksecops scan run contract.sol
 ### 3.2 Scan with No Wait
 
 ```bash
-blocksecops scan run contract.sol --no-wait
+0xapogee scan run contract.sol --no-wait
 ```
 
 - [ ] Returns immediately
@@ -168,7 +168,7 @@ blocksecops scan run contract.sol --no-wait
 ### 3.3 Scan with Specific Scanners
 
 ```bash
-blocksecops scan run contract.sol --scanner slither --scanner aderyn
+0xapogee scan run contract.sol --scanner slither --scanner aderyn
 ```
 
 - [ ] Uses only specified scanners
@@ -179,7 +179,7 @@ blocksecops scan run contract.sol --scanner slither --scanner aderyn
 ### 3.4 Scan Status
 
 ```bash
-blocksecops scan status <scan-id>
+0xapogee scan status <scan-id>
 ```
 
 - [ ] Shows scan ID
@@ -192,7 +192,7 @@ blocksecops scan status <scan-id>
 ### 3.5 Scan Results
 
 ```bash
-blocksecops scan results <scan-id>
+0xapogee scan results <scan-id>
 ```
 
 - [ ] Shows full results
@@ -204,7 +204,7 @@ blocksecops scan results <scan-id>
 ### 3.6 Scan List
 
 ```bash
-blocksecops scan list
+0xapogee scan list
 ```
 
 - [ ] Lists recent contracts
@@ -218,7 +218,7 @@ blocksecops scan list
 ### 4.1 Table Format (Default)
 
 ```bash
-blocksecops scan run contract.sol --output table
+0xapogee scan run contract.sol --output table
 ```
 
 - [ ] Rich terminal formatting
@@ -231,7 +231,7 @@ blocksecops scan run contract.sol --output table
 ### 4.2 JSON Format
 
 ```bash
-blocksecops scan run contract.sol --output json
+0xapogee scan run contract.sol --output json
 ```
 
 - [ ] Valid JSON output
@@ -244,7 +244,7 @@ blocksecops scan run contract.sol --output json
 ### 4.3 SARIF Format
 
 ```bash
-blocksecops scan run contract.sol --output sarif
+0xapogee scan run contract.sol --output sarif
 ```
 
 - [ ] Valid SARIF 2.1.0 schema
@@ -257,7 +257,7 @@ blocksecops scan run contract.sol --output sarif
 ### 4.4 JUnit Format
 
 ```bash
-blocksecops scan run contract.sol --output junit
+0xapogee scan run contract.sol --output junit
 ```
 
 - [ ] Valid JUnit XML
@@ -271,7 +271,7 @@ blocksecops scan run contract.sol --output junit
 ### 4.5 Output to File
 
 ```bash
-blocksecops scan run contract.sol --output sarif --output-file results.sarif
+0xapogee scan run contract.sol --output sarif --output-file results.sarif
 ```
 
 - [ ] Writes to specified file
@@ -285,7 +285,7 @@ blocksecops scan run contract.sol --output sarif --output-file results.sarif
 ### 5.1 Fail on Severity
 
 ```bash
-blocksecops scan run contract.sol --fail-on high
+0xapogee scan run contract.sol --fail-on high
 echo $?
 ```
 
@@ -298,7 +298,7 @@ echo $?
 ### 5.2 Fail on Critical
 
 ```bash
-blocksecops scan run contract.sol --fail-on critical
+0xapogee scan run contract.sol --fail-on critical
 ```
 
 - [ ] Only fails on critical
@@ -310,7 +310,7 @@ blocksecops scan run contract.sol --fail-on critical
 
 ### 6.1 Config File Location
 
-- Linux/macOS: `~/.blocksecops/config.json`
+- Linux/macOS: `~/.0xapogee/config.json`
 - Windows: `%APPDATA%\blocksecops\config.json`
 
 - [ ] Config file created on first use
@@ -321,11 +321,11 @@ blocksecops scan run contract.sol --fail-on critical
 ### 6.2 Environment Variables
 
 ```bash
-BLOCKSECOPS_API_KEY=xxx blocksecops auth status
+APOGEE_API_KEY=xxx 0xapogee auth status
 ```
 
-- [ ] BLOCKSECOPS_API_KEY overrides stored key
-- [ ] BLOCKSECOPS_API_URL overrides stored URL
+- [ ] APOGEE_API_KEY overrides stored key
+- [ ] APOGEE_API_URL overrides stored URL
 - [ ] CI=true enables CI mode
 
 ---
@@ -333,7 +333,7 @@ BLOCKSECOPS_API_KEY=xxx blocksecops auth status
 ### 6.3 CI Mode
 
 ```bash
-CI=true blocksecops scan run contract.sol
+CI=true 0xapogee scan run contract.sol
 ```
 
 - [ ] Disables interactive prompts
@@ -348,10 +348,10 @@ CI=true blocksecops scan run contract.sol
 Create `.pre-commit-config.yaml`:
 ```yaml
 repos:
-  - repo: https://github.com/blocksecops/blocksecops-cli
+  - repo: https://github.com/blocksecops/0xapogee-cli
     rev: v0.1.0
     hooks:
-      - id: blocksecops-scan
+      - id: 0xapogee-scan
 ```
 
 ```bash
@@ -392,7 +392,7 @@ git commit --no-verify -m "skip hook"
 ### 8.1 Not Authenticated
 
 ```bash
-blocksecops scan run contract.sol
+0xapogee scan run contract.sol
 # (without login)
 ```
 
@@ -404,7 +404,7 @@ blocksecops scan run contract.sol
 ### 8.2 Invalid API Key
 
 ```bash
-blocksecops auth login --api-key invalid_key
+0xapogee auth login --api-key invalid_key
 ```
 
 - [ ] Shows "Invalid API key" error
@@ -415,7 +415,7 @@ blocksecops auth login --api-key invalid_key
 ### 8.3 File Not Found
 
 ```bash
-blocksecops scan run nonexistent.sol
+0xapogee scan run nonexistent.sol
 ```
 
 - [ ] Shows "File not found" error
@@ -435,7 +435,7 @@ blocksecops scan run nonexistent.sol
 ### 9.1 Global Help
 
 ```bash
-blocksecops --help
+0xapogee --help
 ```
 
 - [ ] Shows all commands
@@ -446,7 +446,7 @@ blocksecops --help
 ### 9.2 Command Help
 
 ```bash
-blocksecops scan run --help
+0xapogee scan run --help
 ```
 
 - [ ] Shows command options
@@ -457,7 +457,7 @@ blocksecops scan run --help
 ### 9.3 Version
 
 ```bash
-blocksecops version
+0xapogee version
 ```
 
 - [ ] Shows version number

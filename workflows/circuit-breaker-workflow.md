@@ -6,7 +6,7 @@ Portal Version: 0.4.0
 
 ## Overview
 
-The admin portal circuit breaker provides per-service-group failure isolation for API calls from `admin.blocksecops.local`. When a backend service experiences sustained failures, the circuit breaker stops sending requests to that service, allowing it to recover while the portal continues operating with stale cached data.
+The admin portal circuit breaker provides per-service-group failure isolation for API calls from `admin.0xapogee.local`. When a backend service experiences sustained failures, the circuit breaker stops sending requests to that service, allowing it to recover while the portal continues operating with stale cached data.
 
 ```
                     ┌──────────────────────────────┐

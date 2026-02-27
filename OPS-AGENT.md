@@ -144,7 +144,7 @@ Step-by-step operational guides — prerequisites, UI + API methods, verificatio
 |------|--------|------------|
 | `ide-vscode.md` | VS Code extension setup | Extension install, configuration |
 | `ide-jetbrains.md` | IntelliJ/WebStorm plugin setup | Plugin install, configuration |
-| `cli-installation.md` | BlockSecOps CLI install and configure | pip install, auth, commands |
+| `cli-installation.md` | Apogee CLI install and configure | pip install, auth, commands |
 
 ### Deployment Operations
 

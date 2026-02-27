@@ -188,7 +188,7 @@ sed -i "s/version = \".*\"/version = \"${VERSION}\"/" pyproject.toml
 sed -i "s/newTag: \".*\"/newTag: \"${VERSION}\"/" k8s/overlays/local/intelligence-engine/kustomization.yaml
 
 # 3. Build and push
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 docker build \
   --build-arg SERVICE_VERSION=${VERSION} \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
@@ -219,7 +219,7 @@ kubectl get deployment intelligence-engine -n intelligence-engine-local \
 kubectl logs -n intelligence-engine-local -l app.kubernetes.io/name=intelligence-engine --tail=30
 
 # Test endpoint
-curl -sk https://app.blocksecops.local/api/v1/health/ready
+curl -sk https://app.0xapogee.local/api/v1/health/ready
 ```
 
 ---

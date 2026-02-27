@@ -117,7 +117,7 @@ ResultCollector (every 60s):
 
 ## Scanner Image Architecture
 
-Each scanner runs as a custom Docker image stored in Harbor (`harbor.blocksecops.local/blocksecops/`):
+Each scanner runs as a custom Docker image stored in Harbor (`harbor.0xapogee.local/blocksecops/`):
 
 ```
 scanner-images/
@@ -229,7 +229,7 @@ data:
   ...
 ```
 
-**Local overlay** adds Harbor registry prefix: `harbor.blocksecops.local/blocksecops/scanner-slither:0.3.2`
+**Local overlay** adds Harbor registry prefix: `harbor.0xapogee.local/blocksecops/scanner-slither:0.3.2`
 
 Both the API service (for displaying scanner info) and tool-integration (for selecting images) read from this ConfigMap.
 

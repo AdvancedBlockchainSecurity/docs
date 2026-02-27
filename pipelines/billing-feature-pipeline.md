@@ -66,8 +66,8 @@ cd ~/Git
 VERSION=$(grep '"version"' blocksecops-dashboard/package.json | head -1 | cut -d'"' -f4)
 docker build -f blocksecops-dashboard/Dockerfile \
   --build-arg SERVICE_VERSION=$VERSION \
-  -t harbor.blocksecops.local/blocksecops/dashboard:$VERSION .
-docker push harbor.blocksecops.local/blocksecops/dashboard:$VERSION
+  -t harbor.0xapogee.local/blocksecops/dashboard:$VERSION .
+docker push harbor.0xapogee.local/blocksecops/dashboard:$VERSION
 kubectl apply -k blocksecops-dashboard/k8s/overlays/local/
 ```
 

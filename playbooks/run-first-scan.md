@@ -47,7 +47,7 @@ flowchart LR
 **API:**
 ```bash
 # Create new project
-curl -X POST "https://app.blocksecops.com/api/v1/projects" \
+curl -X POST "https://app.0xapogee.com/api/v1/projects" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -71,7 +71,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/projects" \
 **API:**
 ```bash
 # Upload contract file
-curl -X POST "https://app.blocksecops.com/api/v1/contracts" \
+curl -X POST "https://app.0xapogee.com/api/v1/contracts" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: multipart/form-data" \
   -F "project_id=proj_abc123" \
@@ -79,7 +79,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/contracts" \
   -F "name=Token.sol"
 
 # Or upload source code directly
-curl -X POST "https://app.blocksecops.com/api/v1/contracts" \
+curl -X POST "https://app.0xapogee.com/api/v1/contracts" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -114,7 +114,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/contracts" \
 **API:**
 ```bash
 # Create scan with specific scanners
-curl -X POST "https://app.blocksecops.com/api/v1/scans" \
+curl -X POST "https://app.0xapogee.com/api/v1/scans" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -149,11 +149,11 @@ curl -X POST "https://app.blocksecops.com/api/v1/scans" \
 **API:**
 ```bash
 # Start scan (if created without auto-start)
-curl -X POST "https://app.blocksecops.com/api/v1/scans/{scan_id}/start" \
+curl -X POST "https://app.0xapogee.com/api/v1/scans/{scan_id}/start" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # Check scan status
-curl -X GET "https://app.blocksecops.com/api/v1/scans/{scan_id}" \
+curl -X GET "https://app.0xapogee.com/api/v1/scans/{scan_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -177,11 +177,11 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans/{scan_id}" \
 **API:**
 ```bash
 # Get scan results
-curl -X GET "https://app.blocksecops.com/api/v1/scans/{scan_id}" \
+curl -X GET "https://app.0xapogee.com/api/v1/scans/{scan_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # Get vulnerabilities for scan
-curl -X GET "https://app.blocksecops.com/api/v1/scans/{scan_id}/vulnerabilities" \
+curl -X GET "https://app.0xapogee.com/api/v1/scans/{scan_id}/vulnerabilities" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -231,7 +231,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans/{scan_id}/vulnerabilities"
 **API:**
 ```bash
 # Update finding status
-curl -X PATCH "https://app.blocksecops.com/api/v1/vulnerabilities/{vuln_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/vulnerabilities/{vuln_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -267,12 +267,12 @@ Confirm your first scan was successful:
 **API:**
 ```bash
 # Verify scan completed
-curl -X GET "https://app.blocksecops.com/api/v1/scans/{scan_id}" \
+curl -X GET "https://app.0xapogee.com/api/v1/scans/{scan_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" | jq '.status'
 # Expected: "completed"
 
 # Verify findings exist
-curl -X GET "https://app.blocksecops.com/api/v1/scans/{scan_id}/vulnerabilities" \
+curl -X GET "https://app.0xapogee.com/api/v1/scans/{scan_id}/vulnerabilities" \
   -H "Authorization: Bearer $ACCESS_TOKEN" | jq '.total'
 ```
 

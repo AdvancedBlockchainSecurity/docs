@@ -9,7 +9,7 @@ Test CI/CD pipeline integration with GitHub Actions, GitLab CI, Jenkins, and gen
 - [ ] BlockSecOps API key with scan permissions
 - [ ] Access to CI/CD platform (GitHub, GitLab, or Jenkins)
 - [ ] Sample Solidity contract repository
-- [ ] blocksecops-cli installed (for CLI-based tests)
+- [ ] 0xapogee-cli installed (for CLI-based tests)
 
 ---
 
@@ -28,11 +28,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install CLI
-        run: pip install blocksecops-cli
+        run: pip install 0xapogee-cli
       - name: Run Scan
         env:
-          BLOCKSECOPS_API_KEY: ${{ secrets.BLOCKSECOPS_API_KEY }}
-        run: blocksecops scan run contracts/ --fail-on high
+          APOGEE_API_KEY: ${{ secrets.APOGEE_API_KEY }}
+        run: 0xapogee scan run contracts/ --fail-on high
 ```
 
 - [ ] Workflow file validates
@@ -48,7 +48,7 @@ jobs:
 ```yaml
 - name: Run Scan
   run: |
-    blocksecops scan run contracts/ \
+    0xapogee scan run contracts/ \
       --output sarif \
       --output-file results.sarif \
       --fail-on critical
@@ -113,7 +113,7 @@ on:
 - name: Cache scan results
   uses: actions/cache@v4
   with:
-    path: ~/.blocksecops/cache
+    path: ~/.0xapogee/cache
     key: scan-${{ hashFiles('contracts/**') }}
 ```
 
@@ -133,11 +133,11 @@ security-scan:
   stage: test
   image: python:3.11
   before_script:
-    - pip install blocksecops-cli
+    - pip install 0xapogee-cli
   script:
-    - blocksecops scan run contracts/ --fail-on high
+    - 0xapogee scan run contracts/ --fail-on high
   variables:
-    BLOCKSECOPS_API_KEY: $BLOCKSECOPS_API_KEY
+    APOGEE_API_KEY: $APOGEE_API_KEY
 ```
 
 - [ ] Pipeline validates
@@ -152,7 +152,7 @@ security-scan:
 ```yaml
 security-scan:
   script:
-    - blocksecops scan run contracts/ --output junit --output-file report.xml
+    - 0xapogee scan run contracts/ --output junit --output-file report.xml
   artifacts:
     reports:
       junit: report.xml
@@ -171,7 +171,7 @@ security-scan:
 ```yaml
 security-scan:
   script:
-    - blocksecops scan run contracts/ --output json > gl-code-quality-report.json
+    - 0xapogee scan run contracts/ --output json > gl-code-quality-report.json
   artifacts:
     reports:
       codequality: gl-code-quality-report.json
@@ -205,8 +205,8 @@ security-scan:
 
 **Build Step (Execute Shell):**
 ```bash
-pip install blocksecops-cli
-blocksecops scan run contracts/ --output junit --output-file results.xml --fail-on high
+pip install 0xapogee-cli
+0xapogee scan run contracts/ --output junit --output-file results.xml --fail-on high
 ```
 
 **Post-build: Publish JUnit test result report:**
@@ -225,13 +225,13 @@ blocksecops scan run contracts/ --output junit --output-file results.xml --fail-
 pipeline {
     agent any
     environment {
-        BLOCKSECOPS_API_KEY = credentials('blocksecops-api-key')
+        APOGEE_API_KEY = credentials('blocksecops-api-key')
     }
     stages {
         stage('Security Scan') {
             steps {
-                sh 'pip install blocksecops-cli'
-                sh 'blocksecops scan run contracts/ --output junit --output-file results.xml --fail-on high'
+                sh 'pip install 0xapogee-cli'
+                sh '0xapogee scan run contracts/ --output junit --output-file results.xml --fail-on high'
             }
             post {
                 always {
@@ -278,17 +278,17 @@ steps:
     inputs:
       versionSpec: '3.11'
 
-  - script: pip install blocksecops-cli
+  - script: pip install 0xapogee-cli
     displayName: 'Install CLI'
 
   - script: |
-      blocksecops scan run contracts/ \
+      0xapogee scan run contracts/ \
         --output junit \
         --output-file $(System.DefaultWorkingDirectory)/results.xml \
         --fail-on high
     displayName: 'Security Scan'
     env:
-      BLOCKSECOPS_API_KEY: $(BLOCKSECOPS_API_KEY)
+      APOGEE_API_KEY: $(APOGEE_API_KEY)
 
   - task: PublishTestResults@2
     inputs:
@@ -309,8 +309,8 @@ steps:
 ### 5.1 Upload Contract
 
 ```bash
-CONTRACT_ID=$(curl -s -X POST https://api.blocksecops.com/api/v1/contracts/upload \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY" \
+CONTRACT_ID=$(curl -s -X POST https://api.0xapogee.com/api/v1/contracts/upload \
+  -H "Authorization: Bearer $APOGEE_API_KEY" \
   -F "file=@contract.sol" | jq -r '.id')
 ```
 
@@ -323,8 +323,8 @@ CONTRACT_ID=$(curl -s -X POST https://api.blocksecops.com/api/v1/contracts/uploa
 ### 5.2 Start Scan
 
 ```bash
-SCAN_ID=$(curl -s -X POST https://api.blocksecops.com/api/v1/scans \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY" \
+SCAN_ID=$(curl -s -X POST https://api.0xapogee.com/api/v1/scans \
+  -H "Authorization: Bearer $APOGEE_API_KEY" \
   -H "Content-Type: application/json" \
   -d "{\"contract_id\": \"$CONTRACT_ID\"}" | jq -r '.id')
 ```
@@ -339,8 +339,8 @@ SCAN_ID=$(curl -s -X POST https://api.blocksecops.com/api/v1/scans \
 
 ```bash
 while true; do
-  STATUS=$(curl -s https://api.blocksecops.com/api/v1/scans/$SCAN_ID \
-    -H "Authorization: Bearer $BLOCKSECOPS_API_KEY" | jq -r '.status')
+  STATUS=$(curl -s https://api.0xapogee.com/api/v1/scans/$SCAN_ID \
+    -H "Authorization: Bearer $APOGEE_API_KEY" | jq -r '.status')
   if [[ "$STATUS" == "completed" || "$STATUS" == "failed" ]]; then
     break
   fi
@@ -358,8 +358,8 @@ done
 ### 5.4 Get Results
 
 ```bash
-RESULTS=$(curl -s https://api.blocksecops.com/api/v1/scans/$SCAN_ID/vulnerabilities \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY")
+RESULTS=$(curl -s https://api.0xapogee.com/api/v1/scans/$SCAN_ID/vulnerabilities \
+  -H "Authorization: Bearer $APOGEE_API_KEY")
 CRITICAL=$(echo $RESULTS | jq '[.[] | select(.severity == "critical")] | length')
 ```
 
@@ -389,7 +389,7 @@ fi
 ### 6.1 Basic Scan
 
 ```bash
-blocksecops scan run contracts/ --fail-on high
+0xapogee scan run contracts/ --fail-on high
 ```
 
 - [ ] Scans all .sol files in directory
@@ -401,7 +401,7 @@ blocksecops scan run contracts/ --fail-on high
 ### 6.2 Specific Scanners
 
 ```bash
-blocksecops scan run contract.sol --scanner slither --scanner aderyn
+0xapogee scan run contract.sol --scanner slither --scanner aderyn
 ```
 
 - [ ] Only runs specified scanners
@@ -414,13 +414,13 @@ blocksecops scan run contract.sol --scanner slither --scanner aderyn
 
 ```bash
 # SARIF for GitHub/GitLab
-blocksecops scan run contracts/ --output sarif --output-file results.sarif
+0xapogee scan run contracts/ --output sarif --output-file results.sarif
 
 # JUnit for Jenkins/Azure
-blocksecops scan run contracts/ --output junit --output-file results.xml
+0xapogee scan run contracts/ --output junit --output-file results.xml
 
 # JSON for custom processing
-blocksecops scan run contracts/ --output json > results.json
+0xapogee scan run contracts/ --output json > results.json
 ```
 
 - [ ] SARIF validates
@@ -432,11 +432,11 @@ blocksecops scan run contracts/ --output json > results.json
 ### 6.4 Environment Variables
 
 ```bash
-export BLOCKSECOPS_API_KEY=bso_live_xxx
-export BLOCKSECOPS_API_URL=https://api.blocksecops.com
+export APOGEE_API_KEY=bso_live_xxx
+export APOGEE_API_URL=https://api.0xapogee.com
 export CI=true
 
-blocksecops scan run contracts/
+0xapogee scan run contracts/
 ```
 
 - [ ] API key from environment
@@ -451,7 +451,7 @@ blocksecops scan run contracts/
 
 Create notification channel:
 ```bash
-curl -X POST https://api.blocksecops.com/api/v1/notification-channels \
+curl -X POST https://api.0xapogee.com/api/v1/notification-channels \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
     "name": "CI Notifications",
@@ -488,7 +488,7 @@ curl -X POST https://api.blocksecops.com/api/v1/notification-channels \
 ### 8.1 Invalid API Key
 
 ```bash
-BLOCKSECOPS_API_KEY=invalid blocksecops scan run contracts/
+APOGEE_API_KEY=invalid 0xapogee scan run contracts/
 ```
 
 - [ ] Returns authentication error

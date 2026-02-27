@@ -18,7 +18,7 @@ This playbook covers deployment of the separate admin portal to various environm
 ### Required Accounts/Services
 
 - [ ] Supabase URL and keys available (same as customer dashboard)
-- [ ] DNS configured for `admin.blocksecops.com` (production)
+- [ ] DNS configured for `admin.0xapogee.com` (production)
 - [ ] TLS certificate available or Let's Encrypt configured
 - [ ] IP allowlist configured in Traefik middleware (production)
 
@@ -95,7 +95,7 @@ kubectl apply -k k8s/overlays/local/
 cd /home/pwner/Git/blocksecops-admin-portal
 
 VERSION=$(grep '"version"' package.json | head -1 | cut -d'"' -f4)
-REGISTRY="harbor.blocksecops.local"
+REGISTRY="harbor.0xapogee.local"
 
 # Get environment variables from secrets/configmaps
 ADMIN_SUPABASE_URL=$(kubectl get secret admin-supabase-credentials -o jsonpath='{.data.url}' | base64 -d)
@@ -105,7 +105,7 @@ ADMIN_SUPABASE_KEY=$(kubectl get secret admin-supabase-credentials -o jsonpath='
 docker build \
   --build-arg VITE_ADMIN_SUPABASE_URL=${ADMIN_SUPABASE_URL} \
   --build-arg VITE_ADMIN_SUPABASE_ANON_KEY=${ADMIN_SUPABASE_KEY} \
-  --build-arg VITE_API_BASE_URL=https://api.blocksecops.com/api/v1 \
+  --build-arg VITE_API_BASE_URL=https://api.0xapogee.com/api/v1 \
   --build-arg VITE_ENVIRONMENT=production \
   -t ${REGISTRY}/blocksecops/admin-portal:${VERSION} .
 
@@ -137,7 +137,7 @@ kubectl get pods -l app.kubernetes.io/name=admin-portal
 kubectl get ingressroute admin-portal
 
 # Test endpoint
-curl -I https://admin.blocksecops.com
+curl -I https://admin.0xapogee.com
 ```
 
 ---
@@ -160,7 +160,7 @@ ADMIN_SUPABASE_KEY=$(gcloud secrets versions access latest --secret=admin-supaba
 docker build \
   --build-arg VITE_ADMIN_SUPABASE_URL=${ADMIN_SUPABASE_URL} \
   --build-arg VITE_ADMIN_SUPABASE_ANON_KEY=${ADMIN_SUPABASE_KEY} \
-  --build-arg VITE_API_BASE_URL=https://api.blocksecops.com/api/v1 \
+  --build-arg VITE_API_BASE_URL=https://api.0xapogee.com/api/v1 \
   --build-arg VITE_ENVIRONMENT=production \
   -t ${REGISTRY}/admin-portal:${VERSION} .
 
@@ -182,10 +182,10 @@ argocd app sync admin-portal
 
 ```bash
 # Check DNS resolution
-dig admin.blocksecops.com
+dig admin.0xapogee.com
 
 # Check TLS certificate
-openssl s_client -connect admin.blocksecops.com:443 -servername admin.blocksecops.com < /dev/null 2>/dev/null | openssl x509 -noout -dates
+openssl s_client -connect admin.0xapogee.com:443 -servername admin.0xapogee.com < /dev/null 2>/dev/null | openssl x509 -noout -dates
 ```
 
 ---
@@ -207,16 +207,16 @@ ADMIN_SUPABASE_SERVICE_KEY=eyJ...  # Service role key for admin operations
 
 ```bash
 # Check admin auth endpoints work
-curl -X POST https://api.blocksecops.com/api/v1/admin/auth/session \
+curl -X POST https://api.0xapogee.com/api/v1/admin/auth/session \
   -H "Authorization: Bearer <admin-supabase-jwt>" \
   -H "Cookie: admin_session=<session-token>"
 
 # Verify user management endpoints (returns 401 without auth)
-curl -s https://api.blocksecops.com/api/v1/admin/users
+curl -s https://api.0xapogee.com/api/v1/admin/users
 # Expected: {"detail":"Not authenticated"}
 
 # Verify organization endpoints (returns 401 without auth)
-curl -s https://api.blocksecops.com/api/v1/admin/organizations
+curl -s https://api.0xapogee.com/api/v1/admin/organizations
 # Expected: {"detail":"Not authenticated"}
 ```
 
@@ -303,7 +303,7 @@ kubectl apply -k .
 
 1. Check server-side rate limiting:
    ```bash
-   curl -X POST https://api.blocksecops.com/api/v1/admin/auth/mfa/verify \
+   curl -X POST https://api.0xapogee.com/api/v1/admin/auth/mfa/verify \
      -H "Authorization: Bearer <token>" \
      -H "Content-Type: application/json" \
      -d '{"code": "123456"}'
@@ -313,12 +313,12 @@ kubectl apply -k .
    ```sql
    SELECT email, mfa_failed_attempts, mfa_locked_until
    FROM users
-   WHERE email = 'admin@blocksecops.com';
+   WHERE email = 'admin@0xapogee.com';
    ```
 
 3. Reset MFA lockout (emergency):
    ```bash
-   python -m src.cli.admin reset-mfa-lockout --email admin@blocksecops.com
+   python -m src.cli.admin reset-mfa-lockout --email admin@0xapogee.com
    ```
 
 See [Admin MFA Recovery & Lockout Reset](admin-mfa-lockout-reset.md) for full MFA recovery procedures including encryption key rotation impacts.
@@ -354,8 +354,8 @@ After deploying admin portal, verify the System page health monitoring:
 
 ```bash
 # Access admin portal
-# Local: http://admin.blocksecops.local:3000
-# Server: http://admin.blocksecops.local
+# Local: http://admin.0xapogee.local:3000
+# Server: http://admin.0xapogee.local
 
 # Verify dashboard loads and shows all 8 KPI cards
 # Verify system health panel shows component statuses
@@ -397,7 +397,7 @@ docker build \
   --build-arg SERVICE_VERSION=${VERSION} \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
-  -t harbor.blocksecops.local/blocksecops/admin-portal:${VERSION} .
+  -t harbor.0xapogee.local/blocksecops/admin-portal:${VERSION} .
 ```
 
 > **Note:** Admin portal shares the same Supabase project as the customer dashboard. Credentials can be sourced from the `dashboard-config` ConfigMap in the `dashboard-local` namespace.

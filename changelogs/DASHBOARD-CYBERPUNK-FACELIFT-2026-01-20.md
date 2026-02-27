@@ -144,7 +144,7 @@ docs/standards/
 # Build from parent directory (required for shared lib)
 cd /home/pwner/Git
 VERSION="0.30.13"
-REGISTRY="harbor.blocksecops.local"
+REGISTRY="harbor.0xapogee.local"
 
 # Get build args from ConfigMap
 SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')

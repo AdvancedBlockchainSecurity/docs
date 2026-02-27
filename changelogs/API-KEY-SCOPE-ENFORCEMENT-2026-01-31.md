@@ -66,7 +66,7 @@ def require_auth_with_scope(required_scopes: List[str]) -> Callable:
 # Test scope enforcement (should fail with 403)
 curl -sk -H 'X-API-Key: <read-only-key>' \
   -X POST -d '{"name": "Test"}' \
-  'https://app.blocksecops.local/api/v1/contracts'
+  'https://app.0xapogee.local/api/v1/contracts'
 
 # Expected: 403 Forbidden with message about missing scope
 ```

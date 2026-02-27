@@ -27,7 +27,7 @@ API keys must only access endpoints matching their assigned scopes. Write endpoi
 
 **Request:**
 ```bash
-curl -sk -H 'Host: app.blocksecops.local' \
+curl -sk -H 'Host: app.0xapogee.local' \
   -H 'X-API-Key: <read-only-api-key>' \
   -H 'Content-Type: application/json' \
   -X POST \
@@ -53,7 +53,7 @@ curl -sk -H 'Host: app.blocksecops.local' \
 
 **Request:**
 ```bash
-curl -sk -H 'Host: app.blocksecops.local' \
+curl -sk -H 'Host: app.0xapogee.local' \
   -H 'X-API-Key: <write-api-key>' \
   -H 'Content-Type: application/json' \
   -X POST \
@@ -73,7 +73,7 @@ curl -sk -H 'Host: app.blocksecops.local' \
 
 **Request:**
 ```bash
-curl -sk -H 'Host: app.blocksecops.local' \
+curl -sk -H 'Host: app.0xapogee.local' \
   -H 'X-API-Key: <read-only-api-key>' \
   -H 'Content-Type: application/json' \
   -X POST \
@@ -99,7 +99,7 @@ curl -sk -H 'Host: app.blocksecops.local' \
 
 **Request:**
 ```bash
-curl -sk -H 'Host: app.blocksecops.local' \
+curl -sk -H 'Host: app.0xapogee.local' \
   -H 'X-API-Key: <write-api-key>' \
   -H 'Content-Type: application/json' \
   -X POST \
@@ -119,7 +119,7 @@ curl -sk -H 'Host: app.blocksecops.local' \
 
 **Request:**
 ```bash
-curl -sk -H 'Host: app.blocksecops.local' \
+curl -sk -H 'Host: app.0xapogee.local' \
   -H 'Authorization: Bearer <jwt-token>' \
   -H 'Content-Type: application/json' \
   -X POST \
@@ -139,7 +139,7 @@ curl -sk -H 'Host: app.blocksecops.local' \
 
 **Request:**
 ```bash
-curl -sk -H 'Host: app.blocksecops.local' \
+curl -sk -H 'Host: app.0xapogee.local' \
   -H 'X-API-Key: <webhooks-write-key>' \
   -H 'Content-Type: application/json' \
   -X POST \
@@ -159,7 +159,7 @@ curl -sk -H 'Host: app.blocksecops.local' \
 
 **Request:**
 ```bash
-curl -sk -H 'Host: app.blocksecops.local' \
+curl -sk -H 'Host: app.0xapogee.local' \
   -H 'X-API-Key: <quality-gates-read-key>' \
   -H 'Content-Type: application/json' \
   -X POST \

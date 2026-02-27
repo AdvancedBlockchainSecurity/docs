@@ -300,7 +300,7 @@ metadata:
   namespace: monitoring
 spec:
   rules:
-  - host: grafana.blocksecops.local
+  - host: grafana.0xapogee.local
     http:
       paths:
       - path: /
@@ -328,7 +328,7 @@ spec:
 kubectl port-forward svc/monitoring-grafana 3001:80 -n monitoring &
 
 # Ingress (requires host configuration)
-echo "$(minikube ip) grafana.blocksecops.local" | sudo tee -a /etc/hosts
+echo "$(minikube ip) grafana.0xapogee.local" | sudo tee -a /etc/hosts
 ```
 
 ## Troubleshooting Applied Fixes
@@ -649,8 +649,8 @@ $ curl http://127.0.0.1:8000/api/v1/health/ready
 # Test login
 $ curl -X POST http://127.0.0.1:8000/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "test-rebrand@blocksecops.com", "password": "TestPass123"}'
-{"message":"Login successful","user_id":"45b0f212-e9d5-4030-b489-4896ae1263cf","email":"test-rebrand@blocksecops.com"}
+  -d '{"email": "test-rebrand@0xapogee.com", "password": "TestPass123"}'
+{"message":"Login successful","user_id":"45b0f212-e9d5-4030-b489-4896ae1263cf","email":"test-rebrand@0xapogee.com"}
 
 # Check pod status
 $ kubectl get pods -n api-service-local

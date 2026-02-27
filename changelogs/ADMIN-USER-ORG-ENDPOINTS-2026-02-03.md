@@ -76,8 +76,8 @@ blocksecops-api-service/src/presentation/api/v1/endpoints/admin/
 ```bash
 # Build and push
 cd /home/pwner/Git/blocksecops-api-service
-docker build -t harbor.blocksecops.local/blocksecops/api-service:0.22.4 .
-docker push harbor.blocksecops.local/blocksecops/api-service:0.22.4
+docker build -t harbor.0xapogee.local/blocksecops/api-service:0.22.4 .
+docker push harbor.0xapogee.local/blocksecops/api-service:0.22.4
 
 # Deploy
 kubectl apply -k k8s/overlays/local/
@@ -90,10 +90,10 @@ kubectl rollout status deployment/api-service -n api-service-local
 
 ```bash
 # Test users endpoint (requires admin session)
-curl -s http://admin.blocksecops.local/api/v1/admin/users
+curl -s http://admin.0xapogee.local/api/v1/admin/users
 
 # Test organizations endpoint
-curl -s http://admin.blocksecops.local/api/v1/admin/organizations
+curl -s http://admin.0xapogee.local/api/v1/admin/organizations
 
 # Expected: 401 Unauthorized (authentication required)
 ```

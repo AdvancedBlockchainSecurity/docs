@@ -85,7 +85,7 @@ Exclude these directories to reduce upload size:
 ### Via API
 
 ```bash
-curl -X POST "https://api.blocksecops.com/api/v1/contracts/upload" \
+curl -X POST "https://api.0xapogee.com/api/v1/contracts/upload" \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -F "file=@my-project.zip" \
   -F "name=MyToken"

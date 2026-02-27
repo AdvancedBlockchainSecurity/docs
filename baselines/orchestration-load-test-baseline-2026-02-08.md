@@ -222,8 +222,8 @@ f964d466-b014-4797-a589-e7434d209ce9 : sol-azy
 | Server | debian-server (kubeadm) |
 | Total RAM | 125Gi |
 | Kubernetes | kubeadm with containerd |
-| Registry | Harbor (harbor.blocksecops.local) |
-| Image | harbor.blocksecops.local/blocksecops/orchestration:0.9.10 |
+| Registry | Harbor (harbor.0xapogee.local) |
+| Image | harbor.0xapogee.local/blocksecops/orchestration:0.9.10 |
 | Base image tag | 1.0.0-0e97f76b |
 | Python | 3.11 |
 | Celery pool | prefork |

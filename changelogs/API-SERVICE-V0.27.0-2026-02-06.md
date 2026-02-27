@@ -219,9 +219,9 @@ docker build \
   --build-arg SERVICE_VERSION=${VERSION} \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
-  -t harbor.blocksecops.local/blocksecops/api-service:${VERSION} .
+  -t harbor.0xapogee.local/blocksecops/api-service:${VERSION} .
 
-docker push harbor.blocksecops.local/blocksecops/api-service:${VERSION}
+docker push harbor.0xapogee.local/blocksecops/api-service:${VERSION}
 kubectl apply -k k8s/overlays/local/api-service/
 kubectl rollout restart deployment/api-service -n api-service-local
 ```

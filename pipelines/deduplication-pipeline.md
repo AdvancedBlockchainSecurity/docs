@@ -355,7 +355,7 @@ The CronJob requires a Cloud SQL Proxy sidecar in GCP (same pattern as the API S
 |---------|-------|-----|
 | Namespace | `api-service-local` | `api-service-gcp` |
 | Database | Direct PostgreSQL connection | Cloud SQL Proxy sidecar (`localhost:5432`) |
-| Image registry | `harbor.blocksecops.local` | `us-west1-docker.pkg.dev/PROJECT/blocksecops` |
+| Image registry | `harbor.0xapogee.local` | `us-west1-docker.pkg.dev/PROJECT/blocksecops` |
 | IE URL | ConfigMap → `.intelligence-engine-local.` | ConfigMap → `.intelligence-engine-gcp.` |
 | Auth | Kubernetes ServiceAccount | Workload Identity → GCP Service Account |
 | Cloud SQL Proxy | N/A | `--quitquitquit` flag (exits when Job container finishes) |

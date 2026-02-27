@@ -21,7 +21,7 @@
 
 | Setting | Value |
 |---------|-------|
-| API Base URL | `https://app.blocksecops.local/api/v1` |
+| API Base URL | `https://app.0xapogee.local/api/v1` |
 | Cluster | kubeadm (single node) |
 | API replicas | 1 |
 | CPU | 200m request / 1 CPU limit |

@@ -45,7 +45,7 @@
 ## 3. Deduplication Page Filter Fix (Dashboard)
 
 ### 3.1 Default Filter Behavior
-- [ ] Navigate to `https://app.blocksecops.local/deduplication`
+- [ ] Navigate to `https://app.0xapogee.local/deduplication`
 - [ ] Min Scanner Count filter defaults to "1+ scanners"
 - [ ] All deduplication groups are visible (including single-scanner groups)
 

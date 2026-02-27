@@ -40,7 +40,7 @@ flowchart LR
 ### Step 1: Navigate to Login Page
 
 **Dashboard:**
-1. Go to `https://app.blocksecops.com`
+1. Go to `https://app.0xapogee.com`
 2. Click **Connect Wallet** button on the login page
 
 ### Step 2: Select Wallet Provider
@@ -77,7 +77,7 @@ After wallet connection, you'll be prompted to sign a message:
 **Dashboard:**
 1. A signing request appears in your wallet
 2. Review the SIWE message containing:
-   - Domain: `app.blocksecops.com`
+   - Domain: `app.0xapogee.com`
    - Statement: "Sign in with Ethereum to BlockSecOps"
    - Nonce: Unique session identifier
    - Expiration: Message validity period
@@ -87,7 +87,7 @@ After wallet connection, you'll be prompted to sign a message:
 
 ```bash
 # Step 1: Request nonce
-NONCE_RESPONSE=$(curl -X POST "https://app.blocksecops.com/api/v1/auth/wallet/nonce" \
+NONCE_RESPONSE=$(curl -X POST "https://app.0xapogee.com/api/v1/auth/wallet/nonce" \
   -H "Content-Type: application/json" \
   -d '{
     "address": "0xYourWalletAddress"
@@ -99,12 +99,12 @@ NONCE=$(echo $NONCE_RESPONSE | jq -r '.nonce')
 # The message format follows EIP-4361 (SIWE)
 
 # Step 3: Verify signature
-curl -X POST "https://app.blocksecops.com/api/v1/auth/wallet/verify" \
+curl -X POST "https://app.0xapogee.com/api/v1/auth/wallet/verify" \
   -H "Content-Type: application/json" \
   -d '{
     "address": "0xYourWalletAddress",
     "signature": "0xSignedMessage...",
-    "message": "app.blocksecops.com wants you to sign in with your Ethereum account..."
+    "message": "app.0xapogee.com wants you to sign in with your Ethereum account..."
   }'
 ```
 
@@ -129,7 +129,7 @@ Confirm successful wallet connection:
 **API:**
 ```bash
 # Verify wallet is linked to account
-curl -X GET "https://app.blocksecops.com/api/v1/users/me/wallets" \
+curl -X GET "https://app.0xapogee.com/api/v1/users/me/wallets" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 

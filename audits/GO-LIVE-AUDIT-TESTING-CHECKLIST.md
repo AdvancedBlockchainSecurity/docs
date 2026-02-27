@@ -75,7 +75,7 @@ cat blocksecops-shared/tier-config/tiers.json | \
 ```bash
 # Test API key creation denied for Developer tier
 TOKEN="<developer-tier-token>"
-curl -sk -X POST "https://app.blocksecops.com/api/v1/api-keys" \
+curl -sk -X POST "https://app.0xapogee.com/api/v1/api-keys" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name":"test-key","scopes":["scans:read"]}'
@@ -92,7 +92,7 @@ curl -sk -X POST "https://app.blocksecops.com/api/v1/api-keys" \
 ```bash
 # After tier change via Stripe webhook, verify:
 # 1. Old session token returns 401
-curl -sk "https://app.blocksecops.com/api/v1/users/me" \
+curl -sk "https://app.0xapogee.com/api/v1/users/me" \
   -H "Authorization: Bearer $OLD_TOKEN"
 # Expected: 401
 
@@ -137,7 +137,7 @@ cat blocksecops-shared/tier-config/tiers.json | \
 # Test rate limiting (requires rapid requests)
 for i in $(seq 1 310); do
   curl -sk -o /dev/null -w "%{http_code}\n" \
-    "https://app.blocksecops.com/api/v1/scans" \
+    "https://app.0xapogee.com/api/v1/scans" \
     -H "Authorization: Bearer $GROWTH_TOKEN" &
 done
 wait
@@ -165,7 +165,7 @@ wait
 ls blocksecops-tool-integration/scanner-images/
 
 # Verify scanner metadata
-curl -sk "https://app.blocksecops.com/api/v1/scanners" \
+curl -sk "https://app.0xapogee.com/api/v1/scanners" \
   -H "Authorization: Bearer $TOKEN" | jq '.[].name'
 ```
 
@@ -204,7 +204,7 @@ kubectl get pods -A -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\
 # Expected: 0
 
 # Verify 4naly3er is excluded
-curl -sk "https://app.blocksecops.com/api/v1/scanners" \
+curl -sk "https://app.0xapogee.com/api/v1/scanners" \
   -H "Authorization: Bearer $TOKEN" | jq '.[].name' | grep -i "4naly3er"
 # Expected: no output
 ```
@@ -226,7 +226,7 @@ curl -sk "https://app.blocksecops.com/api/v1/scanners" \
 
 ```bash
 # Verify dedup groups exist
-curl -sk "https://app.blocksecops.com/api/v1/deduplication/groups?limit=5" \
+curl -sk "https://app.0xapogee.com/api/v1/deduplication/groups?limit=5" \
   -H "Authorization: Bearer $TOKEN" | jq '.total, .items[0].finding_count'
 
 # Verify fingerprint columns are populated
@@ -301,7 +301,7 @@ kubectl get jobs -A -l app=dedup-maintenance --sort-by=.status.startTime | tail 
 
 ```bash
 # Test notification channel delivery
-curl -sk -X POST "https://app.blocksecops.com/api/v1/notifications/channels/{channel_id}/test" \
+curl -sk -X POST "https://app.0xapogee.com/api/v1/notifications/channels/{channel_id}/test" \
   -H "Authorization: Bearer $TOKEN"
 # Expected: 200 with delivery confirmation
 ```
@@ -352,7 +352,7 @@ stripe trigger customer.subscription.updated \
   --override customer.subscription.updated:metadata.tier=team
 
 # Verify webhook endpoint
-curl -sk -X POST "https://app.blocksecops.com/api/v1/billing/webhook" \
+curl -sk -X POST "https://app.0xapogee.com/api/v1/billing/webhook" \
   -H "Content-Type: application/json" \
   -H "Stripe-Signature: invalid_signature" \
   -d '{"type":"test"}'
@@ -371,7 +371,7 @@ curl -sk -X POST "https://app.blocksecops.com/api/v1/billing/webhook" \
 
 ```bash
 # Verify pricing data matches tiers.json
-curl -sk "https://app.blocksecops.com/api/v1/pricing" | \
+curl -sk "https://app.0xapogee.com/api/v1/pricing" | \
   jq '.tiers[] | {name: .name, price: .pricing.monthly}'
 
 # Cross-check with tiers.json
@@ -408,7 +408,7 @@ TOKEN=$(curl -s -X POST "${SUPABASE_URL}/auth/v1/token?grant_type=password" \
   jq -r '.access_token')
 
 # Verify token works
-curl -sk "https://app.blocksecops.com/api/v1/users/me" \
+curl -sk "https://app.0xapogee.com/api/v1/users/me" \
   -H "Authorization: Bearer $TOKEN" | jq '.tier'
 ```
 
@@ -423,13 +423,13 @@ curl -sk "https://app.blocksecops.com/api/v1/users/me" \
 
 ```bash
 # Test API key authentication
-curl -sk "https://app.blocksecops.com/api/v1/scans" \
+curl -sk "https://app.0xapogee.com/api/v1/scans" \
   -H "X-API-Key: bso_<key>"
 # Expected: 200 with scan results
 
 # Test expired key
 curl -sk -o /dev/null -w "%{http_code}" \
-  "https://app.blocksecops.com/api/v1/scans" \
+  "https://app.0xapogee.com/api/v1/scans" \
   -H "X-API-Key: bso_expired_key"
 # Expected: 401
 ```
@@ -448,12 +448,12 @@ curl -sk -o /dev/null -w "%{http_code}" \
 curl -sk -H "Origin: https://evil.com" \
   -H "Access-Control-Request-Method: GET" \
   -X OPTIONS \
-  "https://app.blocksecops.com/api/v1/health/live" \
+  "https://app.0xapogee.com/api/v1/health/live" \
   -D - 2>/dev/null | grep -i "access-control"
 # Expected: No Access-Control-Allow-Origin for evil.com
 
 # Test scope enforcement
-curl -sk -X DELETE "https://app.blocksecops.com/api/v1/scans/some-id" \
+curl -sk -X DELETE "https://app.0xapogee.com/api/v1/scans/some-id" \
   -H "X-API-Key: bso_readonly_key"
 # Expected: 403 Forbidden (key only has read scope)
 ```
@@ -559,7 +559,7 @@ grep -r "password\|secret\|api_key\|token" \
 
 # Check image registries
 kubectl get pods -A -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}' | \
-  sort -u | grep -v "gcr.io\|harbor.blocksecops\|registry.k8s.io"
+  sort -u | grep -v "gcr.io\|harbor.0xapogee\|registry.k8s.io"
 # Expected: No unexpected public registries
 ```
 
@@ -659,7 +659,7 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 
 ```bash
 # Test SQL injection on search endpoint
-curl -sk -X POST "https://app.blocksecops.com/api/v1/search" \
+curl -sk -X POST "https://app.0xapogee.com/api/v1/search" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"query":"test'\'' OR 1=1 --","limit":5}'
@@ -676,7 +676,7 @@ curl -sk -X POST "https://app.blocksecops.com/api/v1/search" \
 ```bash
 # Test oversized input
 python3 -c "import json; print(json.dumps({'query': 'A'*5000}))" | \
-  curl -sk -X POST "https://app.blocksecops.com/api/v1/search" \
+  curl -sk -X POST "https://app.0xapogee.com/api/v1/search" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d @-
@@ -684,7 +684,7 @@ python3 -c "import json; print(json.dumps({'query': 'A'*5000}))" | \
 
 # Test malicious file upload
 echo "malicious" > /tmp/test.exe
-curl -sk -X POST "https://app.blocksecops.com/api/v1/upload" \
+curl -sk -X POST "https://app.0xapogee.com/api/v1/upload" \
   -H "Authorization: Bearer $TOKEN" \
   -F "file=@/tmp/test.exe"
 # Expected: 422 or 400 (invalid file type)
@@ -700,7 +700,7 @@ rm /tmp/test.exe
 
 ```bash
 # Test error response doesn't leak internals
-curl -sk "https://app.blocksecops.com/api/v1/scans/nonexistent-id" \
+curl -sk "https://app.0xapogee.com/api/v1/scans/nonexistent-id" \
   -H "Authorization: Bearer $TOKEN" | jq '.detail'
 # Expected: Generic "Not found" message, no stack trace or internal paths
 ```
@@ -716,7 +716,7 @@ curl -sk "https://app.blocksecops.com/api/v1/scans/nonexistent-id" \
 
 ```bash
 # Check security headers
-curl -sk -D - "https://app.blocksecops.com/" 2>/dev/null | \
+curl -sk -D - "https://app.0xapogee.com/" 2>/dev/null | \
   grep -iE "^(x-frame-options|content-security-policy|strict-transport-security|x-content-type-options):"
 # Expected: All 4 headers present
 
@@ -744,8 +744,8 @@ cd blocksecops-api-service && pip audit 2>/dev/null
 
 ```bash
 # Check all service health endpoints (see smoke-test.md for full script)
-curl -sk "https://app.blocksecops.com/api/v1/health/live" | jq '.status'
-curl -sk "https://app.blocksecops.com/api/v1/health/ready" | jq '.status'
+curl -sk "https://app.0xapogee.com/api/v1/health/live" | jq '.status'
+curl -sk "https://app.0xapogee.com/api/v1/health/ready" | jq '.status'
 # Expected: "healthy" / "ready"
 ```
 
@@ -780,7 +780,7 @@ curl -sk "https://app.blocksecops.com/api/v1/health/ready" | jq '.status'
 | # | Test | Expected Result | Status |
 |---|------|-----------------|--------|
 | 10.10 | Dependency monitor: external service health tracked | Degradation detected | [ ] |
-| 10.11 | Uptime checks: external HTTPS probes on `app.blocksecops.com` | Downtime detected within SLA | [ ] |
+| 10.11 | Uptime checks: external HTTPS probes on `app.0xapogee.com` | Downtime detected within SLA | [ ] |
 
 ---
 
@@ -799,7 +799,7 @@ curl -sk "https://app.blocksecops.com/api/v1/health/ready" | jq '.status'
 
 ```bash
 # Test risk scoring
-curl -sk "https://app.blocksecops.com/api/v1/statistics/risk" \
+curl -sk "https://app.0xapogee.com/api/v1/statistics/risk" \
   -H "Authorization: Bearer $TOKEN" | jq '.projects[0] | {risk_score, risk_level}'
 # Expected: risk_score (number), risk_level (CRITICAL/HIGH/MEDIUM/LOW)
 ```
@@ -822,13 +822,13 @@ curl -sk "https://app.blocksecops.com/api/v1/statistics/risk" \
 
 ```bash
 # Test prompt injection prevention
-curl -sk -X POST "https://app.blocksecops.com/api/v1/upload" \
+curl -sk -X POST "https://app.0xapogee.com/api/v1/upload" \
   -H "Authorization: Bearer $TOKEN" \
   -F "file=@test-contracts/prompt-injection.sol"
 # Verify no prompt injection in AI explanation output
 
 # Test GDPR consent
-curl -sk "https://app.blocksecops.com/api/v1/users/me/consent" \
+curl -sk "https://app.0xapogee.com/api/v1/users/me/consent" \
   -H "Authorization: Bearer $TOKEN" | jq '.ml_data_consent'
 ```
 
@@ -869,7 +869,7 @@ kubectl delete pod -n api-service-local -l app.kubernetes.io/name=api-service
 # Wait for replacement pod
 kubectl wait --for=condition=Ready pod -n api-service-local -l app.kubernetes.io/name=api-service --timeout=120s
 # Verify API is responsive
-curl -sk "https://app.blocksecops.com/api/v1/health/live" | jq '.status'
+curl -sk "https://app.0xapogee.com/api/v1/health/live" | jq '.status'
 # Expected: "healthy"
 ```
 
@@ -904,7 +904,7 @@ curl -sk "https://app.blocksecops.com/api/v1/health/live" | jq '.status'
 # Quick response time check
 for endpoint in "health/live" "scans?limit=1" "contracts?limit=1" "vulnerabilities?limit=1"; do
   TIME=$(curl -sk -o /dev/null -w "%{time_total}" \
-    "https://app.blocksecops.com/api/v1/$endpoint" \
+    "https://app.0xapogee.com/api/v1/$endpoint" \
     -H "Authorization: Bearer $TOKEN")
   echo "$endpoint: ${TIME}s"
 done
@@ -939,7 +939,7 @@ kubectl get pods -A --no-headers | grep -v "Running\|Completed" | grep -v "kube-
 
 | # | Test | Expected Result | Status |
 |---|------|-----------------|--------|
-| 14.5 | Ingress: `app.blocksecops.com` resolves and loads dashboard | HTTPS, valid cert | [ ] |
+| 14.5 | Ingress: `app.0xapogee.com` resolves and loads dashboard | HTTPS, valid cert | [ ] |
 | 14.6 | Auth flow: login via Supabase, receive JWT | Authenticated session | [ ] |
 | 14.7 | Scan flow: upload + scan + results displayed | End-to-end works | [ ] |
 | 14.8 | Stripe: pricing page loads, checkout redirects | Payment flow accessible | [ ] |
@@ -948,12 +948,12 @@ kubectl get pods -A --no-headers | grep -v "Running\|Completed" | grep -v "kube-
 
 ```bash
 # Check HTTPS and certificate
-curl -sI "https://app.blocksecops.com" | head -5
+curl -sI "https://app.0xapogee.com" | head -5
 # Expected: HTTP/2 200, valid TLS
 
 # Check all health endpoints
 for svc in "api/v1/health/live" "api/v1/health/ready"; do
-  STATUS=$(curl -sk -o /dev/null -w "%{http_code}" "https://app.blocksecops.com/$svc")
+  STATUS=$(curl -sk -o /dev/null -w "%{http_code}" "https://app.0xapogee.com/$svc")
   echo "$svc: $STATUS"
 done
 # Expected: All 200

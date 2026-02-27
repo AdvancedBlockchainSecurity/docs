@@ -62,11 +62,11 @@ Store as a secure environment variable:
 
 | CI System | Variable Name | Method |
 |-----------|---------------|--------|
-| CircleCI | `BLOCKSECOPS_API_KEY` | Project Settings > Environment Variables |
-| Travis CI | `BLOCKSECOPS_API_KEY` | Settings > Environment Variables |
-| Azure DevOps | `BLOCKSECOPS_API_KEY` | Pipelines > Library > Variable Groups |
-| Bitbucket | `BLOCKSECOPS_API_KEY` | Repository Settings > Pipelines > Variables |
-| TeamCity | `env.BLOCKSECOPS_API_KEY` | Build Parameters |
+| CircleCI | `APOGEE_API_KEY` | Project Settings > Environment Variables |
+| Travis CI | `APOGEE_API_KEY` | Settings > Environment Variables |
+| Azure DevOps | `APOGEE_API_KEY` | Pipelines > Library > Variable Groups |
+| Bitbucket | `APOGEE_API_KEY` | Repository Settings > Pipelines > Variables |
+| TeamCity | `env.APOGEE_API_KEY` | Build Parameters |
 
 ### Step 3: Create Scan Script
 
@@ -77,15 +77,15 @@ Create a reusable script `scripts/security-scan.sh`:
 set -e
 
 # Configuration
-API_URL="${BLOCKSECOPS_API_URL:-https://app.blocksecops.com/api/v1}"
-API_KEY="${BLOCKSECOPS_API_KEY}"
+API_URL="${APOGEE_API_URL:-https://app.0xapogee.com/api/v1}"
+API_KEY="${APOGEE_API_KEY}"
 CONTRACT_PATH="${1:-contracts/}"
 PROJECT_NAME="${2:-$CI_PROJECT_NAME}"
 FAIL_ON="${3:-critical,high}"
 
 # Validate API key
 if [ -z "$API_KEY" ]; then
-  echo "Error: BLOCKSECOPS_API_KEY not set"
+  echo "Error: APOGEE_API_KEY not set"
   exit 1
 fi
 
@@ -198,7 +198,7 @@ echo "Medium:   $MEDIUM"
 echo "Low:      $LOW"
 echo "Total:    $TOTAL"
 echo ""
-echo "View report: https://app.blocksecops.com/scans/$SCAN_ID"
+echo "View report: https://app.0xapogee.com/scans/$SCAN_ID"
 echo ""
 
 # Step 8: Save results
@@ -329,7 +329,7 @@ stages:
               filePath: './scripts/security-scan.sh'
               arguments: 'contracts/'
             env:
-              BLOCKSECOPS_API_KEY: $(BLOCKSECOPS_API_KEY)
+              APOGEE_API_KEY: $(APOGEE_API_KEY)
 
           - task: PublishBuildArtifacts@1
             displayName: 'Publish Results'
@@ -386,7 +386,7 @@ object SecurityScan : BuildType({
     }
 
     params {
-        password("env.BLOCKSECOPS_API_KEY", "credentialsJSON:xxxxx")
+        password("env.APOGEE_API_KEY", "credentialsJSON:xxxxx")
     }
 
     artifactRules = "scan-results.json"
@@ -402,7 +402,7 @@ Receive scan completion notifications:
 ### Register Webhook
 
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/webhooks" \
+curl -X POST "https://app.0xapogee.com/api/v1/webhooks" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{

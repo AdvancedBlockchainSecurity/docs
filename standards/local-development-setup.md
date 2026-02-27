@@ -137,7 +137,7 @@ kubectl cluster-info
 kubectl get nodes -o wide
 
 # Verify Harbor registry is accessible
-curl -sk https://harbor.blocksecops.local/api/v2.0/health
+curl -sk https://harbor.0xapogee.local/api/v2.0/health
 ```
 
 ### Important Notes
@@ -233,7 +233,7 @@ For local development, images are built with Docker and pushed to Harbor registr
 
 ```bash
 # 1. Set registry variable
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 
 # 2. Build with versioned tag
 docker build -t ${REGISTRY}/blocksecops/<service>:<version> .
@@ -252,7 +252,7 @@ kubectl apply -k k8s/overlays/local/<service>/
 ### Example: Building API Service
 
 ```bash
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 cd /home/pwner/Git/blocksecops-api-service
 
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
@@ -329,7 +329,7 @@ kubectl exec -n redis-local deployment/redis-exporter -- curl -s localhost:9121/
 |---------|----------|-------|
 | Grafana | `http://127.0.0.1:3001` | Monitoring (disabled by default) |
 | Prometheus | `http://127.0.0.1:9090` | Metrics (disabled by default) |
-| Harbor | `https://harbor.blocksecops.local` | Container registry for image builds |
+| Harbor | `https://harbor.0xapogee.local` | Container registry for image builds |
 
 ## Port Forward Standards
 
@@ -368,7 +368,7 @@ echo "✅ Notification: http://127.0.0.1:8003"
 # kubectl port-forward -n monitoring svc/monitoring-grafana 3001:80 > /tmp/pf-grafana.log 2>&1 &
 # echo "✅ Grafana: http://127.0.0.1:3001"
 
-# Harbor Container Registry (accessed via https://harbor.blocksecops.local)
+# Harbor Container Registry (accessed via https://harbor.0xapogee.local)
 # Port-forward not needed - Harbor is accessed directly via Traefik ingress
 
 sleep 3
@@ -731,7 +731,7 @@ VITE_WALLETCONNECT_PROJECT_ID=your-project-id-here
 Build the dashboard with the project ID:
 
 ```bash
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 source blocksecops-dashboard/.env.local
 VERSION=$(grep '"version"' blocksecops-dashboard/package.json | head -1 | cut -d'"' -f4)
 
@@ -755,7 +755,7 @@ const API_PREFIX = '/api/v1';  // Relative URL - routed by Traefik
 **WebSocket configuration** (if needed):
 ```bash
 # For server/staging/production with TLS:
-VITE_WS_URL=wss://app.blocksecops.local/ws
+VITE_WS_URL=wss://app.0xapogee.local/ws
 
 # For pure local development (traffic stays on machine), ws://localhost is acceptable:
 # VITE_WS_URL=ws://127.0.0.1:8003/ws
@@ -780,9 +780,9 @@ def configure_cors(app):
 
     # Add environment-specific origins
     if settings.ENVIRONMENT == "staging":
-        origins.append("https://staging.blocksecops.com")
+        origins.append("https://staging.0xapogee.com")
     elif settings.ENVIRONMENT == "production":
-        origins.append("https://app.blocksecops.com")
+        origins.append("https://app.0xapogee.com")
 
     app.add_middleware(
         CORSMiddleware,

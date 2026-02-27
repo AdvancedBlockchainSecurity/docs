@@ -57,7 +57,7 @@ flowchart LR
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/users/me/notifications" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/users/me/notifications" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -85,7 +85,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/users/me/notifications" \
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/users/me/notifications" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/users/me/notifications" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -112,7 +112,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/users/me/notifications" \
 **API:**
 ```bash
 # Add secondary email
-curl -X POST "https://app.blocksecops.com/api/v1/users/me/emails" \
+curl -X POST "https://app.0xapogee.com/api/v1/users/me/emails" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -140,7 +140,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/users/me/emails" \
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/organizations/{org_id}/notifications" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/organizations/{org_id}/notifications" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -168,7 +168,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/organizations/{org_id}/notific
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/teams/{team_id}/notifications" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/teams/{team_id}/notifications" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -212,7 +212,7 @@ Top Findings:
 
 ---
 BlockSecOps - Smart Contract Security Platform
-Manage notifications: https://app.blocksecops.com/settings/notifications
+Manage notifications: https://app.0xapogee.com/settings/notifications
 ```
 
 ### Critical Vulnerability Alert
@@ -292,7 +292,7 @@ Confirm email notifications are working:
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/users/me/notifications/test" \
+curl -X POST "https://app.0xapogee.com/api/v1/users/me/notifications/test" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -302,7 +302,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/users/me/notifications/test" \
 
 **Check Notification History:**
 ```bash
-curl -X GET "https://app.blocksecops.com/api/v1/users/me/notifications/history" \
+curl -X GET "https://app.0xapogee.com/api/v1/users/me/notifications/history" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -312,7 +312,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/users/me/notifications/history" 
 
 | Issue | Cause | Solution |
 |-------|-------|----------|
-| Not receiving emails | Email in spam folder | Add no-reply@blocksecops.com to contacts |
+| Not receiving emails | Email in spam folder | Add no-reply@0xapogee.com to contacts |
 | "Email not verified" | Secondary email not confirmed | Check inbox for verification email |
 | Too many emails | Frequency set to immediate | Change to digest mode |
 | Missing critical alerts | Notifications disabled | Re-enable in settings |
@@ -326,8 +326,8 @@ If emails are not arriving:
 
 1. **Check spam/junk folder**
 2. **Add to safe senders:**
-   - `no-reply@blocksecops.com`
-   - `alerts@blocksecops.com`
+   - `no-reply@0xapogee.com`
+   - `alerts@0xapogee.com`
 3. **Check corporate email filters**
 4. **Verify email address is correct**
 5. **Check notification history** for delivery status

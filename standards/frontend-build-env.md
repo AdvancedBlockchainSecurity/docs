@@ -40,7 +40,7 @@ These values are intentionally public and designed to be visible in browser code
 |----------|---------|---------------|
 | `VITE_SUPABASE_URL` | `https://xxx.supabase.co` | Public endpoint, protected by RLS |
 | `VITE_SUPABASE_ANON_KEY` | `eyJhbGci...` | Anonymous key, RLS enforces access |
-| `VITE_WS_URL` | `wss://app.blocksecops.local/ws` | WebSocket endpoint, auth required (use wss:// for server/staging/production) |
+| `VITE_WS_URL` | `wss://app.0xapogee.local/ws` | WebSocket endpoint, auth required (use wss:// for server/staging/production) |
 | `VITE_WALLETCONNECT_PROJECT_ID` | `abc123...` | Public project identifier |
 | `VITE_USE_TESTNET` | `true` | Feature flag, no security impact |
 | `VITE_API_URL` | `https://api.example.com` | Public API endpoint |
@@ -69,7 +69,7 @@ These values must **NEVER** be in frontend code:
 # Dockerfile
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
-ARG VITE_WS_URL=wss://app.blocksecops.local/ws
+ARG VITE_WS_URL=wss://app.0xapogee.local/ws
 
 ENV VITE_SUPABASE_URL=${VITE_SUPABASE_URL} \
     VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY} \
@@ -113,7 +113,7 @@ Store local development values in `.env.local`. This file is gitignored and cont
 VITE_SUPABASE_URL=https://huzjlpypdlelqnbjvxad.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 VITE_WS_ENABLED=true
-VITE_WS_URL=wss://app.blocksecops.local/ws
+VITE_WS_URL=wss://app.0xapogee.local/ws
 VITE_WALLETCONNECT_PROJECT_ID=your_project_id
 VITE_USE_TESTNET=true
 ```
@@ -127,7 +127,7 @@ Document required variables in `.env.example`. This file IS committed to Git.
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
 VITE_WS_ENABLED=true
-VITE_WS_URL=wss://app.blocksecops.local/ws
+VITE_WS_URL=wss://app.0xapogee.local/ws
 VITE_WALLETCONNECT_PROJECT_ID=
 VITE_USE_TESTNET=true
 ```
@@ -143,7 +143,7 @@ VITE_USE_TESTNET=true
 cat .env.local
 
 # 2. Set Harbor registry
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
 
 # 3. Source environment variables and build
 cd /Users/pwner/Git/ABS
@@ -193,7 +193,7 @@ ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
 # Non-sensitive defaults are OK
 ARG VITE_WS_ENABLED=true
-ARG VITE_WS_URL=wss://app.blocksecops.local/ws
+ARG VITE_WS_URL=wss://app.0xapogee.local/ws
 
 # Validate required build args
 RUN if [ -z "$VITE_SUPABASE_URL" ]; then echo "VITE_SUPABASE_URL is required" && exit 1; fi

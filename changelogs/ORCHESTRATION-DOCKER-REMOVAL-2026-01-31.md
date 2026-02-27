@@ -67,4 +67,4 @@ kubectl logs -n orchestration-local deployment/orchestration -c orchestration-ap
 ## Related
 
 - Version: 0.9.3
-- Image: `harbor.blocksecops.local/blocksecops/orchestration:0.9.3`
+- Image: `harbor.0xapogee.local/blocksecops/orchestration:0.9.3`

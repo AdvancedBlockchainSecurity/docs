@@ -359,7 +359,7 @@ kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity
 # ─── Step 10: Trigger Deduplication Maintenance ───────────────────────
 # The CronJob may fail if api-service-secrets is not available.
 # Use the API endpoint instead:
-curl -sk -X POST "https://app.blocksecops.local/api/v1/deduplication/maintenance/run-full-backfill" \
+curl -sk -X POST "https://app.0xapogee.local/api/v1/deduplication/maintenance/run-full-backfill" \
   -H "Authorization: Bearer <TOKEN>"
 
 # ─── Step 11: Verify Clean Slate ─────────────────────────────────────
@@ -395,7 +395,7 @@ DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/solidity_sec
 # ─── Step 15: Retrain ML Model ───────────────────────────────────────
 # Admin Portal → ML Models → Force Retrain
 # Or via API:
-# curl -sk -X POST https://app.blocksecops.local/api/v1/admin/system/ml/retrain \
+# curl -sk -X POST https://app.0xapogee.local/api/v1/admin/system/ml/retrain \
 #   -H "Authorization: Bearer <TOKEN>" \
 #   -H "Content-Type: application/json" \
 #   -d '{"force": true, "min_samples": 50}'

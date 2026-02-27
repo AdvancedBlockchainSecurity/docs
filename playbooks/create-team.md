@@ -53,7 +53,7 @@ flowchart LR
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/teams" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/teams" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -90,7 +90,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/teams" \
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/teams/{team_id}/members" \
+curl -X POST "https://app.0xapogee.com/api/v1/teams/{team_id}/members" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -102,14 +102,14 @@ curl -X POST "https://app.blocksecops.com/api/v1/teams/{team_id}/members" \
 **Add Multiple Members:**
 ```bash
 # Add team lead
-curl -X POST "https://app.blocksecops.com/api/v1/teams/{team_id}/members" \
+curl -X POST "https://app.0xapogee.com/api/v1/teams/{team_id}/members" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"user_id": "user_lead123", "role": "lead"}'
 
 # Add team members
 for USER_ID in user_001 user_002 user_003; do
-  curl -X POST "https://app.blocksecops.com/api/v1/teams/{team_id}/members" \
+  curl -X POST "https://app.0xapogee.com/api/v1/teams/{team_id}/members" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -H "Content-Type: application/json" \
     -d "{\"user_id\": \"$USER_ID\", \"role\": \"member\"}"
@@ -132,7 +132,7 @@ done
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/teams/{team_id}/settings" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/teams/{team_id}/settings" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -158,7 +158,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/teams/{team_id}/settings" \
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/projects/{project_id}/teams" \
+curl -X POST "https://app.0xapogee.com/api/v1/projects/{project_id}/teams" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -182,7 +182,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/projects/{project_id}/teams" \
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/teams/{team_id}/members/{user_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/teams/{team_id}/members/{user_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -200,7 +200,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/teams/{team_id}/members/{user_
 
 **API:**
 ```bash
-curl -X DELETE "https://app.blocksecops.com/api/v1/teams/{team_id}/members/{user_id}" \
+curl -X DELETE "https://app.0xapogee.com/api/v1/teams/{team_id}/members/{user_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -230,7 +230,7 @@ curl -X DELETE "https://app.blocksecops.com/api/v1/teams/{team_id}/members/{user
 ### Security Audit Team
 
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/teams" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/teams" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -243,7 +243,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/teams" \
 ### Development Security Team
 
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/teams" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/teams" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -256,7 +256,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/teams" \
 ### External Auditors Team
 
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/teams" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/teams" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -281,15 +281,15 @@ Confirm team setup is complete:
 **API:**
 ```bash
 # List all teams
-curl -X GET "https://app.blocksecops.com/api/v1/organizations/{org_id}/teams" \
+curl -X GET "https://app.0xapogee.com/api/v1/organizations/{org_id}/teams" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # Get team members
-curl -X GET "https://app.blocksecops.com/api/v1/teams/{team_id}/members" \
+curl -X GET "https://app.0xapogee.com/api/v1/teams/{team_id}/members" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # Get team project access
-curl -X GET "https://app.blocksecops.com/api/v1/teams/{team_id}/projects" \
+curl -X GET "https://app.0xapogee.com/api/v1/teams/{team_id}/projects" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 

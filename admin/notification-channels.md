@@ -62,7 +62,7 @@ Notifications use Slack Block Kit for rich formatting:
         {
           "type": "button",
           "text": {"type": "plain_text", "text": "View Details"},
-          "url": "https://app.blocksecops.com/scans/..."
+          "url": "https://app.0xapogee.com/scans/..."
         }
       ]
     }
@@ -117,7 +117,7 @@ Notifications use Adaptive Cards:
   "potentialAction": [{
     "@type": "OpenUri",
     "name": "View Details",
-    "targets": [{"os": "default", "uri": "https://app.blocksecops.com/..."}]
+    "targets": [{"os": "default", "uri": "https://app.0xapogee.com/..."}]
   }]
 }
 ```
@@ -181,7 +181,7 @@ Notifications use rich embeds:
 ### Creating a Notification Channel
 
 ```bash
-curl -X POST https://api.blocksecops.com/api/v1/notification-channels \
+curl -X POST https://api.0xapogee.com/api/v1/notification-channels \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -215,21 +215,21 @@ curl -X POST https://api.blocksecops.com/api/v1/notification-channels \
 ### Listing Channels
 
 ```bash
-curl -X GET https://api.blocksecops.com/api/v1/notification-channels \
+curl -X GET https://api.0xapogee.com/api/v1/notification-channels \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 ### Testing a Channel
 
 ```bash
-curl -X POST https://api.blocksecops.com/api/v1/notification-channels/{id}/test \
+curl -X POST https://api.0xapogee.com/api/v1/notification-channels/{id}/test \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 ### Updating a Channel
 
 ```bash
-curl -X PUT https://api.blocksecops.com/api/v1/notification-channels/{id} \
+curl -X PUT https://api.0xapogee.com/api/v1/notification-channels/{id} \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -242,7 +242,7 @@ curl -X PUT https://api.blocksecops.com/api/v1/notification-channels/{id} \
 ### Deleting a Channel
 
 ```bash
-curl -X DELETE https://api.blocksecops.com/api/v1/notification-channels/{id} \
+curl -X DELETE https://api.0xapogee.com/api/v1/notification-channels/{id} \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -253,7 +253,7 @@ curl -X DELETE https://api.blocksecops.com/api/v1/notification-channels/{id} \
 ### Viewing Delivery History
 
 ```bash
-curl -X GET "https://api.blocksecops.com/api/v1/notification-channels/{id}/deliveries?limit=20" \
+curl -X GET "https://api.0xapogee.com/api/v1/notification-channels/{id}/deliveries?limit=20" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -362,7 +362,7 @@ The system validates webhook URLs on creation:
 Use the test endpoint to verify webhook connectivity:
 
 ```bash
-curl -X POST https://api.blocksecops.com/api/v1/notification-channels/{id}/test \
+curl -X POST https://api.0xapogee.com/api/v1/notification-channels/{id}/test \
   -H "Authorization: Bearer $TOKEN"
 ```
 

@@ -16,7 +16,7 @@ This playbook covers monitoring and recovering stale scans — scans stuck in `q
 ## Prerequisites
 
 - Admin portal access (`platform_admin` role or higher)
-- Access to `admin.blocksecops.local` or `admin.blocksecops.com`
+- Access to `admin.0xapogee.local` or `admin.0xapogee.com`
 
 ## How Auto-Recovery Works
 
@@ -79,7 +79,7 @@ If the stale scan count is elevated:
 ```bash
 curl -s -H "Authorization: Bearer $JWT" \
   -H "X-Admin-Session: $SESSION" \
-  "https://admin.blocksecops.com/api/v1/admin/scan-monitoring/stale"
+  "https://admin.0xapogee.com/api/v1/admin/scan-monitoring/stale"
 ```
 
 ## Step 3: Manual Recovery
@@ -97,7 +97,7 @@ curl -X POST -H "Authorization: Bearer $JWT" \
   -H "X-Admin-Session: $SESSION" \
   -H "Content-Type: application/json" \
   -d '{"reason": "Worker node recovered, retrying scan"}' \
-  "https://admin.blocksecops.com/api/v1/admin/scan-monitoring/scans/{scan_id}/retry"
+  "https://admin.0xapogee.com/api/v1/admin/scan-monitoring/scans/{scan_id}/retry"
 ```
 
 ### Force Fail a Scan
@@ -113,7 +113,7 @@ curl -X POST -H "Authorization: Bearer $JWT" \
   -H "X-Admin-Session: $SESSION" \
   -H "Content-Type: application/json" \
   -d '{"reason": "Contract source corrupted, scan cannot complete"}' \
-  "https://admin.blocksecops.com/api/v1/admin/scan-monitoring/scans/{scan_id}/fail"
+  "https://admin.0xapogee.com/api/v1/admin/scan-monitoring/scans/{scan_id}/fail"
 ```
 
 ## Step 4: Verify Recovery
@@ -163,7 +163,7 @@ HTTP endpoint for recovery of scans that the orchestration beat may miss (e.g., 
 ```bash
 # Recover scans stuck in queued/running for >1 hour
 # Records error_message with recovery context and original status
-curl -sk -X POST https://app.blocksecops.local/api/v1/scans/maintenance/recover-stale-scans \
+curl -sk -X POST https://app.0xapogee.local/api/v1/scans/maintenance/recover-stale-scans \
   -H "X-Internal-Service: true"
 ```
 

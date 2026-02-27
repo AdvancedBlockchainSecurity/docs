@@ -98,22 +98,22 @@ Comprehensive security audit fix addressing CORS header duplication, missing rat
 
 1. **CORS verification:**
    ```bash
-   curl -v -X OPTIONS https://app.blocksecops.local/api/v1/health/live \
-     -H "Origin: https://app.blocksecops.local"
+   curl -v -X OPTIONS https://app.0xapogee.local/api/v1/health/live \
+     -H "Origin: https://app.0xapogee.local"
    # Verify single set of CORS headers, max-age=3600
    ```
 
 2. **Rate limiting verification:**
    ```bash
    # Check X-RateLimit-* headers on previously unprotected endpoint
-   curl -v https://app.blocksecops.local/api/v1/payments/...
+   curl -v https://app.0xapogee.local/api/v1/payments/...
    ```
 
 3. **JWKS cache:** Service starts and authenticates correctly with TTL cache
 
 4. **Health check:**
    ```bash
-   curl https://app.blocksecops.local/api/v1/health/ready
+   curl https://app.0xapogee.local/api/v1/health/ready
    ```
 
 ### Impact

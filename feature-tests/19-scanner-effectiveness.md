@@ -103,7 +103,7 @@ curl "http://localhost:3000/api/v1/analytics/scanner-effectiveness" \
 ```bash
 # Should return 200 (with valid auth)
 curl -s -o /dev/null -w "%{http_code}" \
-  -H "Host: app.blocksecops.local" \
+  -H "Host: app.0xapogee.local" \
   -H "Authorization: Bearer $TOKEN" \
   "http://127.0.0.1/api/v1/analytics/scanner-effectiveness?time_range=all_time"
 

@@ -607,7 +607,7 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 ### Related Documentation
 - Migration File: `blocksecops-api-service/alembic/versions/20260120_0100-034_add_scan_source.py`
 - IDE Integration Plan: `docs/features/IDE-INTEGRATION.md`
-- CLI Changes: `blocksecops-cli/src/blocksecops_cli/commands/scan.py` (--local, --scan-source flags)
+- CLI Changes: `0xapogee-cli/src/apogee_cli/commands/scan.py` (--local, --scan-source flags)
 - API Changes: `blocksecops-api-service/src/presentation/api/v1/endpoints/scans.py` (scan_source filter)
 - Dashboard Changes: `blocksecops-dashboard/src/components/common/ScanSourceBadge.tsx`
 

@@ -59,7 +59,7 @@ flowchart LR
 7. Click **Restart IDE** when prompted
 
 **Alternative: Install from Disk**
-1. Download plugin from [BlockSecOps Downloads](https://app.blocksecops.com/downloads/jetbrains)
+1. Download plugin from [BlockSecOps Downloads](https://app.0xapogee.com/downloads/jetbrains)
 2. Go to **Settings > Plugins**
 3. Click gear icon > **Install Plugin from Disk...**
 4. Select downloaded `.zip` file
@@ -81,7 +81,7 @@ flowchart LR
 2. Navigate to **Tools > BlockSecOps**
 3. Enter your API key
 4. Configure options:
-   - **API URL:** `https://app.blocksecops.com/api/v1` (default)
+   - **API URL:** `https://app.0xapogee.com/api/v1` (default)
    - **Enable Auto-Scan:** Toggle on for real-time scanning
    - **Scan on Save:** Trigger scan when file saved
    - **Severity Filter:** Select severities to display
@@ -94,7 +94,7 @@ Edit `~/.config/JetBrains/<IDE>/options/blocksecops.xml`:
 <application>
   <component name="BlockSecOpsSettings">
     <option name="apiKey" value="bso_live_xxxxxxxxxxxx" />
-    <option name="apiUrl" value="https://app.blocksecops.com/api/v1" />
+    <option name="apiUrl" value="https://app.0xapogee.com/api/v1" />
     <option name="autoScan" value="true" />
     <option name="scanOnSave" value="true" />
     <option name="severityFilter" value="critical,high,medium" />
@@ -171,7 +171,7 @@ For supported vulnerability types:
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `apiKey` | - | Your BlockSecOps API key |
-| `apiUrl` | `https://app.blocksecops.com/api/v1` | API endpoint |
+| `apiUrl` | `https://app.0xapogee.com/api/v1` | API endpoint |
 | `autoScan` | `true` | Enable real-time scanning |
 | `scanOnSave` | `true` | Scan when file saved |
 | `scanDelay` | `1500` | Delay (ms) before auto-scan |
@@ -190,7 +190,7 @@ For supported vulnerability types:
 
 ## Project-Level Configuration
 
-Create `.blocksecops.xml` in project root:
+Create `.0xapogee.xml` in project root:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>

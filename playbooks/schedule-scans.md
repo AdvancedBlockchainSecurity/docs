@@ -54,7 +54,7 @@ flowchart LR
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/schedules" \
+curl -X POST "https://app.0xapogee.com/api/v1/schedules" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -88,7 +88,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/schedules" \
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/schedules/{schedule_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/schedules/{schedule_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -116,7 +116,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/schedules/{schedule_id}" \
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/schedules/{schedule_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/schedules/{schedule_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -150,7 +150,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/schedules/{schedule_id}" \
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/schedules/{schedule_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/schedules/{schedule_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -173,7 +173,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/schedules/{schedule_id}" \
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/schedules/{schedule_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/schedules/{schedule_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -197,7 +197,7 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/schedules/{schedule_id}" \
 
 **API:**
 ```bash
-curl -X GET "https://app.blocksecops.com/api/v1/schedules" \
+curl -X GET "https://app.0xapogee.com/api/v1/schedules" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -209,7 +209,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/schedules" \
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/schedules/{schedule_id}" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/schedules/{schedule_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -227,7 +227,7 @@ Trigger a scheduled scan immediately:
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/schedules/{schedule_id}/run" \
+curl -X POST "https://app.0xapogee.com/api/v1/schedules/{schedule_id}/run" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -239,7 +239,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/schedules/{schedule_id}/run" \
 
 **API:**
 ```bash
-curl -X GET "https://app.blocksecops.com/api/v1/schedules/{schedule_id}/history" \
+curl -X GET "https://app.0xapogee.com/api/v1/schedules/{schedule_id}/history" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -252,7 +252,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/schedules/{schedule_id}/history"
 
 **API:**
 ```bash
-curl -X DELETE "https://app.blocksecops.com/api/v1/schedules/{schedule_id}" \
+curl -X DELETE "https://app.0xapogee.com/api/v1/schedules/{schedule_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -263,7 +263,7 @@ curl -X DELETE "https://app.blocksecops.com/api/v1/schedules/{schedule_id}" \
 ### Daily Development Check
 
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/schedules" \
+curl -X POST "https://app.0xapogee.com/api/v1/schedules" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -284,7 +284,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/schedules" \
 ### Weekly Comprehensive Audit
 
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/schedules" \
+curl -X POST "https://app.0xapogee.com/api/v1/schedules" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -305,7 +305,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/schedules" \
 ### Pre-Deployment Check
 
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/schedules" \
+curl -X POST "https://app.0xapogee.com/api/v1/schedules" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -342,11 +342,11 @@ Confirm schedule is working:
 **API:**
 ```bash
 # Check schedule status
-curl -X GET "https://app.blocksecops.com/api/v1/schedules/{schedule_id}" \
+curl -X GET "https://app.0xapogee.com/api/v1/schedules/{schedule_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN" | jq '.enabled, .next_run'
 
 # Check recent history
-curl -X GET "https://app.blocksecops.com/api/v1/schedules/{schedule_id}/history?limit=5" \
+curl -X GET "https://app.0xapogee.com/api/v1/schedules/{schedule_id}/history?limit=5" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -368,7 +368,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/schedules/{schedule_id}/history?
 
 **API:**
 ```bash
-curl -X GET "https://app.blocksecops.com/api/v1/schedules/{schedule_id}/logs" \
+curl -X GET "https://app.0xapogee.com/api/v1/schedules/{schedule_id}/logs" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 

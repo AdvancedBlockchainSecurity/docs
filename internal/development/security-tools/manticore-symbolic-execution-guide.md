@@ -1159,20 +1159,20 @@ Path constraints: 1847 conditions
 
 ### BlockSecOps Support
 
-- **Email**: support@blocksecops.com
+- **Email**: support@0xapogee.com
 - **Discord**: https://discord.gg/blocksecops
-- **Documentation**: https://docs.blocksecops.com
+- **Documentation**: https://docs.0xapogee.com
 
 ### Reporting Bugs
 
 - **Manticore Issues**: https://github.com/trailofbits/manticore/issues
-- **Platform Issues**: support@blocksecops.com
+- **Platform Issues**: support@0xapogee.com
 
 ### Feature Requests
 
 Have ideas for improving Manticore integration? Contact us:
-- **Email**: features@blocksecops.com
-- **Feedback Form**: https://blocksecops.com/feedback
+- **Email**: features@0xapogee.com
+- **Feedback Form**: https://0xapogee.com/feedback
 
 ---
 

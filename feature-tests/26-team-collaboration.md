@@ -548,7 +548,7 @@ curl -s -H "Authorization: Bearer ${TOKEN}" \
 ```bash
 TOKEN="your-auth-token"
 curl -s -H "Authorization: Bearer ${TOKEN}" \
-  "http://app.blocksecops.local/api/v1/roles" | jq '.'
+  "http://app.0xapogee.local/api/v1/roles" | jq '.'
 ```
 
 **Expected Response**:
@@ -576,7 +576,7 @@ curl -s -H "Authorization: Bearer ${TOKEN}" \
 ```bash
 TOKEN="your-auth-token"
 curl -s -H "Authorization: Bearer ${TOKEN}" \
-  "http://app.blocksecops.local/api/v1/organizations/current/users" | jq '.'
+  "http://app.0xapogee.local/api/v1/organizations/current/users" | jq '.'
 ```
 
 **Expected Response**:

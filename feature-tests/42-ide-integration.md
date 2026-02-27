@@ -19,8 +19,8 @@
 
 ## Prerequisites
 
-- [ ] blocksecops-cli installed: `pip install blocksecops-cli`
-- [ ] API key configured: `blocksecops auth login`
+- [ ] 0xapogee-cli installed: `pip install 0xapogee-cli`
+- [ ] API key configured: `0xapogee auth login`
 - [ ] SolidityDefend available (auto-downloads on first use)
 - [ ] Test Solidity files available
 
@@ -31,13 +31,13 @@
 ### TC-42-001: Local Scan with SolidityDefend
 
 **Steps**:
-1. Run `blocksecops scan run test.sol --local`
+1. Run `0xapogee scan run test.sol --local`
 2. Verify SolidityDefend downloads if not present
 3. Verify scan completes and results display
 4. Verify scan appears in dashboard
 
 **Expected**:
-- SolidityDefend binary at `~/.blocksecops/bin/soliditydefend`
+- SolidityDefend binary at `~/.0xapogee/bin/soliditydefend`
 - Scan results in JSON format
 - Scan visible in dashboard with source badge
 
@@ -46,7 +46,7 @@
 ### TC-42-002: Scan Source Parameter
 
 **Steps**:
-1. Run `blocksecops scan run test.sol --local --scan-source vscode`
+1. Run `0xapogee scan run test.sol --local --scan-source vscode`
 2. Check scan in dashboard
 3. Verify source badge shows "VS Code"
 
@@ -59,7 +59,7 @@
 ### TC-42-003: SolidityDefend Auto-Update
 
 **Steps**:
-1. Delete `~/.blocksecops/bin/.version`
+1. Delete `~/.0xapogee/bin/.version`
 2. Run local scan
 3. Verify latest version downloaded
 
@@ -247,7 +247,7 @@
 **Steps**:
 ```lua
 require('blocksecops').setup({
-  api_key = os.getenv('BLOCKSECOPS_API_KEY'),
+  api_key = os.getenv('APOGEE_API_KEY'),
   scan_on_save = true,
 })
 ```

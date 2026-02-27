@@ -13,7 +13,7 @@ This playbook covers deploying a new Docker image to the local Kubernetes cluste
 
 - [ ] Docker running locally
 - [ ] kubectl configured for local cluster
-- [ ] Harbor registry accessible at `harbor.blocksecops.local`
+- [ ] Harbor registry accessible at `harbor.0xapogee.local`
 - [ ] Service source code checked out
 
 ---
@@ -113,17 +113,17 @@ docker build \
   --build-arg SERVICE_VERSION=$VERSION \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
-  -t harbor.blocksecops.local/blocksecops/orchestration:$VERSION .
+  -t harbor.0xapogee.local/blocksecops/orchestration:$VERSION .
 ```
 
 **Note:** Base images are stored in Harbor (use versioned tags, not `latest` — Harbor enforces immutable tags):
-- `harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353`
-- `harbor.blocksecops.local/blocksecops/blocksecops-intelligence-base-cpu:1.0.0-5ede3c61`
+- `harbor.0xapogee.local/blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353`
+- `harbor.0xapogee.local/blocksecops/blocksecops-intelligence-base-cpu:1.0.0-5ede3c61`
 
 To rebuild base images (only needed for dependency changes):
 ```bash
 ./docker/build-base-image.sh
-docker push harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353
+docker push harbor.0xapogee.local/blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353
 ```
 
 ### API Service (Python)
@@ -139,7 +139,7 @@ docker build \
   --build-arg SERVICE_VERSION=$VERSION \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
-  -t harbor.blocksecops.local/blocksecops/api-service:$VERSION .
+  -t harbor.0xapogee.local/blocksecops/api-service:$VERSION .
 ```
 
 ### Dashboard (Node.js/TypeScript)
@@ -164,7 +164,7 @@ docker build \
   --build-arg SERVICE_VERSION=$VERSION \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(cd blocksecops-dashboard && git rev-parse --short HEAD) \
-  -t harbor.blocksecops.local/blocksecops/dashboard:$VERSION .
+  -t harbor.0xapogee.local/blocksecops/dashboard:$VERSION .
 ```
 
 ### Build Tips
@@ -179,17 +179,17 @@ docker build \
 
 ```bash
 # Push API service
-docker push harbor.blocksecops.local/blocksecops/api-service:$VERSION
+docker push harbor.0xapogee.local/blocksecops/api-service:$VERSION
 
 # Push Dashboard
-docker push harbor.blocksecops.local/blocksecops/dashboard:$VERSION
+docker push harbor.0xapogee.local/blocksecops/dashboard:$VERSION
 ```
 
 ### Verify Push
 
 ```bash
 # List images in Harbor
-curl -s https://harbor.blocksecops.local/api/v2.0/projects/blocksecops/repositories \
+curl -s https://harbor.0xapogee.local/api/v2.0/projects/blocksecops/repositories \
   --insecure | jq '.[].name'
 ```
 
@@ -206,7 +206,7 @@ File: `k8s/overlays/local/api-service/kustomization.yaml`
 ```yaml
 images:
   - name: blocksecops-api-service
-    newName: harbor.blocksecops.local/blocksecops/api-service
+    newName: harbor.0xapogee.local/blocksecops/api-service
     newTag: "0.11.4"  # Update this
 ```
 
@@ -217,7 +217,7 @@ File: `k8s/overlays/local/kustomization.yaml`
 ```yaml
 images:
   - name: blocksecops-dashboard
-    newName: harbor.blocksecops.local/blocksecops/dashboard
+    newName: harbor.0xapogee.local/blocksecops/dashboard
     newTag: "0.30.13"  # Update this
 ```
 
@@ -286,10 +286,10 @@ kubectl get cronjob -n api-service-local -o custom-columns='NAME:.metadata.name,
 
 ```bash
 # API Service health
-curl -s https://app.blocksecops.local/api/v1/health/ready --insecure
+curl -s https://app.0xapogee.local/api/v1/health/ready --insecure
 
 # Dashboard (check title in response)
-curl -s https://app.blocksecops.local/ --insecure | grep -o '<title>.*</title>'
+curl -s https://app.0xapogee.local/ --insecure | grep -o '<title>.*</title>'
 ```
 
 ---
@@ -329,7 +329,7 @@ kubectl rollout undo deployment/api-service -n api-service-local --to-revision=N
 kubectl describe pod -n api-service-local -l app.kubernetes.io/name=api-service
 
 # Verify image exists in Harbor
-docker pull harbor.blocksecops.local/blocksecops/api-service:$VERSION
+docker pull harbor.0xapogee.local/blocksecops/api-service:$VERSION
 ```
 
 ### Pod CrashLoopBackOff

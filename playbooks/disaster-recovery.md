@@ -79,7 +79,7 @@ kubectl scale deployment/api-service -n api-service-local --replicas=1
 kubectl rollout status deployment/api-service -n api-service-local
 
 # 5. Verify
-curl -sk https://app.blocksecops.local/api/v1/health/ready
+curl -sk https://app.0xapogee.local/api/v1/health/ready
 ```
 
 ### Without Backup (Full Rebuild)
@@ -188,8 +188,8 @@ for svc in api-service data-service intelligence-engine notification \
   orchestration tool-integration contract-parser dashboard admin-portal; do
   cd ~/Git/blocksecops-${svc}
   VERSION=$(grep -E '^version|"version"' pyproject.toml package.json 2>/dev/null | head -1 | grep -oP '[\d.]+')
-  docker build -t harbor.blocksecops.local/blocksecops/${svc}:${VERSION} .
-  docker push harbor.blocksecops.local/blocksecops/${svc}:${VERSION}
+  docker build -t harbor.0xapogee.local/blocksecops/${svc}:${VERSION} .
+  docker push harbor.0xapogee.local/blocksecops/${svc}:${VERSION}
   kubectl apply -k k8s/overlays/local/${svc}/ 2>/dev/null || \
     kubectl apply -k k8s/overlays/local/ 2>/dev/null
 done
@@ -198,7 +198,7 @@ done
 # See Scenario 1 above
 
 # 8. Verify
-curl -sk https://app.blocksecops.local/api/v1/health/ready
+curl -sk https://app.0xapogee.local/api/v1/health/ready
 ```
 
 ---

@@ -440,10 +440,10 @@ A: Make sure you're viewing a contract in the correct language. Scanners are fil
 
 ### Support Resources
 
-- **Documentation**: [docs.blocksecops.com](https://docs.blocksecops.com)
+- **Documentation**: [docs.0xapogee.com](https://docs.0xapogee.com)
 - **GitHub Issues**: [github.com/blocksecops/platform/issues](https://github.com/blocksecops/platform/issues)
 - **Community Discord**: [discord.gg/blocksecops](https://discord.gg/blocksecops)
-- **Email Support**: support@blocksecops.com
+- **Email Support**: support@0xapogee.com
 
 ### Related Guides
 

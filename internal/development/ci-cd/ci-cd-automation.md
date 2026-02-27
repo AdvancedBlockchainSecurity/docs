@@ -534,8 +534,8 @@ jobs:
 
       - name: Run smoke tests
         run: |
-          curl -f https://staging-api.blocksecops.com/health
-          curl -f https://staging-data.blocksecops.com/health
+          curl -f https://staging-api.0xapogee.com/health
+          curl -f https://staging-data.0xapogee.com/health
 
       - name: Notify deployment
         uses: 8398a7/action-slack@v3
@@ -896,7 +896,7 @@ jobs:
     if: needs.validate.outputs.is_prerelease == 'false'
     environment:
       name: production
-      url: https://api.blocksecops.com
+      url: https://api.0xapogee.com
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

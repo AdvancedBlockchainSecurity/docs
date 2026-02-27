@@ -37,7 +37,7 @@ flowchart LR
 **Dashboard:**
 1. Log in to BlockSecOps
 2. Click **Projects** in the left sidebar
-3. Or navigate to `https://app.blocksecops.com/projects`
+3. Or navigate to `https://app.0xapogee.com/projects`
 
 ### Step 2: Create New Project
 
@@ -52,7 +52,7 @@ flowchart LR
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/projects" \
+curl -X POST "https://app.0xapogee.com/api/v1/projects" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -91,7 +91,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/projects" \
 
 **API:**
 ```bash
-curl -X PATCH "https://app.blocksecops.com/api/v1/projects/{project_id}/settings" \
+curl -X PATCH "https://app.0xapogee.com/api/v1/projects/{project_id}/settings" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -118,14 +118,14 @@ curl -X PATCH "https://app.blocksecops.com/api/v1/projects/{project_id}/settings
 **API:**
 ```bash
 # File upload
-curl -X POST "https://app.blocksecops.com/api/v1/contracts" \
+curl -X POST "https://app.0xapogee.com/api/v1/contracts" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: multipart/form-data" \
   -F "project_id=proj_abc123" \
   -F "file=@contracts/Token.sol"
 
 # Source code upload
-curl -X POST "https://app.blocksecops.com/api/v1/contracts" \
+curl -X POST "https://app.0xapogee.com/api/v1/contracts" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -149,7 +149,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/contracts" \
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/projects/{project_id}/github" \
+curl -X POST "https://app.0xapogee.com/api/v1/projects/{project_id}/github" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -190,7 +190,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/projects/{project_id}/github" \
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/projects/{project_id}/access" \
+curl -X POST "https://app.0xapogee.com/api/v1/projects/{project_id}/access" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -210,7 +210,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/projects/{project_id}/access" \
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/projects/{project_id}/teams" \
+curl -X POST "https://app.0xapogee.com/api/v1/projects/{project_id}/teams" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -226,7 +226,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/projects/{project_id}/teams" \
 ### DeFi Protocol Audit
 
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/projects" \
+curl -X POST "https://app.0xapogee.com/api/v1/projects" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -244,7 +244,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/projects" \
 ### NFT Collection
 
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/projects" \
+curl -X POST "https://app.0xapogee.com/api/v1/projects" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -262,7 +262,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/projects" \
 ### Cross-Chain Bridge
 
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/projects" \
+curl -X POST "https://app.0xapogee.com/api/v1/projects" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -293,15 +293,15 @@ Confirm project is set up correctly:
 **API:**
 ```bash
 # Get project details
-curl -X GET "https://app.blocksecops.com/api/v1/projects/{project_id}" \
+curl -X GET "https://app.0xapogee.com/api/v1/projects/{project_id}" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # List project contracts
-curl -X GET "https://app.blocksecops.com/api/v1/projects/{project_id}/contracts" \
+curl -X GET "https://app.0xapogee.com/api/v1/projects/{project_id}/contracts" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # List project access
-curl -X GET "https://app.blocksecops.com/api/v1/projects/{project_id}/access" \
+curl -X GET "https://app.0xapogee.com/api/v1/projects/{project_id}/access" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 

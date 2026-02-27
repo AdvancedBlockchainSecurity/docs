@@ -280,7 +280,7 @@ Tests for the comprehensive admin dashboard with real-time platform metrics, sys
 ## Test Execution
 
 ### Prerequisites
-1. Admin portal running at `http://localhost:5173` or `http://admin.blocksecops.local:3000`
+1. Admin portal running at `http://localhost:5173` or `http://admin.0xapogee.local:3000`
 2. API service running and healthy
 3. Valid admin credentials with MFA
 4. Test data in database (users, scans, vulnerabilities)

@@ -49,7 +49,7 @@ flowchart LR
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/api_keys" \
+curl -X POST "https://app.0xapogee.com/api/v1/api_keys" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -65,7 +65,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/api_keys" \
 1. Navigate to your repository on GitHub
 2. Go to **Settings > Secrets and variables > Actions**
 3. Click **New repository secret**
-4. Name: `BLOCKSECOPS_API_KEY`
+4. Name: `APOGEE_API_KEY`
 5. Value: Paste the API key from Step 1
 6. Click **Add secret**
 
@@ -96,17 +96,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install BlockSecOps CLI
+      - name: Install Apogee CLI
         run: |
-          pip install blocksecops-cli
-          blocksecops --version
+          pip install 0xapogee-cli
+          0xapogee --version
 
       - name: Run Security Scan
         id: scan
         env:
-          BLOCKSECOPS_API_KEY: ${{ secrets.BLOCKSECOPS_API_KEY }}
+          APOGEE_API_KEY: ${{ secrets.APOGEE_API_KEY }}
         run: |
-          blocksecops scan \
+          0xapogee scan \
             --path contracts/ \
             --project "${{ github.repository }}" \
             --output json \
@@ -148,7 +148,7 @@ jobs:
             | :yellow_circle: Medium | ${medium} |
             | :white_circle: Low | ${low} |
 
-            [View Full Report](https://app.blocksecops.com/scans/${results.scan_id})
+            [View Full Report](https://app.0xapogee.com/scans/${results.scan_id})
             `;
 
             github.rest.issues.createComment({
@@ -183,7 +183,7 @@ This ensures PRs cannot be merged if the security scan fails.
 
 **API:**
 ```bash
-curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/integrations" \
+curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/integrations" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -206,7 +206,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/integrat
 ```yaml
 - name: Run Security Scan
   run: |
-    blocksecops scan \
+    0xapogee scan \
       --files contracts/Token.sol,contracts/Vault.sol \
       --project "${{ github.repository }}"
 ```
@@ -216,7 +216,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/integrat
 ```yaml
 - name: Run Security Scan
   run: |
-    blocksecops scan \
+    0xapogee scan \
       --path contracts/ \
       --exclude "contracts/mocks/**,contracts/test/**" \
       --project "${{ github.repository }}"
@@ -228,7 +228,7 @@ curl -X POST "https://app.blocksecops.com/api/v1/organizations/{org_id}/integrat
 - name: Run Security Scan
   run: |
     # Only fail on critical vulnerabilities
-    blocksecops scan \
+    0xapogee scan \
       --path contracts/ \
       --fail-on critical
 ```
@@ -241,13 +241,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: blocksecops scan --path contracts/token/
+      - run: 0xapogee scan --path contracts/token/
 
   scan-governance:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: blocksecops scan --path contracts/governance/
+      - run: 0xapogee scan --path contracts/governance/
 ```
 
 ### Scheduled Scans
@@ -262,7 +262,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: blocksecops scan --path contracts/ --project weekly-audit
+      - run: 0xapogee scan --path contracts/ --project weekly-audit
 ```
 
 ---
@@ -279,8 +279,8 @@ Confirm the integration is working:
 **API Verification:**
 ```bash
 # List recent scans for the project
-curl -X GET "https://app.blocksecops.com/api/v1/scans?project=owner/repo-name&limit=5" \
-  -H "Authorization: Bearer $BLOCKSECOPS_API_KEY"
+curl -X GET "https://app.0xapogee.com/api/v1/scans?project=owner/repo-name&limit=5" \
+  -H "Authorization: Bearer $APOGEE_API_KEY"
 ```
 
 ---
@@ -289,7 +289,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans?project=owner/repo-name&li
 
 | Issue | Cause | Solution |
 |-------|-------|----------|
-| "Invalid API key" | Secret not configured or expired | Verify `BLOCKSECOPS_API_KEY` secret exists |
+| "Invalid API key" | Secret not configured or expired | Verify `APOGEE_API_KEY` secret exists |
 | "Permission denied" | API key missing required scopes | Create new key with `write:scans` scope |
 | Workflow not triggering | Path filter not matching | Check `paths` matches your contract locations |
 | "No contracts found" | Wrong path specified | Verify `--path` points to Solidity files |
@@ -303,7 +303,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans?project=owner/repo-name&li
 # Fix: Ensure CLI is installed and in PATH
 - name: Install CLI
   run: |
-    pip install blocksecops-cli
+    pip install 0xapogee-cli
     echo "$HOME/.local/bin" >> $GITHUB_PATH
 ```
 
@@ -315,7 +315,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans?project=owner/repo-name&li
   with:
     timeout_minutes: 10
     max_attempts: 3
-    command: blocksecops scan --path contracts/
+    command: 0xapogee scan --path contracts/
 ```
 
 ---
@@ -323,7 +323,7 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans?project=owner/repo-name&li
 ## Checklist
 
 - [ ] API key created with correct scopes
-- [ ] GitHub secret `BLOCKSECOPS_API_KEY` configured
+- [ ] GitHub secret `APOGEE_API_KEY` configured
 - [ ] Workflow file created at `.github/workflows/security-scan.yml`
 - [ ] Workflow triggers on PR and push to main
 - [ ] Path filters match contract directory structure
@@ -339,4 +339,4 @@ curl -X GET "https://app.blocksecops.com/api/v1/scans?project=owner/repo-name&li
 - [API Key Management](./api-key-management.md) - Create and manage API keys
 - [GitLab CI Integration](./cicd-gitlab-ci.md) - GitLab pipeline integration
 - [Run First Scan](./run-first-scan.md) - Manual scanning workflow
-- [CLI Installation](./cli-installation.md) - Install BlockSecOps CLI
+- [CLI Installation](./cli-installation.md) - Install Apogee CLI

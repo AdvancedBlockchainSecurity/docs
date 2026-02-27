@@ -51,7 +51,7 @@ kubectl rollout restart deployment/api-service -n api-service-local
 kubectl rollout status deployment/api-service -n api-service-local
 
 # 5. Verify
-curl -sk https://app.blocksecops.local/api/v1/health/ready
+curl -sk https://app.0xapogee.local/api/v1/health/ready
 ```
 
 ### GCP (Secret Manager)
@@ -139,7 +139,7 @@ for svc in api-service data-service intelligence-engine orchestration; do
 done
 
 # 5. Verify database connectivity
-curl -sk https://app.blocksecops.local/api/v1/health/ready | \
+curl -sk https://app.0xapogee.local/api/v1/health/ready | \
   python3 -c "import sys,json; d=json.load(sys.stdin); print('DB:', d['checks']['database'])"
 ```
 
@@ -188,7 +188,7 @@ kubectl rollout restart deployment/api-service -n api-service-local
 
 # 5. Test Stripe connectivity
 curl -sk -H "Authorization: Bearer TOKEN" \
-  https://app.blocksecops.local/api/v1/billing/plans
+  https://app.0xapogee.local/api/v1/billing/plans
 
 # 6. Expire old key in Stripe Dashboard after confirming new key works
 ```

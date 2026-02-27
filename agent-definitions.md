@@ -10,7 +10,7 @@ This document defines specialized AI agents for each repository in the BlockSecO
 | [blocksecops-analysis](#blocksecops-analysis) | `blocksecops-analysis` | React analysis workflow UI |
 | [blocksecops-api-service](#blocksecops-api-service) | `blocksecops-api-service` | FastAPI main HTTP gateway |
 | [blocksecops-gcp-infrastructure](#blocksecops-gcp-infrastructure) | `blocksecops-gcp-infrastructure` | GCP infrastructure configs |
-| [blocksecops-cli](#blocksecops-cli) | `blocksecops-cli` | Python CLI tool |
+| [0xapogee-cli](#0xapogee-cli) | `0xapogee-cli` | Python CLI tool |
 | [blocksecops-contract-parser](#blocksecops-contract-parser) | `blocksecops-contract-parser` | Rust contract parser |
 | [blocksecops-dashboard](#blocksecops-dashboard) | `blocksecops-dashboard` | React main dashboard |
 | [blocksecops-data-service](#blocksecops-data-service) | `blocksecops-data-service` | Database operations service |
@@ -227,22 +227,22 @@ When coding, follow IaC best practices and GCP Well-Architected Framework. When 
 
 ---
 
-### blocksecops-cli
+### 0xapogee-cli
 
-**Repository**: `~/Git/ABS/blocksecops-cli`
+**Repository**: `~/Git/ABS/0xapogee-cli`
 **Description**: Command-line interface for smart contract security scanning with API key authentication and multiple output formats.
 
 #### Tech Stack
 - **Language**: Python 3.11+
 - **CLI Framework**: Click or Typer
 - **Output Formats**: JSON, SARIF, JUnit
-- **Installation**: pip install blocksecops-cli
+- **Installation**: pip install 0xapogee-cli
 
 #### Key Directories
-- `blocksecops_cli/` - Main CLI package
-- `blocksecops_cli/commands/` - CLI command implementations
-- `blocksecops_cli/api/` - API client
-- `blocksecops_cli/formatters/` - Output formatters
+- `apogee_cli/` - Main CLI package
+- `apogee_cli/commands/` - CLI command implementations
+- `apogee_cli/api/` - API client
+- `apogee_cli/formatters/` - Output formatters
 
 #### Architecture Notes
 - API key authentication
@@ -253,18 +253,18 @@ When coding, follow IaC best practices and GCP Well-Architected Framework. When 
 
 #### Agent Prompt
 ```
-You are a specialized agent for the blocksecops-cli repository, a Python CLI tool for smart contract security scanning.
+You are a specialized agent for the 0xapogee-cli repository, a Python CLI tool for smart contract security scanning.
 
 REPOSITORY CONTEXT:
-- Path: ~/Git/ABS/blocksecops-cli
+- Path: ~/Git/ABS/0xapogee-cli
 - Stack: Python 3.11+, Click/Typer CLI framework
 - Purpose: CLI for contract scanning, CI/CD integration
 
 KEY DIRECTORIES:
-- blocksecops_cli/ - Main package
-- blocksecops_cli/commands/ - CLI commands
-- blocksecops_cli/api/ - API client for BlockSecOps platform
-- blocksecops_cli/formatters/ - Output formatters (JSON, SARIF, JUnit)
+- apogee_cli/ - Main package
+- apogee_cli/commands/ - CLI commands
+- apogee_cli/api/ - API client for BlockSecOps platform
+- apogee_cli/formatters/ - Output formatters (JSON, SARIF, JUnit)
 
 CODING CONVENTIONS:
 - Use Click/Typer decorators for commands

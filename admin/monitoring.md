@@ -17,7 +17,7 @@ BlockSecOps provides monitoring capabilities for:
 ### API Health Endpoint
 
 ```bash
-curl https://api.blocksecops.com/health
+curl https://api.0xapogee.com/health
 ```
 
 Response:
@@ -45,7 +45,7 @@ Response:
 ### Get Platform Statistics
 
 ```bash
-curl -X GET https://api.blocksecops.com/api/v1/statistics \
+curl -X GET https://api.0xapogee.com/api/v1/statistics \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -84,7 +84,7 @@ curl -X GET https://api.blocksecops.com/api/v1/statistics \
 ### Risk Statistics
 
 ```bash
-curl -X GET https://api.blocksecops.com/api/v1/statistics/risk \
+curl -X GET https://api.0xapogee.com/api/v1/statistics/risk \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -116,7 +116,7 @@ Returns per-project risk breakdown:
 ### Recent Scans
 
 ```bash
-curl -X GET "https://api.blocksecops.com/api/v1/scans?limit=20" \
+curl -X GET "https://api.0xapogee.com/api/v1/scans?limit=20" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -149,7 +149,7 @@ Track scan performance:
 ### Channel Statistics
 
 ```bash
-curl -X GET https://api.blocksecops.com/api/v1/notification-channels \
+curl -X GET https://api.0xapogee.com/api/v1/notification-channels \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -169,7 +169,7 @@ success_rate = successful_notifications / total_notifications * 100
 ### Delivery History
 
 ```bash
-curl -X GET "https://api.blocksecops.com/api/v1/notification-channels/{id}/deliveries?limit=100" \
+curl -X GET "https://api.0xapogee.com/api/v1/notification-channels/{id}/deliveries?limit=100" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -192,7 +192,7 @@ curl -X GET "https://api.blocksecops.com/api/v1/notification-channels/{id}/deliv
 Use notification channels to alert on platform events:
 
 ```bash
-curl -X POST https://api.blocksecops.com/api/v1/notification-channels \
+curl -X POST https://api.0xapogee.com/api/v1/notification-channels \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
     "name": "Platform Alerts",

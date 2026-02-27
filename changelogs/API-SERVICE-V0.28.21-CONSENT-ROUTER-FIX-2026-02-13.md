@@ -68,7 +68,7 @@ Privacy Policy: 2026.01.1
 
 ```bash
 # Public endpoint (no auth required)
-curl -sk https://app.blocksecops.local/api/v1/consent/versions
+curl -sk https://app.0xapogee.local/api/v1/consent/versions
 # Returns: {"tos_version":"2026.01.1","privacy_policy_version":"2026.01.1",...}
 
 # Authenticated endpoint (requires JWT)

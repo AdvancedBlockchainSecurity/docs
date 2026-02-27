@@ -125,7 +125,7 @@ Bake the publishable key into the dashboard at build time.
 cd /home/pwner/Git
 
 VERSION=$(grep '"version"' blocksecops-dashboard/package.json | head -1 | cut -d'"' -f4)
-REGISTRY="harbor.blocksecops.local"
+REGISTRY="harbor.0xapogee.local"
 
 # Get existing config values
 SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')
@@ -186,7 +186,7 @@ cat /tmp/stripe-listener.log | tail -20
 
 ### 5.1 Access the Dashboard
 
-1. Open browser to `http://127.0.0.1:3000` (minikube) or `http://app.blocksecops.local` (kubeadm)
+1. Open browser to `http://127.0.0.1:3000` (minikube) or `http://app.0xapogee.local` (kubeadm)
 2. Log in with your account
 3. Navigate to **Billing** or **Credits** page
 
