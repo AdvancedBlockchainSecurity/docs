@@ -1,7 +1,7 @@
 # Domain Management Standards
 
-**Version:** 2.0.0
-**Last Updated:** February 8, 2026
+**Version:** 2.1.0
+**Last Updated:** February 27, 2026
 **Status:** Active
 
 ## Overview
@@ -282,6 +282,22 @@ curl https://app.0xapogee.com/api/v1/health/live
 
 ---
 
+## Harbor Registry Domain Exception
+
+The container registry domain `harbor.blocksecops.local` is **not** part of the application domain rebrand. Harbor has its own TLS certificate, IngressRoute, and DNS entry. Changing this domain requires coordinated infrastructure migration:
+
+1. Issue new TLS certificate for `harbor.0xapogee.local`
+2. Update Harbor IngressRoute Host rules
+3. Update DNS entries on all nodes and clients
+4. Re-trust the new registry on all kubelet nodes
+5. Update all kustomization `newName` image references
+
+Until this migration is completed, all `kustomization.yaml` files use `harbor.blocksecops.local/blocksecops/` as the image registry prefix.
+
+**Regression tests** use negative lookbehind regex `(?<!harbor\.)blocksecops\.local` to correctly exclude harbor references from legacy domain checks. See [Feature Test 82](../feature-tests/82-cors-domain-regression.md).
+
+---
+
 ## Security Considerations
 
 ### All Environments
@@ -289,6 +305,7 @@ curl https://app.0xapogee.com/api/v1/health/live
 1. **Always use HTTPS** — Both server and production use TLS
 2. **Restrict CORS origins** — Only allow the specific domain, never use `*`
 3. **Single origin per environment** — One domain in CORS, not multiple
+4. **Credentials disabled** — Traefik CORS middleware sets `accessControlAllowCredentials: false`
 
 ### Production Requirements
 
@@ -306,4 +323,4 @@ curl https://app.0xapogee.com/api/v1/health/live
 
 ---
 
-*Last Updated: February 8, 2026*
+*Last Updated: February 27, 2026*
