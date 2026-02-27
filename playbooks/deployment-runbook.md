@@ -1,7 +1,7 @@
 # Playbook: Deployment Runbook
 
-**Version:** 1.0.0
-**Last Updated:** February 25, 2026
+**Version:** 1.1.0
+**Last Updated:** February 27, 2026
 **Audience:** Platform Operator
 **Priority:** High (must complete before go-live)
 
@@ -68,7 +68,70 @@ Deploy in dependency order:
 
 ---
 
-## Standard Deployment (GCP — ArgoCD)
+## Standard Deployment (GCP Alpha — Manual)
+
+### Prerequisites
+
+```bash
+# Authenticate to GCP
+export GOOGLE_OAUTH_ACCESS_TOKEN=$(gcloud auth print-access-token)
+
+# Connect to GKE cluster
+gcloud container clusters get-credentials blocksecops-staging-gke \
+  --region us-west1 --project project-8a2657b9-d96c-4c0a-a69
+
+# Verify access (admin IP must be 136.60.244.81/32)
+kubectl get nodes
+```
+
+### Single Service Deployment
+
+```bash
+SERVICE="api-service"
+
+# 1. Deploy (namespace + ExternalSecret + deployment)
+kubectl apply -k k8s/overlays/gcp/services/${SERVICE}/
+
+# 2. Verify ExternalSecret synced
+kubectl get externalsecret -n ${SERVICE}-gcp
+# STATUS should show "SecretSynced"
+
+# 3. Wait for rollout
+kubectl rollout status deployment/${SERVICE} -n ${SERVICE}-gcp --timeout=300s
+
+# 4. Verify health
+curl -I https://app.0xApogee.com/api/v1/health/live
+```
+
+### Full Platform Deployment (Dependency Order)
+
+```
+1. Infrastructure: kubectl apply -k k8s/overlays/gcp/  (PostgreSQL, Redis, Ingress, PriorityClasses, ExternalSecrets)
+2. Create PostgreSQL credentials: kubectl create secret generic postgresql-credentials -n postgresql-gcp
+3. data-service (database layer)
+4. api-service (HTTP gateway — most services depend on it)
+5. orchestration (workflow engine)
+6. intelligence-engine (ML/AI)
+7. notification (real-time, depends on Redis)
+8. tool-integration, contract-parser (backend services)
+9. analysis, findings (supporting services)
+10. dashboard, admin-portal (frontends — last, depend on API)
+```
+
+### Secrets (GCP Secret Manager + ESO)
+
+Secrets are stored in GCP Secret Manager and automatically synced via ExternalSecrets Operator. No manual `kubectl create secret` needed for services (only PostgreSQL credentials are manual).
+
+```bash
+# Populate secrets before first deployment
+cd scripts/
+./populate-secrets.sh --interactive
+./populate-secrets.sh --verify
+```
+
+See [Secrets Management](../standards/secrets-management.md) for full details.
+
+## Standard Deployment (GCP Production — ArgoCD)
 
 ### ArgoCD Sync
 

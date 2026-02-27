@@ -1,19 +1,24 @@
 # Secrets Management
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 2.0.0
-**Last Updated:** December 20, 2025
+**Version:** 3.0.0
+**Last Updated:** February 27, 2026
 **Status:** Active
 
 ## Overview
 
-This document defines mandatory standards for managing secrets in the BlockSecOps Platform using HashiCorp Vault and the External Secrets Operator.
+This document defines mandatory standards for managing secrets in the BlockSecOps Platform using the External Secrets Operator (ESO) with environment-specific secret backends.
 
 ---
 
-## Rule: Vault with External Secrets Operator
+## Rule: Centralized Secret Store with External Secrets Operator
 
-**MANDATORY:** All secrets MUST be stored in HashiCorp Vault and synchronized to Kubernetes using the External Secrets Operator (ESO).
+**MANDATORY:** All secrets MUST be stored in a centralized secret backend and synchronized to Kubernetes using the External Secrets Operator (ESO).
+
+| Environment | Secret Backend | SecretStore Type |
+|-------------|----------------|------------------|
+| Local (kubeadm) | HashiCorp Vault | SecretStore (`vault-backend`) |
+| GCP (alpha/production) | GCP Secret Manager | ClusterSecretStore (`gcp-secret-manager`) |
 
 **Why this matters:**
 - **Security:** Centralized secret storage with encryption at rest and in transit
@@ -21,6 +26,102 @@ This document defines mandatory standards for managing secrets in the BlockSecOp
 - **Rotation:** Automated secret rotation capabilities
 - **Separation of Concerns:** Secrets managed separately from application code and Kubernetes manifests
 - **Multi-Environment:** Single source of truth for secrets across all environments
+
+## GCP Secret Manager (GCP Environments)
+
+### Architecture
+
+```
+GCP Secret Manager (prefix: blocksecops-gcp-*)
+    │
+    │  Workload Identity (GCP SA → K8s SA)
+    ▼
+ExternalSecrets Operator (Helm-installed)
+    │
+    │  ClusterSecretStore (gcp-secret-manager)
+    ▼
+ExternalSecret (per service namespace) → creates K8s Secret
+    │
+    │  envFrom.secretRef
+    ▼
+Service Pod (env vars injected automatically)
+```
+
+### GCP Secret Manager Key Naming
+
+All secrets use the prefix `blocksecops-gcp-`:
+
+| GCP SM Key | Used By |
+|---|---|
+| `blocksecops-gcp-database-url` | api-service, data-service, orchestration, intelligence-engine |
+| `blocksecops-gcp-redis-url` | All backend services |
+| `blocksecops-gcp-jwt-secret` | api-service |
+| `blocksecops-gcp-supabase-url` | api-service |
+| `blocksecops-gcp-supabase-key` | api-service |
+| `blocksecops-gcp-stripe-api-key` | api-service |
+| `blocksecops-gcp-stripe-webhook-secret` | api-service |
+| `blocksecops-gcp-openai-api-key` | intelligence-engine |
+| `blocksecops-gcp-api-service-url` | orchestration, admin-portal, tool-integration |
+| `blocksecops-gcp-smtp-host` | notification |
+| `blocksecops-gcp-smtp-password` | notification |
+
+### GCP ExternalSecret Example
+
+```yaml
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: api-service-secrets
+  namespace: api-service-gcp
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: gcp-secret-manager
+  target:
+    name: api-service-secrets
+    creationPolicy: Owner
+  data:
+    - secretKey: DATABASE_URL
+      remoteRef:
+        key: blocksecops-gcp-database-url
+    - secretKey: REDIS_URL
+      remoteRef:
+        key: blocksecops-gcp-redis-url
+```
+
+### Populating GCP Secrets
+
+```bash
+# Use the populate-secrets.sh script
+cd blocksecops-gcp-infrastructure/scripts/
+./populate-secrets.sh --interactive   # Interactive prompts
+./populate-secrets.sh --verify        # Verify all secrets exist
+./populate-secrets.sh --list          # List status of all secrets
+```
+
+### GCP Workload Identity for ESO
+
+ESO authenticates to GCP Secret Manager via Workload Identity — no API keys needed:
+
+```yaml
+# ClusterSecretStore (k8s/overlays/gcp/external-secrets/clustersecretstore.yaml)
+spec:
+  provider:
+    gcpsm:
+      projectID: "project-8a2657b9-d96c-4c0a-a69"
+      auth:
+        workloadIdentity:
+          clusterLocation: us-west1
+          clusterName: blocksecops-gcp-gke
+          serviceAccountRef:
+            name: external-secrets-sa
+            namespace: external-secrets-gcp
+```
+
+The Terraform `secret-manager` module creates the GCP service account and Workload Identity binding automatically.
+
+## HashiCorp Vault (Local Environment)
 
 ## What Must Be in Vault
 
