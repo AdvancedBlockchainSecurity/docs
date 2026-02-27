@@ -79,6 +79,7 @@ Manual testing checklists for all user-facing features.
 | [77-integration-security-hardening.md](./77-integration-security-hardening.md) | **NEW** - Integration security hardening: webhook encryption, SSRF protection, error sanitization, input validation, URL validation, webhook domain checks (v0.29.22 API, v0.46.4 Dashboard) |
 | [api-key-scope-enforcement.md](./api-key-scope-enforcement.md) | API key scope enforcement tests |
 | [SCAN-TEST-2026-02-22.md](./SCAN-TEST-2026-02-22.md) | **NEW** - Cluster health audit scan tests: single/multi/full scanner, deduplication verification, auth 401 fix validation |
+| [82-cors-domain-regression.md](./82-cors-domain-regression.md) | **NEW** - Automated CORS wildcard and legacy domain regression tests (64 tests across all repos) |
 
 ---
 
