@@ -309,15 +309,15 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
-| admin-portal | 0.7.5 | `k8s/overlays/local/` | Apogee rebrand: UI branding, metadata |
-| api-service | 0.29.38 | `k8s/overlays/local/api-service/` | Apogee rebrand: domains, SIWE, OpenAPI, notifications |
-| contract-parser | 0.2.1 | `k8s/overlays/local/contract-parser/` | Apogee rebrand: metadata, OCI labels |
-| dashboard | 0.46.9 | `k8s/overlays/local/` | Apogee rebrand: UI branding, legal, pricing, integrations |
-| data-service | 0.2.6 | `k8s/overlays/local/` | Apogee rebrand: metadata, OCI labels |
-| intelligence-engine | 0.3.6 | `k8s/overlays/local/` | Apogee rebrand: OpenAPI title, metadata, OCI labels |
-| notification | 0.2.5 | `k8s/overlays/local/` | Apogee rebrand: CORS domains, metadata |
-| orchestration | 0.10.7 | `k8s/overlays/local/` | Apogee rebrand: OpenAPI title, scanner descriptions |
-| tool-integration | 0.5.8 | `k8s/overlays/local/` | Apogee rebrand: OpenAPI title, metadata, OCI labels |
+| admin-portal | 0.7.6 | `k8s/overlays/local/` | Apogee rebrand: UI branding, metadata, vite config |
+| api-service | 0.29.39 | `k8s/overlays/local/api-service/` | Apogee rebrand: OCI source URL, CI/CD, scripts, tests |
+| contract-parser | 0.2.2 | `k8s/overlays/local/contract-parser/` | Apogee rebrand: OCI source URL, .env.example |
+| dashboard | 0.46.10 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, vite config, comments |
+| data-service | 0.2.7 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, README |
+| intelligence-engine | 0.3.7 | `k8s/overlays/local/` | Apogee rebrand: OCI source/vendor, base images, .env |
+| notification | 0.2.6 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL |
+| orchestration | 0.10.8 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, README |
+| tool-integration | 0.5.9 | `k8s/overlays/local/` | Apogee rebrand: scanner images, OCI labels, build scripts |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |
