@@ -1,7 +1,7 @@
 # Playbook: Deploy New Image to Cluster
 
-**Version:** 1.2.0
-**Last Updated:** February 22, 2026
+**Version:** 1.3.0
+**Last Updated:** February 28, 2026
 
 ## Overview
 
@@ -151,9 +151,9 @@ cd /home/pwner/Git
 VERSION="0.30.13"
 
 # Get Supabase credentials from cluster
-SUPABASE_URL=$(kubectl get configmap api-service-config -n api-service-local \
+SUPABASE_URL=$(kubectl get configmap dashboard-config -n dashboard-local \
   -o jsonpath='{.data.supabase_url}')
-SUPABASE_ANON_KEY=$(kubectl get configmap api-service-config -n api-service-local \
+SUPABASE_ANON_KEY=$(kubectl get configmap dashboard-config -n dashboard-local \
   -o jsonpath='{.data.supabase_anon_key}')
 
 # Build from parent directory (monorepo structure)
@@ -384,7 +384,7 @@ kubectl delete pods -n api-service-local -l app.kubernetes.io/name=api-service
 |---------|-----------|------|
 | api-service | api-service-local | 8000 |
 | dashboard | dashboard-local | 3000 |
-| tool-integration | tool-integration-local | 8004 |
+| tool-integration | tool-integration-local | 8005 |
 | notification | notification-local | 8003 |
 
 ---

@@ -1,7 +1,7 @@
 # Platform Development Standards - Index
 
-**Version:** 2.4.0
-**Last Updated:** February 5, 2026
+**Version:** 2.5.0
+**Last Updated:** February 28, 2026
 **Status:** Active
 
 ## Overview
@@ -236,15 +236,24 @@ These standards ensure proper versioning and configuration management:
     - Common patterns and anti-patterns
     - Validation and troubleshooting
 
+27. **[Cluster Baseline](./cluster-baseline.md)** [NEW]
+    - Expected healthy cluster state (pods, deployments, replicas)
+    - revisionHistoryLimit validation
+    - Resource thresholds (CPU, memory, disk)
+    - Certificate and ExternalSecret status
+    - IngressRoute topology
+    - Health check script
+    - Known deviations tracking
+
 ### ✅ Compliance & Verification
 
-27. **[Compliance Checklist](./compliance-checklist.md)**
+28. **[Compliance Checklist](./compliance-checklist.md)**
     - Daily development checklist
     - Making changes checklist
     - Database configuration changes checklist
     - Code review checklist
 
-28. **[Smoke Test](./smoke-test.md)** [NEW]
+29. **[Smoke Test](./smoke-test.md)** [NEW]
     - Platform smoke test after deployments
     - Pre-flight infrastructure checks
     - External and internal service health checks
@@ -311,6 +320,7 @@ docs/standards/
 ├── kustomize-standards.md         # NEW: Kustomize base/overlay patterns
 ├── secure-coding.md               # NEW: Security-first development, OWASP Top 10
 ├── encryption-standards.md        # NEW: Encryption at rest, in transit, key management
+├── cluster-baseline.md            # NEW: Expected healthy cluster state and validation
 └── smoke-test.md                  # NEW: Platform smoke test procedures
 ```
 
@@ -359,5 +369,5 @@ Contact the development team or create an issue in the `blocksecops-docs` reposi
 
 ---
 
-**Last Updated:** February 12, 2026
+**Last Updated:** February 28, 2026
 **Maintained By:** Apogee Team

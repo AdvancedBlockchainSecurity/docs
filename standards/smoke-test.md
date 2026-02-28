@@ -1,7 +1,7 @@
 # Platform Smoke Test Standards
 
-**Version:** 1.5.0
-**Last Updated:** February 27, 2026
+**Version:** 1.6.0
+**Last Updated:** February 28, 2026
 **Status:** Active
 
 ## Overview
@@ -44,6 +44,19 @@ kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity
 # 5. Version drift check (all services)
 /home/pwner/Git/scripts/check-version-drift.sh
 # Expected: all services show "OK" (source == kustomize == cluster)
+
+# 6. Stale pod check (no Completed/Failed pods outside kube-system)
+kubectl get pods -A --field-selector='status.phase!=Running' --no-headers | grep -v "kube-system"
+# Expected: empty output
+
+# 7. Stale ReplicaSet check
+STALE_RS=$(kubectl get rs -A --no-headers | awk '$3==0 && $4==0' | wc -l)
+echo "Stale ReplicaSets: $STALE_RS (warning if > 20)"
+
+# 8. revisionHistoryLimit check (all managed deployments should be 3)
+kubectl get deployments -A -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}: {.spec.revisionHistoryLimit}{"\n"}{end}' | \
+  grep -v "kube-system\|local-path\|external-secrets" | grep -v ": 3$"
+# Expected: empty output (all managed deployments at 3)
 ```
 
 ## Service Health Checks
@@ -246,7 +259,7 @@ done
 | admin-portal | 0.7.3 |
 | tool-integration | 0.5.6 |
 | orchestration | 0.10.6 |
-| notification | 0.2.4 |
+| notification | 0.2.6 |
 | intelligence-engine | 0.3.4 |
 | data-service | 0.2.5 |
 | contract-parser | 0.2.0 |
