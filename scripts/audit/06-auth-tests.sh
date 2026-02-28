@@ -1,5 +1,5 @@
 #!/bin/bash
-# BlockSecOps Go-Live Audit: Authentication & Authorization (Section 6)
+# Apogee Go-Live Audit: Authentication & Authorization (Section 6)
 # Validates auth methods, API key security, session management, and CORS
 set -euo pipefail
 
@@ -7,7 +7,7 @@ PASS=0
 FAIL=0
 WARN=0
 
-BASE_URL="${BASE_URL:-https://app.blocksecops.com}"
+BASE_URL="${BASE_URL:-https://app.0xApogee.com}"
 CURL_FLAGS="${CURL_FLAGS:--sk}"
 
 check() {
@@ -99,7 +99,7 @@ fi
 
 # Test authorized origin
 CORS_VALID=$(curl $CURL_FLAGS -s -D - -o /dev/null \
-  -H "Origin: https://app.blocksecops.com" \
+  -H "Origin: https://app.0xApogee.com" \
   -H "Access-Control-Request-Method: GET" \
   -X OPTIONS \
   "$BASE_URL/api/v1/health/live" 2>/dev/null)

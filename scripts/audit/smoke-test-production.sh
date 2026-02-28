@@ -1,5 +1,5 @@
 #!/bin/bash
-# BlockSecOps Go-Live Audit: Production Smoke Test (Section 14)
+# Apogee Go-Live Audit: Production Smoke Test (Section 14)
 # Validates core functionality after GCP production deployment
 set -euo pipefail
 
@@ -8,8 +8,8 @@ FAIL=0
 WARN=0
 
 # Configuration - override via environment variables
-BASE_URL="${BASE_URL:-https://app.blocksecops.com}"
-ADMIN_URL="${ADMIN_URL:-https://admin.blocksecops.com}"
+BASE_URL="${BASE_URL:-https://app.0xApogee.com}"
+ADMIN_URL="${ADMIN_URL:-https://admin.0xApogee.com}"
 CURL_FLAGS="${CURL_FLAGS:--sk}"  # -sk for self-signed certs, remove -k for production
 
 check() {

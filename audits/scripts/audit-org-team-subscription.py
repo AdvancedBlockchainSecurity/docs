@@ -614,7 +614,7 @@ async def audit_invites(client: httpx.AsyncClient, org_id: str):
 
     # Create invite (use a real-looking domain — .local is rejected by email validator)
     invite_payload = {
-        "email": "audit-invite@blocksecops.com",
+        "email": "audit-invite@0xapogee.com",
         "name": "Audit Invitee",
         "role": "developer",
     }

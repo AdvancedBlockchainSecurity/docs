@@ -1,5 +1,5 @@
 #!/bin/bash
-# BlockSecOps Go-Live Audit: Application Security Tests (Section 9)
+# Apogee Go-Live Audit: Application Security Tests (Section 9)
 # OWASP-aligned security checks for the platform
 set -euo pipefail
 
@@ -7,7 +7,7 @@ PASS=0
 FAIL=0
 WARN=0
 
-BASE_URL="${BASE_URL:-https://app.blocksecops.com}"
+BASE_URL="${BASE_URL:-https://app.0xApogee.com}"
 CURL_FLAGS="${CURL_FLAGS:--sk}"
 
 check() {
