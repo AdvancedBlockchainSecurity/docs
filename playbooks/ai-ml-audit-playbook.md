@@ -2,7 +2,7 @@
 
 ## Overview
 
-This playbook provides a systematic audit procedure for the complete AI/ML implementation across the BlockSecOps platform. Use it to verify data workflows, backend endpoints, frontend components, deduplication systems, and vulnerability patterns.
+This playbook provides a systematic audit procedure for the complete AI/ML implementation across the Apogee platform. Use it to verify data workflows, backend endpoints, frontend components, deduplication systems, and vulnerability patterns.
 
 **Last Updated:** February 2026
 **Version:** 1.0.0
@@ -11,7 +11,7 @@ This playbook provides a systematic audit procedure for the complete AI/ML imple
 
 ## Prerequisites
 
-- [ ] BlockSecOps API service running
+- [ ] Apogee API service running
 - [ ] PostgreSQL database accessible
 - [ ] Redis cache accessible
 - [ ] Intelligence Engine running (for semantic search)

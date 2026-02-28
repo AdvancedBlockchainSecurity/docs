@@ -7,7 +7,7 @@
 
 ## Overview
 
-Encryption standards for BlockSecOps platform covering data at rest, data in transit, and key management.
+Encryption standards for Apogee platform covering data at rest, data in transit, and key management.
 
 ---
 

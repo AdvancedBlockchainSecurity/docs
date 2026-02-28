@@ -1,6 +1,6 @@
-# BlockSecOps Changelogs
+# Apogee Changelogs
 
-**Purpose:** Centralized changelog directory for all BlockSecOps platform changes
+**Purpose:** Centralized changelog directory for all Apogee platform changes
 **Last Updated:** February 20, 2026
 **Status:** Active
 
@@ -8,7 +8,7 @@
 
 ## Overview
 
-This directory contains comprehensive changelogs for the BlockSecOps platform. All significant changes, bug fixes, feature additions, and deployments are documented here.
+This directory contains comprehensive changelogs for the Apogee platform. All significant changes, bug fixes, feature additions, and deployments are documented here.
 
 ### Organization
 
@@ -1062,7 +1062,7 @@ Create an issue or submit a PR with corrections.
 
 ---
 
-**Maintained By:** BlockSecOps Documentation Team
+**Maintained By:** Apogee Documentation Team
 **Location:** `/Users/pwner/Git/ABS/docs/changelogs/README.md`
 **Last Updated:** December 20, 2025
 **Status:** ✅ Active

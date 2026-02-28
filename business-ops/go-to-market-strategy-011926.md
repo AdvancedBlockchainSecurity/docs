@@ -1,8 +1,8 @@
-# BlockSecOps Go-to-Market Strategy
+# Apogee Go-to-Market Strategy
 
 ## Capturing the Unified Web3 Security Platform Opportunity
 
-**Executive Summary:** BlockSecOps enters a $3 billion Web3 security market at a pivotal moment. The landscape fragments just as enterprise demand surges—$2.3 billion lost to hacks in H1 2025 alone, OpenZeppelin Defender sunsetting July 2026, and multi-chain expansion outpacing tool support. BlockSecOps occupies a unique position as the only vendor-agnostic platform aggregating 17+ scanners into a unified dashboard with transparent, published pricing and crypto-native micropayments. This strategy outlines a 30-day soft launch plan optimized for a bootstrapped solo founder, targeting 10-20 qualified enterprise leads and 3-5 paying pilots within the first month.
+**Executive Summary:** Apogee enters a $3 billion Web3 security market at a pivotal moment. The landscape fragments just as enterprise demand surges—$2.3 billion lost to hacks in H1 2025 alone, OpenZeppelin Defender sunsetting July 2026, and multi-chain expansion outpacing tool support. Apogee occupies a unique position as the only vendor-agnostic platform aggregating 17+ scanners into a unified dashboard with transparent, published pricing and crypto-native micropayments. This strategy outlines a 30-day soft launch plan optimized for a bootstrapped solo founder, targeting 10-20 qualified enterprise leads and 3-5 paying pilots within the first month.
 
 ---
 
@@ -14,11 +14,11 @@ The Bybit breach ($1.5 billion, February 2025) and Balancer V2 exploit ($129 mil
 
 ### OpenZeppelin Defender's Sunset Creates Migration Opportunity
 
-Defender 1.0 shuts down July 2026, displacing thousands of protocols currently relying on the platform for post-deployment security operations. These teams actively seek alternatives—BlockSecOps can capture this migrating customer base with a direct positioning play.
+Defender 1.0 shuts down July 2026, displacing thousands of protocols currently relying on the platform for post-deployment security operations. These teams actively seek alternatives—Apogee can capture this migrating customer base with a direct positioning play.
 
 ### Multi-Chain Expansion Outpaces Tool Support
 
-Protocols increasingly deploy across Ethereum, Polygon, Arbitrum, Base, Solana, Aptos, and Sui. Few platforms offer comprehensive Solidity, Rust, Move, and Vyper support. BlockSecOps' multi-chain, multi-language coverage creates meaningful differentiation in an EVM-dominated competitive landscape.
+Protocols increasingly deploy across Ethereum, Polygon, Arbitrum, Base, Solana, Aptos, and Sui. Few platforms offer comprehensive Solidity, Rust, Move, and Vyper support. Apogee' multi-chain, multi-language coverage creates meaningful differentiation in an EVM-dominated competitive landscape.
 
 ---
 
@@ -26,7 +26,7 @@ Protocols increasingly deploy across Ethereum, Polygon, Arbitrum, Base, Solana, 
 
 ### Open-Source Analyzers Lack Enterprise Features
 
-Slither (Trail of Bits) dominates static analysis with its 10.9% false positive rate and sub-second execution, but offers only CLI access with no dashboard, monitoring, or compliance reporting. Aderyn (Cyfrin) provides modern Rust-based analysis but remains Solidity-only. These tools are excellent individually but painful to orchestrate—exactly the workflow BlockSecOps eliminates.
+Slither (Trail of Bits) dominates static analysis with its 10.9% false positive rate and sub-second execution, but offers only CLI access with no dashboard, monitoring, or compliance reporting. Aderyn (Cyfrin) provides modern Rust-based analysis but remains Solidity-only. These tools are excellent individually but painful to orchestrate—exactly the workflow Apogee eliminates.
 
 ### Enterprise Platforms Price Out Mid-Market Protocols
 
@@ -36,9 +36,9 @@ CertiK offers comprehensive enterprise suite (Skynet monitoring, KYC services, f
 
 Forta Network provides decentralized real-time threat detection (250 FORT/month, ~$5-10) but focuses exclusively on post-deployment. No platform effectively bridges pre-deployment analysis with continuous post-deployment monitoring in a single interface.
 
-### BlockSecOps Differentiation Matrix
+### Apogee Differentiation Matrix
 
-| Capability | Slither | Certora | CertiK | Forta | OZ Defender | BlockSecOps |
+| Capability | Slither | Certora | CertiK | Forta | OZ Defender | Apogee |
 |------------|---------|---------|--------|-------|-------------|-------------|
 | Pre-deployment analysis | ✅ | ✅ | ✅ | ❌ | Limited | ✅ 17+ scanners |
 | Post-deployment monitoring | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ Integrated |
@@ -90,7 +90,7 @@ Enterprise blockchain companies with $10M+ monthly transaction volume represent 
 
 ---
 
-## BlockSecOps Pricing Structure: Competitive Advantage Through Transparency
+## Apogee Pricing Structure: Competitive Advantage Through Transparency
 
 ### Current Tier Architecture
 
@@ -104,7 +104,7 @@ Enterprise blockchain companies with $10M+ monthly transaction volume represent 
 
 ### x402 Pay-Per-Use: The Secret Weapon
 
-BlockSecOps' crypto-native micropayment system represents a unique differentiator no competitor offers:
+Apogee's crypto-native micropayment system represents a unique differentiator no competitor offers:
 
 | Scan Size | Price | Includes |
 |-----------|-------|----------|
@@ -127,9 +127,9 @@ BlockSecOps' crypto-native micropayment system represents a unique differentiato
 | Aikido Security | $300/mo | $600/mo | Custom |
 | Jit Security | $50/dev/mo | — | Custom |
 | CertiK audits | $15,000 min | $30-70K | $100K+ |
-| **BlockSecOps** | **$0 (Free) / $3 (x402)** | **$489/mo** | **$1,956/mo+** |
+| **Apogee** | **$0 (Free) / $3 (x402)** | **$489/mo** | **$1,956/mo+** |
 
-BlockSecOps offers the lowest barrier to entry (Free + x402) while providing clear upgrade paths to enterprise-grade features. The $489 Startup tier undercuts MetaTrust ($599) and Aikido ($600) while offering Web3-specific multi-scanner aggregation they lack.
+Apogee offers the lowest barrier to entry (Free + x402) while providing clear upgrade paths to enterprise-grade features. The $489 Startup tier undercuts MetaTrust ($599) and Aikido ($600) while offering Web3-specific multi-scanner aggregation they lack.
 
 ---
 
@@ -219,7 +219,7 @@ ETHGlobal, DeFi Security Summit, regional ETH events. Focus on speaking opportun
 
 ### Audit Firm Partnerships (Highest Priority)
 
-Most audit firms combine automated scanning with manual review but don't build their own tooling platforms. Position BlockSecOps as infrastructure that makes auditors more efficient.
+Most audit firms combine automated scanning with manual review but don't build their own tooling platforms. Position Apogee as infrastructure that makes auditors more efficient.
 
 | Partner Type | Example Firms | Partnership Value |
 |--------------|---------------|-------------------|
@@ -242,8 +242,8 @@ Apply within first 60 days—grant timelines are 3-6 months but establish credib
 **OpenZeppelin Defender Migration Play**
 
 Create dedicated migration guide and outreach campaign:
-- "Defender → BlockSecOps Migration Checklist"
-- Feature comparison showing BlockSecOps advantages
+- "Defender → Apogee Migration Checklist"
+- Feature comparison showing Apogee advantages
 - Special migration pricing (3 months at 50% off)
 - Direct outreach to known Defender users
 
@@ -255,7 +255,7 @@ Create dedicated migration guide and outreach campaign:
 
 | Content Piece | Format | Distribution | Purpose |
 |---------------|--------|--------------|---------|
-| "Why we're building BlockSecOps" | Blog + Twitter thread | Website, Twitter, LinkedIn | Origin story, differentiation |
+| "Why we're building Apogee" | Blog + Twitter thread | Website, Twitter, LinkedIn | Origin story, differentiation |
 | Pre-launch security checklist | PDF download, carousel | LinkedIn, Twitter, gated landing page | Lead magnet |
 | Recent hack postmortem | Technical blog + thread | Twitter (tag @Rekt_News), blog | Credibility, SEO |
 | Product demo video | Loom/YouTube (5 min) | Website, cold outreach | Conversion |
@@ -279,11 +279,11 @@ Create dedicated migration guide and outreach campaign:
 
 ### High-Performing Content Formats
 
-1. **Hack postmortems**: Technical breakdowns consistently generate highest engagement. Template: "How $XM was stolen → Technical root cause → How BlockSecOps detects this"
+1. **Hack postmortems**: Technical breakdowns consistently generate highest engagement. Template: "How $XM was stolen → Technical root cause → How Apogee detects this"
 
 2. **Security checklists**: Actionable frameworks (pre-audit checklist, deployment security checklist) are highly saved/shared and capture featured snippets
 
-3. **Tool comparisons**: "Running 5 scanners manually vs. BlockSecOps" with time/cost analysis
+3. **Tool comparisons**: "Running 5 scanners manually vs. Apogee" with time/cost analysis
 
 4. **Contrarian takes**: "Why most audits don't prevent hacks" drives engagement and positions continuous scanning value prop
 
@@ -297,7 +297,7 @@ Create dedicated migration guide and outreach campaign:
 - [ ] Finalize website messaging emphasizing: unified platform + multi-chain + OZ Defender migration + x402 uniqueness
 - [ ] Create product demo video (5-minute Loom showing key workflows)
 - [ ] Optimize LinkedIn profile as founder landing page
-- [ ] Set up Twitter with consistent branding and pinned thread explaining BlockSecOps
+- [ ] Set up Twitter with consistent branding and pinned thread explaining Apogee
 
 **Lead Generation Setup**
 - [ ] Build initial prospect list: 100 protocols with $10M+ monthly volume
@@ -306,7 +306,7 @@ Create dedicated migration guide and outreach campaign:
 - [ ] Set up simple CRM (Notion, Airtable, or HubSpot free)
 
 **Content Creation**
-- [ ] Write origin story blog post: "Why we're building BlockSecOps"
+- [ ] Write origin story blog post: "Why we're building Apogee"
 - [ ] Create pre-launch security checklist (PDF lead magnet)
 - [ ] Draft 5 LinkedIn posts for scheduling
 - [ ] Create x402 explainer content
@@ -461,16 +461,16 @@ Create dedicated migration guide and outreach campaign:
 ## Appendix: Value Propositions by Persona
 
 ### For CTOs/Technical Leads
-"Stop managing 5 different CLI tools. BlockSecOps runs Slither, Aderyn, Mythril, and 14 other scanners in one dashboard, with unified reporting and 95% fewer false positives."
+"Stop managing 5 different CLI tools. Apogee runs Slither, Aderyn, Mythril, and 14 other scanners in one dashboard, with unified reporting and 95% fewer false positives."
 
 ### For CISOs/Security Leads
 "Continuous compliance, not point-in-time audits. Get audit-ready reports, 365-day result retention, and the documentation regulators expect."
 
 ### For Founders/CEOs
-"One annual audit costs $50K and covers one moment in time. BlockSecOps Professional costs $23K/year and covers every commit, every day."
+"One annual audit costs $50K and covers one moment in time. Apogee Professional costs $23K/year and covers every commit, every day."
 
 ### For Solo Developers
 "Pay $3 to scan a contract right now, no subscription required. Or $189/month for unlimited access. Your choice."
 
 ### For Audit Firms
-"Extend your audit value. Refer clients to BlockSecOps for continuous monitoring and earn partnership revenue while your clients stay secure between engagements."
+"Extend your audit value. Refer clients to Apogee for continuous monitoring and earn partnership revenue while your clients stay secure between engagements."

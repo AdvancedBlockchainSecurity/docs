@@ -10,7 +10,7 @@
 
 ## Overview
 
-The Platform Admin Panel provides BlockSecOps internal team with full administrative access to manage the platform. This includes user management, organization oversight, audit logging, and emergency response capabilities.
+The Platform Admin Panel provides Apogee internal team with full administrative access to manage the platform. This includes user management, organization oversight, audit logging, and emergency response capabilities.
 
 > **February 2026 Update:** The admin panel has been moved to a **separate repository** (`blocksecops-admin-portal`) with its own Supabase project for complete authentication isolation. This ensures that any compromise of customer authentication cannot affect admin access.
 
@@ -95,7 +95,7 @@ The CLI will:
 ### Creating Admin Supabase Account
 
 1. Contact a super_admin to create your Admin Supabase account
-2. Use the same email as your main BlockSecOps account
+2. Use the same email as your main Apogee account
 3. The admin role and permissions are linked by email
 
 ---
@@ -585,4 +585,4 @@ Organization Management (`/admin/organizations`):
 ---
 
 **Last Updated**: 2026-02-02
-**Maintained By**: BlockSecOps Team
+**Maintained By**: Apogee Team

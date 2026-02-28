@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-This audit verifies that Free tier users cannot access the BlockSecOps API. The audit confirms that:
+This audit verifies that Free tier users cannot access the Apogee API. The audit confirms that:
 
 1. **Database layer**: Free tier quotas are correctly configured with `api_access_enabled = false`
 2. **Middleware layer**: `APICallTrackerMiddleware` correctly blocks users with `api_access_enabled = false` (returns 429)
@@ -72,7 +72,7 @@ The database trigger `create_user_quota()` automatically creates correct quota r
 ```json
 {
   "status": "healthy",
-  "service": "BlockSecOps API Service",
+  "service": "Apogee API Service",
   "version": "0.11.1",
   "timestamp": "2026-01-19T03:58:13.865737"
 }

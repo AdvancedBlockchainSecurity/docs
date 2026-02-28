@@ -291,4 +291,4 @@ istio-system/
 - Sidecar injection troubleshooting and debugging
 - Security policy management and updates
 
-This task establishes the foundational service mesh infrastructure that will enable secure, observable, and manageable service-to-service communication for the entire BlockSecOps Platform.
+This task establishes the foundational service mesh infrastructure that will enable secure, observable, and manageable service-to-service communication for the entire Apogee Platform.

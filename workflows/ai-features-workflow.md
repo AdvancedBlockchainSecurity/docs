@@ -8,13 +8,13 @@
 
 ## Overview
 
-This document covers the end-to-end workflow for all AI-powered features in the BlockSecOps platform. All AI features use the Anthropic Claude API, are tier-gated (Team+), and follow consistent security patterns.
+This document covers the end-to-end workflow for all AI-powered features in the Apogee platform. All AI features use the Anthropic Claude API, are tier-gated (Team+), and follow consistent security patterns.
 
 ### Architecture Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                          BlockSecOps AI Features                                │
+│                          Apogee AI Features                                │
 ├─────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                 │
 │  ┌──────────────┐     ┌──────────────────────────────────────┐                │
@@ -432,4 +432,4 @@ All error responses use `get_safe_error_detail()` to prevent internal informatio
 
 ---
 
-**Maintained by:** BlockSecOps Platform Team
+**Maintained by:** Apogee Platform Team

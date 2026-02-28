@@ -6,12 +6,12 @@
 
 ## Overview
 
-This playbook covers setting up Stripe for credit card payments in the BlockSecOps platform. It includes both test mode setup for development and production configuration.
+This playbook covers setting up Stripe for credit card payments in the Apogee platform. It includes both test mode setup for development and production configuration.
 
 ## Prerequisites
 
 - Access to Stripe Dashboard (create account at https://stripe.com)
-- Access to BlockSecOps API service configuration
+- Access to Apogee API service configuration
 - Access to `blocksecops-shared` repository for tier configuration
 
 ---
@@ -60,7 +60,7 @@ Secret: sk_test_51ABC123...
 
 ## Part 3: Create Stripe Products
 
-BlockSecOps has two types of purchasable items:
+Apogee has two types of purchasable items:
 1. **Credit Packages** - One-time purchases for scan credits
 2. **Subscription Tiers** - Monthly/annual subscriptions for platform access
 
@@ -96,28 +96,28 @@ For each credit package:
 **Credits - Starter**
 ```
 Name:        Credits - Starter (10 credits)
-Description: 10 scan credits for BlockSecOps smart contract security scanning
+Description: 10 scan credits for Apogee smart contract security scanning
 Pricing:     $30.00 USD - One time
 ```
 
 **Credits - Builder**
 ```
 Name:        Credits - Builder (50 credits)
-Description: 50 scan credits for BlockSecOps - Save 17% ($2.50/credit)
+Description: 50 scan credits for Apogee - Save 17% ($2.50/credit)
 Pricing:     $125.00 USD - One time
 ```
 
 **Credits - Pro**
 ```
 Name:        Credits - Pro (200 credits)
-Description: 200 scan credits for BlockSecOps - Save 33% ($2.00/credit)
+Description: 200 scan credits for Apogee - Save 33% ($2.00/credit)
 Pricing:     $400.00 USD - One time
 ```
 
 **Credits - Bulk**
 ```
 Name:        Credits - Bulk (1000 credits)
-Description: 1000 scan credits for BlockSecOps - Save 50% ($1.50/credit)
+Description: 1000 scan credits for Apogee - Save 50% ($1.50/credit)
 Pricing:     $1500.00 USD - One time
 ```
 
@@ -129,7 +129,7 @@ For subscription tiers, each product needs TWO prices (monthly and annual):
 
 **Team Tier**
 ```
-Name:        BlockSecOps Team
+Name:        Apogee Team
 Description: Team plan - 50 scans/month, 5 team members, API access, email support
 
 Add two prices:
@@ -139,7 +139,7 @@ Add two prices:
 
 **Growth Tier**
 ```
-Name:        BlockSecOps Growth
+Name:        Apogee Growth
 Description: Growth plan - 200 scans/month, 20 team members, priority support, webhooks
 
 Add two prices:
@@ -149,7 +149,7 @@ Add two prices:
 
 **Enterprise Tier**
 ```
-Name:        BlockSecOps Enterprise
+Name:        Apogee Enterprise
 Description: Enterprise plan - Unlimited scans, SSO, dedicated support, custom integrations
 
 Add one price:
@@ -182,7 +182,7 @@ enterprise_monthly:   price_1Nxxxxxxxxxxxxx
 
 ---
 
-## Part 4: Configure BlockSecOps
+## Part 4: Configure Apogee
 
 ### 4.1 Update Tier Configuration
 
@@ -583,7 +583,7 @@ Before going live:
 - [Stripe API Documentation](https://stripe.com/docs/api)
 - [Stripe Testing Guide](https://stripe.com/docs/testing)
 - [Stripe CLI Reference](https://stripe.com/docs/stripe-cli)
-- [BlockSecOps Tier Standards](/home/pwner/Git/docs/standards/tier-standards.md)
+- [Apogee Tier Standards](/home/pwner/Git/docs/standards/tier-standards.md)
 - [Secrets Management](/home/pwner/Git/docs/standards/secrets-management.md)
 
 ---
@@ -592,5 +592,5 @@ Before going live:
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0.0 | 2026-02-02 | Initial playbook | BlockSecOps Team |
-| 1.1.0 | 2026-02-03 | Updated secrets to use Vault (not ConfigMap), updated webhook forwarding for kubeadm NodePort | BlockSecOps Team |
+| 1.0.0 | 2026-02-02 | Initial playbook | Apogee Team |
+| 1.1.0 | 2026-02-03 | Updated secrets to use Vault (not ConfigMap), updated webhook forwarding for kubeadm NodePort | Apogee Team |

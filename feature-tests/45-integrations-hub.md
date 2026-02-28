@@ -153,7 +153,7 @@ The Unified Integrations Hub consolidates all platform integrations into a singl
 | 2 | Team tier user views tab | Shows "Enterprise" badge, upgrade button |
 | 3 | Enterprise user clicks Connect | OAuth flow to auth.atlassian.com |
 | 4 | Authorize application | Returns with success |
-| 5 | Configure project mapping | Can map BlockSecOps project to JIRA project |
+| 5 | Configure project mapping | Can map Apogee project to JIRA project |
 
 ---
 

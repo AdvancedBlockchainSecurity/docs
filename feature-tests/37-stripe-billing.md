@@ -232,7 +232,7 @@ WHERE user_id = 'user-uuid';
 - PDF downloads with format `blocksecops-receipt-BSO-YYMMDD-XXXX.pdf`
 - Contains:
   - Receipt number
-  - BlockSecOps info
+  - Apogee info
   - User billing details
   - Purchase details (credits, amount)
   - Blockchain verification (tx hash, block, explorer link)

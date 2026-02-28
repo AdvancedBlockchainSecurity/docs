@@ -1,10 +1,10 @@
 # Uploading Hardhat Projects
 
-This guide explains how to upload and scan Hardhat projects with BlockSecOps.
+This guide explains how to upload and scan Hardhat projects with Apogee.
 
 ## Overview
 
-BlockSecOps natively supports Hardhat project structures. When you upload a Hardhat project, BlockSecOps automatically:
+Apogee natively supports Hardhat project structures. When you upload a Hardhat project, Apogee automatically:
 
 1. Detects the framework from `hardhat.config.js` or `hardhat.config.ts`
 2. Parses your configuration (compiler version, paths, optimizer settings)
@@ -40,12 +40,12 @@ my-project/
 
 ### What Gets Extracted
 
-BlockSecOps uses **smart dependency extraction**:
+Apogee uses **smart dependency extraction**:
 
 - **Included**: Your contract files + only the npm packages they import
 - **Excluded**: Test files (`test/`), scripts (`scripts/`), deployment files, unimported packages
 
-**Example**: If `node_modules/@openzeppelin/contracts/` has 200+ files but your contracts only import ERC20 and Ownable, BlockSecOps extracts only those ~10 files.
+**Example**: If `node_modules/@openzeppelin/contracts/` has 200+ files but your contracts only import ERC20 and Ownable, Apogee extracts only those ~10 files.
 
 ## Creating the Archive
 
@@ -93,14 +93,14 @@ Exclude these directories to reduce upload size:
 - `typechain-types/` - TypeChain generated types
 - `.openzeppelin/` - Upgrade plugin data
 
-## Uploading to BlockSecOps
+## Uploading to Apogee
 
 ### Via Dashboard
 
 1. Navigate to **Contracts** > **Upload Contract**
 2. Select **Upload Archive** (ZIP or tar.gz)
 3. Choose your archive file
-4. BlockSecOps auto-detects Hardhat and shows configuration
+4. Apogee auto-detects Hardhat and shows configuration
 5. Click **Upload**
 
 ### Via API
@@ -135,7 +135,7 @@ curl -X POST "https://api.0xapogee.com/api/v1/contracts/upload" \
 
 ## Configuration Parsing
 
-BlockSecOps parses these fields from `hardhat.config.js`:
+Apogee parses these fields from `hardhat.config.js`:
 
 | Field | Description | Default |
 |-------|-------------|---------|
@@ -196,7 +196,7 @@ export default config;
 
 ## npm Dependencies
 
-BlockSecOps reads `package.json` to understand your dependencies:
+Apogee reads `package.json` to understand your dependencies:
 
 ```json
 {
@@ -213,7 +213,7 @@ BlockSecOps reads `package.json` to understand your dependencies:
 
 ### Import Resolution
 
-BlockSecOps resolves imports from `node_modules`:
+Apogee resolves imports from `node_modules`:
 
 ```solidity
 // This import:
@@ -303,7 +303,7 @@ File count limits apply after smart dependency extraction:
 
 ## Plugin Support
 
-BlockSecOps recognizes common Hardhat plugins:
+Apogee recognizes common Hardhat plugins:
 
 | Plugin | Supported | Notes |
 |--------|-----------|-------|

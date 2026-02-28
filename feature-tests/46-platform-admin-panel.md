@@ -85,7 +85,7 @@ curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
 {
   "secret": "BASE32ENCODEDSTRING",
   "qr_code": "data:image/png;base64,...",
-  "provisioning_uri": "otpauth://totp/BlockSecOps:admin@0xapogee.com?secret=..."
+  "provisioning_uri": "otpauth://totp/Apogee:admin@0xapogee.com?secret=..."
 }
 ```
 

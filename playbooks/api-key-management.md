@@ -6,13 +6,13 @@
 
 ## Overview
 
-This playbook covers creating, scoping, rotating, and revoking API keys for programmatic access to the BlockSecOps platform. API keys enable CI/CD integrations, CLI tools, and automated scanning workflows.
+This playbook covers creating, scoping, rotating, and revoking API keys for programmatic access to the Apogee platform. API keys enable CI/CD integrations, CLI tools, and automated scanning workflows.
 
 ---
 
 ## Prerequisites
 
-- [ ] Active BlockSecOps account
+- [ ] Active Apogee account
 - [ ] Authenticated session (email/password or wallet)
 - [ ] Growth or Enterprise tier subscription (API keys not available on Free tier)
 - [ ] Understanding of required scopes for your use case

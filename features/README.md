@@ -1,8 +1,8 @@
-# BlockSecOps Feature Documentation
+# Apogee Feature Documentation
 
 **Last Updated**: December 1, 2025
 
-This directory contains feature specifications and implementation documentation for BlockSecOps platform enhancements.
+This directory contains feature specifications and implementation documentation for Apogee platform enhancements.
 
 ## Feature Phases
 

@@ -20,7 +20,7 @@
 
 ## Overview
 
-BlockSecOps provides a comprehensive suite of security scanning tools to analyze your smart contracts. The scanner selection interface allows you to choose which tools to run based on your needs, time constraints, and the specific vulnerabilities you want to detect.
+Apogee provides a comprehensive suite of security scanning tools to analyze your smart contracts. The scanner selection interface allows you to choose which tools to run based on your needs, time constraints, and the specific vulnerabilities you want to detect.
 
 ### What You'll Learn
 
@@ -70,7 +70,7 @@ This ensures you always get relevant security analysis without needing to manual
 
 ## Scan Profiles
 
-BlockSecOps offers four preset scan profiles to match different use cases:
+Apogee offers four preset scan profiles to match different use cases:
 
 ### Quick Scan (~2 minutes)
 
@@ -441,7 +441,7 @@ A: Make sure you're viewing a contract in the correct language. Scanners are fil
 ### Support Resources
 
 - **Documentation**: [docs.0xapogee.com](https://docs.0xapogee.com)
-- **GitHub Issues**: [github.com/blocksecops/platform/issues](https://github.com/blocksecops/platform/issues)
+- **GitHub Issues**: [github.com/AdvancedBlockchainSecurity/platform/issues](https://github.com/AdvancedBlockchainSecurity/platform/issues)
 - **Community Discord**: [discord.gg/blocksecops](https://discord.gg/blocksecops)
 - **Email Support**: support@0xapogee.com
 

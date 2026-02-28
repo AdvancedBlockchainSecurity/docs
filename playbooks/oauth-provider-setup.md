@@ -6,14 +6,14 @@
 
 ## Overview
 
-This playbook guides you through configuring OAuth providers for BlockSecOps third-party integrations. Each provider requires creating an OAuth application, storing credentials in Vault/GCP Secret Manager, and verifying the connection.
+This playbook guides you through configuring OAuth providers for Apogee third-party integrations. Each provider requires creating an OAuth application, storing credentials in Vault/GCP Secret Manager, and verifying the connection.
 
 ---
 
 ## Prerequisites
 
-- [ ] BlockSecOps API service v0.29.22+ deployed
-- [ ] BlockSecOps dashboard v0.46.4+ deployed
+- [ ] Apogee API service v0.29.22+ deployed
+- [ ] Apogee dashboard v0.46.4+ deployed
 - [ ] Public domain with valid TLS (e.g., `app.0xapogee.com`)
 - [ ] Access to Vault or GCP Secret Manager
 - [ ] ExternalSecret Operator configured
@@ -52,7 +52,7 @@ vault kv put secret/blocksecops/api-service/encryption \
 3. Fill in the form:
    | Field | Value |
    |-------|-------|
-   | Application name | `BlockSecOps` |
+   | Application name | `Apogee` |
    | Homepage URL | `https://app.0xapogee.com` |
    | Application description | `Smart contract security platform` |
    | Authorization callback URL | `https://app.0xapogee.com/api/v1/oauth/github/callback` |
@@ -86,7 +86,7 @@ echo -n "ghsecret_xxxxxxxxxxxx" | gcloud secrets create github-client-secret --d
 
 ### Verify
 
-1. Log into BlockSecOps as an org admin
+1. Log into Apogee as an org admin
 2. Go to **Settings > Integrations > Source Control**
 3. Click **Connect GitHub**
 4. Authorize at GitHub
@@ -107,7 +107,7 @@ echo -n "ghsecret_xxxxxxxxxxxx" | gcloud secrets create github-client-secret --d
 3. Fill in the form:
    | Field | Value |
    |-------|-------|
-   | Name | `BlockSecOps` |
+   | Name | `Apogee` |
    | Redirect URI | `https://app.0xapogee.com/api/v1/oauth/gitlab/callback` |
    | Confidential | Yes (checked) |
    | Scopes | `api`, `read_user`, `read_repository` |
@@ -159,7 +159,7 @@ Currently, the API service hardcodes `gitlab.com` URLs. Self-hosted GitLab suppo
 3. Fill in the form:
    | Field | Value |
    |-------|-------|
-   | Name | `BlockSecOps` |
+   | Name | `Apogee` |
    | Callback URL | `https://app.0xapogee.com/api/v1/oauth/bitbucket/callback` |
    | This is a private consumer | Yes (checked) |
    | Permissions | Repository: Read, Pull requests: Read, Webhooks: Read and Write |
@@ -203,7 +203,7 @@ Bitbucket uses HTTP Basic Authentication for the token exchange (client_id:clien
 3. Fill in the form:
    | Field | Value |
    |-------|-------|
-   | Name | `BlockSecOps` |
+   | Name | `Apogee` |
 
 4. Go to **Permissions** tab and add:
    - **Jira API**: `read:jira-work`, `write:jira-work`, `read:jira-user`
@@ -246,17 +246,17 @@ JIRA has additional steps compared to other providers:
 
 ## Jenkins API Token Setup
 
-Jenkins does not use OAuth. Instead, users provide their Jenkins URL and API token directly in the BlockSecOps UI.
+Jenkins does not use OAuth. Instead, users provide their Jenkins URL and API token directly in the Apogee UI.
 
 ### User-Side Setup
 
 1. Log into Jenkins as the user who will connect
 2. Navigate to **User > Configure** (or `/me/configure`)
 3. Under **API Token**, click **Add new Token**
-4. Name it `BlockSecOps` and click **Generate**
+4. Name it `Apogee` and click **Generate**
 5. Copy the token immediately (shown once)
 
-### In BlockSecOps
+### In Apogee
 
 1. Go to **Settings > Integrations > CI/CD**
 2. Click **Connect Jenkins**

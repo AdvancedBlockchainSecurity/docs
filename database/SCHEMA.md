@@ -1,4 +1,4 @@
-# BlockSecOps Database Schema
+# Apogee Database Schema
 
 **Database:** PostgreSQL 15.4
 **Database Name:** `solidity_security`
@@ -23,7 +23,7 @@
 
 ## Overview
 
-The BlockSecOps database supports a comprehensive smart contract security scanning platform with:
+The Apogee database supports a comprehensive smart contract security scanning platform with:
 
 - **Multi-language support:** Solidity, Vyper, and Solana/Rust (16/16 scanners available as of December 15, 2025)
 - **Multi-file contracts:** Support for complex projects with multiple source files
@@ -2864,7 +2864,7 @@ See [Platform Development Standards](/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPM
 
 **Document Version:** 1.8.0
 **Last Updated:** February 4, 2026 (Added deduplication audit fixes - Migration 066)
-**Maintained By:** BlockSecOps Team
+**Maintained By:** Apogee Team
 
 ---
 

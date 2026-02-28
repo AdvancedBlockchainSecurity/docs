@@ -196,7 +196,7 @@ If subscription prices changed, update Stripe:
 ### Create New Stripe Price
 
 1. Go to [Stripe Dashboard](https://dashboard.stripe.com/products)
-2. Find the relevant product (e.g., "BlockSecOps Team")
+2. Find the relevant product (e.g., "Apogee Team")
 3. Click "Add another price"
 4. Configure:
    - Pricing model: Standard pricing

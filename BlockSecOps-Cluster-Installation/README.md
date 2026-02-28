@@ -1,4 +1,4 @@
-# BlockSecOps Platform Installation Guide
+# Apogee Platform Installation Guide
 
 **Version:** 1.0.0
 **Created:** December 13, 2025
@@ -6,7 +6,7 @@
 
 ## Overview
 
-This guide provides comprehensive step-by-step instructions for installing the BlockSecOps platform on a local Minikube cluster using the `local` overlay. Follow the phases in order for a successful installation.
+This guide provides comprehensive step-by-step instructions for installing the Apogee platform on a local Minikube cluster using the `local` overlay. Follow the phases in order for a successful installation.
 
 ## Deferred Components
 
@@ -719,7 +719,7 @@ kubectl get externalsecrets -A
 #!/bin/bash
 # Save as /Users/pwner/Git/ABS/scripts/health-check.sh
 
-echo "=== BlockSecOps Platform Health Check ==="
+echo "=== Apogee Platform Health Check ==="
 echo
 
 echo "1. Cluster Status:"

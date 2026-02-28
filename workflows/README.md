@@ -6,7 +6,7 @@
 
 ## Overview
 
-This directory contains comprehensive documentation of key workflows in the BlockSecOps platform. Each document provides end-to-end coverage of a specific operational flow, including architecture diagrams, service interactions, data models, and API references.
+This directory contains comprehensive documentation of key workflows in the Apogee platform. Each document provides end-to-end coverage of a specific operational flow, including architecture diagrams, service interactions, data models, and API references.
 
 ---
 
@@ -84,4 +84,4 @@ When adding new workflow documentation:
 
 ---
 
-**Maintained by:** BlockSecOps Platform Team
+**Maintained by:** Apogee Platform Team

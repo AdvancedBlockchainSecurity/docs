@@ -6,13 +6,13 @@
 
 ## Overview
 
-This playbook guides you through configuring email notifications for BlockSecOps security events. Set up personal notifications, team digests, and organization-wide alerts.
+This playbook guides you through configuring email notifications for Apogee security events. Set up personal notifications, team digests, and organization-wide alerts.
 
 ---
 
 ## Prerequisites
 
-- [ ] Active BlockSecOps account
+- [ ] Active Apogee account
 - [ ] Verified email address
 - [ ] Organization admin role (for organization-wide settings)
 
@@ -187,7 +187,7 @@ curl -X PATCH "https://app.0xapogee.com/api/v1/teams/{team_id}/notifications" \
 ### Scan Completed
 
 ```
-Subject: [BlockSecOps] Scan Completed: Token.sol
+Subject: [Apogee] Scan Completed: Token.sol
 
 Hi [Name],
 
@@ -211,7 +211,7 @@ Top Findings:
 [View Full Report]
 
 ---
-BlockSecOps - Smart Contract Security Platform
+Apogee - Smart Contract Security Platform
 Manage notifications: https://app.0xapogee.com/settings/notifications
 ```
 
@@ -235,20 +235,20 @@ External call made before state update allows reentrancy attack.
 Attackers can drain contract funds by recursively calling withdraw().
 
 Immediate Action Required:
-1. Review the finding in BlockSecOps
+1. Review the finding in Apogee
 2. Apply the recommended fix
 3. Re-scan after fixing
 
 [View Vulnerability] [View Recommended Fix]
 
 ---
-This is an automated security alert from BlockSecOps.
+This is an automated security alert from Apogee.
 ```
 
 ### Weekly Summary
 
 ```
-Subject: [BlockSecOps] Weekly Security Summary - Jan 27-Feb 1
+Subject: [Apogee] Weekly Security Summary - Jan 27-Feb 1
 
 Weekly Security Summary
 January 27 - February 1, 2026
@@ -276,7 +276,7 @@ Top Projects by Risk:
 [View Dashboard] [Configure Notifications]
 
 ---
-BlockSecOps - Smart Contract Security Platform
+Apogee - Smart Contract Security Platform
 ```
 
 ---

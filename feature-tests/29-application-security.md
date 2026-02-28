@@ -374,7 +374,7 @@ curl -s -X PUT http://127.0.0.1:8000/api/v1/health/ready -w "%{http_code}"
 TOKEN=$1
 BASE_URL="http://127.0.0.1:8000"
 
-echo "=== BlockSecOps Application Security Scan ==="
+echo "=== Apogee Application Security Scan ==="
 echo ""
 
 # SQL Injection

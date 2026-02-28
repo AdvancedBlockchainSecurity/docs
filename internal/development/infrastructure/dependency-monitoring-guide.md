@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide covers the automated dependency monitoring and security scanning system for the BlockSecOps platform. The dependency monitoring service provides real-time visibility into dependency health, security vulnerabilities, and update requirements across all platform services.
+This guide covers the automated dependency monitoring and security scanning system for the Apogee platform. The dependency monitoring service provides real-time visibility into dependency health, security vulnerabilities, and update requirements across all platform services.
 
 ## Architecture
 
@@ -532,4 +532,4 @@ rate(dependency_scan_errors_total[5m])
 3. **Process Automation**: Automate routine dependency management tasks
 4. **Continuous Improvement**: Regular review and optimization of monitoring
 
-This comprehensive dependency monitoring system provides the visibility and automation needed to maintain secure and up-to-date dependencies across the entire BlockSecOps platform.
+This comprehensive dependency monitoring system provides the visibility and automation needed to maintain secure and up-to-date dependencies across the entire Apogee platform.

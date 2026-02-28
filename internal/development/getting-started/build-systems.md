@@ -2,7 +2,7 @@
 
 ## Overview
 
-The BlockSecOps Platform uses three primary build systems optimized for each language ecosystem: Python with pip/maturin, TypeScript with Vite, and Rust with Cargo. This document covers build configuration, automation, and optimization strategies across all services.
+The Apogee Platform uses three primary build systems optimized for each language ecosystem: Python with pip/maturin, TypeScript with Vite, and Rust with Cargo. This document covers build configuration, automation, and optimization strategies across all services.
 
 ## Build System Architecture
 

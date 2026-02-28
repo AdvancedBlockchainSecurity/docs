@@ -8,13 +8,13 @@
 
 ## Overview
 
-This document provides a comprehensive audit of the smart contract scanning workflow in the BlockSecOps platform. It covers the complete end-to-end flow from contract upload to vulnerability display in the dashboard.
+This document provides a comprehensive audit of the smart contract scanning workflow in the Apogee platform. It covers the complete end-to-end flow from contract upload to vulnerability display in the dashboard.
 
 ### Architecture Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              BlockSecOps Platform                                │
+│                              Apogee Platform                                │
 ├─────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                  │
 │  ┌──────────────┐     ┌──────────────┐     ┌──────────────────────┐            │
@@ -449,7 +449,7 @@ Raw scanner output
 
 #### Pattern Classification (BVD Codes)
 
-Vulnerabilities are classified using BlockSecOps Vulnerability Database (BVD) codes:
+Vulnerabilities are classified using Apogee Vulnerability Database (BVD) codes:
 
 ```
 Format: BVD-{CHAIN}-{CATEGORY}-{NUMBER}
@@ -811,5 +811,5 @@ data:
 
 ---
 
-**Maintained by:** BlockSecOps Platform Team
+**Maintained by:** Apogee Platform Team
 **Last Audit:** February 19, 2026

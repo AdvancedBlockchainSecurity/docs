@@ -965,7 +965,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/blocksecops/aws-infrastructure.git
+    repoURL: https://github.com/AdvancedBlockchainSecurity/aws-infrastructure.git
     targetRevision: main
     path: kubernetes/manifests
     directory:
@@ -1000,7 +1000,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/blocksecops/aws-infrastructure.git
+    repoURL: https://github.com/AdvancedBlockchainSecurity/aws-infrastructure.git
     targetRevision: main
     path: kubernetes/monitoring
     directory:
@@ -1028,9 +1028,9 @@ metadata:
   name: blocksecops
   namespace: argocd
 spec:
-  description: BlockSecOps Platform applications
+  description: Apogee Platform applications
   sourceRepos:
-  - 'https://github.com/blocksecops/*'
+  - 'https://github.com/AdvancedBlockchainSecurity/*'
   destinations:
   - namespace: blocksecops
     server: https://kubernetes.default.svc
@@ -1056,14 +1056,14 @@ spec:
     kind: '*'
   roles:
   - name: developer
-    description: Developer access to BlockSecOps applications
+    description: Developer access to Apogee applications
     policies:
     - p, proj:blocksecops:developer, applications, get, blocksecops/*, allow
     - p, proj:blocksecops:developer, applications, action/*, blocksecops/*, allow
     groups:
     - blocksecops:developers
   - name: admin
-    description: Admin access to BlockSecOps applications
+    description: Admin access to Apogee applications
     policies:
     - p, proj:blocksecops:admin, applications, *, blocksecops/*, allow
     - p, proj:blocksecops:admin, repositories, *, *, allow
@@ -1390,7 +1390,7 @@ data:
     {
       "dashboard": {
         "id": null,
-        "title": "BlockSecOps Platform",
+        "title": "Apogee Platform",
         "tags": ["solidity", "security", "backend"],
         "timezone": "browser",
         "panels": [
@@ -1781,7 +1781,7 @@ health_check() {
 
 # Main deployment function
 main() {
-    log_info "Starting local deployment of BlockSecOps Platform..."
+    log_info "Starting local deployment of Apogee Platform..."
 
     check_prerequisites
     setup_storage

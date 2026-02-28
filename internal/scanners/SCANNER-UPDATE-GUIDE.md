@@ -2,7 +2,7 @@
 
 **Version:** 1.1
 **Last Updated:** December 4, 2025
-**Purpose:** Guide for updating third-party security scanners and SBOM generators in the BlockSecOps platform
+**Purpose:** Guide for updating third-party security scanners and SBOM generators in the Apogee platform
 
 ---
 
@@ -24,7 +24,7 @@
 
 ## Overview
 
-This guide covers the process for updating security scanners (Slither, Mythril, SolidityDefend, etc.) and SBOM generators (SolidityBOM) in the BlockSecOps platform.
+This guide covers the process for updating security scanners (Slither, Mythril, SolidityDefend, etc.) and SBOM generators (SolidityBOM) in the Apogee platform.
 
 ### Platform Architecture for Scanner Updates
 
@@ -1263,8 +1263,8 @@ Copy this checklist for each scanner update:
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.1 | 2025-12-04 | Updated scanner versions table, added latest stable versions | BlockSecOps Team |
-| 1.0 | 2025-10-25 | Initial version | BlockSecOps Team |
+| 1.1 | 2025-12-04 | Updated scanner versions table, added latest stable versions | Apogee Team |
+| 1.0 | 2025-10-25 | Initial version | Apogee Team |
 
 ---
 

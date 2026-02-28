@@ -6,7 +6,7 @@
 
 ## Purpose
 
-This is a **reusable template** for safely removing security scanners from the BlockSecOps platform. Follow this guide step-by-step to ensure clean removal without breaking existing functionality.
+This is a **reusable template** for safely removing security scanners from the Apogee platform. Follow this guide step-by-step to ensure clean removal without breaking existing functionality.
 
 ---
 

@@ -8,7 +8,7 @@
 
 ## Overview
 
-The Intelligence Engine is a standalone FastAPI microservice that provides semantic embedding generation for the BlockSecOps platform. It powers Level 5 (semantic) deduplication matching by generating 384-dimensional vectors from vulnerability text.
+The Intelligence Engine is a standalone FastAPI microservice that provides semantic embedding generation for the Apogee platform. It powers Level 5 (semantic) deduplication matching by generating 384-dimensional vectors from vulnerability text.
 
 ```
 API Service                Intelligence Engine              SentenceTransformer

@@ -8,7 +8,7 @@
 
 ## Overview
 
-The BlockSecOps Dashboard v0.13.0 includes full frontend implementation for Phase 4.5 enterprise features. These features provide enterprise-grade management capabilities with tier-based access control.
+The Apogee Dashboard v0.13.0 includes full frontend implementation for Phase 4.5 enterprise features. These features provide enterprise-grade management capabilities with tier-based access control.
 
 ## Feature Summary
 
@@ -279,7 +279,7 @@ export const useCreateApiKey = () =>
 Webhooks support HMAC-SHA256 signature verification:
 
 ```typescript
-// Signature header: X-BlockSecOps-Signature
+// Signature header: X-Apogee-Signature
 const signature = createHmac('sha256', secret)
   .update(JSON.stringify(payload))
   .digest('hex');

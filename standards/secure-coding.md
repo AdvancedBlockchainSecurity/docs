@@ -6,7 +6,7 @@
 
 ## Overview
 
-All BlockSecOps code MUST follow security-first development practices. Every line of code is written with the assumption that it will be attacked. Security is not a phase or an afterthought -- it is a mandatory property of every commit, PR, and deployment.
+All Apogee code MUST follow security-first development practices. Every line of code is written with the assumption that it will be attacked. Security is not a phase or an afterthought -- it is a mandatory property of every commit, PR, and deployment.
 
 **Violations of these standards are considered CRITICAL and block merge.**
 

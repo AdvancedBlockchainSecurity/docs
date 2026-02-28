@@ -2,7 +2,7 @@
 
 ## Overview
 
-BlockSecOps uses an **unbounded risk scoring system** to quantify security risk across smart contracts and projects. Higher scores indicate higher risk, with no artificial cap. This allows users to accurately understand their risk exposure regardless of how many vulnerabilities are present.
+Apogee uses an **unbounded risk scoring system** to quantify security risk across smart contracts and projects. Higher scores indicate higher risk, with no artificial cap. This allows users to accurately understand their risk exposure regardless of how many vulnerabilities are present.
 
 ## Key Principles
 

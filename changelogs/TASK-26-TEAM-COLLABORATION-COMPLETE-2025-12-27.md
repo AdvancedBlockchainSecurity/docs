@@ -6,7 +6,7 @@
 
 ## Summary
 
-Implemented the Team Collaboration feature for the BlockSecOps platform, enabling organizations to create teams, manage project access, assign vulnerabilities, and add comments for collaborative security work.
+Implemented the Team Collaboration feature for the Apogee platform, enabling organizations to create teams, manage project access, assign vulnerabilities, and add comments for collaborative security work.
 
 ## Changes Made
 

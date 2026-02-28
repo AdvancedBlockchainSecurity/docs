@@ -141,6 +141,6 @@ grep 'scanner_id=' vyper_scanners.py | head -1
 
 ---
 
-**Completed By:** BlockSecOps Audit
+**Completed By:** Apogee Audit
 **Reviewed:** December 20, 2025
 **Validated:** December 21, 2025

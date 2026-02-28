@@ -2,7 +2,7 @@
 
 **Last Updated:** February 19, 2026
 **Status:** Active
-**Applies to:** All BlockSecOps platform services
+**Applies to:** All Apogee platform services
 
 ---
 

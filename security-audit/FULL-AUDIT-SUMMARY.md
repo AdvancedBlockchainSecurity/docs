@@ -1,4 +1,4 @@
-# BlockSecOps Security Audit - Full Summary
+# Apogee Security Audit - Full Summary
 
 **Date:** January 31, 2026
 **Audit Scope:** blocksecops-api-service

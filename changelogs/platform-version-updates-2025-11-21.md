@@ -26,7 +26,7 @@ Scanner UI enhancements from merged PRs including:
 - Enhanced scanner selection modal with improved layout
 - Version badge display for all scanners
 - GitHub link integration for scanner documentation
-- Visual hierarchy improvements (BlockSecOps scanners at top)
+- Visual hierarchy improvements (Apogee scanners at top)
 - UI polish and refinements
 
 **Build Process:**
@@ -113,8 +113,8 @@ kubectl rollout restart deployment/api-service -n api-service-local
 **Issue #2: Incorrect GitHub URL**
 - **Problem:** GitHub URL pointing to wrong organization
 - **Incorrect URL:** `https://github.com/Advanced-Blockchain-Security/SolidityDefend`
-- **Correct URL:** `https://github.com/BlockSecOps/SolidityDefend`
-- **User Report:** "the url is https://github.com/BlockSecOps/SolidityDefend not https://github.com/Advanced-Blockchain-Security/SolidityDefend"
+- **Correct URL:** `https://github.com/AdvancedBlockchainSecurity/SolidityDefend`
+- **User Report:** "the url is https://github.com/AdvancedBlockchainSecurity/SolidityDefend not https://github.com/Advanced-Blockchain-Security/SolidityDefend"
 
 **Issue #3: Outdated Detector Count**
 - **Problem:** Description showing "105+ vulnerability detectors"
@@ -152,8 +152,8 @@ kubectl rollout restart deployment/api-service -n api-service-local
     estimated_time_seconds=30,
     requires_compilation=False,
     version="1.3.7",
-    developer="BlockSecOps",
-    github_url="https://github.com/BlockSecOps/SolidityDefend",
+    developer="Apogee",
+    github_url="https://github.com/AdvancedBlockchainSecurity/SolidityDefend",
     is_blocksecops_scanner=True,
 ),
 ```
@@ -161,8 +161,8 @@ kubectl rollout restart deployment/api-service -n api-service-local
 #### Changes Summary
 
 1. ✅ Added `version="1.3.7"` (retrieved from GitHub releases)
-2. ✅ Added `developer="BlockSecOps"`
-3. ✅ Fixed `github_url` to correct organization (`BlockSecOps`)
+2. ✅ Added `developer="Apogee"`
+3. ✅ Fixed `github_url` to correct organization (`Apogee`)
 4. ✅ Updated detector count from "105+" to "209"
 
 #### Verification
@@ -182,19 +182,19 @@ curl -s http://127.0.0.1:8000/api/v1/scanners | jq '.scanners[] | select(.id == 
   "languages": ["solidity"],
   "estimated_time_seconds": 30,
   "version": "1.3.7",
-  "developer": "BlockSecOps",
+  "developer": "Apogee",
   "requires_compilation": false,
   "is_production_ready": true,
   "confidence_level": "high",
   "is_blocksecops_scanner": true,
-  "github_url": "https://github.com/BlockSecOps/SolidityDefend"
+  "github_url": "https://github.com/AdvancedBlockchainSecurity/SolidityDefend"
 }
 ```
 
 **Dashboard UI:**
-- ✅ SolidityDefend appears at top of scanner list (BlockSecOps scanner)
+- ✅ SolidityDefend appears at top of scanner list (Apogee scanner)
 - ✅ Version badge displays "v1.3.7"
-- ✅ GitHub link points to `https://github.com/BlockSecOps/SolidityDefend`
+- ✅ GitHub link points to `https://github.com/AdvancedBlockchainSecurity/SolidityDefend`
 - ✅ Description shows "209 vulnerability detectors"
 
 ---
@@ -401,14 +401,14 @@ curl -s http://127.0.0.1:8000/api/v1/scanners | jq '.scanners[] | select(.id == 
 
 **Verified Fields:**
 - ✅ `version: "1.3.7"` (was "unknown")
-- ✅ `developer: "BlockSecOps"`
-- ✅ `github_url: "https://github.com/BlockSecOps/SolidityDefend"` (corrected)
+- ✅ `developer: "Apogee"`
+- ✅ `github_url: "https://github.com/AdvancedBlockchainSecurity/SolidityDefend"` (corrected)
 - ✅ `description` includes "209 vulnerability detectors" (updated from 105)
 
 ### Dashboard UI Verification
 
 **Expected Behavior:**
-- ✅ SolidityDefend appears at top of scanner list (BlockSecOps scanner)
+- ✅ SolidityDefend appears at top of scanner list (Apogee scanner)
 - ✅ Version badge displays "v1.3.7"
 - ✅ GitHub link points to correct repository
 - ✅ All scanners display with their correct versions
@@ -425,7 +425,7 @@ curl -s http://127.0.0.1:8000/api/v1/scanners | jq '.scanners[] | select(.id == 
 - ✅ Enhanced scanner selection UI (v0.3.0)
 - ✅ Version badges for all scanners
 - ✅ GitHub links for scanner documentation
-- ✅ Improved visual hierarchy with BlockSecOps scanners at top
+- ✅ Improved visual hierarchy with Apogee scanners at top
 
 **API:**
 - ✅ Accurate scanner metadata (version, developer, GitHub URLs)
@@ -572,9 +572,9 @@ curl -s http://127.0.0.1:8000/api/v1/scanners | jq '.scanners[] | select(.id == 
 | Metric | Target | Actual | Status |
 |--------|--------|--------|--------|
 | SolidityDefend Version Correct | v1.3.7 | v1.3.7 | ✅ |
-| GitHub URL Correct | BlockSecOps org | BlockSecOps org | ✅ |
+| GitHub URL Correct | Apogee org | Apogee org | ✅ |
 | Detector Count Accurate | 209 | 209 | ✅ |
-| Developer Attribution | BlockSecOps | BlockSecOps | ✅ |
+| Developer Attribution | Apogee | Apogee | ✅ |
 
 ### Documentation Completeness
 

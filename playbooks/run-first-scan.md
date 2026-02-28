@@ -6,13 +6,13 @@
 
 ## Overview
 
-This playbook guides new users through running their first security scan on BlockSecOps. Learn how to upload a smart contract, configure scan settings, run the scan, and interpret the results.
+This playbook guides new users through running their first security scan on Apogee. Learn how to upload a smart contract, configure scan settings, run the scan, and interpret the results.
 
 ---
 
 ## Prerequisites
 
-- [ ] Active BlockSecOps account (any tier)
+- [ ] Active Apogee account (any tier)
 - [ ] Solidity smart contract file(s) to scan
 - [ ] Project created (or create during this workflow)
 

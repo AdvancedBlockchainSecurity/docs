@@ -21,7 +21,7 @@
 
 ## Overview
 
-This document defines mandatory standards for all Docker images in the BlockSecOps Platform. These standards ensure:
+This document defines mandatory standards for all Docker images in the Apogee Platform. These standards ensure:
 
 - **Reproducible builds** through semantic versioning
 - **Cache busting** to prevent stale image usage
@@ -148,7 +148,7 @@ ARG RUST_VERSION=1.90
 All images MUST include these OCI-compliant labels:
 
 ```dockerfile
-LABEL maintainer="BlockSecOps Team <team@soliditysecurity.com>" \
+LABEL maintainer="Apogee Team <team@soliditysecurity.com>" \
       org.label-schema.name="${SERVICE_NAME}" \
       org.label-schema.version="${SERVICE_VERSION}" \
       org.label-schema.description="Service description here" \
@@ -198,7 +198,7 @@ ARG BUILD_DATE
 ARG VCS_REF
 
 # Add labels
-LABEL maintainer="BlockSecOps Team <team@soliditysecurity.com>" \
+LABEL maintainer="Apogee Team <team@soliditysecurity.com>" \
       org.label-schema.name="${SERVICE_NAME}" \
       org.label-schema.version="${SERVICE_VERSION}" \
       org.label-schema.description="Service description" \
@@ -503,7 +503,7 @@ ARG SERVICE_VERSION
 ARG BUILD_DATE
 ARG VCS_REF
 
-LABEL maintainer="BlockSecOps Team <team@soliditysecurity.com>" \
+LABEL maintainer="Apogee Team <team@soliditysecurity.com>" \
       org.label-schema.name="${SERVICE_NAME}" \
       org.label-schema.version="${SERVICE_VERSION}" \
       org.label-schema.description="FastAPI gateway service" \
@@ -559,7 +559,7 @@ ARG SERVICE_VERSION
 ARG BUILD_DATE
 ARG VCS_REF
 
-LABEL maintainer="BlockSecOps Team <team@soliditysecurity.com>" \
+LABEL maintainer="Apogee Team <team@soliditysecurity.com>" \
       org.label-schema.name="${SERVICE_NAME}" \
       org.label-schema.version="${SERVICE_VERSION}" \
       org.label-schema.description="Notification service" \
@@ -606,7 +606,7 @@ ARG SERVICE_VERSION
 ARG BUILD_DATE
 ARG VCS_REF
 
-LABEL maintainer="BlockSecOps Team <team@soliditysecurity.com>" \
+LABEL maintainer="Apogee Team <team@soliditysecurity.com>" \
       org.label-schema.name="${SERVICE_NAME}" \
       org.label-schema.version="${SERVICE_VERSION}" \
       org.label-schema.description="Contract parser service" \
@@ -666,7 +666,7 @@ This document references:
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0.0 | 2025-10-09 | Initial standards document | BlockSecOps Team |
+| 1.0.0 | 2025-10-09 | Initial standards document | Apogee Team |
 
 ---
 

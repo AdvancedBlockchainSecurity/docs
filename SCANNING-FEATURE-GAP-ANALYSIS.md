@@ -2,13 +2,13 @@
 
 **Date**: October 17, 2025
 **Status**: Initial Assessment
-**Platform**: BlockSecOps Security Platform
+**Platform**: Apogee Security Platform
 
 ---
 
 ## Executive Summary
 
-This document analyzes the current state of security scanning features in the BlockSecOps platform and identifies gaps that need to be addressed to provide a comprehensive security scanning solution.
+This document analyzes the current state of security scanning features in the Apogee platform and identifies gaps that need to be addressed to provide a comprehensive security scanning solution.
 
 **Current Status**: 🟡 Partially Implemented
 **Scanner Coverage**: 26 tools across 5 languages (Excellent)
@@ -375,7 +375,7 @@ GET /api/v1/scans/{id}/export?format=json
   "runs": [{
     "tool": {
       "driver": {
-        "name": "BlockSecOps Scanner",
+        "name": "Apogee Scanner",
         "version": "1.0.0",
         "rules": [...]
       }

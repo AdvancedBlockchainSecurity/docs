@@ -6,13 +6,13 @@
 
 ## Overview
 
-This playbook guides enterprise users through creating an organization in BlockSecOps. Organizations provide centralized team management, shared projects, role-based access control, and consolidated billing.
+This playbook guides enterprise users through creating an organization in Apogee. Organizations provide centralized team management, shared projects, role-based access control, and consolidated billing.
 
 ---
 
 ## Prerequisites
 
-- [ ] Active BlockSecOps account with verified email
+- [ ] Active Apogee account with verified email
 - [ ] Enterprise tier subscription (required for organizations)
 - [ ] No existing organization owned by this account (one organization per owner)
 - [ ] Organization name and purpose defined
@@ -185,7 +185,7 @@ curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/invites" \
   -d '{
     "email": "admin@acme.com",
     "role": "admin",
-    "message": "You are invited to join Acme Security on BlockSecOps."
+    "message": "You are invited to join Acme Security on Apogee."
   }'
 ```
 

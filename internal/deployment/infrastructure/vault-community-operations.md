@@ -316,4 +316,4 @@ If you need enterprise features in the future:
 - **Performance replication** (requires Vault Enterprise)
 - **Namespaces** for multi-tenancy (requires Vault Enterprise)
 
-For now, Vault Community Edition provides all the secret management capabilities needed for the BlockSecOps Platform.
+For now, Vault Community Edition provides all the secret management capabilities needed for the Apogee Platform.

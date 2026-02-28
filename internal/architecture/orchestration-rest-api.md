@@ -32,7 +32,7 @@
 
 ## Overview
 
-The **Orchestration REST API** provides programmatic access to all 12 security scanners in the BlockSecOps platform through a unified HTTP interface. Built with FastAPI integrated with Celery workers, it combines HTTP convenience with distributed execution capabilities.
+The **Orchestration REST API** provides programmatic access to all 12 security scanners in the Apogee platform through a unified HTTP interface. Built with FastAPI integrated with Celery workers, it combines HTTP convenience with distributed execution capabilities.
 
 ### Key Features
 

@@ -451,7 +451,7 @@ kubectl port-forward -n api-service-local svc/api-service 8000:8000
 
 ```bash
 curl http://localhost:8000/
-# Expected: {"message":"BlockSecOps API Service","status":"running","version":"0.1.0"}
+# Expected: {"message":"Apogee API Service","status":"running","version":"0.1.0"}
 ```
 
 ### Authentication Test (Supabase)

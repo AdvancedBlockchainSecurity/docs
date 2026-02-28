@@ -168,5 +168,5 @@ kubectl exec -n api-service-local deploy/api-service -- python -c \
 
 ---
 
-**Maintained By:** BlockSecOps Team
+**Maintained By:** Apogee Team
 **Status:** Complete

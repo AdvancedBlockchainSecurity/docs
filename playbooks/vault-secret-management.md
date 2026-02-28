@@ -6,7 +6,7 @@
 
 ## Overview
 
-Manage secrets in HashiCorp Vault for the BlockSecOps local development cluster. Vault stores all sensitive configuration consumed by services via the External Secrets Operator (ESO).
+Manage secrets in HashiCorp Vault for the Apogee local development cluster. Vault stores all sensitive configuration consumed by services via the External Secrets Operator (ESO).
 
 ---
 

@@ -7,13 +7,13 @@
 
 ## Overview
 
-This document defines the standards for ingress controllers, routing, and networking in BlockSecOps platform infrastructure across all environments (local, staging, production).
+This document defines the standards for ingress controllers, routing, and networking in Apogee platform infrastructure across all environments (local, staging, production).
 
 ## Ingress Controller Standard
 
 ### Official Ingress Controller: Traefik v3.6+
 
-**Traefik** is the official and only supported ingress controller for BlockSecOps platform.
+**Traefik** is the official and only supported ingress controller for Apogee platform.
 
 - **Current Version**: v3.6.2
 - **Minimum Version**: v3.6.0

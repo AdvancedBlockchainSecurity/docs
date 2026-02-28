@@ -1,14 +1,14 @@
 # Deployment Documentation
 
 **Last Updated**: November 21, 2025
-**Platform**: BlockSecOps Security Platform
+**Platform**: Apogee Security Platform
 **Deployment Targets**: AWS EKS (Production), Minikube (Local)
 
 ---
 
 ## Overview
 
-Comprehensive deployment guides for the BlockSecOps Platform infrastructure components. This directory contains production deployment procedures, local configuration guides, and troubleshooting documentation.
+Comprehensive deployment guides for the Apogee Platform infrastructure components. This directory contains production deployment procedures, local configuration guides, and troubleshooting documentation.
 
 ---
 
@@ -425,6 +425,6 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
 ---
 
-**Maintained by**: BlockSecOps DevOps Team
+**Maintained by**: Apogee DevOps Team
 **Last Review**: November 21, 2025
 **Emergency Contact**: devops@0xapogee.com

@@ -18,7 +18,7 @@
 
 ## Overview
 
-The BlockSecOps API Service has a comprehensive automated testing suite that ensures code quality, security, and functionality. Tests are organized into multiple categories and run automatically in CI/CD pipelines.
+The Apogee API Service has a comprehensive automated testing suite that ensures code quality, security, and functionality. Tests are organized into multiple categories and run automatically in CI/CD pipelines.
 
 ### Testing Stack
 

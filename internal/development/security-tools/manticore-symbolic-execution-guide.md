@@ -71,9 +71,9 @@ function withdraw(uint256 amount) public {
 
 ## Quick Start
 
-### Using BlockSecOps Dashboard
+### Using Apogee Dashboard
 
-1. **Upload your contract** to the BlockSecOps platform
+1. **Upload your contract** to the Apogee platform
 2. **Select Manticore** from the security tools dropdown
 3. **Configure analysis depth** (see [Configuration Options](#configuration-options))
 4. **Run scan** and wait for results (typically 2-15 minutes)
@@ -622,7 +622,7 @@ Adjust memory allocation for complex contracts:
 
 ```json
 {
-  "memory_limit": "3Gi",  // Default for Manticore in BlockSecOps
+  "memory_limit": "3Gi",  // Default for Manticore in Apogee
   "solver_timeout": 120    // Z3 timeout per query (seconds)
 }
 ```
@@ -1006,7 +1006,7 @@ Manticore struggles with:
 
 ### Q9: Can I run Manticore locally?
 
-**Answer**: Yes, but BlockSecOps platform is recommended:
+**Answer**: Yes, but Apogee platform is recommended:
 
 **Local Installation**:
 ```bash
@@ -1014,7 +1014,7 @@ pip3 install manticore[native]
 manticore --detect-all MyContract.sol
 ```
 
-**BlockSecOps Platform Advantages**:
+**Apogee Platform Advantages**:
 - Pre-configured optimal settings
 - Kubernetes-managed resources (3Gi memory)
 - Standardized JSON output
@@ -1121,7 +1121,7 @@ Path constraints: 1847 conditions
 **Solutions**:
 1. Reduce path complexity by targeting specific functions
 2. Increase `solver_timeout`
-3. Update Z3 to latest version (handled automatically in BlockSecOps)
+3. Update Z3 to latest version (handled automatically in Apogee)
 4. Report to support with contract sample
 
 ---
@@ -1134,7 +1134,7 @@ Path constraints: 1847 conditions
 - **Trail of Bits Blog**: https://blog.trailofbits.com (Manticore case studies)
 - **Z3 Theorem Prover**: https://github.com/Z3Prover/z3
 
-### BlockSecOps Resources
+### Apogee Resources
 
 - **Security Tools Overview**: `/development/security-tools-overview.md`
 - **Echidna Fuzzing Guide**: `/development/echidna-fuzzing-guide.md`
@@ -1149,7 +1149,7 @@ Path constraints: 1847 conditions
 
 ### Community
 
-- **BlockSecOps Discord**: Security tool discussions and support
+- **Apogee Discord**: Security tool discussions and support
 - **Trail of Bits Slack**: Manticore-specific questions
 - **Ethereum Security**: https://github.com/ethereum/security
 
@@ -1157,7 +1157,7 @@ Path constraints: 1847 conditions
 
 ## Getting Help
 
-### BlockSecOps Support
+### Apogee Support
 
 - **Email**: support@0xapogee.com
 - **Discord**: https://discord.gg/blocksecops
@@ -1178,4 +1178,4 @@ Have ideas for improving Manticore integration? Contact us:
 
 **Document Version**: 1.0
 **Last Updated**: October 13, 2025
-**Maintained By**: BlockSecOps Security Team
+**Maintained By**: Apogee Security Team

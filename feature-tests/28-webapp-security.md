@@ -321,7 +321,7 @@ Run this script to verify all security hardening is in place:
 # Security Hardening Verification Script
 # Run from terminal with API service accessible at 127.0.0.1:8000
 
-echo "=== BlockSecOps Security Hardening Tests ==="
+echo "=== Apogee Security Hardening Tests ==="
 echo ""
 
 # Test 1: API Security Headers

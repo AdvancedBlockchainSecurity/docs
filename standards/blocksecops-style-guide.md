@@ -1,4 +1,4 @@
-# BlockSecOps Style Guide
+# Apogee Style Guide
 
 **Version:** 1.0
 **Last Updated:** January 19, 2026
@@ -7,7 +7,7 @@
 
 ## Overview
 
-This style guide defines the visual language for BlockSecOps applications, featuring a dark cyberpunk aesthetic with electric cyan, purple accents, glassmorphism effects, and neon glows.
+This style guide defines the visual language for Apogee applications, featuring a dark cyberpunk aesthetic with electric cyan, purple accents, glassmorphism effects, and neon glows.
 
 ---
 

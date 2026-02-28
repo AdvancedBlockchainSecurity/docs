@@ -8,7 +8,7 @@
 
 ## Overview
 
-Implement a comprehensive FastAPI application using Domain-Driven Design (DDD), Clean Architecture, and CQRS patterns. This service will serve as the primary API gateway for the BlockSecOps Platform, handling authentication, user management, and project orchestration.
+Implement a comprehensive FastAPI application using Domain-Driven Design (DDD), Clean Architecture, and CQRS patterns. This service will serve as the primary API gateway for the Apogee Platform, handling authentication, user management, and project orchestration.
 
 ## Technical Requirements
 
@@ -457,7 +457,7 @@ from typing import List, Optional
 
 class Settings(BaseSettings):
     # Application
-    app_name: str = "BlockSecOps API"
+    app_name: str = "Apogee API"
     debug: bool = False
     api_version: str = "v1"
 

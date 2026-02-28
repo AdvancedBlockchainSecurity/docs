@@ -1,7 +1,7 @@
 # Pattern Code Backfill and Column Widening
 
 **Date:** January 16, 2026
-**Author:** BlockSecOps Team
+**Author:** Apogee Team
 **Services Affected:** api-service
 **Version:** 0.10.9
 

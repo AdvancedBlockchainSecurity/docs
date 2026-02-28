@@ -536,4 +536,4 @@ Add tests verifying:
 
 **Report Version:** 1.0
 **Last Updated:** November 2, 2025
-**Author:** BlockSecOps Team
+**Author:** Apogee Team

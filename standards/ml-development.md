@@ -7,7 +7,7 @@
 
 ## Overview
 
-This document defines standards for developing and maintaining ML features in BlockSecOps. All ML features use a CPU-only approach to minimize infrastructure costs.
+This document defines standards for developing and maintaining ML features in Apogee. All ML features use a CPU-only approach to minimize infrastructure costs.
 
 ---
 

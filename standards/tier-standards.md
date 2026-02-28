@@ -5,7 +5,7 @@
 **Status**: Official
 **Owner**: Product Team
 
-This document describes the tier and pricing standards for the BlockSecOps platform.
+This document describes the tier and pricing standards for the Apogee platform.
 
 ## Centralized Configuration
 
@@ -351,7 +351,7 @@ AI-powered features use the Anthropic Claude API and are tier-gated with monthly
 | Claude Haiku 3.5 | $0.80 | $4.00 | Code Review, Economic Analysis |
 | Claude Sonnet 4 | $3.00 | $15.00 | Copilot, Code Repair, Invariants |
 
-### Monthly Cost to BlockSecOps (Absorbed in Tier)
+### Monthly Cost to Apogee (Absorbed in Tier)
 
 | Tier | Typical AI Usage | Est. Monthly Cost |
 |------|------------------|-------------------|
@@ -431,7 +431,7 @@ Pay-per-scan credit packages via x402 (USDC on Base) for users who prefer flexib
 
 | Platform | Model | Per-Scan Cost | Scanners |
 |----------|-------|---------------|----------|
-| BlockSecOps x402 | Credit packages | $1.50-$3.00 | 25+ |
+| Apogee x402 | Credit packages | $1.50-$3.00 | 25+ |
 | MythX On-Demand | Per-scan | $3.33 | 1 |
 | SolidityScan On-Demand | LoC-based | $15-30 | 1 |
 
@@ -617,7 +617,7 @@ monthly_nl_conversions_limit = -1
 
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-24 | **v3.5**: Added API Endpoint Tier Gates section documenting all `require_tier()` enforcement. 5 missing gates fixed (search, api-keys, integrations, notification-channels, webhooks). 20 regression tests. | BlockSecOps Team |
+| 2026-02-24 | **v3.5**: Added API Endpoint Tier Gates section documenting all `require_tier()` enforcement. 5 missing gates fixed (search, api-keys, integrations, notification-channels, webhooks). 20 regression tests. | Apogee Team |
 | 2026-02-13 | **v3.4**: Added PoC Exploit Generation (Growth+ tier, 10s cooldown, output safety validation). Tier-config v3.3 updated with `monthlyAiExploitsLimit`. | Claude Code |
 | 2026-02-07 | **v3.3**: AI Features now ACTIVE (v0.28.2). Updated all AI quotas to match implementation. Added security controls, feature flags, rate limits, Vault secret path, and related pipeline documentation links. | Claude Code |
 | 2026-01-26 | **v3.1**: Added Phase 5 AI feature quotas (AI Copilot, Code Review, Code Repair, Compliance assessments) for upcoming AI/ML implementation. | Claude Code |

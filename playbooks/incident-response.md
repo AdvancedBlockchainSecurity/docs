@@ -7,7 +7,7 @@
 
 ## Overview
 
-Procedures for detecting, responding to, and recovering from incidents affecting the BlockSecOps platform.
+Procedures for detecting, responding to, and recovering from incidents affecting the Apogee platform.
 
 ---
 

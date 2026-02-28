@@ -42,7 +42,7 @@ For current authentication documentation, see:
 
 ## Historical Overview (For Reference Only)
 
-The Authentication Frontend was a standalone React + TypeScript application that provided user authentication for the BlockSecOps platform using Supabase Auth. It handled user registration, login, email verification, OAuth flows, and displayed user tier/quota information.
+The Authentication Frontend was a standalone React + TypeScript application that provided user authentication for the Apogee platform using Supabase Auth. It handled user registration, login, email verification, OAuth flows, and displayed user tier/quota information.
 
 **This application is no longer in use. All functionality has been integrated into blocksecops-dashboard.**
 
@@ -700,7 +700,7 @@ Response (SSO Disabled):
 
 ```
 ┌─────────────────────────────────────────┐
-│     BlockSecOps Dashboard               │
+│     Apogee Dashboard               │
 │     Sign in to your account             │
 ├─────────────────────────────────────────┤
 │  Email address                          │

@@ -1,10 +1,10 @@
-# BlockSecOps Differentiators
+# Apogee Differentiators
 
 **Last Updated**: January 19, 2026
 
 ## Executive Summary
 
-BlockSecOps is the only well-rounded platform in the web3 smart contract security market that combines 25+ SAST scanners, fuzzing, ML-powered intelligence with 95% false positive reduction, multi-chain support, continuous monitoring, and vulnerability management in one unified solution.
+Apogee is the only well-rounded platform in the web3 smart contract security market that combines 25+ SAST scanners, fuzzing, ML-powered intelligence with 95% false positive reduction, multi-chain support, continuous monitoring, and vulnerability management in one unified solution.
 
 ---
 
@@ -72,7 +72,7 @@ BlockSecOps is the only well-rounded platform in the web3 smart contract securit
 
 ### 3. SolidityDefend (Proprietary Scanner)
 
-**What**: BlockSecOps' proprietary security scanner with 509+ unique detectors.
+**What**: Apogee' proprietary security scanner with 509+ unique detectors.
 
 **Unique Capabilities**:
 - Custom vulnerability patterns not in open-source tools
@@ -85,7 +85,7 @@ BlockSecOps is the only well-rounded platform in the web3 smart contract securit
 **Why It Matters**:
 - Catches vulnerabilities other scanners miss
 - Continuously updated with new patterns
-- BlockSecOps exclusive
+- Apogee exclusive
 
 **Competitor Gap**:
 - No competitor has a proprietary scanner layer on top of aggregation
@@ -253,7 +253,7 @@ BlockSecOps is the only well-rounded platform in the web3 smart contract securit
 
 ## Feature Comparison
 
-| Feature | BlockSecOps | SolidityScan | MetaTrust | Olympix | Diligence |
+| Feature | Apogee | SolidityScan | MetaTrust | Olympix | Diligence |
 |---------|:-----------:|:------------:|:---------:|:-------:|:---------:|
 | Unified Scanning (25+ tools) | ✅ | ❌ | ❌ | ❌ | ❌ |
 | **95% False Positive Reduction** | ✅ | ❌ | ❌ | ❌ | ❌ |
@@ -274,7 +274,7 @@ Legend: ✅ Full support | ⚠️ Limited | ❌ Not available
 
 ## Competitive Positioning Statement
 
-> **BlockSecOps is the only unified smart contract security platform that combines 25+ SAST scanners, fuzzing, ML-powered 95% false positive reduction, multi-chain support, continuous monitoring, and a complete vulnerability management dashboard - with the option to pay with crypto.**
+> **Apogee is the only unified smart contract security platform that combines 25+ SAST scanners, fuzzing, ML-powered 95% false positive reduction, multi-chain support, continuous monitoring, and a complete vulnerability management dashboard - with the option to pay with crypto.**
 
 ---
 
@@ -282,13 +282,13 @@ Legend: ✅ Full support | ⚠️ Limited | ❌ Not available
 
 **IBM Research**: Organizations use 83 security solutions from 29 vendors on average, with consolidated platforms delivering 72 days faster incident detection and 242% ROI.
 
-**BlockSecOps Consolidation Value**:
+**Apogee Consolidation Value**:
 - Replaces 10+ point solutions with single platform
 - Growth tier at $699/month replaces $2,400+/month in point solutions
 - 3.4x value multiplier that competitors cannot match
 
 **ROI Calculator**:
-| Point Solution | Monthly Cost | BlockSecOps Alternative |
+| Point Solution | Monthly Cost | Apogee Alternative |
 |----------------|--------------|-------------------------|
 | Slither (manual) | $0 + engineer time | Included |
 | Mythril (manual) | $0 + engineer time | Included |

@@ -214,7 +214,7 @@ Manual testing checklist for dashboard enhancements implemented in January 2026.
 | Step | Action | Expected Result | Status |
 |------|--------|-----------------|--------|
 | 1 | Open generated PDF | PDF displays | [ ] |
-| 2 | Check header | Shows "BlockSecOps.com" | [ ] |
+| 2 | Check header | Shows "Apogee.com" | [ ] |
 | 3 | Check header | Shows "AdvancedBlockchainSecurity.com" | [ ] |
 
 ### Test 7.3: Watermark
@@ -222,7 +222,7 @@ Manual testing checklist for dashboard enhancements implemented in January 2026.
 | Step | Action | Expected Result | Status |
 |------|--------|-----------------|--------|
 | 1 | Open generated PDF | PDF displays | [ ] |
-| 2 | Check page background | "BlockSecOps" watermark visible | [ ] |
+| 2 | Check page background | "Apogee" watermark visible | [ ] |
 
 ---
 

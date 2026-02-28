@@ -85,4 +85,4 @@ curl -sk -H 'X-API-Key: <read-only-key>' \
 
 ---
 
-**Maintained By:** BlockSecOps Team
+**Maintained By:** Apogee Team

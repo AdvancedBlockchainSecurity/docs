@@ -104,7 +104,7 @@
 
 **Steps**:
 1. Open a `.sol` file
-2. Run command: "BlockSecOps: Scan Current File"
+2. Run command: "Apogee: Scan Current File"
 3. Wait for scan to complete
 
 **Expected**:
@@ -147,7 +147,7 @@
 **Steps**:
 1. Scan a contract
 2. Click vulnerability in Problems panel
-3. Right-click > "View in BlockSecOps Dashboard"
+3. Right-click > "View in Apogee Dashboard"
 
 **Expected**:
 - Browser opens to scan detail page
@@ -174,7 +174,7 @@
 ### TC-42-021: Settings Configuration
 
 **Steps**:
-1. Open Settings > Tools > BlockSecOps
+1. Open Settings > Tools > Apogee
 2. Enter API key
 3. Configure CLI path (or leave blank for auto-detect)
 4. Apply settings
@@ -207,7 +207,7 @@
 3. Review inspection results
 
 **Expected**:
-- BlockSecOps findings in inspection results
+- Apogee findings in inspection results
 - Double-click navigates to line
 
 **Status**: [ ]
@@ -238,7 +238,7 @@
 
 **Expected**:
 - Plugin loads cleanly
-- `:BlockSecOps*` commands available
+- `:Apogee*` commands available
 
 **Status**: [ ]
 
@@ -264,7 +264,7 @@ require('blocksecops').setup({
 
 **Steps**:
 1. Open a `.sol` file
-2. Run `:BlockSecOpsScan`
+2. Run `:ApogeeScan`
 3. Wait for results
 
 **Expected**:
@@ -303,7 +303,7 @@ require('blocksecops').setup({
 
 **Steps**:
 1. Scan a contract
-2. Run `:BlockSecOpsQuickfix`
+2. Run `:ApogeeQuickfix`
 3. Navigate with `:cnext`/`:cprev`
 
 **Expected**:
@@ -370,7 +370,7 @@ let g:ale_linters = { 'solidity': ['blocksecops'] }
 3. Verify linter runs
 
 **Expected**:
-- ALE shows BlockSecOps in linter list
+- ALE shows Apogee in linter list
 - Diagnostics appear
 
 **Status**: [ ]

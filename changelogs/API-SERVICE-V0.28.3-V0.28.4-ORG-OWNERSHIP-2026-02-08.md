@@ -104,5 +104,5 @@ Updated migration 073 to backfill org-scoped data. Migration 069 had skipped the
 
 ---
 
-**Maintained By:** BlockSecOps Team
+**Maintained By:** Apogee Team
 **Status:** Complete

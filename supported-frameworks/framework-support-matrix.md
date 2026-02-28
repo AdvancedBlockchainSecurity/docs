@@ -1,10 +1,10 @@
 # Framework Support Matrix
 
-This document provides a comprehensive overview of BlockSecOps framework support, including which scanners work with each framework and known limitations.
+This document provides a comprehensive overview of Apogee framework support, including which scanners work with each framework and known limitations.
 
 ## Framework Detection
 
-BlockSecOps automatically detects your project framework based on configuration files:
+Apogee automatically detects your project framework based on configuration files:
 
 | Framework | Detection File | Priority |
 |-----------|----------------|----------|
@@ -22,7 +22,7 @@ BlockSecOps automatically detects your project framework based on configuration 
 |---------|-------------|---------|---------|-------|
 | **Slither** | Full | Full | Full | Native support for all frameworks |
 | **Aderyn** | Full | Full | Partial | Designed primarily for Foundry |
-| **SolidityDefend** | Full | Full | Full | BlockSecOps premier scanner |
+| **SolidityDefend** | Full | Full | Full | Apogee premier scanner |
 | **Echidna** | Full | Full | Full | Fuzz testing with dependencies |
 | **Halmos** | Full | Full | Full | Symbolic execution |
 | **Wake** | Full | Partial | Partial | Better with single files |

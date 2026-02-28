@@ -8,7 +8,7 @@
 
 ## Summary
 
-Complete visual overhaul of the BlockSecOps Dashboard to match the BlockSecOps.com website styling. The dashboard now uses a dark cyberpunk aesthetic with electric cyan (#00D4FF), purple accents (#8B5CF6), glassmorphism effects, and neon glow styling. Light mode has been removed - the dashboard is now dark-mode only.
+Complete visual overhaul of the Apogee Dashboard to match the Apogee.com website styling. The dashboard now uses a dark cyberpunk aesthetic with electric cyan (#00D4FF), purple accents (#8B5CF6), glassmorphism effects, and neon glow styling. Light mode has been removed - the dashboard is now dark-mode only.
 
 ---
 
@@ -180,7 +180,7 @@ kubectl rollout restart deployment/dashboard -n dashboard-local
 
 ## Related Documentation
 
-- [BlockSecOps Style Guide](../standards/blocksecops-style-guide.md)
+- [Apogee Style Guide](../standards/blocksecops-style-guide.md)
 - [Docker Image Versioning](../standards/docker-image-versioning.md)
 - [Frontend Build Environment](../standards/frontend-build-env.md)
 

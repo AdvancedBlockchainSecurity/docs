@@ -1622,6 +1622,6 @@ Certora Prover provides **mathematical guarantees** that smart contract properti
 
 ---
 
-**BlockSecOps Platform**: Comprehensive security analysis with static analysis (Slither), fuzzing (Echidna), symbolic execution (Manticore), and **formal verification (Certora)** for maximum assurance.
+**Apogee Platform**: Comprehensive security analysis with static analysis (Slither), fuzzing (Echidna), symbolic execution (Manticore), and **formal verification (Certora)** for maximum assurance.
 
-For questions or issues, contact the BlockSecOps team or join the Certora Discord community.
+For questions or issues, contact the Apogee team or join the Certora Discord community.

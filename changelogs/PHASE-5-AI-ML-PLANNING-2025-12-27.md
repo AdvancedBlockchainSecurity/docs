@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-Phase 5 implements **CPU-only ML features** that differentiate BlockSecOps without incurring LLM API or GPU costs. All models run on existing infrastructure using scikit-learn, XGBoost, and Sentence Transformers.
+Phase 5 implements **CPU-only ML features** that differentiate Apogee without incurring LLM API or GPU costs. All models run on existing infrastructure using scikit-learn, XGBoost, and Sentence Transformers.
 
 ---
 

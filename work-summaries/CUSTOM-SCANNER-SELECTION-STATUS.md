@@ -203,7 +203,7 @@ class ScanCreate(BaseModel):
 ### Test 1: API Health ✅
 ```bash
 $ curl http://localhost:8000/api/v1/health/live
-{"status":"healthy","service":"BlockSecOps API Service","version":"0.1.0"}
+{"status":"healthy","service":"Apogee API Service","version":"0.1.0"}
 ```
 
 ### Test 2: Scanner Endpoint ✅

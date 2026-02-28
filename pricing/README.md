@@ -1,6 +1,6 @@
-# BlockSecOps Pricing Documentation
+# Apogee Pricing Documentation
 
-Pricing strategy and competitive analysis for BlockSecOps smart contract security platform.
+Pricing strategy and competitive analysis for Apogee smart contract security platform.
 
 **Value Proposition**: 25+ scanners at the price of 1, with 95% false positive reduction. The most comprehensive smart contract security platform.
 
@@ -45,7 +45,7 @@ Pricing strategy and competitive analysis for BlockSecOps smart contract securit
 | [Pricing Tiers](./pricing-tiers.md) | Detailed breakdown of all subscription tiers |
 | [x402 Credits](./x402-credits.md) | Pay-per-scan with USDC on Base |
 | [Competitive Analysis](./competitive-analysis.md) | Web3 security market analysis |
-| [Differentiators](./differentiators.md) | What makes BlockSecOps unique |
+| [Differentiators](./differentiators.md) | What makes Apogee unique |
 
 ---
 
@@ -56,7 +56,7 @@ Price Scale (Monthly):
 
 $0 ─────────────────────────────────────────────────────────────── $2K+
 │                                                                    │
-Free Tools    BlockSecOps    MetaTrust      Olympix      Enterprise
+Free Tools    Apogee    MetaTrust      Olympix      Enterprise
 (Slither)     ($0-$699)      ($599)         (~$1K)       Solutions
               25+ scanners   1 scanner      1 scanner
               95% FP reduce
@@ -69,7 +69,7 @@ Free Tools    BlockSecOps    MetaTrust      Olympix      Enterprise
 | SolidityScan | $200-500/mo | 1 | $200-500 |
 | MetaTrust | $599/mo | 1 | $599 |
 | Olympix | ~$1,000/mo | 1 | $1,000 |
-| **BlockSecOps** | $299-699/mo | 25+ | **$12-28** |
+| **Apogee** | $299-699/mo | 25+ | **$12-28** |
 
 ---
 

@@ -5,7 +5,7 @@
 
 ## Overview
 
-Sprint 3 focuses on implementing the core backend services that form the foundation of the BlockSecOps Platform. Building on the local development environment and Kubernetes foundation established in previous sprints, this sprint delivers production-ready backend microservices with comprehensive security, monitoring, and scalability features, developed locally first with AWS deployment preparation.
+Sprint 3 focuses on implementing the core backend services that form the foundation of the Apogee Platform. Building on the local development environment and Kubernetes foundation established in previous sprints, this sprint delivers production-ready backend microservices with comprehensive security, monitoring, and scalability features, developed locally first with AWS deployment preparation.
 
 ## Technical Architecture
 

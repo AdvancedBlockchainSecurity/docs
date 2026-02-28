@@ -6,7 +6,7 @@
 
 ## Overview
 
-Run load tests against the BlockSecOps API to measure latency, throughput, error rates, and verify tier-based access control under concurrent load.
+Run load tests against the Apogee API to measure latency, throughput, error rates, and verify tier-based access control under concurrent load.
 
 ---
 

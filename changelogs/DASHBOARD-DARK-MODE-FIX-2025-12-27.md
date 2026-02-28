@@ -8,7 +8,7 @@
 
 ## Summary
 
-Comprehensive dark mode fixes applied to all Intelligence Layer components and Scanner Selection modal in the BlockSecOps Dashboard. All components now properly support Tailwind CSS dark mode using `dark:` prefix variants.
+Comprehensive dark mode fixes applied to all Intelligence Layer components and Scanner Selection modal in the Apogee Dashboard. All components now properly support Tailwind CSS dark mode using `dark:` prefix variants.
 
 ---
 

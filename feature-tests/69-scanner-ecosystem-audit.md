@@ -34,7 +34,7 @@ Full audit and remediation of scanner ecosystem across orchestration, api-servic
 ### RustDefend v0.5.1 Upgrade
 - Tool version: 0.3.0 → 0.5.1 (61 detectors, 347 fewer FPs)
 - Image version: 0.3.1 → 0.4.2
-- Repo URL migrated: `github.com/BlockSecOps/RustDefend` → `github.com/0xStarBridge/RustDefend`
+- Repo URL migrated: `github.com/AdvancedBlockchainSecurity/RustDefend` → `github.com/0xStarBridge/RustDefend`
 
 ---
 
@@ -51,7 +51,7 @@ Full audit and remediation of scanner ecosystem across orchestration, api-servic
 | 7 | RustDefend test scan (VulnerableStaking) | Pass | 4 critical findings (Integer Overflow), full Job lifecycle verified |
 | 8 | All scanner github_urls | Pass | Only RustDefend changed to 0xStarBridge, no stale references |
 | 9 | Running pod image version | Pass | api-service:0.28.44, 0 restarts |
-| 10 | Codebase grep for old URL | Pass | Zero references to BlockSecOps/RustDefend in api-service, tool-integration, orchestration |
+| 10 | Codebase grep for old URL | Pass | Zero references to Apogee/RustDefend in api-service, tool-integration, orchestration |
 | 11 | New GitHub URL reachable | Pass | https://github.com/0xStarBridge/RustDefend returns HTTP 200 |
 | 12 | UI path via Traefik | Pass | https://app.0xapogee.local/api/v1/scanners returns updated URL |
 

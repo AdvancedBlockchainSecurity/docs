@@ -11,7 +11,7 @@
 
 ## Purpose
 
-This is a **reusable template** for integrating any security scanner into the BlockSecOps platform. Follow this guide step-by-step to ensure consistent, standards-compliant scanner integration.
+This is a **reusable template** for integrating any security scanner into the Apogee platform. Follow this guide step-by-step to ensure consistent, standards-compliant scanner integration.
 
 **This guide covers:**
 - Docker image creation
@@ -160,7 +160,7 @@ Follow platform patterns from existing scanners (see `slither/Dockerfile`, `ader
 ```dockerfile
 FROM <base-image>:<version>
 
-LABEL maintainer="BlockSecOps Team"
+LABEL maintainer="Apogee Team"
 LABEL description="<Scanner Name> - <Brief description>"
 LABEL version="<MAJOR.MINOR.PATCH>"
 LABEL scanner.id="<scanner-id>"
@@ -216,7 +216,7 @@ Create `run-<scanner>.sh` following this template:
 set -e
 
 # run-<scanner>.sh
-# Wrapper script for running <Scanner Name> in BlockSecOps platform
+# Wrapper script for running <Scanner Name> in Apogee platform
 #
 # Usage: run-<scanner>.sh <contract_path> [output_path]
 #

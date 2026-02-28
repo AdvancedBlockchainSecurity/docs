@@ -36,7 +36,7 @@ Found and fixed **5 critical authentication documentation conflicts** that docum
 
 **Current Implementation**: Supabase Auth (v0.4.0+)
 
-Authentication is handled entirely by Supabase on the frontend. The BlockSecOps API does not provide authentication endpoints. Instead, it verifies JWT tokens issued by Supabase.
+Authentication is handled entirely by Supabase on the frontend. The Apogee API does not provide authentication endpoints. Instead, it verifies JWT tokens issued by Supabase.
 
 **Frontend Authentication Flow**:
 1. User authenticates via Supabase SDK (email/password or OAuth)

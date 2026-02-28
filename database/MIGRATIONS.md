@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document tracks all database schema migrations for the BlockSecOps platform. Migrations are managed using Alembic and follow a strict versioning system.
+This document tracks all database schema migrations for the Apogee platform. Migrations are managed using Alembic and follow a strict versioning system.
 
 ## Migration History
 

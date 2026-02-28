@@ -1,6 +1,6 @@
 # User Management
 
-Manage users, tiers, and quotas in the BlockSecOps platform.
+Manage users, tiers, and quotas in the Apogee platform.
 
 ## Overview
 

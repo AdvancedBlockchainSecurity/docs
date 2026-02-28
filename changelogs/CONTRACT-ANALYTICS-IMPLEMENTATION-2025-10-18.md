@@ -300,7 +300,7 @@ kubectl exec -n api-service-local deployment/api-service -- \
 curl -s http://127.0.0.1:8000/api/v1/health/live | jq '.'
 # {
 #   "status": "healthy",
-#   "service": "BlockSecOps API Service",
+#   "service": "Apogee API Service",
 #   "version": "0.1.2",
 #   "timestamp": "2025-10-18T..."
 # }

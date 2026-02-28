@@ -9,7 +9,7 @@
 
 ---
 
-# BlockSecOps Pricing Strategy Document (ARCHIVED)
+# Apogee Pricing Strategy Document (ARCHIVED)
 ## Enterprise DevSecOps Platform for Blockchain Security
 
 **Document Version:** 1.0  
@@ -21,7 +21,7 @@
 
 ## Executive Summary
 
-This document establishes a comprehensive pricing strategy for BlockSecOps, positioning it competitively against Web2 DevSecOps platforms (Snyk, Wiz, Orca) and emerging Web3 security tools (SolidityScan, Olympix). The strategy addresses the critical market opportunity created by OpenZeppelin Defender's July 2026 shutdown while establishing sustainable economics for growth from developer teams to Fortune 500 enterprises.
+This document establishes a comprehensive pricing strategy for Apogee, positioning it competitively against Web2 DevSecOps platforms (Snyk, Wiz, Orca) and emerging Web3 security tools (SolidityScan, Olympix). The strategy addresses the critical market opportunity created by OpenZeppelin Defender's July 2026 shutdown while establishing sustainable economics for growth from developer teams to Fortune 500 enterprises.
 
 **Key Strategic Decisions:**
 - Introduce $3,500 Developer tier to capture small teams and Defender refugees
@@ -79,7 +79,7 @@ This document establishes a comprehensive pricing strategy for BlockSecOps, posi
 - Audit services: $5K-$150K per project (one-time)
 - OpenZeppelin Defender shutdown creates migration opportunity
 
-### 1.2 BlockSecOps Competitive Position
+### 1.2 Apogee Competitive Position
 
 **Unique Value Proposition:**
 - Multi-chain native platform (Ethereum, Solana, StarkNet, Avalanche+)
@@ -404,7 +404,7 @@ $3.5K      $12K      $50K          $150K        $300K-$500K
 
 **Comparison to Snyk:**
 - Snyk median: $676-$948/developer (50-100 dev scale)
-- BlockSecOps: $1,950-$2,200/developer (small scale premium)
+- Apogee: $1,950-$2,200/developer (small scale premium)
 - Justification: Blockchain specialization, multi-chain coverage
 
 ### 4.3 Volume Discounts (Developer Seats)
@@ -1093,7 +1093,7 @@ Net Revenue Retention: 137%
 
 ### 10.5 Execution Risk: OpenZeppelin Defender Migration
 
-**Risk:** Defender users migrate to alternatives instead of BlockSecOps before July 2026.
+**Risk:** Defender users migrate to alternatives instead of Apogee before July 2026.
 
 **Indicators:**
 - <20% of addressable Defender users (est. 5,000) engage with outreach
@@ -1153,7 +1153,7 @@ Net Revenue Retention: 137%
 
 **Likelihood:** Medium (if they pursue volume growth strategy)
 
-**BlockSecOps Response:**
+**Apogee Response:**
 1. **Do not match pricing** - maintain $50K Professional positioning
 2. **Emphasize differentiation:** Multi-chain vs. EVM-only, platform vs. plugin
 3. **Target different segment:** Enterprise vs. developer-focused
@@ -1166,11 +1166,11 @@ Net Revenue Retention: 137%
 
 **Likelihood:** Low-Medium (Snyk focuses on Web2, but possible acquisition)
 
-**BlockSecOps Response:**
+**Apogee Response:**
 1. **Partnership not competition:** Position as Snyk complement ("Web2 + Web3 security")
 2. **Deep expertise:** Emphasize blockchain-native development, multi-chain specialization
 3. **Co-selling:** Approach Snyk about partnership or white-label arrangement
-4. **Enterprise bundling:** "Use Snyk for Web2 app, BlockSecOps for smart contracts"
+4. **Enterprise bundling:** "Use Snyk for Web2 app, Apogee for smart contracts"
 5. **Speed advantage:** Ship blockchain-specific features faster than generalist platform
 
 **Decision criteria:** If Snyk enters market, immediately engage partnership discussions. Price aggressively to win displaced customers.
@@ -1179,7 +1179,7 @@ Net Revenue Retention: 137%
 
 **Likelihood:** High (Slither, Mythril model with better UX)
 
-**BlockSecOps Response:**
+**Apogee Response:**
 1. **Accept commodity bottom:** Developer tier competes, Professional+ tiers don't
 2. **Enterprise positioning:** Focus on features free tools can't provide (SLA, support, compliance)
 3. **Freemium consideration:** Offer free tier limited to testnet only
@@ -1262,7 +1262,7 @@ Net Revenue Retention: 137%
 **Objection: "Too expensive compared to SolidityScan"**
 
 **Response:**
-> "I appreciate the price comparison. SolidityScan offers excellent point-in-time scanning, which is valuable. BlockSecOps is positioned differently as a continuous security platform. The difference is like comparing a single building inspection to 24/7 security monitoring. Here's why that matters for you:
+> "I appreciate the price comparison. SolidityScan offers excellent point-in-time scanning, which is valuable. Apogee is positioned differently as a continuous security platform. The difference is like comparing a single building inspection to 24/7 security monitoring. Here's why that matters for you:
 >
 > 1. **Real-time monitoring:** We catch vulnerabilities in production, not just during development
 > 2. **Multi-chain context:** We understand exploits across chains—a vulnerability pattern on Ethereum might affect your Solana deployment
@@ -1280,7 +1280,7 @@ Net Revenue Retention: 137%
 > - **Snapshot in time:** Code changes after audit aren't covered
 > - **Cost:** 4 audits/year = $100K-$200K+ for point-in-time coverage
 >
-> BlockSecOps provides continuous security between audits:
+> Apogee provides continuous security between audits:
 > - **Daily scanning:** Every commit is automatically scanned
 > - **Real-time monitoring:** Production contract monitoring 24/7
 > - **Audit preparation:** Clean up issues before expensive audit begins
@@ -1314,20 +1314,20 @@ Net Revenue Retention: 137%
 > **Board Presentation Support:**
 > 1. **Executive summary:** One-pager with ROI model
 > 2. **Risk analysis:** Cost of exploit vs. cost of prevention
-> 3. **Comparative analysis:** BlockSecOps vs. alternatives
+> 3. **Comparative analysis:** Apogee vs. alternatives
 > 4. **Peer validation:** Reference customers in your sector
 > 5. **Pilot results:** Data from your 30-day trial
 >
 > **Board Narrative:**
 > - 'We're protecting $XXM in TVL with $50K annual investment (0.X% of assets)'
 > - 'Continuous security reduces exploit risk by 80%+ vs. quarterly audits alone'
-> - 'Comparable protocols using BlockSecOps: [customer names]'
+> - 'Comparable protocols using Apogee: [customer names]'
 >
 > I've helped 15+ customers get board approval. Would you like me to join the board presentation to answer technical questions?"
 
 ### 13.2 Value Calculator Template
 
-**BlockSecOps ROI Calculator (Professional Tier Example)**
+**Apogee ROI Calculator (Professional Tier Example)**
 
 ```
 SECURITY COSTS WITHOUT BLOCKSECOPS:
@@ -1338,7 +1338,7 @@ SECURITY COSTS WITHOUT BLOCKSECOPS:
 TOTAL ANNUAL COST: $275,000
 
 SECURITY COSTS WITH BLOCKSECOPS:
-- BlockSecOps Professional: $50,000
+- Apogee Professional: $50,000
 - Annual audit (1x $25K): $25,000
 - Reduced security time (50 hrs): $12,500
 TOTAL ANNUAL COST: $87,500
@@ -1349,7 +1349,7 @@ RISK MITIGATION VALUE:
 - Average DeFi exploit loss: $10M
 - Probability of exploit (unprotected): 10%
 - Expected annual loss: $1,000,000
-- Risk reduction with BlockSecOps: 80%
+- Risk reduction with Apogee: 80%
 - Expected annual loss (protected): $200,000
 RISK VALUE: $800,000 additional protection
 
@@ -1360,9 +1360,9 @@ ROI: 19.75x return
 
 ### 13.3 Competitive Battle Cards
 
-**BlockSecOps vs. SolidityScan**
+**Apogee vs. SolidityScan**
 
-| Factor | BlockSecOps | SolidityScan |
+| Factor | Apogee | SolidityScan |
 |--------|-------------|--------------|
 | **Pricing** | $50K Professional | $1.5K-$3.6K |
 | **Positioning** | Enterprise platform | Developer scanning tool |
@@ -1376,9 +1376,9 @@ ROI: 19.75x return
 - Target Professional/Enterprise buyers
 - Position SolidityScan as complementary (use both)
 
-**BlockSecOps vs. Olympix**
+**Apogee vs. Olympix**
 
-| Factor | BlockSecOps | Olympix |
+| Factor | Apogee | Olympix |
 |--------|-------------|---------|
 | **Pricing** | Transparent ($50K+) | Opaque (contact sales) |
 | **Positioning** | Multi-chain platform | GitHub plugin |
@@ -1398,7 +1398,7 @@ ROI: 19.75x return
 
 ### 14.1 Strategic Summary
 
-BlockSecOps pricing strategy positions the platform at the intersection of Web2 DevSecOps maturity and Web3 market opportunity. The five-tier structure ($3.5K → $12K → $50K → $150K → $300K+) creates clear customer segmentation while enabling land-and-expand growth from indie developers to Fortune 500 enterprises.
+Apogee pricing strategy positions the platform at the intersection of Web2 DevSecOps maturity and Web3 market opportunity. The five-tier structure ($3.5K → $12K → $50K → $150K → $300K+) creates clear customer segmentation while enabling land-and-expand growth from indie developers to Fortune 500 enterprises.
 
 **Key Strategic Bets:**
 1. **Developer tier ($3.5K)** captures OpenZeppelin Defender refugees and competes with SolidityScan

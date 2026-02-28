@@ -7,7 +7,7 @@
 
 ## Overview
 
-This document describes the production-ready authentication optimizations implemented in the BlockSecOps dashboard after the Supabase Auth migration. These optimizations ensure fast page loads, proper session persistence, and a smooth user experience during authentication checks.
+This document describes the production-ready authentication optimizations implemented in the Apogee dashboard after the Supabase Auth migration. These optimizations ensure fast page loads, proper session persistence, and a smooth user experience during authentication checks.
 
 ## Problem Statement
 

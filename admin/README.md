@@ -1,10 +1,10 @@
 # Administration Guide
 
-Platform administration documentation for BlockSecOps operators and system administrators.
+Platform administration documentation for Apogee operators and system administrators.
 
 ## Overview
 
-This section covers administrative tasks for managing the BlockSecOps platform, including:
+This section covers administrative tasks for managing the Apogee platform, including:
 
 - User and team management
 - Notification channel configuration

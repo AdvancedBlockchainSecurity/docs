@@ -2,7 +2,7 @@
 
 ## Overview
 
-Phase 4.5 introduces enterprise-grade features for BlockSecOps:
+Phase 4.5 introduces enterprise-grade features for Apogee:
 - **Webhooks**: Real-time event notifications for scans and vulnerabilities
 - **RBAC**: Role-Based Access Control with organizations and teams
 - **SSO**: Single Sign-On integration (SAML 2.0 and OIDC)
@@ -48,10 +48,10 @@ def verify_webhook_signature(payload: bytes, signature: str, secret: str) -> boo
 
 | Header | Description |
 |--------|-------------|
-| `X-BlockSecOps-Signature` | HMAC-SHA256 signature |
-| `X-BlockSecOps-Event` | Event type |
-| `X-BlockSecOps-Delivery` | Unique delivery ID |
-| `X-BlockSecOps-Timestamp` | Unix timestamp |
+| `X-Apogee-Signature` | HMAC-SHA256 signature |
+| `X-Apogee-Event` | Event type |
+| `X-Apogee-Delivery` | Unique delivery ID |
+| `X-Apogee-Timestamp` | Unix timestamp |
 
 #### Retry Policy
 

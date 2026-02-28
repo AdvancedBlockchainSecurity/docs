@@ -1,6 +1,6 @@
 # Security Configuration Playbook
 
-This playbook describes how to configure security settings for BlockSecOps deployments.
+This playbook describes how to configure security settings for Apogee deployments.
 
 ## Overview
 

@@ -12,7 +12,7 @@ This playbook guides you through installing and configuring the Apogee CLI for c
 
 ## Prerequisites
 
-- [ ] BlockSecOps account (any tier)
+- [ ] Apogee account (any tier)
 - [ ] Python 3.8+ installed
 - [ ] pip package manager
 - [ ] API key with `write:scans`, `read:scans`, `read:vulnerabilities` scopes
@@ -46,7 +46,7 @@ pipx install 0xapogee-cli
 ### Method 2: Homebrew (macOS/Linux)
 
 ```bash
-# Add BlockSecOps tap
+# Add Apogee tap
 brew tap blocksecops/tap
 
 # Install CLI
@@ -65,7 +65,7 @@ docker run --rm -v $(pwd):/workspace blocksecops/cli:latest scan --path /workspa
 
 ### Method 4: Binary Download
 
-Download pre-built binaries from [BlockSecOps Downloads](https://app.0xapogee.com/downloads/cli):
+Download pre-built binaries from [Apogee Downloads](https://app.0xapogee.com/downloads/cli):
 
 ```bash
 # Linux (x64)
@@ -393,7 +393,7 @@ repos:
   - repo: local
     hooks:
       - id: blocksecops
-        name: BlockSecOps Security Scan
+        name: Apogee Security Scan
         entry: 0xapogee scan --path . --fail-on critical
         language: system
         types: [solidity]

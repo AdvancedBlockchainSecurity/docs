@@ -4,11 +4,11 @@
 
 ## Overview
 
-BlockSecOps provides comprehensive smart contract analysis through multiple specialized scanners. Each scanner produces different types of results beyond traditional security vulnerabilities. This guide explains the different result types and how to interpret them.
+Apogee provides comprehensive smart contract analysis through multiple specialized scanners. Each scanner produces different types of results beyond traditional security vulnerabilities. This guide explains the different result types and how to interpret them.
 
 ## Understanding Result Sources: Scanner vs Intelligence Layer
 
-**NEW (v0.3.0)**: BlockSecOps now clearly distinguishes between two sources of vulnerability findings:
+**NEW (v0.3.0)**: Apogee now clearly distinguishes between two sources of vulnerability findings:
 
 ### Scanner Results (Direct Detection)
 Vulnerabilities directly detected by the scanner tool you selected. These are findings from the scanner's own analysis algorithms.
@@ -19,10 +19,10 @@ Vulnerabilities directly detected by the scanner tool you selected. These are fi
 - **Example**: Slither's reentrancy detector finds a reentrancy vulnerability
 
 ### Intelligence Layer (Pattern Analysis)
-Vulnerabilities identified by BlockSecOps' intelligence layer through pattern matching against our vulnerability knowledge base.
+Vulnerabilities identified by Apogee' intelligence layer through pattern matching against our vulnerability knowledge base.
 
 **Characteristics**:
-- **Source**: BlockSecOps Intelligence Engine
+- **Source**: Apogee Intelligence Engine
 - **How detected**: Pattern matching against known vulnerability patterns
 - **Example**: Code pattern matches a known vulnerability signature in our database
 
@@ -431,7 +431,7 @@ If you need assistance interpreting scanner results:
 
 1. **Check Scanner Documentation**: Each scanner has detailed docs explaining their findings
 2. **Review Examples**: Look at the example findings in this guide
-3. **Ask the Community**: BlockSecOps Discord/Forum for specific questions
+3. **Ask the Community**: Apogee Discord/Forum for specific questions
 4. **Professional Audit**: For high-value contracts, consider a professional audit
 
 ---

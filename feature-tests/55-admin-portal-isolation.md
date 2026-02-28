@@ -30,7 +30,7 @@ Testing the separated admin portal at `admin.0xapogee.com` with network-level is
 | Step | Action | Expected Result |
 |------|--------|-----------------|
 | 1 | Navigate to admin portal (`admin.0xapogee.com`) | Login page displayed |
-| 2 | Enter admin credentials (BlockSecOps account) | Redirected to MFA verification |
+| 2 | Enter admin credentials (Apogee account) | Redirected to MFA verification |
 | 3 | Enter invalid credentials | Generic error message (no username enumeration) |
 
 #### 1.2 IP Allowlist Restriction (Production)

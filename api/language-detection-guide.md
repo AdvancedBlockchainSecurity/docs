@@ -8,7 +8,7 @@
 
 ## Overview
 
-The BlockSecOps Platform provides comprehensive security analysis for **3 blockchain contract languages** across multiple blockchain ecosystems. The platform features automatic language detection, requiring zero manual configuration for supported languages.
+The Apogee Platform provides comprehensive security analysis for **3 blockchain contract languages** across multiple blockchain ecosystems. The platform features automatic language detection, requiring zero manual configuration for supported languages.
 
 ### Key Features
 

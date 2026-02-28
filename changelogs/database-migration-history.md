@@ -1,6 +1,6 @@
 # Database Migration History
 
-This document tracks all database schema migrations for the BlockSecOps platform.
+This document tracks all database schema migrations for the Apogee platform.
 
 ## Migration Summary
 

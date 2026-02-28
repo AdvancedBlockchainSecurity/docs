@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Dependency Monitoring Service provides automated dependency tracking, security vulnerability scanning, and health monitoring across all BlockSecOps platform services. This service supports Python, Node.js, and Rust projects with real-time metrics export to Prometheus and visualization through Grafana dashboards.
+The Dependency Monitoring Service provides automated dependency tracking, security vulnerability scanning, and health monitoring across all Apogee platform services. This service supports Python, Node.js, and Rust projects with real-time metrics export to Prometheus and visualization through Grafana dashboards.
 
 ## Architecture
 
@@ -686,4 +686,4 @@ spec:
 - Priority queuing for critical services
 - Circuit breaker patterns for external dependencies
 
-This comprehensive dependency monitoring service provides the foundation for maintaining secure and up-to-date dependencies across the entire BlockSecOps platform with real-time visibility and automated alerting.
+This comprehensive dependency monitoring service provides the foundation for maintaining secure and up-to-date dependencies across the entire Apogee platform with real-time visibility and automated alerting.

@@ -1,4 +1,4 @@
-# BlockSecOps Go-Live Audit Testing Checklist
+# Apogee Go-Live Audit Testing Checklist
 
 **Version:** 1.0.0
 **Created:** February 16, 2026

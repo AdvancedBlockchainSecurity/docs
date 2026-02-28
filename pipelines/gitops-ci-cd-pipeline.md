@@ -1,8 +1,8 @@
-# GitOps CI/CD Pipeline — BlockSecOps Platform
+# GitOps CI/CD Pipeline — Apogee Platform
 
 ## Overview
 
-This document defines the CI/CD pipeline architecture for all BlockSecOps services, connecting GitHub.com to GKE via GCP Artifact Registry, with ArgoCD as the GitOps controller.
+This document defines the CI/CD pipeline architecture for all Apogee services, connecting GitHub.com to GKE via GCP Artifact Registry, with ArgoCD as the GitOps controller.
 
 **Key principle:** CI and CD are two independent loops. Git is the sole coordination point.
 **Sources:** Actual Dockerfiles in each repo, `blocksecops-gcp-infrastructure/k8s/overlays/gcp/argocd/applications/applicationset.yaml`, `docs/INFRA-AGENT.md`.
@@ -189,7 +189,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: BlockSecOps/blocksecops-gcp-infrastructure
+          repository: Apogee/blocksecops-gcp-infrastructure
           token: ${{ secrets.GCP_INFRA_REPO_TOKEN }}
 
       - name: Update image tag
@@ -293,7 +293,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: BlockSecOps/blocksecops-gcp-infrastructure
+          repository: Apogee/blocksecops-gcp-infrastructure
           token: ${{ secrets.GCP_INFRA_REPO_TOKEN }}
 
       - name: Update image tag
@@ -395,7 +395,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: BlockSecOps/blocksecops-gcp-infrastructure
+          repository: Apogee/blocksecops-gcp-infrastructure
           token: ${{ secrets.GCP_INFRA_REPO_TOKEN }}
 
       - name: Update image tag
@@ -512,7 +512,7 @@ The existing GCP ApplicationSet points all services at `blocksecops-gcp-infrastr
 
 ```yaml
 source:
-  repoURL: https://github.com/BlockSecOps/blocksecops-gcp-infrastructure.git
+  repoURL: https://github.com/AdvancedBlockchainSecurity/blocksecops-gcp-infrastructure.git
   path: 'k8s/overlays/gcp/services/{{ .name }}'
 ```
 
@@ -612,10 +612,10 @@ All 12 deployable services follow this pattern.
 
 ### Organization-Level Reusable Workflows
 
-Create a `.github` repository in the BlockSecOps GitHub organization:
+Create a `.github` repository in the Apogee GitHub organization:
 
 ```
-BlockSecOps/.github/
+AdvancedBlockchainSecurity/.github/
 └── .github/
     └── workflows/
         ├── ci-python.yml          # Reusable: lint + test Python 3.11
@@ -641,14 +641,14 @@ on:
 
 jobs:
   lint-and-test:
-    uses: BlockSecOps/.github/.github/workflows/ci-python.yml@main
+    uses: Apogee/.github/.github/workflows/ci-python.yml@main
     with:
       python-version: "3.11"
 
   build-and-push:
     needs: lint-and-test
     if: github.ref == 'refs/heads/main'
-    uses: BlockSecOps/.github/.github/workflows/docker-build-push.yml@main
+    uses: Apogee/.github/.github/workflows/docker-build-push.yml@main
     with:
       image-name: api-service
     secrets: inherit
@@ -656,7 +656,7 @@ jobs:
   update-manifests:
     needs: build-and-push
     if: github.ref == 'refs/heads/main'
-    uses: BlockSecOps/.github/.github/workflows/update-manifests.yml@main
+    uses: Apogee/.github/.github/workflows/update-manifests.yml@main
     with:
       image-name: api-service
       image-tag: ${{ needs.build-and-push.outputs.image-tag }}

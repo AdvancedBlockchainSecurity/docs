@@ -7,7 +7,7 @@
 
 ## Overview
 
-System architecture, design patterns, and architectural decisions for the BlockSecOps Platform. This directory contains comprehensive documentation on how all services are structured and how they interact.
+System architecture, design patterns, and architectural decisions for the Apogee Platform. This directory contains comprehensive documentation on how all services are structured and how they interact.
 
 ---
 
@@ -260,6 +260,6 @@ See: [Deployment Documentation](../deployment/README.md)
 
 ---
 
-**Maintained by**: BlockSecOps Architecture Team
+**Maintained by**: Apogee Architecture Team
 **Last Review**: December 7, 2025
 **Version**: 0.8.0 (Phase 3.3 + 3.4 Complete)

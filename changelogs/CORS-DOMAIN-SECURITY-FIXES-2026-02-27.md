@@ -1,7 +1,7 @@
 # CORS Wildcard, Legacy Domain, and Deployment Fixes
 
 **Date:** February 27, 2026
-**Author:** BlockSecOps Team
+**Author:** Apogee Team
 **Services Affected:** All 9 platform services + gcp-infrastructure
 **Severity:** HIGH (security) + MEDIUM (legacy domain cleanup)
 
@@ -45,11 +45,11 @@ Added comprehensive regression test suites (64 tests) to prevent reintroduction 
 | Category | Old Domain | New Domain | Files Changed |
 |----------|-----------|------------|---------------|
 | IngressRoutes (local) | `*.solidityops.com`, `*.soliditysecurity.dev` | `*.0xapogee.local` | 8 files |
-| IngressRoutes (production) | `*.blocksecops.com` | `*.0xApogee.com` | 2 files |
+| IngressRoutes (production) | `*.0xApogee.com` | `*.0xApogee.com` | 2 files |
 | Base ingress.yaml | `*.solidityops.com` | `*.0xapogee.com` | 6 files |
 | ConfigMaps | `soliditysecurity.dev` URLs | `app.0xapogee.local` | 3 files |
 | cert-manager emails | `soliditysecurity.example.com` | `0xapogee.com` | 2 files |
-| admin-portal IngressRoutes | `admin.blocksecops.local` | `admin.0xapogee.local` | 2 files |
+| admin-portal IngressRoutes | `admin.0xapogee.local` | `admin.0xapogee.local` | 2 files |
 | API nginx CORS annotation | `*` (wildcard) | `https://app.0xapogee.local` | 1 file |
 
 **Harbor Registry Exception:** `harbor.blocksecops.local` was intentionally NOT changed. Harbor's TLS certificate, IngressRoute, and DNS all serve on `harbor.blocksecops.local`. Changing this requires coordinated infrastructure migration (new TLS cert, DNS update, IngressRoute update, registry re-trust on all nodes). This is tracked separately as an infrastructure task.

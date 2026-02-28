@@ -155,4 +155,4 @@ python3 -m pytest \
 | blocksecops-api-service | Retry logic, URL resolution, 46 new tests, 2 modified test files |
 | blocksecops-gcp-infrastructure | GCP CronJob manifest, kustomization update, image tag 0.29.13 |
 | docs | Pipeline, workflow, playbook updates + this feature-test |
-| TaskDocs-BlockSecOps | Implementation summary |
+| TaskDocs-Apogee | Implementation summary |

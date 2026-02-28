@@ -1,4 +1,4 @@
-# Unified BlockSecOps Platform
+# Unified Apogee Platform
 ## Sprint-Aligned Business Overview
 
 ---

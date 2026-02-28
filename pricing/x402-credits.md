@@ -4,7 +4,7 @@
 
 ## Overview
 
-BlockSecOps offers x402 pay-per-scan credits as a unique, crypto-native payment option. This allows users to pay with USDC on Base mainnet without committing to a subscription.
+Apogee offers x402 pay-per-scan credits as a unique, crypto-native payment option. This allows users to pay with USDC on Base mainnet without committing to a subscription.
 
 **No other competitor in the web3 security market offers this.**
 
@@ -36,7 +36,7 @@ x402 is a crypto-native payment protocol that enables:
 ## How It Works
 
 ### 1. Connect Wallet
-Connect your wallet (MetaMask, WalletConnect, Coinbase Wallet) to the BlockSecOps dashboard.
+Connect your wallet (MetaMask, WalletConnect, Coinbase Wallet) to the Apogee dashboard.
 
 ### 2. Purchase Credits
 Navigate to `/billing` or `/pricing` and select a credit package. Pay with USDC on Base mainnet.
@@ -142,7 +142,7 @@ POST /api/v1/payments/credits/use  # Deduct credit for scan
 
 ## Why x402 Credits?
 
-### For BlockSecOps
+### For Apogee
 - Reduced payment processing fees
 - Crypto-native brand alignment
 - Lower barrier to entry

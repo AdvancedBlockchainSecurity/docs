@@ -5,7 +5,7 @@
 
 ## Overview
 
-This playbook guides team leads and managers through the complete workflow for creating organizations, teams, projects, and managing user access in BlockSecOps. It covers permission requirements, API endpoints, and known issues to be aware of.
+This playbook guides team leads and managers through the complete workflow for creating organizations, teams, projects, and managing user access in Apogee. It covers permission requirements, API endpoints, and known issues to be aware of.
 
 ---
 
@@ -15,7 +15,7 @@ This playbook guides team leads and managers through the complete workflow for c
 - [ ] Enterprise tier subscription (required for organization creation)
 - [ ] API access token (obtained from user profile or login)
 - [ ] `curl` or API client for executing requests
-- [ ] Access to BlockSecOps API at `https://app.0xapogee.local/api/v1`
+- [ ] Access to Apogee API at `https://app.0xapogee.local/api/v1`
 
 ---
 
@@ -57,7 +57,7 @@ This playbook guides team leads and managers through the complete workflow for c
 
 ## System Roles Reference
 
-BlockSecOps defines 5 organization roles with specific permissions:
+Apogee defines 5 organization roles with specific permissions:
 
 | Role | Key Permissions | Use Case |
 |------|-----------------|----------|
@@ -191,7 +191,7 @@ curl -X GET "https://app.0xapogee.local/api/v1/organizations/{org_id}/roles" \
 
 Add existing users to your organization with a specified role.
 
-> **Important:** Users must already have accounts in BlockSecOps. See [Known Issue #3](#issue-3-no-user-invite-flow-for-external-users) for limitations.
+> **Important:** Users must already have accounts in Apogee. See [Known Issue #3](#issue-3-no-user-invite-flow-for-external-users) for limitations.
 
 ### API Request (Convenience Endpoint)
 
@@ -524,10 +524,10 @@ curl -X DELETE "https://app.0xapogee.local/api/v1/organizations/{org_id}" \
 
 ### "User not found" when adding member
 
-**Cause:** The user doesn't have a BlockSecOps account.
+**Cause:** The user doesn't have a Apogee account.
 
 **Solution:**
-1. User must first register at BlockSecOps
+1. User must first register at Apogee
 2. Alternatively, use the team invite system (separate flow)
 3. Verify user_id is correct: `GET /users?email={email}`
 
@@ -625,7 +625,7 @@ if not user:
 ```
 
 **Workaround:**
-1. Have users self-register first at BlockSecOps
+1. Have users self-register first at Apogee
 2. Use the separate team invite system (`TeamInviteModel`) which sends email invitations
 
 ---

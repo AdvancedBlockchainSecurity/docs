@@ -144,5 +144,5 @@ Users can now view their support ticket history, track status, and see live JIRA
 
 ---
 
-**Maintained By:** BlockSecOps Team
+**Maintained By:** Apogee Team
 **Status:** Complete

@@ -46,7 +46,7 @@ Phase 3.3 introduces wallet-based authentication using the Sign-In with Ethereum
 0xapogee.com wants you to sign in with your Ethereum account:
 0x1234...5678
 
-Sign in to BlockSecOps Security Platform
+Sign in to Apogee Security Platform
 
 URI: https://0xapogee.com
 Version: 1
@@ -215,7 +215,7 @@ export const wagmiConfig = createConfig({
   connectors: [
     injected(),
     walletConnect({ projectId }),
-    coinbaseWallet({ appName: 'BlockSecOps' }),
+    coinbaseWallet({ appName: 'Apogee's }),
   ],
   // ...
 });

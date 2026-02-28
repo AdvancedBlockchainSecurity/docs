@@ -5,7 +5,7 @@
 
 ## Overview
 
-Step-by-step checklist for auditing a BlockSecOps service for race conditions. Use this playbook during quarterly concurrency audits or when investigating concurrency bugs.
+Step-by-step checklist for auditing a Apogee service for race conditions. Use this playbook during quarterly concurrency audits or when investigating concurrency bugs.
 
 ---
 

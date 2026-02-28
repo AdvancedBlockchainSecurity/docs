@@ -30,7 +30,7 @@
 
 ### Purpose
 
-This document defines mandatory standards for integrating security scanners, vulnerability patterns, and detector mappings into the BlockSecOps Intelligence Platform. Following these standards ensures:
+This document defines mandatory standards for integrating security scanners, vulnerability patterns, and detector mappings into the Apogee Intelligence Platform. Following these standards ensures:
 
 - **Production Readiness**: All integrations are deployment-ready
 - **Data Integrity**: Database consistency and recoverability
@@ -505,7 +505,7 @@ Phase 8: Production Deployment (1-2 hours)
 **Format**: `BVD-XXX-###`
 
 **Components**:
-- `BVD`: BlockSecOps Vulnerability Database prefix (fixed)
+- `BVD`: Apogee Vulnerability Database prefix (fixed)
 - `XXX`: Three-letter category code (uppercase)
 - `###`: Sequential number within category (001-999)
 

@@ -1,8 +1,8 @@
-# BlockSecOps Shared Library
+# Apogee Shared Library
 
 ## Overview
 
-The BlockSecOps Shared Library (`blocksecops-shared`) is a foundational multi-language library that provides consistent types, utilities, and business logic across all Python, TypeScript, and Rust services in the BlockSecOps Platform.
+The Apogee Shared Library (`blocksecops-shared`) is a foundational multi-language library that provides consistent types, utilities, and business logic across all Python, TypeScript, and Rust services in the Apogee Platform.
 
 This documentation covers the complete implementation of the multi-language shared library with performance-optimized Rust core and bindings for Python (PyO3) and TypeScript (WASM).
 
@@ -617,7 +617,7 @@ console.log(await getWasmDiagnostics());
 
 ## Benefits and Impact
 
-The BlockSecOps Shared Library provides a production-ready, multi-language foundation for the entire platform. Key benefits include:
+The Apogee Shared Library provides a production-ready, multi-language foundation for the entire platform. Key benefits include:
 
 - **Type Safety**: 100% consistency across Python, TypeScript, and Rust
 - **Performance**: Significant speedups through Rust acceleration

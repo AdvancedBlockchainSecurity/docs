@@ -6,14 +6,14 @@
 
 ## Overview
 
-This playbook guides you through installing and configuring the BlockSecOps VS Code extension for real-time smart contract security scanning directly in your editor.
+This playbook guides you through installing and configuring the Apogee VS Code extension for real-time smart contract security scanning directly in your editor.
 
 ---
 
 ## Prerequisites
 
 - [ ] Visual Studio Code installed (version 1.80+)
-- [ ] BlockSecOps account (any tier)
+- [ ] Apogee account (any tier)
 - [ ] API key with `write:scans`, `read:scans`, `read:vulnerabilities` scopes
 - [ ] Solidity smart contract project
 
@@ -39,8 +39,8 @@ flowchart LR
 **VS Code:**
 1. Open VS Code
 2. Click the **Extensions** icon in the sidebar (or press `Ctrl+Shift+X`)
-3. Search for `BlockSecOps`
-4. Click **Install** on "BlockSecOps Security Scanner"
+3. Search for `Apogee`
+4. Click **Install** on "Apogee Security Scanner"
 5. Wait for installation to complete
 6. Click **Reload** if prompted
 
@@ -73,7 +73,7 @@ curl -X POST "https://app.0xapogee.com/api/v1/api_keys" \
 
 **VS Code:**
 1. Open Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
-2. Type `BlockSecOps: Configure`
+2. Type `Apogee: Configure`
 3. Enter your API key when prompted
 4. Or manually edit settings:
 
@@ -93,8 +93,8 @@ curl -X POST "https://app.0xapogee.com/api/v1/api_keys" \
 
 **VS Code:**
 1. Open a Solidity file (`.sol`)
-2. Check the status bar shows "BlockSecOps: Ready"
-3. Look for the BlockSecOps icon in the Activity Bar
+2. Check the status bar shows "Apogee: Ready"
+3. Look for the Apogee icon in the Activity Bar
 
 ---
 
@@ -113,13 +113,13 @@ The extension automatically scans as you type:
 Trigger a full scan:
 
 1. Open Command Palette (`Ctrl+Shift+P`)
-2. Type `BlockSecOps: Scan Current File`
+2. Type `Apogee: Scan Current File`
 3. Or use keyboard shortcut: `Ctrl+Alt+S` (customizable)
 
 ### Scan Entire Workspace
 
 1. Open Command Palette
-2. Type `BlockSecOps: Scan Workspace`
+2. Type `Apogee: Scan Workspace`
 3. Progress shown in status bar
 
 ### View Results
@@ -129,8 +129,8 @@ Trigger a full scan:
 - Click to navigate to affected code
 - Filter by severity
 
-**BlockSecOps Panel:**
-1. Click the BlockSecOps icon in Activity Bar
+**Apogee Panel:**
+1. Click the Apogee icon in Activity Bar
 2. View findings grouped by:
    - Severity
    - File
@@ -146,7 +146,7 @@ For supported vulnerability types:
 3. Select from available fixes:
    - Apply recommended fix
    - Mark as false positive
-   - View in BlockSecOps dashboard
+   - View in Apogee dashboard
 
 ---
 
@@ -154,12 +154,12 @@ For supported vulnerability types:
 
 | Command | Shortcut | Description |
 |---------|----------|-------------|
-| `BlockSecOps: Scan Current File` | `Ctrl+Alt+S` | Scan active file |
-| `BlockSecOps: Scan Workspace` | `Ctrl+Alt+Shift+S` | Scan all Solidity files |
-| `BlockSecOps: Configure` | - | Set API key and preferences |
-| `BlockSecOps: Clear Diagnostics` | - | Clear all warnings |
-| `BlockSecOps: View Report` | - | Open scan report in browser |
-| `BlockSecOps: Toggle Auto-Scan` | - | Enable/disable auto-scan |
+| `Apogee: Scan Current File` | `Ctrl+Alt+S` | Scan active file |
+| `Apogee: Scan Workspace` | `Ctrl+Alt+Shift+S` | Scan all Solidity files |
+| `Apogee: Configure` | - | Set API key and preferences |
+| `Apogee: Clear Diagnostics` | - | Clear all warnings |
+| `Apogee: View Report` | - | Open scan report in browser |
+| `Apogee: Toggle Auto-Scan` | - | Enable/disable auto-scan |
 
 ---
 
@@ -167,7 +167,7 @@ For supported vulnerability types:
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `blocksecops.apiKey` | - | Your BlockSecOps API key |
+| `blocksecops.apiKey` | - | Your Apogee API key |
 | `blocksecops.apiUrl` | `https://app.0xapogee.com/api/v1` | API endpoint |
 | `blocksecops.autoScan` | `true` | Enable real-time scanning |
 | `blocksecops.scanOnSave` | `true` | Scan when file saved |
@@ -181,7 +181,7 @@ For supported vulnerability types:
 
 **VS Code Settings UI:**
 1. Open Settings (`Ctrl+,`)
-2. Search for "BlockSecOps"
+2. Search for "Apogee"
 3. Modify settings as needed
 
 **settings.json:**
@@ -227,7 +227,7 @@ Create `.0xapogee.json` in project root for project-specific settings:
 
 Confirm extension is working:
 
-1. **Status Bar:** Shows "BlockSecOps: Ready"
+1. **Status Bar:** Shows "Apogee: Ready"
 2. **Create Test File:**
 
 ```solidity
@@ -273,12 +273,12 @@ Enable debug logging:
 }
 ```
 
-View logs: **Output** panel > Select "BlockSecOps"
+View logs: **Output** panel > Select "Apogee"
 
 ### Reset Extension
 
 1. Open Command Palette
-2. Type `BlockSecOps: Reset Configuration`
+2. Type `Apogee: Reset Configuration`
 3. Re-enter API key
 
 ---
@@ -287,11 +287,11 @@ View logs: **Output** panel > Select "BlockSecOps"
 
 ### Solidity (Juan Blanco)
 
-Compatible - BlockSecOps adds security diagnostics alongside syntax highlighting.
+Compatible - Apogee adds security diagnostics alongside syntax highlighting.
 
 ### Hardhat
 
-Compatible - Use BlockSecOps for security, Hardhat for compilation/testing.
+Compatible - Use Apogee for security, Hardhat for compilation/testing.
 
 ### Foundry
 
@@ -301,7 +301,7 @@ Compatible - Both tools work independently.
 
 Add to `.prettierignore`:
 ```
-# BlockSecOps config
+# Apogee config
 .0xapogee.json
 ```
 
@@ -332,7 +332,7 @@ Customize shortcuts in `keybindings.json`:
 - [ ] Extension installed from marketplace
 - [ ] API key created with required scopes
 - [ ] Extension configured with API key
-- [ ] Status bar shows "BlockSecOps: Ready"
+- [ ] Status bar shows "Apogee: Ready"
 - [ ] Auto-scan enabled (optional)
 - [ ] Severity filter configured
 - [ ] Test file scanned successfully

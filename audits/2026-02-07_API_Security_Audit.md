@@ -1,4 +1,4 @@
-# BlockSecOps Full API Security Audit Report
+# Apogee Full API Security Audit Report
 
 **Date:** February 7, 2026
 **Scope:** API Service v0.28.2, Dashboard v0.41.0, Admin Portal

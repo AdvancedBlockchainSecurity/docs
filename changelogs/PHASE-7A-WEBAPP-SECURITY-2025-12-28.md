@@ -8,7 +8,7 @@
 
 ## Summary
 
-Security hardening of the BlockSecOps web application before AWS production deployment. Implemented security headers, CORS restrictions, request size limits, error handling improvements, and security event logging.
+Security hardening of the Apogee web application before AWS production deployment. Implemented security headers, CORS restrictions, request size limits, error handling improvements, and security event logging.
 
 ---
 

@@ -8,7 +8,7 @@
 
 ## Objective
 
-Deploy ArgoCD for comprehensive GitOps workflow management across all environments, enabling automated application deployment and configuration management for the entire BlockSecOps Platform.
+Deploy ArgoCD for comprehensive GitOps workflow management across all environments, enabling automated application deployment and configuration management for the entire Apogee Platform.
 
 ## Technical Requirements
 

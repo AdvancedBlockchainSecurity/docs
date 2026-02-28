@@ -1,14 +1,14 @@
 # Development Guides
 
 **Last Updated**: December 7, 2025
-**Platform**: BlockSecOps Security Platform
+**Platform**: Apogee Security Platform
 **Tech Stack**: Python 3.11+, FastAPI, React TypeScript, Rust
 
 ---
 
 ## Overview
 
-Comprehensive development guides for building and contributing to the BlockSecOps Platform. This directory covers everything from initial environment setup to advanced architecture patterns and CI/CD automation.
+Comprehensive development guides for building and contributing to the Apogee Platform. This directory covers everything from initial environment setup to advanced architecture patterns and CI/CD automation.
 
 ---
 
@@ -321,6 +321,6 @@ export REDIS_URL="redis://localhost:6379"
 
 ---
 
-**Maintained by**: BlockSecOps Development Team
+**Maintained by**: Apogee Development Team
 **Last Review**: December 7, 2025
 **Version**: 0.8.0 (Phase 3.4 Complete)

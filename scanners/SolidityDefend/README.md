@@ -11,11 +11,11 @@
 
 ## Overview
 
-SolidityDefend is a comprehensive Rust-based static analyzer specializing in modern blockchain vulnerabilities. It provides the most extensive coverage of contemporary smart contract security threats in the BlockSecOps platform, with 333 specialized detectors covering EIP-7702, EIP-1153, EIP-3074/4844/6780, ERC-4337 Account Abstraction, ERC-7683 intents, DeFi protocols, MEV, L2/rollup security, advanced proxy patterns, and emerging attack vectors.
+SolidityDefend is a comprehensive Rust-based static analyzer specializing in modern blockchain vulnerabilities. It provides the most extensive coverage of contemporary smart contract security threats in the Apogee platform, with 333 specialized detectors covering EIP-7702, EIP-1153, EIP-3074/4844/6780, ERC-4337 Account Abstraction, ERC-7683 intents, DeFi protocols, MEV, L2/rollup security, advanced proxy patterns, and emerging attack vectors.
 
 ### Key Features
 
-- **333 Security Detectors** - Largest detector set in BlockSecOps
+- **333 Security Detectors** - Largest detector set in Apogee
 - **Modern EIP Coverage** - EIP-7702, EIP-1153, EIP-3074, EIP-4844, EIP-6780, ERC-4337, ERC-7683, ERC-7821
 - **DeFi Security** - Vault attacks, AMM invariants, flash loans, oracle manipulation
 - **MEV Detection** - Sandwich attacks, front-running, JIT liquidity, liquidation MEV
@@ -45,7 +45,7 @@ SolidityDefend is a comprehensive Rust-based static analyzer specializing in mod
 
 ## Integration Status
 
-### BlockSecOps Integration
+### Apogee Integration
 
 | Component | Status | Details |
 |-----------|--------|---------|
@@ -167,9 +167,9 @@ soliditydefend scan path/to/Contract.sol
 soliditydefend scan path/to/contracts/
 ```
 
-### Integration with BlockSecOps
+### Integration with Apogee
 
-SolidityDefend is automatically included in BlockSecOps scan presets:
+SolidityDefend is automatically included in Apogee scan presets:
 
 ```bash
 # Standard scan (includes SolidityDefend)
@@ -468,9 +468,9 @@ soliditydefend scan --verbose path/to/Contract.sol
 
 ### Support
 
-- **GitHub Issues:** https://github.com/BlockSecOps/SolidityDefend/issues
-- **Documentation:** https://github.com/BlockSecOps/SolidityDefend/tree/main/docs
-- **BlockSecOps Docs:** This directory
+- **GitHub Issues:** https://github.com/AdvancedBlockchainSecurity/SolidityDefend/issues
+- **Documentation:** https://github.com/AdvancedBlockchainSecurity/SolidityDefend/tree/main/docs
+- **Apogee Docs:** This directory
 
 ---
 
@@ -538,11 +538,11 @@ soliditydefend scan --verbose path/to/Contract.sol
 
 ### External Resources
 
-- **SolidityDefend Repository:** https://github.com/BlockSecOps/SolidityDefend
-- **Detector Documentation:** https://github.com/BlockSecOps/SolidityDefend/tree/main/docs/detectors
-- **Release Notes:** https://github.com/BlockSecOps/SolidityDefend/releases
+- **SolidityDefend Repository:** https://github.com/AdvancedBlockchainSecurity/SolidityDefend
+- **Detector Documentation:** https://github.com/AdvancedBlockchainSecurity/SolidityDefend/tree/main/docs/detectors
+- **Release Notes:** https://github.com/AdvancedBlockchainSecurity/SolidityDefend/releases
 
-### BlockSecOps Documentation
+### Apogee Documentation
 
 - **Scanner Integration Guide:** [../../SCANNER-INTEGRATION-GUIDE.md](../../SCANNER-INTEGRATION-GUIDE.md)
 - **Intelligence Standards:** [../../../docs/standards/INTELLIGENCE-INTEGRATION-STANDARDS.md](../../../docs/standards/INTELLIGENCE-INTEGRATION-STANDARDS.md)

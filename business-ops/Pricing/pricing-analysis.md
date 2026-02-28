@@ -9,9 +9,9 @@
 
 ---
 
-# DevSecOps and Blockchain Security Platform Pricing Analysis for BlockSecOps (ARCHIVED)
+# DevSecOps and Blockchain Security Platform Pricing Analysis for Apogee (ARCHIVED)
 
-BlockSecOps's current pricing sits squarely within market ranges but shows strategic positioning challenges against both Web2 enterprise security leaders and emerging Web3 platforms. **The $10K Starter tier underprices relative to the market, while the $150K Enterprise tier aligns with mid-market Web2 standards.** However, the real insight lies in understanding how Web2 platforms achieve $35K-$500K+ enterprise deals and why Web3 platforms struggle with pricing transparency.
+Apogee's current pricing sits squarely within market ranges but shows strategic positioning challenges against both Web2 enterprise security leaders and emerging Web3 platforms. **The $10K Starter tier underprices relative to the market, while the $150K Enterprise tier aligns with mid-market Web2 standards.** However, the real insight lies in understanding how Web2 platforms achieve $35K-$500K+ enterprise deals and why Web3 platforms struggle with pricing transparency.
 
 ## Web2 DevSecOps: Premium pricing justified by comprehensive platforms
 
@@ -23,7 +23,7 @@ The key differentiator: **Web2 platforms price on recurring developer seats or i
 
 Snyk's pricing architecture reveals sophisticated market segmentation. The Team plan caps at 10 developers ($1,380-$31,200/year for all products), forcing growth-stage companies into Enterprise pricing where **real-world deals range $35K-$500K annually at $676-$948 per developer**. This "graduation pricing" strategy maximizes customer lifetime value while maintaining accessible entry points.
 
-Critical insight for BlockSecOps: **SSO being Enterprise-exclusive is a major customer frustration** cited repeatedly in reviews, yet Snyk maintains this pricing power. BlockSecOps should consider whether authentication features belong in Professional tier to differentiate from Web2 incumbents.
+Critical insight for Apogee: **SSO being Enterprise-exclusive is a major customer frustration** cited repeatedly in reviews, yet Snyk maintains this pricing power. Apogee should consider whether authentication features belong in Professional tier to differentiate from Web2 incumbents.
 
 | Snyk Metric | Value | Implication |
 |-------------|-------|-------------|
@@ -33,7 +33,7 @@ Critical insight for BlockSecOps: **SSO being Enterprise-exclusive is a major cu
 | Standard discount range | 26-36% | Negotiation headroom |
 | Historical price increase (2020-2021) | 100% doubling | Bundle expansion strategy |
 
-**Negotiation insights**: Buyers achieve 34-36% discounts through multi-year commitments, end-of-quarter timing, and competitive pressure. BlockSecOps should plan for similar discount expectations in enterprise sales.
+**Negotiation insights**: Buyers achieve 34-36% discounts through multi-year commitments, end-of-quarter timing, and competitive pressure. Apogee should plan for similar discount expectations in enterprise sales.
 
 ### Wiz and Orca: Workload-based premium positioning
 
@@ -43,7 +43,7 @@ Wiz and Orca employ workload-based pricing that scales with infrastructure size 
 
 **Orca Security starts at $50K+ annually** with simplified "one SKU" pricing including all features—a noteworthy 2025 shift toward pricing simplicity. The company phases out tiered licensing in favor of workload-based all-inclusive subscriptions with 20-25% discounts achievable via 24-month contracts.
 
-Both platforms demonstrate that **$50K-$100K annual minimums are standard for enterprise cloud security**, with users accepting premium pricing when platforms demonstrably replace multiple point solutions. BlockSecOps's $50K Professional tier falls directly in this range.
+Both platforms demonstrate that **$50K-$100K annual minimums are standard for enterprise cloud security**, with users accepting premium pricing when platforms demonstrably replace multiple point solutions. Apogee's $50K Professional tier falls directly in this range.
 
 | Platform | Starting Price | Typical Mid-Market | Enterprise Range | Pricing Metric |
 |----------|---------------|-------------------|------------------|----------------|
@@ -51,7 +51,7 @@ Both platforms demonstrate that **$50K-$100K annual minimums are standard for en
 | Orca Security | $50K+ | $50K-$200K | $200K+ | Per workload |
 | Snyk | $5.9K (5 devs) | $35K-$90K (50-100 devs) | $500K+ | Per developer |
 
-**Key learning**: Both Wiz and Orca face user concerns about "costs going up" as they mature—early adopters received better pricing, then rates increased as market position strengthened. BlockSecOps should lock in strategic customers at current rates with renewal caps.
+**Key learning**: Both Wiz and Orca face user concerns about "costs going up" as they mature—early adopters received better pricing, then rates increased as market position strengthened. Apogee should lock in strategic customers at current rates with renewal caps.
 
 ## Web3 blockchain security: Fragmented pricing and transparency gaps
 
@@ -59,9 +59,9 @@ Web3 security platforms reveal a market still establishing pricing norms, with e
 
 ### SolidityScan: Rare pricing transparency in Web3
 
-SolidityScan provides the most transparent Web3 pricing discovered, with clear monthly subscriptions starting at $29.99 for 2 scans ($15/scan) and scaling to $124.99/month for the Beginner plan (240 scans/year = $6.25/scan). The **annual Beginner plan at $1,499.99 provides 17% savings**, establishing a baseline that BlockSecOps significantly exceeds.
+SolidityScan provides the most transparent Web3 pricing discovered, with clear monthly subscriptions starting at $29.99 for 2 scans ($15/scan) and scaling to $124.99/month for the Beginner plan (240 scans/year = $6.25/scan). The **annual Beginner plan at $1,499.99 provides 17% savings**, establishing a baseline that Apogee significantly exceeds.
 
-Critical insight: **SolidityScan's Beginner plan at $1.5K/year is the competitive floor** for Web3 platforms with CI/CD integration, private repo scanning, and API access. BlockSecOps's $10K Starter tier is 6.7x higher, which requires justification through multi-chain breadth, real-time monitoring, or superior detection accuracy.
+Critical insight: **SolidityScan's Beginner plan at $1.5K/year is the competitive floor** for Web3 platforms with CI/CD integration, private repo scanning, and API access. Apogee's $10K Starter tier is 6.7x higher, which requires justification through multi-chain breadth, real-time monitoring, or superior detection accuracy.
 
 | SolidityScan Plan | Monthly | Annual | Scans Included | Cost Per Scan | Key Features |
 |-------------------|---------|--------|----------------|---------------|--------------|
@@ -70,7 +70,7 @@ Critical insight: **SolidityScan's Beginner plan at $1.5K/year is the competitiv
 | Intermediate | $208.33 | $2,499.99 | Higher volume | Lower | Enhanced features |
 | Pro | $299.99 | ~$3,600 | Higher volume | Lower | Team collaboration |
 
-SolidityScan's 160-200+ vulnerability detectors and support for 15+ chains (Ethereum, Solana, Avalanche, Arbitrum, etc.) create direct feature overlap with BlockSecOps. **The pricing gap suggests BlockSecOps must clearly articulate 6-10x value differential** through superior technology, deeper insights, or enterprise features like SSO and SLA guarantees.
+SolidityScan's 160-200+ vulnerability detectors and support for 15+ chains (Ethereum, Solana, Avalanche, Arbitrum, etc.) create direct feature overlap with Apogee. **The pricing gap suggests Apogee must clearly articulate 6-10x value differential** through superior technology, deeper insights, or enterprise features like SSO and SLA guarantees.
 
 ### Olympix: Enterprise opacity and verification challenges
 
@@ -78,7 +78,7 @@ The user's mention of "$12K for 5 engineers" for Olympix could not be verified t
 
 Olympix positions as "Web3's first enterprise-grade proactive DevSecOps tool" with 300% better detection than open-source alternatives and automated test generation achieving 90% coverage. The value proposition centers on **reducing audit costs** (documented case study shows $16K savings on a single audit) rather than competing on subscription pricing.
 
-**Strategic implication**: Olympix's opacity suggests they're pricing deals individually based on customer size and perceived value—likely in the $25K-$100K+ range based on enterprise positioning and audit cost savings messaging. BlockSecOps's transparent pricing at $10K/$50K/$150K could be a competitive advantage if marketed correctly.
+**Strategic implication**: Olympix's opacity suggests they're pricing deals individually based on customer size and perceived value—likely in the $25K-$100K+ range based on enterprise positioning and audit cost savings messaging. Apogee's transparent pricing at $10K/$50K/$150K could be a competitive advantage if marketed correctly.
 
 ### Additional Web3 platforms reveal pricing patterns
 
@@ -111,7 +111,7 @@ Research into 10 additional blockchain security platforms uncovers distinct mark
 - MythX Enterprise
 - Comprehensive programs with major protocols
 
-**Critical finding**: OpenZeppelin Defender, the most complete Web3 DevSecOps platform comparable to BlockSecOps, is **sunsetting in July 2026** due to business model challenges. This creates a significant market opportunity—BlockSecOps could position as the Defender replacement for teams requiring continuous security integration.
+**Critical finding**: OpenZeppelin Defender, the most complete Web3 DevSecOps platform comparable to Apogee, is **sunsetting in July 2026** due to business model challenges. This creates a significant market opportunity—Apogee could position as the Defender replacement for teams requiring continuous security integration.
 
 ## Comprehensive pricing comparison: Web2 vs Web3
 
@@ -127,11 +127,11 @@ Research into 10 additional blockchain security platforms uncovers distinct mark
 | **Forta** | Web3 Monitoring | Subscription (FORT tokens) | Variable | Premium feeds | Token-gated | ✅ Detection bots |
 | **CertiK** | Web3 Audit Platform | N/A | $5K-$50K per audit | Custom programs | Per project | Partial |
 | **Hacken** | Web3 Audit Services | $5K+ per audit | $10K-$50K per audit | $100K+ programs | Per project + hourly | Limited |
-| **BlockSecOps (Current)** | Web3 DevSecOps | **$10K/year (5 projects)** | **$50K/year (unlimited)** | **$150K/year** | **Per project tier** | **✅ Assumed native** |
+| **Apogee (Current)** | Web3 DevSecOps | **$10K/year (5 projects)** | **$50K/year (unlimited)** | **$150K/year** | **Per project tier** | **✅ Assumed native** |
 
-## Strategic pricing analysis: Where BlockSecOps fits
+## Strategic pricing analysis: Where Apogee fits
 
-BlockSecOps's current pricing structure positions between Web3 scanning tools (SolidityScan at $1.5K-$3.6K) and Web2 enterprise platforms (Snyk/Wiz at $35K-$500K+), but the **per-project model creates scaling concerns** that per-developer or per-workload models avoid.
+Apogee's current pricing structure positions between Web3 scanning tools (SolidityScan at $1.5K-$3.6K) and Web2 enterprise platforms (Snyk/Wiz at $35K-$500K+), but the **per-project model creates scaling concerns** that per-developer or per-workload models avoid.
 
 ### Starter tier ($10K/year, 5 projects): Strategic positioning questions
 
@@ -141,7 +141,7 @@ BlockSecOps's current pricing structure positions between Web3 scanning tools (S
 - 2.5x less expensive than Olympix (estimated $25K+)
 
 **Competitive pressure points**:
-1. **SolidityScan offers 240 scans/year for $1.5K** with GitHub Actions and multi-chain support—BlockSecOps must articulate why 5 projects warrant $10K
+1. **SolidityScan offers 240 scans/year for $1.5K** with GitHub Actions and multi-chain support—Apogee must articulate why 5 projects warrant $10K
 2. **Project-based limits create artificial constraints**—what defines a "project"? Multiple contracts in one dApp? Different chains?
 3. **No clear small-team entry point**—Snyk allows single developers to start at $300/year (1 dev, 1 product)
 
@@ -187,7 +187,7 @@ BlockSecOps's current pricing structure positions between Web3 scanning tools (S
 **Positioning analysis**:
 The $150K Enterprise tier appears **conservative relative to Web2 enterprise pricing** ($200K-$1M+ common) but **aggressive relative to Web3 scanning tools**. This suggests either:
 
-1. **BlockSecOps is pricing for current Web3 market maturity** (lower budgets, fewer established procurement processes)
+1. **Apogee is pricing for current Web3 market maturity** (lower budgets, fewer established procurement processes)
 2. **Platform hasn't yet achieved feature parity** with Web2 security leaders
 3. **Targeting "enterprise-lite"** rather than Fortune 500
 
@@ -206,29 +206,29 @@ Based on competitive analysis, buyers expect:
 
 **Recommendation**: **$150K is defensible as Enterprise entry point** but should represent "Enterprise Starter" rather than top tier. Consider adding **Premium Enterprise ($250K-$500K)** for Fortune 500 customers requiring white-glove service, custom SLA (<15min response), dedicated security engineers, and co-development of detection rules.
 
-## Historical pricing trends: Implications for BlockSecOps
+## Historical pricing trends: Implications for Apogee
 
 ### Web2 pattern: Bundle expansion drives price increases
 
 **Snyk doubled prices (2020→2021)** when adding Code and IaC products to bundles containing Open Source and Container scanning. This **~100% increase accompanied 2x product expansion**, establishing ~50% premium per added product category.
 
-**Application to BlockSecOps**: If BlockSecOps currently covers smart contract scanning, real-time monitoring, and CI/CD integration, adding **API security, off-chain integration monitoring, or formal verification** could justify 30-50% price increases at tier upgrades or annual renewals.
+**Application to Apogee**: If Apogee currently covers smart contract scanning, real-time monitoring, and CI/CD integration, adding **API security, off-chain integration monitoring, or formal verification** could justify 30-50% price increases at tier upgrades or annual renewals.
 
 ### Web2 pattern: Workload models create predictable scaling
 
 Both Wiz and Orca shifted to **workload-based pricing that scales with infrastructure** rather than fixed tiers. As customers' cloud environments grow, revenue grows automatically without renegotiation.
 
-**Application to BlockSecOps**: Consider **per-chain or per-contract-deployment pricing** rather than project-based. For example:
+**Application to Apogee**: Consider **per-chain or per-contract-deployment pricing** rather than project-based. For example:
 - Professional: $50K for 50 active contract deployments across all chains
 - Enterprise: $150K for 200 active deployments + real-time transaction monitoring
 
-This aligns incentives—as customers deploy more contracts (growing their business), BlockSecOps revenue scales proportionally.
+This aligns incentives—as customers deploy more contracts (growing their business), Apogee revenue scales proportionally.
 
 ### Web3 pattern: Pricing opacity creating opportunity
 
 **Only SolidityScan provides transparent pricing** among serious Web3 platforms. Olympix, CertiK, Hacken, and most others require contact-sales quotes, creating **friction for buyers and potentially limiting market adoption**.
 
-**Application to BlockSecOps**: Current transparent pricing at $10K/$50K/$150K is a **competitive advantage** if marketed as such. Buyers tired of "schedule a demo for pricing" can immediately understand costs and budget accordingly. However, this also means **less negotiation flexibility** and potentially leaving money on the table with larger customers.
+**Application to Apogee**: Current transparent pricing at $10K/$50K/$150K is a **competitive advantage** if marketed as such. Buyers tired of "schedule a demo for pricing" can immediately understand costs and budget accordingly. However, this also means **less negotiation flexibility** and potentially leaving money on the table with larger customers.
 
 **Hybrid recommendation**: Maintain transparent pricing for Starter and Professional tiers, require contact-sales for Enterprise to enable custom pricing at scale (similar to Snyk's Team = transparent, Enterprise = custom quote model).
 
@@ -236,11 +236,11 @@ This aligns incentives—as customers deploy more contracts (growing their busin
 
 **OpenZeppelin Defender's July 2026 shutdown** signals challenges with standalone DevSecOps platforms in Web3—developers may resist $500+/month subscriptions when free tools (Slither, Mythril) provide baseline coverage.
 
-**Application to BlockSecOps**: Position as **audit cost replacement** rather than additional subscription burden. Frame $50K Professional as "2-3 audit equivalents" providing continuous protection vs. point-in-time audits costing $25K-$75K each. Case studies showing "$100K audit spend reduced to $50K subscription + 1 audit" would justify pricing.
+**Application to Apogee**: Position as **audit cost replacement** rather than additional subscription burden. Frame $50K Professional as "2-3 audit equivalents" providing continuous protection vs. point-in-time audits costing $25K-$75K each. Case studies showing "$100K audit spend reduced to $50K subscription + 1 audit" would justify pricing.
 
 ## Feature parity requirements: What $10K/$50K/$150K must deliver
 
-Based on competitive analysis, BlockSecOps pricing implies specific feature commitments:
+Based on competitive analysis, Apogee pricing implies specific feature commitments:
 
 ### Starter tier ($10K) minimum features
 To justify 6.7x premium over SolidityScan:
@@ -284,7 +284,7 @@ To justify Web2 adjacent pricing:
 - ✅ Multi-organization management
 - ✅ Priority feature requests
 
-**Gap analysis requirement**: Compare BlockSecOps current features against this matrix. Any gaps undermine pricing justification.
+**Gap analysis requirement**: Compare Apogee current features against this matrix. Any gaps undermine pricing justification.
 
 ## Pricing model alternatives: Beyond project-based tiers
 
@@ -370,7 +370,7 @@ To justify Web2 adjacent pricing:
 ### Targeting small Web3 startups (1-5 developers, pre-seed to seed)
 **Competitive set**: SolidityScan ($1.5K), Slither (free), MythX Developer (low cost)
 
-**Current BlockSecOps position**: $10K Starter tier is **likely too expensive** for this segment unless demonstrating 5-10x value
+**Current Apogee position**: $10K Starter tier is **likely too expensive** for this segment unless demonstrating 5-10x value
 
 **Recommendations**:
 1. **Create Developer tier at $2,500-$3,500/year** (1 project, 2 users, GitHub Actions, basic support)
@@ -381,7 +381,7 @@ To justify Web2 adjacent pricing:
 ### Targeting growth-stage Web3 companies (10-50 developers, Series A-B)
 **Competitive set**: Olympix ($25K-$100K estimated), OpenZeppelin Defender ($500-2K/month estimated), MythX Professional, audit firms ($25K-$75K per audit)
 
-**Current BlockSecOps position**: **$50K Professional tier is well-positioned** for this segment
+**Current Apogee position**: **$50K Professional tier is well-positioned** for this segment
 
 **Recommendations**:
 1. **Maintain $50K Professional as core offering**
@@ -393,7 +393,7 @@ To justify Web2 adjacent pricing:
 ### Targeting enterprise Web3 infrastructure (50+ developers, major protocols)
 **Competitive set**: Web2 platforms (Snyk $100K+, Wiz $200K+), premium audit firms (Trail of Bits), comprehensive security programs
 
-**Current BlockSecOps position**: **$150K Enterprise tier underpriced relative to Web2 but appropriate for Web3 maturity**
+**Current Apogee position**: **$150K Enterprise tier underpriced relative to Web2 but appropriate for Web3 maturity**
 
 **Recommendations**:
 1. **Tier Enterprise pricing**:
@@ -410,11 +410,11 @@ To justify Web2 adjacent pricing:
 ### Targeting traditional enterprises exploring blockchain
 **Competitive set**: Existing Snyk/Veracode relationships ($100K-$500K), internal security teams
 
-**Current BlockSecOps position**: **Must compete with established Web2 relationships**
+**Current Apogee position**: **Must compete with established Web2 relationships**
 
 **Recommendations**:
 1. **Emphasize blockchain-specific expertise** Web2 tools can't provide
-2. **Position as complementary**, not replacement: "Snyk covers your Web2 app, BlockSecOps covers your smart contracts"
+2. **Position as complementary**, not replacement: "Snyk covers your Web2 app, Apogee covers your smart contracts"
 3. **Enterprise Plus tier at $300K** to match budget expectations
 4. **Leverage compliance requirements**: Banking/finance enterprises need blockchain security audits—position as continuous compliance
 5. **Partnership strategy**: Co-sell with Snyk/Wiz as the "blockchain module" for their platform
@@ -459,7 +459,7 @@ To justify Web2 adjacent pricing:
 
 ## Pricing transparency: Competitive advantage or limitation?
 
-BlockSecOps currently displays transparent pricing—a **rarity in blockchain security** where Olympix, CertiK, Hacken, and Quantstamp all require contact-sales. This creates strategic choice:
+Apogee currently displays transparent pricing—a **rarity in blockchain security** where Olympix, CertiK, Hacken, and Quantstamp all require contact-sales. This creates strategic choice:
 
 ### Maintain transparency (recommended for Starter/Professional)
 **Advantages**:
@@ -497,7 +497,7 @@ This mirrors Snyk's approach (Team = transparent, Enterprise = custom) and maint
 ## Critical success factors for pricing sustainability
 
 ### Feature velocity: Must justify premium over free tools
-With Slither, Mythril, and Echidna providing free baseline scanning, BlockSecOps must **ship new features every 4-6 months** to maintain premium pricing justification:
+With Slither, Mythril, and Echidna providing free baseline scanning, Apogee must **ship new features every 4-6 months** to maintain premium pricing justification:
 
 - Q1 2026: Add formal verification module
 - Q2 2026: Add runtime transaction simulation
@@ -526,7 +526,7 @@ Many blockchain teams still budget $25K-$75K for one-time audits rather than con
 ### Competitive monitoring: Track Web3 platform pricing quarterly
 With no established Web3 DevSecOps leader after Defender sunset, **market pricing will fluctuate significantly 2025-2027**. Review competitor pricing quarterly and adjust within 10% of market movements to avoid becoming overpriced or underpriced relative to emerging standards.
 
-## Conclusion: BlockSecOps pricing is defensible but requires strategic choices
+## Conclusion: Apogee pricing is defensible but requires strategic choices
 
 **Current pricing sits in a viable middle ground**: expensive enough to signal enterprise quality, affordable enough for growth-stage Web3 companies. The **$50K Professional tier aligns perfectly with Web2 cloud security entry points** (Orca $50K+, Wiz $111K median), while **$10K Starter faces competitive pressure** from SolidityScan ($1.5K-$3.6K).
 

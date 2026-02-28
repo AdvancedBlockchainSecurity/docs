@@ -1,6 +1,6 @@
 # Race Condition Remediation Pipeline
 
-Standard approach for identifying, classifying, and fixing race conditions across the BlockSecOps platform. Covers atomic SQL patterns, UPSERT, SELECT FOR UPDATE, optimistic locking, and async locks.
+Standard approach for identifying, classifying, and fixing race conditions across the Apogee platform. Covers atomic SQL patterns, UPSERT, SELECT FOR UPDATE, optimistic locking, and async locks.
 
 ## Overview
 

@@ -19,7 +19,7 @@
 
 ## Overview
 
-IDE integrations bring BlockSecOps security scanning directly into developer workflows through VS Code, JetBrains (IntelliJ/WebStorm), and Vim/Neovim plugins. All integrations use the `0xapogee-cli` tool with local SolidityDefend scanning.
+IDE integrations bring Apogee security scanning directly into developer workflows through VS Code, JetBrains (IntelliJ/WebStorm), and Vim/Neovim plugins. All integrations use the `0xapogee-cli` tool with local SolidityDefend scanning.
 
 ## Architecture
 
@@ -58,7 +58,7 @@ IDE integrations bring BlockSecOps security scanning directly into developer wor
 
 - Auto-downloads latest SolidityDefend from GitHub releases
 - Runs locally for fast feedback (no network latency for scanning)
-- Results synced to BlockSecOps API for dashboard visibility
+- Results synced to Apogee API for dashboard visibility
 
 ### 2. Scan Source Tracking
 
@@ -187,7 +187,7 @@ code --install-extension blocksecops-vscode-1.0.0.vsix
 ### Vim (ALE)
 
 ```vim
-" Enable BlockSecOps linter for Solidity
+" Enable Apogee linter for Solidity
 let g:ale_linters = { 'solidity': ['blocksecops'] }
 ```
 
@@ -206,7 +206,7 @@ let g:ale_linters = { 'solidity': ['blocksecops'] }
 
 ### JetBrains Settings
 
-Settings > Tools > BlockSecOps:
+Settings > Tools > Apogee:
 - API Key
 - CLI Path (default: auto-detect)
 - Scan on Save

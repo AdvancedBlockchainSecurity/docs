@@ -1,4 +1,4 @@
-# BlockSecOps Platform - Release Process
+# Apogee Platform - Release Process
 
 **Last Updated**: October 12, 2025
 **Status**: Active
@@ -8,11 +8,11 @@
 
 ## Overview
 
-This document describes the complete release process for BlockSecOps Platform services. All services follow a standardized release workflow using semantic versioning and automated CI/CD pipelines.
+This document describes the complete release process for Apogee Platform services. All services follow a standardized release workflow using semantic versioning and automated CI/CD pipelines.
 
 ## Semantic Versioning
 
-BlockSecOps Platform uses [Semantic Versioning 2.0.0](https://semver.org/) for all releases.
+Apogee Platform uses [Semantic Versioning 2.0.0](https://semver.org/) for all releases.
 
 ### Version Format
 
@@ -78,7 +78,7 @@ git tag v1.2.3
 git push origin v1.2.3
 
 # 4. Monitor release workflow
-# Visit: https://github.com/blocksecops/[service]/actions
+# Visit: https://github.com/AdvancedBlockchainSecurity/[service]/actions
 ```
 
 **Automatic Actions**:
@@ -421,7 +421,7 @@ git push --force origin v1.2.3
 docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 
 # Check GitHub Actions logs
-# https://github.com/blocksecops/[service]/actions
+# https://github.com/AdvancedBlockchainSecurity/[service]/actions
 ```
 
 #### Issue: Security scan blocks release

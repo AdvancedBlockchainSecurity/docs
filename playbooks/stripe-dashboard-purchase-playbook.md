@@ -6,7 +6,7 @@
 
 ## Overview
 
-This playbook covers testing Stripe payment flows through the BlockSecOps dashboard UI. It explains the two Stripe keys, how they work together, and step-by-step testing procedures.
+This playbook covers testing Stripe payment flows through the Apogee dashboard UI. It explains the two Stripe keys, how they work together, and step-by-step testing procedures.
 
 ## Prerequisites
 
@@ -320,4 +320,4 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0.0 | 2026-02-03 | Initial playbook | BlockSecOps Team |
+| 1.0.0 | 2026-02-03 | Initial playbook | Apogee Team |

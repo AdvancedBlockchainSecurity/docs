@@ -8,7 +8,7 @@
 
 ## Overview
 
-Harbor is an open-source container registry that provides policy and role-based access control, vulnerability scanning, and image signing. In BlockSecOps, Harbor serves as the local container registry for development and will be the production registry for all service images.
+Harbor is an open-source container registry that provides policy and role-based access control, vulnerability scanning, and image signing. In Apogee, Harbor serves as the local container registry for development and will be the production registry for all service images.
 
 ---
 
@@ -16,7 +16,7 @@ Harbor is an open-source container registry that provides policy and role-based 
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                           BlockSecOps Platform                          │
+│                           Apogee Platform                          │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐   │
@@ -231,7 +231,7 @@ harbor.local/
 
 ---
 
-## Integration with BlockSecOps Services
+## Integration with Apogee Services
 
 ### Build Workflow
 

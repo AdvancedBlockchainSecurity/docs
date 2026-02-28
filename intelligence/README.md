@@ -214,7 +214,7 @@ Advanced vulnerability fingerprinting strategies:
 
 **Format**: `BVD-<LANGUAGE>-<CATEGORY>-<NUMBER>`
 
-- **BVD**: BlockSecOps Vulnerability Database
+- **BVD**: Apogee Vulnerability Database
 - **LANGUAGE**: SOLIDITY, VYPER, SOLANA (Rust), CAIRO (Starknet)
 - **CATEGORY**: 3-letter code (REE, ACC, INT, etc.)
 - **NUMBER**: 3-digit sequence (001, 002, etc.)
@@ -464,6 +464,6 @@ longer BVD codes like `BVD-SOLIDITY-DEFI-LIQUIDITY-001` (34 characters). See Mig
 
 ---
 
-**Maintained by**: BlockSecOps Intelligence Team
+**Maintained by**: Apogee Intelligence Team
 **Last Pattern Update**: October 28, 2025 (v1.3)
 **Next Milestone**: Phase 2.3 - Aderyn Integration (88 detectors)

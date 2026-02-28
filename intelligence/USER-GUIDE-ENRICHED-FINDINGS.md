@@ -8,7 +8,7 @@
 
 ## Overview
 
-This guide explains how to interpret enriched vulnerability findings from the BlockSecOps Intelligence Layer. Enriched findings include:
+This guide explains how to interpret enriched vulnerability findings from the Apogee Intelligence Layer. Enriched findings include:
 
 - **Pattern Classification**: Standardized vulnerability categorization (BVD-*)
 - **Fingerprinting**: Unique identifiers for deduplication
@@ -780,7 +780,7 @@ Some patterns apply across multiple languages:
 
 ### Overview
 
-The BlockSecOps dashboard includes specialized UI components to visualize intelligence layer data. These components make it easy to understand pattern classifications, deduplication, and confidence scores at a glance.
+The Apogee dashboard includes specialized UI components to visualize intelligence layer data. These components make it easy to understand pattern classifications, deduplication, and confidence scores at a glance.
 
 **Available Components** (Phase 6.3):
 - **PatternCodeBadge**: Color-coded pattern classification badges

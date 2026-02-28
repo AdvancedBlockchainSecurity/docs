@@ -31,7 +31,7 @@ pipx install 0xapogee-cli
 ### Method 3: From Source
 
 ```bash
-git clone https://github.com/blocksecops/0xapogee-cli
+git clone https://github.com/AdvancedBlockchainSecurity/0xapogee-cli
 cd 0xapogee-cli
 pip install -e .
 ```
@@ -111,7 +111,7 @@ sudo apt install 0xapogee-cli
 
 ### Generating API Keys
 
-1. Log into BlockSecOps dashboard
+1. Log into Apogee dashboard
 2. Navigate to **Settings** > **API Keys**
 3. Click **Generate New Key**
 4. Select key type and permissions
@@ -184,11 +184,11 @@ Add to your organization's repository template:
 **`.pre-commit-config.yaml`**:
 ```yaml
 repos:
-  - repo: https://github.com/blocksecops/0xapogee-cli
+  - repo: https://github.com/AdvancedBlockchainSecurity/0xapogee-cli
     rev: v0.1.0
     hooks:
       - id: 0xapogee-scan
-        name: BlockSecOps Security Scan
+        name: Apogee Security Scan
         types: [solidity]
         args: ['--fail-on', 'high']
 ```

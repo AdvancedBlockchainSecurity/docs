@@ -6,7 +6,7 @@
 
 ## Overview
 
-This index provides a comprehensive guide to all BlockSecOps Platform development standards. These standards ensure:
+This index provides a comprehensive guide to all Apogee Platform development standards. These standards ensure:
 
 - **Reproducibility** through code-first development
 - **Traceability** of all platform changes
@@ -360,4 +360,4 @@ Contact the development team or create an issue in the `blocksecops-docs` reposi
 ---
 
 **Last Updated:** February 12, 2026
-**Maintained By:** BlockSecOps Team
+**Maintained By:** Apogee Team

@@ -1,6 +1,6 @@
-# BlockSecOps Agent Definitions
+# Apogee Agent Definitions
 
-This document defines specialized AI agents for each repository in the BlockSecOps ecosystem. Each agent is configured for both **coding assistance** (implementing features, fixing bugs, writing tests) and **codebase exploration** (understanding architecture, finding patterns, researching functionality).
+This document defines specialized AI agents for each repository in the Apogee ecosystem. Each agent is configured for both **coding assistance** (implementing features, fixing bugs, writing tests) and **codebase exploration** (understanding architecture, finding patterns, researching functionality).
 
 ## Agent Index
 
@@ -107,7 +107,7 @@ When coding, follow React best practices, use TypeScript types strictly, and mai
 ### blocksecops-api-service
 
 **Repository**: `~/Git/ABS/blocksecops-api-service`
-**Description**: Main HTTP API gateway and orchestrator for the BlockSecOps platform, handling authentication, contract management, and scan orchestration.
+**Description**: Main HTTP API gateway and orchestrator for the Apogee platform, handling authentication, contract management, and scan orchestration.
 
 #### Tech Stack
 - **Language**: Python 3.11+
@@ -136,7 +136,7 @@ When coding, follow React best practices, use TypeScript types strictly, and mai
 
 #### Agent Prompt
 ```
-You are a specialized agent for the blocksecops-api-service repository, the main FastAPI gateway for the BlockSecOps security platform.
+You are a specialized agent for the blocksecops-api-service repository, the main FastAPI gateway for the Apogee security platform.
 
 REPOSITORY CONTEXT:
 - Path: ~/Git/ABS/blocksecops-api-service
@@ -263,7 +263,7 @@ REPOSITORY CONTEXT:
 KEY DIRECTORIES:
 - apogee_cli/ - Main package
 - apogee_cli/commands/ - CLI commands
-- apogee_cli/api/ - API client for BlockSecOps platform
+- apogee_cli/api/ - API client for Apogee platform
 - apogee_cli/formatters/ - Output formatters (JSON, SARIF, JUnit)
 
 CODING CONVENTIONS:
@@ -379,7 +379,7 @@ When coding, write idiomatic Rust with proper memory management and error handli
 
 #### Agent Prompt
 ```
-You are a specialized agent for the blocksecops-dashboard repository, the main React dashboard for the BlockSecOps platform.
+You are a specialized agent for the blocksecops-dashboard repository, the main React dashboard for the Apogee platform.
 
 REPOSITORY CONTEXT:
 - Path: ~/Git/ABS/blocksecops-dashboard
@@ -491,7 +491,7 @@ When coding, follow the repository pattern strictly and use async operations. Wh
 ### blocksecops-docs
 
 **Repository**: `~/Git/ABS/blocksecops-docs`
-**Description**: Comprehensive user and developer documentation for the BlockSecOps platform.
+**Description**: Comprehensive user and developer documentation for the Apogee platform.
 
 #### Tech Stack
 - **Format**: Markdown
@@ -1090,7 +1090,7 @@ When coding, follow the adapter pattern for consistency. When exploring, underst
 
 #### Key Directories (TaskDocs-SolidityBOM)
 - Root level - Planning and strategy documents
-- Integration guides (Foundry, Hardhat, BlockSecOps)
+- Integration guides (Foundry, Hardhat, Apogee)
 - Testing and release documentation
 
 #### Architecture Notes
@@ -1245,7 +1245,7 @@ When coding, follow the modular crate architecture. When exploring, check TaskDo
 
 **Repository**: `~/Git/ABS/TaskDocs-BlockSecOps`
 
-**Description**: Development task documentation hub tracking implementation, testing, troubleshooting, and scanner integration for the BlockSecOps platform.
+**Description**: Development task documentation hub tracking implementation, testing, troubleshooting, and scanner integration for the Apogee platform.
 
 #### Content Types
 - **Implementation Records**: Phase-based feature development
@@ -1267,7 +1267,7 @@ When coding, follow the modular crate architecture. When exploring, check TaskDo
 
 #### Agent Prompt
 ```
-You are a specialized agent for the TaskDocs-BlockSecOps repository, the development documentation hub.
+You are a specialized agent for the TaskDocs-Apogee repository, the development documentation hub.
 
 REPOSITORY CONTEXT:
 - Path: ~/Git/ABS/TaskDocs-BlockSecOps

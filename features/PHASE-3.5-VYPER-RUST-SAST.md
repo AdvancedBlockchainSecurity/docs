@@ -4,7 +4,7 @@
 
 ## Overview
 
-Phase 3.5 extends BlockSecOps security scanning capabilities to support Vyper smart contracts and Rust-based Solana programs. This phase implements scanner executors for 6 additional security tools, bringing the total scanner count to 17.
+Phase 3.5 extends Apogee security scanning capabilities to support Vyper smart contracts and Rust-based Solana programs. This phase implements scanner executors for 6 additional security tools, bringing the total scanner count to 17.
 
 ## New Scanners
 

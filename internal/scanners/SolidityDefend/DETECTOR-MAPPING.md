@@ -295,7 +295,7 @@ The detector identifies a specific instance or variant of the broader pattern ca
 
 ---
 
-## Usage in BlockSecOps
+## Usage in Apogee
 
 When SolidityDefend generates a finding, the intelligence layer automatically:
 
@@ -358,7 +358,7 @@ This mapping is maintained in the vulnerability pattern database:
 
 - **Pattern Definitions:** See [README.md](./README.md) for complete pattern descriptions
 - **Integration Details:** [../../../TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-DATABASE-INTEGRATION-COMPLETE.md](../../../TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-DATABASE-INTEGRATION-COMPLETE.md)
-- **Detector Documentation:** https://github.com/BlockSecOps/SolidityDefend/tree/main/docs/detectors
+- **Detector Documentation:** https://github.com/AdvancedBlockchainSecurity/SolidityDefend/tree/main/docs/detectors
 
 ---
 

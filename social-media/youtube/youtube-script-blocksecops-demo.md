@@ -1,6 +1,6 @@
-# YouTube Script: BlockSecOps Platform Demo - Smart Contract Security Made Easy
+# YouTube Script: Apogee Platform Demo - Smart Contract Security Made Easy
 
-**Video Title**: BlockSecOps - Multi-Blockchain Smart Contract Security Scanner | Platform Demo
+**Video Title**: Apogee - Multi-Blockchain Smart Contract Security Scanner | Platform Demo
 
 **Duration**: ~10-12 minutes
 
@@ -22,11 +22,11 @@
 
 ### INTRO (0:00 - 1:30)
 
-**[Screen: BlockSecOps Dashboard homepage]**
+**[Screen: Apogee Dashboard homepage]**
 
 **Narrator:**
 
-"Hey everyone! Welcome back to the channel. Today I'm excited to show you BlockSecOps - a comprehensive smart contract security platform that I've been working on."
+"Hey everyone! Welcome back to the channel. Today I'm excited to show you Apogee - a comprehensive smart contract security platform that I've been working on."
 
 **[Pause for effect]**
 
@@ -34,7 +34,7 @@
 
 **[Screen: Show statistics - DeFi hacks, total value lost]**
 
-"BlockSecOps changes that by giving you access to **26 professional security tools** across **5 blockchain languages** - all in one platform. Think of it as your automated security team that runs 24/7."
+"Apogee changes that by giving you access to **26 professional security tools** across **5 blockchain languages** - all in one platform. Think of it as your automated security team that runs 24/7."
 
 **[Screen: Return to dashboard]**
 
@@ -48,11 +48,11 @@
 
 **Narrator:**
 
-"First, let me give you a quick tour of what makes BlockSecOps unique."
+"First, let me give you a quick tour of what makes Apogee unique."
 
 **[Highlight features as you mention them]**
 
-"**Multi-Language Support**: BlockSecOps supports 5 major blockchain languages:
+"**Multi-Language Support**: Apogee supports 5 major blockchain languages:
 - **Solidity** - for Ethereum, BSC, Polygon, and all EVM chains
 - **Vyper** - the Python-based smart contract language
 - **Rust/Solana** - for Solana programs
@@ -73,7 +73,7 @@ Each tool specializes in finding different types of vulnerabilities, so running 
 
 **[Screen: Architecture diagram if available]**
 
-"Under the hood, BlockSecOps runs on **Kubernetes**, scales automatically, and stores all your scan history in a **PostgreSQL database**. Everything runs in isolated containers for security, and you get real-time notifications via WebSocket when scans complete."
+"Under the hood, Apogee runs on **Kubernetes**, scales automatically, and stores all your scan history in a **PostgreSQL database**. Everything runs in isolated containers for security, and you get real-time notifications via WebSocket when scans complete."
 
 "Alright, enough overview - let's actually scan something!"
 
@@ -87,7 +87,7 @@ Each tool specializes in finding different types of vulnerabilities, so running 
 
 **Narrator:**
 
-"First, I need to authenticate. BlockSecOps uses secure JWT authentication with Argon2id password hashing - that's OWASP 2025 compliant security."
+"First, I need to authenticate. Apogee uses secure JWT authentication with Argon2id password hashing - that's OWASP 2025 compliant security."
 
 **[Show login screen briefly, then log in]**
 
@@ -95,7 +95,7 @@ Each tool specializes in finding different types of vulnerabilities, so running 
 
 **[Screen: Contract upload interface]**
 
-"For this demo, I'm going to use a simple ERC20 token contract, but I've intentionally left some vulnerabilities in it. Let's see what BlockSecOps finds."
+"For this demo, I'm going to use a simple ERC20 token contract, but I've intentionally left some vulnerabilities in it. Let's see what Apogee finds."
 
 **[Show the vulnerable contract code]**
 
@@ -135,7 +135,7 @@ contract VulnerableToken {
 
 **[Screen: Upload interface]**
 
-"I'm uploading this contract to BlockSecOps. The platform automatically detects that this is Solidity code based on the file extension and content."
+"I'm uploading this contract to Apogee. The platform automatically detects that this is Solidity code based on the file extension and content."
 
 **[Show upload form]**
 
@@ -163,7 +163,7 @@ contract VulnerableToken {
 
 **[Click "Start Scan" button]**
 
-"When I click **'Start Scan'**, BlockSecOps will:
+"When I click **'Start Scan'**, Apogee will:
 1. Create a new scan job
 2. Spin up Kubernetes pods for each security tool
 3. Run 10 different Solidity scanners in parallel
@@ -194,7 +194,7 @@ contract VulnerableToken {
 
 **Narrator:**
 
-"BlockSecOps gives you real-time updates via WebSocket. Watch the status bar..."
+"Apogee gives you real-time updates via WebSocket. Watch the status bar..."
 
 **[Show real-time progress]**
 
@@ -281,7 +281,7 @@ function withdraw() public {
 
 **[Show tool recommendations]**
 
-"BlockSecOps not only finds the vulnerability but also tells you how to fix it:
+"Apogee not only finds the vulnerability but also tells you how to fix it:
 
 **Recommendation**:
 'Use the Checks-Effects-Interactions pattern. Update state before making external calls, or use OpenZeppelin's ReentrancyGuard.'
@@ -369,11 +369,11 @@ And **1 low-severity** issue:
 
 **Narrator:**
 
-"So there you have it! In just a few minutes, BlockSecOps scanned our smart contract with 10 different security tools and found **8 real vulnerabilities**, including a **CRITICAL reentrancy** issue and **3 HIGH-severity** access control and code quality problems."
+"So there you have it! In just a few minutes, Apogee scanned our smart contract with 10 different security tools and found **8 real vulnerabilities**, including a **CRITICAL reentrancy** issue and **3 HIGH-severity** access control and code quality problems."
 
 **[Show key features list]**
 
-"Let me recap what makes BlockSecOps powerful:
+"Let me recap what makes Apogee powerful:
 
 ✅ **26 Security Tools** - Comprehensive coverage across static analysis, fuzzing, and formal verification
 
@@ -391,7 +391,7 @@ And **1 low-severity** issue:
 
 **[Show GitHub/documentation links]**
 
-"If you want to learn more about BlockSecOps:
+"If you want to learn more about Apogee:
 - Check out the **GitHub repository** (link in description)
 - Read the **full documentation** at [docs link]
 - Try it yourself with the **demo instance** (if available)
@@ -418,7 +418,7 @@ And **1 low-severity** issue:
 "You can find me on:
 - Twitter: [@YourHandle]
 - GitHub: [YourGitHub]
-- Discord: [BlockSecOps Community]
+- Discord: [Apogee Community]
 
 Thanks for watching, and remember - **secure contracts save lives... and money!** See you in the next video!"
 
@@ -464,15 +464,15 @@ Thanks for watching, and remember - **secure contracts save lives... and money!*
 ### Video Metadata
 
 **Title Options**:
-1. "BlockSecOps - Multi-Blockchain Smart Contract Security Scanner | Full Demo"
-2. "Scan Your Smart Contracts for Vulnerabilities in Minutes | BlockSecOps Platform Demo"
-3. "How I Scan Solidity Contracts with 26 Security Tools | BlockSecOps Tutorial"
+1. "Apogee - Multi-Blockchain Smart Contract Security Scanner | Full Demo"
+2. "Scan Your Smart Contracts for Vulnerabilities in Minutes | Apogee Platform Demo"
+3. "How I Scan Solidity Contracts with 26 Security Tools | Apogee Tutorial"
 
 **Description Template**:
 ```
-In this video, I demonstrate BlockSecOps - a comprehensive smart contract security platform that runs 26 professional security tools across 5 blockchain languages.
+In this video, I demonstrate Apogee - a comprehensive smart contract security platform that runs 26 professional security tools across 5 blockchain languages.
 
-🔐 What is BlockSecOps?
+🔐 What is Apogee?
 A Kubernetes-native platform that automates smart contract security analysis for Solidity, Vyper, Rust/Solana, Move, and Cairo.
 
 ⚡ Key Features Shown:
@@ -505,7 +505,7 @@ A Kubernetes-native platform that automates smart contract security analysis for
 8:30 - Critical Vulnerability Analysis
 10:30 - Wrap-up & Next Steps
 
-#BlockSecOps #SmartContractSecurity #Solidity #Blockchain #Ethereum #SecurityTools #DeFi #Web3
+#Apogee #SmartContractSecurity #Solidity #Blockchain #Ethereum #SecurityTools #DeFi #Web3
 ```
 
 **Tags**:
@@ -520,11 +520,11 @@ blockchain security, crypto security, web3 security, solidity security
 
 **Option 1**: Split screen
 - Left: Vulnerable code highlighted in red
-- Right: BlockSecOps dashboard with "8 Vulnerabilities Found"
+- Right: Apogee dashboard with "8 Vulnerabilities Found"
 - Text overlay: "CRITICAL ISSUES FOUND"
 
 **Option 2**: Dashboard screenshot
-- BlockSecOps logo prominent
+- Apogee logo prominent
 - Scan results showing multiple tools
 - Text overlay: "26 Security Tools. 5 Languages. 1 Platform."
 
@@ -605,4 +605,4 @@ Track these metrics after publishing:
 
 ---
 
-*This script is optimized for a ~10-12 minute YouTube video demonstrating BlockSecOps platform capabilities. Adjust timing and content based on your target audience and platform.*
+*This script is optimized for a ~10-12 minute YouTube video demonstrating Apogee platform capabilities. Adjust timing and content based on your target audience and platform.*

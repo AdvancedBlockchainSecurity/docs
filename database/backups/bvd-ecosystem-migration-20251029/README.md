@@ -87,6 +87,6 @@ After migration, verify:
 
 ## Contact
 
-**Engineer**: BlockSecOps Team
+**Engineer**: Apogee Team
 **Date**: 2025-10-29
 **Status**: Pre-Migration Backup Complete

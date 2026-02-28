@@ -10,7 +10,7 @@
 
 ## Overview
 
-Platform integrations enable connecting BlockSecOps to external version control systems (VCS) and issue tracking platforms. This allows:
+Platform integrations enable connecting Apogee to external version control systems (VCS) and issue tracking platforms. This allows:
 - Importing smart contracts directly from repositories
 - Auto-scanning on push/PR events
 - Syncing vulnerabilities to issue tracking systems
@@ -263,7 +263,7 @@ Platform integrations enable connecting BlockSecOps to external version control 
 | `auto_scan_enabled` | boolean | Enable automatic scanning |
 | `scan_on_push` | boolean | Scan when commits pushed |
 | `scan_on_pr` | boolean | Scan when PR opened |
-| `project_id` | string | Link to BlockSecOps project |
+| `project_id` | string | Link to Apogee project |
 
 ---
 
@@ -280,7 +280,7 @@ Platform integrations enable connecting BlockSecOps to external version control 
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `blocksecops_project_id` | string | BlockSecOps project to sync from |
+| `blocksecops_project_id` | string | Apogee project to sync from |
 | `jira_project_id` | string | Jira project ID |
 | `jira_project_key` | string | Jira project key (e.g., "SEC") |
 | `issue_type` | string | Jira issue type (default: "Bug") |

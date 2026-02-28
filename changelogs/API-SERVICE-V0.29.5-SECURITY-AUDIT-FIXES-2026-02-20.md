@@ -1,7 +1,7 @@
 # API Service v0.29.5 - Security Audit Fixes
 
 **Date:** February 20, 2026
-**Author:** BlockSecOps Team
+**Author:** Apogee Team
 **Services Affected:** api-service
 **Version:** 0.29.4 -> 0.29.5
 

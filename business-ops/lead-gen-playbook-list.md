@@ -1,4 +1,4 @@
-# Zero-Budget Lead Generation for BlockSecOps: Complete Action Guide
+# Zero-Budget Lead Generation for Apogee: Complete Action Guide
 
 ## 1. Free Lead Databases & Directories
 

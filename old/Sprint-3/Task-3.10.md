@@ -245,7 +245,7 @@ update_hosts_file() {
     # Add new entries
     cat << EOF | sudo tee -a /etc/hosts
 
-# BlockSecOps Platform - Local Development
+# Apogee Platform - Local Development
 127.0.0.1 api.local.dev
 127.0.0.1 data.local.dev
 127.0.0.1 notifications.local.dev

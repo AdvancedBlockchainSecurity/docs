@@ -207,7 +207,7 @@ Removed: (none)
 **Script:** `blocksecops-api-service/scripts/seed_scanner_patterns.py`
 
 **Purpose:** Create `vulnerability_patterns` database entries for new detectors that don't have pattern mappings yet. This ensures:
-- New detectors get BVD (BlockSecOps Vulnerability Database) codes
+- New detectors get BVD (Apogee Vulnerability Database) codes
 - Findings from new detectors are properly categorized
 - Deduplication can match findings across scanners
 

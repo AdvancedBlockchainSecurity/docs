@@ -12,7 +12,7 @@ This playbook guides you through setting up automated recurring scans for your s
 
 ## Prerequisites
 
-- [ ] BlockSecOps account with Growth or Enterprise tier
+- [ ] Apogee account with Growth or Enterprise tier
 - [ ] Project created with contracts uploaded
 - [ ] Understanding of desired scan frequency
 - [ ] Notification channels configured (recommended)
