@@ -1,5 +1,5 @@
 #!/bin/bash
-# BlockSecOps Go-Live Audit: Tier System & Quota Enforcement (Section 1)
+# Apogee Go-Live Audit: Tier System & Quota Enforcement (Section 1)
 # Validates tier configuration, quota limits, and feature gates
 set -euo pipefail
 
@@ -7,7 +7,7 @@ PASS=0
 FAIL=0
 WARN=0
 
-BASE_URL="${BASE_URL:-https://app.blocksecops.com}"
+BASE_URL="${BASE_URL:-https://app.0xApogee.com}"
 CURL_FLAGS="${CURL_FLAGS:--sk}"
 TIERS_JSON="${TIERS_JSON:-blocksecops-shared/tier-config/tiers.json}"
 

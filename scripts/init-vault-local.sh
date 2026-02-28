@@ -131,7 +131,7 @@ vault_kv_put "secret/local/api-service/stripe" \
 # JIRA support integration
 vault_kv_put "secret/local/api-service/jira" \
     base_url="https://blocksecops.atlassian.net" \
-    api_email="support@blocksecops.com" \
+    api_email="support@0xapogee.com" \
     api_token="placeholder" \
     project_key="BSO"
 

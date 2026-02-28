@@ -314,6 +314,9 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | contract-parser | 0.2.2 | `k8s/overlays/local/contract-parser/` | Apogee rebrand: OCI source URL, .env.example |
 | dashboard | 0.46.10 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, vite config, comments |
 | data-service | 0.2.7 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, README |
+| findings | 0.2.1 | `k8s/overlays/local/findings/` | Apogee rebrand: OCI labels, .env.example |
+| analysis | 0.2.1 | `k8s/overlays/local/analysis/` | Apogee rebrand: OCI labels, .env.example |
+| ui-core | 0.2.1 | `k8s/overlays/local/ui-core/` | Apogee rebrand: OCI labels, .env.example |
 | intelligence-engine | 0.3.7 | `k8s/overlays/local/` | Apogee rebrand: OCI source/vendor, base images, .env |
 | notification | 0.2.6 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL |
 | orchestration | 0.10.8 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, README |

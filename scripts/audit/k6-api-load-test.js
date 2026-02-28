@@ -1,8 +1,8 @@
 /**
- * BlockSecOps Go-Live Audit: API Load Test (Section 13)
+ * Apogee Go-Live Audit: API Load Test (Section 13)
  *
  * Usage:
- *   k6 run --env BASE_URL=https://app.blocksecops.com \
+ *   k6 run --env BASE_URL=https://app.0xApogee.com \
  *          --env TOKEN=<jwt_token> \
  *          scripts/audit/k6-api-load-test.js
  *
@@ -16,7 +16,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Rate, Trend } from 'k6/metrics';
 
-const BASE_URL = __ENV.BASE_URL || 'https://app.blocksecops.com';
+const BASE_URL = __ENV.BASE_URL || 'https://app.0xApogee.com';
 const TOKEN = __ENV.TOKEN || '';
 
 // Custom metrics
@@ -131,7 +131,7 @@ export function handleSummary(data) {
 }
 
 function textSummary(data) {
-  let out = '\n=== BlockSecOps Load Test Results ===\n\n';
+  let out = '\n=== Apogee Load Test Results ===\n\n';
 
   const metrics = data.metrics;
   const endpoints = ['health', 'scans', 'contracts', 'vulnerabilities', 'dedup'];
