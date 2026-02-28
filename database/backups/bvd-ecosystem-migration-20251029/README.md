@@ -80,7 +80,7 @@ After migration, verify:
 ## Related Documents
 
 - Migration Script: `/blocksecops-api-service/scripts/migrate_to_ecosystem_taxonomy.py`
-- Architecture Doc: `/TaskDocs-BlockSecOps/blocksecops/BVD-TAXONOMY-ARCHITECTURE.md`
+- Architecture Doc: `/TaskDocs-Apogee/blocksecops/BVD-TAXONOMY-ARCHITECTURE.md`
 - Rollback Script: `/blocksecops-api-service/scripts/rollback_taxonomy_migration.sh`
 
 ---

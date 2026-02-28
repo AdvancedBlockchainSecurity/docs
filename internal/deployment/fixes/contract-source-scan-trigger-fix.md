@@ -460,7 +460,7 @@ kubectl logs -n api-service-local deployment/api-service | grep ERROR
 
 - **API Service Deployment**: `/Users/pwner/Git/ABS/blocksecops-docs/deployment/api-service-deployment.md`
 - **Development Workflow**: `/Users/pwner/Git/ABS/blocksecops-docs/local-development/development-workflow.md`
-- **Known Issues**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/api/api-service-known-issues.md`
+- **Known Issues**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/api/api-service-known-issues.md`
 - **Sprint 8 Contract Source**: `/Users/pwner/Git/ABS/blocksecops-docs/deployment/sprint-8-contract-source-management.md`
 - **Docker Standards**: `/Users/pwner/Git/ABS/blocksecops-docs/deployment/docker-image-standards.md`
 

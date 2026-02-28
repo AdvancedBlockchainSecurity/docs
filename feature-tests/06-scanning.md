@@ -232,7 +232,7 @@
 - [x] All critical checks pass (0 errors) ✅
 - [x] Parser tests pass (27/27) ✅
 
-**Validation Reference:** See `/TaskDocs-BlockSecOps/phases/02-phase-3.1-scanner-integration/SCANNER-AUDIT-VALIDATION-CHECKLIST.md`
+**Validation Reference:** See `/TaskDocs-Apogee/phases/02-phase-3.1-scanner-integration/SCANNER-AUDIT-VALIDATION-CHECKLIST.md`
 
 ---
 

@@ -245,7 +245,7 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 ```
 
 ### Related Documentation
-- [PHASE-6.6-HOTFIX-MISSING-API-ENDPOINTS.md](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/PHASE-6.6-HOTFIX-MISSING-API-ENDPOINTS.md)
+- [PHASE-6.6-HOTFIX-MISSING-API-ENDPOINTS.md](/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/PHASE-6.6-HOTFIX-MISSING-API-ENDPOINTS.md)
 - [SCHEMA.md](/Users/pwner/Git/ABS/database/SCHEMA.md) - Deduplication groups table documentation
 
 ---
@@ -360,7 +360,7 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 
 ### Related Documentation
 - [SCHEMA.md](/Users/pwner/Git/ABS/docs/database/SCHEMA.md) - Updated with Phase 3.4 tables
-- [Phase 3.4 Documentation](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/PHASE-3.4-CONTRACT-STRUCTURE-ANALYSIS-COMPLETE.md)
+- [Phase 3.4 Documentation](/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/PHASE-3.4-CONTRACT-STRUCTURE-ANALYSIS-COMPLETE.md)
 - [Migration File](/Users/pwner/Git/ABS/blocksecops-api-service/alembic/versions/20251128_1600-add_contract_structure_tables.py)
 
 ---
@@ -398,7 +398,7 @@ cp backups/vulnerability_patterns_pre_taxonomy_migration_20251103_175226.json \
 ```
 
 ### Migration Documentation
-- Task Doc: `TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/PATTERN-TAXONOMY-MIGRATION-EVM-TO-SOLIDITY.md`
+- Task Doc: `TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/PATTERN-TAXONOMY-MIGRATION-EVM-TO-SOLIDITY.md`
 - Integration Summary: `/tmp/wake-soliditydefend-integration-summary.md`
 
 ---
@@ -540,7 +540,7 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 ```
 
 ### Related Documentation
-- Task Documentation: `TaskDocs-BlockSecOps/phases/03-phase-4-intelligence/SOLIDITYDEFEND-PATTERN-SEEDING-20260118.md`
+- Task Documentation: `TaskDocs-Apogee/phases/03-phase-4-intelligence/SOLIDITYDEFEND-PATTERN-SEEDING-20260118.md`
 - Seed Script: `blocksecops-api-service/scripts/seed_scanner_patterns.py`
 - Implementation Plan: Original plan in Claude session transcript
 

@@ -343,4 +343,4 @@ celery -A blocksecops_orchestration.core.celery_app beat --loglevel=info
 
 - [Priority Queue System](/Users/pwner/Git/ABS/blocksecops-docs/backend/priority-queue.md)
 - [Quota Frontend](/Users/pwner/Git/ABS/blocksecops-docs/frontend/quota-frontend.md)
-- [Session Documentation](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2025-11-25-SESSION-4.md)
+- [Session Documentation](/Users/pwner/Git/ABS/TaskDocs-Apogee/DOCUMENTATION-UPDATE-2025-11-25-SESSION-4.md)

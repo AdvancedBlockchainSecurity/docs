@@ -597,7 +597,7 @@ curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
 ## References
 
 - Playbook: `/home/pwner/Git/docs/playbooks/admin-account-setup.md`
-- Task Documentation: `/home/pwner/Git/TaskDocs-BlockSecOps/`
+- Task Documentation: `/home/pwner/Git/TaskDocs-Apogee/`
 - Database Schema: `/home/pwner/Git/docs/database/SCHEMA.md`
 
 ---

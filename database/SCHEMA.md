@@ -2927,9 +2927,9 @@ See [Platform Development Standards](/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPM
 
 ### Related Documentation
 
-- **Implementation Summary**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/implementation-summaries/PHASE-4D-IMPLEMENTATION-COMPLETE.md`
-- **Model Fixes**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/PHASE-4D-MODEL-FIXES-COMPLETE.md`
-- **Parser Fixes**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/PHASE-4D-PARSER-CLASSIFICATION-FIX-COMPLETE.md`
+- **Implementation Summary**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/implementation-summaries/PHASE-4D-IMPLEMENTATION-COMPLETE.md`
+- **Model Fixes**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/PHASE-4D-MODEL-FIXES-COMPLETE.md`
+- **Parser Fixes**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/PHASE-4D-PARSER-CLASSIFICATION-FIX-COMPLETE.md`
 - **Migration Files**: `/Users/pwner/Git/ABS/database/migrations/`
 
 ### Next Phase
@@ -2997,7 +2997,7 @@ Training labels for the FP classifier are stored in the `vulnerability_classific
 
 - **Implementation Summary**: `/docs/changelogs/PHASE-5-AI-ML-IMPLEMENTATION-2025-12-27.md`
 - **Planning Summary**: `/docs/changelogs/PHASE-5-AI-ML-PLANNING-2025-12-27.md`
-- **Task Documentation**: `/TaskDocs-BlockSecOps/phases/05-phase-5-ai-ml/`
+- **Task Documentation**: `/TaskDocs-Apogee/phases/05-phase-5-ai-ml/`
 - **ML Development Standards**: `/docs/standards/ml-development.md`
 - **Feature Tests**: `/docs/feature-tests/27-ai-ml-features.md`
 
@@ -3091,7 +3091,7 @@ Organization-level service accounts for CI/CD automation (Growth tier+, Admin on
 ### Related Documentation
 
 - **Feature Test**: `docs/feature-tests/45-integrations-hub.md`
-- **Task Documentation**: `TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-23-INTEGRATIONS-HUB.md`
+- **Task Documentation**: `TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-01-23-INTEGRATIONS-HUB.md`
 - **User Documentation**: `blocksecops-docs/integrations/hub/README.md`
 
 ---
@@ -3209,7 +3209,7 @@ Columns added to `organizations` table for Enterprise AI opt-out:
 ### Related Documentation
 
 - **Feature Test**: `docs/feature-tests/48-ml-data-strategy.md`
-- **Task Documentation**: `TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-30-ML-DATA-STRATEGY.md`
+- **Task Documentation**: `TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-01-30-ML-DATA-STRATEGY.md`
 - **Database Migrations**: `docs/database/MIGRATIONS.md` (Migrations 053-055)
 
 ---

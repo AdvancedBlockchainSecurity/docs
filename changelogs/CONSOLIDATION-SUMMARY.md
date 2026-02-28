@@ -31,7 +31,7 @@ Successfully consolidated all platform-wide changelogs into a centralized `/docs
 | Original Location | New Location | Action | Filename Change |
 |-------------------|--------------|--------|-----------------|
 | `/docs/CHANGELOG-DASHBOARD-AUTH-2025-11-20.md` | `/docs/changelogs/dashboard-authentication.md` | Moved | ✅ Renamed |
-| `/TaskDocs-BlockSecOps/phases/CHANGELOG-2025-11-19.md` | `/docs/changelogs/api-service-jwt-es256.md` | Copied | ✅ Renamed |
+| `/TaskDocs-Apogee/phases/CHANGELOG-2025-11-19.md` | `/docs/changelogs/api-service-jwt-es256.md` | Copied | ✅ Renamed |
 | `/blocksecops-docs/deployment/CHANGELOG.md` | `/docs/changelogs/orchestration-deployment.md` | Copied | ✅ Renamed |
 
 **Note:** Files in TaskDocs and blocksecops-docs were copied (not moved) to preserve historical references in those locations.
@@ -67,7 +67,7 @@ Successfully consolidated all platform-wide changelogs into a centralized `/docs
 3. `/docs/WORK-SUMMARY-AUTH-OPTIMIZATION-2025-11-20.md`
    - Updated 4 references to dashboard changelog
 
-4. `/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2025-11-21.md`
+4. `/TaskDocs-Apogee/DOCUMENTATION-UPDATE-2025-11-21.md`
    - Updated 4 references to dashboard changelog
 
 **Total References Updated:** 13
@@ -75,7 +75,7 @@ Successfully consolidated all platform-wide changelogs into a centralized `/docs
 ### 5. Created Redirect Notices
 
 **Files Created:**
-1. `/TaskDocs-BlockSecOps/phases/CHANGELOG-REDIRECT.md`
+1. `/TaskDocs-Apogee/phases/CHANGELOG-REDIRECT.md`
    - Points to new location of CHANGELOG-2025-11-19.md
    - Links to centralized directory
 
@@ -204,7 +204,7 @@ docs/
 - Contents: Component-internal changes, minor updates
 
 **Task-Specific Changelogs:**
-- Location: `/TaskDocs-BlockSecOps/phases/`
+- Location: `/TaskDocs-Apogee/phases/`
 - Contents: Work-in-progress, migrate when complete
 
 ---
@@ -338,11 +338,11 @@ grep -r "v1.1.1" /Users/pwner/Git/ABS/docs/changelogs/
 - **This Summary:** `/Users/pwner/Git/ABS/docs/changelogs/CONSOLIDATION-SUMMARY.md`
 
 ### Related Work
-- **Documentation Update:** `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2025-11-21.md`
+- **Documentation Update:** `/Users/pwner/Git/ABS/TaskDocs-Apogee/DOCUMENTATION-UPDATE-2025-11-21.md`
 - **Auth Documentation Index:** `/Users/pwner/Git/ABS/docs/AUTHENTICATION-DOCUMENTATION-INDEX.md`
 
 ### Redirect Notices
-- **TaskDocs Redirect:** `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/CHANGELOG-REDIRECT.md`
+- **TaskDocs Redirect:** `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/CHANGELOG-REDIRECT.md`
 - **Deployment Redirect:** `/Users/pwner/Git/ABS/blocksecops-docs/deployment/CHANGELOG-REDIRECT.md`
 
 ---

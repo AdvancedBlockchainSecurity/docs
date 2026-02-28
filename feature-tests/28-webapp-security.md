@@ -468,6 +468,6 @@ None at this time.
 
 ## Related Documentation
 
-- [Phase 7A: Web Application Security](../../../TaskDocs-BlockSecOps/phases/07a-phase-7a-webapp-security/README.md)
+- [Phase 7A: Web Application Security](../../../TaskDocs-Apogee/phases/07a-phase-7a-webapp-security/README.md)
 - [API Architecture](../../../blocksecops-docs/architecture/api-service-architecture.md)
 - [Authentication System](../../../blocksecops-docs/architecture/authentication-system.md)

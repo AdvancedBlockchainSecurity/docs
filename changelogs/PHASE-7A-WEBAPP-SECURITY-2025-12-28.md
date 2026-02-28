@@ -110,7 +110,7 @@ All security features verified via curl:
 
 ## Related Documentation
 
-- **Task Documentation**: `/TaskDocs-BlockSecOps/phases/07a-phase-7a-webapp-security/README.md`
+- **Task Documentation**: `/TaskDocs-Apogee/phases/07a-phase-7a-webapp-security/README.md`
 - **Feature Tests**: `/docs/feature-tests/28-webapp-security.md`
 - **Application Security Tests**: `/docs/feature-tests/29-application-security.md`
 - **Production Checklist**: `/docs/security/production-security-checklist.md`

@@ -1,5 +1,5 @@
 #!/bin/bash
-# BlockSecOps Go-Live Audit: Master Runner
+# Apogee Go-Live Audit: Master Runner
 # Executes all automated audit scripts and produces a summary report
 set -euo pipefail
 
@@ -25,14 +25,14 @@ TOTAL_FAIL=0
 SECTION_RESULTS=()
 
 echo "=============================================="
-echo " BlockSecOps Go-Live Audit Suite"
+echo " Apogee Go-Live Audit Suite"
 echo " Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo " Report: $REPORT_FILE"
 echo "=============================================="
 echo ""
 
 {
-  echo "BlockSecOps Go-Live Audit Report"
+  echo "Apogee Go-Live Audit Report"
   echo "================================"
   echo "Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "Runner: $(whoami)@$(hostname)"

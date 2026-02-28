@@ -88,4 +88,4 @@ async def request_nonce(request: Request, body: WalletNonceRequest):
 
 - [Wallet Authentication Tests](../feature-tests/11-wallet-authentication.md) - Updated with known issue fix
 - [Docker Image Versioning](../standards/docker-image-versioning.md) - Service versions table updated
-- [GCP Pre-Launch Checklist](../../TaskDocs-BlockSecOps/phases/07-phase-7-gcp-deployment/PRE-LAUNCH-CHECKLIST.md) - OAuth apps marked as GCP TODO
+- [GCP Pre-Launch Checklist](../../TaskDocs-Apogee/phases/07-phase-7-gcp-deployment/PRE-LAUNCH-CHECKLIST.md) - OAuth apps marked as GCP TODO

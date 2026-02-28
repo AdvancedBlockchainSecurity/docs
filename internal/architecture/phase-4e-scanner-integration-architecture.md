@@ -365,8 +365,8 @@ except subprocess.TimeoutExpired:
 
 - [Foundry Documentation](https://book.getfoundry.sh/)
 - [Foundry v1.0 Release Notes](https://www.paradigm.xyz/2025/02/announcing-foundry-v1-0)
-- [Phase 4E Implementation Plan](/TaskDocs-BlockSecOps/blocksecops/implementation-summaries/PHASE-4E-IMPLEMENTATION-PLAN.md)
-- [Manticore Removal Documentation](/TaskDocs-BlockSecOps/blocksecops/MANTICORE-REMOVAL-COMPLETE.md)
+- [Phase 4E Implementation Plan](/TaskDocs-Apogee/blocksecops/implementation-summaries/PHASE-4E-IMPLEMENTATION-PLAN.md)
+- [Manticore Removal Documentation](/TaskDocs-Apogee/blocksecops/MANTICORE-REMOVAL-COMPLETE.md)
 
 ---
 

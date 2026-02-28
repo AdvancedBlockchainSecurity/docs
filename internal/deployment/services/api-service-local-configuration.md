@@ -497,7 +497,7 @@ See integration tests in `tests/conftest.py` for the `authenticated_session` fix
 
 ### End-to-End Workflow Test
 
-See `/Users/pwner/Git/ABS/TaskDocs/BlockSecOps/api-test-results-summary.md` for comprehensive test scripts.
+See `/Users/pwner/Git/ABS/TaskDocs/Apogee/api-test-results-summary.md` for comprehensive test scripts.
 
 ## Security Considerations
 

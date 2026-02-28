@@ -134,8 +134,8 @@ payload = jwt.decode(
 
 ### Changelog Management ✅
 - Removed CHANGELOG.md from service repository
-- Centralized all changelog entries in TaskDocs-BlockSecOps
-- Follows platform standard: "Changelogs should only exist in TaskDocs-BlockSecOps"
+- Centralized all changelog entries in TaskDocs-Apogee
+- Follows platform standard: "Changelogs should only exist in TaskDocs-Apogee"
 
 ### Security ✅
 - No sensitive data in commit messages or PR descriptions

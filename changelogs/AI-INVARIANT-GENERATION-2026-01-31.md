@@ -154,5 +154,5 @@ If issues occur:
 ## Related
 
 - Feature Test: [#50 AI Invariant Generation](/docs/feature-tests/50-ai-invariant-generation.md)
-- Phase Documentation: [Phase E - AI Invariants](/TaskDocs-BlockSecOps/phases/04-phase-5-ai-ml/phase-e-ai-invariants.md)
+- Phase Documentation: [Phase E - AI Invariants](/TaskDocs-Apogee/phases/04-phase-5-ai-ml/phase-e-ai-invariants.md)
 - User Guide: [Invariants](/blocksecops-docs/platform/invariants/README.md)

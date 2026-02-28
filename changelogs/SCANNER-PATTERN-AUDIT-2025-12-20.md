@@ -117,7 +117,7 @@ grep 'scanner_id=' vyper_scanners.py | head -1
 
 ## Related Documentation
 
-- Audit Plan: `/TaskDocs-BlockSecOps/phases/02-phase-3.1-scanner-integration/SCANNER-PATTERN-COVERAGE-AUDIT.md`
+- Audit Plan: `/TaskDocs-Apogee/phases/02-phase-3.1-scanner-integration/SCANNER-PATTERN-COVERAGE-AUDIT.md`
 - Verification Script: `/scripts/verify-scanner-coverage.sh`
 - Pattern Database: `/blocksecops-api-service/seeds/vulnerability_patterns.json`
 
@@ -137,7 +137,7 @@ grep 'scanner_id=' vyper_scanners.py | head -1
 | Parser Tests | 2 | 2 |
 | Documentation | 5 | 5 |
 
-**Validation Checklist:** `/TaskDocs-BlockSecOps/phases/02-phase-3.1-scanner-integration/SCANNER-AUDIT-VALIDATION-CHECKLIST.md`
+**Validation Checklist:** `/TaskDocs-Apogee/phases/02-phase-3.1-scanner-integration/SCANNER-AUDIT-VALIDATION-CHECKLIST.md`
 
 ---
 

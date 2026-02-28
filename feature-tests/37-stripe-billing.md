@@ -421,7 +421,7 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 ## Related Documentation
 
 - [API Endpoints Reference](/docs/api/endpoints-reference.md#billing-phase-8a---stripe-integration)
-- [Phase 8a Task Docs](/TaskDocs-BlockSecOps/phases/08a-phase-8a-stripe-billing-invoices/)
+- [Phase 8a Task Docs](/TaskDocs-Apogee/phases/08a-phase-8a-stripe-billing-invoices/)
 - [User Guide: Invoices & Receipts](/blocksecops-docs/billing/invoices-receipts.md)
 - [Billing Subscription Workflow](/docs/workflows/billing-subscription-workflow.md) - Feature resolution chain, field mapping, invite flow
 - [Billing Feature Pipeline](/docs/pipelines/billing-feature-pipeline.md) - Pipeline for tier feature changes

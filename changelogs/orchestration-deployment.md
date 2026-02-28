@@ -117,8 +117,8 @@ Complete x402 payment backend implementation enabling USDC micropayments on Base
 
 ### Documentation
 
-- Integration Summary: `TaskDocs-BlockSecOps/blocksecops/implementation-summaries/SOLHINT-INTELLIGENCE-INTEGRATION-COMPLETE.md`
-- Task Tracking: `TaskDocs-BlockSecOps/blocksecops/INTELLIGENCE-INTEGRATION-TASKS.md`
+- Integration Summary: `TaskDocs-Apogee/blocksecops/implementation-summaries/SOLHINT-INTELLIGENCE-INTEGRATION-COMPLETE.md`
+- Task Tracking: `TaskDocs-Apogee/blocksecops/INTELLIGENCE-INTEGRATION-TASKS.md`
 
 ### Next Steps
 
@@ -187,9 +187,9 @@ Complete x402 payment backend implementation enabling USDC micropayments on Base
 
 ### Documentation
 
-- Integration Summary: `TaskDocs-BlockSecOps/blocksecops/implementation-summaries/SEMGREP-INTELLIGENCE-INTEGRATION-COMPLETE.md`
-- Migration Summary: `TaskDocs-BlockSecOps/blocksecops/BVD-MIGRATION-COMPLETE-SUMMARY.md`
-- Task Tracking: `TaskDocs-BlockSecOps/blocksecops/INTELLIGENCE-INTEGRATION-TASKS.md`
+- Integration Summary: `TaskDocs-Apogee/blocksecops/implementation-summaries/SEMGREP-INTELLIGENCE-INTEGRATION-COMPLETE.md`
+- Migration Summary: `TaskDocs-Apogee/blocksecops/BVD-MIGRATION-COMPLETE-SUMMARY.md`
+- Task Tracking: `TaskDocs-Apogee/blocksecops/INTELLIGENCE-INTEGRATION-TASKS.md`
 
 ---
 
@@ -261,9 +261,9 @@ Without these fields, the enrichment service couldn't:
 
 ### Documentation
 
-- Parser Fix Details: `TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/PHASE-4D-PARSER-CLASSIFICATION-FIX-COMPLETE.md`
-- Deployment Summary: `TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/DEPLOYMENT-SUMMARY-2025-10-24.md`
-- Logs Archived: `TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/orchestration-logs-2025-10-24.txt`
+- Parser Fix Details: `TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/PHASE-4D-PARSER-CLASSIFICATION-FIX-COMPLETE.md`
+- Deployment Summary: `TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/DEPLOYMENT-SUMMARY-2025-10-24.md`
+- Logs Archived: `TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/orchestration-logs-2025-10-24.txt`
 
 ---
 

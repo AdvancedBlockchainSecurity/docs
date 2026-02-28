@@ -185,7 +185,7 @@ Also completed infrastructure improvements:
 
 ## Related Documentation
 
-- Task Doc: `/TaskDocs-BlockSecOps/phases/02-phase-3-expansion/TASK-27-ADVANCED-WORKFLOW-COMPLETE.md`
+- Task Doc: `/TaskDocs-Apogee/phases/02-phase-3-expansion/TASK-27-ADVANCED-WORKFLOW-COMPLETE.md`
 - Feature Tests: `/docs/feature-tests/18-favorites-annotations.md`
 - Feature Tests: `/docs/feature-tests/19-scanner-effectiveness.md`
 - Feature Tests: `/docs/feature-tests/20-batch-scan.md`

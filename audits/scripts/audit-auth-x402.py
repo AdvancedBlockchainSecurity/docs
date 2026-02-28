@@ -44,7 +44,7 @@ from web3 import Web3
 # Configuration
 # ============================================================================
 
-API_BASE = "https://app.blocksecops.local/api/v1"
+API_BASE = "https://app.0xapogee.local/api/v1"
 JWT_SECRET = "local-dev-jwt-secret-key-change-in-production"
 
 USERS = {
@@ -721,7 +721,7 @@ async def audit_cross_auth(client: httpx.AsyncClient,
 
 async def main():
     print("=" * 70)
-    print("BlockSecOps Auth & x402 Payment Audit")
+    print("Apogee Auth & x402 Payment Audit")
     print(f"Target: {API_BASE}")
     print(f"Time: {datetime.now(timezone.utc).isoformat()}")
     print("=" * 70)

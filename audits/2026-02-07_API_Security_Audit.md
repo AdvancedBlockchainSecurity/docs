@@ -443,4 +443,4 @@ All CRITICAL and HIGH findings resolved in API Service v0.28.1. All remaining LO
 
 ---
 
-*Full findings with resolution history maintained in `TaskDocs-BlockSecOps/phases/00_Security_Audit/FINDINGS.md`*
+*Full findings with resolution history maintained in `TaskDocs-Apogee/phases/00_Security_Audit/FINDINGS.md`*

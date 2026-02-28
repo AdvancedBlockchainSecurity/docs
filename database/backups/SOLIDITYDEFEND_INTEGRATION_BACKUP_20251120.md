@@ -163,10 +163,10 @@ jq '{version, patterns: (.patterns | length), mappings: (.pattern_tool_mappings 
 
 ## Related Documentation
 
-- **Integration Summary:** `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-INTEGRATION-COMPLETE.md`
+- **Integration Summary:** `/Users/pwner/Git/ABS/TaskDocs-Apogee/scanners/SOLIDITYDEFEND-INTEGRATION-COMPLETE.md`
 - **Pattern Definitions:** `/tmp/new_soliditydefend_patterns.json`
 - **Detector Mappings:** `/tmp/soliditydefend_mapping_analysis.json`
-- **Pattern Mapping Status:** `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-PATTERN-MAPPING-STATUS.md`
+- **Pattern Mapping Status:** `/Users/pwner/Git/ABS/TaskDocs-Apogee/scanners/SOLIDITYDEFEND-PATTERN-MAPPING-STATUS.md`
 - **Scanner Integration Guide:** `/Users/pwner/Git/ABS/blocksecops-docs/scanners/SCANNER-INTEGRATION-GUIDE.md`
 
 ---

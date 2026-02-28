@@ -380,6 +380,6 @@ _Record upgrade test results here:_
 ---
 
 **Related Documentation**:
-- Pricing Tiers Specification: `TaskDocs-BlockSecOps/phases/FREEMIUM-MODEL/PRICING-TIERS-SPECIFICATION.md`
+- Pricing Tiers Specification: `TaskDocs-Apogee/phases/FREEMIUM-MODEL/PRICING-TIERS-SPECIFICATION.md`
 - Quota System Tests: `docs/feature-tests/02-quota-system.md`
 - Pricing Page Tests: `docs/feature-tests/07-pricing-page.md`

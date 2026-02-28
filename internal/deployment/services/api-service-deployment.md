@@ -1201,7 +1201,7 @@ kubectl port-forward -n production svc/grafana 3000:80
 - **Intelligence Integration Guide**: `/blocksecops-docs/intelligence/INTELLIGENCE-INTEGRATION-GUIDE.md`
 - **User Guide**: `/blocksecops-docs/intelligence/USER-GUIDE-ENRICHED-FINDINGS.md`
 - **Fingerprinting Strategy**: `/blocksecops-docs/intelligence/fingerprinting/*`
-- **Phase 1-4 Completion**: `/TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/PHASE-1-4-COMPLETION-SUMMARY.md`
+- **Phase 1-4 Completion**: `/TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/PHASE-1-4-COMPLETION-SUMMARY.md`
 
 ---
 

@@ -655,7 +655,7 @@ For complete GKE tiered cost analysis including:
 - Committed use discount calculations
 - GCP Secret Manager vs Vault comparison
 
-See: `TaskDocs-BlockSecOps/phases/07-phase-7-gcp-deployment/GCP-COST-ANALYSIS.md`
+See: `TaskDocs-Apogee/phases/07-phase-7-gcp-deployment/GCP-COST-ANALYSIS.md`
 
 ---
 

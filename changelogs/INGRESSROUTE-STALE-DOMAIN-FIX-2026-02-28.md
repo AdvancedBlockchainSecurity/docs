@@ -7,7 +7,7 @@
 
 ## Summary
 
-4 IngressRoutes in the local cluster retained old `blocksecops.local` domains after the Phase 1/2 Apogee rebrand. Source YAML files were correctly updated but `kubectl apply -k` was not run for all kustomization paths. Additionally, 3 production overlays still referenced `blocksecops.com`.
+4 IngressRoutes in the local cluster retained old `blocksecops.local` domains after the Phase 1/2 Apogee rebrand. Source YAML files were correctly updated but `kubectl apply -k` was not run for all kustomization paths. Additionally, 3 production overlays still referenced `0xApogee.com`.
 
 ## Root Cause
 
@@ -17,10 +17,10 @@ Incomplete `kubectl apply -k` coverage during Phase 1/2 deployment. Some service
 
 | IngressRoute | Old Domain | New Domain |
 |---|---|---|
-| `notification-local/notification-websocket` | `app.blocksecops.local` | `app.0xapogee.local` |
-| `admin-portal-local/admin-portal-ingressroute` | `admin.blocksecops.local` | `admin.0xapogee.local` |
-| `admin-portal-local/admin-portal-ingressroute-server` | `admin.blocksecops.local` | `admin.0xapogee.local` |
-| `traefik-local/app-http-redirect` | `app.blocksecops.local` | `app.0xapogee.local` |
+| `notification-local/notification-websocket` | `app.0xapogee.local` | `app.0xapogee.local` |
+| `admin-portal-local/admin-portal-ingressroute` | `admin.0xapogee.local` | `admin.0xapogee.local` |
+| `admin-portal-local/admin-portal-ingressroute-server` | `admin.0xapogee.local` | `admin.0xapogee.local` |
+| `traefik-local/app-http-redirect` | `app.0xapogee.local` | `app.0xapogee.local` |
 
 ## Affected Production Overlays
 
@@ -41,7 +41,7 @@ Incomplete `kubectl apply -k` coverage during Phase 1/2 deployment. Some service
 
 ## Impact
 
-- Admin portal was only reachable via legacy `admin.blocksecops.local` (still in `/etc/hosts`)
+- Admin portal was only reachable via legacy `admin.0xapogee.local` (still in `/etc/hosts`)
 - WebSocket secondary IngressRoute was stale but primary route covered `/ws` — no functional impact
 - HTTP→HTTPS redirect only triggered for old domain — no functional impact (HTTPS used directly)
 - Production overlays not yet deployed — no production impact

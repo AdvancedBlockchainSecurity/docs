@@ -35,7 +35,7 @@ check_contains() {
 }
 
 echo "=============================================="
-echo " BlockSecOps Production Smoke Test"
+echo " Apogee Production Smoke Test"
 echo " Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo " Target: $BASE_URL"
 echo "=============================================="

@@ -205,7 +205,7 @@ Software Bill of Materials:
 - **Pros**: Dependency tracking, supply chain security
 - **Cons**: Not vulnerability detection, complex solc version management
 - **Examples**: SolidityBOM (deferred to future phase)
-- **See**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/02-phase-3.1-scanner-integration/SOLIDITYBOM-ROLLBACK-PLAN.md`
+- **See**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/02-phase-3.1-scanner-integration/SOLIDITYBOM-ROLLBACK-PLAN.md`
 
 ---
 

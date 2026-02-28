@@ -36,7 +36,7 @@ For current authentication documentation, see:
 - **[Authentication Changelog](/Users/pwner/Git/ABS/docs/CHANGELOG-DASHBOARD-AUTH-2025-11-20.md)** - Recent changes
 - **[Authentication Documentation Index](/Users/pwner/Git/ABS/docs/AUTHENTICATION-DOCUMENTATION-INDEX.md)** - Complete reference
 - [Dashboard Development Guide](/Users/pwner/Git/ABS/docs/standards/dashboard-development.md)
-- [Phase 3.1a Backend Complete](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/02-phase-3.1a-freemium-auth/PHASE-3.1A-BACKEND-COMPLETE.md)
+- [Phase 3.1a Backend Complete](/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/02-phase-3.1a-freemium-auth/PHASE-3.1A-BACKEND-COMPLETE.md)
 
 ---
 
@@ -735,7 +735,7 @@ Response (SSO Disabled):
 
 #### Reference Documentation
 
-- [Phase 4.5 Enterprise SSO Implementation Plan](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/04-phase-4.5-enterprise-features/)
+- [Phase 4.5 Enterprise SSO Implementation Plan](/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/04-phase-4.5-enterprise-features/)
 - [Snyk Login Pattern](https://app.snyk.io/login)
 - [SAML 2.0 Specification](https://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html)
 - [OAuth OIDC Specification](https://openid.net/connect/)
@@ -801,4 +801,4 @@ Response (SSO Disabled):
 **Current Version:** 0.1.1
 **Status:** ✅ Deployed to Kubernetes and Ready for Local Testing
 **Next Steps:** Configure Supabase redirect URLs and test authentication flow
-**Deployment Guide:** See `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/02-phase-3.1a-freemium-auth/PHASE-3.1A-FRONTEND-COMPLETE.md`
+**Deployment Guide:** See `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/02-phase-3.1a-freemium-auth/PHASE-3.1A-FRONTEND-COMPLETE.md`

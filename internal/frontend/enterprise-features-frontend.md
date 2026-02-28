@@ -540,4 +540,4 @@ function CreateModal({ isOpen, onClose, onSuccess }: ModalProps) {
 
 - [Dashboard Integration](./dashboard-integration.md) - API integration details
 - [Authentication Frontend](./authentication-frontend.md) - Auth context
-- [PHASE-4.5-OVERVIEW.md](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/04-phase-4.5-enterprise-features/PHASE-4.5-OVERVIEW.md) - Phase overview
+- [PHASE-4.5-OVERVIEW.md](/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/04-phase-4.5-enterprise-features/PHASE-4.5-OVERVIEW.md) - Phase overview

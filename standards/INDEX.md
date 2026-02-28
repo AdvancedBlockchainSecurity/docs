@@ -346,7 +346,7 @@ When working with Claude Code, you can reference specific standards documents:
 - Development Workflow (blocksecops-docs/local-development/)
 
 **Task Documentation:**
-- Implementation summaries (TaskDocs-BlockSecOps/)
+- Implementation summaries (TaskDocs-Apogee/)
 - Sprint plans and completion reports (docs/Sprints/)
 
 ---

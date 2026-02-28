@@ -21,7 +21,7 @@ Successfully completed comprehensive reorganization of the Apogee documentation 
 - **blocksecops-docs**: Documented current Supabase Auth (v0.4+)
 
 **Solution**:
-- ✅ Completely rewrote `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/api/API-Authentication.md`
+- ✅ Completely rewrote `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/api/API-Authentication.md`
 - ✅ Now documents Supabase Auth with ES256 JWT tokens
 - ✅ Added migration section showing legacy vs current system
 - ✅ Included tier-based access control and quota enforcement
@@ -217,7 +217,7 @@ Created 4 comprehensive navigation README.md files:
 5. `/Users/pwner/Git/ABS/blocksecops-docs/development/README.md`
 
 ### Updated Files (2)
-1. `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/api/API-Authentication.md` (complete rewrite)
+1. `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/api/API-Authentication.md` (complete rewrite)
 2. `/Users/pwner/Git/ABS/blocksecops-docs/deployment/README.md` (comprehensive update)
 3. `/Users/pwner/Git/ABS/blocksecops-docs/README.md` (navigation updates)
 

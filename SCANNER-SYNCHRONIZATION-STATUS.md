@@ -147,7 +147,7 @@ When adding a new scanner:
 
 ## Related Documents
 
-- [Phase 3 Scanner Selection Status](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/PHASE-3-SCANNER-SELECTION-STATUS.md)
+- [Phase 3 Scanner Selection Status](/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/PHASE-3-SCANNER-SELECTION-STATUS.md)
 - [Platform Development Standards](/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPMENT-STANDARDS.md)
 - [Scanner API Documentation](/Users/pwner/Git/ABS/blocksecops-api-service/docs/api/scanners.md)
 

@@ -690,7 +690,7 @@ List of problems fixed
 
 ### Task-Specific Changelogs (TaskDocs)
 
-**Location:** `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/`
+**Location:** `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/`
 
 **Contents:**
 - Temporary task tracking
@@ -742,7 +742,7 @@ Within changelog files:
 2. **Choose Location**
    - Platform-wide: `/docs/changelogs/`
    - Component-specific: `<component>/CHANGELOG.md`
-   - Task-specific: `TaskDocs-BlockSecOps/phases/`
+   - Task-specific: `TaskDocs-Apogee/phases/`
 
 3. **Use Template**
    - Copy template structure from this README
@@ -843,7 +843,7 @@ grep -r "React Hooks" /Users/pwner/Git/ABS/docs/changelogs/
 │   └── SCHEMA.md
 └── standards/               ← Platform standards
 
-/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/
+/Users/pwner/Git/ABS/TaskDocs-Apogee/
 └── phases/                  ← Task-specific changelogs (work in progress)
 
 /Users/pwner/Git/ABS/blocksecops-docs/

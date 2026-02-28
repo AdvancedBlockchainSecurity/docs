@@ -164,6 +164,6 @@ Project (is_project=true):
 
 ## Related Documentation
 
-- Task Plan: `/TaskDocs-BlockSecOps/phases/02-phase-3.1-scanner-integration/FUZZER-SCANNER-IMPROVEMENTS.md`
+- Task Plan: `/TaskDocs-Apogee/phases/02-phase-3.1-scanner-integration/FUZZER-SCANNER-IMPROVEMENTS.md`
 - Scanner Docs: `/blocksecops-docs/scanners/README.md`
 - Feature Tests: `/docs/feature-tests/06-scanning.md`

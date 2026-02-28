@@ -341,7 +341,7 @@ orchestration-api:
   - Updated integration examples
 
 **Task Documentation**:
-- `TaskDocs-BlockSecOps/blocksecops/PHASE-5-CELERY-INTEGRATION-COMPLETE.md`
+- `TaskDocs-Apogee/blocksecops/PHASE-5-CELERY-INTEGRATION-COMPLETE.md`
   - Complete implementation summary
   - Architecture diagrams
   - Troubleshooting guide
@@ -375,7 +375,7 @@ orchestration-api:
 ### Related Documentation
 - [Orchestration REST API Architecture](../blocksecops-docs/architecture/orchestration-rest-api.md)
 - [Result Routing Architecture](../blocksecops-docs/architecture/orchestration-result-routing.md)
-- [Phase 5 Complete Implementation](../TaskDocs-BlockSecOps/blocksecops/PHASE-5-CELERY-INTEGRATION-COMPLETE.md)
+- [Phase 5 Complete Implementation](../TaskDocs-Apogee/blocksecops/PHASE-5-CELERY-INTEGRATION-COMPLETE.md)
 - [Platform Development Standards](./PLATFORM-DEVELOPMENT-STANDARDS.md)
 
 ---

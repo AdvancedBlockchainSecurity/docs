@@ -112,7 +112,7 @@ Implementing scanner selection and configuration UI to allow users to choose whi
 
 **Files Created**:
 - ✅ `/Users/pwner/Git/ABS/docs/SCANNER-SELECTION-FEATURE.md` (500+ lines user guide)
-- ✅ `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/week-6-day-3-progress.md` (800+ lines)
+- ✅ `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/week-6-day-3-progress.md` (800+ lines)
 - ✅ Updated `/Users/pwner/Git/ABS/docs/PHASE-3-PROGRESS-TRACKER.md`
 
 ---

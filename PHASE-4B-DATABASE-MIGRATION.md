@@ -150,5 +150,5 @@ Once migration is applied, proceed with:
 
 - **Intelligence Layer Docs**: `/Users/pwner/Git/ABS/blocksecops-docs/architecture/intelligence-layer.md`
 - **Phase 4 Summary**: `/Users/pwner/Git/ABS/docs/PHASE-4-INTELLIGENCE-LAYER-COMPLETE.md`
-- **Implementation Details**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/implementation-summaries/PHASE-4-INTELLIGENCE-LAYER-IMPLEMENTATION.md`
+- **Implementation Details**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/implementation-summaries/PHASE-4-INTELLIGENCE-LAYER-IMPLEMENTATION.md`
 - **Platform Standards**: `/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPMENT-STANDARDS.md`

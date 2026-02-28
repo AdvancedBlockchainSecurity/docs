@@ -539,7 +539,7 @@ curl -s http://127.0.0.1:8000/api/v1/scanners | jq '.scanners[] | select(.id == 
 **SolidityDefend:**
 - `/Users/pwner/Git/ABS/blocksecops-docs/scanners/SolidityDefend/README.md`
 - `/Users/pwner/Git/ABS/blocksecops-docs/scanners/SolidityDefend/DETECTOR-MAPPING.md`
-- `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-DATABASE-INTEGRATION-COMPLETE.md`
+- `/Users/pwner/Git/ABS/TaskDocs-Apogee/scanners/SOLIDITYDEFEND-DATABASE-INTEGRATION-COMPLETE.md`
 
 **Scanner Configuration:**
 - `/Users/pwner/Git/ABS/blocksecops-api-service/src/infrastructure/scanner_config/scanners.py`
@@ -547,10 +547,10 @@ curl -s http://127.0.0.1:8000/api/v1/scanners | jq '.scanners[] | select(.id == 
 ### Task Documentation
 
 **Work Summary:**
-- `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2025-11-21-AFTERNOON.md`
+- `/Users/pwner/Git/ABS/TaskDocs-Apogee/DOCUMENTATION-UPDATE-2025-11-21-AFTERNOON.md`
 
 **Previous Updates:**
-- `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2025-11-21.md` (Morning session)
+- `/Users/pwner/Git/ABS/TaskDocs-Apogee/DOCUMENTATION-UPDATE-2025-11-21.md` (Morning session)
 - `/Users/pwner/Git/ABS/docs/fixes/login-react-hooks-violation-fix-2025-11-21.md`
 
 ---

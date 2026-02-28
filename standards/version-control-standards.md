@@ -165,7 +165,7 @@ Documentation should be updated in the following locations based on change type:
 /Users/pwner/Git/ABS/docs/*
 
 # Task-specific documentation (sprint tasks, implementation plans)
-/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/*
+/Users/pwner/Git/ABS/TaskDocs-Apogee/*
 
 # Technical documentation (API guides, deployment, development guides)
 /Users/pwner/Git/ABS/blocksecops-docs/*
@@ -189,7 +189,7 @@ Documentation should be updated in the following locations based on change type:
    - Include configuration examples
 
 4. **Feature Implementation** - Document in:
-   - `TaskDocs-BlockSecOps/blocksecops/` (implementation summary)
+   - `TaskDocs-Apogee/blocksecops/` (implementation summary)
    - Create completion report for significant features
    - Update relevant phase/sprint documentation
 
@@ -221,12 +221,12 @@ Documentation should be updated in the following locations based on change type:
 vim blocksecops-docs/api/endpoints-reference.md
 # Add severity parameter documentation with tested examples
 
-vim TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/scan-filtering-implementation.md
+vim TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/scan-filtering-implementation.md
 # Document implementation details and test results
 
 # Commit documentation updates
 git add blocksecops-docs/api/endpoints-reference.md
-git add TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/scan-filtering-implementation.md
+git add TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/scan-filtering-implementation.md
 git commit -m "docs: Update API and implementation docs for scan filtering"
 
 # Push documentation updates with code changes

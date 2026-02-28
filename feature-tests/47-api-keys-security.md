@@ -269,4 +269,4 @@ done
 - [Rate Limits](/home/pwner/Git/blocksecops-docs/api/rate-limits.md)
 - [Tier Standards](/home/pwner/Git/docs/standards/tier-standards.md)
 - [Admin CLI Commands](/home/pwner/Git/docs/playbooks/admin-cli-commands.md)
-- [Security Audit](/home/pwner/Git/TaskDocs-BlockSecOps/audits/API-KEYS-SECURITY-AUDIT-2026-01-26.md)
+- [Security Audit](/home/pwner/Git/TaskDocs-Apogee/audits/API-KEYS-SECURITY-AUDIT-2026-01-26.md)

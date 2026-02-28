@@ -102,7 +102,7 @@ kubectl apply -k k8s/overlays/local/orchestration/
    - Added migration history entry for code fix
    - Added detailed note about field status
 
-2. **Task Documentation** (`/TaskDocs-BlockSecOps/blocksecops/is-project-schema-fix.md`)
+2. **Task Documentation** (`/TaskDocs-Apogee/blocksecops/is-project-schema-fix.md`)
    - Comprehensive task-level documentation
    - Code changes with before/after examples
    - Testing verification details
@@ -147,7 +147,7 @@ def upgrade():
 
 ## References
 
-- **Task Documentation**: `/TaskDocs-BlockSecOps/blocksecops/is-project-schema-fix.md`
+- **Task Documentation**: `/TaskDocs-Apogee/blocksecops/is-project-schema-fix.md`
 - **Database Schema**: `/docs/database/SCHEMA.md`
 - **ORM Models**: `/blocksecops-orchestration/src/blocksecops_orchestration/models/models.py`
 - **Scan Tasks**: `/blocksecops-orchestration/src/blocksecops_orchestration/tasks/scan_tasks_sync.py`

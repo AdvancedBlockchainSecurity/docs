@@ -443,7 +443,7 @@ curl -k -u "admin:Harbor12345" https://harbor.local/api/v2.0/users/current
 ## Related Documentation
 
 - [Harbor Official Docs](https://goharbor.io/docs/2.11.0/)
-- [Task Doc: Harbor Installation](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/02-phase-3.1a1-add-harbor/HARBOR-LOCAL-INSTALLATION.md)
+- [Task Doc: Harbor Installation](/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/02-phase-3.1a1-add-harbor/HARBOR-LOCAL-INSTALLATION.md)
 - [Docker Image Versioning](/Users/pwner/Git/ABS/docs/standards/docker-image-versioning.md)
 - [Kubernetes Kustomize Template](/Users/pwner/Git/ABS/docs/architecture-templates/kubernetes-kustomize-structure-template.md)
 

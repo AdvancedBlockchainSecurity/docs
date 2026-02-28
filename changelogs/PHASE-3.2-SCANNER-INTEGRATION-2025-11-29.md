@@ -61,7 +61,7 @@ Scanner Execution with proper imports
 
 | Location | Document |
 |----------|----------|
-| `TaskDocs-BlockSecOps/` | `DOCUMENTATION-UPDATE-2025-11-29-SCANNER-INTEGRATION.md` |
+| `TaskDocs-Apogee/` | `DOCUMENTATION-UPDATE-2025-11-29-SCANNER-INTEGRATION.md` |
 | `blocksecops-docs/scanners/` | `PROJECT-MODE-SCANNING.md` |
 | `blocksecops-docs/scanners/` | Updated `README.md` with project mode info |
 | `blocksecops-docs/architecture/` | Updated `README.md` with project mode ADR |

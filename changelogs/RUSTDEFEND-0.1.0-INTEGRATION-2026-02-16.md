@@ -205,4 +205,4 @@ RustDefend is a proprietary Rust smart contract static analysis scanner integrat
 | Scanner README | `docs/scanners/RustDefend/README.md` |
 | Scanner Addition Pipeline | `docs/pipelines/scanner-addition-pipeline.md` |
 | Scanner Readiness Checklist | `docs/pipelines/scanner-readiness-checklist.md` |
-| Task Documentation | `TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-16-RUSTDEFEND-INTEGRATION.md` |
+| Task Documentation | `TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-02-16-RUSTDEFEND-INTEGRATION.md` |

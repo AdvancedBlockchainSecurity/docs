@@ -8,7 +8,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Configuration
-API_BASE="${API_BASE:-http://app.blocksecops.local/api/v1}"
+API_BASE="${API_BASE:-http://app.0xapogee.local/api/v1}"
 
 # Get auth token
 echo "Getting auth token..."

@@ -187,9 +187,9 @@ kubectl rollout restart deployment/tool-integration -n tool-integration-local
 
 ## Related Documentation
 
-- [Admin System Health Fixes (2026-02-05)](../../TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-05-ADMIN-SYSTEM-HEALTH-FIXES.md)
+- [Admin System Health Fixes (2026-02-05)](../../TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-02-05-ADMIN-SYSTEM-HEALTH-FIXES.md)
 - [Admin Portal Dashboard (2026-02-04)](ADMIN-PORTAL-DASHBOARD-2026-02-04.md)
-- [Semgrep Troubleshooting Checklist](../../TaskDocs-BlockSecOps/scanners/semgrep/semgrep-troubleshooting-checklist.md)
+- [Semgrep Troubleshooting Checklist](../../TaskDocs-Apogee/scanners/semgrep/semgrep-troubleshooting-checklist.md)
 - [Docker Image Versioning Standards](../standards/docker-image-versioning.md)
 - [Upgrade Scanner Image Playbook](../playbooks/upgrade-scanner-image.md)
 

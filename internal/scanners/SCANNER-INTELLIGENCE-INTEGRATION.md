@@ -741,8 +741,8 @@ Enrichment adds **13 columns** to the `vulnerabilities` table:
 - **[Scanner Integration Guide](SCANNER-INTEGRATION-GUIDE.md)** - Main scanner integration process
 - **[Platform Development Standards](/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPMENT-STANDARDS.md)** - Platform coding standards
 - **[API Endpoints Reference](/Users/pwner/Git/ABS/blocksecops-docs/api/endpoints-reference.md)** - Intelligence Layer API fields
-- **[Phase 4D Pattern Matching](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/PHASE-4D-NEXT-STEPS.md)** - Pattern classification deep-dive
-- **[Phase 4E Deduplication](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/implementation-summaries/PHASE-4E-DEDUPLICATION-COMPLETE.md)** - Deduplication implementation
+- **[Phase 4D Pattern Matching](/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/PHASE-4D-NEXT-STEPS.md)** - Pattern classification deep-dive
+- **[Phase 4E Deduplication](/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/implementation-summaries/PHASE-4E-DEDUPLICATION-COMPLETE.md)** - Deduplication implementation
 
 ---
 

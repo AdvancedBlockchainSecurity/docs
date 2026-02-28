@@ -272,7 +272,7 @@ kubectl get jobs -A -l app=dedup-maintenance --sort-by=.status.startTime | tail 
 
 ## 4. Integrations Hub
 
-**Key files:** `TaskDocs-BlockSecOps/PLAN-2026-01-23-UNIFIED-INTEGRATIONS-HUB.md`, `docs/feature-tests/44-platform-integrations.md`, `docs/feature-tests/45-integrations-hub.md`
+**Key files:** `TaskDocs-Apogee/PLAN-2026-01-23-UNIFIED-INTEGRATIONS-HUB.md`, `docs/feature-tests/44-platform-integrations.md`, `docs/feature-tests/45-integrations-hub.md`
 **Related specs:** [44-platform-integrations.md](../feature-tests/44-platform-integrations.md), [45-integrations-hub.md](../feature-tests/45-integrations-hub.md)
 
 ### 4.1 VCS Integrations (OAuth)
@@ -327,7 +327,7 @@ curl -sk -X POST "https://app.0xapogee.com/api/v1/notifications/channels/{channe
 
 ## 5. Payment & Billing (Stripe)
 
-**Key files:** `TaskDocs-BlockSecOps/phases/08a-phase-8a-stripe-billing-invoices/`, `docs/feature-tests/37-stripe-billing.md`
+**Key files:** `TaskDocs-Apogee/phases/08a-phase-8a-stripe-billing-invoices/`, `docs/feature-tests/37-stripe-billing.md`
 **Related specs:** [37-stripe-billing.md](../feature-tests/37-stripe-billing.md), [52-dual-payment-options.md](../feature-tests/52-dual-payment-options.md)
 
 ### 5.1 Subscription Lifecycle

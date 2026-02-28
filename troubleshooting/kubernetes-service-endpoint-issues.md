@@ -366,7 +366,7 @@ kubectl exec -n <namespace> <pod-name> -- netstat -tlnp
 - [Local Development Setup](/Users/pwner/Git/ABS/docs/standards/local-development-setup.md)
 
 **Work Documentation:**
-- [Redis Projects Fix - November 25, 2025](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2025-11-25-REDIS-PROJECTS-FIX.md)
+- [Redis Projects Fix - November 25, 2025](/Users/pwner/Git/ABS/TaskDocs-Apogee/DOCUMENTATION-UPDATE-2025-11-25-REDIS-PROJECTS-FIX.md)
 
 ---
 

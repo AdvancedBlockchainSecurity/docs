@@ -184,7 +184,7 @@
 
 ### Phase 3.1a: Freemium Authentication
 
-**Location:** `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/02-phase-3.1a-freemium-auth/`
+**Location:** `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/02-phase-3.1a-freemium-auth/`
 
 **Key Documents:**
 - `AUTHENTICATION-MIGRATION-STRATEGY.md` - Migration plan
@@ -195,7 +195,7 @@
 
 ### Phase 8: Security Hardening
 
-**Location:** `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/08-phase-8-security-hardening/`
+**Location:** `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/08-phase-8-security-hardening/`
 
 **Key Documents:**
 - `AUTHENTICATION-FIXES-2025-10-15.md` - Oct 15 fixes

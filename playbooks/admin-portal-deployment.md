@@ -407,7 +407,7 @@ docker build \
 ## Related Documentation
 
 - [Platform Admin Guide](../admin/platform-admin.md)
-- [Security Hardening](../../TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-24-SECURITY-HARDENING.md)
-- [Admin Portal Isolation](../../TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-02-ADMIN-PORTAL-ISOLATION.md)
+- [Security Hardening](../../TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-01-24-SECURITY-HARDENING.md)
+- [Admin Portal Isolation](../../TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-02-02-ADMIN-PORTAL-ISOLATION.md)
 - [Admin System Fixes (2026-02-05)](../changelogs/ADMIN-SYSTEM-FIXES-2026-02-05.md)
 - [Admin Dashboard Metrics Feature Test](../feature-tests/56-admin-dashboard-metrics.md)

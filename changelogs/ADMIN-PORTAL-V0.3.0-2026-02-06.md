@@ -308,7 +308,7 @@ kubectl apply -k k8s/overlays/local/
 
 ## Related Documentation
 
-- [Task Documentation](../../TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-06-ADMIN-PORTAL-V0.3.0.md)
+- [Task Documentation](../../TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-02-06-ADMIN-PORTAL-V0.3.0.md)
 - [Admin Portal Architecture](../../blocksecops-docs/architecture/admin-portal.md)
 - [Admin Portal Dashboard (2026-02-04)](ADMIN-PORTAL-DASHBOARD-2026-02-04.md)
 - [Admin System Fixes (2026-02-05)](ADMIN-SYSTEM-FIXES-2026-02-05.md)

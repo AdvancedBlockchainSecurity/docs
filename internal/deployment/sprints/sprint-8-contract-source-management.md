@@ -549,8 +549,8 @@ encoded = base64.b64encode(compressed).decode()
 
 ## References
 
-- [Sprint 8 Documentation](/Users/pwner/Git/ABS/TaskDocs/BlockSecOps/SPRINT-8-CONTRACT-SOURCE-MANAGEMENT.md)
-- [Kubernetes Jobs Implementation](/Users/pwner/Git/ABS/TaskDocs/BlockSecOps/k8s-jobs-scanner-implementation.md)
+- [Sprint 8 Documentation](/Users/pwner/Git/ABS/TaskDocs/Apogee/SPRINT-8-CONTRACT-SOURCE-MANAGEMENT.md)
+- [Kubernetes Jobs Implementation](/Users/pwner/Git/ABS/TaskDocs/Apogee/k8s-jobs-scanner-implementation.md)
 - [Scanner Execution Architecture](scanner-execution-architecture.md)
 - [Kubernetes ConfigMap Documentation](https://kubernetes.io/docs/concepts/configuration/configmap/)
 

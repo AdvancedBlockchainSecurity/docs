@@ -258,7 +258,7 @@ Expected Response:
 
 - [AI Invariants API Reference](/docs/api/ai-invariants.md)
 - [Database Schema - Invariants](/docs/database/INVARIANTS.md)
-- [Phase E Implementation](/TaskDocs-BlockSecOps/phases/04-phase-5-ai-ml/phase-e-ai-invariants.md)
+- [Phase E Implementation](/TaskDocs-Apogee/phases/04-phase-5-ai-ml/phase-e-ai-invariants.md)
 - [User Guide - Invariants](/blocksecops-docs/platform/invariants/README.md)
 
 ## Changelog

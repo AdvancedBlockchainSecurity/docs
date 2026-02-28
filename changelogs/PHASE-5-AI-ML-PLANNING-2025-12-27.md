@@ -153,14 +153,14 @@ No new tables required for Phase 5.
 
 | File | Location |
 |------|----------|
-| README.md | `/TaskDocs-BlockSecOps/phases/05-phase-5-ai-ml/` |
-| PHASE-5-CPU-ML-PLAN.md | `/TaskDocs-BlockSecOps/phases/05-phase-5-ai-ml/` |
-| DATA-LABELING-GUIDE.md | `/TaskDocs-BlockSecOps/phases/05-phase-5-ai-ml/` |
-| TASK-1-ML-INFRASTRUCTURE.md | `/TaskDocs-BlockSecOps/phases/05-phase-5-ai-ml/` |
-| TASK-2-FALSE-POSITIVE-DETECTION.md | `/TaskDocs-BlockSecOps/phases/05-phase-5-ai-ml/` |
-| TASK-3-RISK-SCORING.md | `/TaskDocs-BlockSecOps/phases/05-phase-5-ai-ml/` |
-| TASK-4-SEMANTIC-DEDUPLICATION.md | `/TaskDocs-BlockSecOps/phases/05-phase-5-ai-ml/` |
-| TASK-5-SMART-PRIORITIZATION.md | `/TaskDocs-BlockSecOps/phases/05-phase-5-ai-ml/` |
+| README.md | `/TaskDocs-Apogee/phases/05-phase-5-ai-ml/` |
+| PHASE-5-CPU-ML-PLAN.md | `/TaskDocs-Apogee/phases/05-phase-5-ai-ml/` |
+| DATA-LABELING-GUIDE.md | `/TaskDocs-Apogee/phases/05-phase-5-ai-ml/` |
+| TASK-1-ML-INFRASTRUCTURE.md | `/TaskDocs-Apogee/phases/05-phase-5-ai-ml/` |
+| TASK-2-FALSE-POSITIVE-DETECTION.md | `/TaskDocs-Apogee/phases/05-phase-5-ai-ml/` |
+| TASK-3-RISK-SCORING.md | `/TaskDocs-Apogee/phases/05-phase-5-ai-ml/` |
+| TASK-4-SEMANTIC-DEDUPLICATION.md | `/TaskDocs-Apogee/phases/05-phase-5-ai-ml/` |
+| TASK-5-SMART-PRIORITIZATION.md | `/TaskDocs-Apogee/phases/05-phase-5-ai-ml/` |
 
 ---
 

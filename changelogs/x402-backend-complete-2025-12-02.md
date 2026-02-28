@@ -111,4 +111,4 @@ Remaining:
 - Migration docs: `/docs/database/MIGRATIONS.md`
 - Schema docs: `/docs/database/SCHEMA.md`
 - API docs: `/blocksecops-docs/api/endpoints-reference.md`
-- Task docs: `/TaskDocs-BlockSecOps/phases/04-phase-3.4-x402-pay-per-scan/`
+- Task docs: `/TaskDocs-Apogee/phases/04-phase-3.4-x402-pay-per-scan/`
