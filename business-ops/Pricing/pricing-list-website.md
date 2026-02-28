@@ -9,10 +9,10 @@
 
 ---
 
-# BlockSecOps Website Pricing Update (ARCHIVED)
+# Apogee Website Pricing Update (ARCHIVED)
 
 ## Instructions for Claude Code
-Please update the BlockSecOps website pricing page with the following five-tier structure. Replace the existing three-tier pricing (Starter/Professional/Enterprise) with this new structure.
+Please update the Apogee website pricing page with the following five-tier structure. Replace the existing three-tier pricing (Starter/Professional/Enterprise) with this new structure.
 
 ---
 
@@ -203,7 +203,7 @@ Save up to 20% with multi-year commitments:
 50% off first year for YC, a16z, and select accelerator portfolio companies. [Learn more]
 
 ### Migration Offer
-**OpenZeppelin Defender users:** Get 50% off your first year when you migrate to BlockSecOps. [Claim offer]
+**OpenZeppelin Defender users:** Get 50% off your first year when you migrate to Apogee. [Claim offer]
 
 
 ---
@@ -244,10 +244,10 @@ A: Absolutely! Developer and Startup tiers include free trials (14 and 30 days).
 **Social Proof:**
 - Add customer logos under relevant tiers (if available)
 - Add testimonial carousel between pricing tiers
-- Show "X companies trust BlockSecOps" counter
+- Show "X companies trust Apogee" counter
 
 **Comparison Emphasis:**
-- Add expandable "Compare to alternatives" section showing BlockSecOps vs. SolidityScan, Olympix, and traditional audits
+- Add expandable "Compare to alternatives" section showing Apogee vs. SolidityScan, Olympix, and traditional audits
 - Include ROI calculator widget for Professional+ tiers
 
 **Mobile Optimization:**

@@ -1,6 +1,6 @@
-# BlockSecOps Development Guide
+# Apogee Development Guide
 
-This project contains documentation and standards for the BlockSecOps platform.
+This project contains documentation and standards for the Apogee platform.
 
 ## Project Agents
 
@@ -38,7 +38,7 @@ When working on specific repositories, use the appropriate agent by referencing 
 
 | Repository | Agent File | Use For |
 |------------|------------|---------|
-| TaskDocs-BlockSecOps | @.claude/agents/taskdocs-blocksecops.md | Development task documentation |
+| TaskDocs-Apogee | @.claude/agents/taskdocs-blocksecops.md | Development task documentation |
 
 ## Platform Standards
 

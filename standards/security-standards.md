@@ -5,7 +5,7 @@
 
 ## Overview
 
-This document defines security standards for BlockSecOps platform development, covering circuit breakers, archive extraction, query patterns, and task security.
+This document defines security standards for Apogee platform development, covering circuit breakers, archive extraction, query patterns, and task security.
 
 ---
 

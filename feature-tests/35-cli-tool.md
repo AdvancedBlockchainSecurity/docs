@@ -1,6 +1,6 @@
 # 35. CLI Tool (0xapogee-cli)
 
-Test the BlockSecOps command-line interface tool.
+Test the Apogee command-line interface tool.
 
 ---
 
@@ -8,7 +8,7 @@ Test the BlockSecOps command-line interface tool.
 
 - [ ] Python 3.10+ installed
 - [ ] pip/pipx available
-- [ ] Valid BlockSecOps API key
+- [ ] Valid Apogee API key
 - [ ] Sample Solidity contract file
 
 ---
@@ -41,7 +41,7 @@ pipx install 0xapogee-cli
 ### 1.3 Install from source
 
 ```bash
-git clone https://github.com/blocksecops/0xapogee-cli
+git clone https://github.com/AdvancedBlockchainSecurity/0xapogee-cli
 cd 0xapogee-cli
 pip install -e .
 ```
@@ -348,7 +348,7 @@ CI=true 0xapogee scan run contract.sol
 Create `.pre-commit-config.yaml`:
 ```yaml
 repos:
-  - repo: https://github.com/blocksecops/0xapogee-cli
+  - repo: https://github.com/AdvancedBlockchainSecurity/0xapogee-cli
     rev: v0.1.0
     hooks:
       - id: 0xapogee-scan

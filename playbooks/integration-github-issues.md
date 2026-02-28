@@ -6,16 +6,16 @@
 
 ## Overview
 
-This playbook guides you through integrating BlockSecOps with GitHub Issues to automatically create issues from security vulnerabilities. Track remediation in your existing GitHub workflow and keep findings synchronized.
+This playbook guides you through integrating Apogee with GitHub Issues to automatically create issues from security vulnerabilities. Track remediation in your existing GitHub workflow and keep findings synchronized.
 
 ---
 
 ## Prerequisites
 
-- [ ] BlockSecOps account with Growth or Enterprise tier
+- [ ] Apogee account with Growth or Enterprise tier
 - [ ] GitHub repository with write access
 - [ ] GitHub personal access token or GitHub App installation
-- [ ] Organization admin role in BlockSecOps (for org-wide integration)
+- [ ] Organization admin role in Apogee (for org-wide integration)
 
 ---
 
@@ -42,7 +42,7 @@ flowchart LR
 1. Go to [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens)
 2. Click **Generate new token (classic)**
 3. Configure:
-   - **Note:** `BlockSecOps Integration`
+   - **Note:** `Apogee Integration`
    - **Expiration:** 90 days (or longer)
    - **Scopes:** Select:
      - `repo` (Full control of private repositories)
@@ -50,7 +50,7 @@ flowchart LR
 4. Click **Generate token**
 5. Copy the token immediately
 
-### Step 2: Configure GitHub Integration in BlockSecOps
+### Step 2: Configure GitHub Integration in Apogee
 
 **Dashboard:**
 1. Navigate to **Settings > Integrations**
@@ -96,7 +96,7 @@ curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/integration
 | `{{recommendation}}` | Fix recommendation |
 | `{{code_snippet}}` | Vulnerable code |
 | `{{scanner}}` | Scanner that found it |
-| `{{blocksecops_url}}` | Link to BlockSecOps |
+| `{{blocksecops_url}}` | Link to Apogee |
 
 **Default Template:**
 
@@ -123,7 +123,7 @@ curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/integration
 ```
 
 ---
-**BlockSecOps:** [View Details]({{blocksecops_url}})
+**Apogee:** [View Details]({{blocksecops_url}})
 
 <!-- blocksecops:vuln_id={{id}} -->
 ```
@@ -212,11 +212,11 @@ curl -X POST "https://app.0xapogee.com/api/v1/vulnerabilities/{vuln_id}/github" 
 **Dashboard:**
 1. In GitHub integration settings, click **Sync Settings**
 2. Enable:
-   - **Sync status to GitHub:** Update issue when BlockSecOps status changes
-   - **Sync status from GitHub:** Update BlockSecOps when issue closed
+   - **Sync status to GitHub:** Update issue when Apogee status changes
+   - **Sync status from GitHub:** Update Apogee when issue closed
 3. Map statuses:
 
-| BlockSecOps Status | GitHub Action |
+| Apogee Status | GitHub Action |
 |-------------------|---------------|
 | Open | Issue open |
 | Confirmed | Add "confirmed" label |
@@ -258,7 +258,7 @@ curl -X PATCH "https://app.0xapogee.com/api/v1/integrations/{integration_id}/syn
      - Issue comments
 4. Click **Add webhook**
 
-**Configure Secret in BlockSecOps:**
+**Configure Secret in Apogee:**
 
 ```bash
 curl -X PATCH "https://app.0xapogee.com/api/v1/integrations/{integration_id}" \
@@ -382,7 +382,7 @@ curl -H "Authorization: token ghp_xxxx" \
 curl -X POST -H "Authorization: token ghp_xxxx" \
   -H "Content-Type: application/json" \
   https://api.github.com/repos/owner/repo/issues \
-  -d '{"title": "Test Issue", "body": "Testing BlockSecOps integration"}'
+  -d '{"title": "Test Issue", "body": "Testing Apogee integration"}'
 ```
 
 ---
@@ -391,7 +391,7 @@ curl -X POST -H "Authorization: token ghp_xxxx" \
 
 - [ ] GitHub personal access token created
 - [ ] Token has `repo` scope
-- [ ] Integration added in BlockSecOps
+- [ ] Integration added in Apogee
 - [ ] Connection tested successfully
 - [ ] Issue template configured
 - [ ] Auto-create rules set (optional)

@@ -6,13 +6,13 @@
 
 ## Overview
 
-This playbook guides you through creating a project in BlockSecOps. Projects organize your smart contracts, scans, and findings into logical groups for better management and collaboration.
+This playbook guides you through creating a project in Apogee. Projects organize your smart contracts, scans, and findings into logical groups for better management and collaboration.
 
 ---
 
 ## Prerequisites
 
-- [ ] Active BlockSecOps account
+- [ ] Active Apogee account
 - [ ] Understanding of project structure (which contracts belong together)
 - [ ] Optional: Team or organization membership
 
@@ -35,7 +35,7 @@ flowchart LR
 ### Step 1: Navigate to Projects
 
 **Dashboard:**
-1. Log in to BlockSecOps
+1. Log in to Apogee
 2. Click **Projects** in the left sidebar
 3. Or navigate to `https://app.0xapogee.com/projects`
 
@@ -140,7 +140,7 @@ curl -X POST "https://app.0xapogee.com/api/v1/contracts" \
 **Dashboard:**
 1. In project settings, click **Integrations**
 2. Click **Connect GitHub**
-3. Authorize BlockSecOps GitHub App
+3. Authorize Apogee GitHub App
 4. Select repository and branch
 5. Configure sync options:
    - **Auto-sync:** Automatically import on push

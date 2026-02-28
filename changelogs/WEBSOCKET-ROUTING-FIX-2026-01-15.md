@@ -1,7 +1,7 @@
 # WebSocket Routing and Scanner Effectiveness Fix
 
 **Date:** January 15, 2026
-**Author:** BlockSecOps Team
+**Author:** Apogee Team
 **Services Affected:** dashboard, notification, api-service, gcp-infrastructure
 
 ## Summary

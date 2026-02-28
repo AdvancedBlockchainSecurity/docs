@@ -4,7 +4,7 @@
 
 ## Overview
 
-Create pull requests directly from AI-generated code repairs. After generating a repair for a vulnerability, users can push the fix to their connected GitHub or GitLab repository as a pull request — without leaving the BlockSecOps dashboard.
+Create pull requests directly from AI-generated code repairs. After generating a repair for a vulnerability, users can push the fix to their connected GitHub or GitLab repository as a pull request — without leaving the Apogee dashboard.
 
 ## Prerequisites
 

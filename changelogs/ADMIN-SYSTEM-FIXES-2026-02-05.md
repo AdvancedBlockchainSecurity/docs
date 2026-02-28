@@ -204,5 +204,5 @@ kubectl rollout restart deployment/tool-integration -n tool-integration-local
 
 ---
 
-**Maintained By:** BlockSecOps Team
+**Maintained By:** Apogee Team
 **Status:** Complete

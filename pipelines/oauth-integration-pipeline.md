@@ -53,7 +53,7 @@ Environment Setup Pipeline:
 1. Go to [GitHub Developer Settings > OAuth Apps](https://github.com/settings/developers)
 2. Click **New OAuth App**
 3. Configure:
-   - **Application name:** `BlockSecOps`
+   - **Application name:** `Apogee`
    - **Homepage URL:** `https://app.0xapogee.com`
    - **Authorization callback URL:** `https://app.0xapogee.com/api/v1/oauth/github/callback`
 4. Save the **Client ID** and generate a **Client Secret**
@@ -63,7 +63,7 @@ Environment Setup Pipeline:
 1. Go to [GitLab Applications](https://gitlab.com/-/user_settings/applications)
 2. Click **New application**
 3. Configure:
-   - **Name:** `BlockSecOps`
+   - **Name:** `Apogee`
    - **Redirect URI:** `https://app.0xapogee.com/api/v1/oauth/gitlab/callback`
    - **Scopes:** `api`, `read_user`, `read_repository`
 4. Save the **Application ID** and **Secret**
@@ -73,7 +73,7 @@ Environment Setup Pipeline:
 1. Go to [Bitbucket Workspace Settings > OAuth consumers](https://bitbucket.org/workspace/settings/api)
 2. Click **Add consumer**
 3. Configure:
-   - **Name:** `BlockSecOps`
+   - **Name:** `Apogee`
    - **Callback URL:** `https://app.0xapogee.com/api/v1/oauth/bitbucket/callback`
    - **Permissions:** Repository (Read), Pull requests (Read), Webhooks (Read & Write)
 4. Save the **Key** (client_id) and **Secret** (client_secret)
@@ -83,7 +83,7 @@ Environment Setup Pipeline:
 1. Go to [Atlassian Developer Console](https://developer.atlassian.com/console/myapps/)
 2. Click **Create** > **OAuth 2.0 integration**
 3. Configure:
-   - **Name:** `BlockSecOps`
+   - **Name:** `Apogee`
    - **Callback URL:** `https://app.0xapogee.com/api/v1/oauth/jira/callback`
    - **Scopes:** `read:jira-work`, `write:jira-work`, `read:jira-user`, `offline_access`
 4. Enable **Authorization code grants** with the callback URL
@@ -91,7 +91,7 @@ Environment Setup Pipeline:
 
 ### Jenkins
 
-Jenkins uses API tokens instead of OAuth. No provider-side app creation is needed. Users configure their Jenkins URL and API token directly in the BlockSecOps UI.
+Jenkins uses API tokens instead of OAuth. No provider-side app creation is needed. Users configure their Jenkins URL and API token directly in the Apogee UI.
 
 ## Step 2: Store Credentials in Secret Manager
 
@@ -210,7 +210,7 @@ curl -s https://app.0xapogee.com/api/v1/oauth/github/callback?code=test&state=te
 
 For each provider:
 
-1. Log into BlockSecOps dashboard as an org admin
+1. Log into Apogee dashboard as an org admin
 2. Navigate to **Settings > Integrations**
 3. Click **Connect** for the provider
 4. Complete OAuth authorization at provider

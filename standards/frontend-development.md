@@ -6,7 +6,7 @@
 
 ## Overview
 
-The BlockSecOps Frontend is a React + TypeScript application built with Vite that provides the user-facing authentication interface for the platform. It integrates with Supabase Auth for authentication and the API Service for user data and quota management.
+The Apogee Frontend is a React + TypeScript application built with Vite that provides the user-facing authentication interface for the platform. It integrates with Supabase Auth for authentication and the API Service for user data and quota management.
 
 **Repository:** `/Users/pwner/Git/ABS/blocksecops-frontend`
 **Technology Stack:** React 18.2, TypeScript 5.3, Vite 5.0, Supabase, Zustand, Tailwind CSS
@@ -100,7 +100,7 @@ curl -s http://127.0.0.1:8000/api/v1/health/live | jq '.'
 # Expected output:
 # {
 #   "status": "healthy",
-#   "service": "BlockSecOps API Service",
+#   "service": "Apogee API Service",
 #   "version": "0.3.20",
 #   "timestamp": "2025-11-13T18:25:00.123456"
 # }
@@ -218,7 +218,7 @@ curl -s http://127.0.0.1:8000/api/v1/health/live
 
 # 5. Try to access login page
 curl -s http://127.0.0.1:3002 | grep "<title>"
-# Should return: <title>BlockSecOps Dashboard</title>
+# Should return: <title>Apogee Dashboard</title>
 ```
 
 ## Accessing Frontend in Kubernetes

@@ -8,7 +8,7 @@
 
 ## Overview
 
-This document tracks the integration status of security detectors across all scanners in the BlockSecOps platform. It provides visibility into:
+This document tracks the integration status of security detectors across all scanners in the Apogee platform. It provides visibility into:
 
 1. **Total Native Detectors**: How many detectors each scanner tool provides
 2. **Platform Integration**: Whether the scanner is operational on the platform

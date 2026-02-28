@@ -6,16 +6,16 @@
 
 ## Overview
 
-This playbook guides you through integrating BlockSecOps with Atlassian JIRA to automatically create issues from security vulnerabilities. Track remediation progress, assign findings to team members, and sync status between platforms.
+This playbook guides you through integrating Apogee with Atlassian JIRA to automatically create issues from security vulnerabilities. Track remediation progress, assign findings to team members, and sync status between platforms.
 
 ---
 
 ## Prerequisites
 
-- [ ] BlockSecOps account with Enterprise tier
+- [ ] Apogee account with Enterprise tier
 - [ ] JIRA Cloud or Data Center instance
 - [ ] JIRA admin access (for API token and project configuration)
-- [ ] Organization owner or admin role in BlockSecOps
+- [ ] Organization owner or admin role in Apogee
 - [ ] JIRA project created for security issues
 
 ---
@@ -42,7 +42,7 @@ flowchart LR
 **JIRA Cloud:**
 1. Go to [Atlassian Account Settings](https://id.atlassian.com/manage-profile/security/api-tokens)
 2. Click **Create API token**
-3. Label: `BlockSecOps Integration`
+3. Label: `Apogee Integration`
 4. Click **Create**
 5. Copy the token immediately (shown only once)
 
@@ -50,11 +50,11 @@ flowchart LR
 1. Navigate to your profile (click avatar > Profile)
 2. Go to **Personal Access Tokens**
 3. Click **Create token**
-4. Name: `BlockSecOps Integration`
+4. Name: `Apogee Integration`
 5. Set expiry (recommend 1 year)
 6. Copy the token
 
-### Step 2: Configure JIRA Integration in BlockSecOps
+### Step 2: Configure JIRA Integration in Apogee
 
 **Dashboard:**
 1. Navigate to **Settings > Integrations**
@@ -89,9 +89,9 @@ curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/integration
 
 **Dashboard:**
 1. In JIRA integration settings, click **Configure Mappings**
-2. Map BlockSecOps severities to JIRA priorities:
+2. Map Apogee severities to JIRA priorities:
 
-| BlockSecOps Severity | JIRA Priority |
+| Apogee Severity | JIRA Priority |
 |---------------------|---------------|
 | Critical | Highest |
 | High | High |
@@ -101,7 +101,7 @@ curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/integration
 3. Map to issue type: **Bug** or custom type (e.g., "Security Vulnerability")
 4. Configure field mappings:
 
-| BlockSecOps Field | JIRA Field |
+| Apogee Field | JIRA Field |
 |-------------------|------------|
 | Title | Summary |
 | Description | Description |
@@ -189,11 +189,11 @@ curl -X POST "https://app.0xapogee.com/api/v1/vulnerabilities/{vuln_id}/jira" \
 **Dashboard:**
 1. In JIRA integration settings, click **Sync Settings**
 2. Enable:
-   - **Sync status to JIRA:** Update JIRA when BlockSecOps status changes
-   - **Sync status from JIRA:** Update BlockSecOps when JIRA status changes
+   - **Sync status to JIRA:** Update JIRA when Apogee status changes
+   - **Sync status from JIRA:** Update Apogee when JIRA status changes
 3. Map statuses:
 
-| BlockSecOps Status | JIRA Status |
+| Apogee Status | JIRA Status |
 |-------------------|-------------|
 | Open | To Do / Open |
 | Confirmed | In Progress |
@@ -258,11 +258,11 @@ function withdraw() external {
 {code}
 
 h3. References
-* [BlockSecOps Vulnerability|https://app.0xapogee.com/vulnerabilities/xyz789]
+* [Apogee Vulnerability|https://app.0xapogee.com/vulnerabilities/xyz789]
 * [SWC-107: Reentrancy|https://swcregistry.io/docs/SWC-107]
 
 ----
-_Created automatically by BlockSecOps_
+_Created automatically by Apogee_
 ```
 
 ---
@@ -327,13 +327,13 @@ curl -X GET "https://app.0xapogee.com/api/v1/integrations/{integration_id}/logs?
 
 ## JIRA Webhook Setup (For Two-Way Sync)
 
-To enable sync from JIRA to BlockSecOps:
+To enable sync from JIRA to Apogee:
 
 **JIRA:**
 1. Go to **Settings > System > WebHooks**
 2. Click **Create a WebHook**
 3. Configure:
-   - **Name:** BlockSecOps Sync
+   - **Name:** Apogee Sync
    - **URL:** `https://app.0xapogee.com/api/v1/webhooks/jira/{integration_id}`
    - **Events:** Issue updated, Issue deleted
 4. Save
@@ -343,7 +343,7 @@ To enable sync from JIRA to BlockSecOps:
 ## Checklist
 
 - [ ] JIRA API token generated
-- [ ] Integration added in BlockSecOps
+- [ ] Integration added in Apogee
 - [ ] Connection tested successfully
 - [ ] Severity-to-priority mapping configured
 - [ ] Issue type selected

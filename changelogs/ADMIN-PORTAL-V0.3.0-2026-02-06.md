@@ -327,5 +327,5 @@ kubectl apply -k k8s/overlays/local/
 
 ---
 
-**Maintained By:** BlockSecOps Team
+**Maintained By:** Apogee Team
 **Status:** Complete

@@ -4,13 +4,13 @@
 
 ## Executive Summary
 
-BlockSecOps operates in the web3 smart contract security market, a smaller and less mature market compared to web2 application security (Snyk, Checkmarx, Veracode). Our unique position as a unified DevSecOps platform aggregating 25+ scanners with 95% false positive reduction creates significant pricing leverage that competitors cannot match.
+Apogee operates in the web3 smart contract security market, a smaller and less mature market compared to web2 application security (Snyk, Checkmarx, Veracode). Our unique position as a unified DevSecOps platform aggregating 25+ scanners with 95% false positive reduction creates significant pricing leverage that competitors cannot match.
 
 ---
 
 ## Market Landscape
 
-### What BlockSecOps Is
+### What Apogee Is
 
 | Capability | Description |
 |------------|-------------|
@@ -45,13 +45,13 @@ BlockSecOps operates in the web3 smart contract security market, a smaller and l
 - 15+ chain support
 - GitHub Actions integration
 
-**Weaknesses vs BlockSecOps**:
+**Weaknesses vs Apogee**:
 - **Single scanner** (1 scanner vs our 25+)
 - Limited intelligence layer
 - No cross-scanner deduplication
 - No 95% false positive reduction
 - No vulnerability management dashboard
-- **Cost per scanner: $200-500** vs BlockSecOps $12-28
+- **Cost per scanner: $200-500** vs Apogee $12-28
 
 ---
 
@@ -70,12 +70,12 @@ BlockSecOps operates in the web3 smart contract security market, a smaller and l
 - Published pricing
 - Enterprise features
 
-**Weaknesses vs BlockSecOps**:
+**Weaknesses vs Apogee**:
 - **Single scanner** (1 scanner vs our 25+)
 - No cross-scanner deduplication
 - No 95% false positive reduction
 - Per-LOC pricing can become expensive at scale
-- **Cost per scanner: $599** vs BlockSecOps $12-28
+- **Cost per scanner: $599** vs Apogee $12-28
 
 ---
 
@@ -95,12 +95,12 @@ BlockSecOps operates in the web3 smart contract security market, a smaller and l
 - Automated test generation (90% coverage)
 - Reduces audit costs (documented $16K savings)
 
-**Weaknesses vs BlockSecOps**:
+**Weaknesses vs Apogee**:
 - IDE plugin only - no web dashboard
 - No unified scanning (single tool)
 - No vulnerability management
 - Opaque pricing
-- **Cost per scanner: ~$1,000** vs BlockSecOps $12-28
+- **Cost per scanner: ~$1,000** vs Apogee $12-28
 
 ---
 
@@ -119,7 +119,7 @@ BlockSecOps operates in the web3 smart contract security market, a smaller and l
 - Modern DevSecOps platform
 - Good CI/CD integration
 
-**Weaknesses vs BlockSecOps**:
+**Weaknesses vs Apogee**:
 - **Not Web3-specific** (no blockchain scanner focus)
 - No smart contract analysis
 - No multi-chain support
@@ -143,7 +143,7 @@ BlockSecOps operates in the web3 smart contract security market, a smaller and l
 - ConsenSys/MythX heritage
 - Foundry project support
 
-**Weaknesses vs BlockSecOps**:
+**Weaknesses vs Apogee**:
 - Fuzzing only - no SAST
 - No vulnerability dashboard
 - No unified scanner aggregation
@@ -189,7 +189,7 @@ OpenZeppelin Defender, the most complete Web3 DevSecOps platform, is sunsetting.
 
 ### 2. Certora Prover Open-Sourced (February 2025)
 
-Certora open-sourced its Prover with 2,000 free minutes/month for formal verification. BlockSecOps can integrate this as one capability within broader DevSecOps, not a standalone tool.
+Certora open-sourced its Prover with 2,000 free minutes/month for formal verification. Apogee can integrate this as one capability within broader DevSecOps, not a standalone tool.
 
 ### 3. Market Fragmentation
 
@@ -198,7 +198,7 @@ Most teams currently use:
 - Point-in-time audits ($5K-$150K each)
 - No continuous vulnerability management
 
-BlockSecOps offers the only unified platform combining all capabilities with 95% false positive reduction.
+Apogee offers the only unified platform combining all capabilities with 95% false positive reduction.
 
 ---
 
@@ -209,13 +209,13 @@ Price Scale (Monthly):
 
 $0 ──────────────────────────────────────────────────────────────── $2K+
 │                                                                     │
-Free Tools    BlockSecOps    MetaTrust      Olympix      Enterprise
+Free Tools    Apogee    MetaTrust      Olympix      Enterprise
 (Slither,     ($0-$699)      ($599)         (~$1K)       Solutions
  Aderyn)      25+ scanners   1 scanner      1 scanner
               95% FP reduce
 ```
 
-### BlockSecOps Position
+### Apogee Position
 
 - **Above** free tools: Dashboard, intelligence, 95% FP reduction, support
 - **Entry below** MetaTrust ($599): Team tier at $299 with 25x more scanners
@@ -230,14 +230,14 @@ Free Tools    BlockSecOps    MetaTrust      Olympix      Enterprise
 | SolidityScan Pro | $500 | 1 | $500 |
 | MetaTrust | $599 | 1 | $599 |
 | Olympix | ~$1,000 | 1 | $1,000 |
-| **BlockSecOps Team** | $299 | 25+ | **$12** |
-| **BlockSecOps Growth** | $699 | 25+ | **$28** |
+| **Apogee Team** | $299 | 25+ | **$12** |
+| **Apogee Growth** | $699 | 25+ | **$28** |
 
 ---
 
 ## Feature Comparison Matrix
 
-| Feature | BlockSecOps | SolidityScan | MetaTrust | Olympix | Diligence |
+| Feature | Apogee | SolidityScan | MetaTrust | Olympix | Diligence |
 |---------|-------------|--------------|-----------|---------|-----------|
 | SAST Scanning | 25+ scanners | 1 scanner | 1 scanner | 1 scanner | - |
 | Fuzzing | Integrated | - | - | - | Core focus |
@@ -255,22 +255,22 @@ Free Tools    BlockSecOps    MetaTrust      Olympix      Enterprise
 
 ## Pricing Gap Analysis
 
-BlockSecOps exploits three significant pricing gaps in the Web3 security market:
+Apogee exploits three significant pricing gaps in the Web3 security market:
 
 **Gap 1: No unified platform with transparent pricing.**
 - Web3-native tools (Olympix, MetaTrust) require sales contact for enterprise pricing
 - Traditional DevSecOps platforms (Aikido, Jit) have transparent pricing but lack blockchain coverage
-- BlockSecOps: Published, predictable pricing for a Web3-native unified platform
+- Apogee: Published, predictable pricing for a Web3-native unified platform
 
 **Gap 2: Aggregator premium is undermonetized.**
 - IBM research: Organizations use 83 security solutions from 29 vendors on average
 - Consolidated platforms deliver 72 days faster incident detection and 242% ROI
-- No Web3 vendor charges "consolidation premium" - BlockSecOps prices in this value
+- No Web3 vendor charges "consolidation premium" - Apogee prices in this value
 
 **Gap 3: Usage-based pricing absent in continuous monitoring.**
 - Audit firms: project-based
 - DevSecOps tools: seat-based
-- BlockSecOps: Hybrid (subscription + usage-based expansion)
+- Apogee: Hybrid (subscription + usage-based expansion)
 
 ---
 

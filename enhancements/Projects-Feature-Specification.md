@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This specification defines two major enhancements to the BlockSecOps Platform:
+This specification defines two major enhancements to the Apogee Platform:
 
 1. **Transaction Hash Integration** - Enable contract scanning via blockchain transaction hash
 2. **Project Grouping** - Allow customers to organize multiple contracts into logical projects

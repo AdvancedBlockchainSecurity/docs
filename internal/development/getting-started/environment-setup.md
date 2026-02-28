@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide covers setting up development environments across all services in the BlockSecOps Platform. The platform consists of 11 services using Python, TypeScript/React, and Rust, all integrated with a shared multi-language library.
+This guide covers setting up development environments across all services in the Apogee Platform. The platform consists of 11 services using Python, TypeScript/React, and Rust, all integrated with a shared multi-language library.
 
 ## Service Architecture
 

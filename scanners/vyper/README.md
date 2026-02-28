@@ -256,5 +256,5 @@ Installing Vyper X.Y.Z using vvm...
 
 ---
 
-**Document Maintainer:** BlockSecOps Team
+**Document Maintainer:** Apogee Team
 **Last Review:** 2025-12-29

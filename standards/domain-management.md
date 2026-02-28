@@ -6,7 +6,7 @@
 
 ## Overview
 
-This document defines the domain configuration strategy for BlockSecOps across environments.
+This document defines the domain configuration strategy for Apogee across environments.
 
 | Environment | Domain | TLS | Purpose |
 |-------------|--------|-----|---------|

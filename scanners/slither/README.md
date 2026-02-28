@@ -20,7 +20,7 @@
 
 ## Overview
 
-Slither is a static analysis framework for Solidity smart contracts that runs as an isolated Kubernetes Job in the BlockSecOps platform. It detects vulnerabilities, code quality issues, and provides optimization recommendations.
+Slither is a static analysis framework for Solidity smart contracts that runs as an isolated Kubernetes Job in the Apogee platform. It detects vulnerabilities, code quality issues, and provides optimization recommendations.
 
 ### Key Features
 
@@ -49,7 +49,7 @@ Slither is a static analysis framework for Solidity smart contracts that runs as
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         BlockSecOps Platform                             │
+│                         Apogee Platform                             │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                           │
 │  ┌─────────────────┐   ┌───────────────────┐   ┌───────────────────┐  │
@@ -1042,6 +1042,6 @@ INFO: Sending failure status to API
 
 ---
 
-**Document Maintainer:** BlockSecOps Team
+**Document Maintainer:** Apogee Team
 **Last Review:** 2025-12-05
 **Next Review:** 2026-01-05

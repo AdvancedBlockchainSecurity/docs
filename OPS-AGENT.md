@@ -1,4 +1,4 @@
-# BlockSecOps Operations Agent Reference
+# Apogee Operations Agent Reference
 
 > **Live index** for playbooks, pipelines, and workflows.
 > This file does NOT duplicate content — it tells you WHERE to look.

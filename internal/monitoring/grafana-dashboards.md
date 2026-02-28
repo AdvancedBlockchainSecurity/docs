@@ -1,6 +1,6 @@
 # Grafana Dashboards Setup
 
-This guide covers the setup and configuration of Grafana dashboards for monitoring the BlockSecOps platform.
+This guide covers the setup and configuration of Grafana dashboards for monitoring the Apogee platform.
 
 ## Overview
 
@@ -19,7 +19,7 @@ The monitoring stack includes pre-built Grafana dashboards that provide real-tim
 |-----------|-----|--------|---------|
 | Cluster Overview | `cluster-overview` | Cluster | Pod status, resource usage, cluster health |
 | Logs Explorer | `logs-explorer` | Logs | Search logs across all namespaces with filters |
-| BlockSecOps Services | `blocksecops-services` | Services | API, Dashboard, Orchestration, Tool Integration logs |
+| Apogee Services | `blocksecops-services` | Services | API, Dashboard, Orchestration, Tool Integration logs |
 | Infrastructure Services | `infrastructure` | Infrastructure | PostgreSQL, Redis, Vault, Harbor, Traefik, Cert-Manager |
 | Scanner Jobs | `scanners` | Scanners | Slither, Aderyn, Semgrep, Wake, fuzzers, Solana scanners |
 

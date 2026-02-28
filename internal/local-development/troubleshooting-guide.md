@@ -777,7 +777,7 @@ kubectl get pods -A --field-selector=status.phase=Failed
 
 ### Root Cause
 
-Minikube was started with insufficient memory, or Docker Desktop doesn't have enough memory allocated. The BlockSecOps platform requires **10GB memory and 6 CPUs** minimum.
+Minikube was started with insufficient memory, or Docker Desktop doesn't have enough memory allocated. The Apogee platform requires **10GB memory and 6 CPUs** minimum.
 
 **Common causes:**
 - Minikube started with default resources (2GB memory, 2 CPUs)

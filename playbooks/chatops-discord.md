@@ -6,16 +6,16 @@
 
 ## Overview
 
-This playbook guides you through integrating BlockSecOps with Discord for real-time notifications about security scans, vulnerability discoveries, and platform events. Perfect for development teams using Discord for communication.
+This playbook guides you through integrating Apogee with Discord for real-time notifications about security scans, vulnerability discoveries, and platform events. Perfect for development teams using Discord for communication.
 
 ---
 
 ## Prerequisites
 
-- [ ] BlockSecOps account with Growth or Enterprise tier
+- [ ] Apogee account with Growth or Enterprise tier
 - [ ] Discord server with admin or "Manage Webhooks" permission
 - [ ] Discord channel designated for security notifications
-- [ ] Organization owner or admin role in BlockSecOps
+- [ ] Organization owner or admin role in Apogee
 
 ---
 
@@ -23,7 +23,7 @@ This playbook guides you through integrating BlockSecOps with Discord for real-t
 
 ```mermaid
 flowchart LR
-    A[BlockSecOps Event] --> B[Notification Service]
+    A[Apogee Event] --> B[Notification Service]
     B --> C{Channel Config?}
     C -->|Matches| D[Format Discord Embed]
     D --> E[Send to Discord]
@@ -45,12 +45,12 @@ flowchart LR
 5. Click **Webhooks**
 6. Click **New Webhook**
 7. Configure:
-   - **Name:** `BlockSecOps`
-   - **Avatar:** Upload BlockSecOps logo (optional)
+   - **Name:** `Apogee`
+   - **Avatar:** Upload Apogee logo (optional)
 8. Click **Copy Webhook URL**
 9. Click **Save Changes**
 
-### Step 2: Add Discord Integration in BlockSecOps
+### Step 2: Add Discord Integration in Apogee
 
 **Dashboard:**
 1. Navigate to **Settings > Integrations**
@@ -145,7 +145,7 @@ Discord messages use rich embeds:
     "url": "https://app.0xapogee.com/scans/abc123",
     "timestamp": "2026-02-01T10:30:00Z",
     "footer": {
-      "text": "BlockSecOps Security Scanner"
+      "text": "Apogee Security Scanner"
     }
   }]
 }
@@ -280,7 +280,7 @@ curl -X PATCH "https://app.0xapogee.com/api/v1/notification_channels/{channel_id
   -H "Content-Type: application/json" \
   -d '{
     "config": {
-      "username": "BlockSecOps Bot",
+      "username": "Apogee Bot",
       "avatar_url": "https://app.0xapogee.com/images/bot-avatar.png"
     }
   }'
@@ -341,7 +341,7 @@ Test the webhook directly:
 curl -X POST "https://discord.com/api/webhooks/123/abc..." \
   -H "Content-Type: application/json" \
   -d '{
-    "content": "Test message from BlockSecOps",
+    "content": "Test message from Apogee",
     "embeds": [{
       "title": "Test Notification",
       "description": "If you see this, the webhook is working!",
@@ -356,7 +356,7 @@ curl -X POST "https://discord.com/api/webhooks/123/abc..." \
 
 - [ ] Discord webhook created in target channel
 - [ ] Webhook URL copied
-- [ ] Integration added in BlockSecOps
+- [ ] Integration added in Apogee
 - [ ] Notification triggers configured
 - [ ] Test message received in Discord
 - [ ] Embed formatting verified

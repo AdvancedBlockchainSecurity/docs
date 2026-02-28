@@ -2,7 +2,7 @@
 
 ## Overview
 
-The BlockSecOps API Service implements Domain-Driven Design (DDD) + Clean Architecture + CQRS patterns to provide a robust, maintainable, and scalable foundation for the security analysis platform.
+The Apogee API Service implements Domain-Driven Design (DDD) + Clean Architecture + CQRS patterns to provide a robust, maintainable, and scalable foundation for the security analysis platform.
 
 ## Service Responsibilities
 

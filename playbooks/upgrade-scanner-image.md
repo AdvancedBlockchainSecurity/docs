@@ -5,7 +5,7 @@
 
 ## Overview
 
-This playbook covers upgrading a scanner image in the BlockSecOps platform. Scanners have **dual versioning**: the upstream tool version and our scanner wrapper image version.
+This playbook covers upgrading a scanner image in the Apogee platform. Scanners have **dual versioning**: the upstream tool version and our scanner wrapper image version.
 
 ---
 
@@ -132,7 +132,7 @@ LABEL org.opencontainers.image.version="1.10.3"
 
 ```dockerfile
 # Clone specific upstream version
-RUN git clone --branch v1.10.3 --depth 1 https://github.com/BlockSecOps/<Scanner>.git .
+RUN git clone --branch v1.10.3 --depth 1 https://github.com/AdvancedBlockchainSecurity/<Scanner>.git .
 ```
 
 ### Verify Build Requirements

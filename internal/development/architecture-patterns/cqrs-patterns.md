@@ -2,7 +2,7 @@
 
 ## Overview
 
-Command Query Responsibility Segregation (CQRS) is a fundamental pattern in our Domain-Driven Design architecture. This guide provides practical examples and best practices for implementing CQRS in the BlockSecOps Platform.
+Command Query Responsibility Segregation (CQRS) is a fundamental pattern in our Domain-Driven Design architecture. This guide provides practical examples and best practices for implementing CQRS in the Apogee Platform.
 
 ## Core Concepts
 

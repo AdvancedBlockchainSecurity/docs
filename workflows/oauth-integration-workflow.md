@@ -8,7 +8,7 @@
 
 ## Overview
 
-The OAuth integration system connects BlockSecOps to third-party services (GitHub, GitLab, Bitbucket, JIRA, Jenkins) using OAuth 2.0 Authorization Code flow. Tokens are encrypted at rest with Fernet (AES-128-CBC + HMAC-SHA256).
+The OAuth integration system connects Apogee to third-party services (GitHub, GitLab, Bitbucket, JIRA, Jenkins) using OAuth 2.0 Authorization Code flow. Tokens are encrypted at rest with Fernet (AES-128-CBC + HMAC-SHA256).
 
 ```
 ┌──────────────────┐     ┌──────────────────┐     ┌─────────────────┐

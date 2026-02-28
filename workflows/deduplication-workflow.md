@@ -105,7 +105,7 @@ DEFAULT_SCANNER_PRIORITY = {
     "echidna": 6,           # Fuzzing
     "wake": 7,              # Solidity
     "medusa": 8,            # Fuzzing
-    "soliditydefend": 9,    # Solidity (BlockSecOps)
+    "soliditydefend": 9,    # Solidity (Apogee)
     "vyper": 10,            # Vyper
     "moccasin": 11,         # Vyper
     "sol-azy": 12,          # Solana

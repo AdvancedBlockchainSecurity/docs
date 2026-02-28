@@ -31,7 +31,7 @@ Stripe maintains **completely separate databases** for test and live modes:
 
 1. Stripe account with test mode enabled
 2. Local environment configured with test API keys
-3. Access to BlockSecOps API service
+3. Access to Apogee API service
 
 ---
 

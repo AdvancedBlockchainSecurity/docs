@@ -1,6 +1,6 @@
 # Getting Started
 
-Quick start guides for uploading and scanning smart contracts on BlockSecOps.
+Quick start guides for uploading and scanning smart contracts on Apogee.
 
 ## Guides
 
@@ -11,7 +11,7 @@ Quick start guides for uploading and scanning smart contracts on BlockSecOps.
 
 ## Quick Start
 
-1. **Create an account** - Sign up at the BlockSecOps dashboard
+1. **Create an account** - Sign up at the Apogee dashboard
 2. **Upload your project** - Drag and drop your project folder or archive
 3. **Select scanners** - Choose which security scanners to run
 4. **Review results** - Analyze vulnerabilities and security recommendations

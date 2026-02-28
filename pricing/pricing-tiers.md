@@ -1,10 +1,10 @@
-# BlockSecOps Pricing Tiers
+# Apogee Pricing Tiers
 
 **Last Updated**: January 19, 2026
 
 ## Overview
 
-BlockSecOps offers a premium smart contract security platform with 25+ integrated scanners, ML-powered intelligence with 95% false positive reduction, and complete vulnerability management. Our four-tier pricing maximizes market capture while creating clear upgrade paths.
+Apogee offers a premium smart contract security platform with 25+ integrated scanners, ML-powered intelligence with 95% false positive reduction, and complete vulnerability management. Our four-tier pricing maximizes market capture while creating clear upgrade paths.
 
 **Value Proposition**: 25+ scanners at the price of 1, with the industry's best false positive reduction.
 
@@ -288,13 +288,13 @@ Price Scale (Monthly):
 
 $0 ──────────────────────────────────────────────────────────────── $2K+
 │                                                                     │
-Free Tools    BlockSecOps    MetaTrust      Olympix      Enterprise
+Free Tools    Apogee    MetaTrust      Olympix      Enterprise
 (Slither)     ($0-$699)      ($599)         (~$1K)       Solutions
               25+ scanners   1 scanner      1 scanner
               95% FP reduce
 ```
 
-**BlockSecOps vs Competitors**:
+**Apogee vs Competitors**:
 - **Same or lower price** than single-scanner solutions
 - **25x more scanners** integrated
 - **95% false positive reduction** (unique in market)
@@ -308,5 +308,5 @@ Free Tools    BlockSecOps    MetaTrust      Olympix      Enterprise
 | SolidityScan Individual | $200 | 1 | $200 |
 | MetaTrust | $599 | 1 | $599 |
 | Olympix | ~$1,000 | 1 | $1,000 |
-| **BlockSecOps Team** | $299 | 25+ | **$12** |
-| **BlockSecOps Growth** | $699 | 25+ | **$28** |
+| **Apogee Team** | $299 | 25+ | **$12** |
+| **Apogee Growth** | $699 | 25+ | **$28** |

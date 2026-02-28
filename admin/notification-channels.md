@@ -87,7 +87,7 @@ Notifications use Slack Block Kit for rich formatting:
 2. Navigate to the target channel
 3. Click **...** (More options) > **Connectors**
 4. Find **Incoming Webhook** and click **Configure**
-5. Provide a name (e.g., "BlockSecOps Alerts")
+5. Provide a name (e.g., "Apogee Alerts")
 6. Optionally upload a custom icon
 7. Click **Create** and copy the webhook URL
 
@@ -161,7 +161,7 @@ Notifications use rich embeds:
       {"name": "Severity", "value": "Critical", "inline": true},
       {"name": "Scanner", "value": "Slither", "inline": true}
     ],
-    "footer": {"text": "BlockSecOps Security Scanner"},
+    "footer": {"text": "Apogee Security Scanner"},
     "timestamp": "2026-01-04T10:00:00Z"
   }]
 }

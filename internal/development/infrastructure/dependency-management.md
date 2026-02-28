@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide covers dependency management strategies across all services in the BlockSecOps Platform. Each service category uses language-specific dependency management tools while maintaining consistency and shared library integration.
+This guide covers dependency management strategies across all services in the Apogee Platform. Each service category uses language-specific dependency management tools while maintaining consistency and shared library integration.
 
 ## Platform Architecture
 
@@ -156,12 +156,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "blocksecops-{service-name}"
 dynamic = ["version"]
-description = "BlockSecOps Platform - {Service Description}"
+description = "Apogee Platform - {Service Description}"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [
-    {name = "BlockSecOps Team"}
+    {name = "Apogee Team"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

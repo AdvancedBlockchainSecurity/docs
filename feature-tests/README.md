@@ -1,4 +1,4 @@
-# BlockSecOps Feature Tests
+# Apogee Feature Tests
 
 Manual testing checklists for all user-facing features.
 

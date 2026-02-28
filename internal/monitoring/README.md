@@ -1,6 +1,6 @@
 # Monitoring & Observability Documentation
 
-This directory contains comprehensive documentation for monitoring and observability services in the BlockSecOps platform.
+This directory contains comprehensive documentation for monitoring and observability services in the Apogee platform.
 
 ## 📊 Available Documentation
 
@@ -74,7 +74,7 @@ Service Instrumentation
 |-----------|--------|---------|
 | Cluster Overview | Cluster | Pod status, resource usage, cluster health |
 | Logs Explorer | Logs | Search logs across all namespaces |
-| BlockSecOps Services | Services | API, Dashboard, Orchestration, Tool Integration |
+| Apogee Services | Services | API, Dashboard, Orchestration, Tool Integration |
 | Infrastructure Services | Infrastructure | PostgreSQL, Redis, Vault, Harbor, Traefik |
 | Scanner Jobs | Scanners | Slither, Aderyn, Semgrep, Wake, fuzzers |
 
@@ -206,4 +206,4 @@ The tool-integration service exposes scanner-specific metrics on port 9090:
 - **Alert Tuning**: Adjust alert thresholds based on operational experience
 - **Best Practices**: Share operational insights and lessons learned
 
-This monitoring infrastructure provides comprehensive visibility into the health, security, and performance of the entire BlockSecOps platform.
+This monitoring infrastructure provides comprehensive visibility into the health, security, and performance of the entire Apogee platform.

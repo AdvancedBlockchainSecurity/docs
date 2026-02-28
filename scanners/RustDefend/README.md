@@ -2,7 +2,7 @@
 
 ## Overview
 
-RustDefend is a BlockSecOps proprietary Rust smart contract static analysis scanner. It performs AST-based analysis using the Rust `syn` crate to detect security vulnerabilities in smart contracts across multiple blockchain ecosystems.
+RustDefend is a Apogee proprietary Rust smart contract static analysis scanner. It performs AST-based analysis using the Rust `syn` crate to detect security vulnerabilities in smart contracts across multiple blockchain ecosystems.
 
 ---
 
@@ -151,7 +151,7 @@ docker run --rm -v $(pwd)/contracts:/workspace scanner-rustdefend:0.3.3 scan /wo
 - KJM configuration defines: image, command, memory_limit (1Gi), memory_request (512Mi), timeout (300s).
 
 ### Output Parser
-- Custom parser (`rustdefend_parser.py`) transforms JSON findings into BlockSecOps normalized format.
+- Custom parser (`rustdefend_parser.py`) transforms JSON findings into Apogee normalized format.
 - Registered in the parser registry.
 
 ### API

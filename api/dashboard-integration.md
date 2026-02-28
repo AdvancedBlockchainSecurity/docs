@@ -1,11 +1,11 @@
 # Dashboard API Integration
 
 **Last Updated**: 2025-12-23
-**Product Name**: BlockSecOps Dashboard
+**Product Name**: Apogee Dashboard
 
 ## Overview
 
-The BlockSecOps Dashboard is fully integrated with the FastAPI backend, providing real-time security analysis data through a modern React-based interface.
+The Apogee Dashboard is fully integrated with the FastAPI backend, providing real-time security analysis data through a modern React-based interface.
 
 ## Architecture
 
@@ -49,7 +49,7 @@ PostgreSQL Database
 The complete end-to-end scan integration is now fully operational:
 
 ```
-BlockSecOps Dashboard
+Apogee Dashboard
     ↓ (Create Contract)
 API Service: POST /api/v1/contracts
     ↓
@@ -823,11 +823,11 @@ EXPOSE 80
 - Auth Helper: `/tmp/set-dashboard-auth.html`
 
 **Code Repositories**:
-- Dashboard: `https://github.com/BlockSecOps/blocksecops-dashboard`
-- API Service: `https://github.com/BlockSecOps/blocksecops-api-service`
+- Dashboard: `https://github.com/AdvancedBlockchainSecurity/blocksecops-dashboard`
+- API Service: `https://github.com/AdvancedBlockchainSecurity/blocksecops-api-service`
 
 **Pull Requests**:
-- Dashboard Integration: [#5](https://github.com/BlockSecOps/blocksecops-dashboard/pull/5) ✅ Merged
+- Dashboard Integration: [#5](https://github.com/AdvancedBlockchainSecurity/blocksecops-dashboard/pull/5) ✅ Merged
 
 ## Support
 

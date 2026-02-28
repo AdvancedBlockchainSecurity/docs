@@ -384,7 +384,7 @@ Forwarding from 127.0.0.1:8000 -> 8000
 Forwarding from [::1]:8000 -> 8000
 
 $ curl http://localhost:8000/api/v1/health/live
-{"status":"healthy","service":"BlockSecOps API Service","version":"0.1.0"}
+{"status":"healthy","service":"Apogee API Service","version":"0.1.0"}
 ```
 
 ### Benefits

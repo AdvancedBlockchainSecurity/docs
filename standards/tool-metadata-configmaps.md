@@ -397,7 +397,7 @@ for scanner_id, meta in SCANNERS.items():
 
 ## Real-World Example: Scanner Metadata Refactoring
 
-**Context:** BlockSecOps Platform manages 21 security scanners across 5 blockchain languages
+**Context:** Apogee Platform manages 21 security scanners across 5 blockchain languages
 
 **Before (Anti-Pattern):**
 ```python

@@ -8,7 +8,7 @@
 
 ## Overview
 
-Develop comprehensive communication integration services for the BlockSecOps Platform, including secure email delivery with professional templates, Slack integration for team collaboration, and generic webhook support for external integrations. This task extends the notification service with production-ready communication channels while maintaining local-first development principles.
+Develop comprehensive communication integration services for the Apogee Platform, including secure email delivery with professional templates, Slack integration for team collaboration, and generic webhook support for external integrations. This task extends the notification service with production-ready communication channels while maintaining local-first development principles.
 
 ## Technical Requirements
 
@@ -84,7 +84,7 @@ export class SMTPClient {
       const renderedTemplate = await template.render(variables);
 
       const mailOptions = {
-        from: `"BlockSecOps Platform" <noreply@advancedblockchainsecurity.com>`,
+        from: `"Apogee Platform" <noreply@advancedblockchainsecurity.com>`,
         to: Array.isArray(to) ? to.join(', ') : to,
         subject: renderedTemplate.subject,
         html: renderedTemplate.html,
@@ -150,7 +150,7 @@ export abstract class EmailTemplate {
   async render(variables: Record<string, any>): Promise<RenderedTemplate> {
     const context = {
       ...variables,
-      platformName: 'BlockSecOps Platform',
+      platformName: 'Apogee Platform',
       supportEmail: 'support@advancedblockchainsecurity.com',
       currentYear: new Date().getFullYear(),
       logoUrl: 'https://app.advancedblockchainsecurity.com/assets/logo.png'
@@ -234,7 +234,7 @@ export class SlackClient {
         text: message,
         attachments,
         as_user: false,
-        username: 'BlockSecOps Bot',
+        username: 'Apogee Bot',
         icon_emoji: ':shield:'
       });
 
@@ -254,7 +254,7 @@ export class SlackClient {
         channel: userId,
         text: message,
         as_user: false,
-        username: 'BlockSecOps Bot',
+        username: 'Apogee Bot',
         icon_emoji: ':shield:'
       });
 

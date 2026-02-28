@@ -193,6 +193,6 @@ cd /Users/pwner/Git/ABS/blocksecops-tool-integration
 
 ---
 
-**Maintained By:** BlockSecOps Platform Team
+**Maintained By:** Apogee Platform Team
 **Location:** `/Users/pwner/Git/ABS/blocksecops-tool-integration`
 **Last Updated:** December 20, 2025

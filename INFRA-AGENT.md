@@ -1,6 +1,6 @@
-# BlockSecOps Infrastructure Agent Reference
+# Apogee Infrastructure Agent Reference
 
-> Comprehensive infrastructure knowledge base for the BlockSecOps platform.
+> Comprehensive infrastructure knowledge base for the Apogee platform.
 > Use this document as context when asking infrastructure, Kubernetes, or GCP questions.
 > Server: 128GB RAM local dev server. Target: GCP GKE with Spot VMs.
 
@@ -8,7 +8,7 @@
 
 ## Platform Overview
 
-BlockSecOps is a blockchain/smart-contract security analysis platform with 12 microservices, a scanner job system, and supporting infrastructure (PostgreSQL, Redis, Vault, Traefik, ArgoCD, Harbor).
+Apogee is a blockchain/smart-contract security analysis platform with 12 microservices, a scanner job system, and supporting infrastructure (PostgreSQL, Redis, Vault, Traefik, ArgoCD, Harbor).
 
 ### Repositories (all under /home/pwner/Git/)
 

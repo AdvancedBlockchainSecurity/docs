@@ -11,7 +11,7 @@
 
 ## Overview
 
-This database schema provides structured tracking of scanner versions, releases, and integration status for the BlockSecOps platform. Instead of manually maintaining version information in markdown files, all scanner metadata is now stored in PostgreSQL tables with automated queries and reporting.
+This database schema provides structured tracking of scanner versions, releases, and integration status for the Apogee platform. Instead of manually maintaining version information in markdown files, all scanner metadata is now stored in PostgreSQL tables with automated queries and reporting.
 
 ### Key Benefits
 
@@ -302,7 +302,7 @@ WHERE scanner_name = 'slither';
 
 ```sql
 -- Comprehensive status report
-\echo '\n=== BlockSecOps Scanner Status Report ==='
+\echo '\n=== Apogee Scanner Status Report ==='
 \echo '\nLast Updated:' `date`
 
 SELECT
@@ -456,7 +456,7 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
   - **Pattern seeding**: 11 active mappings covering 9 detector IDs (SOL-002, SOL-003, SOL-004, SOL-005, SOL-006, SOL-007, SOL-010, SOL-017, SOL-020)
   - **Audit validation**: 100% coverage (46/46 mapped), 0 unmapped, 0 orphaned, 0 missing fingerprints
   - **RustDefend**: Tool 0.3.0 → 0.5.1, Image 0.3.1 → 0.4.2 (61 detectors, 347 fewer FPs, custom rules engine)
-  - **RustDefend repo**: Migrated from `github.com/BlockSecOps/RustDefend` to `github.com/0xStarBridge/RustDefend`
+  - **RustDefend repo**: Migrated from `github.com/AdvancedBlockchainSecurity/RustDefend` to `github.com/0xStarBridge/RustDefend`
   - **Orchestration**: ConfigMap rebuilt with correct env var names and pinned versions, removed 3 deprecated scanners (mythril, foundry-fuzz, 4naly3er)
   - **API Service**: ConfigMap synced to source of truth, SOLHINT 0.1.7 → 0.1.8, removed duplicates
   - **Tool Integration**: Added HalmosParser, SolidityDefendParser, marked MythrilParser legacy
@@ -682,4 +682,4 @@ SELECT record_scanner_update('scanner_name', 'new_version', 'new_image_tag');
 
 **Created**: 2025-10-30
 **Last Updated**: 2026-02-18
-**Maintained By**: BlockSecOps Platform Team
+**Maintained By**: Apogee Platform Team

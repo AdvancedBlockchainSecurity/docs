@@ -116,5 +116,5 @@ kubectl rollout restart deploy/admin-portal -n admin-portal-local
 
 ---
 
-**Maintained By:** BlockSecOps Team
+**Maintained By:** Apogee Team
 **Status:** Complete

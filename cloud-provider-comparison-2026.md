@@ -1,15 +1,15 @@
-# Cloud Provider Comparison for BlockSecOps Platform
+# Cloud Provider Comparison for Apogee Platform
 
 **Document Version:** 1.2
 **Date:** February 1, 2026
-**Purpose:** Evaluate cloud providers for BlockSecOps smart contract security platform deployment
+**Purpose:** Evaluate cloud providers for Apogee smart contract security platform deployment
 **Update:** GKE Autopilot + Spot VMs identified as lowest-cost option (~$200/mo), replacing DigitalOcean as primary recommendation
 
 ---
 
 ## Executive Summary
 
-This document compares the top 5 cloud providers for deploying the BlockSecOps Kubernetes-based security platform. Our analysis focuses on startup-scale requirements (1-5 nodes, <100 users) with emphasis on cost optimization and security compliance readiness.
+This document compares the top 5 cloud providers for deploying the Apogee Kubernetes-based security platform. Our analysis focuses on startup-scale requirements (1-5 nodes, <100 users) with emphasis on cost optimization and security compliance readiness.
 
 **Important:** This analysis assumes a **bootstrapped/unfunded startup** scenario. Large startup credits ($25k-$150k) from hyperscalers typically require VC funding or accelerator affiliation.
 
@@ -30,7 +30,7 @@ This document compares the top 5 cloud providers for deploying the BlockSecOps K
 
 ## Platform Requirements
 
-### BlockSecOps Architecture
+### Apogee Architecture
 - **Deployment Model:** Kubernetes-based microservices
 - **Core Services (7):**
   1. API Service - REST/GraphQL endpoints
@@ -430,11 +430,11 @@ Marketing materials advertise massive startup credits:
 
 ---
 
-## BlockSecOps-Specific Recommendations
+## Apogee-Specific Recommendations
 
 ### Minimum Viable Deployment
 
-For initial BlockSecOps deployment:
+For initial Apogee deployment:
 
 **GKE Autopilot Configuration (RECOMMENDED):**
 ```yaml
@@ -479,7 +479,7 @@ Note: Cheaper in year 1 with $5k Hatch credits, but requires
 migration for enterprise compliance later.
 ```
 
-### Security Considerations for BlockSecOps
+### Security Considerations for Apogee
 
 1. **Secrets Management**
    - HashiCorp Vault already in stack
@@ -578,7 +578,7 @@ For disaster recovery or vendor diversification:
 
 ## Final Recommendation
 
-### For Bootstrapped/Unfunded Startups (Like BlockSecOps)
+### For Bootstrapped/Unfunded Startups (Like Apogee)
 
 **Tier 1 - Best Choice: GKE Autopilot + Spot VMs**
 - **Why:** Lowest cost AND enterprise-ready - no migration needed later
@@ -612,7 +612,7 @@ For disaster recovery or vendor diversification:
 | Microsoft ecosystem | AKS | Azure AD, M365 integration |
 | HIPAA/FedRAMP from day 1 | GKE or AKS | Full compliance suite |
 
-### Recommended Path for BlockSecOps
+### Recommended Path for Apogee
 
 **Deploy on GKE Autopilot + Spot VMs from day 1:**
 
@@ -682,4 +682,4 @@ All pricing estimates based on:
 
 ---
 
-*Document prepared for BlockSecOps infrastructure planning. Review quarterly for pricing updates.*
+*Document prepared for Apogee infrastructure planning. Review quarterly for pricing updates.*

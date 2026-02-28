@@ -6,16 +6,16 @@
 
 ## Overview
 
-This playbook guides you through integrating BlockSecOps with Microsoft Teams for real-time notifications about security scans, vulnerability discoveries, and platform events.
+This playbook guides you through integrating Apogee with Microsoft Teams for real-time notifications about security scans, vulnerability discoveries, and platform events.
 
 ---
 
 ## Prerequisites
 
-- [ ] BlockSecOps account with Growth or Enterprise tier
+- [ ] Apogee account with Growth or Enterprise tier
 - [ ] Microsoft Teams workspace access
 - [ ] Permission to add connectors to Teams channels
-- [ ] Organization owner or admin role in BlockSecOps
+- [ ] Organization owner or admin role in Apogee
 
 ---
 
@@ -23,7 +23,7 @@ This playbook guides you through integrating BlockSecOps with Microsoft Teams fo
 
 ```mermaid
 flowchart LR
-    A[BlockSecOps Event] --> B[Notification Service]
+    A[Apogee Event] --> B[Notification Service]
     B --> C{Channel Config?}
     C -->|Matches| D[Format Adaptive Card]
     D --> E[Send to Teams]
@@ -43,13 +43,13 @@ flowchart LR
 3. Click **...** (more options) next to the channel name
 4. Select **Connectors**
 5. Find **Incoming Webhook** and click **Configure**
-6. Enter a name: `BlockSecOps Alerts`
+6. Enter a name: `Apogee Alerts`
 7. Optionally upload a custom icon
 8. Click **Create**
 9. Copy the **Webhook URL**
 10. Click **Done**
 
-### Step 2: Add Teams Integration in BlockSecOps
+### Step 2: Add Teams Integration in Apogee
 
 **Dashboard:**
 1. Navigate to **Settings > Integrations**
@@ -298,7 +298,7 @@ curl -X POST "https://outlook.office.com/webhook/..." \
   -d '{
     "@type": "MessageCard",
     "@context": "https://schema.org/extensions",
-    "summary": "Test from BlockSecOps",
+    "summary": "Test from Apogee",
     "themeColor": "0076D7",
     "title": "Test Notification",
     "text": "If you see this message, the webhook is working correctly."
@@ -313,7 +313,7 @@ For more complex workflows, use Power Automate:
 
 1. Create a new flow in Power Automate
 2. Trigger: **When a HTTP request is received**
-3. Copy the HTTP POST URL (use this as webhook in BlockSecOps)
+3. Copy the HTTP POST URL (use this as webhook in Apogee)
 4. Add actions:
    - Post adaptive card to Teams
    - Create task in Planner
@@ -326,7 +326,7 @@ For more complex workflows, use Power Automate:
 
 - [ ] Incoming Webhook created in Teams channel
 - [ ] Webhook URL copied
-- [ ] Integration added in BlockSecOps
+- [ ] Integration added in Apogee
 - [ ] Notification triggers configured
 - [ ] Test message received in Teams
 - [ ] Adaptive cards rendering correctly

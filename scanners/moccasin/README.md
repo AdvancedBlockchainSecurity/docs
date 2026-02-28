@@ -158,5 +158,5 @@ RUN pip install moccasin
 
 ---
 
-**Document Maintainer:** BlockSecOps Team
+**Document Maintainer:** Apogee Team
 **Last Review:** 2025-12-15

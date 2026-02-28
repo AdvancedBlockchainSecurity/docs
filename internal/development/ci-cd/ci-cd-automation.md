@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide covers the complete CI/CD pipeline and automation strategies for the BlockSecOps Platform. The platform uses GitHub Actions for continuous integration and deployment, with automated testing, quality gates, and deployment orchestration across all 11 services.
+This guide covers the complete CI/CD pipeline and automation strategies for the Apogee Platform. The platform uses GitHub Actions for continuous integration and deployment, with automated testing, quality gates, and deployment orchestration across all 11 services.
 
 ## CI/CD Architecture
 
@@ -654,7 +654,7 @@ protection_rules:
 
 ### Semantic Versioning and Release Management
 
-BlockSecOps Platform uses **semantic versioning** (SemVer) for all releases. Each service can be released independently using git tags matching the pattern `v*.*.*` (e.g., `v1.0.0`, `v0.2.1`, `v1.0.0-beta.1`).
+Apogee Platform uses **semantic versioning** (SemVer) for all releases. Each service can be released independently using git tags matching the pattern `v*.*.*` (e.g., `v1.0.0`, `v0.2.1`, `v1.0.0-beta.1`).
 
 ### Release Workflow Types
 
@@ -1305,7 +1305,7 @@ repos:
 # scripts/dev-setup.sh
 set -e
 
-echo "Setting up BlockSecOps Platform development environment..."
+echo "Setting up Apogee Platform development environment..."
 
 # Check prerequisites
 command -v python3 >/dev/null 2>&1 || { echo "Python 3 is required"; exit 1; }

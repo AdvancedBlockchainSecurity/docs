@@ -1,6 +1,6 @@
-# BlockSecOps Pricing Strategy: Competitive Analysis and Recommendations
+# Apogee Pricing Strategy: Competitive Analysis and Recommendations
 
-**BlockSecOps occupies a unique position in the Web3 security market as a unified DevSecOps platform aggregating 25+ scanners into a single interface.** This aggregator model—combining tools like Slither, Aderyn, Halmos, Echidna, and Medusa with proprietary ML-powered false positive reduction—creates significant pricing leverage that competitors cannot easily match. The analysis below reveals substantial gaps in the current market that BlockSecOps can exploit through strategic pricing differentiation.
+**Apogee occupies a unique position in the Web3 security market as a unified DevSecOps platform aggregating 25+ scanners into a single interface.** This aggregator model—combining tools like Slither, Aderyn, Halmos, Echidna, and Medusa with proprietary ML-powered false positive reduction—creates significant pricing leverage that competitors cannot easily match. The analysis below reveals substantial gaps in the current market that Apogee can exploit through strategic pricing differentiation.
 
 ## The Web3 security market has three distinct pricing tiers
 
@@ -10,7 +10,7 @@ The competitive landscape breaks into clearly differentiated segments, each with
 
 **Continuous monitoring and specialized tools** occupy the middle tier. Forta Network offers the most accessible entry at **250 FORT/month (~$5-10)** for access to 1,000+ detection bots, with premium feeds like Attack Detector 2.0 at $399/month. Certora recently open-sourced its Prover (February 2025), offering **2,000 free minutes/month** for formal verification—a dramatic market shift that democratizes a previously enterprise-only capability. OpenZeppelin Defender (sunsetting July 2026) offered a free builder tier with professional tiers requiring custom quotes.
 
-**DevSecOps platforms** represent the emerging category where BlockSecOps competes. MetaTrust charges **$599/month starting** with per-line-of-code pricing (~1.5¢/line). Aikido Security uses flat-rate tiers at **$300-$600/month** for 10 users. Jit Security prices at **$50/developer/month**. Olympix (Web3-specific) and Sec3 (Solana-focused) offer freemium models with enterprise custom pricing.
+**DevSecOps platforms** represent the emerging category where Apogee competes. MetaTrust charges **$599/month starting** with per-line-of-code pricing (~1.5¢/line). Aikido Security uses flat-rate tiers at **$300-$600/month** for 10 users. Jit Security prices at **$50/developer/month**. Olympix (Web3-specific) and Sec3 (Solana-focused) offer freemium models with enterprise custom pricing.
 
 ## Traditional security SaaS establishes pricing benchmarks
 
@@ -29,19 +29,19 @@ Developer security tools outside Web3 provide critical pricing anchors that info
 
 **Per-developer pricing dominates** developer security tools because it aligns vendor revenue with customer value—more developers means more code being secured. However, this model can become expensive at scale: 50 developers on Snyk averages **$34,886/year**, while GitHub Advanced Security at $49/committer reaches **$29,400/year** for 50 active committers.
 
-## Market gaps create pricing opportunities for BlockSecOps
+## Market gaps create pricing opportunities for Apogee
 
-Three significant pricing gaps exist in the Web3 security market that BlockSecOps can exploit:
+Three significant pricing gaps exist in the Web3 security market that Apogee can exploit:
 
-**Gap 1: No unified platform with transparent pricing.** Web3-native tools (Olympix, Sec3, MetaTrust) all require sales contact for enterprise pricing, creating friction. Traditional DevSecOps platforms (Aikido, Jit) have transparent pricing but lack blockchain-specific coverage. BlockSecOps can differentiate with **published, predictable pricing** for a Web3-native unified platform—the only player combining both attributes.
+**Gap 1: No unified platform with transparent pricing.** Web3-native tools (Olympix, Sec3, MetaTrust) all require sales contact for enterprise pricing, creating friction. Traditional DevSecOps platforms (Aikido, Jit) have transparent pricing but lack blockchain-specific coverage. Apogee can differentiate with **published, predictable pricing** for a Web3-native unified platform—the only player combining both attributes.
 
 **Gap 2: Aggregator premium is undermonetized.** IBM research shows organizations using **83 security solutions from 29 vendors** on average, with consolidated platforms delivering **72 days faster incident detection** and **242% ROI**. Gartner finds 75% of organizations pursuing consolidation. Yet no Web3 security vendor charges an explicit "consolidation premium"—the value of replacing 10+ point solutions isn't priced into current offerings.
 
-**Gap 3: Usage-based pricing absent in continuous monitoring.** While audit firms use project-based pricing and DevSecOps tools use seat-based models, **outcome-based or usage-based models** remain rare. Only 17% of enterprise SaaS vendors have implemented true outcome-based pricing (Bain), yet Gartner predicts 40% adoption by 2025. For BlockSecOps, pricing based on contracts scanned, vulnerabilities detected, or TVL protected could create powerful value alignment.
+**Gap 3: Usage-based pricing absent in continuous monitoring.** While audit firms use project-based pricing and DevSecOps tools use seat-based models, **outcome-based or usage-based models** remain rare. Only 17% of enterprise SaaS vendors have implemented true outcome-based pricing (Bain), yet Gartner predicts 40% adoption by 2025. For Apogee, pricing based on contracts scanned, vulnerabilities detected, or TVL protected could create powerful value alignment.
 
 ## Recommended pricing architecture maximizes market capture
 
-Based on competitive analysis and pricing strategy research, BlockSecOps should implement a **four-tier structure with hybrid pricing** (flat subscription + usage components):
+Based on competitive analysis and pricing strategy research, Apogee should implement a **four-tier structure with hybrid pricing** (flat subscription + usage components):
 
 ### Tier 1: Developer (Free)
 **Price:** $0/month  
@@ -147,12 +147,12 @@ The free tier should maximize adoption while creating clear upgrade triggers:
 
 ## Enterprise pricing psychology and sales strategy
 
-Enterprise security purchases follow distinct patterns that BlockSecOps pricing should accommodate:
+Enterprise security purchases follow distinct patterns that Apogee pricing should accommodate:
 
 **Value framing matters more than price points.** Frame pricing in terms of:
-- **TVL protected**: "For protocols with $10M+ TVL, BlockSecOps costs 0.24% of protected value annually"
+- **TVL protected**: "For protocols with $10M+ TVL, Apogee costs 0.24% of protected value annually"
 - **Audit cost comparison**: "One Enterprise year equals the cost of a single mid-tier audit, but provides continuous coverage"
-- **Exploit prevention ROI**: "Average DeFi exploit costs $5.8M. BlockSecOps Enterprise subscription is <0.5% of that risk"
+- **Exploit prevention ROI**: "Average DeFi exploit costs $5.8M. Apogee Enterprise subscription is <0.5% of that risk"
 
 **Discount structure for enterprise deals:**
 
@@ -178,19 +178,19 @@ Enterprise security purchases follow distinct patterns that BlockSecOps pricing 
 
 ## Differentiation through pricing structure, not just price
 
-BlockSecOps can differentiate on **how** it prices, not just **what** it charges:
+Apogee can differentiate on **how** it prices, not just **what** it charges:
 
 **1. "Unified Scanner Credit" model**
-Position as replacement for multiple tools. Offer calculation: "BlockSecOps Growth at $699/month replaces $2,400+/month in point solutions (Slither + Mythril + Echidna + Semgrep + manual review time)." Create an ROI calculator on the pricing page.
+Position as replacement for multiple tools. Offer calculation: "Apogee Growth at $699/month replaces $2,400+/month in point solutions (Slither + Mythril + Echidna + Semgrep + manual review time)." Create an ROI calculator on the pricing page.
 
 **2. "Security-as-insurance" packaging**
-Offer optional **coverage guarantee**: "If a vulnerability scanned by BlockSecOps leads to an exploit, receive $X credit toward incident response services." This mirrors Sherlock's coverage model and creates unique differentiation.
+Offer optional **coverage guarantee**: "If a vulnerability scanned by Apogee leads to an exploit, receive $X credit toward incident response services." This mirrors Sherlock's coverage model and creates unique differentiation.
 
 **3. "Pay-per-TVL" enterprise tier**
 For large protocols, offer pricing based on **Total Value Locked**: 0.1-0.3% of TVL annually for unlimited scanning. Aligns vendor revenue with customer success and creates powerful incentive alignment.
 
 **4. "Audit-ready" packaging**
-Bundle scanning + report generation + remediation tracking as a package specifically designed to prepare for formal audits. Price at $1,999 one-time + $499/month ongoing. Positions BlockSecOps as complement to (not replacement for) formal audits.
+Bundle scanning + report generation + remediation tracking as a package specifically designed to prepare for formal audits. Price at $1,999 one-time + $499/month ongoing. Positions Apogee as complement to (not replacement for) formal audits.
 
 ## Competitive response scenarios
 
@@ -214,7 +214,7 @@ Anticipate competitive moves and prepare responses:
 **If audit firms launch subscription products:**
 - Emphasize self-service vs. gated access
 - Highlight speed (minutes vs. weeks)
-- Position as complementary ("prepare for audits with BlockSecOps")
+- Position as complementary ("prepare for audits with Apogee")
 
 ## Implementation roadmap and KPIs
 
@@ -246,8 +246,8 @@ Anticipate competitive moves and prepare responses:
 
 ## Conclusion
 
-The Web3 security market's fragmentation creates a significant opportunity for BlockSecOps to establish category leadership through strategic pricing. By combining **transparent published pricing** (unlike competitors requiring sales contact), **generous free tier** (driving developer adoption), **flat-rate team tiers** (avoiding per-developer cost anxiety), and **value-aligned enterprise options** (TVL-based and outcome-based pricing), BlockSecOps can differentiate on pricing structure itself—not just price points.
+The Web3 security market's fragmentation creates a significant opportunity for Apogee to establish category leadership through strategic pricing. By combining **transparent published pricing** (unlike competitors requiring sales contact), **generous free tier** (driving developer adoption), **flat-rate team tiers** (avoiding per-developer cost anxiety), and **value-aligned enterprise options** (TVL-based and outcome-based pricing), Apogee can differentiate on pricing structure itself—not just price points.
 
-The recommended architecture—Developer (Free), Team ($299), Growth ($699), Enterprise (Custom from $1,999)—positions BlockSecOps below MetaTrust while offering more comprehensive Web3 coverage than general DevSecOps platforms like Aikido or Jit. The usage-based expansion components (per-contract overages, express scans, audit reports) create natural growth paths that don't require friction-heavy tier upgrades.
+The recommended architecture—Developer (Free), Team ($299), Growth ($699), Enterprise (Custom from $1,999)—positions Apogee below MetaTrust while offering more comprehensive Web3 coverage than general DevSecOps platforms like Aikido or Jit. The usage-based expansion components (per-contract overages, express scans, audit reports) create natural growth paths that don't require friction-heavy tier upgrades.
 
-Most critically, BlockSecOps should emphasize the **consolidation value proposition** in all pricing communications: replacing 10+ point solutions with a single platform isn't just convenient—it's economically superior. With 25+ integrated scanners, BlockSecOps can credibly claim **$2,400+/month in tool replacement value** against the $699 Growth tier—a 3.4x value multiplier that competitors cannot match.
+Most critically, Apogee should emphasize the **consolidation value proposition** in all pricing communications: replacing 10+ point solutions with a single platform isn't just convenient—it's economically superior. With 25+ integrated scanners, Apogee can credibly claim **$2,400+/month in tool replacement value** against the $699 Growth tier—a 3.4x value multiplier that competitors cannot match.

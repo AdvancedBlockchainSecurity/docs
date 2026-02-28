@@ -8,7 +8,7 @@
 
 ## Overview
 
-This playbook covers the complete process for setting up a Platform Admin account with MFA authentication on the BlockSecOps platform.
+This playbook covers the complete process for setting up a Platform Admin account with MFA authentication on the Apogee platform.
 
 ## Prerequisites
 
@@ -75,7 +75,7 @@ kubectl exec -n api-service-local deployment/api-service -- \
 
 ```
 ============================================================
-BlockSecOps Platform Admin Management
+Apogee Platform Admin Management
 ============================================================
 
 [SUCCESS] Admin account created for YOUR_EMAIL@example.com
@@ -88,7 +88,7 @@ TOTP Secret (for manual entry):
   ABCDEFGHIJKLMNOPQRSTUVWXYZ234567
 
 Or use this URI with an authenticator app:
-  otpauth://totp/BlockSecOps%20Admin:YOUR_EMAIL@example.com?secret=...&issuer=BlockSecOps%20Admin
+  otpauth://totp/Apogee%20Admin:YOUR_EMAIL@example.com?secret=...&issuer=Apogee%20Admin
 
 IMPORTANT: Save this secret securely. It will not be shown again.
 ============================================================

@@ -7,7 +7,7 @@
 
 ## Overview
 
-Procedures for recovering the BlockSecOps platform from catastrophic failures including cluster loss, database corruption, and region-level outages.
+Procedures for recovering the Apogee platform from catastrophic failures including cluster loss, database corruption, and region-level outages.
 
 ---
 

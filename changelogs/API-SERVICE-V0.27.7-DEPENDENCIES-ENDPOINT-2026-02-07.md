@@ -94,5 +94,5 @@ Added `GET /admin/dependencies` endpoint that reports installed Python package v
 
 ---
 
-**Maintained By:** BlockSecOps Team
+**Maintained By:** Apogee Team
 **Status:** Complete

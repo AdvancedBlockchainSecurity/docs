@@ -1,4 +1,4 @@
-# Unified BlockSecOps Platform - Sprint-Based Technical Development Plan
+# Unified Apogee Platform - Sprint-Based Technical Development Plan
 
 ## Executive Summary
 

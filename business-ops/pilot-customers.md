@@ -1,6 +1,6 @@
-# Comprehensive pilot customer acquisition strategy for BlockSecOps
+# Comprehensive pilot customer acquisition strategy for Apogee
 
-BlockSecOps can acquire 5-10 pilot customers within 3-6 months by combining Utah's thriving blockchain ecosystem with targeted online community engagement. The winning approach reverses traditional B2B marketing: build technical credibility through Twitter and Discord first, then leverage in-person relationships in Utah's concentrated tech corridor, while always charging for pilots to validate genuine need. This dual-strategy approach addresses the unique dynamics of blockchain security sales where trust is earned through demonstrated expertise, not traditional sales pitches.
+Apogee can acquire 5-10 pilot customers within 3-6 months by combining Utah's thriving blockchain ecosystem with targeted online community engagement. The winning approach reverses traditional B2B marketing: build technical credibility through Twitter and Discord first, then leverage in-person relationships in Utah's concentrated tech corridor, while always charging for pilots to validate genuine need. This dual-strategy approach addresses the unique dynamics of blockchain security sales where trust is earned through demonstrated expertise, not traditional sales pitches.
 
 ## Why traditional approaches fail for blockchain security platforms
 

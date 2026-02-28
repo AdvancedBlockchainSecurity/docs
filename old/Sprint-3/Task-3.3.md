@@ -8,7 +8,7 @@
 
 ## Overview
 
-Implement a high-performance WebSocket server using Node.js 20 LTS and Socket.IO for real-time communication. This service will handle real-time notifications, analysis progress updates, and system events across the BlockSecOps Platform.
+Implement a high-performance WebSocket server using Node.js 20 LTS and Socket.IO for real-time communication. This service will handle real-time notifications, analysis progress updates, and system events across the Apogee Platform.
 
 ## Technical Requirements
 
@@ -1161,4 +1161,4 @@ src/
 - [ ] Connection statistics provide operational visibility
 - [ ] Error logging captures all failure scenarios for debugging
 
-This WebSocket implementation provides a robust foundation for real-time communication across the BlockSecOps Platform with enterprise-grade performance and reliability.
+This WebSocket implementation provides a robust foundation for real-time communication across the Apogee Platform with enterprise-grade performance and reliability.

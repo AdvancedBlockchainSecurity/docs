@@ -207,7 +207,7 @@ curl -s http://127.0.0.1:3000/api/v1/health/live | jq '.'
 # Expected output:
 # {
 #   "status": "healthy",
-#   "service": "BlockSecOps API Service",
+#   "service": "Apogee API Service",
 #   "version": "0.1.0",
 #   "timestamp": "2025-10-17T18:25:00.123456"
 # }

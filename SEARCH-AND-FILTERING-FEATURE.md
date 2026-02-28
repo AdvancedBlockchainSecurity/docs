@@ -8,7 +8,7 @@
 
 ## Overview
 
-Advanced search and filtering system for BlockSecOps platform, allowing users to search across contracts, scans, and vulnerabilities with comprehensive filters, saved search queries, and export functionality.
+Advanced search and filtering system for Apogee platform, allowing users to search across contracts, scans, and vulnerabilities with comprehensive filters, saved search queries, and export functionality.
 
 ---
 

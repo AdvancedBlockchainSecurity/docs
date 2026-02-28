@@ -4,7 +4,7 @@
 
 Echidna is an advanced property-based fuzzer for Ethereum smart contracts developed by Trail of Bits. Unlike traditional static analysis tools that examine code patterns, Echidna generates intelligent test cases to find violations of user-defined properties and Solidity assertions through runtime testing.
 
-The BlockSecOps platform integrates Echidna v2.2.4, providing automatic property-based fuzzing for all Solidity smart contracts with zero configuration required.
+The Apogee platform integrates Echidna v2.2.4, providing automatic property-based fuzzing for all Solidity smart contracts with zero configuration required.
 
 ## Table of Contents
 
@@ -68,7 +68,7 @@ Echidna will try to break this property by calling your contract functions in va
 
 ### Step 1: Upload Your Contract
 
-Upload your Solidity contract to BlockSecOps as usual:
+Upload your Solidity contract to Apogee as usual:
 
 ```bash
 # Via API
@@ -353,7 +353,7 @@ contract GasLimitTest {
 
 ### Basic Configuration
 
-When running Echidna through BlockSecOps, you can configure:
+When running Echidna through Apogee, you can configure:
 
 ```json
 {
@@ -718,7 +718,7 @@ Use both for comprehensive testing!
 
 ## Support
 
-- **BlockSecOps Docs**: https://docs.0xapogee.io
+- **Apogee Docs**: https://docs.0xapogee.io
 - **Discord**: https://discord.gg/blocksecops
 - **Email**: support@0xapogee.com
 

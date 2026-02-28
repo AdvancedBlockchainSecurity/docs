@@ -1,8 +1,8 @@
-# BlockSecOps Plugin SDK Guide
+# Apogee Plugin SDK Guide
 
 ## Overview
 
-The BlockSecOps Plugin SDK enables third-party developers to integrate custom security scanners into the platform without modifying core code. Plugins run as isolated Kubernetes Jobs with standardized interfaces, providing a secure and scalable way to extend the platform's analysis capabilities.
+The Apogee Plugin SDK enables third-party developers to integrate custom security scanners into the platform without modifying core code. Plugins run as isolated Kubernetes Jobs with standardized interfaces, providing a secure and scalable way to extend the platform's analysis capabilities.
 
 ## Table of Contents
 
@@ -21,7 +21,7 @@ The BlockSecOps Plugin SDK enables third-party developers to integrate custom se
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                   BlockSecOps Platform                  │
+│                   Apogee Platform                  │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
 │  ┌──────────────┐         ┌──────────────┐            │

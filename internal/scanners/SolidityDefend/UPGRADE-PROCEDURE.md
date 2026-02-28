@@ -24,7 +24,7 @@ vim /Users/pwner/Git/ABS/blocksecops-tool-integration/k8s/base/scanner-versions-
 # Update in SCANNER_METADATA JSON:
 "soliditydefend": {
   "version": "X.Y.Z",
-  "developer": "BlockSecOps",
+  "developer": "Apogee",
   "_note": "Updated YYYY-MM-DD, description of changes"
 }
 ```

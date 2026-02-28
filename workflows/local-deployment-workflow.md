@@ -5,7 +5,7 @@
 
 ## Overview
 
-This document covers the local deployment workflow for the BlockSecOps platform running on kubeadm with Harbor registry. The workflow ensures the full version-build-push-apply-verify cycle is completed atomically, preventing version drift between source code, kustomization, and running cluster resources.
+This document covers the local deployment workflow for the Apogee platform running on kubeadm with Harbor registry. The workflow ensures the full version-build-push-apply-verify cycle is completed atomically, preventing version drift between source code, kustomization, and running cluster resources.
 
 ## Architecture
 

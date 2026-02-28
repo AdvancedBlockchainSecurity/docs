@@ -161,7 +161,7 @@ async def safe_generate_contract_id(source: str, name: str) -> str:
 async def blocksecops_error_handler(request, exc):
     return JSONResponse(
         status_code=400,
-        content={"error": "BlockSecOps Error", "detail": str(exc)}
+        content={"error": "Apogee Error", "detail": str(exc)}
     )
 ```
 

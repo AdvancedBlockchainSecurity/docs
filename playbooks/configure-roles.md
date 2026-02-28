@@ -6,7 +6,7 @@
 
 ## Overview
 
-This playbook guides administrators through configuring role-based access control (RBAC) in BlockSecOps. Learn how to assign roles, understand permission levels, and implement least-privilege access for your organization.
+This playbook guides administrators through configuring role-based access control (RBAC) in Apogee. Learn how to assign roles, understand permission levels, and implement least-privilege access for your organization.
 
 ---
 

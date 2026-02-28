@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide covers comprehensive testing strategies across all services in the BlockSecOps Platform. The testing approach spans unit testing, integration testing, performance testing, and cross-language compatibility validation.
+This guide covers comprehensive testing strategies across all services in the Apogee Platform. The testing approach spans unit testing, integration testing, performance testing, and cross-language compatibility validation.
 
 ## Testing Architecture
 

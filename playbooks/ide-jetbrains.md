@@ -6,14 +6,14 @@
 
 ## Overview
 
-This playbook guides you through installing and configuring the BlockSecOps plugin for JetBrains IDEs (IntelliJ IDEA, WebStorm, PhpStorm, etc.) for real-time smart contract security scanning.
+This playbook guides you through installing and configuring the Apogee plugin for JetBrains IDEs (IntelliJ IDEA, WebStorm, PhpStorm, etc.) for real-time smart contract security scanning.
 
 ---
 
 ## Prerequisites
 
 - [ ] JetBrains IDE installed (version 2023.3+)
-- [ ] BlockSecOps account (any tier)
+- [ ] Apogee account (any tier)
 - [ ] API key with `write:scans`, `read:scans`, `read:vulnerabilities` scopes
 - [ ] Solidity smart contract project
 
@@ -54,12 +54,12 @@ flowchart LR
 2. Go to **Settings/Preferences** (`Ctrl+Alt+S` / `Cmd+,`)
 3. Navigate to **Plugins**
 4. Click **Marketplace** tab
-5. Search for `BlockSecOps`
-6. Click **Install** on "BlockSecOps Security Scanner"
+5. Search for `Apogee`
+6. Click **Install** on "Apogee Security Scanner"
 7. Click **Restart IDE** when prompted
 
 **Alternative: Install from Disk**
-1. Download plugin from [BlockSecOps Downloads](https://app.0xapogee.com/downloads/jetbrains)
+1. Download plugin from [Apogee Downloads](https://app.0xapogee.com/downloads/jetbrains)
 2. Go to **Settings > Plugins**
 3. Click gear icon > **Install Plugin from Disk...**
 4. Select downloaded `.zip` file
@@ -78,7 +78,7 @@ flowchart LR
 
 **JetBrains IDE:**
 1. Go to **Settings/Preferences**
-2. Navigate to **Tools > BlockSecOps**
+2. Navigate to **Tools > Apogee**
 3. Enter your API key
 4. Configure options:
    - **API URL:** `https://app.0xapogee.com/api/v1` (default)
@@ -92,7 +92,7 @@ flowchart LR
 Edit `~/.config/JetBrains/<IDE>/options/blocksecops.xml`:
 ```xml
 <application>
-  <component name="BlockSecOpsSettings">
+  <component name="ApogeeSettings">
     <option name="apiKey" value="bso_live_xxxxxxxxxxxx" />
     <option name="apiUrl" value="https://app.0xapogee.com/api/v1" />
     <option name="autoScan" value="true" />
@@ -106,8 +106,8 @@ Edit `~/.config/JetBrains/<IDE>/options/blocksecops.xml`:
 
 **JetBrains IDE:**
 1. Open a Solidity project
-2. Check the status bar shows "BlockSecOps: Ready"
-3. Look for BlockSecOps tool window in the sidebar
+2. Check the status bar shows "Apogee: Ready"
+3. Look for Apogee tool window in the sidebar
 4. Open a `.sol` file and verify scanning starts
 
 ---
@@ -126,22 +126,22 @@ The plugin scans as you type:
 ### Manual Scan
 
 **Trigger a scan:**
-- **Menu:** Tools > BlockSecOps > Scan Current File
+- **Menu:** Tools > Apogee > Scan Current File
 - **Keyboard:** `Ctrl+Alt+Shift+S` (customizable)
-- **Right-click:** Context menu > BlockSecOps > Scan
+- **Right-click:** Context menu > Apogee > Scan
 
 ### Scan Entire Project
 
-**Menu:** Tools > BlockSecOps > Scan Project
+**Menu:** Tools > Apogee > Scan Project
 
 Or use the tool window:
-1. Open BlockSecOps tool window (View > Tool Windows > BlockSecOps)
+1. Open Apogee tool window (View > Tool Windows > Apogee)
 2. Click **Scan Project** button
 
 ### View Results
 
-**BlockSecOps Tool Window:**
-1. Click BlockSecOps in the tool window bar (usually bottom or right)
+**Apogee Tool Window:**
+1. Click Apogee in the tool window bar (usually bottom or right)
 2. View findings organized by:
    - File
    - Severity
@@ -162,7 +162,7 @@ For supported vulnerability types:
    - **Apply recommended fix**
    - **Suppress for line/file**
    - **Mark as false positive**
-   - **Open in BlockSecOps**
+   - **Open in Apogee**
 
 ---
 
@@ -170,7 +170,7 @@ For supported vulnerability types:
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `apiKey` | - | Your BlockSecOps API key |
+| `apiKey` | - | Your Apogee API key |
 | `apiUrl` | `https://app.0xapogee.com/api/v1` | API endpoint |
 | `autoScan` | `true` | Enable real-time scanning |
 | `scanOnSave` | `true` | Scan when file saved |
@@ -182,7 +182,7 @@ For supported vulnerability types:
 
 ### Configure via Settings UI
 
-1. Go to **Settings > Tools > BlockSecOps**
+1. Go to **Settings > Tools > Apogee**
 2. Modify settings as needed
 3. Click **Apply**
 
@@ -240,7 +240,7 @@ Create `.0xapogee.xml` in project root:
 |--------|------------------|
 | Scan Current File | `Ctrl+Alt+Shift+S` |
 | Scan Project | `Ctrl+Alt+Shift+P` |
-| Open BlockSecOps Tool Window | `Alt+B` |
+| Open Apogee Tool Window | `Alt+B` |
 | Go to Next Finding | `F2` (in tool window) |
 | Apply Quick Fix | `Alt+Enter` |
 | Show Finding Details | `Ctrl+Q` |
@@ -248,33 +248,33 @@ Create `.0xapogee.xml` in project root:
 ### Customize Shortcuts
 
 1. Go to **Settings > Keymap**
-2. Search for "BlockSecOps"
+2. Search for "Apogee"
 3. Right-click action > Add Keyboard Shortcut
 
 ---
 
 ## Integration with Existing Inspections
 
-BlockSecOps integrates with JetBrains inspection system:
+Apogee integrates with JetBrains inspection system:
 
 ### Enable/Disable Inspections
 
 1. Go to **Settings > Editor > Inspections**
-2. Navigate to **Solidity > BlockSecOps**
+2. Navigate to **Solidity > Apogee**
 3. Enable/disable individual inspections:
-   - BlockSecOps: Reentrancy
-   - BlockSecOps: Unchecked Return
-   - BlockSecOps: Integer Overflow
+   - Apogee: Reentrancy
+   - Apogee: Unchecked Return
+   - Apogee: Integer Overflow
    - etc.
 
 ### Inspection Profile
 
-Create a custom inspection profile for BlockSecOps:
+Create a custom inspection profile for Apogee:
 
 1. Go to **Settings > Editor > Inspections**
 2. Click gear icon > **Copy to Project**
-3. Name: "BlockSecOps Security"
-4. Enable only BlockSecOps inspections
+3. Name: "Apogee Security"
+4. Enable only Apogee inspections
 5. Use this profile for security-focused inspections
 
 ---
@@ -283,7 +283,7 @@ Create a custom inspection profile for BlockSecOps:
 
 Confirm plugin is working:
 
-1. **Status Bar:** Shows "BlockSecOps: Ready"
+1. **Status Bar:** Shows "Apogee: Ready"
 2. **Test File:** Create a vulnerable contract:
 
 ```solidity
@@ -322,7 +322,7 @@ contract Vulnerable {
 ### View Plugin Logs
 
 1. **Help > Show Log in Explorer/Finder**
-2. Search for "BlockSecOps" in `idea.log`
+2. Search for "Apogee" in `idea.log`
 
 ### Enable Debug Mode
 
@@ -339,7 +339,7 @@ Add to IDE VM options:
 - [ ] IDE restarted after installation
 - [ ] API key created with required scopes
 - [ ] Plugin configured with API key
-- [ ] Status bar shows "BlockSecOps: Ready"
+- [ ] Status bar shows "Apogee: Ready"
 - [ ] Auto-scan enabled (optional)
 - [ ] Severity filter configured
 - [ ] Test file scanned successfully

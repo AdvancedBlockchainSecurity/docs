@@ -2,7 +2,7 @@
 
 **Date:** February 8, 2026
 **Version Change:** 0.9.5 --> 0.9.10
-**PR:** [#68](https://github.com/BlockSecOps/blocksecops-orchestration/pull/68)
+**PR:** [#68](https://github.com/AdvancedBlockchainSecurity/blocksecops-orchestration/pull/68)
 **Branch:** `fix/solc-echidna-scanner-fixes`
 
 ---

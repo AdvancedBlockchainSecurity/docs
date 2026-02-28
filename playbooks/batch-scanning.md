@@ -12,10 +12,10 @@ This playbook guides you through scanning multiple smart contracts at once, eith
 
 ## Prerequisites
 
-- [ ] BlockSecOps account with Growth or Enterprise tier
+- [ ] Apogee account with Growth or Enterprise tier
 - [ ] API key with `write:scans`, `read:scans`, `write:contracts` scopes (for API/CLI)
 - [ ] Multiple Solidity contract files to scan
-- [ ] Project created in BlockSecOps
+- [ ] Project created in Apogee
 
 ---
 

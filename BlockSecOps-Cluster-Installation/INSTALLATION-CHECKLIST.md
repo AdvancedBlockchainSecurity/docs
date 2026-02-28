@@ -1,4 +1,4 @@
-# BlockSecOps Installation Checklist
+# Apogee Installation Checklist
 
 **Date Started:** _______________
 **Completed By:** _______________

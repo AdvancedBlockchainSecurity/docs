@@ -4,7 +4,7 @@
 
 ## Overview
 
-This document summarizes the complete local development environment that was successfully built for the BlockSecOps platform, including all fixes and workarounds applied to resolve known issues.
+This document summarizes the complete local development environment that was successfully built for the Apogee platform, including all fixes and workarounds applied to resolve known issues.
 
 ## Environment Specifications
 

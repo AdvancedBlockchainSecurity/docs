@@ -10,9 +10,9 @@
 
 ---
 
-# BlockSecOps Pricing Tables (ARCHIVED)
+# Apogee Pricing Tables (ARCHIVED)
 
-## Table 1: BlockSecOps Pricing Structure
+## Table 1: Apogee Pricing Structure
 
 | Feature | Developer | Startup | Professional | Enterprise | Enterprise Plus |
 |---------|-----------|---------|--------------|------------|-----------------|
@@ -92,9 +92,9 @@
 
 ---
 
-## Table 2: BlockSecOps vs. Traditional Blockchain Security Approaches
+## Table 2: Apogee vs. Traditional Blockchain Security Approaches
 
-| Feature | IDE Plugins | Point-in-Time Audits | BlockSecOps Platform |
+| Feature | IDE Plugins | Point-in-Time Audits | Apogee Platform |
 |---------|-------------|----------------------|---------------------|
 | **PRICING MODEL** | | | |
 | Typical Cost | Free - $500/mo | $25K-$75K per audit | $3.5K-$300K+/year |
@@ -195,7 +195,7 @@
 | Incident response | Variable | Variable | Variable | $50K-$500K+ | If breach occurs |
 | **Total** | **$225K** | **$225K** | **$225K** | **$675K-$1.175M+** | Point-in-time only |
 | | | | | | |
-| **BlockSecOps Professional** | | | | | |
+| **Apogee Professional** | | | | | |
 | Platform subscription | $50K | $50K | $50K | $150K | Continuous coverage |
 | Annual validation audit | $25K | $25K | $25K | $75K | One audit for validation |
 | Reduced security time | $25K | $25K | $25K | $75K | 0.2 FTE (80% reduction) |
@@ -204,7 +204,7 @@
 | **Savings vs. Plugins** | **$25K-$31K** | **$25K-$31K** | **$25K-$31K** | **$75K-$593K+** | 20-66% cost reduction |
 | **Savings vs. Audits** | **$125K** | **$125K** | **$125K** | **$375K-$875K+** | 56-74% cost reduction |
 | | | | | | |
-| **BlockSecOps Enterprise** | | | | | |
+| **Apogee Enterprise** | | | | | |
 | Platform subscription | $150K | $150K | $150K | $450K | White-glove + compliance |
 | Optional audit | $25K | $25K | $25K | $75K | Regulatory requirement |
 | Minimal security time | $10K | $10K | $10K | $30K | 0.05 FTE (95% reduction) |
@@ -229,14 +229,14 @@
 - ❌ Long lead times (2-4 weeks per audit)
 - ❌ No continuous protection
 
-**BlockSecOps Professional:**
+**Apogee Professional:**
 - ✅ Best TCO for mid-market ($300K over 3 years)
 - ✅ Continuous coverage + annual validation
 - ✅ 56-74% cost savings vs. audit-only approach
 - ✅ 80% reduction in internal security time
 - ✅ Unified platform with metrics
 
-**BlockSecOps Enterprise:**
+**Apogee Enterprise:**
 - ✅ Best for high-value protocols ($555K over 3 years)
 - ✅ White-glove support + compliance
 - ✅ 18-53% cost savings vs. audit-only
@@ -247,7 +247,7 @@
 
 ## Table 4: Feature Parity Matrix - What You Get at Each Price Point
 
-| Price Range | Traditional Approach | BlockSecOps Equivalent |
+| Price Range | Traditional Approach | Apogee Equivalent |
 |-------------|---------------------|----------------------|
 | **$0-$5K/year** | | |
 | | Free IDE plugins (Slither, Mythril) | **Developer Tier ($3.5K)** |
@@ -297,7 +297,7 @@
 
 ---
 
-## Summary: Why BlockSecOps Wins
+## Summary: Why Apogee Wins
 
 ### vs. IDE Plugins
 - **Same price range** (Developer tier) but unified platform

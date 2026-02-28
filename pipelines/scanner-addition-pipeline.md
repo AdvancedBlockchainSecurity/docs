@@ -2,13 +2,13 @@
 
 **Last Updated:** February 16, 2026
 
-This document describes the full end-to-end pipeline for adding a new scanner to the BlockSecOps platform. It covers all 13 steps from initial evaluation through GitOps deployment, with actual file paths, code examples, and lessons learned from real integrations.
+This document describes the full end-to-end pipeline for adding a new scanner to the Apogee platform. It covers all 13 steps from initial evaluation through GitOps deployment, with actual file paths, code examples, and lessons learned from real integrations.
 
 ---
 
 ## Pipeline Overview
 
-Adding a new scanner to BlockSecOps requires coordinated changes across multiple repositories and systems. The pipeline ensures consistent integration, proper testing, and complete documentation for every scanner onboarded to the platform.
+Adding a new scanner to Apogee requires coordinated changes across multiple repositories and systems. The pipeline ensures consistent integration, proper testing, and complete documentation for every scanner onboarded to the platform.
 
 **Typical scope:** 20-25 files across 7 repositories.
 
@@ -486,7 +486,7 @@ NAME_TO_KEY["<Display Name>"] = "<key>";
 
 ## Step 9: Vulnerability Pattern Creation + Mappings
 
-Define BVD (BlockSecOps Vulnerability Definition) patterns for the scanner's detectors and create mapping files.
+Define BVD (Apogee Vulnerability Definition) patterns for the scanner's detectors and create mapping files.
 
 ### Pattern Files
 **Location:** `blocksecops-api-service/scripts/intelligence/`

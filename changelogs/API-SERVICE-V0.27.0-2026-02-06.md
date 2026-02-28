@@ -253,5 +253,5 @@ kubectl exec -n api-service-local deploy/api-service -- alembic upgrade head
 
 ---
 
-**Maintained By:** BlockSecOps Team
+**Maintained By:** Apogee Team
 **Status:** Complete

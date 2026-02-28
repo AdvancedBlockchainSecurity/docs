@@ -1,4 +1,4 @@
-# Unified BlockSecOps Platform - Sprint-Aligned Strategic Roadmap
+# Unified Apogee Platform - Sprint-Aligned Strategic Roadmap
 
 ## Executive Summary
 

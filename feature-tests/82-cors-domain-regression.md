@@ -34,7 +34,7 @@ Validates no legacy domains remain in k8s YAML files.
 
 | Test | What It Checks |
 |------|---------------|
-| `test_no_legacy_domains_in_k8s[<repo>]` | No `solidityops.com`, `soliditysecurity.dev`, `soliditysecurity.com`, or `blocksecops.com` |
+| `test_no_legacy_domains_in_k8s[<repo>]` | No `solidityops.com`, `soliditysecurity.dev`, `soliditysecurity.com`, or `0xApogee.com` |
 | `test_no_blocksecops_local_except_harbor` | No `blocksecops.local` except `harbor.blocksecops.local` |
 
 **Banned domain patterns:**

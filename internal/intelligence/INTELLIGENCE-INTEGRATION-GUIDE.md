@@ -2,7 +2,7 @@
 
 **Version**: 1.2
 **Last Updated**: 2025-11-03
-**Purpose**: Comprehensive guide for integrating vulnerability scanners into the BlockSecOps intelligence layer
+**Purpose**: Comprehensive guide for integrating vulnerability scanners into the Apogee intelligence layer
 
 ---
 
@@ -72,7 +72,7 @@ See: `/Users/pwner/Git/ABS/docs/INTELLIGENCE-API-DEDUPLICATION-FIX-2025-11-02.md
 
 ## Overview
 
-The BlockSecOps intelligence layer provides:
+The Apogee intelligence layer provides:
 - **Pattern Classification**: Maps scanner detectors to standardized vulnerability patterns (BVD-*)
 - **Fingerprinting**: Generates multi-dimensional fingerprints for deduplication
 - **Deduplication**: Groups duplicate findings across scanners
@@ -2054,7 +2054,7 @@ BVD-[ECOSYSTEM]-[CATEGORY]-[NUMBER]
 │   │           │           └─ Sequential number (001, 002, ...)
 │   │           └───────────── Category code (REE, ACC, INT, ...)
 │   └───────────────────────── Ecosystem (EVM, VYPER, SOLANA, CAIRO)
-└───────────────────────────── Prefix (BlockSecOps Vulnerability Database)
+└───────────────────────────── Prefix (Apogee Vulnerability Database)
 ```
 
 ### Mapping Entry Template

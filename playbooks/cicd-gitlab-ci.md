@@ -6,13 +6,13 @@
 
 ## Overview
 
-This playbook guides you through integrating BlockSecOps security scanning into GitLab CI/CD pipelines. Configure automated scans on merge requests, block merges on critical findings, and view results directly in GitLab.
+This playbook guides you through integrating Apogee security scanning into GitLab CI/CD pipelines. Configure automated scans on merge requests, block merges on critical findings, and view results directly in GitLab.
 
 ---
 
 ## Prerequisites
 
-- [ ] BlockSecOps account with Growth or Enterprise tier
+- [ ] Apogee account with Growth or Enterprise tier
 - [ ] API key with `write:scans`, `read:scans`, `read:vulnerabilities` scopes
 - [ ] GitLab project with maintainer access
 - [ ] Solidity smart contracts in the repository
@@ -24,7 +24,7 @@ This playbook guides you through integrating BlockSecOps security scanning into 
 ```mermaid
 flowchart LR
     A[MR Created/Updated] --> B[GitLab CI Triggered]
-    B --> C[Upload Contract to BlockSecOps]
+    B --> C[Upload Contract to Apogee]
     C --> D[Run Security Scan]
     D --> E{Critical Findings?}
     E -->|Yes| F[Block Merge + Report]
@@ -134,7 +134,7 @@ security-report:
       SCAN_ID=$(cat scan-results.json | jq -r '.scan_id')
 
       # Create comment body
-      BODY="## BlockSecOps Security Scan Results\n\n"
+      BODY="## Apogee Security Scan Results\n\n"
       if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
         BODY="${BODY}:x: **Failed**\n\n"
       else
@@ -249,7 +249,7 @@ security-scan:
 
 ## Integration with GitLab Security Dashboard
 
-BlockSecOps results can be exported in GitLab SAST format:
+Apogee results can be exported in GitLab SAST format:
 
 ```yaml
 security-scan:
@@ -275,7 +275,7 @@ Confirm the integration is working:
 1. **Create a test MR** with a Solidity file change
 2. **Check Pipeline tab** for job execution
 3. **Verify MR comment** appears (if configured)
-4. **Check BlockSecOps dashboard** for scan record
+4. **Check Apogee dashboard** for scan record
 
 **API Verification:**
 ```bash
@@ -316,7 +316,7 @@ security-scan:
 - [ ] Scan results visible in job artifacts
 - [ ] MR comment appears (if configured)
 - [ ] Merge request approval rules set (optional)
-- [ ] Scan visible in BlockSecOps dashboard
+- [ ] Scan visible in Apogee dashboard
 
 ---
 

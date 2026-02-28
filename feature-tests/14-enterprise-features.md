@@ -44,10 +44,10 @@
 - [ ] Payload includes event_id (unique)
 - [ ] Payload includes timestamp
 - [ ] Payload includes event-specific data
-- [ ] X-BlockSecOps-Signature header present
-- [ ] X-BlockSecOps-Event header present
-- [ ] X-BlockSecOps-Delivery header present
-- [ ] X-BlockSecOps-Timestamp header present
+- [ ] X-Apogee-Signature header present
+- [ ] X-Apogee-Event header present
+- [ ] X-Apogee-Delivery header present
+- [ ] X-Apogee-Timestamp header present
 
 ### 1.5 Signature Verification
 - [ ] HMAC-SHA256 signature is correct
@@ -417,7 +417,7 @@
 
 #### 7.3.1 Page Layout
 - [ ] Page title "API Keys" displayed
-- [ ] Subtitle "Manage programmatic access to the BlockSecOps API" displayed
+- [ ] Subtitle "Manage programmatic access to the Apogee API" displayed
 - [ ] "Create API Key" button visible in header
 - [ ] Stats cards row displayed (4 cards)
 

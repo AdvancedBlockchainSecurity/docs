@@ -2,7 +2,7 @@
 
 ## Overview
 
-BlockSecOps implements a secure authentication system using Supabase Auth with JWT token verification, tier-based access control, and quota enforcement. This document describes the technical architecture of the authentication and authorization system.
+Apogee implements a secure authentication system using Supabase Auth with JWT token verification, tier-based access control, and quota enforcement. This document describes the technical architecture of the authentication and authorization system.
 
 ## Architecture Components
 

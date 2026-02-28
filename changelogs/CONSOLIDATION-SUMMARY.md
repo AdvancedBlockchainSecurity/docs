@@ -421,7 +421,7 @@ All references have been updated, redirect notices created, and comprehensive do
 
 ---
 
-**Document Owner:** BlockSecOps Documentation Team
+**Document Owner:** Apogee Documentation Team
 **Created:** November 21, 2025
 **Status:** ✅ Complete
 **Last Updated:** November 21, 2025

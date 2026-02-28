@@ -8,7 +8,7 @@
 
 ## Overview
 
-Two user experience enhancements for the BlockSecOps Dashboard:
+Two user experience enhancements for the Apogee Dashboard:
 
 1. **Dark Mode** - Theme switching between light, dark, and system preference
 2. **Global Search (Command Palette)** - Quick search across all entities with Cmd+K / Ctrl+K

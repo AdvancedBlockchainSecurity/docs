@@ -1,6 +1,6 @@
 # Organization Management Playbook
 
-How organizations are created, managed, and secured on the BlockSecOps platform.
+How organizations are created, managed, and secured on the Apogee platform.
 
 ---
 

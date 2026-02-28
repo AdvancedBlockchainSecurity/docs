@@ -5,7 +5,7 @@
 
 ## Overview
 
-This playbook covers deploying a new Docker image to the local Kubernetes cluster for BlockSecOps services.
+This playbook covers deploying a new Docker image to the local Kubernetes cluster for Apogee services.
 
 ---
 

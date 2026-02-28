@@ -1,4 +1,4 @@
-# BlockSecOps Platform - Local-First Development Sprint Plan
+# Apogee Platform - Local-First Development Sprint Plan
 
 > **📋 IMPORTANT - PHASE 3 REQUIREMENTS**
 >

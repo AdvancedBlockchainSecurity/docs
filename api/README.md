@@ -8,7 +8,7 @@
 
 ## Overview
 
-Complete API reference and integration guides for the BlockSecOps Platform. This directory contains documentation for all REST API endpoints, authentication flows, and integration patterns.
+Complete API reference and integration guides for the Apogee Platform. This directory contains documentation for all REST API endpoints, authentication flows, and integration patterns.
 
 ---
 
@@ -199,5 +199,5 @@ For API issues or questions:
 
 ---
 
-**Maintained by**: BlockSecOps Backend Team
+**Maintained by**: Apogee Backend Team
 **Last Review**: February 12, 2026

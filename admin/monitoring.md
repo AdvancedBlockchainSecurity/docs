@@ -4,7 +4,7 @@ Monitor platform health, performance metrics, and usage statistics.
 
 ## Overview
 
-BlockSecOps provides monitoring capabilities for:
+Apogee provides monitoring capabilities for:
 - Platform health and status
 - Scan performance metrics
 - Usage statistics

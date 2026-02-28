@@ -309,15 +309,15 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
-| admin-portal | 0.7.4 | `k8s/overlays/local/` | Rebuild from current source: fix stale bundle calling removed /admin/auth/login endpoint |
-| api-service | 0.29.37 | `k8s/overlays/local/api-service/` | Encryption key validation, health check, stale scan error_message |
-| contract-parser | 0.2.0 | `k8s/overlays/local/contract-parser/` | Rust service, port 9000 |
-| dashboard | 0.46.8 | `k8s/overlays/local/` | Security audit: remove dangerouslySetInnerHTML from recommendations |
-| data-service | 0.2.5 | `k8s/overlays/local/` | Security audit: table name whitelist for /data/table endpoint |
-| intelligence-engine | 0.3.4 | `k8s/overlays/local/` | Security audit: embeddings payload size validation |
-| notification | 0.2.4 | `k8s/overlays/local/` | Security audit: internal service auth, authenticated broadcast |
-| orchestration | 0.10.6 | `k8s/overlays/local/` | Stale scan recovery: queued scans, error_message on all failures |
-| tool-integration | 0.5.6 | `k8s/overlays/local/` | Security audit: CORS hardening, internal auth, error sanitization, JSON size limit |
+| admin-portal | 0.7.5 | `k8s/overlays/local/` | Apogee rebrand: UI branding, metadata |
+| api-service | 0.29.38 | `k8s/overlays/local/api-service/` | Apogee rebrand: domains, SIWE, OpenAPI, notifications |
+| contract-parser | 0.2.1 | `k8s/overlays/local/contract-parser/` | Apogee rebrand: metadata, OCI labels |
+| dashboard | 0.46.9 | `k8s/overlays/local/` | Apogee rebrand: UI branding, legal, pricing, integrations |
+| data-service | 0.2.6 | `k8s/overlays/local/` | Apogee rebrand: metadata, OCI labels |
+| intelligence-engine | 0.3.6 | `k8s/overlays/local/` | Apogee rebrand: OpenAPI title, metadata, OCI labels |
+| notification | 0.2.5 | `k8s/overlays/local/` | Apogee rebrand: CORS domains, metadata |
+| orchestration | 0.10.7 | `k8s/overlays/local/` | Apogee rebrand: OpenAPI title, scanner descriptions |
+| tool-integration | 0.5.8 | `k8s/overlays/local/` | Apogee rebrand: OpenAPI title, metadata, OCI labels |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |
@@ -354,13 +354,13 @@ ARG SERVICE_VERSION=0.0.0
 ARG BUILD_DATE
 ARG VCS_REF
 
-LABEL org.opencontainers.image.title="BlockSecOps API Service"
-LABEL org.opencontainers.image.description="Main API gateway for BlockSecOps platform"
+LABEL org.opencontainers.image.title="Apogee API Service"
+LABEL org.opencontainers.image.description="Main API gateway for Apogee platform"
 LABEL org.opencontainers.image.version="${SERVICE_VERSION}"
 LABEL org.opencontainers.image.created="${BUILD_DATE}"
 LABEL org.opencontainers.image.revision="${VCS_REF}"
-LABEL org.opencontainers.image.vendor="BlockSecOps"
-LABEL org.opencontainers.image.source="https://github.com/blocksecops/blocksecops-api-service"
+LABEL org.opencontainers.image.vendor="Apogee"
+LABEL org.opencontainers.image.source="https://github.com/AdvancedBlockchainSecurity/blocksecops-api-service"
 ```
 
 ### Build with Labels

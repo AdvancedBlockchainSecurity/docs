@@ -6,11 +6,11 @@
 
 ## Overview
 
-Complete reference for all BlockSecOps Platform API endpoints. All endpoints require authentication except where noted.
+Complete reference for all Apogee Platform API endpoints. All endpoints require authentication except where noted.
 
 ## Authentication
 
-BlockSecOps uses **Supabase Auth** for authentication. User registration, login, password reset, and OAuth flows are handled by Supabase. The BlockSecOps API verifies JWT tokens and enforces tier-based access control.
+Apogee uses **Supabase Auth** for authentication. User registration, login, password reset, and OAuth flows are handled by Supabase. The Apogee API verifies JWT tokens and enforces tier-based access control.
 
 ### Authentication Flow
 
@@ -3048,7 +3048,7 @@ Initiate credit package purchase. Returns x402 payment details.
     "recipient": "0x1234...",
     "payment_id": "bso_abc123...",
     "expires_at": "2025-12-01T10:15:00Z",
-    "message": "BlockSecOps Credits: Pro (50 scans)"
+    "message": "Apogee Credits: Pro (50 scans)"
   },
   "x402_accepts": [
     {

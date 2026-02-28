@@ -650,7 +650,7 @@ The Scanner Selection & Configuration UI is **complete and production-ready**. U
 
 **Contributors**:
 - Implementation: Claude Code Assistant
-- Design: BlockSecOps Team
+- Design: Apogee Team
 - Review: Pending
 
 ---

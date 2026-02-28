@@ -6,13 +6,13 @@
 
 ## Overview
 
-This playbook guides you through integrating BlockSecOps security scanning into Jenkins pipelines. Configure automated scans on pull requests, block builds on critical findings, and publish results to Jenkins.
+This playbook guides you through integrating Apogee security scanning into Jenkins pipelines. Configure automated scans on pull requests, block builds on critical findings, and publish results to Jenkins.
 
 ---
 
 ## Prerequisites
 
-- [ ] BlockSecOps account with Growth or Enterprise tier
+- [ ] Apogee account with Growth or Enterprise tier
 - [ ] API key with `write:scans`, `read:scans`, `read:vulnerabilities` scopes
 - [ ] Jenkins server with Pipeline plugin installed
 - [ ] Python 3.8+ available on Jenkins agents
@@ -59,7 +59,7 @@ flowchart LR
    - **Scope:** Global
    - **Secret:** Paste the API key
    - **ID:** `blocksecops-api-key`
-   - **Description:** BlockSecOps API Key
+   - **Description:** Apogee API Key
 5. Click **OK**
 
 ### Step 3: Create Jenkinsfile
@@ -120,7 +120,7 @@ pipeline {
 
                     echo """
                     ======================================
-                    BlockSecOps Security Scan Results
+                    Apogee Security Scan Results
                     ======================================
                     Critical: ${critical}
                     High:     ${high}
@@ -176,7 +176,7 @@ pipeline {
                 script {
                     // Set GitHub commit status
                     if (env.CHANGE_ID) {
-                        githubNotify context: 'BlockSecOps Security Scan',
+                        githubNotify context: 'Apogee Security Scan',
                                      status: 'PENDING',
                                      description: 'Running security scan...'
                     }
@@ -197,11 +197,11 @@ pipeline {
 
                     if (env.CHANGE_ID) {
                         if (critical > 0 || high > 0) {
-                            githubNotify context: 'BlockSecOps Security Scan',
+                            githubNotify context: 'Apogee Security Scan',
                                          status: 'FAILURE',
                                          description: "${critical} critical, ${high} high findings"
                         } else {
-                            githubNotify context: 'BlockSecOps Security Scan',
+                            githubNotify context: 'Apogee Security Scan',
                                          status: 'SUCCESS',
                                          description: 'No critical or high findings'
                         }
@@ -344,7 +344,7 @@ pipeline {
                         keepAll: true,
                         reportDir: '.',
                         reportFiles: 'scan-report.html',
-                        reportName: 'BlockSecOps Security Report'
+                        reportName: 'Apogee Security Report'
                     ])
                 }
             }
@@ -415,7 +415,7 @@ Confirm the integration is working:
 1. **Trigger a build** with Solidity file changes
 2. **Check Console Output** for scan execution
 3. **Verify artifacts** contain `scan-results.json`
-4. **Check BlockSecOps dashboard** for scan record
+4. **Check Apogee dashboard** for scan record
 
 **API Verification:**
 ```bash
@@ -461,7 +461,7 @@ stage('Security Scan') {
 - [ ] Scan results archived as artifacts
 - [ ] Build fails on critical/high findings
 - [ ] PR integration working (if configured)
-- [ ] Scan visible in BlockSecOps dashboard
+- [ ] Scan visible in Apogee dashboard
 
 ---
 

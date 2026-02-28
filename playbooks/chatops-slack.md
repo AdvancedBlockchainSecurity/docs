@@ -6,16 +6,16 @@
 
 ## Overview
 
-This playbook guides you through integrating BlockSecOps with Slack for real-time notifications about security scans, vulnerability discoveries, and platform events. Configure channel-specific alerts and customize notification triggers.
+This playbook guides you through integrating Apogee with Slack for real-time notifications about security scans, vulnerability discoveries, and platform events. Configure channel-specific alerts and customize notification triggers.
 
 ---
 
 ## Prerequisites
 
-- [ ] BlockSecOps account with Growth or Enterprise tier
+- [ ] Apogee account with Growth or Enterprise tier
 - [ ] Slack workspace admin access (or permission to add apps)
 - [ ] Slack channel(s) designated for security notifications
-- [ ] Organization owner or admin role in BlockSecOps
+- [ ] Organization owner or admin role in Apogee
 
 ---
 
@@ -23,7 +23,7 @@ This playbook guides you through integrating BlockSecOps with Slack for real-tim
 
 ```mermaid
 flowchart LR
-    A[BlockSecOps Event] --> B[Notification Service]
+    A[Apogee Event] --> B[Notification Service]
     B --> C{Channel Config?}
     C -->|Matches| D[Format Message]
     D --> E[Send to Slack]
@@ -41,7 +41,7 @@ flowchart LR
 1. Go to [Slack API Apps](https://api.slack.com/apps)
 2. Click **Create New App**
 3. Select **From scratch**
-4. Name: `BlockSecOps Notifications`
+4. Name: `Apogee Notifications`
 5. Select your workspace
 6. Click **Create App**
 
@@ -53,7 +53,7 @@ flowchart LR
 5. Click **Allow**
 6. Copy the **Webhook URL** (starts with `https://hooks.slack.com/services/...`)
 
-### Step 2: Add Slack Integration in BlockSecOps
+### Step 2: Add Slack Integration in Apogee
 
 **Dashboard:**
 1. Navigate to **Settings > Integrations**
@@ -322,7 +322,7 @@ Test the webhook directly:
 ```bash
 curl -X POST "https://hooks.slack.com/services/T00000000/B00000000/XXXX" \
   -H "Content-Type: application/json" \
-  -d '{"text": "Test message from BlockSecOps"}'
+  -d '{"text": "Test message from Apogee"}'
 ```
 
 ---
@@ -332,7 +332,7 @@ curl -X POST "https://hooks.slack.com/services/T00000000/B00000000/XXXX" \
 - [ ] Slack app created in workspace
 - [ ] Incoming webhook activated
 - [ ] Webhook URL copied
-- [ ] Integration added in BlockSecOps
+- [ ] Integration added in Apogee
 - [ ] Notification triggers configured
 - [ ] Test message received in Slack
 - [ ] Channel routing configured (if using multiple channels)

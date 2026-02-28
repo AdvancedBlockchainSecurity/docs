@@ -1,4 +1,4 @@
-# BlockSecOps Database Schema (Minimal Reference)
+# Apogee Database Schema (Minimal Reference)
 
 **Database:** PostgreSQL 15.4 | **Name:** `solidity_security` | **Schema:** `public`
 

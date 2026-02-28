@@ -20,7 +20,7 @@
 
 ## Overview
 
-The BlockSecOps Platform scanner workflow involves **five major services** working together to execute vulnerability scans. Understanding the complete data flow is critical for troubleshooting scanner identification, result submission, and cross-scanner isolation issues.
+The Apogee Platform scanner workflow involves **five major services** working together to execute vulnerability scans. Understanding the complete data flow is critical for troubleshooting scanner identification, result submission, and cross-scanner isolation issues.
 
 ### Key Services
 

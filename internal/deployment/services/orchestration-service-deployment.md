@@ -2,7 +2,7 @@
 
 ## Overview
 
-The BlockSecOps Orchestration Service is a FastAPI-based REST API that manages smart contract security scanning workflows. It exposes 11 security scanners through HTTP endpoints, providing programmatic access to vulnerability detection, code quality analysis, gas optimization, fuzzing, and formal verification tools.
+The Apogee Orchestration Service is a FastAPI-based REST API that manages smart contract security scanning workflows. It exposes 11 security scanners through HTTP endpoints, providing programmatic access to vulnerability detection, code quality analysis, gas optimization, fuzzing, and formal verification tools.
 
 **Current Version**: 0.7.14-parser-fix (Phase 4D - Parser Fixes Deployed)
 **Previous Version**: 0.7.13-fix (Phase 4D - Tree-sitter API Fix)

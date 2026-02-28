@@ -1,7 +1,7 @@
 # Go-Live Audit Test Suite Fixes
 
 **Date:** February 16, 2026
-**Author:** BlockSecOps Team
+**Author:** Apogee Team
 **Services Affected:** api-service, tool-integration, orchestration
 
 ## Summary

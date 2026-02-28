@@ -2,7 +2,7 @@
 
 ## Repository: `blocksecops-docs`
 
-Documentation and knowledge base repository containing technical documentation, API docs, user guides, architecture documentation, team training materials, and onboarding procedures for the entire BlockSecOps Platform.
+Documentation and knowledge base repository containing technical documentation, API docs, user guides, architecture documentation, team training materials, and onboarding procedures for the entire Apogee Platform.
 
 **✅ ALIGNMENT CHECK**: This implementation creates comprehensive documentation and training materials for AWS infrastructure, GitOps workflows, and team onboarding as specified in Sprint 1 documentation.
 

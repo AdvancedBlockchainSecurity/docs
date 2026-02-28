@@ -8,7 +8,7 @@
 
 ## Overview
 
-Phase 3.2 enables BlockSecOps to natively support Foundry and Hardhat project structures, allowing professional developers to upload their projects without flattening contracts or manual configuration.
+Phase 3.2 enables Apogee to natively support Foundry and Hardhat project structures, allowing professional developers to upload their projects without flattening contracts or manual configuration.
 
 ## Components
 

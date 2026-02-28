@@ -1,6 +1,6 @@
 # Local Development Environment Documentation
 
-This directory contains documentation specific to the local development environment setup for the BlockSecOps platform. **These configurations and workarounds are for local development only and should NOT be deployed to production.**
+This directory contains documentation specific to the local development environment setup for the Apogee platform. **These configurations and workarounds are for local development only and should NOT be deployed to production.**
 
 ## 📁 Documentation Structure
 

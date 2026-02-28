@@ -8,7 +8,7 @@
 
 ## Vision: User-Configurable Scanner Marketplace
 
-Transform the BlockSecOps platform into an open ecosystem where users can:
+Transform the Apogee platform into an open ecosystem where users can:
 - Browse available security scanners in a marketplace
 - Enable/disable scanners for their organization
 - Add custom or third-party scanners
@@ -453,8 +453,8 @@ Update these files to reflect the scanner removal:
 | **Slither Cloud** | Single scanner (Slither) | ⚙️ Rule config only | ❌ No |
 | **OpenZeppelin Defender** | Fixed set (Forta, Slither) | ❌ No | ❌ No |
 | **Cyfrin Aderyn** | Single scanner (Aderyn) | ❌ No | ❌ No |
-| **BlockSecOps (Current)** | Fixed set (15 scanners) | ⚙️ Per-project selection | ❌ No |
-| **BlockSecOps (Planned)** | **User-defined + marketplace** | ✅ **Full plugin system** | ✅ **Public marketplace** |
+| **Apogee (Current)** | Fixed set (15 scanners) | ⚙️ Per-project selection | ❌ No |
+| **Apogee (Planned)** | **User-defined + marketplace** | ✅ **Full plugin system** | ✅ **Public marketplace** |
 
 **Key Differentiator:** We will be the **only platform** where users can:
 1. Add their own proprietary scanners

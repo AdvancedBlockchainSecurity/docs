@@ -7,7 +7,7 @@
 
 ## Overview
 
-This document defines mandatory standards for managing secrets in the BlockSecOps Platform using the External Secrets Operator (ESO) with environment-specific secret backends.
+This document defines mandatory standards for managing secrets in the Apogee Platform using the External Secrets Operator (ESO) with environment-specific secret backends.
 
 ---
 

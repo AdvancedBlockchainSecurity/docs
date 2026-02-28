@@ -1,6 +1,6 @@
 # Internal Documentation
 
-This folder contains developer and internal documentation for the BlockSecOps platform. These documents are intended for contributors, DevOps engineers, and internal team members.
+This folder contains developer and internal documentation for the Apogee platform. These documents are intended for contributors, DevOps engineers, and internal team members.
 
 ## Contents
 

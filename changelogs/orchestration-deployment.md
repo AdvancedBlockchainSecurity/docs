@@ -1,6 +1,6 @@
 # Orchestration Service Deployment Changelog
 
-This document tracks all deployments and updates to the BlockSecOps Orchestration Service.
+This document tracks all deployments and updates to the Apogee Orchestration Service.
 
 ---
 

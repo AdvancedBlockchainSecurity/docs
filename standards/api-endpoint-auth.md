@@ -253,4 +253,4 @@ async def create_contract(
 
 ---
 
-**Maintained By:** BlockSecOps Team
+**Maintained By:** Apogee Team

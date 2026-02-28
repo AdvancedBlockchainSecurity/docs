@@ -191,7 +191,7 @@ The API response (`GET /api/v1/vulnerabilities`) includes these intelligence fie
 
 ### Vulnerability Patterns (397 total)
 
-Patterns are identified by BVD (BlockSecOps Vulnerability Database) codes:
+Patterns are identified by BVD (Apogee Vulnerability Database) codes:
 
 | Category | Code Prefix | Count | Example |
 |----------|-------------|-------|---------|

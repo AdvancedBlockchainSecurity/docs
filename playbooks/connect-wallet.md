@@ -6,7 +6,7 @@
 
 ## Overview
 
-This playbook guides users through connecting a cryptocurrency wallet (MetaMask or WalletConnect) to BlockSecOps for x402 payment authentication using Sign-In with Ethereum (SIWE).
+This playbook guides users through connecting a cryptocurrency wallet (MetaMask or WalletConnect) to Apogee for x402 payment authentication using Sign-In with Ethereum (SIWE).
 
 ---
 
@@ -78,7 +78,7 @@ After wallet connection, you'll be prompted to sign a message:
 1. A signing request appears in your wallet
 2. Review the SIWE message containing:
    - Domain: `app.0xapogee.com`
-   - Statement: "Sign in with Ethereum to BlockSecOps"
+   - Statement: "Sign in with Ethereum to Apogee"
    - Nonce: Unique session identifier
    - Expiration: Message validity period
 3. Click **Sign** in your wallet

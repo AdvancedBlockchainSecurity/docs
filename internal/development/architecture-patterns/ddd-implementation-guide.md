@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide provides step-by-step instructions for implementing Domain-Driven Design (DDD) + Clean Architecture + CQRS patterns in the BlockSecOps Platform services.
+This guide provides step-by-step instructions for implementing Domain-Driven Design (DDD) + Clean Architecture + CQRS patterns in the Apogee Platform services.
 
 ## Architecture Layers
 
@@ -603,4 +603,4 @@ async def test_user_registration_duplicate_email(db_session: Session):
 5. **Create API Layer**: Build FastAPI endpoints and schemas
 6. **Add Tests**: Unit tests for domain, integration tests for workflows
 
-This architecture provides a solid foundation for building maintainable, testable, and scalable services in the BlockSecOps Platform.
+This architecture provides a solid foundation for building maintainable, testable, and scalable services in the Apogee Platform.

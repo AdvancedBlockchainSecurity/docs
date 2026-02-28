@@ -2,7 +2,7 @@
 
 **Date:** February 25, 2026
 **Scope:** Full platform — all services, dependencies, Docker images
-**Auditor:** BlockSecOps Security Review
+**Auditor:** Apogee Security Review
 **Status:** Remediated
 
 ---

@@ -1,4 +1,4 @@
-# BlockSecOps Web Application Functionality Audit Map
+# Apogee Web Application Functionality Audit Map
 
 **Version:** 1.0.0
 **Created:** January 22, 2026
@@ -6,7 +6,7 @@
 
 ## Overview
 
-This document provides a complete audit map of the BlockSecOps web application, detailing every page, user action, and API endpoint for functionality testing and verification.
+This document provides a complete audit map of the Apogee web application, detailing every page, user action, and API endpoint for functionality testing and verification.
 
 ### Application Stack
 - **Frontend:** React 18 + TypeScript + Vite

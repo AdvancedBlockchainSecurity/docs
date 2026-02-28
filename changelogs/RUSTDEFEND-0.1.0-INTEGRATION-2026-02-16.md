@@ -3,13 +3,13 @@
 **Date:** 2026-02-16 (initial), 2026-02-17 (v0.3.1 hotfix, v0.3.3 reliability fix)
 **Scanner Image Version:** 0.3.3
 **Tool Version:** 0.3.1 (50 detectors)
-**Platform:** BlockSecOps
+**Platform:** Apogee
 
 ---
 
 ## Summary
 
-RustDefend is a proprietary Rust smart contract static analysis scanner integrated into the BlockSecOps platform. It provides AST-based static analysis powered by the `syn` crate, covering 50 detectors across 4 blockchain ecosystems: Solana, CosmWasm, NEAR, and Ink!.
+RustDefend is a proprietary Rust smart contract static analysis scanner integrated into the Apogee platform. It provides AST-based static analysis powered by the `syn` crate, covering 50 detectors across 4 blockchain ecosystems: Solana, CosmWasm, NEAR, and Ink!.
 
 ---
 
@@ -78,7 +78,7 @@ RustDefend is a proprietary Rust smart contract static analysis scanner integrat
 
 ## New Vulnerability Patterns
 
-36 BVD (BlockSecOps Vulnerability Definition) patterns were created as part of this integration:
+36 BVD (Apogee Vulnerability Definition) patterns were created as part of this integration:
 
 | Ecosystem | Pattern Count | Severity Breakdown |
 |-----------|--------------|-------------------|

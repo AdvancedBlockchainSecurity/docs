@@ -6,7 +6,7 @@
 
 ## Overview
 
-This playbook guides you through inviting external users to your BlockSecOps organization. Learn how to send invitations, manage pending invites, and onboard new team members.
+This playbook guides you through inviting external users to your Apogee organization. Learn how to send invitations, manage pending invites, and onboard new team members.
 
 ---
 
@@ -95,7 +95,7 @@ curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/invites/bat
       {"email": "carol@company.com", "role": "auditor"}
     ],
     "teams": ["team_abc123"],
-    "message": "You are invited to join our security team on BlockSecOps."
+    "message": "You are invited to join our security team on Apogee."
   }'
 ```
 
@@ -121,11 +121,11 @@ curl -X POST "https://app.0xapogee.com/api/v1/organizations/{org_id}/invites/bat
 
 **Email Content:**
 ```
-Subject: You've been invited to join [Organization Name] on BlockSecOps
+Subject: You've been invited to join [Organization Name] on Apogee
 
 Hi,
 
-[Inviter Name] has invited you to join [Organization Name] on BlockSecOps.
+[Inviter Name] has invited you to join [Organization Name] on Apogee.
 
 You've been assigned the Developer role.
 
@@ -138,17 +138,17 @@ Click the button below to accept the invitation:
 
 This invitation expires in 7 days.
 
-If you don't have a BlockSecOps account, you'll be able to create one.
+If you don't have a Apogee account, you'll be able to create one.
 
 ---
-BlockSecOps - Smart Contract Security Platform
+Apogee - Smart Contract Security Platform
 ```
 
 ### Step 4: Invitee Accepts Invitation
 
 **New Users:**
 1. Click the invitation link in email
-2. Redirected to BlockSecOps signup page
+2. Redirected to Apogee signup page
 3. Create account with email/password or wallet
 4. Automatically added to organization with assigned role
 

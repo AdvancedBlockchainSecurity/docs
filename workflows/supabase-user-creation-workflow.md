@@ -70,7 +70,7 @@ Click email link    →    Validate token        →   Redirect to Site URL
 |------|--------------|
 | User clicks "Sign in with Google/GitHub" | `supabase.auth.signInWithOAuth()` called |
 | Redirect | Browser redirected to OAuth provider |
-| User authorizes | Grants access to BlockSecOps |
+| User authorizes | Grants access to Apogee |
 | Redirect back | `redirectTo: window.location.origin` returns user to dashboard |
 | Session set | Same `SIGNED_IN` flow as email verification |
 

@@ -15,7 +15,7 @@
 
 ## Overview
 
-Security scanner integration, management, and troubleshooting guides for the BlockSecOps Platform. This directory contains documentation for all scanner operations, from adding new scanners to debugging workflow issues.
+Security scanner integration, management, and troubleshooting guides for the Apogee Platform. This directory contains documentation for all scanner operations, from adding new scanners to debugging workflow issues.
 
 ---
 
@@ -537,7 +537,7 @@ See: [Workflow Troubleshooting](SCANNER-WORKFLOW-TROUBLESHOOTING.md)
 
 ---
 
-**Maintained by**: BlockSecOps Scanner Integration Team
+**Maintained by**: Apogee Scanner Integration Team
 **Active Scanners**: 18 operational (February 17, 2026)
 **Supported Languages**: Solidity (12 scanners), Vyper (2 scanners), Solana (4 scanners, 2 active)
 **Total Detector Count**: 500+ and growing

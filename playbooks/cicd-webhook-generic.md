@@ -6,13 +6,13 @@
 
 ## Overview
 
-This playbook guides you through integrating BlockSecOps security scanning into any CI/CD system using webhooks and the REST API. This approach works with systems like CircleCI, Travis CI, Azure DevOps, Bitbucket Pipelines, TeamCity, or custom build systems.
+This playbook guides you through integrating Apogee security scanning into any CI/CD system using webhooks and the REST API. This approach works with systems like CircleCI, Travis CI, Azure DevOps, Bitbucket Pipelines, TeamCity, or custom build systems.
 
 ---
 
 ## Prerequisites
 
-- [ ] BlockSecOps account with Growth or Enterprise tier
+- [ ] Apogee account with Growth or Enterprise tier
 - [ ] API key with `write:scans`, `read:scans`, `read:vulnerabilities` scopes
 - [ ] CI/CD system with HTTP request capability
 - [ ] Solidity smart contracts in the repository
@@ -89,7 +89,7 @@ if [ -z "$API_KEY" ]; then
   exit 1
 fi
 
-echo "=== BlockSecOps Security Scan ==="
+echo "=== Apogee Security Scan ==="
 echo "Path: $CONTRACT_PATH"
 echo "Project: $PROJECT_NAME"
 
@@ -377,7 +377,7 @@ object SecurityScan : BuildType({
 
     steps {
         script {
-            name = "Run BlockSecOps Scan"
+            name = "Run Apogee Scan"
             scriptContent = """
                 apt-get update && apt-get install -y jq
                 ./scripts/security-scan.sh contracts/
@@ -457,7 +457,7 @@ Confirm the integration is working:
 1. **Trigger a build** with Solidity file changes
 2. **Check build logs** for scan execution
 3. **Verify artifacts** contain `scan-results.json`
-4. **Check BlockSecOps dashboard** for scan record
+4. **Check Apogee dashboard** for scan record
 
 ---
 
@@ -483,7 +483,7 @@ Confirm the integration is working:
 - [ ] Test build executed
 - [ ] Scan results saved as artifact
 - [ ] Build fails on critical/high findings
-- [ ] Scan visible in BlockSecOps dashboard
+- [ ] Scan visible in Apogee dashboard
 
 ---
 

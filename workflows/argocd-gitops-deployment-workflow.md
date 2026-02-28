@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines the ArgoCD deployment workflow for the BlockSecOps platform, covering the ApplicationSet bootstrap process, sync wave ordering, GKE cluster registration, self-managing ArgoCD, and rollback procedures.
+This document defines the ArgoCD deployment workflow for the Apogee platform, covering the ApplicationSet bootstrap process, sync wave ordering, GKE cluster registration, self-managing ArgoCD, and rollback procedures.
 
 **ArgoCD Instances:**
 - Bare-metal (local dev): v2.13.3 in `argocd-local` namespace, at https://argocd.0xapogee.local
@@ -125,7 +125,7 @@ spec:
     spec:
       project: default
       source:
-        repoURL: https://github.com/BlockSecOps/blocksecops-gcp-infrastructure.git
+        repoURL: https://github.com/AdvancedBlockchainSecurity/blocksecops-gcp-infrastructure.git
         targetRevision: main
         path: 'k8s/overlays/gcp/services/{{ .name }}'
       destination:
@@ -163,7 +163,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/BlockSecOps/blocksecops-gcp-infrastructure.git
+    repoURL: https://github.com/AdvancedBlockchainSecurity/blocksecops-gcp-infrastructure.git
     targetRevision: main
     path: k8s/overlays/gcp/external-secrets
   destination:
@@ -466,7 +466,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/BlockSecOps/infra-argocd
+    repoURL: https://github.com/AdvancedBlockchainSecurity/infra-argocd
     targetRevision: main
     path: k8s/overlays/local/argocd
   destination:

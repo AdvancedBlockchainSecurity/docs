@@ -69,7 +69,7 @@ kubectl exec -n api-service-local deployment/api-service -- \
 
 ```
 ============================================================
-BlockSecOps Platform Admin Management
+Apogee Platform Admin Management
 ============================================================
 
 [SUCCESS] Admin account created for user@example.com
@@ -82,7 +82,7 @@ TOTP Secret (for manual entry):
   ABCDEFGHIJKLMNOPQRSTUVWXYZ234567
 
 Or use this URI with an authenticator app:
-  otpauth://totp/BlockSecOps%20Admin:user@example.com?secret=...
+  otpauth://totp/Apogee%20Admin:user@example.com?secret=...
 
 IMPORTANT: Save this secret securely. It will not be shown again.
 ============================================================
@@ -103,7 +103,7 @@ kubectl exec -n api-service-local deployment/api-service -- \
 
 ```
 ============================================================
-BlockSecOps Platform Admin Management
+Apogee Platform Admin Management
 ============================================================
 
 Email                                    Role                 MFA      Created
@@ -152,7 +152,7 @@ TOTP Secret (for manual entry):
   NEWSECRETHEREABCDEFGHIJ234567
 
 Or use this URI with an authenticator app:
-  otpauth://totp/BlockSecOps%20Admin:admin@example.com?secret=...
+  otpauth://totp/Apogee%20Admin:admin@example.com?secret=...
 
 IMPORTANT: Save this secret securely. It will not be shown again.
 ============================================================
@@ -225,7 +225,7 @@ kubectl exec -n api-service-local deployment/api-service -- \
 
 ```
 ============================================================
-BlockSecOps Platform Admin Management
+Apogee Platform Admin Management
 ============================================================
 
 [SUCCESS] Tier updated for user@example.com: none -> growth

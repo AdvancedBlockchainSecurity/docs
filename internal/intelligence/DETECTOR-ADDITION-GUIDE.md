@@ -6,7 +6,7 @@
 
 ## Overview
 
-This guide covers the process for adding new detectors to an **already-integrated** scanner in BlockSecOps. This is different from initial scanner integration (see [INTELLIGENCE-INTEGRATION-GUIDE.md](./INTELLIGENCE-INTEGRATION-GUIDE.md)).
+This guide covers the process for adding new detectors to an **already-integrated** scanner in Apogee. This is different from initial scanner integration (see [INTELLIGENCE-INTEGRATION-GUIDE.md](./INTELLIGENCE-INTEGRATION-GUIDE.md)).
 
 ### When to Use This Guide
 
@@ -992,4 +992,4 @@ For questions or issues:
 1. Check [Troubleshooting](#troubleshooting) section above
 2. Review [INTELLIGENCE-INTEGRATION-GUIDE.md](./INTELLIGENCE-INTEGRATION-GUIDE.md)
 3. Consult intelligence layer documentation
-4. Contact BlockSecOps development team
+4. Contact Apogee development team

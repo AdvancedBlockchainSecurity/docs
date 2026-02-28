@@ -1,10 +1,10 @@
 # Uploading Foundry Projects
 
-This guide explains how to upload and scan Foundry projects with BlockSecOps.
+This guide explains how to upload and scan Foundry projects with Apogee.
 
 ## Overview
 
-BlockSecOps natively supports Foundry project structures. When you upload a Foundry project, BlockSecOps automatically:
+Apogee natively supports Foundry project structures. When you upload a Foundry project, Apogee automatically:
 
 1. Detects the framework from `foundry.toml`
 2. Parses your configuration (compiler version, remappings, optimizer settings)
@@ -39,12 +39,12 @@ my-project/
 
 ### What Gets Extracted
 
-BlockSecOps uses **smart dependency extraction**:
+Apogee uses **smart dependency extraction**:
 
 - **Included**: Your source files + only the library files they import
 - **Excluded**: Test files (`test/`), scripts (`script/`), unimported libraries
 
-**Example**: If your project has 200+ files in `lib/openzeppelin-contracts/` but your contracts only import 12 of them, BlockSecOps extracts only those 12 files.
+**Example**: If your project has 200+ files in `lib/openzeppelin-contracts/` but your contracts only import 12 of them, Apogee extracts only those 12 files.
 
 ## Creating the Archive
 
@@ -72,14 +72,14 @@ Exclude these directories to reduce upload size:
 - `broadcast/` - Deployment broadcasts
 - `node_modules/` - If using npm dependencies
 
-## Uploading to BlockSecOps
+## Uploading to Apogee
 
 ### Via Dashboard
 
 1. Navigate to **Contracts** > **Upload Contract**
 2. Select **Upload Archive** (ZIP or tar.gz)
 3. Choose your archive file
-4. BlockSecOps auto-detects Foundry and shows configuration
+4. Apogee auto-detects Foundry and shows configuration
 5. Click **Upload**
 
 ### Via API
@@ -115,7 +115,7 @@ curl -X POST "https://api.0xapogee.com/api/v1/contracts/upload" \
 
 ## Configuration Parsing
 
-BlockSecOps parses these fields from `foundry.toml`:
+Apogee parses these fields from `foundry.toml`:
 
 | Field | Description | Default |
 |-------|-------------|---------|

@@ -6,7 +6,7 @@ Test CI/CD pipeline integration with GitHub Actions, GitLab CI, Jenkins, and gen
 
 ## Prerequisites
 
-- [ ] BlockSecOps API key with scan permissions
+- [ ] Apogee API key with scan permissions
 - [ ] Access to CI/CD platform (GitHub, GitLab, or Jenkins)
 - [ ] Sample Solidity contract repository
 - [ ] 0xapogee-cli installed (for CLI-based tests)

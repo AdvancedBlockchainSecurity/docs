@@ -6,7 +6,7 @@
 
 ## Overview
 
-This guide provides step-by-step procedures for integrating the modernized shared library into BlockSecOps platform services. The integration includes PyO3 Python bindings and WASM TypeScript acceleration with comprehensive testing procedures.
+This guide provides step-by-step procedures for integrating the modernized shared library into Apogee platform services. The integration includes PyO3 Python bindings and WASM TypeScript acceleration with comprehensive testing procedures.
 
 ## Prerequisites
 
@@ -395,4 +395,4 @@ docker run -it --rm python:3.13-slim bash
 - Verify package contents and versions
 - Test in isolated environments first
 
-This integration guide provides the proven procedures for successful shared library integration across all BlockSecOps platform services.
+This integration guide provides the proven procedures for successful shared library integration across all Apogee platform services.

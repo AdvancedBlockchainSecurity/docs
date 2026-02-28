@@ -6,13 +6,13 @@
 
 ## Overview
 
-This playbook guides you through integrating BlockSecOps security scanning into GitHub Actions workflows. Configure automated scans on pull requests, block merges on critical findings, and receive inline PR comments for vulnerabilities.
+This playbook guides you through integrating Apogee security scanning into GitHub Actions workflows. Configure automated scans on pull requests, block merges on critical findings, and receive inline PR comments for vulnerabilities.
 
 ---
 
 ## Prerequisites
 
-- [ ] BlockSecOps account with Growth or Enterprise tier
+- [ ] Apogee account with Growth or Enterprise tier
 - [ ] API key with `write:scans`, `read:scans`, `read:vulnerabilities` scopes
 - [ ] GitHub repository with admin access
 - [ ] Solidity smart contracts in the repository
@@ -24,7 +24,7 @@ This playbook guides you through integrating BlockSecOps security scanning into 
 ```mermaid
 flowchart LR
     A[PR Created/Updated] --> B[GitHub Actions Triggered]
-    B --> C[Upload Contract to BlockSecOps]
+    B --> C[Upload Contract to Apogee]
     C --> D[Run Security Scan]
     D --> E{Critical Findings?}
     E -->|Yes| F[Block Merge + Comment]
@@ -74,7 +74,7 @@ curl -X POST "https://app.0xapogee.com/api/v1/api_keys" \
 Create `.github/workflows/security-scan.yml`:
 
 ```yaml
-name: BlockSecOps Security Scan
+name: Apogee Security Scan
 
 on:
   pull_request:
@@ -137,7 +137,7 @@ jobs:
               status = ':x: **Failed**';
             }
 
-            const body = `## BlockSecOps Security Scan Results
+            const body = `## Apogee Security Scan Results
 
             ${status}
 
@@ -274,7 +274,7 @@ Confirm the integration is working:
 1. **Create a test PR** with a Solidity file change
 2. **Check Actions tab** for workflow execution
 3. **Verify PR comment** appears with scan results
-4. **Check BlockSecOps dashboard** for the scan record
+4. **Check Apogee dashboard** for the scan record
 
 **API Verification:**
 ```bash
@@ -330,7 +330,7 @@ curl -X GET "https://app.0xapogee.com/api/v1/scans?project=owner/repo-name&limit
 - [ ] Test PR created and scan executed
 - [ ] PR comment appears with results
 - [ ] Branch protection configured (optional)
-- [ ] Scan visible in BlockSecOps dashboard
+- [ ] Scan visible in Apogee dashboard
 
 ---
 

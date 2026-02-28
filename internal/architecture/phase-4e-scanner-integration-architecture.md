@@ -9,7 +9,7 @@
 
 ## Overview
 
-Phase 4E introduces one advanced security scanner to the BlockSecOps orchestration platform:
+Phase 4E introduces one advanced security scanner to the Apogee orchestration platform:
 - **Foundry Fuzz**: Industry-standard coverage-guided property-based fuzzer
 
 Note: Manticore was initially included but has been removed as it is no longer actively developed by Trail of Bits.

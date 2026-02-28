@@ -6,13 +6,13 @@
 
 ## Overview
 
-This playbook guides users through linking an Ethereum wallet to an existing BlockSecOps account. This enables x402 payment support and wallet-based authentication while keeping your email as the primary login method.
+This playbook guides users through linking an Ethereum wallet to an existing Apogee account. This enables x402 payment support and wallet-based authentication while keeping your email as the primary login method.
 
 ---
 
 ## Prerequisites
 
-- [ ] Existing BlockSecOps account (email/password)
+- [ ] Existing Apogee account (email/password)
 - [ ] MetaMask browser extension OR WalletConnect-compatible mobile wallet
 - [ ] Ethereum wallet with at least one account
 - [ ] Access to the wallet you want to link
@@ -77,7 +77,7 @@ After connecting, sign a verification message:
 1. Signing request appears in your wallet
 2. Review the message:
    ```
-   Link wallet to BlockSecOps account
+   Link wallet to Apogee account
 
    Account: user@example.com
    Wallet: 0x1234...5678

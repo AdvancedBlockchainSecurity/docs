@@ -1,6 +1,6 @@
 # Go-Live Audit Scripts
 
-Automated test scripts for the BlockSecOps GCP production launch audit.
+Automated test scripts for the Apogee GCP production launch audit.
 
 **Full checklist:** [`docs/audits/GO-LIVE-AUDIT-TESTING-CHECKLIST.md`](../../docs/audits/GO-LIVE-AUDIT-TESTING-CHECKLIST.md)
 
