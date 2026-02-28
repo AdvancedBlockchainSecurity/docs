@@ -442,6 +442,6 @@ Click **History** button on a channel:
 
 ```
 [Date] | [Tester] | [Note]
-2026-01-04 | Claude Code | Feature implemented, API endpoints verified, test docs created
-2026-01-04 | Claude Code | Dashboard UI implemented with full modal support
+2026-01-04 | Team | Feature implemented, API endpoints verified, test docs created
+2026-01-04 | Team | Dashboard UI implemented with full modal support
 ```
