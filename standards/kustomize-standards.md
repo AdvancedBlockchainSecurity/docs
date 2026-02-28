@@ -1,8 +1,8 @@
 # Kustomize Standards
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 1.2.0
-**Last Updated:** February 27, 2026
+**Version:** 1.3.0
+**Last Updated:** February 28, 2026
 **Status:** Active
 
 ## Overview
@@ -451,7 +451,59 @@ kubectl apply -k k8s/overlays/local/ --dry-run=client
    # k8s/overlays/local/kustomization.yaml includes both patches
    ```
 
-6. **Commit ExternalSecrets with values:**
+7. **Override Service selectors in service-patch.yaml:**
+   ```yaml
+   # BAD - service-patch.yaml adds/changes selector labels
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: <service>
+   spec:
+     selector:
+       app.kubernetes.io/name: <service>  # Overrides base selector via strategic merge
+     ports:
+       - port: 8000
+
+   # Result: Service selector becomes {app: <service>, app.kubernetes.io/name: <service>}
+   # but pods only have {app: <service>} → Service has <none> endpoints → service DOWN
+
+   # GOOD - service-patch.yaml only patches ports, annotations, or type
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: <service>
+   spec:
+     ports:
+       - port: 8000
+         targetPort: 8000
+         name: http
+   # Selector is inherited from base — never override it in a patch
+   ```
+
+   **Why this breaks things:** Strategic merge patch on a Service's `selector` field MERGES the patch labels with base labels. If the merged set doesn't match pod labels, the Service has no endpoints. This caused outages in data-service, contract-parser, and 4 other services (February 28, 2026 audit). See [Cluster Baseline — Resolved Deviations](./cluster-baseline.md#resolved-deviations).
+
+   **Rule:** `service-patch.yaml` files must NEVER contain a `selector:` block. Selectors are defined in `k8s/base/service.yaml` and inherited by overlays.
+
+7. **Use `includeSelectors: true` in kustomization commonLabels:**
+   ```yaml
+   # BAD - injects ALL commonLabels (including version) into Service selectors and Deployment matchLabels
+   commonLabels:
+     app.kubernetes.io/version: "0.2.7"
+   configuration:
+     commonLabels:
+       includeSelectors: true  # Version label in selector → breaks on next version bump
+
+   # GOOD - labels added to pod metadata only, not selectors
+   commonLabels:
+     app.kubernetes.io/version: "0.2.7"
+   configuration:
+     commonLabels:
+       includeSelectors: false  # Default and correct behavior
+   ```
+
+   **Why this breaks things:** `includeSelectors: true` adds version labels to both `spec.selector.matchLabels` (Deployment) and `spec.selector` (Service). On version bump, the Deployment's `matchLabels` changes, but Kubernetes rejects the update because `spec.selector.matchLabels` is **immutable**. The workaround (delete and recreate the Deployment) causes downtime. Even without version labels, injecting kustomize labels into selectors can cause mismatches with pods from other tools (Helm, manual kubectl). See [Local Development Setup — Kubernetes Service Selector Standards](./local-development-setup.md#kubernetes-service-selector-standards).
+
+8. **Commit ExternalSecrets with values:**
    ```yaml
    # BAD - in Git
    apiVersion: external-secrets.io/v1beta1
@@ -477,6 +529,8 @@ kubectl apply -k k8s/overlays/local/ --dry-run=client
 | Image not found | Tag mismatch | Sync newTag with version file |
 | Patch not applied | Wrong path | Check strategic merge path |
 | Cross-namespace resource placed in wrong NS | `namespace:` field overrides all resources | Apply cross-namespace resources separately with `kubectl apply -f` |
+| Service has `<none>` endpoints | `service-patch.yaml` overrides selector with labels pods don't have | Remove `selector:` block from service-patch.yaml; selectors come from base only |
+| Deployment update rejected (immutable field) | `includeSelectors: true` changed matchLabels | Set `includeSelectors: false`, delete Deployment, re-apply kustomize |
 
 ### Debug Commands
 

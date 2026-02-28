@@ -1,6 +1,6 @@
 # Platform Smoke Test Standards
 
-**Version:** 1.6.0
+**Version:** 1.7.0
 **Last Updated:** February 28, 2026
 **Status:** Active
 
@@ -250,19 +250,19 @@ for ns in $(kubectl get cronjob -A --no-headers 2>/dev/null | awk '{print $1}' |
 done
 ```
 
-**Current versions (as of February 27, 2026):**
+**Current versions (as of February 28, 2026):**
 
 | Service | Version |
 |---------|---------|
-| api-service | 0.29.37 |
-| dashboard | 0.46.8 |
-| admin-portal | 0.7.3 |
-| tool-integration | 0.5.6 |
-| orchestration | 0.10.6 |
+| api-service | 0.29.39 |
+| dashboard | 0.46.10 |
+| admin-portal | 0.7.6 |
+| tool-integration | 0.5.9 |
+| orchestration | 0.10.8 |
 | notification | 0.2.6 |
-| intelligence-engine | 0.3.4 |
-| data-service | 0.2.5 |
-| contract-parser | 0.2.0 |
+| intelligence-engine | 0.3.7 |
+| data-service | 0.2.7 |
+| contract-parser | 0.2.2 |
 
 ## Encryption & Security Checks
 
@@ -314,6 +314,40 @@ kubectl get hpa -A --no-headers 2>/dev/null | while read ns name _ _ _ _ _; do
   CONDS=$(kubectl get hpa -n "$ns" "$name" -o jsonpath='{.status.conditions[?(@.type=="ScalingActive")].status}' 2>/dev/null)
   echo "  HPA $ns/$name: ScalingActive=$CONDS"
 done
+```
+
+## WebSocket Health Check
+
+**Important:** WebSocket upgrade requires HTTP/1.1. When testing with `curl`, force HTTP/1.1 to avoid false negatives from HTTP/2 ALPN negotiation:
+
+```bash
+# CORRECT: Force HTTP/1.1 for WebSocket upgrade
+curl -sk --http1.1 -H "Connection: Upgrade" -H "Upgrade: websocket" \
+  -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
+  -o /dev/null -w "%{http_code}" \
+  https://app.0xapogee.local/ws/
+# Expected: 101 (Switching Protocols)
+
+# WRONG: Default curl may negotiate HTTP/2 via ALPN, which does not support
+# the Connection: Upgrade header → returns 404 (false negative)
+curl -sk -H "Connection: Upgrade" -H "Upgrade: websocket" \
+  https://app.0xapogee.local/ws/
+# May return 404 even though WebSocket is working
+```
+
+**For reliable WebSocket testing, use a proper WebSocket client:**
+```bash
+# Python websockets library
+python3 -c "
+import asyncio, websockets, ssl
+async def test():
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    async with websockets.connect('wss://app.0xapogee.local/ws/', ssl=ctx) as ws:
+        print('WebSocket connected successfully')
+asyncio.run(test())
+"
 ```
 
 ## Quick Full Smoke Test Script

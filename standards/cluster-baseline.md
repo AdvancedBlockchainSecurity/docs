@@ -1,6 +1,6 @@
 # Cluster Baseline — Local Development Environment
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Last Updated:** February 28, 2026
 **Status:** Active
 **Cluster:** debian-server (single-node kubeadm)
@@ -402,6 +402,12 @@ Track known deviations here until they are resolved:
 | 48 stale ReplicaSets | Feb 28, 2026 | Deleted + revisionHistoryLimit prevents recurrence |
 | 3 Completed harbor pods | Feb 28, 2026 | Deleted + revisionHistoryLimit: 3 on all harbor deployments |
 | Stale `notification` IngressRoute conflict | Feb 28, 2026 | Deleted manually-applied IngressRoute from cluster |
+| Service selector mismatches (6 services) | Feb 28, 2026 | Removed selector overrides from service-patch.yaml (api-service, dashboard, data-service, intelligence-engine, orchestration); set `includeSelectors: false` in contract-parser, data-service, intelligence-engine, orchestration overlays. PRs: api-service #285, dashboard #178, data-service #40, intelligence-engine #31, orchestration #91, contract-parser #23 |
+| Harbor API 502 (3 service selectors) | Feb 28, 2026 | Patched harbor-core, harbor-database, harbor-registry Service selectors to match Helm pod labels (`app.kubernetes.io/name: harbor` not `harbor-<component>`) |
+| metrics-server selector mismatch | Feb 28, 2026 | Patched metrics-server Service selector to match pod label `k8s-app: metrics-server` (removed kustomize-injected labels) |
+| HPA metrics unknown (3 HPAs) | Feb 28, 2026 | Fixed by metrics-server selector fix above; all HPAs now reading CPU/memory |
+| Stale HTTP IngressRoutes (api-service, dashboard) | Feb 28, 2026 | Deleted manually-applied IngressRoutes on `web` entrypoint that competed with `app-http-redirect` HTTPS redirect |
+| Version label drift (5 repos) | Feb 28, 2026 | Aligned `app.kubernetes.io/version` labels with `newTag` in api-service, admin-portal, dashboard, data-service, notification overlays |
 
 ---
 
