@@ -433,5 +433,5 @@ echo "=== Scan Complete ==="
 ## Related Documentation
 
 - [Feature 28: Web Application Security](./28-webapp-security.md)
-- [Phase 7A: Security Hardening](../../../TaskDocs-BlockSecOps/phases/07a-phase-7a-webapp-security/README.md)
+- [Phase 7A: Security Hardening](../../../TaskDocs-Apogee/phases/07a-phase-7a-webapp-security/README.md)
 - [Authentication System](../../../blocksecops-docs/architecture/authentication-system.md)

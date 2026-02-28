@@ -10,7 +10,7 @@ fi
 show_status() {
   clear
   echo "=========================================="
-  echo "  BlockSecOps Workflow Monitor"
+  echo "  Apogee Workflow Monitor"
   echo "  $(date '+%Y-%m-%d %H:%M:%S')"
   echo "=========================================="
   echo ""

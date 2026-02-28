@@ -757,7 +757,7 @@ service = EnrichmentServiceFactory.create_service(enable_ast_hashing=False)
 ## References
 
 - **Implementation**: `/Users/pwner/Git/ABS/blocksecops-orchestration/src/blocksecops_orchestration/intelligence/fingerprinting/`
-- **Task Documentation**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/PHASE-4-VULNERABILITY-INTELLIGENCE-TASK-LIST.md`
+- **Task Documentation**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/PHASE-4-VULNERABILITY-INTELLIGENCE-TASK-LIST.md`
 - **Database Schema**: Migration v006 (Phase 4 intelligence models)
 - **Related**: Parser architecture (`blocksecops_orchestration.parsers.base.ParsedFinding`)
 

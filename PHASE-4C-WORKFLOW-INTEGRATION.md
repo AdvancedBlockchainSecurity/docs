@@ -17,7 +17,7 @@ Phase 4C successfully integrated the enrichment service into the scan workflow, 
 
 **Issue**: API service called tool-integration directly via HTTP, preventing Celery-based orchestration from picking up scans.
 
-**Resolution**: Removed HTTP bypass; scans now properly queued for orchestration pickup. See `/TaskDocs-BlockSecOps/blocksecops/PHASE-4-ORCHESTRATION-FIX-COMPLETE.md`.
+**Resolution**: Removed HTTP bypass; scans now properly queued for orchestration pickup. See `/TaskDocs-Apogee/blocksecops/PHASE-4-ORCHESTRATION-FIX-COMPLETE.md`.
 
 ## What Was Accomplished
 

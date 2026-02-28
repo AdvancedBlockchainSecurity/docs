@@ -138,7 +138,7 @@ Users can now view their support ticket history, track status, and see live JIRA
 
 ## Related Documentation
 
-- [Task Documentation](../../TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-05-DASHBOARD-API-FIXES.md)
+- [Task Documentation](../../TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-02-05-DASHBOARD-API-FIXES.md)
 - [Support Tickets Feature Test](../feature-tests/53-support-tickets.md)
 - [Integrations Hub Feature Test](../feature-tests/45-integrations-hub.md)
 

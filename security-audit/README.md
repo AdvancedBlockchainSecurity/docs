@@ -55,11 +55,11 @@ For each fix:
 1. Apply the patch to the codebase
 2. Run relevant tests
 3. Verify endpoint/platform functionality
-4. Update TaskDocs-BlockSecOps
+4. Update TaskDocs-Apogee
 5. Document in this directory
 
 ## Related Documentation
 
-- [Security Audit Checklists](../../TaskDocs-BlockSecOps/phases/00_Security_Audit/)
+- [Security Audit Checklists](../../TaskDocs-Apogee/phases/00_Security_Audit/)
 - [Platform Standards](../standards/)
 - [Core Development Rules](../standards/core-development-rules.md)

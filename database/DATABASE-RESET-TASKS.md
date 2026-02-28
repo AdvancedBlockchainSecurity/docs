@@ -6,7 +6,7 @@
 
 ### Documentation Preparation
 - [ ] **TASK-001:** Review current DATABASE-RESET-PLAN.md
-  - Location: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/DATABASE-RESET-PLAN.md`
+  - Location: `/Users/pwner/Git/ABS/TaskDocs-Apogee/DATABASE-RESET-PLAN.md`
   - Verify all steps are clear and actionable
   - Estimated time: 5 minutes
 
@@ -440,9 +440,9 @@
 
 - [ ] **TASK-058:** Stage TaskDocs
   - Files:
-    - `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/DATABASE-RESET-PLAN.md`
-    - `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/DATABASE-RESET-TASKS.md`
-  - Command: `git add TaskDocs-BlockSecOps/DATABASE-RESET-*.md`
+    - `/Users/pwner/Git/ABS/TaskDocs-Apogee/DATABASE-RESET-PLAN.md`
+    - `/Users/pwner/Git/ABS/TaskDocs-Apogee/DATABASE-RESET-TASKS.md`
+  - Command: `git add TaskDocs-Apogee/DATABASE-RESET-*.md`
   - Estimated time: 1 minute
 
 ### Stage Code Changes

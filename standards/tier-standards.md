@@ -634,6 +634,6 @@ monthly_nl_conversions_limit = -1
 - [Database Schema](../database/SCHEMA.md) - user_quotas table
 - [API Billing Endpoints](../../blocksecops-docs/API/endpoints.md) - Billing API
 - [Competitive Analysis](/Users/pwner/.claude/plans/humble-bubbling-rabin.md) - Full pricing research
-- [Pricing Tiers Specification](../../TaskDocs-BlockSecOps/phases/FREEMIUM-MODEL/PRICING-TIERS-SPECIFICATION.md) - Detailed tier specification
-- [AI Invariant Generation Plan](../../TaskDocs-BlockSecOps/phases/05-phase-5-ai-ml/TASK-6-AI-INVARIANT-GENERATION.md) - AI invariant feature details
-- [Economic Security Enhancement](../../TaskDocs-BlockSecOps/phases/05-phase-5.5-security-graph-Economic-security-analysis/FEATURE-1-ECONOMIC-SECURITY-TASKS.md) - Economic AI explainer details
+- [Pricing Tiers Specification](../../TaskDocs-Apogee/phases/FREEMIUM-MODEL/PRICING-TIERS-SPECIFICATION.md) - Detailed tier specification
+- [AI Invariant Generation Plan](../../TaskDocs-Apogee/phases/05-phase-5-ai-ml/TASK-6-AI-INVARIANT-GENERATION.md) - AI invariant feature details
+- [Economic Security Enhancement](../../TaskDocs-Apogee/phases/05-phase-5.5-security-graph-Economic-security-analysis/FEATURE-1-ECONOMIC-SECURITY-TASKS.md) - Economic AI explainer details

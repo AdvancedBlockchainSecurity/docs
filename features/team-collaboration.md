@@ -429,5 +429,5 @@ import { TierGate } from '@/components/common/TierGate';
 
 - [API Endpoints Reference](/api/endpoints-reference.md)
 - [Database Schema](/docs/database/SCHEMA.md)
-- [Phase 4.5 Overview](/TaskDocs-BlockSecOps/phases/04-phase-4.5-enterprise-features/PHASE-4.5-OVERVIEW.md)
-- [Task 26 UI Implementation Plan](/TaskDocs-BlockSecOps/phases/04-phase-4.5-enterprise-features/TASK-26-UI-IMPLEMENTATION-PLAN.md)
+- [Phase 4.5 Overview](/TaskDocs-Apogee/phases/04-phase-4.5-enterprise-features/PHASE-4.5-OVERVIEW.md)
+- [Task 26 UI Implementation Plan](/TaskDocs-Apogee/phases/04-phase-4.5-enterprise-features/TASK-26-UI-IMPLEMENTATION-PLAN.md)

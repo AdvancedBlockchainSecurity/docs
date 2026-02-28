@@ -1067,7 +1067,7 @@ Replace in-memory scan storage with PostgreSQL:
 
 - [Orchestration Service Deployment](../deployment/orchestration-service-deployment.md)
 - [Result Routing Architecture](orchestration-result-routing.md)
-- [Phase 5 Implementation](../../TaskDocs-BlockSecOps/blocksecops/06-phase-5-rest-api/PHASE-5-REST-API-COMPLETE.md)
+- [Phase 5 Implementation](../../TaskDocs-Apogee/blocksecops/06-phase-5-rest-api/PHASE-5-REST-API-COMPLETE.md)
 
 ### Code Files
 

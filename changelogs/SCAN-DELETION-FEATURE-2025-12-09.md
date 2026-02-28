@@ -73,5 +73,5 @@ Implemented functionality to allow users to delete old/unwanted scans with check
 
 ## Related Files
 
-- Task Plan: `/TaskDocs-BlockSecOps/phases/02-phase-3.1b-frontend-projects-api-routing/20-SCAN-DELETION-FEATURE-PLAN.md`
+- Task Plan: `/TaskDocs-Apogee/phases/02-phase-3.1b-frontend-projects-api-routing/20-SCAN-DELETION-FEATURE-PLAN.md`
 - Feature Tests: `/docs/feature-tests/06-scanning.md` (section 7.5)

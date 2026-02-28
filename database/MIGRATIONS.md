@@ -1222,7 +1222,7 @@ asyncio.run(verify())
 3. Use `alembic current` and schema inspection together for verification
 4. Document inconsistent states and resolutions for future reference
 
-**Related Documentation:** `TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-24-SCANNER-MIGRATION-FIXES.md`
+**Related Documentation:** `TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-01-24-SCANNER-MIGRATION-FIXES.md`
 
 ---
 
@@ -1297,7 +1297,7 @@ asyncio.run(verify())
 - **Related Documentation**:
   - [AI Invariants Database Schema](/docs/database/INVARIANTS.md)
   - [Feature Test #50](/docs/feature-tests/50-ai-invariant-generation.md)
-  - [Phase E Implementation](/TaskDocs-BlockSecOps/phases/04-phase-5-ai-ml/phase-e-ai-invariants.md)
+  - [Phase E Implementation](/TaskDocs-Apogee/phases/04-phase-5-ai-ml/phase-e-ai-invariants.md)
 
 ---
 
@@ -1331,7 +1331,7 @@ asyncio.run(verify())
 - **Migration File**: `alembic/versions/20260131_1930-060_cleanup_invalid_scanner_ids.py`
 - **Related Documentation**:
   - [Feature Test #41 - Vulnerability Filtering](/docs/feature-tests/41-vulnerability-filtering.md) (TC-41.2 scanner filter validation)
-  - [Task Documentation](/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-31-INVALID-SCANNER-ID-CLEANUP.md)
+  - [Task Documentation](/TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-01-31-INVALID-SCANNER-ID-CLEANUP.md)
 
 ---
 
@@ -1371,7 +1371,7 @@ asyncio.run(verify())
 - **Migration File**: `alembic/versions/20260201_0100-061_add_support_tickets.py`
 - **Related Documentation**:
   - [Feature Test #53](/docs/feature-tests/53-support-tickets.md)
-  - [Task Documentation](/TaskDocs-BlockSecOps/blocksecops/support-ticket-jira-integration.md)
+  - [Task Documentation](/TaskDocs-Apogee/blocksecops/support-ticket-jira-integration.md)
 
 ---
 

@@ -217,7 +217,7 @@ All CRITICAL and HIGH issues resolved. Remaining issues are hardening improvemen
 | `docs/security-audit/FIX-BSO-SEC-003-allowed-hosts-wildcard.md` | Fix documentation |
 | `docs/security-audit/FIX-BSO-SEC-004-unauthenticated-endpoints.md` | Fix documentation |
 | `docs/security-audit/FIX-BSO-SEC-005-nonce-rate-limiting.md` | Fix documentation |
-| `TaskDocs-BlockSecOps/phases/00_Security_Audit/FINDINGS.md` | All findings tracker |
+| `TaskDocs-Apogee/phases/00_Security_Audit/FINDINGS.md` | All findings tracker |
 
 ---
 

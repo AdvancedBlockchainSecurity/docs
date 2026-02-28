@@ -601,7 +601,7 @@ kubectl logs job/smoke-<id> -c cloud-sql-proxy -n api-service-gcp  # verify side
 - [Smart Contract Scanning Workflow](./smart-contract-scanning-workflow.md)
 - [Deduplication Pipeline](../pipelines/deduplication-pipeline.md)
 - [Feature Test: Hybrid Deduplication](../feature-tests/73-hybrid-deduplication-inline-maintenance.md)
-- [Cross-Scan Deduplication Implementation](../../TaskDocs-BlockSecOps/blocksecops/cross-scan-deduplication-implementation.md)
+- [Cross-Scan Deduplication Implementation](../../TaskDocs-Apogee/blocksecops/cross-scan-deduplication-implementation.md)
 - [Deduplication & Metadata Audit Fixes](/docs/changelogs/DEDUPLICATION-METADATA-AUDIT-FIXES-2026-02-04.md)
 - [Multi-Level Matching Audit](/docs/changelogs/API-SERVICE-DEDUP-MULTILEVEL-MATCHING-AUDIT-2026-02-15.md)
 - [Hybrid Deduplication Changelog](/docs/changelogs/API-SERVICE-V0.29.11-HYBRID-DEDUPLICATION-2026-02-23.md)

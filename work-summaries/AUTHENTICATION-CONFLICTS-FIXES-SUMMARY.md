@@ -16,7 +16,7 @@ Found and fixed **5 critical authentication documentation conflicts** that docum
 
 ### ✅ 1. API-Reference.md - CRITICAL ISSUE IDENTIFIED
 
-**File**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/api/API-Reference.md`
+**File**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/api/API-Reference.md`
 
 **Issue**: Lines 27-150 document deprecated auth endpoints that no longer exist in v0.4.0+
 
@@ -120,7 +120,7 @@ Authorization: Bearer <supabase_access_token>
 
 ### ✅ 3. API-Architecture.md - MINOR FIX NEEDED
 
-**File**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/api/API-Architecture.md`
+**File**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/api/API-Architecture.md`
 
 **Change Required**: Line 84 - Remove `cookies.py` reference
 
@@ -147,7 +147,7 @@ src/infrastructure/
 
 ### ✅ 4. API-Changelog.md - CLARIFICATION ADDED
 
-**File**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/api/API-Changelog.md`
+**File**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/api/API-Changelog.md`
 
 **Change Required**: Add note after v0.3.4 section (after line 74)
 
@@ -162,7 +162,7 @@ src/infrastructure/
 
 ### ✅ 5. HTTPONLY-COOKIES-IMPLEMENTATION.md - DEPRECATION NOTICE
 
-**File**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/08-phase-8-security-hardening/HTTPONLY-COOKIES-IMPLEMENTATION.md`
+**File**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/08-phase-8-security-hardening/HTTPONLY-COOKIES-IMPLEMENTATION.md`
 
 **Change Required**: Add deprecation notice at top (before line 1)
 
@@ -223,7 +223,7 @@ src/infrastructure/
 
 Due to the size and complexity of these files, the following require manual editing:
 
-1. ✏️ **TaskDocs-BlockSecOps/phases/api/API-Reference.md**
+1. ✏️ **TaskDocs-Apogee/phases/api/API-Reference.md**
    - Remove lines 27-150 (deprecated auth endpoints)
    - Add new authentication section with correct endpoints
 
@@ -231,13 +231,13 @@ Due to the size and complexity of these files, the following require manual edit
    - Move to `/Users/pwner/Git/ABS/old/authentication-security-legacy.md`
    - OR completely rewrite for Supabase Auth
 
-3. ✏️ **TaskDocs-BlockSecOps/phases/api/API-Architecture.md**
+3. ✏️ **TaskDocs-Apogee/phases/api/API-Architecture.md**
    - Update line 84: Remove `cookies.py`, update infrastructure listing
 
-4. ✏️ **TaskDocs-BlockSecOps/phases/api/API-Changelog.md**
+4. ✏️ **TaskDocs-Apogee/phases/api/API-Changelog.md**
    - Add clarification note after v0.3.4 section
 
-5. ✏️ **TaskDocs-BlockSecOps/phases/08-phase-8-security-hardening/HTTPONLY-COOKIES-IMPLEMENTATION.md**
+5. ✏️ **TaskDocs-Apogee/phases/08-phase-8-security-hardening/HTTPONLY-COOKIES-IMPLEMENTATION.md**
    - Add deprecation notice at top of file
 
 6. ✏️ **docs/AUTHENTICATION-DOCUMENTATION-INDEX.md**

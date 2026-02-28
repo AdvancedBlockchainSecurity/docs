@@ -236,7 +236,7 @@ kubectl exec -n api-service-local deploy/api-service -- alembic upgrade head
 
 ## Related Documentation
 
-- [Task Documentation](../../TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-06-API-SERVICE-V0.27.0.md)
+- [Task Documentation](../../TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-02-06-API-SERVICE-V0.27.0.md)
 - [Intelligence Integration Standards](../standards/INTELLIGENCE-INTEGRATION-STANDARDS.md)
 - [Tier Standards](../standards/tier-standards.md)
 - [API Endpoint Authentication](../standards/api-endpoint-auth.md)

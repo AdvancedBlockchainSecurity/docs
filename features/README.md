@@ -87,6 +87,6 @@ IDE extensions for real-time security scanning in development environments.
 ## Related Documentation
 
 - **Test Checklists**: `/docs/feature-tests/`
-- **Task Documentation**: `/TaskDocs-BlockSecOps/phases/`
+- **Task Documentation**: `/TaskDocs-Apogee/phases/`
 - **Database Migrations**: `/docs/database/MIGRATIONS.md`
 - **Technical Docs**: `/blocksecops-docs/`

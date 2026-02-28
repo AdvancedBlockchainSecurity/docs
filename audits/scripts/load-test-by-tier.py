@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive load test for BlockSecOps API by tier.
+Comprehensive load test for Apogee API by tier.
 
 Tests all 4 tiers (developer, team, growth, enterprise) against a representative
 set of endpoints at increasing concurrency levels. Measures p50/p95/p99 latency,
@@ -27,7 +27,7 @@ import jwt
 # Configuration
 # ============================================================================
 
-API_BASE = "https://app.blocksecops.local/api/v1"
+API_BASE = "https://app.0xapogee.local/api/v1"
 JWT_SECRET = "local-dev-jwt-secret-key-change-in-production"
 
 USERS = {
@@ -367,7 +367,7 @@ def generate_markdown(
     lines.append("")
     lines.append("| Setting | Value |")
     lines.append("|---------|-------|")
-    lines.append("| API Base URL | `https://app.blocksecops.local/api/v1` |")
+    lines.append("| API Base URL | `https://app.0xapogee.local/api/v1` |")
     lines.append("| Cluster | kubeadm (single node) |")
     lines.append("| API replicas | 1 |")
     lines.append("| CPU | 200m request / 1 CPU limit |")
@@ -555,7 +555,7 @@ async def main():
 
     warnings.filterwarnings("ignore", message=".*SSL.*")
 
-    print_header("BlockSecOps Platform Load Test")
+    print_header("Apogee Platform Load Test")
     print(f"  API: {API_BASE}")
     print(f"  Tiers: developer, team, growth, enterprise")
     print(f"  Endpoints: {len(ENDPOINTS)}")

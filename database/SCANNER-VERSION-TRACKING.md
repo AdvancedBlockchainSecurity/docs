@@ -448,7 +448,7 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
   - Root cause: Seeds had 678 mappings but DB only had 667 — 40 mappings added for detector_id variants across scanner versions
   - Addresses: 596 dedup groups without pattern_code, 1067 ungrouped vulnerabilities
   - Service version: api-service 0.28.44 → 0.28.45
-  - See: `TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-18-DEDUP-SCHEDULE-DATA-FIX.md`
+  - See: `TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-02-18-DEDUP-SCHEDULE-DATA-FIX.md`
 
 - **2026-02-18**: RustDefend v0.5.1 Clean-Slate Upgrade + Scanner Ecosystem Audit
   - **RustDefend clean-slate**: Deleted all old findings (9 vulns, 5 scans, 4 dedup groups) due to high FP rate in previous version
@@ -462,7 +462,7 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
   - **Tool Integration**: Added HalmosParser, SolidityDefendParser, marked MythrilParser legacy
   - **SolidityDefend**: Image 0.8.0 → 0.9.1
   - Service versions: api-service 0.28.44, orchestration 0.9.14, tool-integration 0.4.7
-  - See: `TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-18-SCANNER-ECOSYSTEM-AUDIT.md`
+  - See: `TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-02-18-SCANNER-ECOSYSTEM-AUDIT.md`
 
 - **2026-02-05**: Semgrep Scanner Wrapper 0.3.2 Bug Fix
   - **Semgrep**: Image 0.3.1 → 0.3.2 (tool version remains 1.141.0)
@@ -493,7 +493,7 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
   - ConfigMap (`scanner-versions`) updated with Harbor image references
   - Orchestration SCANNER_METADATA updated with missing scanner entries (moccasin, vyper, soliditydefend, sol-azy, sec3-xray, trident, cargo-fuzz-solana)
   - Vyper and Moccasin scans completing successfully (E2E verified)
-  - See: `/home/pwner/Git/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-19-SCANNER-HARBOR-IMAGES.md`
+  - See: `/home/pwner/Git/TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-01-19-SCANNER-HARBOR-IMAGES.md`
 
 - **2025-12-20**: Scanner Pattern Coverage Audit Complete
   - Fixed 5 duplicate pattern IDs in vulnerability_patterns.json

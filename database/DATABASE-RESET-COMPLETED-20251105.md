@@ -288,8 +288,8 @@ kubectl apply -k k8s/overlays/local/postgresql/
 
 ## Related Documentation
 
-- **Reset Plan:** `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/DATABASE-RESET-PLAN.md`
-- **Task Checklist:** `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/DATABASE-RESET-TASKS.md`
+- **Reset Plan:** `/Users/pwner/Git/ABS/TaskDocs-Apogee/DATABASE-RESET-PLAN.md`
+- **Task Checklist:** `/Users/pwner/Git/ABS/TaskDocs-Apogee/DATABASE-RESET-TASKS.md`
 - **Schema Reference:** `/Users/pwner/Git/ABS/database/SCHEMA.md`
 - **Backup Location:** `/Users/pwner/Git/ABS/database/backups/pre-reset-20251105/`
 - **Database Standards:** `/Users/pwner/Git/ABS/docs/standards/database-management.md`
@@ -344,7 +344,7 @@ cd /Users/pwner/Git/ABS/blocksecops-api-service
 alembic upgrade head
 ```
 
-**Investigation Document:** `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/scanners/slither/investigation-scans-marked-failed.md`
+**Investigation Document:** `/Users/pwner/Git/ABS/TaskDocs-Apogee/scanners/slither/investigation-scans-marked-failed.md`
 
 **Lesson Learned:** Always verify Alembic migrations have been applied after database restoration/recreation. Check with:
 ```bash
@@ -360,7 +360,7 @@ kubectl exec -n postgresql-local postgresql-0 -- psql -U postgres -d solidity_se
 **Status:** OPEN
 **Severity:** MEDIUM (Cosmetic issue, does not affect core functionality)
 **Discovered:** 2025-11-06 during verification testing after database table fixes
-**Documentation:** `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/dashboard-summary-counts-zero-issue.md`
+**Documentation:** `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/dashboard-summary-counts-zero-issue.md`
 
 **Symptom:**
 After resolving the database table issues (Bug #2 above), scans complete successfully and vulnerabilities display correctly in the dashboard. However, the summary section at the top of the scan detail page shows all zeros for vulnerability counts:
@@ -388,4 +388,4 @@ Database contains correct vulnerability data. For scan `41556b81-9923-4264-95ba-
 Likely missing aggregation column population in `scans` table or frontend parsing issue. Not related to database table existence (Bug #2).
 
 **Next Steps:**
-See full investigation document at `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/dashboard-summary-counts-zero-issue.md` for resolution steps.
+See full investigation document at `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/dashboard-summary-counts-zero-issue.md` for resolution steps.

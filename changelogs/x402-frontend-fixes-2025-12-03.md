@@ -141,5 +141,5 @@ tests/unit/services/test_payment_services.py
 ## Related Documentation
 
 - API Reference: `/blocksecops-docs/api/endpoints-reference.md` (payments section complete)
-- TaskDocs: `/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2025-12-03-X402-FRONTEND-STATUS.md`
+- TaskDocs: `/TaskDocs-Apogee/DOCUMENTATION-UPDATE-2025-12-03-X402-FRONTEND-STATUS.md`
 - Feature Tests: `/docs/feature-tests/15-x402-pay-per-scan.md`

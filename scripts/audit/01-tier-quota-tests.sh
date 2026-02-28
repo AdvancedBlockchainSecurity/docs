@@ -34,7 +34,7 @@ check() {
 }
 
 echo "=============================================="
-echo " BlockSecOps Tier System & Quota Audit"
+echo " Apogee Tier System & Quota Audit"
 echo " Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo "=============================================="
 

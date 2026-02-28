@@ -302,7 +302,7 @@ kubectl apply -k blocksecops-dashboard/k8s/overlays/local/
 
 ## Related Documentation
 
-- [Task Documentation](../../TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-06-DASHBOARD-V0.40.0.md)
+- [Task Documentation](../../TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-02-06-DASHBOARD-V0.40.0.md)
 - [Frontend Development Standards](../standards/frontend-development.md)
 - [Frontend Build-Time Environment Variables](../standards/frontend-build-env.md)
 - [Tier Standards](../standards/tier-standards.md)

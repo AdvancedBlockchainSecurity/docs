@@ -469,5 +469,5 @@ FROM ${BASE_REGISTRY}/blocksecops/blocksecops-orchestration-base:${BASE_IMAGE_TA
 ## Related Documentation
 
 - [Docker Base Images](./docker-base-images.md) - Pre-built base images for heavy dependencies
-- [Docker Standardization Plan](/home/pwner/Git/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-01-17-DOCKER-STANDARDIZATION-PLAN.md)
-- [Harbor Local Installation](/home/pwner/Git/TaskDocs-BlockSecOps/phases/02-phase-3.1a1-add-harbor/HARBOR-LOCAL-INSTALLATION.md)
+- [Docker Standardization Plan](/home/pwner/Git/TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-01-17-DOCKER-STANDARDIZATION-PLAN.md)
+- [Harbor Local Installation](/home/pwner/Git/TaskDocs-Apogee/phases/02-phase-3.1a1-add-harbor/HARBOR-LOCAL-INSTALLATION.md)

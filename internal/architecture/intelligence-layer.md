@@ -32,7 +32,7 @@
 - ✅ Tree-sitter API compatibility fix deployed
 
 **See Also**:
-- `/TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/CAIRO-INTEGRATION-PLAN.md` - Cairo integration details
+- `/TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/CAIRO-INTEGRATION-PLAN.md` - Cairo integration details
 - `/Users/pwner/Git/ABS/blocksecops-orchestration/docs/PHASE-4D-FIX-SUMMARY.md` - Phase 4D fix summary
 
 ---
@@ -793,7 +793,7 @@ def test_enrichment_with_pattern_matching():
 - **Implementation**: `/Users/pwner/Git/ABS/blocksecops-orchestration/src/blocksecops_orchestration/intelligence/`
 - **Fingerprinting Engine**: `fingerprinting-engine.md`
 - **Database Schema**: Migration v006 (Phase 4 intelligence models)
-- **Task Documentation**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/`
+- **Task Documentation**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/`
 - **Related**: Parser architecture, Workflow engine
 
 ---
@@ -826,7 +826,7 @@ def test_enrichment_with_pattern_matching():
 
 **References**:
 - Implementation: `/blocksecops-orchestration/src/blocksecops_orchestration/intelligence/`
-- Task Documentation: `/TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/PHASE-4C-INTELLIGENCE-MODULES-COMPLETE.md`
+- Task Documentation: `/TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/PHASE-4C-INTELLIGENCE-MODULES-COMPLETE.md`
 - General Documentation: `/docs/fixes/intelligence-layer-implementation.md`
 
 **Note**: This document describes the TARGET architecture. For current implementation status, see task documentation above.

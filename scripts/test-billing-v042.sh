@@ -9,7 +9,7 @@
 #   ./test-billing-v042.sh --quick      # Skip invite tests (read-only)
 #
 # Prerequisites:
-#   - API service running at app.blocksecops.local
+#   - API service running at app.0xapogee.local
 #   - Supabase auth working
 #   - jq installed
 #
@@ -28,7 +28,7 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 # Configuration
-API_BASE="${API_BASE:-https://app.blocksecops.local/api/v1}"
+API_BASE="${API_BASE:-https://app.0xapogee.local/api/v1}"
 CURL_OPTS="-sk --location-trusted"
 
 # Parse arguments

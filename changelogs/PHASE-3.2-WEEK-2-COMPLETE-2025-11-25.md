@@ -121,9 +121,9 @@ blocksecops-api-service/
 
 ## Documentation Updated
 
-- `TaskDocs-BlockSecOps/phases/03-phase-3.2-project-structure-support/README.md`
-- `TaskDocs-BlockSecOps/phases/03-phase-3.2-project-structure-support/WEEK-2-IMPORT-RESOLUTION.md`
-- `TaskDocs-BlockSecOps/phases/README.md`
+- `TaskDocs-Apogee/phases/03-phase-3.2-project-structure-support/README.md`
+- `TaskDocs-Apogee/phases/03-phase-3.2-project-structure-support/WEEK-2-IMPORT-RESOLUTION.md`
+- `TaskDocs-Apogee/phases/README.md`
 - `blocksecops-docs/features/framework-support.md`
 
 ---
@@ -159,8 +159,8 @@ Created comprehensive manual testing checklists at `/docs/feature-tests/`:
 
 ## Related Documentation
 
-- Phase 3.2 README: `TaskDocs-BlockSecOps/phases/03-phase-3.2-project-structure-support/README.md`
-- Week 2 Tasks: `TaskDocs-BlockSecOps/phases/03-phase-3.2-project-structure-support/WEEK-2-IMPORT-RESOLUTION.md`
+- Phase 3.2 README: `TaskDocs-Apogee/phases/03-phase-3.2-project-structure-support/README.md`
+- Week 2 Tasks: `TaskDocs-Apogee/phases/03-phase-3.2-project-structure-support/WEEK-2-IMPORT-RESOLUTION.md`
 - Technical Docs: `blocksecops-docs/features/framework-support.md`
 
 ---

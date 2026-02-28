@@ -218,7 +218,7 @@ Wrapped scan creation response in `JSONResponse` for SlowAPI rate limiter compat
 - `/Users/pwner/Git/ABS/docs/SCAN-TRIGGER-FIX-2025-10-13.md` (this summary)
 
 ### Updated
-- `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/api/api-service-known-issues.md` (marked as fixed)
+- `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/api/api-service-known-issues.md` (marked as fixed)
 - `/Users/pwner/Git/ABS/blocksecops-docs/deployment/api-service-deployment.md` (added change log entry)
 - `/Users/pwner/Git/ABS/blocksecops-docs/local-development/development-workflow.md` (added port-forward management section)
 
@@ -242,7 +242,7 @@ Wrapped scan creation response in `JSONResponse` for SlowAPI rate limiter compat
 
 ### Detailed Documentation
 - **Full Technical Writeup**: `/Users/pwner/Git/ABS/blocksecops-docs/deployment/contract-source-scan-trigger-fix.md`
-- **Known Issues Tracker**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/api/api-service-known-issues.md`
+- **Known Issues Tracker**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/api/api-service-known-issues.md`
 - **Deployment Guide**: `/Users/pwner/Git/ABS/blocksecops-docs/deployment/api-service-deployment.md`
 - **Development Workflow**: `/Users/pwner/Git/ABS/blocksecops-docs/local-development/development-workflow.md`
 

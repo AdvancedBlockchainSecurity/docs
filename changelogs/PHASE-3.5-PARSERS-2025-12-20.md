@@ -181,7 +181,7 @@ cd /Users/pwner/Git/ABS/blocksecops-tool-integration
 
 ### Related Documentation
 
-- **Phase 3.5 Task Tracking:** `/TaskDocs-BlockSecOps/phases/03-phase-3.5-vyper-rust/TASK-TRACKING.md`
+- **Phase 3.5 Task Tracking:** `/TaskDocs-Apogee/phases/03-phase-3.5-vyper-rust/TASK-TRACKING.md`
 - **Scanner Integration Guide:** `/blocksecops-docs/scanners/SCANNER-INTEGRATION-GUIDE.md`
 - **Vulnerability Patterns:** `/docs/database/vulnerability_patterns.json`
 - **Docker Images:** Phase 3.5 scanner images documented in `PHASE-3.5-VYPER-RUST-DOCKER-IMAGES-2025-12-08.md`

@@ -1154,7 +1154,7 @@ pytest tests/integration/test_<scanner>_integration_complete.py -v
 
 #### 1. Integration Summary
 
-**Location**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/implementation-summaries/<SCANNER>-INTELLIGENCE-INTEGRATION-COMPLETE.md`
+**Location**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/implementation-summaries/<SCANNER>-INTELLIGENCE-INTEGRATION-COMPLETE.md`
 
 **Required Sections**:
 - Executive Summary (metrics, completion %)

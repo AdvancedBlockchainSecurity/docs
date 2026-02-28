@@ -605,5 +605,5 @@ time curl -s "http://127.0.0.1:3000/api/v1/search/quick?q=transfer&limit=10" \
 
 - [Feature Docs: Dark Mode & Global Search](/blocksecops-docs/features/dark-mode-global-search.md)
 - [API Endpoints Reference](/blocksecops-docs/api/endpoints-reference.md)
-- [Task 24 Implementation](/TaskDocs-BlockSecOps/phases/04-phase-4.5-enterprise-features/TASK-24-DARK-MODE-GLOBAL-SEARCH.md)
-- [Task 25 CSS Fix](/TaskDocs-BlockSecOps/phases/04-phase-4.5-enterprise-features/TASK-25-DARK-MODE-CSS-FIX.md)
+- [Task 24 Implementation](/TaskDocs-Apogee/phases/04-phase-4.5-enterprise-features/TASK-24-DARK-MODE-GLOBAL-SEARCH.md)
+- [Task 25 CSS Fix](/TaskDocs-Apogee/phases/04-phase-4.5-enterprise-features/TASK-25-DARK-MODE-CSS-FIX.md)

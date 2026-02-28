@@ -1,5 +1,5 @@
 #!/bin/bash
-# BlockSecOps Go-Live Audit: Database Integrity Checks (Section 8)
+# Apogee Go-Live Audit: Database Integrity Checks (Section 8)
 # Validates database constraints, triggers, data integrity, and migration state
 set -euo pipefail
 
@@ -42,7 +42,7 @@ check_gte() {
 }
 
 echo "=============================================="
-echo " BlockSecOps Database Integrity Audit"
+echo " Apogee Database Integrity Audit"
 echo " Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo " Database: $DB_NAME @ $DB_NAMESPACE"
 echo "=============================================="

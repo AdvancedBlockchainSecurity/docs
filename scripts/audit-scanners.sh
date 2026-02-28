@@ -5,7 +5,7 @@
 #
 # Audits all 6 static analysis scanners by:
 #   Phase 1: Running each Docker image directly against test contracts (baseline)
-#   Phase 2: Running scans via the BlockSecOps platform API
+#   Phase 2: Running scans via the Apogee platform API
 #   Phase 3: Comparing results to identify pipeline failures
 #
 # Usage:
@@ -56,7 +56,7 @@ CONTRACTS_DIR="/home/pwner/Git/vulnerable-smart-contract-examples/contracts/soli
 REGISTRY="${REGISTRY:-harbor.blocksecops.local/blocksecops}"
 
 # API Configuration
-API_URL="${API_URL:-https://app.blocksecops.local/api/v1}"
+API_URL="${API_URL:-https://app.0xapogee.local/api/v1}"
 SUPABASE_URL="https://huzjlpypdlelqnbjvxad.supabase.co"
 SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1empscHlwZGxlbHFuYmp2eGFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4MTQ5MzYsImV4cCI6MjA3ODM5MDkzNn0.AabcSkKyi6HP3sLnTR7Bj-jZfgGgeSlEQZ0YRajC3i4"
 TEST_EMAIL="jasonbrailowbizop@mail.com"
@@ -1208,7 +1208,7 @@ DIAGNOSTIC
 main() {
     echo -e "${CYAN}${BOLD}"
     echo "========================================================"
-    echo "  BlockSecOps Comprehensive Scanner Audit"
+    echo "  Apogee Comprehensive Scanner Audit"
     echo "========================================================"
     echo -e "${NC}"
     echo "  Scanners:  ${SCANNERS[*]}"

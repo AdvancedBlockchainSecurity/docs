@@ -241,7 +241,7 @@ ls -la src/infrastructure/database/specialized_models/
 - **Updated:** `/k8s/overlays/local/api-service/kustomization.yaml` (image version 0.4.12)
 
 ### Related Documentation
-- **Known Issues:** `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/api/api-service-known-issues.md`
+- **Known Issues:** `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/api/api-service-known-issues.md`
 - **Architecture:** `/Users/pwner/Git/ABS/blocksecops-docs/architecture/api-service-architecture.md`
 
 ---

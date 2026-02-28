@@ -691,7 +691,7 @@ curl -s -H "Authorization: Bearer ${TOKEN}" \
 ## References
 
 - Feature Documentation: `/Users/pwner/Git/ABS/blocksecops-docs/features/team-collaboration.md`
-- Task Documentation: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/04-phase-4.5-enterprise-features/TASK-26-TEAM-COLLABORATION.md`
+- Task Documentation: `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/04-phase-4.5-enterprise-features/TASK-26-TEAM-COLLABORATION.md`
 - API Implementation: `/Users/pwner/Git/ABS/blocksecops-api-service/src/presentation/api/v1/endpoints/teams.py`
 - Database Schema: `/Users/pwner/Git/ABS/docs/database/SCHEMA.md`
 

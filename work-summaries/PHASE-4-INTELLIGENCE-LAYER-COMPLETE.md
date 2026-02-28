@@ -31,7 +31,7 @@ The Intelligence Layer is now fully integrated into the Apogee dashboard with a 
 
 **Status**: Intelligence layer is **fully operational** with complete dashboard integration.
 
-📄 **See**: `/TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/PHASE-6.3-PAGES-COMPLETE.md`
+📄 **See**: `/TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/PHASE-6.3-PAGES-COMPLETE.md`
 
 ---
 
@@ -50,7 +50,7 @@ The Phase 4 Vulnerability Intelligence Layer has been successfully implemented, 
 - ✅ **Solution**: Removed HTTP bypass; scans now properly queued via Celery beat (10-second polling)
 - ✅ **Impact**: All intelligence features (enrichment, pattern matching, deduplication) now functional
 - ✅ **Verification**: 5/5 critical features confirmed operational
-- 📄 **Details**: `/TaskDocs-BlockSecOps/blocksecops/PHASE-4-ORCHESTRATION-FIX-COMPLETE.md`
+- 📄 **Details**: `/TaskDocs-Apogee/blocksecops/PHASE-4-ORCHESTRATION-FIX-COMPLETE.md`
 
 **Status Change**: Phase 4 intelligence layer transitioned from "implemented but non-functional" to **fully operational** as of 2025-10-29.
 
@@ -449,8 +449,8 @@ The Phase 4 Vulnerability Intelligence Layer core implementation is complete, va
 
 **For Questions**: See detailed documentation in `/Users/pwner/Git/ABS/blocksecops-docs/architecture/intelligence-layer.md`
 
-**For Implementation Details**: See `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/implementation-summaries/PHASE-4-INTELLIGENCE-LAYER-IMPLEMENTATION.md`
+**For Implementation Details**: See `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/implementation-summaries/PHASE-4-INTELLIGENCE-LAYER-IMPLEMENTATION.md`
 
-**For Validation Results**: See `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/PHASE-1-100-PERCENT-COMPLETE.md`
+**For Validation Results**: See `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/PHASE-1-100-PERCENT-COMPLETE.md`
 
 **For Test Instructions**: Run `pytest tests/integration/ tests/unit/intelligence/` or see Phase 1 documentation

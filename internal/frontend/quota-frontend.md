@@ -298,8 +298,8 @@ The `useQuota` hook outputs debug logs:
 
 ## Related Documentation
 
-- [Session Documentation](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2025-11-25-SESSION-3.md)
-- [Phase 3.1b Tier Features](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/)
+- [Session Documentation](/Users/pwner/Git/ABS/TaskDocs-Apogee/DOCUMENTATION-UPDATE-2025-11-25-SESSION-3.md)
+- [Phase 3.1b Tier Features](/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/)
 - [Authentication Frontend](/Users/pwner/Git/ABS/blocksecops-docs/frontend/authentication-frontend.md)
 - [Notification Frontend](/Users/pwner/Git/ABS/blocksecops-docs/frontend/notification-frontend.md)
 - [Project Contracts Frontend](/Users/pwner/Git/ABS/blocksecops-docs/frontend/project-contracts-frontend.md)

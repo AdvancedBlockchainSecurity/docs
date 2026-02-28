@@ -1271,7 +1271,7 @@ Copy this checklist for each scanner update:
 ## Related Documentation
 
 - `/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPMENT-STANDARDS.md` - Development standards
-- `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/implementation-summaries/SOLIDITYBOM-SOLIDITYDEFEND-INTEGRATION-PLAN.md` - Integration plan
+- `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/implementation-summaries/SOLIDITYBOM-SOLIDITYDEFEND-INTEGRATION-PLAN.md` - Integration plan
 - `/Users/pwner/Git/ABS/docs/architecture-templates/kubernetes-kustomize-structure-template.md` - K8s structure
 
 ---

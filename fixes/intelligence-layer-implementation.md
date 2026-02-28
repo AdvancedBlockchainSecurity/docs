@@ -169,7 +169,7 @@ Result: All fingerprint fields are NULL (expected for placeholder implementation
    - Added migration history entry for intelligence layer implementation
    - Added Phase 4C fingerprint indexes documentation
 
-2. **Task Documentation** (`/TaskDocs-BlockSecOps/blocksecops/intelligence-layer-implementation.md`)
+2. **Task Documentation** (`/TaskDocs-Apogee/blocksecops/intelligence-layer-implementation.md`)
    - Comprehensive implementation details
    - Code structure documentation
    - Testing results
@@ -253,7 +253,7 @@ When implementing actual fingerprinting algorithms:
 
 ## References
 
-- **Task Documentation**: `/TaskDocs-BlockSecOps/blocksecops/intelligence-layer-implementation.md`
+- **Task Documentation**: `/TaskDocs-Apogee/blocksecops/intelligence-layer-implementation.md`
 - **Database Schema**: `/docs/database/SCHEMA.md`
 - **Models**: `/blocksecops-orchestration/src/blocksecops_orchestration/intelligence/models.py`
 - **Normalizer**: `/blocksecops-orchestration/src/blocksecops_orchestration/intelligence/normalizer.py`

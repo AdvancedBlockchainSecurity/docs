@@ -367,7 +367,7 @@ All 43 new patterns follow the BVD-SOLIDITY-* taxonomy:
 - BVD-SOLIDITY-ZK-001 (Zero-Knowledge)
 - BVD-SOLIDITY-AI-001 (AI Agents)
 
-*See complete list in [../../../TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-PATTERNS-GENERATED.md](../../../TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-PATTERNS-GENERATED.md)*
+*See complete list in [../../../TaskDocs-Apogee/scanners/SOLIDITYDEFEND-PATTERNS-GENERATED.md](../../../TaskDocs-Apogee/scanners/SOLIDITYDEFEND-PATTERNS-GENERATED.md)*
 
 ---
 
@@ -550,10 +550,10 @@ soliditydefend scan --verbose path/to/Contract.sol
 
 ### Integration Documentation
 
-- **Pattern Mapping Status:** [../../../TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-PATTERN-MAPPING-STATUS.md](../../../TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-PATTERN-MAPPING-STATUS.md)
-- **Integration Complete:** [../../../TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-INTEGRATION-COMPLETE.md](../../../TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-INTEGRATION-COMPLETE.md)
-- **Patterns Generated:** [../../../TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-PATTERNS-GENERATED.md](../../../TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-PATTERNS-GENERATED.md)
-- **Database Integration:** [../../../TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-DATABASE-INTEGRATION-COMPLETE.md](../../../TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-DATABASE-INTEGRATION-COMPLETE.md)
+- **Pattern Mapping Status:** [../../../TaskDocs-Apogee/scanners/SOLIDITYDEFEND-PATTERN-MAPPING-STATUS.md](../../../TaskDocs-Apogee/scanners/SOLIDITYDEFEND-PATTERN-MAPPING-STATUS.md)
+- **Integration Complete:** [../../../TaskDocs-Apogee/scanners/SOLIDITYDEFEND-INTEGRATION-COMPLETE.md](../../../TaskDocs-Apogee/scanners/SOLIDITYDEFEND-INTEGRATION-COMPLETE.md)
+- **Patterns Generated:** [../../../TaskDocs-Apogee/scanners/SOLIDITYDEFEND-PATTERNS-GENERATED.md](../../../TaskDocs-Apogee/scanners/SOLIDITYDEFEND-PATTERNS-GENERATED.md)
+- **Database Integration:** [../../../TaskDocs-Apogee/scanners/SOLIDITYDEFEND-DATABASE-INTEGRATION-COMPLETE.md](../../../TaskDocs-Apogee/scanners/SOLIDITYDEFEND-DATABASE-INTEGRATION-COMPLETE.md)
 
 ---
 

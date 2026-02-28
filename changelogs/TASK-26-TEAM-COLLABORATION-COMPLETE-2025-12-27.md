@@ -157,6 +157,6 @@ Pre-migration backup created at:
 
 ## Related Documentation
 
-- Task Plan: `/TaskDocs-BlockSecOps/phases/04-phase-4.5-enterprise-features/TEAM-COLLABORATION-PLAN.md`
+- Task Plan: `/TaskDocs-Apogee/phases/04-phase-4.5-enterprise-features/TEAM-COLLABORATION-PLAN.md`
 - Feature Docs: `/blocksecops-docs/features/team-collaboration.md`
 - API Reference: `/blocksecops-docs/api/team-collaboration-endpoints.md`

@@ -109,7 +109,7 @@ images:
 
 ## Documentation Updated
 
-- `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/04-phase-4.5-enterprise-features/TASK-24-DARK-MODE-GLOBAL-SEARCH.md` - Marked complete
+- `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/04-phase-4.5-enterprise-features/TASK-24-DARK-MODE-GLOBAL-SEARCH.md` - Marked complete
 - `/Users/pwner/Git/ABS/blocksecops-docs/features/dark-mode-global-search.md` - Feature documentation
 - `/Users/pwner/Git/ABS/blocksecops-docs/api/endpoints-reference.md` - Added Search section
 - `/Users/pwner/Git/ABS/docs/feature-tests/25-dark-mode-global-search.md` - Test guide
@@ -118,5 +118,5 @@ images:
 
 ## Related
 
-- Task Source: `TaskDocs-BlockSecOps/phases/02-phase-3.1b-frontend-projects-api-routing/24-UI-QUALITY-OF-LIFE.md`
+- Task Source: `TaskDocs-Apogee/phases/02-phase-3.1b-frontend-projects-api-routing/24-UI-QUALITY-OF-LIFE.md`
 - Plan File: `.claude/plans/harmonic-soaring-parasol.md`

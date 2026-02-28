@@ -22,7 +22,7 @@ check() {
 }
 
 echo "=============================================="
-echo " BlockSecOps Application Security Audit"
+echo " Apogee Application Security Audit"
 echo " Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo " Target: $BASE_URL"
 echo "=============================================="

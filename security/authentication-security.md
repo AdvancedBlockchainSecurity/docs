@@ -19,7 +19,7 @@ For current authentication security information, please see:
 
 ### Primary Documentation
 - **[Authentication System Architecture](../../blocksecops-docs/architecture/authentication-system.md)** - Current Supabase Auth implementation
-- **[API Authentication Guide](../../TaskDocs-BlockSecOps/phases/api/API-Authentication.md)** - Complete authentication reference
+- **[API Authentication Guide](../../TaskDocs-Apogee/phases/api/API-Authentication.md)** - Complete authentication reference
 - **[Supabase Auth Security](https://supabase.com/docs/guides/auth/security)** - Official Supabase security docs
 
 ### Current Implementation (v0.4.0+)

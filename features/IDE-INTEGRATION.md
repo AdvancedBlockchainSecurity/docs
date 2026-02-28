@@ -231,4 +231,4 @@ require('blocksecops').setup({
 - **API Reference**: `/blocksecops-docs/api/`
 - **Test Checklist**: `/docs/feature-tests/42-ide-integration.md`
 - **Database Migration**: `/docs/database/MIGRATIONS.md` (Migration 034)
-- **Task Documentation**: `/TaskDocs-BlockSecOps/phases/06-phase-ide-integration/`
+- **Task Documentation**: `/TaskDocs-Apogee/phases/06-phase-ide-integration/`

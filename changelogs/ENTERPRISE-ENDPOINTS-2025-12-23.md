@@ -131,4 +131,4 @@ All endpoints tested via Traefik at `http://127.0.0.1:3000/api/v1/`
 ## Related
 
 - PR #123: feat(api): Add Phase 4.5 enterprise feature endpoints
-- Phase 4.5 Overview: `/TaskDocs-BlockSecOps/phases/04-phase-4.5-enterprise-features/`
+- Phase 4.5 Overview: `/TaskDocs-Apogee/phases/04-phase-4.5-enterprise-features/`

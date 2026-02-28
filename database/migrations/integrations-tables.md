@@ -204,6 +204,6 @@ Backend should enforce tier requirements:
 
 ## Related Documentation
 
-- [Frontend Implementation](../../TaskDocs-BlockSecOps/phases/2026-01-23-platform-integrations.md)
+- [Frontend Implementation](../../TaskDocs-Apogee/phases/2026-01-23-platform-integrations.md)
 - [Feature Tests](../feature-tests/44-platform-integrations.md)
 - [User Documentation](../../blocksecops-docs/platform/integrations/README.md)

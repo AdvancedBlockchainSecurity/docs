@@ -121,7 +121,7 @@ All 166 tool-to-pattern mappings updated:
 
 ### Documentation Files
 5. **database/backups/bvd-ecosystem-migration-20251029/README.md**
-6. **TaskDocs-BlockSecOps/blocksecops/BVD-TAXONOMY-ARCHITECTURE.md** (architecture doc)
+6. **TaskDocs-Apogee/blocksecops/BVD-TAXONOMY-ARCHITECTURE.md** (architecture doc)
 
 ### Scripts
 7. **scripts/migrate_to_ecosystem_taxonomy.py** (migration script)
@@ -333,7 +333,7 @@ Rollback available:
 ## Related Documents
 
 ### Architecture
-- `/TaskDocs-BlockSecOps/blocksecops/BVD-TAXONOMY-ARCHITECTURE.md`
+- `/TaskDocs-Apogee/blocksecops/BVD-TAXONOMY-ARCHITECTURE.md`
 
 ### Implementation
 - `/blocksecops-api-service/scripts/migrate_to_ecosystem_taxonomy.py`

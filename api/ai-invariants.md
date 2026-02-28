@@ -353,4 +353,4 @@ Cache behavior:
 
 - [Feature Test #50](/docs/feature-tests/50-ai-invariant-generation.md)
 - [Database Schema](/docs/database/INVARIANTS.md)
-- [Phase E Implementation](/TaskDocs-BlockSecOps/phases/04-phase-5-ai-ml/phase-e-ai-invariants.md)
+- [Phase E Implementation](/TaskDocs-Apogee/phases/04-phase-5-ai-ml/phase-e-ai-invariants.md)

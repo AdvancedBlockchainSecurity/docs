@@ -1,5 +1,5 @@
 #!/bin/bash
-# BlockSecOps Go-Live Audit: Kubernetes Security Checks (Section 7)
+# Apogee Go-Live Audit: Kubernetes Security Checks (Section 7)
 # Run against target cluster before production launch
 set -euo pipefail
 
@@ -39,7 +39,7 @@ warn() {
 }
 
 echo "=============================================="
-echo " BlockSecOps K8s Security Audit"
+echo " Apogee K8s Security Audit"
 echo " Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo "=============================================="
 

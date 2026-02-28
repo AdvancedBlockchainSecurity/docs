@@ -22,7 +22,7 @@ Adding a new scanner to Apogee requires coordinated changes across multiple repo
 | `blocksecops-dashboard` | Admin portal scanner config (SCANNERS array, NAME_TO_KEY), tests |
 | `blocksecops-gcp-infrastructure` | Production overlay ConfigMap (if separate from tool-integration) |
 | `docs` | Pipeline docs, changelogs, scanner README |
-| `TaskDocs-BlockSecOps` | Task documentation |
+| `TaskDocs-Apogee` | Task documentation |
 
 ---
 
@@ -671,12 +671,12 @@ Create all required documentation artifacts.
 |----------|------|---------|
 | Changelog | `docs/changelogs/<SCANNER>-<VERSION>-INTEGRATION-<DATE>.md` | Integration changelog with all changes |
 | Scanner README | `docs/scanners/<Scanner>/README.md` | Scanner capabilities, CLI usage, detector table |
-| Task Documentation | `TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-<DATE>-<SCANNER>-INTEGRATION.md` | Task summary, files modified, verification |
+| Task Documentation | `TaskDocs-Apogee/DOCUMENTATION-UPDATE-<DATE>-<SCANNER>-INTEGRATION.md` | Task summary, files modified, verification |
 
 ### Reference Files
 - `docs/changelogs/` -- existing changelogs
 - `docs/scanners/RustDefend/README.md` -- recent scanner README example
-- `TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-16-RUSTDEFEND-INTEGRATION.md` -- recent task doc example
+- `TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-02-16-RUSTDEFEND-INTEGRATION.md` -- recent task doc example
 
 ### Checklist
 - [ ] Changelog written with all files modified
@@ -702,7 +702,7 @@ Follow the GitOps branching strategy for multi-repository changes.
 3. `blocksecops-orchestration` -- Parser, registry, tests.
 4. `blocksecops-api-service` -- Scanner config, presets, ConfigMap overlay, patterns, tests.
 5. `blocksecops-dashboard` -- Admin portal scanner config.
-6. `docs` / `TaskDocs-BlockSecOps` -- Documentation.
+6. `docs` / `TaskDocs-Apogee` -- Documentation.
 
 ### Checklist
 - [ ] Feature branches created in all affected repositories

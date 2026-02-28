@@ -29,7 +29,7 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 # API Configuration
-API_URL="http://app.blocksecops.local/api/v1"
+API_URL="http://app.0xapogee.local/api/v1"
 
 # Supabase Configuration (matches api-service configmap)
 SUPABASE_URL="https://huzjlpypdlelqnbjvxad.supabase.co"
@@ -89,7 +89,7 @@ if [ ${#SCANNERS_TO_TEST[@]} -eq 0 ]; then
 fi
 
 echo -e "${CYAN}========================================"
-echo "BlockSecOps Scanner Test Suite"
+echo "Apogee Scanner Test Suite"
 echo -e "========================================${NC}"
 echo ""
 

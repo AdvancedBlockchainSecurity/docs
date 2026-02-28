@@ -105,9 +105,9 @@ None. The semantic deduplication API is unchanged - only the implementation (HTT
 
 ## Subsequent Optimization (February 8, 2026)
 
-The intelligence-engine image was further reduced from ~3GB to **1.89GB** (base image: 12.1GB → 1.85GB) by removing 13 unused ML packages (TensorFlow, spacy, pandas, etc.), switching to CPU-only PyTorch, and using multi-stage builds. See [PLAN-2026-02-08-INTELLIGENCE-ENGINE-DOCKER-SLIM.md](/home/pwner/Git/TaskDocs-BlockSecOps/PLAN-2026-02-08-INTELLIGENCE-ENGINE-DOCKER-SLIM.md).
+The intelligence-engine image was further reduced from ~3GB to **1.89GB** (base image: 12.1GB → 1.85GB) by removing 13 unused ML packages (TensorFlow, spacy, pandas, etc.), switching to CPU-only PyTorch, and using multi-stage builds. See [PLAN-2026-02-08-INTELLIGENCE-ENGINE-DOCKER-SLIM.md](/home/pwner/Git/TaskDocs-Apogee/PLAN-2026-02-08-INTELLIGENCE-ENGINE-DOCKER-SLIM.md).
 
 ## Related
 
-- [ML-DEPENDENCY-SPLIT-PLAN.md](/home/pwner/Git/TaskDocs-BlockSecOps/phases/03-phase-4-intelligence/ML-DEPENDENCY-SPLIT-PLAN.md)
+- [ML-DEPENDENCY-SPLIT-PLAN.md](/home/pwner/Git/TaskDocs-Apogee/phases/03-phase-4-intelligence/ML-DEPENDENCY-SPLIT-PLAN.md)
 - [Docker Base Images Standards](/home/pwner/Git/docs/standards/docker-base-images.md)

@@ -28,7 +28,7 @@ The Apogee Orchestration Service is a FastAPI-based REST API that manages smart 
 
 **Impact**: Enables pattern matching and fingerprinting for all vulnerability findings.
 
-**Documentation**: See `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/PHASE-4D-PARSER-CLASSIFICATION-FIX-COMPLETE.md`
+**Documentation**: See `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/PHASE-4D-PARSER-CLASSIFICATION-FIX-COMPLETE.md`
 
 ### v0.7.13-fix - Tree-sitter API Compatibility Fix
 
@@ -550,7 +550,7 @@ spec:
 - **Repository**: `/Users/pwner/Git/ABS/blocksecops-orchestration`
 - **REST API Architecture**: [orchestration-rest-api.md](../architecture/orchestration-rest-api.md)
 - **Result Routing**: [orchestration-result-routing.md](../architecture/orchestration-result-routing.md)
-- **Phase 5 Completion**: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/06-phase-5-rest-api/PHASE-5-REST-API-COMPLETE.md`
+- **Phase 5 Completion**: `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/06-phase-5-rest-api/PHASE-5-REST-API-COMPLETE.md`
 - **CHANGELOG**: `/Users/pwner/Git/ABS/blocksecops-orchestration/CHANGELOG.md`
 
 ### Pull Requests

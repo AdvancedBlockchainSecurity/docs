@@ -334,7 +334,7 @@ curl http://localhost:8000/api/v1/health/ready
 ### Documentation
 - `/Users/pwner/Git/ABS/blocksecops-docs/deployment/contract-source-scan-trigger-fix.md`
 - `/Users/pwner/Git/ABS/docs/SCAN-TRIGGER-FIX-2025-10-13.md`
-- `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/api/api-service-known-issues.md`
+- `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/api/api-service-known-issues.md`
 
 ### Code Changes
 - `src/presentation/api/v1/endpoints/scans.py:184-194` (scan trigger fix)

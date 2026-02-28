@@ -34,7 +34,7 @@ This document tracks the integration status of security detectors across all sca
 - ✅ **11 new mappings added** - SolidityDefend total: 219 → **230** (+11)
 - ✅ **Pattern database upgraded**: v3.13 → **v3.14** (402 → **413** patterns)
 - 📊 **New patterns include**: MEV detection (JIT liquidity, sandwich, backrunning), reentrancy, DoS, flash loan manipulation
-- 📋 **Documentation**: `TaskDocs-BlockSecOps/phases/03-phase-4-intelligence/SOLIDITYDEFEND-PATTERN-SEEDING-20260118.md`
+- 📋 **Documentation**: `TaskDocs-Apogee/phases/03-phase-4-intelligence/SOLIDITYDEFEND-PATTERN-SEEDING-20260118.md`
 
 **✅ PHASE 3.5: Vyper & Moccasin Scanner Integration (2025-12-15)** 🎉:
 - ✅ **Vyper Scanner Available** - Slither with Vyper compilation support (vyper 0.4.0)
@@ -68,7 +68,7 @@ This document tracks the integration status of security detectors across all sca
 - ✅ **8 comprehensive integration tests** created and passing
 - ✅ **Database seeding complete** - 14 patterns + 14 mappings live
 - 🎉 **MILESTONE: Platform achieves complete intelligence coverage across all supported ecosystems!**
-- Completion document: `/TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/CAIRO-INTEGRATION-PLAN.md`
+- Completion document: `/TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/CAIRO-INTEGRATION-PLAN.md`
 
 **Certora Removed from Platform (2025-10-31)** ⚠️:
 - ❌ Certora Prover removed from scanner tracking
@@ -99,7 +99,7 @@ This document tracks the integration status of security detectors across all sca
 - ✅ Database update executed (101/101 = 100%)
 - ✅ Corrected detector count: Slither has 101 detectors (not 92)
 - ✅ Total platform detectors: 389 → 398 (+9 from correction)
-- Completion document: `/TaskDocs-BlockSecOps/blocksecops/SLITHER-PHASE5-6-COMPLETION-SUMMARY.md`
+- Completion document: `/TaskDocs-Apogee/blocksecops/SLITHER-PHASE5-6-COMPLETION-SUMMARY.md`
 
 **Slither Phase 4 Integration Complete (2025-10-30)** 🎉:
 - ✅ 20 detectors mapped (10 medium-severity + 10 low-severity)
@@ -110,7 +110,7 @@ This document tracks the integration status of security detectors across all sca
 - ✅ **Slither crossed 70% integration milestone!** 🎉
 - ✅ **Introduced 2 new pattern categories**: SCP (Scope), TYP (Typo)
 - ✅ Database update script created (68/92 = 73.9%)
-- Completion document: `/TaskDocs-BlockSecOps/blocksecops/SLITHER-PHASE4-COMPLETION-SUMMARY.md`
+- Completion document: `/TaskDocs-Apogee/blocksecops/SLITHER-PHASE4-COMPLETION-SUMMARY.md`
 
 **Slither Phase 3 Integration Complete (2025-10-30)** 🎉:
 - ✅ 8 medium-severity detectors mapped (Oracle & DeFi security)
@@ -121,7 +121,7 @@ This document tracks the integration status of security detectors across all sca
 - ✅ **Slither crossed 50% integration milestone!** 🎉
 - ✅ **Introduced 2 new pattern categories**: RND (Randomness), L2 (Layer 2)
 - ✅ Database updated with Phase 3 integration status (48/92 = 52.2%)
-- Completion document: `/TaskDocs-BlockSecOps/blocksecops/SLITHER-PHASE3-COMPLETION-SUMMARY.md`
+- Completion document: `/TaskDocs-Apogee/blocksecops/SLITHER-PHASE3-COMPLETION-SUMMARY.md`
 
 **Slither Phase 2 Integration Complete (2025-10-30)** 🎉:
 - ✅ 10 medium-severity detectors mapped to vulnerability patterns (ERC20/token issues)
@@ -131,7 +131,7 @@ This document tracks the integration status of security detectors across all sca
 - ✅ Overall intelligence integration: 45.0% → 46.7% (+1.7pp)
 - ✅ **Solidity integration reached 50%** (186/371 detectors) - major milestone! 🎉
 - ✅ Database updated with Phase 2 integration status (40/92 = 43.5%)
-- Completion document: `/TaskDocs-BlockSecOps/blocksecops/SLITHER-PHASE2-COMPLETION-SUMMARY.md`
+- Completion document: `/TaskDocs-Apogee/blocksecops/SLITHER-PHASE2-COMPLETION-SUMMARY.md`
 
 **Slither Phase 1 Integration Complete (2025-10-30)** 🎉:
 - ✅ 14 high-severity detectors mapped to vulnerability patterns
@@ -141,7 +141,7 @@ This document tracks the integration status of security detectors across all sca
 - ✅ Overall intelligence integration: 41.5% → 45.0% (+3.5pp)
 - ✅ Detector count corrected: Slither has 92 detectors (not 99)
 - ✅ Database updated with correct counts and integration percentage
-- Completion document: `/TaskDocs-BlockSecOps/blocksecops/SLITHER-PHASE1-COMPLETION-SUMMARY.md`
+- Completion document: `/TaskDocs-Apogee/blocksecops/SLITHER-PHASE1-COMPLETION-SUMMARY.md`
 
 **4naly3er Scanner Removed (2025-10-29)** ⚠️:
 - ❌ Removed 4naly3er scanner from platform (111 detectors)
@@ -161,7 +161,7 @@ This document tracks the integration status of security detectors across all sca
   - Phase 4E: Deduplication (cross-scanner finding consolidation)
 - ✅ 5/5 critical features verified: Orchestration, Pattern Matching, Fingerprinting, Enrichment, Multi-Scanner
 - ✅ Scans now properly queued via Celery beat (10-second polling interval)
-- Completion document: `/TaskDocs-BlockSecOps/blocksecops/PHASE-4-ORCHESTRATION-FIX-COMPLETE.md`
+- Completion document: `/TaskDocs-Apogee/blocksecops/PHASE-4-ORCHESTRATION-FIX-COMPLETE.md`
 
 **Ecosystem-Based Taxonomy Migration (2025-10-29)** 🎉:
 - ✅ Pattern database migrated to v3.0 (BREAKING CHANGE)
@@ -340,7 +340,7 @@ This document tracks the integration status of security detectors across all sca
 - Mapping verification, pattern validation, deduplication testing
 
 **Detailed Summaries**:
-- `/TaskDocs-BlockSecOps/blocksecops/implementation-summaries/ADERYN-INTELLIGENCE-INTEGRATION-COMPLETE.md`
+- `/TaskDocs-Apogee/blocksecops/implementation-summaries/ADERYN-INTELLIGENCE-INTEGRATION-COMPLETE.md`
 
 ---
 
@@ -1040,7 +1040,7 @@ Track major updates:
 - `/Users/pwner/Git/ABS/blocksecops-api-service/seeds/detector_pattern_mappings.json` - Current mappings
 - `/Users/pwner/Git/ABS/blocksecops-tool-integration/k8s/base/scanner-versions-configmap.yaml` - Scanner versions
 - `/Users/pwner/Git/ABS/blocksecops-api-service/src/infrastructure/scanner_config/scanners.py` - Scanner registry
-- `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/PHASE4-FAILURE-RESOLUTION-PLAN.md` - Intelligence integration blockers
+- `/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/PHASE4-FAILURE-RESOLUTION-PLAN.md` - Intelligence integration blockers
 
 ### External References
 - [Slither Detectors](https://github.com/crytic/slither/wiki/Detector-Documentation) - 101 detectors

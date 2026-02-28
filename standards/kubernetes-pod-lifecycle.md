@@ -562,4 +562,4 @@ Before deploying any new service:
 - [Core Development Rules](./core-development-rules.md)
 - [Docker Image Versioning](./docker-image-versioning.md)
 - [Testing & Deployment](./testing-deployment.md)
-- [GCP Launch Phase 2](../../TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-01-GCP-LAUNCH-PHASE-2.md)
+- [GCP Launch Phase 2](../../TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-02-01-GCP-LAUNCH-PHASE-2.md)

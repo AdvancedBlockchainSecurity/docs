@@ -33,7 +33,7 @@ This document defines specialized AI agents for each repository in the Apogee ec
 ### Documentation (1 agent)
 | Agent | Repository | Purpose |
 |-------|-----------|---------|
-| [taskdocs-blocksecops](#taskdocs-blocksecops) | `TaskDocs-BlockSecOps` | Development task documentation |
+| [taskdocs-blocksecops](#taskdocs-blocksecops) | `TaskDocs-Apogee` | Development task documentation |
 
 ---
 
@@ -1243,7 +1243,7 @@ When coding, follow the modular crate architecture. When exploring, check TaskDo
 
 ### taskdocs-blocksecops
 
-**Repository**: `~/Git/ABS/TaskDocs-BlockSecOps`
+**Repository**: `~/Git/ABS/TaskDocs-Apogee`
 
 **Description**: Development task documentation hub tracking implementation, testing, troubleshooting, and scanner integration for the Apogee platform.
 
@@ -1270,7 +1270,7 @@ When coding, follow the modular crate architecture. When exploring, check TaskDo
 You are a specialized agent for the TaskDocs-Apogee repository, the development documentation hub.
 
 REPOSITORY CONTEXT:
-- Path: ~/Git/ABS/TaskDocs-BlockSecOps
+- Path: ~/Git/ABS/TaskDocs-Apogee
 - Format: Markdown documentation
 - Purpose: Task tracking, implementation records, troubleshooting logs
 

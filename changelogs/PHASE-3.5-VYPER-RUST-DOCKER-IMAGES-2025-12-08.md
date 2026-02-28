@@ -104,6 +104,6 @@ Next steps:
 
 ## Related Documentation
 
-- Task docs: `/TaskDocs-BlockSecOps/phases/03-phase-3.5-vyper-rust/TASK-TRACKING.md`
+- Task docs: `/TaskDocs-Apogee/phases/03-phase-3.5-vyper-rust/TASK-TRACKING.md`
 - ConfigMap: `/blocksecops-tool-integration/k8s/base/scanner-versions-configmap.yaml`
 - Scanner version tracking: `/docs/database/SCANNER-VERSION-TRACKING.md`

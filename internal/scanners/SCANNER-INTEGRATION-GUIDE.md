@@ -1031,8 +1031,8 @@ SELECT COUNT(*) FROM pattern_tool_mappings WHERE tool_name = '<scanner-id>';
 - [Platform Development Standards](/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPMENT-STANDARDS.md)
 - [Scanner Removal Guide](/Users/pwner/Git/ABS/blocksecops-docs/SCANNER-REMOVAL-GUIDE.md)
 - [Scanner Update Guide](/Users/pwner/Git/ABS/blocksecops-docs/SCANNER-UPDATE-GUIDE.md)
-- [Phase 4D Pattern Matching](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/03-phase-4-intelligence/PHASE-4D-NEXT-STEPS.md)
-- [Phase 4E Deduplication](/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/blocksecops/implementation-summaries/PHASE-4E-DEDUPLICATION-COMPLETE.md)
+- [Phase 4D Pattern Matching](/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/03-phase-4-intelligence/PHASE-4D-NEXT-STEPS.md)
+- [Phase 4E Deduplication](/Users/pwner/Git/ABS/TaskDocs-Apogee/blocksecops/implementation-summaries/PHASE-4E-DEDUPLICATION-COMPLETE.md)
 
 ---
 

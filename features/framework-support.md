@@ -354,8 +354,8 @@ interface Contract {
 ## Test Projects
 
 Sample projects for testing are located at:
-- `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/03-phase-3.2-project-structure-support/test-projects/foundry-sample/`
-- `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/03-phase-3.2-project-structure-support/test-projects/hardhat-sample/`
+- `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/03-phase-3.2-project-structure-support/test-projects/foundry-sample/`
+- `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/03-phase-3.2-project-structure-support/test-projects/hardhat-sample/`
 
 ## Dependencies
 
@@ -366,8 +366,8 @@ tomli>=2.0.1,<3.0.0  # TOML parser for foundry.toml
 
 ## Related Documentation
 
-- Phase 3.2 README: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/03-phase-3.2-project-structure-support/README.md`
-- Implementation Plan: `/Users/pwner/Git/ABS/TaskDocs-BlockSecOps/phases/03-phase-3.2-project-structure-support/IMPLEMENTATION-PLAN.md`
+- Phase 3.2 README: `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/03-phase-3.2-project-structure-support/README.md`
+- Implementation Plan: `/Users/pwner/Git/ABS/TaskDocs-Apogee/phases/03-phase-3.2-project-structure-support/IMPLEMENTATION-PLAN.md`
 - Database Schema: `/Users/pwner/Git/ABS/docs/database/SCHEMA.md`
 
 ---

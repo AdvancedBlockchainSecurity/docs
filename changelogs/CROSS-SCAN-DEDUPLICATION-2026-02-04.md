@@ -96,4 +96,4 @@ kubectl rollout restart deployment/blocksecops-api-service -n blocksecops-api-se
 
 - [Deduplication Feature Test](../feature-tests/24-cross-scanner-deduplication.md)
 - [Deduplication Workflow](../workflows/deduplication-workflow.md)
-- [TaskDoc: Implementation](../../TaskDocs-BlockSecOps/blocksecops/cross-scan-deduplication-implementation.md)
+- [TaskDoc: Implementation](../../TaskDocs-Apogee/blocksecops/cross-scan-deduplication-implementation.md)

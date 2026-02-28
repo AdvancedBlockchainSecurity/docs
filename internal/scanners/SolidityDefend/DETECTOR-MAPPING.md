@@ -357,7 +357,7 @@ This mapping is maintained in the vulnerability pattern database:
 ## References
 
 - **Pattern Definitions:** See [README.md](./README.md) for complete pattern descriptions
-- **Integration Details:** [../../../TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-DATABASE-INTEGRATION-COMPLETE.md](../../../TaskDocs-BlockSecOps/scanners/SOLIDITYDEFEND-DATABASE-INTEGRATION-COMPLETE.md)
+- **Integration Details:** [../../../TaskDocs-Apogee/scanners/SOLIDITYDEFEND-DATABASE-INTEGRATION-COMPLETE.md](../../../TaskDocs-Apogee/scanners/SOLIDITYDEFEND-DATABASE-INTEGRATION-COMPLETE.md)
 - **Detector Documentation:** https://github.com/AdvancedBlockchainSecurity/SolidityDefend/tree/main/docs/detectors
 
 ---

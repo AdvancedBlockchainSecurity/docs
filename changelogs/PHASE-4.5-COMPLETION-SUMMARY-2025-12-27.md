@@ -198,13 +198,13 @@ alembic upgrade head
 - Semantic Deduplication (embeddings)
 - Smart Prioritization (composite score)
 
-See: `/TaskDocs-BlockSecOps/phases/05-phase-5-ai-ml/`
+See: `/TaskDocs-Apogee/phases/05-phase-5-ai-ml/`
 
 ---
 
 ## Related Documentation
 
-- [Phase 4.5 Overview](../../TaskDocs-BlockSecOps/phases/04-phase-4.5-enterprise-features/PHASE-4.5-OVERVIEW.md)
+- [Phase 4.5 Overview](../../TaskDocs-Apogee/phases/04-phase-4.5-enterprise-features/PHASE-4.5-OVERVIEW.md)
 - [API Endpoints Reference](../../blocksecops-docs/api/endpoints-reference.md)
 - [Database Schema](../database/SCHEMA.md)
 - [Feature Tests](../feature-tests/14-enterprise-features.md)

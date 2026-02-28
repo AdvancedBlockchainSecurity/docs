@@ -348,5 +348,5 @@ echo "=== Verification Complete ==="
 ## Related Documentation
 
 - [Kubernetes Pod Lifecycle Standards](../standards/kubernetes-pod-lifecycle.md)
-- [GCP Launch Phase 2](../../TaskDocs-BlockSecOps/DOCUMENTATION-UPDATE-2026-02-01-GCP-LAUNCH-PHASE-2.md)
+- [GCP Launch Phase 2](../../TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-02-01-GCP-LAUNCH-PHASE-2.md)
 - [Application Security Testing](./29-application-security.md)
