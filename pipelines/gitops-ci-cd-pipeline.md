@@ -92,8 +92,19 @@ Developer            GitHub              GitHub Actions         Artifact Registr
 
 | Service | Workflows | Status |
 |---------|----------|--------|
-| api-service | `release.yml`, `test.yml` | EXISTS |
-| All other 11 services | None | **NEEDS CREATION** |
+| api-service | `release.yml`, `test.yml`, `validate-manifests.yml` | EXISTS |
+| admin-portal | `validate-manifests.yml` | EXISTS |
+| contract-parser | `validate-manifests.yml` | EXISTS |
+| dashboard | `validate-manifests.yml` | EXISTS |
+| data-service | `validate-manifests.yml` | EXISTS |
+| intelligence-engine | `validate-manifests.yml` | EXISTS |
+| notification | `validate-manifests.yml` | EXISTS |
+| orchestration | `validate-manifests.yml` | EXISTS |
+| tool-integration | `validate-manifests.yml` | EXISTS |
+| gcp-infrastructure | None | Infrastructure repo (excluded from app validation) |
+| monitoring | None | **NEEDS CREATION** |
+
+**Manifest Validation (`validate-manifests.yml`):** Runs on PR/push when `k8s/**` files change. Validates kustomize build, kubeconform schema (K8s 1.32.0), `revisionHistoryLimit: 3`, pod/container securityContext standards, `/tmp` emptyDir volume, image tag policy (no `latest`), and version consistency. Can be run locally with `make validate` (standalone) or `make act-validate` (via `act` — avoids GitHub Actions minutes).
 
 ---
 
