@@ -175,7 +175,7 @@ kubectl get jobs -A --sort-by=.status.startTime | tail -5
 | tool-integration-local | tool-integration-hpa | 2 | 10 | CPU (75%), Memory (85%), custom (tool_execution_queue_length) | ScalingActive on CPU/Memory |
 | openclaw | openclaw-gateway | 2 | 5 | CPU (70%) | ScalingActive |
 
-**Note:** Custom metrics (`database_connections_active`, `tool_execution_queue_length`) require Prometheus + prometheus-adapter to be running and services to expose `/metrics` endpoints. These are not yet implemented; HPAs function using CPU/Memory fallback.
+**Note:** Custom metrics (`database_connections_active`, `tool_execution_queue_length`) require Prometheus + prometheus-adapter to be running and services to expose `/metrics` endpoints. These are not yet implemented; HPAs function using CPU/Memory fallback. The same service-level `/metrics` implementation is required for GCP (GKE Metrics Adapter / Cloud Monitoring replaces prometheus-adapter, but the application metrics are the same).
 
 **Check:**
 ```bash
