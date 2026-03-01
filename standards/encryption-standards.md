@@ -2,7 +2,7 @@
 
 **Part of:** [Platform Development Standards](./INDEX.md)
 **Version:** 1.1.0
-**Last Updated:** February 27, 2026
+**Last Updated:** March 1, 2026
 **Status:** Active
 
 ## Overview
@@ -29,8 +29,10 @@ All network communication MUST be encrypted with TLS 1.2+.
 
 - **Local:** cert-manager with local CA (`Certificate` resources)
 - **Production:** cert-manager with Let's Encrypt (ACME)
-- Minimum protocol: TLS 1.2
+- **Minimum protocol:** TLS 1.2 (enforced via Traefik `TLSOption` CRD)
+- **Cipher suites:** ECDHE + AES-GCM/ChaCha20 only (no RC4, 3DES, weak ciphers)
 - Private keys: 0600 permissions, mounted via initContainer from K8s secrets
+- TLS 1.0/1.1 rejected (enforced Mar 1, 2026 per audit finding F11)
 
 ### PostgreSQL TLS Enforcement
 

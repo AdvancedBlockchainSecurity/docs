@@ -1,7 +1,7 @@
 # Platform Development Standards - Index
 
-**Version:** 2.5.0
-**Last Updated:** February 28, 2026
+**Version:** 2.5.1
+**Last Updated:** March 1, 2026
 **Status:** Active
 
 ## Overview
