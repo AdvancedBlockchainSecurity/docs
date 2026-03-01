@@ -107,7 +107,7 @@ Updated Dockerfile to use this script for production builds.
 
 ## Deployment
 
-- Dashboard v0.35.2 deployed to `harbor.0xapogee.local`
+- Dashboard v0.35.2 deployed to `harbor.blocksecops.local`
 - Rollout completed successfully
 - No migration required
 

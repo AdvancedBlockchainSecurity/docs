@@ -429,7 +429,7 @@ sed -i 's/newTag: "0.22.2"/newTag: "0.22.3"/' k8s/overlays/local/api-service/kus
 
 # Build
 VERSION="0.22.3"
-REGISTRY="harbor.0xapogee.local"
+REGISTRY="harbor.blocksecops.local"
 docker build \
   --build-arg SERVICE_VERSION=${VERSION} \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
@@ -456,7 +456,7 @@ sed -i 's/version: "0.37.2"/version: "0.37.3"/' blocksecops-dashboard/k8s/overla
 
 # Build with Stripe key
 VERSION="0.37.3"
-REGISTRY="harbor.0xapogee.local"
+REGISTRY="harbor.blocksecops.local"
 SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')
 SUPABASE_KEY=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_anon_key}')
 WALLETCONNECT_ID=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.VITE_WALLETCONNECT_PROJECT_ID}')

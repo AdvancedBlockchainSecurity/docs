@@ -91,9 +91,9 @@ cd /home/pwner/Git/blocksecops-admin-portal
 docker build \
   --build-arg VITE_ADMIN_SUPABASE_URL=${SUPABASE_URL} \
   --build-arg VITE_ADMIN_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY} \
-  -t harbor.0xapogee.local/blocksecops/admin-portal:0.3.1 .
+  -t harbor.blocksecops.local/blocksecops/admin-portal:0.3.1 .
 
-docker push harbor.0xapogee.local/blocksecops/admin-portal:0.3.1
+docker push harbor.blocksecops.local/blocksecops/admin-portal:0.3.1
 kubectl apply -k k8s/overlays/local/
 kubectl rollout restart deploy/admin-portal -n admin-portal-local
 ```

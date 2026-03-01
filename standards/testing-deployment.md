@@ -104,7 +104,7 @@ kubectl logs -n api-service-local -l app.kubernetes.io/name=api-service --tail=5
 vim src/presentation/api/v1/endpoints/analytics.py
 
 # 2. Build and deploy (DON'T COMMIT YET)
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 docker build -t ${REGISTRY}/blocksecops/api-service:0.4.2 .
 docker push ${REGISTRY}/blocksecops/api-service:0.4.2
 kubectl rollout restart deployment/api-service -n api-service-local
@@ -157,7 +157,7 @@ With the Harbor container registry:
 **Standard Build Workflow:**
 
 ```bash
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # 1. Build with new version tag
 docker build -t ${REGISTRY}/blocksecops/api-service:0.4.1 .

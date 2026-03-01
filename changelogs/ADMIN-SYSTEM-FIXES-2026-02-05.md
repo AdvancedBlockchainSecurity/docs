@@ -145,9 +145,9 @@ docker build \
   --build-arg SERVICE_VERSION=${VERSION} \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
-  -t harbor.0xapogee.local/blocksecops/admin-portal:${VERSION} .
+  -t harbor.blocksecops.local/blocksecops/admin-portal:${VERSION} .
 
-docker push harbor.0xapogee.local/blocksecops/admin-portal:${VERSION}
+docker push harbor.blocksecops.local/blocksecops/admin-portal:${VERSION}
 kubectl apply -k k8s/overlays/local/
 ```
 
@@ -155,8 +155,8 @@ kubectl apply -k k8s/overlays/local/
 ```bash
 cd /home/pwner/Git/blocksecops-tool-integration/scanner-images/semgrep
 
-docker build -t harbor.0xapogee.local/blocksecops/scanner-semgrep:0.3.2 .
-docker push harbor.0xapogee.local/blocksecops/scanner-semgrep:0.3.2
+docker build -t harbor.blocksecops.local/blocksecops/scanner-semgrep:0.3.2 .
+docker push harbor.blocksecops.local/blocksecops/scanner-semgrep:0.3.2
 
 kubectl apply -k /home/pwner/Git/blocksecops-tool-integration/k8s/overlays/local/
 kubectl rollout restart deployment/tool-integration -n tool-integration-local

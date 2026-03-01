@@ -143,7 +143,7 @@ VITE_USE_TESTNET=true
 cat .env.local
 
 # 2. Set Harbor registry
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # 3. Source environment variables and build
 cd /Users/pwner/Git/ABS

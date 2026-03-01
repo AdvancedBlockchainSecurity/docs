@@ -125,7 +125,7 @@ Bake the publishable key into the dashboard at build time.
 cd /home/pwner/Git
 
 VERSION=$(grep '"version"' blocksecops-dashboard/package.json | head -1 | cut -d'"' -f4)
-REGISTRY="harbor.0xapogee.local"
+REGISTRY="harbor.blocksecops.local"
 
 # Get existing config values
 SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')

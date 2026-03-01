@@ -619,7 +619,7 @@ pkill -f "kubectl port-forward"
 ### Build Images
 
 ```bash
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
 docker build -t ${REGISTRY}/blocksecops/<service>:${VERSION} .
 docker push ${REGISTRY}/blocksecops/<service>:${VERSION}

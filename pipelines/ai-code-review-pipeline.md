@@ -31,14 +31,14 @@ POST /review/suggestions →   1. Authenticate (JWT)                            
 | 3 | Feature flags | `ai_features_enabled` + `ai_code_review_enabled` | Returns 503 if disabled |
 | 4 | Rate limiting | `@limiter.limit(get_rate_limit_string("ai", "codeReview"))` | Per-tier rate limits (BSO-SEC-AI-003) |
 | 5 | Load context | Database query | Fetch vulnerability, contract source, scan metadata |
-| 6 | Anthropic API call | `CodeReviewService.generate_suggestion()` | Model: `claude-3-haiku-20240307`, max tokens: 2048 |
+| 6 | Anthropic API call | `CodeReviewService.generate_suggestion()` | Model: `claude-haiku-4-5-20251001`, max tokens: 2048 |
 | 7 | Store result | Database INSERT | Save suggestion with risk explanation, fix code, attack scenario |
 
 ## Configuration
 
 | Setting | Default | Source |
 |---------|---------|--------|
-| `anthropic_model_code_review` | `claude-3-haiku-20240307` | `config.py` |
+| `anthropic_model_code_review` | `claude-haiku-4-5-20251001` | `config.py` |
 | `anthropic_max_tokens_code_review` | 2048 | `config.py` |
 | `ai_code_review_enabled` | `true` | `config.py` |
 

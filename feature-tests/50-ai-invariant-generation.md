@@ -139,7 +139,7 @@ Expected Response (200):
     }
   ],
   "metadata": {
-    "model": "claude-sonnet-4-20250514",
+    "model": "claude-sonnet-4-6",
     "tokens_used": 1234,
     "generation_time_ms": 2500
   }

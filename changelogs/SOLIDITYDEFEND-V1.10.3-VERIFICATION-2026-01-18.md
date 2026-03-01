@@ -20,7 +20,7 @@ Comprehensive verification of the SolidityDefend v1.10.3 deployment completed su
 | Component | Status | Details |
 |-----------|--------|---------|
 | Harbor Image | Verified | `scanner-soliditydefend:0.4.0` |
-| Registry | Harbor (local) | `harbor.0xapogee.local` |
+| Registry | Harbor (local) | `harbor.blocksecops.local` |
 
 ### Kubernetes Resources
 

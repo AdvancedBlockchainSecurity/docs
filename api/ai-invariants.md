@@ -86,7 +86,7 @@ curl -X POST https://api.0xapogee.local/api/v1/invariants/generate \
     }
   ],
   "metadata": {
-    "model": "claude-sonnet-4-20250514",
+    "model": "claude-sonnet-4-6",
     "tokens_input": 856,
     "tokens_output": 423,
     "generation_time_ms": 2340,
@@ -221,7 +221,7 @@ curl -X GET https://api.0xapogee.local/api/v1/invariants/inv_7f3a2b1c-4d5e-6f7a-
   "description": "The total supply must always equal the sum of all individual balances.",
   "confidence": 0.95,
   "focus_areas": ["balance"],
-  "model_used": "claude-sonnet-4-20250514",
+  "model_used": "claude-sonnet-4-6",
   "created_at": "2026-01-31T12:00:00Z"
 }
 ```

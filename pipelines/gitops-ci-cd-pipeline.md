@@ -676,7 +676,7 @@ jobs:
 
 ### Custom Base Image Consideration
 
-Two services (`orchestration`, `intelligence-engine`) use custom base images from Harbor (`harbor.0xapogee.local`). For GCP CI:
+Two services (`orchestration`, `intelligence-engine`) use custom base images from Harbor (`harbor.blocksecops.local`). For GCP CI:
 
 - Mirror these base images to Artifact Registry
 - Or build them in a separate CI workflow and reference from Artifact Registry

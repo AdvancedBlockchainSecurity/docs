@@ -98,8 +98,8 @@ All 15 scanners passed:
 
 ```bash
 # Build and push
-docker build -t harbor.0xapogee.local/blocksecops/orchestration:0.9.10 .
-docker push harbor.0xapogee.local/blocksecops/orchestration:0.9.10
+docker build -t harbor.blocksecops.local/blocksecops/orchestration:0.9.10 .
+docker push harbor.blocksecops.local/blocksecops/orchestration:0.9.10
 
 # Deploy
 kubectl apply -k k8s/overlays/local/orchestration/

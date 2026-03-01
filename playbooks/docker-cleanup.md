@@ -65,7 +65,7 @@ The cleanup script protects critical images automatically:
 
 ### What Gets Protected
 
-- All Harbor-tagged images (`harbor.0xapogee.local/blocksecops/*`)
+- All Harbor-tagged images (`harbor.blocksecops.local/blocksecops/*`)
 - Base images (`blocksecops-*-base`)
 - Kubernetes system images (`registry.k8s.io/*`)
 - Infrastructure (Vault, Traefik, Postgres, Redis, Harbor)
@@ -114,7 +114,7 @@ docker builder prune -f
 ### Remove Specific Image
 
 ```bash
-docker rmi harbor.0xapogee.local/blocksecops/api-service:0.11.0
+docker rmi harbor.blocksecops.local/blocksecops/api-service:0.11.0
 ```
 
 ### Remove All Unused Images (DANGEROUS)
@@ -134,10 +134,10 @@ docker image prune -a -f
 
 ```bash
 # List images in Harbor
-curl -s -k https://harbor.0xapogee.local/api/v2.0/projects/blocksecops/repositories | jq -r '.[].name'
+curl -s -k https://harbor.blocksecops.local/api/v2.0/projects/blocksecops/repositories | jq -r '.[].name'
 
 # Check specific image
-curl -s -k https://harbor.0xapogee.local/api/v2.0/projects/blocksecops/repositories/api-service/artifacts | jq -r '.[].tags[].name'
+curl -s -k https://harbor.blocksecops.local/api/v2.0/projects/blocksecops/repositories/api-service/artifacts | jq -r '.[].tags[].name'
 ```
 
 ### Pull Image Back from Harbor
@@ -145,7 +145,7 @@ curl -s -k https://harbor.0xapogee.local/api/v2.0/projects/blocksecops/repositor
 If you accidentally removed a needed image:
 
 ```bash
-docker pull harbor.0xapogee.local/blocksecops/api-service:0.13.2
+docker pull harbor.blocksecops.local/blocksecops/api-service:0.13.2
 ```
 
 ---
@@ -168,7 +168,7 @@ kubectl describe pod <pod-name> -n <namespace>
 docker images | grep <image-name>
 
 # Check if image exists in Harbor
-docker pull harbor.0xapogee.local/blocksecops/<image>:<tag>
+docker pull harbor.blocksecops.local/blocksecops/<image>:<tag>
 ```
 
 ---

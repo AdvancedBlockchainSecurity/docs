@@ -38,7 +38,7 @@ POST /messages         →     3. Validate tier (team+)
 | 5 | RAG retrieval | `RAGRetriever.retrieve_context()` | Fetch relevant context from vulnerabilities, scans, contracts |
 | 6 | History assembly | Last 10 messages | Build conversation context window, sanitize all content |
 | 7 | System prompt | `_get_system_prompt()` | Security-focused instructions + XML-wrapped retrieved context |
-| 8 | Anthropic API call | `client.messages.create()` | Model: `claude-sonnet-4-20250514`, max tokens: 2048 |
+| 8 | Anthropic API call | `client.messages.create()` | Model: `claude-sonnet-4-6`, max tokens: 2048 |
 | 9 | Output validation | `_validate_ai_output()` | Detect injection patterns in AI response (BSO-SEC-AI-002) |
 | 10 | Token tracking | `token_budget` check | Log warning if input + output exceeds budget (6144 tokens) |
 | 11 | Persist response | Database INSERT | Save assistant message with token counts, context sources, model info |
@@ -103,7 +103,7 @@ Save to DB: message content, tokens_input, tokens_output, model_used, generation
 | Setting | Default | Source |
 |---------|---------|--------|
 | `anthropic_api_key` | Required | Vault: `secret/local/api-service/anthropic` |
-| `anthropic_model_copilot` | `claude-sonnet-4-20250514` | `config.py` |
+| `anthropic_model_copilot` | `claude-sonnet-4-6` | `config.py` |
 | `anthropic_max_tokens_copilot` | 2048 | `config.py` |
 | `ai_features_enabled` | `true` | `config.py` (master toggle) |
 | `ai_copilot_enabled` | `true` | `config.py` |

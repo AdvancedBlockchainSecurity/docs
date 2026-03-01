@@ -252,10 +252,10 @@ interface DeduplicationStatsResponse {
 cd /home/pwner/Git/blocksecops-admin-portal
 
 # Build Docker image
-docker build --no-cache -t harbor.0xapogee.local/blocksecops/admin-portal:0.1.5 .
+docker build --no-cache -t harbor.blocksecops.local/blocksecops/admin-portal:0.1.5 .
 
 # Push to Harbor
-docker push harbor.0xapogee.local/blocksecops/admin-portal:0.1.5
+docker push harbor.blocksecops.local/blocksecops/admin-portal:0.1.5
 
 # Deploy to Kubernetes
 kubectl apply -k k8s/overlays/local/

@@ -17,7 +17,7 @@
 | Metrics Port | 9090 |
 | External Access | `https://app.0xapogee.local` (via Traefik, not directly exposed) |
 | Internal URL | `http://intelligence-engine.intelligence-engine-local.svc.cluster.local:80` |
-| Image | `harbor.0xapogee.local/blocksecops/intelligence-engine:0.3.3` |
+| Image | `harbor.blocksecops.local/blocksecops/intelligence-engine:0.3.3` |
 | Base Image | `blocksecops-intelligence-base-cpu:1.0.0-5ede3c61` |
 
 ---

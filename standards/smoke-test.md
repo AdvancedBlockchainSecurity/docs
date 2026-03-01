@@ -15,7 +15,7 @@ Smoke tests verify the platform is operational after deployments, upgrades, or i
 | **Server access** | `https://app.0xapogee.local` (Traefik with hostPort 80/443, HTTP redirects to HTTPS) |
 | **Admin access** | `http://admin.0xapogee.local` (Traefik hostPort 80) |
 | **Cluster type** | kubeadm with containerd |
-| **Registry** | Harbor at `harbor.0xapogee.local` |
+| **Registry** | Harbor at `harbor.blocksecops.local` |
 | **Auth provider** | Supabase (external) |
 | **Database** | PostgreSQL 15.4, database name `solidity_security`, user `blocksecops` |
 | **curl flag** | Use `-sk` for HTTPS (self-signed cert) |
@@ -254,10 +254,10 @@ done
 
 | Service | Version |
 |---------|---------|
-| api-service | 0.29.39 |
-| dashboard | 0.46.10 |
+| api-service | 0.29.41 |
+| dashboard | 0.46.11 |
 | admin-portal | 0.7.6 |
-| tool-integration | 0.5.9 |
+| tool-integration | 0.5.10 |
 | orchestration | 0.10.8 |
 | notification | 0.2.6 |
 | intelligence-engine | 0.3.7 |

@@ -4,7 +4,7 @@
 **Last Tested**: February 17, 2026
 **Active Scanners**: 17 (10 Solidity, 2 Vyper, 5 Rust/Solana)
 **Test Contract Location**: `/Users/pwner/Git/vulnerable-smart-contract-examples`
-**Registry**: Harbor (`harbor.0xapogee.local/blocksecops/scanner-*`)
+**Registry**: Harbor (`harbor.blocksecops.local/blocksecops/scanner-*`)
 
 ---
 
@@ -24,32 +24,32 @@
 ```bash
 # Check all scanner images in Harbor registry
 for scanner in slither aderyn semgrep solhint wake soliditydefend echidna medusa halmos vyper moccasin sol-azy sec3-xray trident cargo-fuzz-solana rustdefend; do
-    result=$(curl -sk "https://harbor.0xapogee.local/api/v2.0/projects/blocksecops/repositories/scanner-${scanner}/artifacts" | jq -r '.[].tags[]?.name // empty' | head -1)
+    result=$(curl -sk "https://harbor.blocksecops.local/api/v2.0/projects/blocksecops/repositories/scanner-${scanner}/artifacts" | jq -r '.[].tags[]?.name // empty' | head -1)
     echo "scanner-${scanner}: ${result:-MISSING}"
 done
 
 # Or check local Docker images (if built locally)
-docker images | grep "harbor.0xapogee.local.*scanner-"
+docker images | grep "harbor.blocksecops.local.*scanner-"
 ```
 
 | Scanner | Harbor Image | Version | Status |
 |---------|--------------|---------|--------|
-| slither | harbor.0xapogee.local/blocksecops/scanner-slither | 0.3.2 | ✅ Verified |
-| aderyn | harbor.0xapogee.local/blocksecops/scanner-aderyn | 0.7.2 | ✅ Verified |
-| semgrep | harbor.0xapogee.local/blocksecops/scanner-semgrep | 0.3.7 | ✅ Verified |
-| solhint | harbor.0xapogee.local/blocksecops/scanner-solhint | 0.1.6 | ✅ Verified |
-| wake | harbor.0xapogee.local/blocksecops/scanner-wake | 0.3.6 | ✅ Verified |
-| soliditydefend | harbor.0xapogee.local/blocksecops/scanner-soliditydefend | 0.9.0 | ✅ Verified |
-| echidna | harbor.0xapogee.local/blocksecops/scanner-echidna | 0.3.1 | ✅ Verified |
-| medusa | harbor.0xapogee.local/blocksecops/scanner-medusa | 0.3.1 | ✅ Verified |
-| halmos | harbor.0xapogee.local/blocksecops/scanner-halmos | 0.3.0 | ✅ Verified |
-| vyper | harbor.0xapogee.local/blocksecops/scanner-vyper | 0.3.0 | ✅ Verified |
-| moccasin | harbor.0xapogee.local/blocksecops/scanner-moccasin | 0.3.0 | ✅ Verified |
-| sol-azy | harbor.0xapogee.local/blocksecops/scanner-sol-azy | 0.4.1 | ✅ Verified |
-| sec3-xray | harbor.0xapogee.local/blocksecops/scanner-sec3-xray | 0.3.1 | ✅ Verified |
-| trident | harbor.0xapogee.local/blocksecops/scanner-trident | 0.3.0 | ✅ Verified |
-| cargo-fuzz-solana | harbor.0xapogee.local/blocksecops/scanner-cargo-fuzz-solana | 0.3.0 | ✅ Verified |
-| rustdefend | harbor.0xapogee.local/blocksecops/scanner-rustdefend | 0.3.1 | ✅ Verified |
+| slither | harbor.blocksecops.local/blocksecops/scanner-slither | 0.3.2 | ✅ Verified |
+| aderyn | harbor.blocksecops.local/blocksecops/scanner-aderyn | 0.7.2 | ✅ Verified |
+| semgrep | harbor.blocksecops.local/blocksecops/scanner-semgrep | 0.3.7 | ✅ Verified |
+| solhint | harbor.blocksecops.local/blocksecops/scanner-solhint | 0.1.6 | ✅ Verified |
+| wake | harbor.blocksecops.local/blocksecops/scanner-wake | 0.3.6 | ✅ Verified |
+| soliditydefend | harbor.blocksecops.local/blocksecops/scanner-soliditydefend | 0.9.0 | ✅ Verified |
+| echidna | harbor.blocksecops.local/blocksecops/scanner-echidna | 0.3.1 | ✅ Verified |
+| medusa | harbor.blocksecops.local/blocksecops/scanner-medusa | 0.3.1 | ✅ Verified |
+| halmos | harbor.blocksecops.local/blocksecops/scanner-halmos | 0.3.0 | ✅ Verified |
+| vyper | harbor.blocksecops.local/blocksecops/scanner-vyper | 0.3.0 | ✅ Verified |
+| moccasin | harbor.blocksecops.local/blocksecops/scanner-moccasin | 0.3.0 | ✅ Verified |
+| sol-azy | harbor.blocksecops.local/blocksecops/scanner-sol-azy | 0.4.1 | ✅ Verified |
+| sec3-xray | harbor.blocksecops.local/blocksecops/scanner-sec3-xray | 0.3.1 | ✅ Verified |
+| trident | harbor.blocksecops.local/blocksecops/scanner-trident | 0.3.0 | ✅ Verified |
+| cargo-fuzz-solana | harbor.blocksecops.local/blocksecops/scanner-cargo-fuzz-solana | 0.3.0 | ✅ Verified |
+| rustdefend | harbor.blocksecops.local/blocksecops/scanner-rustdefend | 0.3.1 | ✅ Verified |
 
 **Last Verified:** February 17, 2026
 

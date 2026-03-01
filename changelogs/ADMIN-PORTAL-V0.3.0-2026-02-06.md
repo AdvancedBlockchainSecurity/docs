@@ -298,9 +298,9 @@ docker build \
   --build-arg SERVICE_VERSION=${VERSION} \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
-  -t harbor.0xapogee.local/blocksecops/admin-portal:${VERSION} .
+  -t harbor.blocksecops.local/blocksecops/admin-portal:${VERSION} .
 
-docker push harbor.0xapogee.local/blocksecops/admin-portal:${VERSION}
+docker push harbor.blocksecops.local/blocksecops/admin-portal:${VERSION}
 kubectl apply -k k8s/overlays/local/
 ```
 

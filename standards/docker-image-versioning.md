@@ -57,7 +57,7 @@ images:
 ```bash
 VERSION="0.2.1"
 SERVICE="api-service"
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # Build and push
 docker build -t ${REGISTRY}/blocksecops/${SERVICE}:${VERSION} .
@@ -104,7 +104,7 @@ The dashboard requires:
 cd /home/pwner/Git  # Parent directory containing both repos
 
 VERSION=$(grep '"version"' blocksecops-dashboard/package.json | head -1 | cut -d'"' -f4)
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # Get Supabase credentials from existing ConfigMap
 SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')
@@ -148,7 +148,7 @@ Standard build from service directory:
 cd /home/pwner/Git/blocksecops-api-service
 
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # Build image
 docker build \
@@ -187,7 +187,7 @@ Harbor provides proper registry semantics that match production:
 ```bash
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
 SERVICE="api-service"
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # Build locally
 docker build -t ${REGISTRY}/blocksecops/${SERVICE}:${VERSION} .
@@ -260,7 +260,7 @@ Immutable tags are enforced at the Harbor project level via tag immutability rul
 ```bash
 # Verify immutable tag rule exists
 curl -s -k -u admin:${HARBOR_PASSWORD} \
-  https://harbor.0xapogee.local/api/v2.0/projects/blocksecops/immutabletagrules | jq
+  https://harbor.blocksecops.local/api/v2.0/projects/blocksecops/immutabletagrules | jq
 ```
 
 The rule matches all repositories (`**`) and all tags (`**`) in the `blocksecops` project.
@@ -271,13 +271,13 @@ Because tags are immutable, any image change requires a version bump:
 
 ```bash
 # Cannot do this (tag already exists, push will fail):
-docker push harbor.0xapogee.local/blocksecops/api-service:0.28.2
+docker push harbor.blocksecops.local/blocksecops/api-service:0.28.2
 
 # Must bump version first:
 # 1. Update pyproject.toml: version = "0.28.3"
 # 2. Update kustomization.yaml: newTag: "0.28.3"
 # 3. Build and push with new tag
-docker push harbor.0xapogee.local/blocksecops/api-service:0.28.3
+docker push harbor.blocksecops.local/blocksecops/api-service:0.28.3
 ```
 
 ### GCP Equivalent
@@ -310,9 +310,9 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.6 | `k8s/overlays/local/` | Apogee rebrand: UI branding, metadata, vite config |
-| api-service | 0.29.39 | `k8s/overlays/local/api-service/` | Apogee rebrand: OCI source URL, CI/CD, scripts, tests |
+| api-service | 0.29.41 | `k8s/overlays/local/api-service/` | Fix 503 scan trigger (service token auth), update Anthropic model defaults |
 | contract-parser | 0.2.2 | `k8s/overlays/local/contract-parser/` | Apogee rebrand: OCI source URL, .env.example |
-| dashboard | 0.46.10 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, vite config, comments |
+| dashboard | 0.46.11 | `k8s/overlays/local/` | Sidebar ABC ordering, Teams modal styling, dark mode toggle fix, scanner preset counts |
 | data-service | 0.2.7 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, README |
 | findings | 0.2.1 | `k8s/overlays/local/findings/` | Apogee rebrand: OCI labels, .env.example |
 | analysis | 0.2.1 | `k8s/overlays/local/analysis/` | Apogee rebrand: OCI labels, .env.example |
@@ -320,7 +320,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | intelligence-engine | 0.3.7 | `k8s/overlays/local/` | Apogee rebrand: OCI source/vendor, base images, .env |
 | notification | 0.2.6 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL |
 | orchestration | 0.10.8 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, README |
-| tool-integration | 0.5.9 | `k8s/overlays/local/` | Apogee rebrand: scanner images, OCI labels, build scripts |
+| tool-integration | 0.5.10 | `k8s/overlays/local/` | Fix envFrom to load tool-integration-config ConfigMap |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |
@@ -459,7 +459,7 @@ Example: 1.0.0-5ede3c61
 Base images are stored in Harbor and referenced by application Dockerfiles:
 
 ```dockerfile
-ARG BASE_REGISTRY=harbor.0xapogee.local
+ARG BASE_REGISTRY=harbor.blocksecops.local
 ARG BASE_IMAGE_TAG=1.0.0-ac02c353
 FROM ${BASE_REGISTRY}/blocksecops/blocksecops-orchestration-base:${BASE_IMAGE_TAG} AS builder
 ```

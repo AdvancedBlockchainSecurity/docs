@@ -38,7 +38,7 @@ POST /invariants/generate →       1. Authenticate (JWT)                       
 | 6 | Size validation | 50KB max contract size | Returns 400 if exceeded |
 | 7 | Injection detection | Pattern matching on input | Returns 400 if injection detected |
 | 8 | Rate limiting | `@limiter.limit(get_rate_limit_string("ai", "invariants"))` | Per-tier rate limits (BSO-SEC-AI-003) |
-| 9 | Anthropic API call | `InvariantService.generate_invariants()` | Model: `claude-sonnet-4-20250514`, max tokens: 4096 |
+| 9 | Anthropic API call | `InvariantService.generate_invariants()` | Model: `claude-sonnet-4-6`, max tokens: 4096 |
 | 10 | Output validation | Pattern checks on AI response | Detect injection relay |
 | 11 | Store result | Database INSERT | Save invariants with type, test code, explanation |
 
@@ -61,7 +61,7 @@ Error responses for quota exhaustion:
 
 | Setting | Default | Source |
 |---------|---------|--------|
-| `anthropic_model_invariant` | `claude-sonnet-4-20250514` | `config.py` |
+| `anthropic_model_invariant` | `claude-sonnet-4-6` | `config.py` |
 | `anthropic_max_tokens_invariant` | 4096 | `config.py` |
 | `invariant_token_budget_per_request` | 8000 | `config.py` |
 | `invariant_cooldown_seconds` | 5 | `config.py` |

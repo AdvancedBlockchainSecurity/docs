@@ -254,8 +254,8 @@ sed -i 's/version = ".*"/version = "X.Y.Z"/' pyproject.toml
 
 # 3. Build and push (Harbor)
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
-docker build -t harbor.0xapogee.local/blocksecops/api-service:${VERSION} .
-docker push harbor.0xapogee.local/blocksecops/api-service:${VERSION}
+docker build -t harbor.blocksecops.local/blocksecops/api-service:${VERSION} .
+docker push harbor.blocksecops.local/blocksecops/api-service:${VERSION}
 
 # 4. Apply and restart
 kubectl apply -k k8s/overlays/local/api-service/

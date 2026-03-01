@@ -46,7 +46,7 @@ cd /home/pwner/Git/blocksecops-<service>
 2. **Kustomization check** - Verifies `newTag` in kustomization.yaml matches the source version. Fails immediately if mismatch detected.
 3. **CronJob suspend** - Suspends all CronJobs in the service namespace to prevent stale image execution during the deploy window
 4. **Docker build** - Builds the image with OCI labels (`SERVICE_VERSION`, `BUILD_DATE`, `VCS_REF`)
-5. **Docker push** - Pushes to Harbor at `harbor.0xapogee.local/blocksecops/<service>:<version>`
+5. **Docker push** - Pushes to Harbor at `harbor.blocksecops.local/blocksecops/<service>:<version>`
 6. **kubectl apply -k** - Applies kustomization overlay, updating both Deployments and CronJobs
 7. **CronJob resume** - Re-enables CronJobs after apply completes
 8. **Rollout wait** - Waits for deployment rollout to complete
@@ -76,7 +76,7 @@ grep "newTag" k8s/overlays/local/${SERVICE}/kustomization.yaml
 # Must show: newTag: "${VERSION}"
 
 # 3. Build
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 docker build \
   --build-arg SERVICE_VERSION=${VERSION} \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \

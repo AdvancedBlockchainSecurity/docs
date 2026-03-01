@@ -85,8 +85,8 @@ Run a scan on a contract that has been scanned before. New vulnerabilities shoul
 ## Deployment
 
 ```bash
-docker build --no-cache -t harbor.0xapogee.local/blocksecops/api-service:0.25.0 .
-docker push harbor.0xapogee.local/blocksecops/api-service:0.25.0
+docker build --no-cache -t harbor.blocksecops.local/blocksecops/api-service:0.25.0 .
+docker push harbor.blocksecops.local/blocksecops/api-service:0.25.0
 kubectl rollout restart deployment/blocksecops-api-service -n blocksecops-api-service-local
 ```
 

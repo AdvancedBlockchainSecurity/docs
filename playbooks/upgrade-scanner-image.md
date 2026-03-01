@@ -13,7 +13,7 @@ This playbook covers upgrading a scanner image in the Apogee platform. Scanners 
 
 - [ ] Docker running locally
 - [ ] kubectl configured for local cluster
-- [ ] Harbor registry accessible at `harbor.0xapogee.local`
+- [ ] Harbor registry accessible at `harbor.blocksecops.local`
 - [ ] Database backup created (if scanner has existing findings)
 - [ ] Upstream release notes reviewed for breaking changes
 
@@ -153,7 +153,7 @@ cd /home/pwner/Git/blocksecops-tool-integration/scanner-images/<scanner>
 docker build \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
-  -t harbor.0xapogee.local/blocksecops/scanner-<scanner>:<IMAGE_VERSION> \
+  -t harbor.blocksecops.local/blocksecops/scanner-<scanner>:<IMAGE_VERSION> \
   .
 ```
 
@@ -170,10 +170,10 @@ docker build \
 
 ```bash
 # Push to Harbor
-docker push harbor.0xapogee.local/blocksecops/scanner-<scanner>:<IMAGE_VERSION>
+docker push harbor.blocksecops.local/blocksecops/scanner-<scanner>:<IMAGE_VERSION>
 
 # Verify push succeeded
-curl -s https://harbor.0xapogee.local/api/v2.0/projects/blocksecops/repositories/scanner-<scanner>/artifacts \
+curl -s https://harbor.blocksecops.local/api/v2.0/projects/blocksecops/repositories/scanner-<scanner>/artifacts \
   --insecure | jq '.[0].tags[].name'
 ```
 
@@ -206,7 +206,7 @@ SCANNER_IMAGE_<SCANNER>: "scanner-<scanner>:<IMAGE_VERSION>"
 **Location:** `blocksecops-tool-integration/k8s/overlays/local/scanner-versions-patch.yaml`
 
 ```yaml
-SCANNER_IMAGE_<SCANNER>: "harbor.0xapogee.local/blocksecops/scanner-<scanner>:<IMAGE_VERSION>"
+SCANNER_IMAGE_<SCANNER>: "harbor.blocksecops.local/blocksecops/scanner-<scanner>:<IMAGE_VERSION>"
 ```
 
 ---
@@ -302,7 +302,7 @@ kubectl rollout undo deployment/tool-integration -n tool-integration-local
 ```bash
 # Revert ConfigMap to previous image version
 kubectl patch configmap scanner-versions -n tool-integration-local \
-  --type merge -p '{"data":{"SCANNER_IMAGE_<SCANNER>":"harbor.0xapogee.local/blocksecops/scanner-<scanner>:<OLD_VERSION>"}}'
+  --type merge -p '{"data":{"SCANNER_IMAGE_<SCANNER>":"harbor.blocksecops.local/blocksecops/scanner-<scanner>:<OLD_VERSION>"}}'
 
 # Restart deployment
 kubectl rollout restart deployment/tool-integration -n tool-integration-local
@@ -337,7 +337,7 @@ gunzip -c ~/backups/solidity_security_YYYYMMDD_HHMMSS.dump.gz | \
 kubectl describe pod -n tool-integration-local -l app=tool-integration | grep -A5 "Events:"
 
 # Verify image exists in Harbor
-docker pull harbor.0xapogee.local/blocksecops/scanner-<scanner>:<VERSION>
+docker pull harbor.blocksecops.local/blocksecops/scanner-<scanner>:<VERSION>
 
 # Check Harbor credentials
 kubectl get secret -n tool-integration-local harbor-registry-secret -o yaml
@@ -351,7 +351,7 @@ kubectl get jobs -n tool-integration-local | grep <scanner>
 kubectl logs job/<JOB_NAME> -n tool-integration-local
 
 # Check scanner container directly
-docker run --rm -it harbor.0xapogee.local/blocksecops/scanner-<scanner>:<VERSION> --help
+docker run --rm -it harbor.blocksecops.local/blocksecops/scanner-<scanner>:<VERSION> --help
 ```
 
 ### Version Mismatch

@@ -76,8 +76,8 @@ blocksecops-api-service/src/presentation/api/v1/endpoints/admin/
 ```bash
 # Build and push
 cd /home/pwner/Git/blocksecops-api-service
-docker build -t harbor.0xapogee.local/blocksecops/api-service:0.22.4 .
-docker push harbor.0xapogee.local/blocksecops/api-service:0.22.4
+docker build -t harbor.blocksecops.local/blocksecops/api-service:0.22.4 .
+docker push harbor.blocksecops.local/blocksecops/api-service:0.22.4
 
 # Deploy
 kubectl apply -k k8s/overlays/local/

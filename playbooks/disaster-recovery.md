@@ -188,8 +188,8 @@ for svc in api-service data-service intelligence-engine notification \
   orchestration tool-integration contract-parser dashboard admin-portal; do
   cd ~/Git/blocksecops-${svc}
   VERSION=$(grep -E '^version|"version"' pyproject.toml package.json 2>/dev/null | head -1 | grep -oP '[\d.]+')
-  docker build -t harbor.0xapogee.local/blocksecops/${svc}:${VERSION} .
-  docker push harbor.0xapogee.local/blocksecops/${svc}:${VERSION}
+  docker build -t harbor.blocksecops.local/blocksecops/${svc}:${VERSION} .
+  docker push harbor.blocksecops.local/blocksecops/${svc}:${VERSION}
   kubectl apply -k k8s/overlays/local/${svc}/ 2>/dev/null || \
     kubectl apply -k k8s/overlays/local/ 2>/dev/null
 done

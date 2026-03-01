@@ -176,7 +176,7 @@ End-to-end verification of all 6 core Solidity scanner pipelines plus sol-azy (S
 Sol-azy (Solana static analyzer) pipeline fixed. Verify after deployment:
 
 - [ ] scanner-sol-azy:0.4.1 built with Rust 1.88, UID 1000, build verification
-- [ ] Image pushed to Harbor (`harbor.0xapogee.local/blocksecops/scanner-sol-azy:0.4.1`)
+- [ ] Image pushed to Harbor (`harbor.blocksecops.local/blocksecops/scanner-sol-azy:0.4.1`)
 - [ ] K8s Job created with correct image and security context
 - [ ] Scanner container starts without permission errors (UID 1000 match)
 - [ ] Scanner executes analysis and posts callback

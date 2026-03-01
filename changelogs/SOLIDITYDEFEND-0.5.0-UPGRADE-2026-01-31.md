@@ -108,7 +108,7 @@ Fixed an unrelated API service bug that was preventing scan result storage:
 If needed:
 ```bash
 kubectl patch configmap scanner-versions -n tool-integration-local \
-  --type merge -p '{"data":{"SCANNER_IMAGE_SOLIDITYDEFEND":"harbor.0xapogee.local/blocksecops/scanner-soliditydefend:0.4.0"}}'
+  --type merge -p '{"data":{"SCANNER_IMAGE_SOLIDITYDEFEND":"harbor.blocksecops.local/blocksecops/scanner-soliditydefend:0.4.0"}}'
 kubectl rollout restart deployment/tool-integration -n tool-integration-local
 ```
 

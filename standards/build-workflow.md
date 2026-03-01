@@ -5,7 +5,7 @@
 
 ## Overview
 
-Images are built locally with Docker, pushed to a container registry, and deployed via `kubectl apply`. The registry is configurable via the `REGISTRY` environment variable, defaulting to `harbor.0xapogee.local` for the server environment.
+Images are built locally with Docker, pushed to a container registry, and deployed via `kubectl apply`. The registry is configurable via the `REGISTRY` environment variable, defaulting to `harbor.blocksecops.local` for the server environment.
 
 ```
 docker build → docker push ${REGISTRY}/blocksecops/<service>:<version> → kubectl apply -k
@@ -17,7 +17,7 @@ All build commands use the `REGISTRY` variable for registry-agnostic builds:
 
 ```bash
 # Default: Harbor (server environment)
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # Override for GCP Artifact Registry
 REGISTRY="us-west1-docker.pkg.dev/blocksecops-prod/blocksecops"
@@ -43,7 +43,7 @@ VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)  # Python
 # or
 VERSION=$(grep '"version"' package.json | head -1 | cut -d'"' -f4)  # Node.js
 
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # Build
 docker build \
@@ -104,7 +104,7 @@ Run the platform-wide drift checker to detect version mismatches across all serv
 Each service has a build script for the build step only:
 
 ```bash
-# Uses REGISTRY env var (defaults to harbor.0xapogee.local)
+# Uses REGISTRY env var (defaults to harbor.blocksecops.local)
 ./scripts/build-image.sh
 
 # Override registry
@@ -121,7 +121,7 @@ Kustomization overlays specify the registry for their environment:
 # k8s/overlays/local/<service>/kustomization.yaml (Harbor)
 images:
 - name: <service>
-  newName: harbor.0xapogee.local/blocksecops/<service>
+  newName: harbor.blocksecops.local/blocksecops/<service>
   newTag: "0.29.0"
 
 # k8s/overlays/gcp-production/<service>/kustomization.yaml (GCP)

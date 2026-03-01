@@ -303,10 +303,10 @@ All error responses use `get_safe_error_detail()` to prevent internal informatio
 |---------|---------|-------------|
 | `anthropic_api_key` | Required | From Vault via K8s secret |
 | `anthropic_api_base_url` | None (default) | Custom endpoint for enterprise/proxy |
-| `anthropic_model_copilot` | `claude-sonnet-4-20250514` | Copilot model |
-| `anthropic_model_code_review` | `claude-3-haiku-20240307` | Code review model (cost-efficient) |
-| `anthropic_model_code_repair` | `claude-sonnet-4-20250514` | Code repair model |
-| `anthropic_model_invariant` | `claude-sonnet-4-20250514` | Invariant generation model |
+| `anthropic_model_copilot` | `claude-sonnet-4-6` | Copilot model |
+| `anthropic_model_code_review` | `claude-haiku-4-5-20251001` | Code review model (cost-efficient) |
+| `anthropic_model_code_repair` | `claude-sonnet-4-6` | Code repair model |
+| `anthropic_model_invariant` | `claude-sonnet-4-6` | Invariant generation model |
 | `anthropic_rate_limit_per_minute` | 20 | Global per-user rate limit |
 | `anthropic_max_tokens_copilot` | 2048 | Copilot output token limit |
 | `anthropic_max_tokens_code_review` | 2048 | Code review output token limit |
