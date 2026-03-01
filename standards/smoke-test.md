@@ -254,10 +254,10 @@ done
 
 | Service | Version |
 |---------|---------|
-| api-service | 0.29.41 |
+| api-service | 0.29.42 |
 | dashboard | 0.46.11 |
 | admin-portal | 0.7.6 |
-| tool-integration | 0.5.10 |
+| tool-integration | 0.5.11 |
 | orchestration | 0.10.8 |
 | notification | 0.2.6 |
 | intelligence-engine | 0.3.7 |
