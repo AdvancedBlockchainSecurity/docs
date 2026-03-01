@@ -94,6 +94,54 @@ ContractResponse (id, vulnerabilities: {0,0,0,0}, projects, tags)
 | Move | `move` | `.move` extension |
 | Cairo | `cairo` | `.cairo` extension |
 
+## Input Validation (v0.29.43)
+
+### ContractCreate model_validator
+
+A Pydantic `model_validator` enforces that every contract creation request includes at least one of `address` or `source_code`. Requests that provide neither are rejected before any database write.
+
+| Condition | Status | Description |
+|-----------|--------|-------------|
+| Neither `address` nor `source_code` provided | 422 | At least one field is required |
+| `source_code` provided | proceeds | Normal flow |
+| `address` only | proceeds | Address-only contract (no source) |
+
+### Source Code Size Limit
+
+A global `RequestSizeLimitMiddleware` (10 MB) applies to `POST /api/v1/contracts` inline source submissions. Requests that exceed 10 MB are rejected before the endpoint handler runs.
+
+| Condition | Status | Description |
+|-----------|--------|-------------|
+| `source_code` ≤ 10 MB | proceeds | Normal flow |
+| `source_code` > 10 MB | 413 | Request Entity Too Large |
+
+### Null Byte Rejection
+
+Source code content is checked for null bytes (`\x00`) before storage. Null bytes indicate binary or corrupted content, not valid source text.
+
+| Condition | Status | Description |
+|-----------|--------|-------------|
+| No null bytes in content | proceeds | Normal flow |
+| Null byte detected | 400 | Null bytes are not permitted in source code |
+
+### Binary Signature Detection (File Uploads)
+
+The `POST /api/v1/upload` endpoint inspects the first bytes of every uploaded file against known binary magic numbers before processing. This prevents executable or document binaries from being stored as source code.
+
+| Format | Magic Bytes | Detection |
+|--------|-------------|-----------|
+| ELF (Linux binary) | `\x7fELF` | Bytes 0–3 |
+| PE (Windows binary) | `MZ` | Bytes 0–1 |
+| Mach-O (macOS binary) | `\xcf\xfa\xed\xfe` / `\xce\xfa\xed\xfe` | Bytes 0–3 |
+| WASM module | `\x00asm` | Bytes 0–3 |
+| OLE2 compound doc | `\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1` | Bytes 0–7 |
+| PDF | `%PDF` | Bytes 0–3 |
+
+| Condition | Status | Description |
+|-----------|--------|-------------|
+| File passes signature check | proceeds | Normal flow |
+| Binary signature detected | 400 | Binary files are not permitted |
+
 ## Error Handling
 
 | Error | Status | Description |
@@ -103,3 +151,7 @@ ContractResponse (id, vulnerabilities: {0,0,0,0}, projects, tags)
 | Auth failure | 401/403 | Invalid token/key or insufficient scope |
 | Invalid address | 400 | Address fails `^0x[0-9a-fA-F]{40}$` validation (silently ignored) |
 | Validation error | 422 | Missing required fields in request body |
+| Neither address nor source_code | 422 | `model_validator` requires at least one |
+| Source code > 10 MB | 413 | Request body too large |
+| Null bytes in source | 400 | Binary/corrupt content rejected |
+| Binary file upload | 400 | Magic number signature detected |

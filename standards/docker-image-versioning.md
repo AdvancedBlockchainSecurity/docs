@@ -3,6 +3,10 @@
 **Version:** 3.6.0
 **Last Updated:** February 27, 2026
 
+## Owner Approval Required
+
+**MANDATORY:** All version bumps, image builds, registry pushes, and Kustomize applies require explicit approval from the repository owner before execution. See [Core Development Rules — Rule 0](./core-development-rules.md#rule-0-gitops-requires-owner-approval).
+
 ## Single Source of Truth
 
 The **application version file** is the single source of truth:
@@ -310,7 +314,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.6 | `k8s/overlays/local/` | Apogee rebrand: UI branding, metadata, vite config |
-| api-service | 0.29.42 | `k8s/overlays/local/api-service/` | Tier gate fixes (integrations→team, IDE tokens→growth), automated database backup CronJob |
+| api-service | 0.29.43 | `k8s/overlays/local/api-service/` | Stuck contract fix, upload security hardening, stale scan recovery CronJob |
 | contract-parser | 0.2.2 | `k8s/overlays/local/contract-parser/` | Apogee rebrand: OCI source URL, .env.example |
 | dashboard | 0.46.11 | `k8s/overlays/local/` | Sidebar ABC ordering, Teams modal styling, dark mode toggle fix, scanner preset counts |
 | data-service | 0.2.7 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, README |

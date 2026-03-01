@@ -426,6 +426,92 @@ kubectl run --rm -it backup-check --image=busybox -n postgresql-local \
 
 ---
 
+## February 28, 2026 - Pre Stuck Contract Data Fix (v0.29.43)
+
+### Backup Details
+
+**Filename:** `solidity_security_20260228_224442.dump`
+**Location:** `docs/databases/backups/solidity_security_20260228_224442.dump`
+**Created:** February 28, 2026 22:44:42
+**Size:** 9.4MB
+**Database Version:** PostgreSQL 15.4
+**Format:** PostgreSQL custom format (`pg_dump -F c`)
+**Backup Method:** kubectl exec pg_dump from within cluster
+
+### Reason for Backup
+
+Created before manual data fixes accompanying API service v0.29.43 deployment. Ten contracts were stuck in `"scanning"` status due to a race condition in `create_scan()`. Additionally, 45 orphaned failed scans had `NULL` `completed_at` and no `error_message`.
+
+### Changes Applied After This Backup
+
+```sql
+-- Fix 1: Contracts stuck in "scanning" with no active scans
+-- 9 contracts → "scanned", 1 GNosis contract (no source code) → "uploaded"
+UPDATE contracts SET status = 'scanned'
+WHERE status = 'scanning'
+AND id NOT IN (
+    SELECT DISTINCT contract_id FROM scans
+    WHERE status IN ('queued', 'running')
+)
+AND source_code IS NOT NULL;
+
+UPDATE contracts SET status = 'uploaded'
+WHERE status = 'scanning'
+AND id NOT IN (
+    SELECT DISTINCT contract_id FROM scans
+    WHERE status IN ('queued', 'running')
+)
+AND source_code IS NULL;
+
+-- Fix 2: Orphaned failed scans missing completed_at and error_message
+-- 45 rows updated
+UPDATE scans
+SET completed_at = updated_at,
+    error_message = 'Recovered: scan failed without posting results (stale scan cleanup 2026-02-28)'
+WHERE status = 'failed'
+AND completed_at IS NULL;
+```
+
+### Results
+
+| Fix | Count |
+|-----|-------|
+| Contracts fixed: `scanning` → `scanned` | 9 |
+| Contracts fixed: `scanning` → `uploaded` (GNosis, no source) | 1 |
+| Orphaned failed scans updated (`completed_at` + `error_message`) | 45 |
+
+### Restore Command
+
+```bash
+# Stop API service to prevent concurrent access
+kubectl scale deployment/api-service -n api-service-local --replicas=0
+kubectl scale deployment/celery-worker -n api-service-local --replicas=0
+
+# Restore database (custom format requires pg_restore)
+kubectl cp docs/databases/backups/solidity_security_20260228_224442.dump \
+  postgresql-local/postgresql-0:/tmp/restore.dump
+kubectl exec -n postgresql-local postgresql-0 -- \
+  pg_restore -U blocksecops -d solidity_security --clean --if-exists \
+  /tmp/restore.dump
+
+# Restart services
+kubectl scale deployment/api-service -n api-service-local --replicas=1
+kubectl scale deployment/celery-worker -n api-service-local --replicas=1
+
+# Verify contract statuses
+kubectl exec -n postgresql-local postgresql-0 -- \
+  psql -U blocksecops -d solidity_security \
+  -c "SELECT status, count(*) FROM contracts GROUP BY status ORDER BY count DESC;"
+```
+
+### Related Documentation
+
+- [Changelog: API-SERVICE-V0.29.43](../changelogs/API-SERVICE-V0.29.43-STUCK-CONTRACT-UPLOAD-HARDENING-2026-02-28.md)
+- [Manual Fix: MANUAL-FIXES-2026-02-17-STALE-SCANS.md](MANUAL-FIXES-2026-02-17-STALE-SCANS.md) — Original stale contract root cause analysis
+- [Playbook: scan-stale-recovery.md](../playbooks/scan-stale-recovery.md) — Updated with Phase 2 and CronJob
+
+---
+
 ## Notes
 
 - All backups include `--clean --if-exists` flags to drop existing objects before restore

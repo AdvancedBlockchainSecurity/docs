@@ -1,7 +1,7 @@
 # Playbook: Scan Stale Recovery & Monitoring
 
-**Version**: 2.0.0
-**Last Updated**: 2026-02-27
+**Version**: 2.1.0
+**Last Updated**: 2026-02-28
 
 ## Overview
 
@@ -156,7 +156,7 @@ Runs every 30 seconds via `check_stale_scans` task. Directly queries the databas
 
 The outer exception handler in `execute_scan_analysis` also records `error_message` on unexpected failures, preventing NULL error messages on failed scans.
 
-### 2. API Service Maintenance Endpoint (Secondary — v0.28.38+)
+### 2. API Service Maintenance Endpoint + CronJob (Secondary — v0.28.38+, Phase 2 in v0.29.43+)
 
 HTTP endpoint for recovery of scans that the orchestration beat may miss (e.g., scans where the callback never arrived):
 
@@ -169,12 +169,25 @@ curl -sk -X POST https://app.0xapogee.local/api/v1/scans/maintenance/recover-sta
 
 This endpoint records `error_message: "Recovered by maintenance: scan was stuck in '{status}' status for over 1 hour (created {timestamp})"` and resets associated contract status from `scanning` to `scanned`.
 
+**Phase 2 (v0.29.43+):** The endpoint now includes a second recovery pass that finds contracts stuck in `"scanning"` status with no active (`queued`/`running`) scans and resets them to `"scanned"` or `"uploaded"`. This closes the gap where a contract could remain in `"scanning"` even after all associated scans had completed or failed.
+
+**Automated CronJob (v0.29.43+):** A Kubernetes CronJob (`cronjob-stale-scan-recovery.yaml`) runs `stale_scan_recovery.py` every 15 minutes with `concurrencyPolicy: Forbid`. No manual invocation is required for routine recovery.
+
+```bash
+# Check CronJob status
+kubectl get cronjob stale-scan-recovery -n api-service-local
+
+# Manually trigger a recovery job
+kubectl create job --from=cronjob/stale-scan-recovery stale-scan-recovery-manual -n api-service-local
+kubectl logs -n api-service-local job/stale-scan-recovery-manual -f
+```
+
 ### Key Difference
 
-| Mechanism | Interval | Timeout | Handles Queued | Retries Running | Records error_message |
-|---|---|---|---|---|---|
-| Orchestration beat | 30s | 600s (10m) | Yes (v0.10.6+) | Yes (up to 3) | Yes |
-| API maintenance endpoint | On-demand / CronJob | 3600s (1h) | Yes | No (fails immediately) | Yes (v0.29.37+) |
+| Mechanism | Interval | Timeout | Handles Queued | Retries Running | Fixes Contract Status | Records error_message |
+|---|---|---|---|---|---|---|
+| Orchestration beat | 30s | 600s (10m) | Yes (v0.10.6+) | Yes (up to 3) | Yes | Yes |
+| API maintenance endpoint | On-demand / CronJob (15 min) | 3600s (1h) | Yes | No (fails immediately) | Yes — Phase 2 (v0.29.43+) | Yes (v0.29.37+) |
 
 **See also:** [Database manual fix for existing stuck contracts](../database/MANUAL-FIXES-2026-02-17-STALE-SCANS.md)
 
