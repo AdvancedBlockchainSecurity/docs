@@ -320,7 +320,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | intelligence-engine | 0.3.7 | `k8s/overlays/local/` | Apogee rebrand: OCI source/vendor, base images, .env |
 | notification | 0.2.6 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL |
 | orchestration | 0.10.8 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, README |
-| tool-integration | 0.5.11 | `k8s/overlays/local/` | Health probes, NetworkPolicy, server header removal |
+| tool-integration | 0.5.12 | `k8s/overlays/local/` | Fix auth header for outgoing API service requests |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |
