@@ -8,7 +8,7 @@
 > **Important Note on Database Naming:**
 > The database is named `solidity_security`, NOT `blocksecops`. This name was established during initial platform development when the focus was solely on Solidity security scanning. The name has been retained for backward compatibility and to avoid migration complexity. All services, connection strings, and documentation should reference `solidity_security`.
 >
-> **Verified:** February 28, 2026 (Current stats: 184 contracts, 555 scans, 7,342 vulnerabilities, 14 users, 89 tables in `solidity_security` database)
+> **Verified:** March 1, 2026 (Current stats: 184 contracts, 555 scans, 7,342 vulnerabilities, 14 users, 91 tables in `solidity_security` database)
 
 ## Table of Contents
 
@@ -68,8 +68,9 @@ The Apogee database supports a comprehensive smart contract security scanning pl
 - **Compliance:** ToS consent records, GDPR data requests (February 2026)
 - **Alerts & Feedback:** On-chain security alerts and general user feedback submissions (February 2026)
 - **JIRA Integration:** Project mappings and bidirectional issue sync records (February 2026)
+- **Referral System:** User referral codes, referral tracking, reward management, and admin-configurable platform settings (March 2026)
 
-**Total Tables:** 88 (excluding alembic_version)
+**Total Tables:** 91 (excluding alembic_version)
 
 ---
 
@@ -4415,4 +4416,102 @@ Individual vulnerability-to-JIRA-issue synchronization records tracking issue st
 
 ---
 
-**Last Updated**: February 28, 2026
+## Referral System (March 2026)
+
+User referral program with configurable thresholds and reward tracking. Referrers earn free subscription months when referred users sign up.
+
+### New Tables
+
+#### `platform_settings`
+
+Admin-configurable key-value store for platform-wide settings (initially used for referral configuration).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `key` | VARCHAR(100) | PRIMARY KEY | Setting key identifier |
+| `value` | TEXT | NOT NULL | JSON-encoded setting value |
+| `description` | VARCHAR(500) | NULLABLE | Human-readable description |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+| `updated_by` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | Admin who last updated |
+
+**Default Rows:**
+| Key | Value | Description |
+|-----|-------|-------------|
+| `referral_threshold` | `3` | Number of referrals needed to earn a reward |
+| `referral_reward_tier` | `team` | Tier granted as reward |
+| `referral_reward_days` | `30` | Duration of reward in days |
+| `referral_enabled` | `true` | Whether referral system is active |
+
+**Relationships:**
+- Many-to-one with `users` (updated_by, SET NULL on delete)
+
+---
+
+#### `referrals`
+
+Tracks individual referral events between referrer and referred users.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique referral identifier |
+| `referrer_user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | User who shared the referral code |
+| `referred_user_id` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL, INDEX | User who signed up with the code |
+| `referral_code` | VARCHAR(20) | NOT NULL, INDEX | The referral code used |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT 'completed' | Referral status |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `completed_at` | TIMESTAMPTZ | NULLABLE | When the referred user signed up |
+
+**Indexes:**
+- `ix_referrals_referrer_user_id` on `referrer_user_id`
+- `ix_referrals_referred_user_id` on `referred_user_id`
+- `ix_referrals_referral_code` on `referral_code`
+
+**Relationships:**
+- Many-to-one with `users` (referrer_user_id, CASCADE delete)
+- Many-to-one with `users` (referred_user_id, SET NULL on delete)
+
+---
+
+#### `referral_rewards`
+
+Tracks rewards earned by referrers when they reach the referral threshold.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique reward identifier |
+| `referrer_user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | User who earned the reward |
+| `reward_type` | VARCHAR(50) | NOT NULL, DEFAULT 'free_month' | Type of reward |
+| `plan_tier` | VARCHAR(50) | NOT NULL, DEFAULT 'team' | Subscription tier granted |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT 'pending' | pending / applied / expired |
+| `qualifying_referral_count` | INTEGER | NOT NULL | Snapshot of referral count when earned |
+| `applied_at` | TIMESTAMPTZ | NULLABLE | When the reward was applied to subscription |
+| `expires_at` | TIMESTAMPTZ | NULLABLE | 90-day window to claim reward |
+| `stripe_coupon_id` | VARCHAR(255) | NULLABLE | Stripe coupon ID when applied |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+
+**Indexes:**
+- `ix_referral_rewards_referrer_user_id` on `referrer_user_id`
+
+**Relationships:**
+- Many-to-one with `users` (referrer_user_id, CASCADE delete)
+
+---
+
+### Modified Tables
+
+#### `users` (Extended)
+
+New columns added for referral system:
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `referral_code` | VARCHAR(20) | UNIQUE, NULLABLE | User's personal referral code |
+| `referred_by_user_id` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | User who referred this user |
+
+**Indexes:**
+- `uq_users_referral_code` UNIQUE on `referral_code`
+- `ix_users_referred_by_user_id` on `referred_by_user_id`
+
+---
+
+**Last Updated**: March 1, 2026
