@@ -99,8 +99,90 @@ kubectl exec deployment/api-service -n api-service-local -- alembic upgrade head
 kubectl exec deployment/api-service -n api-service-local -- alembic downgrade 058_add_audit_log_protection
 ```
 
+---
+
+## Referral System
+
+### `platform_settings`
+
+Admin-configurable key-value store for platform-wide settings.
+
+| Column | Type | Nullable | Description |
+|--------|------|----------|-------------|
+| `key` | VARCHAR(100) | No | Primary key — setting identifier |
+| `value` | TEXT | No | JSON-encoded setting value |
+| `description` | VARCHAR(500) | Yes | Human-readable description |
+| `updated_at` | TIMESTAMP | No | Last update timestamp |
+| `updated_by` | UUID | Yes | FK to users.id (SET NULL delete) |
+
+**Default Settings:**
+| Key | Default | Description |
+|-----|---------|-------------|
+| `referral_threshold` | `3` | Referrals needed for reward |
+| `referral_reward_tier` | `team` | Tier granted as reward |
+| `referral_reward_days` | `30` | Reward duration in days |
+| `referral_enabled` | `true` | System active flag |
+
+### `referrals`
+
+| Column | Type | Nullable | Description |
+|--------|------|----------|-------------|
+| `id` | UUID | No | Primary key |
+| `referrer_user_id` | UUID | No | FK to users.id (CASCADE delete) |
+| `referred_user_id` | UUID | Yes | FK to users.id (SET NULL delete) |
+| `referral_code` | VARCHAR(20) | No | Code used for this referral |
+| `status` | VARCHAR(20) | No | Default: 'completed' |
+| `created_at` | TIMESTAMP | No | Creation timestamp |
+| `completed_at` | TIMESTAMP | Yes | Signup completion time |
+
+### `referral_rewards`
+
+| Column | Type | Nullable | Description |
+|--------|------|----------|-------------|
+| `id` | UUID | No | Primary key |
+| `referrer_user_id` | UUID | No | FK to users.id (CASCADE delete) |
+| `reward_type` | VARCHAR(50) | No | Default: 'free_month' |
+| `plan_tier` | VARCHAR(50) | No | Default: 'team' |
+| `status` | VARCHAR(20) | No | pending / applied / expired |
+| `qualifying_referral_count` | INTEGER | No | Count snapshot when earned |
+| `applied_at` | TIMESTAMP | Yes | When applied to subscription |
+| `expires_at` | TIMESTAMP | Yes | 90-day claim window |
+| `stripe_coupon_id` | VARCHAR(255) | Yes | Stripe coupon ID |
+| `created_at` | TIMESTAMP | No | Creation timestamp |
+
+### `users` (Extended Columns)
+
+| Column | Type | Nullable | Description |
+|--------|------|----------|-------------|
+| `referral_code` | VARCHAR(20) | Yes | UNIQUE personal referral code |
+| `referred_by_user_id` | UUID | Yes | FK to users.id (SET NULL delete) |
+
+### Referral Invariants
+
+1. A user cannot refer themselves (enforced at API level)
+2. A user can only be referred once (`referred_by_user_id` is set once, not updated)
+3. Referral codes are cryptographically random (`secrets.token_urlsafe(6)`, 8 chars)
+4. Referral codes must match pattern `^[A-Za-z0-9_-]{6,20}$`
+5. Rewards are created when `completed_referral_count >= platform_settings['referral_threshold']`
+6. Reward expiry window: 90 days from creation
+7. Stripe coupon applied as 100% off for one billing cycle (team tier)
+
+### Migration
+
+Migration: `078_add_referral_system`
+
+```bash
+# Run migration
+kubectl exec deployment/api-service -n api-service-local -- alembic upgrade head
+
+# Rollback
+kubectl exec deployment/api-service -n api-service-local -- alembic downgrade 077_add_poc_exploits_table
+```
+
 ## Related Documentation
 
 - [AI Invariant Testing Guide](../feature-tests/AI-INVARIANT-TESTING.md)
 - [AI Features API](../api/ai-features.md)
 - [ML Fields Overview](./ML-FIELDS.md)
+- [Referral System Feature Test](../feature-tests/88-referral-system.md)
+- [Referral System Pipeline](../pipelines/referral-system-pipeline.md)

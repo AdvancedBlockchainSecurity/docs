@@ -80,6 +80,7 @@ Manual testing checklists for all user-facing features.
 | [api-key-scope-enforcement.md](./api-key-scope-enforcement.md) | API key scope enforcement tests |
 | [SCAN-TEST-2026-02-22.md](./SCAN-TEST-2026-02-22.md) | **NEW** - Cluster health audit scan tests: single/multi/full scanner, deduplication verification, auth 401 fix validation |
 | [82-cors-domain-regression.md](./82-cors-domain-regression.md) | **NEW** - Automated CORS wildcard and legacy domain regression tests (64 tests across all repos) |
+| [88-referral-system.md](./88-referral-system.md) | **NEW** - Referral system: code generation, sharing, applying, reward threshold, admin settings, dashboard UI, Stripe integration (v0.29.49 API, v0.46.13 Dashboard) |
 
 ---
 
@@ -343,6 +344,7 @@ For the comprehensive GCP production launch audit (cross-cutting, integration-le
 
 ```
 [Date] | [Tester] | [File] | [Result]
+2026-03-01 | Claude Code | 88-referral-system.md | NEW - Referral system: 14/16 tests passing (2 pending: Stripe webhook, disable gate). Code gen, apply, self-referral block, rate limit, reward threshold, admin settings, dashboard UI (v0.29.49 API, v0.46.13 Dashboard)
 2026-02-25 | Automated | 81-platform-security-audit.md | NEW - Full platform security audit: 145/145 tests passing across 5 audit suites (K8s, AppSec, Auth, DB integrity, Auth x402). 3 critical + 7 high + 8 medium issues remediated.
 2026-02-16 | Claude Code | GO-LIVE-AUDIT-TESTING-CHECKLIST.md | NEW - GCP production launch audit: 14 sections, 140+ cross-cutting tests, 6 automation scripts
 2026-02-14 | Automated | 61-ai-inline-results.md | NEW - AI inline results: Code Review & Code Repair fully inline on vulnerability detail page, auth middleware fix for code-repair/copilot endpoints (v0.45.3 Dashboard, v0.28.32 API)

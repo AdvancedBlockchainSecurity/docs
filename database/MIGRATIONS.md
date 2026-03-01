@@ -1567,6 +1567,87 @@ asyncio.run(verify())
 
 ---
 
+### Migration 073: Enforce Single Organization Ownership
+- **Status**: ✅ Completed
+- **Created**: 2026-02-08
+- **Revision ID**: `073_enforce_single_org_ownership`
+- **Description**: Enforces single-organization ownership constraints
+- **Migration File**: `alembic/versions/20260208_1000-073_enforce_single_org_ownership.py`
+
+---
+
+### Migration 074: Add Missing Vulnerability Columns
+- **Status**: ✅ Completed
+- **Created**: 2026-02-08
+- **Revision ID**: `074_add_missing_vulnerability_columns`
+- **Description**: Adds missing columns to vulnerabilities table for data completeness
+- **Migration File**: `alembic/versions/20260208_1200-074_add_missing_vulnerability_columns.py`
+
+---
+
+### Migration 075: Backfill Requires Login Code Snippets
+- **Status**: ✅ Completed
+- **Created**: 2026-02-13
+- **Revision ID**: `075_backfill_requires_login_code_snippets`
+- **Description**: Backfills code snippet data that requires authentication
+- **Migration File**: `alembic/versions/20260213_1000-075_backfill_requires_login_code_snippets.py`
+
+---
+
+### Migration 076: Backfill Repair Suggestions Code
+- **Status**: ✅ Completed
+- **Created**: 2026-02-13
+- **Revision ID**: `076_backfill_repair_suggestions_code`
+- **Description**: Backfills repair suggestion code fields
+- **Migration File**: `alembic/versions/20260213_1100-076_backfill_repair_suggestions_code.py`
+
+---
+
+### Migration 077: Add PoC Exploits Table
+- **Status**: ✅ Completed
+- **Created**: 2026-02-14
+- **Revision ID**: `077_add_poc_exploits_table`
+- **Description**: Adds table for proof-of-concept exploit generation and tracking
+- **Migration File**: `alembic/versions/20260214_1000-077_add_poc_exploits_table.py`
+
+---
+
+### Migration 078: Add Referral System
+- **Status**: ✅ Completed
+- **Created**: 2026-03-01
+- **Revision ID**: `078_add_referral_system`
+- **Down Revision**: `077_add_poc_exploits_table`
+- **Description**: Adds complete referral system with platform settings, referral tracking, and reward management
+- **Tables Created**:
+  - `platform_settings` — Admin-configurable key-value store (PK: `key` VARCHAR(100))
+  - `referrals` — Referral event tracking between referrer and referred users
+  - `referral_rewards` — Reward records earned when referral threshold is reached
+- **Columns Added to `users`**:
+  - `referral_code` (VARCHAR(20), UNIQUE, nullable) — Personal referral code
+  - `referred_by_user_id` (UUID, nullable, FK → users.id ON DELETE SET NULL) — Who referred this user
+- **Seed Data**: 4 platform_settings rows: `referral_threshold=3`, `referral_reward_tier=team`, `referral_reward_days=30`, `referral_enabled=true`
+- **Indexes Created**:
+  - `ix_referrals_referrer_user_id`, `ix_referrals_referred_user_id`, `ix_referrals_referral_code`
+  - `ix_referral_rewards_referrer_user_id`
+  - `uq_users_referral_code` (UNIQUE)
+  - `ix_users_referred_by_user_id`
+- **Migration File**: `alembic/versions/20260301_1400-078_add_referral_system.py`
+- **Related Files**:
+  - Models: `blocksecops-api-service/src/infrastructure/database/models.py`
+  - API Endpoints: `blocksecops-api-service/src/presentation/api/v1/endpoints/referrals.py`
+  - Admin Endpoints: `blocksecops-api-service/src/presentation/api/v1/endpoints/admin/referrals.py`
+  - Schemas: `blocksecops-api-service/src/presentation/schemas/referrals.py`
+  - Stripe Webhook: `blocksecops-api-service/src/presentation/api/v1/endpoints/stripe_webhook.py` (pending reward auto-apply)
+- **API Endpoints Added**:
+  - `GET /api/v1/referrals/my-code` — Get/generate personal referral code
+  - `GET /api/v1/referrals/status` — Referral dashboard (count, threshold, rewards)
+  - `POST /api/v1/referrals/apply` — Apply a referral code after signup
+  - `GET /api/v1/admin/referrals/settings` — Get referral configuration (platform_admin)
+  - `PATCH /api/v1/admin/referrals/settings` — Update referral configuration (platform_admin)
+- **Deployed**: API Service v0.29.49, Dashboard v0.46.13
+
+---
+
 ### Migration Compatibility Check (Deduplication Maintenance Job)
 
 **Added:** February 22, 2026
@@ -1614,3 +1695,4 @@ alembic revision -m "add_x402_payment_tables"
 8. ✅ Migration 014 - x402 payment models complete (Phase 3.4)
 9. ⏳ Generate and apply alembic migrations for new tables
 10. ⏳ Seed credit packages with default pricing
+11. ✅ Migrations 073-078 completed (org enforcement, vulnerability columns, backfills, PoC exploits, referral system)
