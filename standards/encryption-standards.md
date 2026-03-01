@@ -1,7 +1,7 @@
 # Encryption Standards
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Last Updated:** March 1, 2026
 **Status:** Active
 
@@ -31,6 +31,7 @@ All network communication MUST be encrypted with TLS 1.2+.
 - **Production:** cert-manager with Let's Encrypt (ACME)
 - **Minimum protocol:** TLS 1.2 (enforced via Traefik `TLSOption` CRD)
 - **Cipher suites:** ECDHE + AES-GCM/ChaCha20 only (no RC4, 3DES, weak ciphers)
+- **HSTS Header:** Applied globally to all HTTPS responses with 1-year max-age, includeSubDomains, and preload flags (enforced Mar 1, 2026 per audit finding F12)
 - Private keys: 0600 permissions, mounted via initContainer from K8s secrets
 - TLS 1.0/1.1 rejected (enforced Mar 1, 2026 per audit finding F11)
 

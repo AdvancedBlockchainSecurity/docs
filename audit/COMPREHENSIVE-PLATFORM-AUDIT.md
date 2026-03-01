@@ -2,9 +2,9 @@
 
 **Version:** 1.1.0
 **Created:** February 28, 2026
-**Last Updated:** March 1, 2026 (post-TLS hardening)
+**Last Updated:** March 1, 2026 (post-TLS hardening + HSTS)
 **Audit Date:** March 1, 2026 (re-audit after v0.29.43/v0.29.44/TLS hardening deployment)
-**Status:** Audit Complete — All critical findings remediated, 1 new finding fixed (F11), 1 open (F12)
+**Status:** Audit Complete — All findings remediated. F11 (TLS 1.2 min) and F12 (HSTS) both fixed.
 **Scope:** Full platform audit — all services, infrastructure, scanners, billing, auth, and operations
 
 ---
@@ -596,7 +596,7 @@
 | 13.1.3 | Valid TLS certificates (production) | No cert errors | [x] |
 | 13.1.4 | PostgreSQL SSL enabled for all service connections | `hostssl` enforced | [x] |
 | 13.1.5 | Internal service-to-service: mTLS or TLS | Encrypted in transit | [~] |
-| 13.1.6 | HSTS header present on HTTPS responses | Strict-Transport-Security set | [!] |
+| 13.1.6 | HSTS header present on HTTPS responses | Strict-Transport-Security set | [x] |  ← Fixed F12 |
 
 ### 13.2 DNS & Domain Security
 
@@ -886,7 +886,7 @@
 | 10. Application Security (OWASP) | 18 | 12 | 0 | 4 | 2 |
 | 11. Database Integrity & Migrations | 12 | 8 | 0 | 4 | 0 |
 | 12. Kubernetes & Infrastructure Security | 15 | 13 | 0 | 2 | 0 |
-| 13. Network Security & TLS | 9 | 4 | 1 | 4 | 0 |
+| 13. Network Security & TLS | 9 | 5 | 0 | 4 | 0 |
 | 14. Secrets Management | 11 | 7 | 0 | 4 | 0 |
 | 15. Load Testing & Performance | 17 | 7 | 0 | 10 | 0 |
 | 16. Monitoring, Alerting & Observability | 13 | 4 | 0 | 9 | 0 |
@@ -895,14 +895,14 @@
 | 19. Compliance & Data Privacy | 10 | 2 | 0 | 8 | 0 |
 | 20. End-to-End Workflow Validation | 11 | 2 | 0 | 9 | 0 |
 | 21. Production Smoke Test | 11 | 8 | 0 | 3 | 0 |
-| **TOTAL** | **292** | **166** | **1** | **123** | **2** |
+| **TOTAL** | **292** | **167** | **0** | **123** | **2** |
 
 ### Test Execution Log
 
 | Date | Tester | Sections | Result | Notes |
 |------|--------|----------|--------|-------|
 | 2026-02-28 | Claude (automated audit) | 1-21 | 163/0/126 | Full platform audit with live API testing |
-| 2026-03-01 | Claude (re-audit) | 1-21 | 166/1/123 | Re-audit after v0.29.43/v0.29.44/TLS hardening. F4-F6, F11 fixed. 1 open (F12: HSTS header). |
+| 2026-03-01 | Claude (re-audit) | 1-21 | 167/0/123 | Re-audit after v0.29.43/v0.29.44/TLS hardening. F4-F6, F11, F12 all fixed. 0 failed items. |
 
 ### Final Approval
 
@@ -928,7 +928,7 @@
 | F9 | **INFO** | 10.6.4 | python-jose updated to 3.5.0 (was 3.3.0). PyJWT 2.11.0 also installed. Consider migrating fully to PyJWT and removing python-jose. | Technical debt |
 | F10 | **INFO** | 12.4.4 | Dashboard no longer uses busybox init container. **Resolved.** | Resolved |
 | F11 | **LOW** | 13.1.2 | Traefik accepting TLS 1.0 connections. **FIXED (Mar 1)**: Created `TLSOption` CRD (`default`) in `traefik-local` namespace enforcing `minVersion: VersionTLS12` with modern cipher suites (ECDHE + AES-GCM/ChaCha20). Verified: TLS 1.0/1.1 rejected, TLS 1.2/1.3 accepted. Also added missing `certificate.yaml`, `tlsstore.yaml` to traefik kustomization.yaml. | Fixed |
-| F12 | **LOW** | 13.1.6 | No HSTS (Strict-Transport-Security) header on HTTPS responses. Traefik needs HSTS middleware configured. | Open |
+| F12 | **LOW** | 13.1.6 | No HSTS (Strict-Transport-Security) header on HTTPS responses. **FIXED (Mar 1)**: Created Traefik `Middleware` CRD (`hsts`) with `stsSeconds: 31536000`, `stsIncludeSubdomains: true`, `stsPreload: true`. Applied globally via websecure entrypoint default middleware chain. Also fixed Traefik RBAC (missing `configmaps` and `nodes` permissions). Verified: `strict-transport-security: max-age=31536000; includeSubDomains; preload` header present on all HTTPS responses. | Fixed |
 
 ### Deployed Fixes (All committed and merged)
 
@@ -940,6 +940,7 @@ All fixes from the Feb 28 audit have been committed, deployed, and verified:
 | blocksecops-api-service | v0.29.43 fixes: source code validation, upload hardening, stale scan recovery CronJob | v0.29.43 (PR #288) | Merged |
 | blocksecops-api-service | v0.29.44 fix: stale scan recovery model import | v0.29.44 (PR #289) | Merged |
 | blocksecops-tool-integration | F5 (liveness/readiness probes), NetworkPolicy | v0.5.12 | Deployed |
+| blocksecops-gcp-infrastructure | F11 (TLS 1.2 min via TLSOption CRD), F12 (HSTS middleware + RBAC fix) | Traefik config | Applied |
 
 ### Audit Notes
 
@@ -967,13 +968,13 @@ All fixes from the Feb 28 audit have been committed, deployed, and verified:
 - PostgreSQL backup CronJob running daily at 2 AM, last success: 2026-03-01T02:06:07Z
 - No `server:` header disclosed (F4 fixed in v0.29.43)
 - TLS 1.2+ minimum enforced, TLS 1.0/1.1 rejected (F11 fixed Mar 1)
-- No HSTS header (F12 remains open)
+- HSTS header present on all HTTPS responses: `max-age=31536000; includeSubDomains; preload` (F12 fixed Mar 1)
 - HTTP→HTTPS redirect working (301)
 - CORS: unauthorized origins blocked, authorized origin allowed
 
 **Items marked [~] (Partial):** Require either production environment testing (GCP, Stripe live mode, external integrations), load testing tools (k6/locust), or manual end-to-end browser testing. Code review confirmed implementation exists but live verification was not possible in local environment.
 
-**Items marked [!] (Failed):** TLS 1.0 accepted by Traefik (F11) and no HSTS header (F12). Both are Traefik configuration issues requiring TLSOption CRD or middleware updates.
+**Items marked [!] (Failed):** None. All previously failed items (F11: TLS 1.0, F12: HSTS) have been remediated.
 
 ### Go/No-Go Criteria
 
@@ -1001,12 +1002,11 @@ All fixes from the Feb 28 audit have been committed, deployed, and verified:
 5. F5: tool-integration probes — deployed in v0.5.12, verified liveness/readiness present
 6. F6: NetworkPolicy in all namespaces — all 9 namespaces have default-deny-all
 7. F11: TLS 1.0 acceptance — fixed Mar 1, TLSOption CRD enforces TLS 1.2+ minimum
-6. F6: NetworkPolicies — all 9 namespaces now have default-deny-all
-7. F10: Dashboard busybox init container — no longer present
+8. F12: No HSTS header — fixed Mar 1, Traefik HSTS middleware with global entrypoint binding
+9. F6: NetworkPolicies — all 9 namespaces now have default-deny-all
+10. F10: Dashboard busybox init container — no longer present
 
-**New Findings (March 1):**
-1. F11 (LOW): Traefik accepts TLS 1.0 — needs TLSOption CRD
-2. F12 (LOW): No HSTS header — needs Traefik HSTS middleware
+**All findings remediated.** No open findings remain.
 
 **Remaining [~] items:** 123 tests require production environment (GCP), load testing tools, or manual browser testing.
 
