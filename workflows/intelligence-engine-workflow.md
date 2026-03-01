@@ -188,7 +188,7 @@ sed -i "s/version = \".*\"/version = \"${VERSION}\"/" pyproject.toml
 sed -i "s/newTag: \".*\"/newTag: \"${VERSION}\"/" k8s/overlays/local/intelligence-engine/kustomization.yaml
 
 # 3. Build and push
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 docker build \
   --build-arg SERVICE_VERSION=${VERSION} \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \

@@ -59,7 +59,7 @@ Verification of fixes from the comprehensive scanner and API service audit. Cove
 | 7 | Load test: Uniswap V2 Router (3 scanners) | Pass | 87 findings, ~3 min |
 | 8 | Load test: Compound Governor (2 scanners) | Pass | 64 findings, ~4 min |
 | 9 | Contract-by-address feature | Pass | 4 contracts with addresses stored and returned |
-| 10 | Harbor registry default in build scripts | Pass | 4 repos updated to harbor.0xapogee.local |
+| 10 | Harbor registry default in build scripts | Pass | 4 repos updated to harbor.blocksecops.local |
 | 11 | `/users/me` endpoint returns user profile | Pass | EmailStr → str fix resolves `.local` TLD validation |
 | 12 | `/scanners` endpoint returns scanner list | Pass | slowapi Response parameter fix resolves 500 error |
 | 13 | Bulk scanning: 3 concurrent scans | Pass | Completed in 16s |

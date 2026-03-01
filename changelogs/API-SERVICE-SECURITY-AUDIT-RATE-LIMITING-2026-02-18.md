@@ -110,7 +110,7 @@ Comprehensive security audit of the API service identified 20 issues (3 critical
 
 ## Deployment
 
-- **Image:** `harbor.0xapogee.local/blocksecops/api-service:0.28.42`
+- **Image:** `harbor.blocksecops.local/blocksecops/api-service:0.28.42`
 - **Deployed:** February 18, 2026
 - **Smoke tests:** All pass (health, auth, database integrity, internal services)
 - **Unit tests:** 11 passed, 0 failed

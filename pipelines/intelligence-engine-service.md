@@ -42,7 +42,7 @@ POST /api/v1/embeddings →  Sanitize input texts        →   all-MiniLM-L6-v2
 cd /home/pwner/Git/blocksecops-intelligence-engine
 
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # Build (base image provides ML deps; app image adds source + pre-downloaded model)
 docker build \

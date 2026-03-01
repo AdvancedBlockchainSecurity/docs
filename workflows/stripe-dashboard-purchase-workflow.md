@@ -73,9 +73,9 @@ docker build --no-cache \
   --build-arg VITE_STRIPE_PUBLISHABLE_KEY=${STRIPE_PK} \
   --build-arg VITE_SUPABASE_URL=$(kubectl get cm dashboard-config -n dashboard-local -o jsonpath='{.data.supabase_url}') \
   --build-arg VITE_SUPABASE_ANON_KEY=$(kubectl get cm dashboard-config -n dashboard-local -o jsonpath='{.data.supabase_anon_key}') \
-  -t harbor.0xapogee.local/blocksecops/dashboard:latest .
+  -t harbor.blocksecops.local/blocksecops/dashboard:latest .
 
-docker push harbor.0xapogee.local/blocksecops/dashboard:latest
+docker push harbor.blocksecops.local/blocksecops/dashboard:latest
 kubectl rollout restart deployment/dashboard -n dashboard-local
 ```
 

@@ -369,10 +369,10 @@ AI-powered features use the Anthropic Claude API and are tier-gated with monthly
 **Configuration** (`src/infrastructure/config.py`):
 ```python
 anthropic_api_key: Optional[str]                     # From Vault
-anthropic_model_copilot: str = "claude-sonnet-4-20250514"
-anthropic_model_code_review: str = "claude-3-haiku-20240307"
-anthropic_model_code_repair: str = "claude-sonnet-4-20250514"
-anthropic_model_invariant: str = "claude-sonnet-4-20250514"
+anthropic_model_copilot: str = "claude-sonnet-4-6"
+anthropic_model_code_review: str = "claude-haiku-4-5-20251001"
+anthropic_model_code_repair: str = "claude-sonnet-4-6"
+anthropic_model_invariant: str = "claude-sonnet-4-6"
 anthropic_rate_limit_per_minute: int = 20
 anthropic_max_tokens_copilot: int = 2048
 anthropic_max_tokens_code_review: int = 2048

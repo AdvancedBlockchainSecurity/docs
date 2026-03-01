@@ -86,16 +86,16 @@ For production, the API Service ConfigMap entries for `cors_origins`, `allowed_h
 |---------|-----|
 | Dashboard | `https://app.0xapogee.local` |
 | API | `https://app.0xapogee.local/api/v1/...` |
-| Harbor | `https://harbor.0xapogee.local` |
+| Harbor | `https://harbor.blocksecops.local` |
 
 **DNS Setup (one-time):**
 
 ```bash
 # On server (required for local API testing and health checks)
-echo "127.0.0.1  app.0xapogee.local harbor.0xapogee.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1  app.0xapogee.local harbor.blocksecops.local" | sudo tee -a /etc/hosts
 
 # On client machines
-echo "192.168.86.225  app.0xapogee.local harbor.0xapogee.local" | sudo tee -a /etc/hosts
+echo "192.168.86.225  app.0xapogee.local harbor.blocksecops.local" | sudo tee -a /etc/hosts
 ```
 
 **Verification:**
@@ -286,7 +286,7 @@ curl https://app.0xapogee.com/api/v1/health/live
 
 The container registry domain `harbor.blocksecops.local` is **not** part of the application domain rebrand. Harbor has its own TLS certificate, IngressRoute, and DNS entry. Changing this domain requires coordinated infrastructure migration:
 
-1. Issue new TLS certificate for `harbor.0xapogee.local`
+1. Issue new TLS certificate for `harbor.blocksecops.local`
 2. Update Harbor IngressRoute Host rules
 3. Update DNS entries on all nodes and clients
 4. Re-trust the new registry on all kubelet nodes

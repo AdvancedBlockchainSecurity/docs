@@ -84,7 +84,7 @@ FROM vulnerabilities WHERE scan_id = '{scan_id}';
 - [x] Correct Python module in command (`src.infrastructure.tasks.deduplication_maintenance`)
 - [x] `runAsNonRoot: true`
 - [x] `restartPolicy`: OnFailure
-- [x] Image: `harbor.0xapogee.local/blocksecops/api-service:0.29.11`
+- [x] Image: `harbor.blocksecops.local/blocksecops/api-service:0.29.11`
 
 ---
 

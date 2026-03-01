@@ -93,7 +93,7 @@ The `find` command without `-L` does not follow symlinks, so `find /contracts -n
 # Check all scanner images are available in Harbor
 for scanner in slither aderyn semgrep solhint vyper moccasin halmos echidna medusa wake soliditydefend sol-azy cargo-fuzz-solana trident rustdefend; do
   echo -n "$scanner: "
-  curl -sk "https://harbor.0xapogee.local/api/v2.0/projects/blocksecops/repositories/scanner-${scanner}/artifacts" | jq -r '.[0].tags[0].name' 2>/dev/null || echo "NOT FOUND"
+  curl -sk "https://harbor.blocksecops.local/api/v2.0/projects/blocksecops/repositories/scanner-${scanner}/artifacts" | jq -r '.[0].tags[0].name' 2>/dev/null || echo "NOT FOUND"
 done
 
 # Verify tool-integration has updated ConfigMap

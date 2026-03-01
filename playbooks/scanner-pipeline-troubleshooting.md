@@ -53,8 +53,8 @@ grep -A5 'security_context' src/scanners/kubernetes_job_manager.py
 RUN useradd -m -u 1000 scanner  # Was: useradd -m -u 1001 scanner
 
 # Rebuild and push
-docker build -t harbor.0xapogee.local/blocksecops/scanner-<name>:<new-version> .
-docker push harbor.0xapogee.local/blocksecops/scanner-<name>:<new-version>
+docker build -t harbor.blocksecops.local/blocksecops/scanner-<name>:<new-version> .
+docker push harbor.blocksecops.local/blocksecops/scanner-<name>:<new-version>
 ```
 
 ---

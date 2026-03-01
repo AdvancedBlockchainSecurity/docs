@@ -32,7 +32,7 @@ Standard operating procedures for deploying services to GKE production and local
 ```bash
 SERVICE="api-service"
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # 1. Build and push
 docker build \

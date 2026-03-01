@@ -77,14 +77,14 @@ Also rejects bare `line:col` patterns (e.g. "669:16") as invalid code snippets i
 
 ```bash
 # Image already built and pushed to Harbor
-docker push harbor.0xapogee.local/blocksecops/api-service:0.28.40
+docker push harbor.blocksecops.local/blocksecops/api-service:0.28.40
 
 # Applied kustomize overlay
 kubectl apply -k k8s/overlays/local/
 
 # Verified
 kubectl -n api-service-local get pods -o jsonpath='{.items[?(@.status.phase=="Running")].spec.containers[*].image}'
-# harbor.0xapogee.local/blocksecops/api-service:0.28.40
+# harbor.blocksecops.local/blocksecops/api-service:0.28.40
 
 curl -sk https://app.0xapogee.local/api/v1/health/live
 # {"status":"healthy","version":"0.28.40"}

@@ -458,7 +458,7 @@ cd /Users/pwner/Git/ABS/blocksecops-api-service
 git pull
 
 # 2. Build and push new Docker image to Harbor
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 docker build -t ${REGISTRY}/blocksecops/api-service:0.3.20 .
 docker push ${REGISTRY}/blocksecops/api-service:0.3.20
 
@@ -482,7 +482,7 @@ curl -s http://127.0.0.1:3000/api/v1/health/live
 
 ```bash
 # 1. Set registry and source environment variables
-REGISTRY="${REGISTRY:-harbor.0xapogee.local}"
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # 2. Source environment variables from .env.local
 cd /Users/pwner/Git/ABS

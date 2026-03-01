@@ -19,7 +19,7 @@ Stores AI-generated Foundry invariants for smart contracts.
 | `invariant_type` | VARCHAR(50) | No | Type: state, access, arithmetic, economic, reentrancy |
 | `function_name` | VARCHAR(200) | Yes | Target function (optional) |
 | `description` | TEXT | Yes | Human-readable description |
-| `model_used` | VARCHAR(100) | No | Claude model used (e.g., claude-sonnet-4-20250514) |
+| `model_used` | VARCHAR(100) | No | Claude model used (e.g., claude-sonnet-4-6) |
 | `tokens_input` | INTEGER | No | Input tokens consumed |
 | `tokens_output` | INTEGER | No | Output tokens generated |
 | `generation_time_ms` | INTEGER | Yes | Generation time in milliseconds |

@@ -95,7 +95,7 @@ kubectl apply -k k8s/overlays/local/
 cd /home/pwner/Git/blocksecops-admin-portal
 
 VERSION=$(grep '"version"' package.json | head -1 | cut -d'"' -f4)
-REGISTRY="harbor.0xapogee.local"
+REGISTRY="harbor.blocksecops.local"
 
 # Get environment variables from secrets/configmaps
 ADMIN_SUPABASE_URL=$(kubectl get secret admin-supabase-credentials -o jsonpath='{.data.url}' | base64 -d)
@@ -397,7 +397,7 @@ docker build \
   --build-arg SERVICE_VERSION=${VERSION} \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
-  -t harbor.0xapogee.local/blocksecops/admin-portal:${VERSION} .
+  -t harbor.blocksecops.local/blocksecops/admin-portal:${VERSION} .
 ```
 
 > **Note:** Admin portal shares the same Supabase project as the customer dashboard. Credentials can be sourced from the `dashboard-config` ConfigMap in the `dashboard-local` namespace.

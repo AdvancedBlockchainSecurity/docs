@@ -278,7 +278,7 @@ Removed all "info" and "informational" severity references from dashboard code:
 cd /home/pwner/Git
 
 VERSION=0.40.0
-REGISTRY="harbor.0xapogee.local"
+REGISTRY="harbor.blocksecops.local"
 
 SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')
 SUPABASE_KEY=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_anon_key}')

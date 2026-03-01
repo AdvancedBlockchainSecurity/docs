@@ -81,7 +81,7 @@ docker build \
   --build-arg SERVICE_VERSION=$(grep 'version' pyproject.toml | head -1 | cut -d'"' -f2) \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
-  -t harbor.0xapogee.local/blocksecops/service-name:version .
+  -t harbor.blocksecops.local/blocksecops/service-name:version .
 ```
 
 ---

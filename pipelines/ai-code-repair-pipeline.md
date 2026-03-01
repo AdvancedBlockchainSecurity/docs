@@ -33,14 +33,14 @@ POST /code-repair/generate → 1. Authenticate (JWT)                            
 | 3 | Feature flags | `ai_features_enabled` + `ai_code_repair_enabled` | Returns 503 if disabled |
 | 4 | Rate limiting | `@limiter.limit(get_rate_limit_string("ai", "codeRepair"))` | Per-tier rate limits (BSO-SEC-AI-003) |
 | 5 | Load context | Database query | Fetch vulnerability details, surrounding code context. If `original_code` not provided, extract from contract source |
-| 6 | Anthropic API call | `CodeRepairService.generate_repair()` | Model: `claude-sonnet-4-20250514`, max tokens: 4096 |
+| 6 | Anthropic API call | `CodeRepairService.generate_repair()` | Model: `claude-sonnet-4-6`, max tokens: 4096 |
 | 7 | Store result | Database INSERT | Save repair with repaired_code, explanation, diff |
 
 ## Configuration
 
 | Setting | Default | Source |
 |---------|---------|--------|
-| `anthropic_model_code_repair` | `claude-sonnet-4-20250514` | `config.py` |
+| `anthropic_model_code_repair` | `claude-sonnet-4-6` | `config.py` |
 | `anthropic_max_tokens_code_repair` | 4096 | `config.py` |
 | `ai_code_repair_enabled` | `true` | `config.py` |
 
