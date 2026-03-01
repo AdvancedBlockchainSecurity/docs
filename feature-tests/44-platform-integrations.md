@@ -48,11 +48,10 @@ Platform integrations enable connecting Apogee to external version control syste
 | 1 | Login as Developer tier user | Login successful |
 | 2 | Navigate to `/integrations` | TierGate blocks access, shows upgrade prompt |
 | 3 | Login as Team tier user | Login successful |
-| 4 | Navigate to `/integrations` | Page loads, GitHub/GitLab/Bitbucket show "Connect" button |
-| 5 | Check Jira integration card | Shows "Enterprise" badge, button shows "Upgrade to Enterprise" |
-| 6 | Click Jira upgrade button | Redirects to /pricing page |
-| 7 | Login as Enterprise tier user | Login successful |
-| 8 | Navigate to `/integrations` | All integrations show "Connect" button including Jira |
+| 4 | Navigate to `/integrations` | Page loads, all integrations show "Connect" button (GitHub, GitLab, Bitbucket, Jira, Jenkins) |
+| 5 | Check Jira integration card | Shows "Connect" button (available to all paying tiers) |
+| 6 | Login as Enterprise tier user | Login successful |
+| 7 | Navigate to `/integrations` | All integrations show "Connect" button |
 
 ---
 
@@ -272,7 +271,7 @@ Platform integrations enable connecting Apogee to external version control syste
 **Goal:** Verify Jira project mapping configuration
 
 **Prerequisites:**
-- Connected Jira integration (Enterprise tier)
+- Connected Jira integration (Team+ tier)
 
 **API Endpoint:** `POST /organizations/{orgId}/integrations/{integrationId}/jira/mappings`
 

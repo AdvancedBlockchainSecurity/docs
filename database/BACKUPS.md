@@ -365,14 +365,74 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 
 ---
 
+## Automated Kubernetes CronJob Backup (February 28, 2026)
+
+As of February 28, 2026, automated database backups run via a Kubernetes CronJob in the `postgresql-local` namespace.
+
+### Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Schedule** | Daily at 2:00 AM (`0 2 * * *`) |
+| **Retention** | 7 days (automatic cleanup) |
+| **Format** | PostgreSQL custom format (`-F c`) |
+| **Storage** | PVC `postgresql-backups` (2Gi, `local-path`) |
+| **Mount path** | `/backups/` |
+| **Image** | `pgvector/pgvector:pg15` (matches production database) |
+| **Credentials** | From `postgresql-secret` (Vault-managed) |
+| **Concurrency** | `Forbid` (no parallel backup jobs) |
+| **History** | 3 successful, 3 failed jobs retained |
+| **Cleanup** | Jobs cleaned after 24 hours (`ttlSecondsAfterFinished: 86400`) |
+
+### Manifests
+
+| File | Purpose |
+|------|---------|
+| `blocksecops-api-service/k8s/overlays/local/database-backup/kustomization.yaml` | Kustomize entry point |
+| `blocksecops-api-service/k8s/overlays/local/database-backup/backup-cronjob.yaml` | CronJob spec |
+| `blocksecops-api-service/k8s/overlays/local/database-backup/backup-pvc.yaml` | PVC for backup storage |
+
+### Security
+
+- `runAsNonRoot: true`, `runAsUser: 999` (postgres user)
+- `seccompProfile: RuntimeDefault`
+- `allowPrivilegeEscalation: false`
+- All Linux capabilities dropped
+
+### Manual Trigger
+
+```bash
+kubectl create job --from=cronjob/postgresql-backup postgresql-backup-manual -n postgresql-local
+kubectl logs -n postgresql-local job/postgresql-backup-manual -f
+```
+
+### Verify Backups
+
+```bash
+# Check CronJob status
+kubectl get cronjob postgresql-backup -n postgresql-local
+
+# List backup files inside PVC
+kubectl run --rm -it backup-check --image=busybox -n postgresql-local \
+  --overrides='{"spec":{"containers":[{"name":"check","image":"busybox","command":["ls","-lh","/backups/"],"volumeMounts":[{"name":"backups","mountPath":"/backups"}]}],"volumes":[{"name":"backups","persistentVolumeClaim":{"claimName":"postgresql-backups"}}]}}' --restart=Never
+```
+
+### First Successful Backup
+
+- **Date:** February 28, 2026 (manual trigger test)
+- **File:** `solidity_security_20260228_HHMMSS.sql`
+- **Size:** 7.2MB
+- **Status:** Verified successfully
+
+---
+
 ## Notes
 
 - All backups include `--clean --if-exists` flags to drop existing objects before restore
-- Backups are NOT automatically backed up to remote storage in local development
+- Automated CronJob backups run daily at 2 AM with 7-day retention
 - Production backups should be stored in S3/GCS with encryption
 - Test restore procedures monthly to ensure backup validity
 - Document all manual database changes in MANUAL-FIXES.md
-- Consider automating backups with a cron job or Kubernetes CronJob
 
 ## Pattern Taxonomy Migration Backup
 

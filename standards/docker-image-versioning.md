@@ -310,7 +310,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Service | Version | Kustomization Path | Notes |
 |---------|---------|-------------------|-------|
 | admin-portal | 0.7.6 | `k8s/overlays/local/` | Apogee rebrand: UI branding, metadata, vite config |
-| api-service | 0.29.41 | `k8s/overlays/local/api-service/` | Fix 503 scan trigger (service token auth), update Anthropic model defaults |
+| api-service | 0.29.42 | `k8s/overlays/local/api-service/` | Tier gate fixes (integrations→team, IDE tokens→growth), automated database backup CronJob |
 | contract-parser | 0.2.2 | `k8s/overlays/local/contract-parser/` | Apogee rebrand: OCI source URL, .env.example |
 | dashboard | 0.46.11 | `k8s/overlays/local/` | Sidebar ABC ordering, Teams modal styling, dark mode toggle fix, scanner preset counts |
 | data-service | 0.2.7 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, README |
@@ -320,7 +320,7 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | intelligence-engine | 0.3.7 | `k8s/overlays/local/` | Apogee rebrand: OCI source/vendor, base images, .env |
 | notification | 0.2.6 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL |
 | orchestration | 0.10.8 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, README |
-| tool-integration | 0.5.10 | `k8s/overlays/local/` | Fix envFrom to load tool-integration-config ConfigMap |
+| tool-integration | 0.5.11 | `k8s/overlays/local/` | Health probes, NetworkPolicy, server header removal |
 | scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
 | scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |

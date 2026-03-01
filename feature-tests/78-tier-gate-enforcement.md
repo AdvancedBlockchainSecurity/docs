@@ -1,7 +1,7 @@
 # Feature Test: Tier Gate Enforcement
 
 **Feature:** Tier-based feature access control for all premium endpoints
-**Version:** api-service 0.29.23 through 0.29.26
+**Version:** api-service 0.29.23 through 0.29.42
 **Date:** February 24, 2026
 **Status:** Deployed and verified (37/37 smoke test, 36/36 tier audit)
 
@@ -46,9 +46,9 @@ All 36 endpoint/tier combinations verified:
 - [ ] growth -> 200 (allowed)
 - [ ] enterprise -> 200 (allowed)
 
-#### Integrations (`require_tier("growth")`)
-- [ ] developer -> 429 (API access blocked)
-- [ ] team -> 429 (API access blocked)
+#### Integrations (`require_tier("team")`) — Updated v0.29.42
+- [ ] developer -> 403 (tier too low)
+- [ ] team -> 200 (allowed, integrations available to all paying tiers)
 - [ ] growth -> 200 (allowed)
 - [ ] enterprise -> 200 (allowed)
 
@@ -93,7 +93,7 @@ All 36 endpoint/tier combinations verified:
 
 - [ ] TestSearchTierGate (3 tests) - verifies `require_tier("team")` on POST `/search`
 - [ ] TestApiKeysTierGate (3 tests) - verifies `require_tier("growth")` on GET `/api-keys`
-- [ ] TestIntegrationsTierGate (2 tests) - verifies `require_tier("growth")` on GET integrations list
+- [ ] TestIntegrationsTierGate (2 tests) - verifies `require_tier("team")` on GET integrations list
 - [ ] TestNotificationChannelsTierGate (2 tests) - verifies `require_tier("growth")` on GET list
 - [ ] TestWebhooksTierGate (2 tests) - verifies `require_tier("growth")` on GET list
 - [ ] TestAuditLogsTierGate (1 test) - verifies `require_tier("growth")` on GET `/audit-logs`
@@ -117,3 +117,4 @@ All 36 endpoint/tier combinations verified:
 | 0.29.24 | #259 | Added tier gates: notification-channels (growth), webhooks (growth) |
 | 0.29.25 | #260 | Added 20 structural unit tests for tier gate enforcement |
 | 0.29.26 | #261 | Fixed 5 stale unit tests; full suite clean (1032/0/24) |
+| 0.29.42 | — | Integrations tier gate changed from growth to team; IDE tokens changed from team to growth |

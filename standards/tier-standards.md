@@ -1,7 +1,7 @@
 # Tier Standards - Source of Truth
 
-**Last Updated**: February 13, 2026
-**Version**: 3.4 (AI Features Active + PoC Exploit Generation)
+**Last Updated**: February 28, 2026
+**Version**: 3.5 (Integrations tier gate update, IDE token tier fix)
 **Status**: Official
 **Owner**: Product Team
 
@@ -471,7 +471,7 @@ All premium API endpoints are protected by `require_tier()` dependencies. Core e
 |----------|--------------|---------------|
 | `POST /api/v1/search` | team | developer |
 | `GET /api/v1/api-keys` | growth | developer, team |
-| `GET /api/v1/integrations` | growth | developer, team |
+| `GET /api/v1/integrations` | team | developer |
 | `GET /api/v1/notification-channels` | growth | developer, team |
 | `GET /api/v1/webhooks` | growth | developer, team |
 | `GET /api/v1/audit-logs` | growth | developer, team |
@@ -479,6 +479,7 @@ All premium API endpoints are protected by `require_tier()` dependencies. Core e
 | `PUT /api/v1/organizations/{id}/settings/ai-opt-out` | enterprise | developer, team, growth |
 | `POST /api/v1/economic-analysis/reports` | enterprise | developer, team, growth |
 | `POST /api/v1/economic-analysis/simulate` | enterprise | developer, team, growth |
+| `POST /api/v1/ide-tokens` | growth | developer, team |
 | AI generation endpoints | team | developer |
 | PoC exploit generation | growth | developer, team |
 
