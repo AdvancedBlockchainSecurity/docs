@@ -1,7 +1,7 @@
 # Database Management and Recovery Standards
 
-**Version:** 2.0.0
-**Last Updated:** February 22, 2026
+**Version:** 2.1.0
+**Last Updated:** February 28, 2026
 **Status:** Active
 
 ## Database Configuration
@@ -293,6 +293,45 @@ curl -X POST http://127.0.0.1:8000/api/v1/auth/login \
   -d '{"email":"test-rebrand@0xapogee.com","password":"TestPass123"}'
 ```
 
+## Rule 4: Schema Documentation Must Stay Current
+
+**MANDATORY:** Whenever database schema changes are made, `docs/database/SCHEMA.md` MUST be updated to reflect those changes before the work is considered complete.
+
+**Applies to:**
+- Alembic migrations that create or alter tables
+- Manual SQL changes to the database
+- Any ORM model changes that result in schema changes (new models, altered fields, new relationships)
+
+**What must be updated in `docs/database/SCHEMA.md`:**
+- **New tables** — Add full documentation including columns, types, constraints, indexes, and foreign keys
+- **Altered columns** — Update column names, types, nullability, defaults, or constraints
+- **Removed tables or columns** — Remove or mark as deprecated in the schema doc
+- **New or dropped indexes** — Reflect index changes in the relevant table section
+- **Table count** — Update the total table count in the document header or stats section
+- **Verified date and stats** — Update the "Verified" date and any row-count or summary statistics
+
+**Why this matters:**
+- **Onboarding:** New developers rely on `SCHEMA.md` to understand the data model without inspecting the database directly
+- **Debugging:** Accurate schema docs speed up incident response and root cause analysis
+- **Audit trail:** Schema docs provide a human-readable record of the data model at any point in time
+- **Migration safety:** Out-of-date docs cause confusion when reviewing or writing new migrations
+
+```
+✅ CORRECT WORKFLOW:
+1. Write Alembic migration (or ORM model change)
+2. Apply migration and verify it runs cleanly
+3. Update docs/database/SCHEMA.md to match the new schema
+4. Commit migration file and SCHEMA.md together in the same commit
+
+❌ INCORRECT WORKFLOW:
+1. Write and apply migration
+2. Skip updating SCHEMA.md ("I'll do it later")
+3. Schema doc drifts from reality
+4. Future developers work from inaccurate documentation
+```
+
+**Violations of this rule leave the schema documentation in an inaccurate state and must be corrected immediately.**
+
 ## Pre-Change Checklist for Database Configuration
 
 Before applying ANY changes to database configuration:
@@ -302,6 +341,7 @@ Before applying ANY changes to database configuration:
 - [ ] **Changes documented** - Know exactly what will change
 - [ ] **Rollback plan ready** - Know how to revert changes
 - [ ] **Team notified** - If shared development environment
+- [ ] **SCHEMA.md updated** - If the change affects the database schema, update `docs/database/SCHEMA.md`
 
 **NEVER skip the backup step. Data loss is NOT acceptable.**
 

@@ -1,7 +1,7 @@
 # Smart Contract Scanning Workflow
 
-**Version:** 1.1.0
-**Last Updated:** February 12, 2026
+**Version:** 1.2.0
+**Last Updated:** February 28, 2026
 **Status:** Active
 
 ---
@@ -171,6 +171,12 @@ User submits scan request
           │
           ▼
 ┌───────────────────┐
+│ Source code check │ Reject if no source_code AND no contract_files
+│ (v0.29.43)        │ → HTTP 400 "Contract has no source code to scan"
+└─────────┬─────────┘
+          │
+          ▼
+┌───────────────────┐
 │ Check user quota  │ Monthly scan limits by tier
 └─────────┬─────────┘
           │
@@ -197,11 +203,21 @@ User submits scan request
 └───────────────────┘
 ```
 
+#### Source Code Validation (v0.29.43)
+
+`create_scan()` and `create_batch_scan()` both validate that the target contract has source code before creating a scan record. A contract is considered scannable if it has either a `source_code` field (single file) or at least one entry in `contract_files` (multi-file project).
+
+| Endpoint | Behaviour on missing source |
+|----------|-----------------------------|
+| `POST /api/v1/scans` | Returns HTTP 400 with error message |
+| `POST /api/v1/scans/batch` | Silently skips that contract, continues remaining batch |
+
 #### Response Codes
 
 | Code | Description |
 |------|-------------|
 | `201 Created` | Scan queued successfully |
+| `400 Bad Request` | Contract has no source code to scan |
 | `402 Payment Required` | Quota exceeded (includes payment options) |
 | `403 Forbidden` | Not authorized for this contract |
 | `404 Not Found` | Contract not found |
@@ -802,14 +818,99 @@ data:
 
 ---
 
+## Stale Scan Recovery (v0.29.43)
+
+### Overview
+
+The `recover_stale_scans()` function runs as an automated CronJob every 15 minutes. It handles two failure classes that can leave the system in an inconsistent state.
+
+### Automated CronJob
+
+```
+Schedule: */15 * * * *  (every 15 minutes)
+Namespace: api-service-local
+Job: recover-stale-scans
+```
+
+The CronJob invokes the recovery endpoint on the API service. No manual intervention is required.
+
+### Phase 1 — Stale Scans
+
+Targets individual `ScanModel` records stuck in `queued` or `running` states with no recent activity. These arise from worker crashes or network failures during scan dispatch.
+
+```
+Query: scans where status IN ('queued', 'running')
+              AND updated_at < NOW() - stale_threshold
+        │
+        ▼
+┌───────────────────┐
+│ Mark scan failed  │ status = "failed"
+│                   │ error_message = "Recovered by stale scan job"
+└─────────┬─────────┘
+          │
+          ▼
+┌───────────────────┐
+│ Re-evaluate       │ If contract has no remaining active scans,
+│ contract status   │ reset contract status to "uploaded"
+└───────────────────┘
+```
+
+### Phase 2 — Stuck Contracts (v0.29.43)
+
+Targets `ContractModel` records stuck in `scanning` status where all associated scans have already reached a terminal state (`completed`, `failed`, or `cancelled`). This race condition arose when a scan completed but the contract status update failed mid-transaction.
+
+```
+Query: contracts where status = 'scanning'
+        │
+        ▼
+┌───────────────────┐
+│ Load associated   │ Fetch all ScanModel records for contract
+│ scans             │
+└─────────┬─────────┘
+          │
+          ▼
+┌───────────────────┐
+│ Check for active  │ Any scan in queued/running = contract is
+│ scans             │ genuinely scanning → skip
+└─────────┬─────────┘
+          │ No active scans found
+          ▼
+┌───────────────────┐
+│ Reset contract    │ status = "uploaded"
+│ status            │ (safe fallback — user can re-scan)
+└───────────────────┘
+```
+
+### Root Cause — Race Condition
+
+The stuck-contract scenario was caused by a race condition in status transitions:
+
+1. Scan completes and updates `ScanModel.status = "completed"`
+2. Code begins updating `ContractModel.status = "uploaded"`
+3. Between steps 1 and 2, an exception or connection drop leaves the contract in `"scanning"`
+4. No subsequent code path re-evaluates stuck contracts
+
+Phase 2 recovery corrects this without data loss by checking whether the stuck state is genuine (active scans exist) or residual (all scans terminal).
+
+### Recovery Thresholds
+
+| State | Recovery Threshold | Action |
+|-------|--------------------|--------|
+| Scan `queued` | Configurable stale timeout | Mark `failed`, re-evaluate contract |
+| Scan `running` | Configurable stale timeout | Mark `failed`, re-evaluate contract |
+| Contract `scanning` + no active scans | Every recovery cycle | Reset to `uploaded` |
+
+---
+
 ## Related Documentation
 
 - [Scanner Documentation](../scanners/README.md) - Detailed scanner guides
 - [Intelligence Integration Standards](../standards/INTELLIGENCE-INTEGRATION-STANDARDS.md) - Deduplication and classification
 - [API Documentation](../api/README.md) - Complete API reference
 - [Database Schema](../database/schema.md) - Full database documentation
+- [Implementation Summary: Stuck Contract & Upload Hardening v0.29.43](../../TaskDocs-BlockSecOps/implementation-summaries/2026-02-28-stuck-contract-upload-hardening-v0.29.43.md)
 
 ---
 
 **Maintained by:** Apogee Platform Team
-**Last Audit:** February 19, 2026
+**Last Audit:** February 28, 2026

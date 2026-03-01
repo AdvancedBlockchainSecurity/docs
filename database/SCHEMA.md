@@ -8,7 +8,7 @@
 > **Important Note on Database Naming:**
 > The database is named `solidity_security`, NOT `blocksecops`. This name was established during initial platform development when the focus was solely on Solidity security scanning. The name has been retained for backward compatibility and to avoid migration complexity. All services, connection strings, and documentation should reference `solidity_security`.
 >
-> **Verified:** February 24, 2026 (Current stats: 184 contracts, 555 scans, 7,342 vulnerabilities, 14 users, 89 tables in `solidity_security` database)
+> **Verified:** February 28, 2026 (Current stats: 184 contracts, 555 scans, 7,342 vulnerabilities, 14 users, 89 tables in `solidity_security` database)
 
 ## Table of Contents
 
@@ -58,8 +58,18 @@ The Apogee database supports a comprehensive smart contract security scanning pl
 - **ML Data Preservation:** Soft delete vulnerabilities, contract archival, implicit labeling for ML training (February 2026)
 - **Multi-class Classification:** 4-class vulnerability classification (confirmed, false_positive, wont_fix, needs_review) (February 2026)
 - **Deduplication Audit Fixes:** Performance indexes, FK cascade behavior fix for canonical_finding_id (February 2026)
+- **AI Copilot:** Conversation threads, messages, repair suggestions, review suggestions and feedback (February 2026)
+- **ML/Training Pipeline:** Active learning queue, weak labels, scanner quality metrics, training data provenance (February 2026)
+- **Intelligence Enrichment:** CVE database, real-world exploit records, PoC exploit generation, vulnerability classifications, interactions, and trends (February 2026)
+- **Contract Monitoring:** On-chain monitored contracts with alert detection and acknowledgment (February 2026)
+- **Contracts Metadata:** User-defined contract tags and associations (February 2026)
+- **Invariant Generation:** AI-generated invariants and reusable invariant templates (February 2026)
+- **Auth/Billing Extensions:** Service accounts, Stripe subscriptions, billing details, IDE tokens, support impersonation sessions (February 2026)
+- **Compliance:** ToS consent records, GDPR data requests (February 2026)
+- **Alerts & Feedback:** On-chain security alerts and general user feedback submissions (February 2026)
+- **JIRA Integration:** Project mappings and bidirectional issue sync records (February 2026)
 
-**Total Tables:** 57 (excluding alembic_version)
+**Total Tables:** 88 (excluding alembic_version)
 
 ---
 
@@ -3297,4 +3307,1112 @@ Encrypted OAuth tokens for integration connections. Access and refresh tokens ar
 
 ---
 
-**Last Updated**: February 24, 2026
+---
+
+## AI Copilot (February 2026)
+
+The AI Copilot feature provides conversational security analysis with repair suggestions and code review assistance.
+
+### New Tables
+
+#### `copilot_conversations`
+
+Stores AI Copilot conversation sessions, optionally scoped to a specific scan or project.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique conversation identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Owner user |
+| `scan_id` | UUID | NULLABLE, FK → scans.id ON DELETE SET NULL, INDEX | Associated scan context |
+| `project_id` | UUID | NULLABLE, FK → projects.id ON DELETE SET NULL, INDEX | Associated project context |
+| `title` | VARCHAR(255) | NOT NULL | Conversation display title |
+| `summary` | TEXT | NULLABLE | Optional conversation summary |
+| `is_archived` | BOOLEAN | NOT NULL, DEFAULT false | Archived status |
+| `message_count` | INTEGER | NOT NULL, DEFAULT 0 | Total messages in conversation |
+| `total_tokens` | INTEGER | NOT NULL, DEFAULT 0 | Cumulative token usage |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_copilot_conversations_user_id` on `user_id`
+- `ix_copilot_conversations_scan_id` on `scan_id`
+- `ix_copilot_conversations_project_id` on `project_id`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `scans` (scan_id, SET NULL)
+- Many-to-one with `projects` (project_id, SET NULL)
+- One-to-many with `copilot_messages` (CASCADE DELETE)
+
+---
+
+#### `copilot_messages`
+
+Individual messages within a Copilot conversation including token usage and optional user ratings.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique message identifier |
+| `conversation_id` | UUID | NOT NULL, FK → copilot_conversations.id ON DELETE CASCADE, INDEX | Parent conversation |
+| `role` | VARCHAR(20) | NOT NULL | `user` or `assistant` |
+| `content` | TEXT | NOT NULL | Message text content |
+| `context_sources` | JSONB | NULLABLE | Sources used for context (scan IDs, vulnerability IDs, etc.) |
+| `tokens_input` | INTEGER | NOT NULL, DEFAULT 0 | Input tokens consumed |
+| `tokens_output` | INTEGER | NOT NULL, DEFAULT 0 | Output tokens generated |
+| `model_used` | VARCHAR(100) | NULLABLE | Model identifier (e.g., claude-sonnet-4-6) |
+| `generation_time_ms` | INTEGER | NULLABLE | Response generation time in milliseconds |
+| `rating` | INTEGER | NULLABLE | User rating 1-5 |
+| `feedback_text` | TEXT | NULLABLE | Optional written feedback |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Message timestamp |
+
+**Indexes:**
+- `ix_copilot_messages_conversation_id` on `conversation_id`
+
+**Relationships:**
+- Many-to-one with `copilot_conversations` (conversation_id, CASCADE DELETE)
+
+---
+
+#### `repair_suggestions`
+
+AI-generated code repair suggestions for vulnerabilities including the diff patch and application tracking.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique suggestion identifier |
+| `vulnerability_id` | UUID | NOT NULL, FK → vulnerabilities.id ON DELETE CASCADE, INDEX | Target vulnerability |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Requesting user |
+| `original_code` | TEXT | NOT NULL | Original vulnerable code snippet |
+| `file_path` | VARCHAR(500) | NULLABLE | Source file path |
+| `start_line` | INTEGER | NULLABLE | Start line of the affected code |
+| `end_line` | INTEGER | NULLABLE | End line of the affected code |
+| `fixed_code` | TEXT | NOT NULL | Repaired code snippet |
+| `diff_patch` | TEXT | NOT NULL | Unified diff patch |
+| `explanation` | TEXT | NOT NULL | Human-readable explanation of the fix |
+| `fix_type` | VARCHAR(50) | NOT NULL | Category of fix (e.g., input_validation, access_control) |
+| `confidence` | FLOAT | NOT NULL, DEFAULT 0.0 | Model confidence 0.0-1.0 |
+| `model_used` | VARCHAR(100) | NOT NULL | Model identifier |
+| `tokens_input` | INTEGER | NOT NULL, DEFAULT 0 | Input tokens consumed |
+| `tokens_output` | INTEGER | NOT NULL, DEFAULT 0 | Output tokens generated |
+| `generation_time_ms` | INTEGER | NULLABLE | Generation time in milliseconds |
+| `was_applied` | BOOLEAN | NOT NULL, DEFAULT false | Whether fix was applied |
+| `applied_at` | TIMESTAMPTZ | NULLABLE | When fix was applied |
+| `rating` | INTEGER | NULLABLE | User rating 1-5 |
+| `feedback_text` | TEXT | NULLABLE | Optional written feedback |
+| `was_helpful` | BOOLEAN | NULLABLE | User helpful flag |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_repair_suggestions_vulnerability_id` on `vulnerability_id`
+- `ix_repair_suggestions_user_id` on `user_id`
+
+**Relationships:**
+- Many-to-one with `vulnerabilities` (vulnerability_id, CASCADE DELETE)
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+
+---
+
+#### `review_suggestions`
+
+AI-generated narrative review suggestions for vulnerabilities including risk explanation and recommended fixes.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique suggestion identifier |
+| `vulnerability_id` | UUID | NOT NULL, FK → vulnerabilities.id ON DELETE CASCADE, INDEX | Target vulnerability |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Requesting user |
+| `suggestion_text` | TEXT | NOT NULL | Main suggestion narrative |
+| `risk_explanation` | TEXT | NULLABLE | Risk explanation text |
+| `attack_scenario` | TEXT | NULLABLE | Attack scenario description |
+| `recommended_fix` | TEXT | NULLABLE | Recommended remediation |
+| `code_context` | TEXT | NULLABLE | Relevant code context |
+| `model_used` | VARCHAR(100) | NOT NULL | Model identifier |
+| `tokens_input` | INTEGER | NOT NULL, DEFAULT 0 | Input tokens consumed |
+| `tokens_output` | INTEGER | NOT NULL, DEFAULT 0 | Output tokens generated |
+| `generation_time_ms` | INTEGER | NULLABLE | Generation time in milliseconds |
+| `is_cached` | BOOLEAN | NOT NULL, DEFAULT false | Whether response was served from cache |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+
+**Indexes:**
+- `idx_review_suggestions_vulnerability_id` on `vulnerability_id`
+- `idx_review_suggestions_user_id` on `user_id`
+- `idx_review_suggestions_created_at` on `created_at`
+
+**Relationships:**
+- Many-to-one with `vulnerabilities` (vulnerability_id, CASCADE DELETE)
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- One-to-many with `review_feedback` (CASCADE DELETE)
+
+---
+
+#### `review_feedback`
+
+User feedback on AI review suggestions including multi-dimensional quality ratings.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique feedback identifier |
+| `suggestion_id` | UUID | NOT NULL, FK → review_suggestions.id ON DELETE CASCADE, INDEX | Parent suggestion |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Feedback author |
+| `rating` | INTEGER | NOT NULL, INDEX | Overall rating 1-5 |
+| `was_helpful` | BOOLEAN | NOT NULL | Whether suggestion was helpful |
+| `was_applied` | BOOLEAN | NULLABLE | Whether suggestion was applied |
+| `feedback_text` | TEXT | NULLABLE | Optional written feedback |
+| `accuracy_rating` | INTEGER | NULLABLE | Accuracy sub-rating 1-5 |
+| `clarity_rating` | INTEGER | NULLABLE | Clarity sub-rating 1-5 |
+| `usefulness_rating` | INTEGER | NULLABLE | Usefulness sub-rating 1-5 |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Feedback timestamp |
+
+**Indexes:**
+- `idx_review_feedback_suggestion_id` on `suggestion_id`
+- `idx_review_feedback_user_id` on `user_id`
+- `idx_review_feedback_rating` on `rating`
+
+**Relationships:**
+- Many-to-one with `review_suggestions` (suggestion_id, CASCADE DELETE)
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+
+---
+
+## ML/Training Pipeline (February 2026)
+
+Tables supporting the ML active learning pipeline, weak supervision, and scanner quality measurement.
+
+### New Tables
+
+#### `active_learning_queue`
+
+Vulnerability samples queued for active learning label collection, prioritized by model uncertainty.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique queue entry identifier |
+| `vulnerability_id` | UUID | NOT NULL, UNIQUE, FK → vulnerabilities.id ON DELETE CASCADE | Target vulnerability (one entry per vulnerability) |
+| `uncertainty_score` | FLOAT | NOT NULL | Model uncertainty (higher = more valuable to label) |
+| `prediction` | FLOAT | NOT NULL | Current model prediction 0.0-1.0 |
+| `priority` | INTEGER | NOT NULL | Queue priority (lower number = higher priority) |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT 'pending' | `pending`, `shown`, `labeled`, `skipped` |
+| `shown_to_user_id` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | User who reviewed this entry |
+| `shown_at` | TIMESTAMPTZ | NULLABLE | When entry was shown to user |
+| `labeled_at` | TIMESTAMPTZ | NULLABLE | When user submitted label |
+| `label_result` | VARCHAR(20) | NULLABLE | Label submitted by user |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Entry creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `active_learning_queue_vulnerability_id_key` UNIQUE on `vulnerability_id`
+- `idx_alq_priority_pending` on `priority` WHERE status = 'pending'
+- `idx_alq_status` on `status`
+
+**Relationships:**
+- Many-to-one with `vulnerabilities` (vulnerability_id, CASCADE DELETE)
+- Many-to-one with `users` (shown_to_user_id, SET NULL)
+
+---
+
+#### `weak_labels`
+
+Programmatically assigned labels from heuristic sources used in weak supervision for ML training.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique weak label identifier |
+| `vulnerability_id` | UUID | NOT NULL, FK → vulnerabilities.id ON DELETE CASCADE, INDEX | Labeled vulnerability |
+| `label` | VARCHAR(20) | NOT NULL | `true_positive`, `false_positive`, `needs_review` |
+| `confidence` | FLOAT | NOT NULL | Label confidence 0.0-1.0 |
+| `source` | VARCHAR(20) | NOT NULL | Labeling function source (e.g., `heuristic`, `scanner`, `pattern`) |
+| `sample_weight` | FLOAT | NULLABLE | Training sample weight override |
+| `metadata` | JSONB | NULLABLE | Source-specific metadata |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT true | Whether label is current |
+| `superseded_by` | UUID | NULLABLE | ID of replacement weak label |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Label creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `idx_weak_labels_vuln_id` on `vulnerability_id`
+- `idx_weak_labels_unique_active` UNIQUE on (`vulnerability_id`, `source`) WHERE is_active = true
+- `idx_weak_labels_source_active` on `source` WHERE is_active = true
+
+**Relationships:**
+- Many-to-one with `vulnerabilities` (vulnerability_id, CASCADE DELETE)
+
+---
+
+#### `scanner_quality_metrics`
+
+Per-scanner accuracy and quality metrics calculated from user feedback and classification data.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | INTEGER | PRIMARY KEY, SERIAL | Auto-increment identifier |
+| `scanner_id` | VARCHAR(50) | NOT NULL, UNIQUE | Scanner identifier (e.g., `slither`, `aderyn`) |
+| `total_findings` | INTEGER | NOT NULL, DEFAULT 0 | Total findings attributed to scanner |
+| `confirmed_count` | INTEGER | NOT NULL, DEFAULT 0 | Findings confirmed as true positives |
+| `false_positive_count` | INTEGER | NOT NULL, DEFAULT 0 | Findings marked as false positives |
+| `wont_fix_count` | INTEGER | NOT NULL, DEFAULT 0 | Findings marked as won't fix |
+| `confirmation_rate` | FLOAT | NULLABLE | Calculated true positive rate |
+| `false_positive_rate` | FLOAT | NULLABLE | Calculated false positive rate |
+| `precision_score` | FLOAT | NULLABLE | Precision metric (TP / (TP + FP)) |
+| `user_override_count` | INTEGER | NOT NULL, DEFAULT 0 | Number of user-overridden classifications |
+| `avg_user_confidence` | FLOAT | NULLABLE | Average user confidence in labels |
+| `user_preference_score` | FLOAT | NOT NULL, DEFAULT 0.5 | Composite user preference score |
+| `calculated_priority` | INTEGER | NOT NULL, DEFAULT 50 | Scanner display priority (lower = higher priority) |
+| `manual_priority_override` | INTEGER | NULLABLE | Admin-set priority override |
+| `last_calculated_at` | TIMESTAMPTZ | NULLABLE | When metrics were last recalculated |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Record creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_scanner_quality_metrics_scanner_id` UNIQUE on `scanner_id`
+- `ix_scanner_quality_metrics_calculated_priority` on `calculated_priority`
+
+**Relationships:**
+- Referenced by scanner attribution in `vulnerabilities` (scanner_id string reference, no FK)
+
+---
+
+#### `ml_training_data_provenance`
+
+Tracks full data lineage for ML training records including consent, user identity, and exclusion status.
+
+> **Note:** This table was partially documented in the ML Data Strategy section above. The schema below reflects the actual database columns as verified February 28, 2026.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique provenance identifier |
+| `vulnerability_id` | UUID | NOT NULL, FK → vulnerabilities.id ON DELETE CASCADE, INDEX | Labeled vulnerability |
+| `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE SET NULL, INDEX | Organization context |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE SET NULL, INDEX | User who labeled |
+| `label` | VARCHAR(20) | NOT NULL | Classification label |
+| `confidence` | FLOAT | NULLABLE | Label confidence 0.0-1.0 |
+| `features_snapshot` | JSONB | NOT NULL | Anonymized feature data at labeling time |
+| `tos_consent_id` | UUID | NULLABLE, FK → tos_consent_records.id ON DELETE SET NULL | Consent record reference |
+| `consent_version` | VARCHAR(20) | NOT NULL | ToS version at labeling time |
+| `excluded_from_training` | BOOLEAN | NOT NULL, DEFAULT false, INDEX | Excluded from training pipeline |
+| `exclusion_reason` | VARCHAR(50) | NULLABLE | Reason for exclusion |
+| `collected_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Data collection timestamp |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Record creation timestamp |
+
+**Indexes:**
+- `ix_ml_training_data_provenance_vulnerability_id` on `vulnerability_id`
+- `ix_ml_training_data_provenance_organization_id` on `organization_id`
+- `ix_ml_training_data_provenance_user_id` on `user_id`
+- `ix_ml_training_data_provenance_excluded_from_training` on `excluded_from_training`
+
+**Relationships:**
+- Many-to-one with `vulnerabilities` (vulnerability_id, CASCADE DELETE)
+- Many-to-one with `organizations` (organization_id, SET NULL)
+- Many-to-one with `users` (user_id, SET NULL)
+- Many-to-one with `tos_consent_records` (tos_consent_id, SET NULL)
+
+---
+
+## Intelligence Enrichment (February 2026)
+
+Tables providing vulnerability intelligence enrichment from CVE databases, real-world exploit data, and trend analytics.
+
+### New Tables
+
+#### `cves`
+
+CVE (Common Vulnerabilities and Exposures) records enriched with blockchain-specific metadata and vector embeddings for semantic search.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique CVE record identifier |
+| `cve_id` | VARCHAR(20) | NOT NULL, UNIQUE, INDEX | CVE identifier (e.g., CVE-2023-12345) |
+| `cwe_id` | VARCHAR(20) | NULLABLE, INDEX | CWE identifier (e.g., CWE-89) |
+| `severity` | VARCHAR(20) | NOT NULL, INDEX | `critical`, `high`, `medium`, `low`, `none` |
+| `cvss_score` | FLOAT | NULLABLE | CVSS v3 base score |
+| `cvss_vector` | VARCHAR(100) | NULLABLE | CVSS v3 vector string |
+| `title` | VARCHAR(200) | NOT NULL | Short CVE title |
+| `description` | TEXT | NOT NULL | Full CVE description |
+| `remediation` | TEXT | NULLABLE | Remediation guidance |
+| `affected_languages` | VARCHAR(20)[] | NOT NULL | Affected languages (e.g., ['solidity', 'rust']) |
+| `affected_products` | VARCHAR(100)[] | NULLABLE | Affected products/frameworks |
+| `vulnerability_type` | VARCHAR(100) | NULLABLE | Vulnerability category |
+| `references` | JSONB | NULLABLE | External reference URLs |
+| `pattern_ids` | VARCHAR(50)[] | NULLABLE | Related vulnerability pattern IDs |
+| `published_at` | TIMESTAMPTZ | NULLABLE | NVD publication date |
+| `modified_at` | TIMESTAMPTZ | NULLABLE | Last modification date |
+| `embedding` | vector(1536) | NULLABLE | Semantic embedding for similarity search |
+| `source` | VARCHAR(50) | NOT NULL, DEFAULT 'nvd' | Data source (`nvd`, `osv`, `manual`) |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Record creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `cves_cve_id_key` UNIQUE on `cve_id`
+- `ix_cves_cve_id` on `cve_id`
+- `ix_cves_cwe_id` on `cwe_id`
+- `ix_cves_severity` on `severity`
+
+**Relationships:**
+- Referenced by vulnerability intelligence linking (pattern_ids array, no FK constraint)
+
+---
+
+#### `exploits`
+
+Real-world DeFi and smart contract exploit records for intelligence enrichment and risk scoring.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique exploit identifier |
+| `source` | VARCHAR(50) | NOT NULL | Data source (`rekt`, `immunefi`, `manual`) |
+| `source_id` | VARCHAR(100) | NULLABLE | Source-specific record ID |
+| `source_url` | TEXT | NULLABLE | Source reference URL |
+| `protocol` | VARCHAR(100) | NOT NULL, INDEX | Protocol name (e.g., `Uniswap`, `Curve`) |
+| `chain` | VARCHAR(50) | NOT NULL, INDEX | Blockchain (e.g., `ethereum`, `bsc`) |
+| `contract_addresses` | VARCHAR(42)[] | NULLABLE | Exploited contract addresses |
+| `date` | TIMESTAMPTZ | NOT NULL, INDEX | Date of exploit |
+| `loss_usd` | NUMERIC(20,2) | NULLABLE | Total loss in USD |
+| `funds_recovered` | NUMERIC(20,2) | NULLABLE | Recovered funds in USD |
+| `attack_vector` | VARCHAR(100) | NOT NULL, INDEX | Attack vector (e.g., `flash_loan`, `reentrancy`) |
+| `root_cause` | VARCHAR(200) | NULLABLE | Root cause description |
+| `vulnerability_types` | VARCHAR(50)[] | NULLABLE | Vulnerability type tags |
+| `title` | VARCHAR(200) | NOT NULL | Exploit title |
+| `description` | TEXT | NOT NULL | Detailed description |
+| `technical_analysis` | TEXT | NULLABLE | Technical breakdown |
+| `code_snippet` | TEXT | NULLABLE | Relevant code snippet |
+| `tx_hashes` | VARCHAR(66)[] | NULLABLE | Transaction hashes |
+| `embedding` | vector(1536) | NULLABLE | Semantic embedding for similarity search |
+| `is_verified` | BOOLEAN | NOT NULL, DEFAULT false | Whether record has been verified |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Record creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_exploits_protocol` on `protocol`
+- `ix_exploits_chain` on `chain`
+- `ix_exploits_date` on `date`
+- `ix_exploits_attack_vector` on `attack_vector`
+
+**Relationships:**
+- Referenced by vulnerability intelligence enrichment (no FK — external data)
+
+---
+
+#### `poc_exploits`
+
+AI-generated proof-of-concept exploit code for confirmed vulnerabilities. Safety-validated before storage.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique PoC identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Requesting user |
+| `vulnerability_id` | UUID | NOT NULL, FK → vulnerabilities.id ON DELETE CASCADE, INDEX | Target vulnerability |
+| `exploit_code` | TEXT | NOT NULL | Generated exploit code |
+| `setup_code` | TEXT | NULLABLE | Test environment setup code |
+| `test_code` | TEXT | NULLABLE | Test runner code |
+| `explanation` | TEXT | NULLABLE | Explanation of how exploit works |
+| `attack_vector` | VARCHAR(100) | NULLABLE | Attack vector used |
+| `preconditions` | TEXT | NULLABLE | Required preconditions |
+| `impact_assessment` | TEXT | NULLABLE | Impact of successful exploit |
+| `contract_code` | TEXT | NULLABLE | Vulnerable contract code context |
+| `vulnerability_description` | TEXT | NULLABLE | Vulnerability description at generation time |
+| `model_used` | VARCHAR(100) | NOT NULL | Model identifier |
+| `tokens_input` | INTEGER | NOT NULL | Input tokens consumed |
+| `tokens_output` | INTEGER | NOT NULL | Output tokens generated |
+| `generation_time_ms` | INTEGER | NULLABLE | Generation time in milliseconds |
+| `confidence` | FLOAT | NOT NULL | Model confidence 0.0-1.0 |
+| `safety_validated` | BOOLEAN | NOT NULL | Whether safety check passed |
+| `safety_warnings` | JSON | NULLABLE | Safety check warnings |
+| `disclaimer_included` | BOOLEAN | NOT NULL | Whether disclaimer was included in output |
+| `rating` | INTEGER | NULLABLE | User rating 1-5 |
+| `feedback_text` | TEXT | NULLABLE | Optional written feedback |
+| `was_helpful` | BOOLEAN | NULLABLE | User helpful flag |
+| `was_accurate` | BOOLEAN | NULLABLE | User accuracy flag |
+| `created_at` | TIMESTAMPTZ | NOT NULL | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL | Last update timestamp |
+
+**Indexes:**
+- `ix_poc_exploits_vulnerability_id` on `vulnerability_id`
+- `ix_poc_exploits_user_id` on `user_id`
+- `ix_poc_exploits_created_at` on `created_at`
+
+**Relationships:**
+- Many-to-one with `vulnerabilities` (vulnerability_id, CASCADE DELETE)
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+
+---
+
+#### `vulnerability_classifications`
+
+4-class vulnerability classification records tracking confirmed, false_positive, wont_fix, and needs_review decisions with full history.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique classification identifier |
+| `vulnerability_id` | UUID | NOT NULL, FK → vulnerabilities.id ON DELETE CASCADE, INDEX | Classified vulnerability |
+| `user_id` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL, INDEX | User who classified (NULL = system) |
+| `classification` | VARCHAR(20) | NOT NULL, INDEX | `confirmed`, `false_positive`, `wont_fix`, `needs_review` |
+| `previous_classification` | VARCHAR(20) | NULLABLE | Prior classification for audit trail |
+| `confidence` | FLOAT | NULLABLE | Classifier confidence 0.0-1.0 |
+| `feedback_text` | TEXT | NULLABLE | Rationale for classification |
+| `tags` | VARCHAR(50)[] | NULLABLE, GIN INDEX | Classification tags |
+| `fix_status` | VARCHAR(20) | NULLABLE, INDEX | `open`, `in_progress`, `fixed`, `verified` |
+| `fix_commit_hash` | VARCHAR(64) | NULLABLE | Git commit hash of fix |
+| `fix_verified` | BOOLEAN | NOT NULL, DEFAULT false | Whether fix has been verified |
+| `fix_verified_at` | TIMESTAMPTZ | NULLABLE | Fix verification timestamp |
+| `was_actually_vulnerable` | BOOLEAN | NULLABLE | Post-fix ground truth |
+| `exploitability_score` | FLOAT | NULLABLE | Exploitability assessment 0.0-1.0 |
+| `business_impact` | VARCHAR(20) | NULLABLE | `low`, `medium`, `high`, `critical` |
+| `is_latest` | BOOLEAN | NOT NULL, DEFAULT true, INDEX | Whether this is the current classification |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Classification timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_vuln_classifications_vuln_id` on `vulnerability_id`
+- `ix_vuln_classifications_user_id` on `user_id`
+- `ix_vuln_classifications_classification` on `classification`
+- `ix_vuln_classifications_is_latest` on `is_latest`
+- `ix_vuln_classifications_fix_status` on `fix_status`
+- `ix_vuln_classifications_created_at` on `created_at`
+- `ix_vuln_classifications_latest_lookup` on (`vulnerability_id`, `is_latest`, `created_at`)
+- `ix_vuln_classifications_tags` GIN on `tags`
+
+**Relationships:**
+- Many-to-one with `vulnerabilities` (vulnerability_id, CASCADE DELETE)
+- Many-to-one with `users` (user_id, SET NULL)
+
+---
+
+#### `vulnerability_interactions`
+
+Tracks user interactions with vulnerabilities for implicit labeling and engagement analytics.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique interaction identifier |
+| `vulnerability_id` | UUID | NOT NULL, FK → vulnerabilities.id ON DELETE CASCADE, INDEX | Interacted vulnerability |
+| `user_id` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL, INDEX | Interacting user (NULL = anonymous) |
+| `interaction_type` | VARCHAR(30) | NOT NULL | `view`, `expand`, `copy_snippet`, `export`, `share`, `dismiss` |
+| `duration_ms` | INTEGER | NULLABLE | Time spent on interaction in milliseconds |
+| `metadata` | JSONB | NULLABLE | Interaction-specific metadata |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Interaction timestamp |
+
+**Indexes:**
+- `idx_vuln_interactions_vuln_id` on `vulnerability_id`
+- `idx_vuln_interactions_user_id` on `user_id`
+- `idx_vuln_interactions_created_at` on `created_at`
+
+**Relationships:**
+- Many-to-one with `vulnerabilities` (vulnerability_id, CASCADE DELETE)
+- Many-to-one with `users` (user_id, SET NULL)
+
+---
+
+#### `vulnerability_trends`
+
+Aggregated vulnerability trend metrics per pattern/contract/user over configurable time periods for analytics dashboards.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique trend record identifier |
+| `pattern_id` | VARCHAR(20) | NOT NULL, FK → vulnerability_patterns.id ON DELETE CASCADE, INDEX | Vulnerability pattern |
+| `contract_id` | UUID | NULLABLE, FK → contracts.id ON DELETE CASCADE, INDEX | Optional contract scope |
+| `user_id` | UUID | NULLABLE, FK → users.id ON DELETE CASCADE, INDEX | Optional user scope |
+| `period_start` | TIMESTAMPTZ | NOT NULL, INDEX | Period start (inclusive) |
+| `period_end` | TIMESTAMPTZ | NOT NULL, INDEX | Period end (exclusive) |
+| `period_type` | VARCHAR(20) | NOT NULL, INDEX | `daily`, `weekly`, `monthly` |
+| `total_occurrences` | INTEGER | NOT NULL, DEFAULT 0 | Total vulnerability occurrences |
+| `unique_contracts` | INTEGER | NOT NULL, DEFAULT 0 | Unique contracts affected |
+| `new_occurrences` | INTEGER | NOT NULL, DEFAULT 0 | New occurrences in period |
+| `reintroduced_occurrences` | INTEGER | NOT NULL, DEFAULT 0 | Previously fixed then reintroduced |
+| `critical_count` | INTEGER | NOT NULL, DEFAULT 0 | Critical severity count |
+| `high_count` | INTEGER | NOT NULL, DEFAULT 0 | High severity count |
+| `medium_count` | INTEGER | NOT NULL, DEFAULT 0 | Medium severity count |
+| `low_count` | INTEGER | NOT NULL, DEFAULT 0 | Low severity count |
+| `open_count` | INTEGER | NOT NULL, DEFAULT 0 | Open/unresolved count |
+| `fixed_count` | INTEGER | NOT NULL, DEFAULT 0 | Fixed count |
+| `false_positive_count` | INTEGER | NOT NULL, DEFAULT 0 | False positive count |
+| `acknowledged_count` | INTEGER | NOT NULL, DEFAULT 0 | Acknowledged count |
+| `scanner_distribution` | JSONB | NULLABLE | Breakdown by scanner |
+| `avg_time_to_fix` | FLOAT | NULLABLE | Average days to fix |
+| `fix_rate` | FLOAT | NULLABLE | Fix rate 0.0-1.0 |
+| `reintroduction_rate` | FLOAT | NULLABLE | Reintroduction rate 0.0-1.0 |
+| `avg_false_positive_score` | FLOAT | NULLABLE | Average FP confidence score |
+| `avg_confidence` | FLOAT | NULLABLE | Average scanner confidence |
+| `duplicate_rate` | FLOAT | NULLABLE | Deduplication rate 0.0-1.0 |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Record creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_vuln_trends_pattern_id` on `pattern_id`
+- `ix_vuln_trends_contract_id` on `contract_id`
+- `ix_vuln_trends_user_id` on `user_id`
+- `ix_vuln_trends_period_start` on `period_start`
+- `ix_vuln_trends_period_end` on `period_end`
+- `ix_vuln_trends_period_type` on `period_type`
+- `ix_vuln_trends_pattern_time_series` on (`pattern_id`, `period_type`, `period_start`)
+- `ix_vuln_trends_contract_time_series` on (`contract_id`, `period_type`, `period_start`)
+- `ix_vuln_trends_user_time_series` on (`user_id`, `period_type`, `period_start`)
+- `uq_vuln_trends_pattern_contract_period` UNIQUE on (`pattern_id`, `contract_id`, `period_type`, `period_start`)
+
+**Relationships:**
+- Many-to-one with `vulnerability_patterns` (pattern_id, CASCADE DELETE)
+- Many-to-one with `contracts` (contract_id, CASCADE DELETE)
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+
+---
+
+## Contract Monitoring (February 2026)
+
+On-chain contract monitoring with real-time alert detection for deployed smart contracts.
+
+### New Tables
+
+#### `monitored_contracts`
+
+Deployed smart contracts registered for on-chain monitoring and alerting.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique monitored contract identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Owning user |
+| `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE SET NULL, INDEX | Owning organization |
+| `address` | VARCHAR(42) | NOT NULL, INDEX | Contract address (0x-prefixed) |
+| `chain` | VARCHAR(50) | NOT NULL, INDEX | Blockchain network (e.g., `ethereum`, `polygon`) |
+| `name` | VARCHAR(200) | NULLABLE | Display name for contract |
+| `abi` | JSONB | NULLABLE | Contract ABI for event decoding |
+| `monitored_functions` | VARCHAR[] | NULLABLE | Functions to monitor (NULL = all) |
+| `alert_threshold_usd` | NUMERIC(20,2) | NULLABLE | Alert threshold for value transfers (USD) |
+| `is_active` | BOOLEAN | NOT NULL | Whether monitoring is active |
+| `webhook_url` | TEXT | NULLABLE | Webhook URL for alert delivery |
+| `webhook_secret` | VARCHAR(100) | NULLABLE | HMAC secret for webhook signature |
+| `last_checked_block` | INTEGER | NULLABLE | Last blockchain block number checked |
+| `created_at` | TIMESTAMPTZ | NOT NULL | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL | Last update timestamp |
+
+**Indexes:**
+- `ix_monitored_contracts_user_id` on `user_id`
+- `ix_monitored_contracts_organization_id` on `organization_id`
+- `ix_monitored_contracts_address` on `address`
+- `ix_monitored_contracts_chain` on `chain`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `organizations` (organization_id, SET NULL)
+- One-to-many with `alerts` (CASCADE DELETE)
+
+---
+
+#### `alerts`
+
+Security alerts generated from on-chain event monitoring of registered contracts.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique alert identifier |
+| `contract_id` | UUID | NOT NULL, FK → monitored_contracts.id ON DELETE CASCADE, INDEX | Source monitored contract |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Alert owner |
+| `alert_type` | VARCHAR(50) | NOT NULL, INDEX | Alert category (e.g., `large_transfer`, `unusual_access`) |
+| `severity` | VARCHAR(20) | NOT NULL, INDEX | `critical`, `high`, `medium`, `low` |
+| `title` | VARCHAR(500) | NOT NULL | Alert title |
+| `description` | TEXT | NULLABLE | Detailed alert description |
+| `tx_hash` | VARCHAR(66) | NULLABLE, INDEX | Triggering transaction hash |
+| `block_number` | INTEGER | NULLABLE | Block number of triggering event |
+| `from_address` | VARCHAR(42) | NULLABLE | Transaction sender address |
+| `to_address` | VARCHAR(42) | NULLABLE | Transaction recipient address |
+| `value_wei` | VARCHAR(78) | NULLABLE | Transfer value in wei |
+| `value_usd` | NUMERIC(20,2) | NULLABLE | Transfer value in USD |
+| `details` | JSONB | NULLABLE | Additional alert details |
+| `function_called` | VARCHAR(200) | NULLABLE | Contract function that triggered alert |
+| `acknowledged` | BOOLEAN | NOT NULL | Whether alert has been acknowledged |
+| `acknowledged_at` | TIMESTAMPTZ | NULLABLE | Acknowledgment timestamp |
+| `acknowledged_by` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | User who acknowledged |
+| `webhook_sent` | BOOLEAN | NOT NULL | Whether webhook notification was sent |
+| `webhook_sent_at` | TIMESTAMPTZ | NULLABLE | Webhook delivery timestamp |
+| `detected_at` | TIMESTAMPTZ | NOT NULL, INDEX | When alert was detected |
+| `created_at` | TIMESTAMPTZ | NOT NULL | Record creation timestamp |
+
+**Indexes:**
+- `ix_alerts_contract_id` on `contract_id`
+- `ix_alerts_user_id` on `user_id`
+- `ix_alerts_alert_type` on `alert_type`
+- `ix_alerts_severity` on `severity`
+- `ix_alerts_tx_hash` on `tx_hash`
+- `ix_alerts_detected_at` on `detected_at`
+
+**Relationships:**
+- Many-to-one with `monitored_contracts` (contract_id, CASCADE DELETE)
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `users` (acknowledged_by, SET NULL)
+
+---
+
+## Contracts Metadata (February 2026)
+
+User-defined tagging system for organizing and filtering contracts.
+
+### New Tables
+
+#### `contract_tags`
+
+User-defined tags with color coding for contract organization.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique tag identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Tag owner |
+| `name` | VARCHAR(50) | NOT NULL | Tag name |
+| `color` | VARCHAR(7) | NOT NULL | Hex color code (e.g., `#FF5733`) |
+| `description` | VARCHAR(255) | NULLABLE | Optional tag description |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_contract_tags_user_id` on `user_id`
+- `ix_contract_tags_user_name` UNIQUE on (`user_id`, `name`)
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- One-to-many with `contract_tag_associations` (CASCADE DELETE)
+
+---
+
+#### `contract_tag_associations`
+
+Join table linking contracts to user-defined tags.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique association identifier |
+| `contract_id` | UUID | NOT NULL, FK → contracts.id ON DELETE CASCADE, INDEX | Tagged contract |
+| `tag_id` | UUID | NOT NULL, FK → contract_tags.id ON DELETE CASCADE, INDEX | Applied tag |
+| `assigned_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | When tag was applied |
+
+**Indexes:**
+- `ix_contract_tag_associations_contract_id` on `contract_id`
+- `ix_contract_tag_associations_tag_id` on `tag_id`
+- `ix_contract_tag_associations_unique` UNIQUE on (`contract_id`, `tag_id`)
+
+**Relationships:**
+- Many-to-one with `contracts` (contract_id, CASCADE DELETE)
+- Many-to-one with `contract_tags` (tag_id, CASCADE DELETE)
+
+---
+
+## Invariant Generation (February 2026)
+
+AI-generated formal verification invariants for smart contracts.
+
+### New Tables
+
+#### `invariants`
+
+AI-generated invariant code for smart contracts, including application tracking and user feedback.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique invariant identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Requesting user |
+| `contract_id` | UUID | NOT NULL, FK → contracts.id ON DELETE CASCADE, INDEX | Target contract |
+| `invariant_code` | TEXT | NOT NULL | Generated invariant code |
+| `invariant_type` | VARCHAR(50) | NOT NULL | `property`, `state`, `access_control`, `arithmetic` |
+| `function_name` | VARCHAR(200) | NULLABLE | Specific function targeted |
+| `description` | TEXT | NULLABLE | Human-readable description |
+| `model_used` | VARCHAR(100) | NOT NULL | Model identifier |
+| `tokens_input` | INTEGER | NOT NULL | Input tokens consumed |
+| `tokens_output` | INTEGER | NOT NULL | Output tokens generated |
+| `generation_time_ms` | INTEGER | NULLABLE | Generation time in milliseconds |
+| `confidence` | FLOAT | NOT NULL | Model confidence 0.0-1.0 |
+| `was_applied` | BOOLEAN | NOT NULL | Whether invariant was applied |
+| `applied_at` | TIMESTAMPTZ | NULLABLE | Application timestamp |
+| `rating` | INTEGER | NULLABLE | User rating 1-5 |
+| `feedback_text` | TEXT | NULLABLE | Optional written feedback |
+| `was_helpful` | BOOLEAN | NULLABLE | User helpful flag |
+| `syntax_valid` | BOOLEAN | NULLABLE | Whether invariant passed syntax validation |
+| `validation_error` | TEXT | NULLABLE | Syntax validation error message |
+| `created_at` | TIMESTAMPTZ | NOT NULL | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL | Last update timestamp |
+
+**Indexes:**
+- `ix_invariants_user_id` on `user_id`
+- `ix_invariants_contract_id` on `contract_id`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `contracts` (contract_id, CASCADE DELETE)
+
+---
+
+#### `invariant_templates`
+
+Reusable invariant templates categorized by type for common security properties.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Unique template identifier |
+| `name` | VARCHAR(200) | NOT NULL, UNIQUE | Template name |
+| `description` | TEXT | NULLABLE | Template description |
+| `template_code` | TEXT | NOT NULL | Template invariant code with placeholders |
+| `invariant_type` | VARCHAR(50) | NOT NULL | `property`, `state`, `access_control`, `arithmetic` |
+| `applicable_patterns` | JSON | NULLABLE | Vulnerability pattern IDs this template applies to |
+| `keywords` | JSON | NULLABLE | Keywords for template search and matching |
+| `usage_count` | INTEGER | NOT NULL | Number of times template has been used |
+| `is_active` | BOOLEAN | NOT NULL | Whether template is available for use |
+| `created_at` | TIMESTAMPTZ | NOT NULL | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL | Last update timestamp |
+
+**Indexes:**
+- `invariant_templates_name_key` UNIQUE on `name`
+
+**Relationships:**
+- Referenced by `invariants` generation (no FK — templates are seed data)
+
+---
+
+## Auth/Billing Extensions (February 2026)
+
+Additional authentication, billing, and access management tables.
+
+### New Tables
+
+#### `service_accounts`
+
+Organization-scoped service accounts for programmatic API access with granular scope control.
+
+> **Note:** The `service_accounts` table was previously partially documented in the Integrations Hub section. The schema below reflects the actual database columns as verified February 28, 2026.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique service account identifier |
+| `organization_id` | UUID | NOT NULL, FK → organizations.id ON DELETE CASCADE, INDEX | Owning organization |
+| `name` | VARCHAR(255) | NOT NULL | Display name |
+| `description` | VARCHAR(500) | NULLABLE | Optional description |
+| `created_by` | UUID | NOT NULL, FK → users.id ON DELETE SET NULL, INDEX | Admin who created |
+| `key_prefix` | VARCHAR(16) | NOT NULL, INDEX | First 16 characters of key (for lookup) |
+| `key_hash` | VARCHAR(64) | NOT NULL | SHA-256 hash of full API key |
+| `scopes` | JSONB | NOT NULL, DEFAULT '[]' | List of granted permission scopes |
+| `rate_limit_per_minute` | INTEGER | NOT NULL, DEFAULT 120 | Rate limit per minute |
+| `rate_limit_per_hour` | INTEGER | NOT NULL, DEFAULT 2000 | Rate limit per hour |
+| `last_used_at` | TIMESTAMPTZ | NULLABLE | Last API call timestamp |
+| `last_used_ip` | VARCHAR(45) | NULLABLE | IP of last API call |
+| `total_requests` | INTEGER | NOT NULL, DEFAULT 0 | Lifetime request count |
+| `expires_at` | TIMESTAMPTZ | NULLABLE | Optional expiration |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT true, INDEX | Active status |
+| `revoked_at` | TIMESTAMPTZ | NULLABLE | When revoked |
+| `revoked_by` | UUID | NULLABLE, FK → users.id ON DELETE SET NULL | Admin who revoked |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_service_accounts_organization_id` on `organization_id`
+- `ix_service_accounts_created_by` on `created_by`
+- `ix_service_accounts_key_prefix` on `key_prefix`
+- `ix_service_accounts_is_active` on `is_active`
+
+**Relationships:**
+- Many-to-one with `organizations` (organization_id, CASCADE DELETE)
+- Many-to-one with `users` (created_by, SET NULL)
+- Many-to-one with `users` (revoked_by, SET NULL)
+
+---
+
+#### `subscriptions`
+
+Stripe subscription records tracking billing cycles, plan tiers, and cancellation state.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique subscription identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Subscriber user |
+| `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE SET NULL, INDEX | Organization scope (if applicable) |
+| `stripe_subscription_id` | VARCHAR(255) | NOT NULL, UNIQUE | Stripe subscription ID (sub_xxx) |
+| `stripe_customer_id` | VARCHAR(255) | NOT NULL, INDEX | Stripe customer ID (cus_xxx) |
+| `stripe_price_id` | VARCHAR(255) | NULLABLE | Stripe price ID (price_xxx) |
+| `plan_tier` | VARCHAR(50) | NOT NULL, INDEX | `developer`, `team`, `growth`, `enterprise` |
+| `billing_interval` | VARCHAR(20) | NOT NULL | `monthly`, `annual` |
+| `status` | VARCHAR(50) | NOT NULL, INDEX | `active`, `past_due`, `canceled`, `trialing` |
+| `current_period_start` | TIMESTAMPTZ | NOT NULL | Current billing period start |
+| `current_period_end` | TIMESTAMPTZ | NOT NULL | Current billing period end |
+| `cancel_at_period_end` | BOOLEAN | NULLABLE, DEFAULT false | Schedule cancellation at period end |
+| `canceled_at` | TIMESTAMPTZ | NULLABLE | Cancellation timestamp |
+| `cancellation_reason` | VARCHAR(255) | NULLABLE | Reason for cancellation |
+| `trial_start` | TIMESTAMPTZ | NULLABLE | Trial period start |
+| `trial_end` | TIMESTAMPTZ | NULLABLE | Trial period end |
+| `stripe_metadata` | JSONB | NULLABLE | Raw Stripe metadata |
+| `created_at` | TIMESTAMPTZ | NULLABLE, DEFAULT now() | Record creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NULLABLE, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `subscriptions_stripe_subscription_id_key` UNIQUE on `stripe_subscription_id`
+- `ix_subscriptions_user_id` on `user_id`
+- `ix_subscriptions_organization_id` on `organization_id`
+- `ix_subscriptions_stripe_customer_id` on `stripe_customer_id`
+- `ix_subscriptions_plan_tier` on `plan_tier`
+- `ix_subscriptions_status` on `status`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `organizations` (organization_id, SET NULL)
+
+---
+
+#### `billing_details`
+
+Billing address and tax information for users, stored separately from payment processing data.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique billing record identifier |
+| `user_id` | UUID | NOT NULL, UNIQUE, FK → users.id ON DELETE CASCADE, INDEX | Associated user (one per user) |
+| `company_name` | VARCHAR(255) | NULLABLE | Company or organization name |
+| `billing_email` | VARCHAR(255) | NULLABLE | Billing contact email |
+| `address_line1` | VARCHAR(255) | NULLABLE | Street address line 1 |
+| `address_line2` | VARCHAR(255) | NULLABLE | Street address line 2 |
+| `city` | VARCHAR(100) | NULLABLE | City |
+| `state` | VARCHAR(100) | NULLABLE | State or region |
+| `postal_code` | VARCHAR(20) | NULLABLE | Postal or ZIP code |
+| `country` | VARCHAR(2) | NULLABLE | ISO 3166-1 alpha-2 country code |
+| `tax_id` | VARCHAR(100) | NULLABLE | Tax ID number |
+| `tax_id_type` | VARCHAR(50) | NULLABLE | Tax ID type (e.g., `vat`, `ein`) |
+| `tax_exempt` | BOOLEAN | NULLABLE, DEFAULT false | Tax exempt status |
+| `created_at` | TIMESTAMPTZ | NULLABLE, DEFAULT now() | Record creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NULLABLE, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `billing_details_user_id_key` UNIQUE on `user_id`
+- `ix_billing_details_user_id` on `user_id`
+
+**Relationships:**
+- One-to-one with `users` (user_id, CASCADE DELETE)
+
+---
+
+#### `ide_tokens`
+
+IDE plugin authentication tokens with fine-grained permission scopes for VS Code, JetBrains, and other IDE integrations.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique token identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Token owner |
+| `organization_id` | UUID | NULLABLE, FK → organizations.id ON DELETE SET NULL, INDEX | Organization scope |
+| `name` | VARCHAR(255) | NOT NULL | Display name for token |
+| `ide_type` | VARCHAR(50) | NOT NULL, INDEX | `vscode`, `jetbrains`, `vim`, `emacs`, `other` |
+| `token_prefix` | VARCHAR(16) | NOT NULL, INDEX | First 16 characters (for lookup without revealing full token) |
+| `token_hash` | VARCHAR(64) | NOT NULL | SHA-256 hash of full token |
+| `permissions` | JSONB | NOT NULL, DEFAULT '["scan:create","scan:read"]' | Granted permission scopes |
+| `last_used_at` | TIMESTAMPTZ | NULLABLE | Last authentication timestamp |
+| `last_used_ip` | VARCHAR(45) | NULLABLE | IP of last authentication |
+| `total_scans` | INTEGER | NOT NULL, DEFAULT 0 | Total scans initiated via this token |
+| `expires_at` | TIMESTAMPTZ | NULLABLE | Optional token expiry |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT true, INDEX | Active status |
+| `revoked_at` | TIMESTAMPTZ | NULLABLE | Revocation timestamp |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_ide_tokens_user_id` on `user_id`
+- `ix_ide_tokens_organization_id` on `organization_id`
+- `ix_ide_tokens_ide_type` on `ide_type`
+- `ix_ide_tokens_token_prefix` on `token_prefix`
+- `ix_ide_tokens_is_active` on `is_active`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- Many-to-one with `organizations` (organization_id, SET NULL)
+
+---
+
+#### `support_impersonation_sessions`
+
+Records of support staff impersonating customer accounts for troubleshooting, with time-limited sessions and full action audit.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique session identifier |
+| `admin_user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Support admin initiating impersonation |
+| `customer_user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Customer account being impersonated |
+| `reason` | TEXT | NOT NULL | Required justification for impersonation |
+| `started_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Session start time |
+| `ended_at` | TIMESTAMPTZ | NULLABLE | Session end time (NULL = still active) |
+| `expires_at` | TIMESTAMPTZ | NOT NULL | Session expiry (maximum duration) |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT true, INDEX | Whether session is currently active |
+| `actions_taken` | JSONB | NOT NULL, DEFAULT '[]' | Chronological list of actions performed |
+
+**Indexes:**
+- `ix_support_impersonation_sessions_admin_user_id` on `admin_user_id`
+- `ix_support_impersonation_sessions_customer_user_id` on `customer_user_id`
+- `ix_support_impersonation_sessions_is_active` on `is_active`
+
+**Relationships:**
+- Many-to-one with `users` (admin_user_id, CASCADE DELETE)
+- Many-to-one with `users` (customer_user_id, CASCADE DELETE)
+
+**Security Notes:**
+- All impersonation sessions are logged to `admin_audit_logs`
+- Sessions have a hard expiry enforced at the database level
+- `actions_taken` provides an immutable trail of all actions during the session
+
+---
+
+## Compliance (February 2026)
+
+Legal and regulatory compliance tables.
+
+> **Note:** `tos_consent_records` and `gdpr_data_requests` were initially documented in the ML Data Strategy section above. The entries below reflect the actual database schema as verified February 28, 2026, including columns not previously documented.
+
+#### `tos_consent_records` (Updated Schema)
+
+Tracks user consent for Terms of Service and Privacy Policy with IP and user agent capture for GDPR/LGPD compliance. See also the ML Data Strategy section for context.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique consent identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | User who consented |
+| `tos_version` | VARCHAR(20) | NOT NULL | Terms of Service version accepted |
+| `privacy_policy_version` | VARCHAR(20) | NOT NULL | Privacy Policy version accepted |
+| `ml_data_collection_consent` | BOOLEAN | NOT NULL, DEFAULT true | Explicit consent for ML data collection |
+| `consent_ip_address` | VARCHAR(45) | NULLABLE | IP address at time of consent |
+| `consent_user_agent` | TEXT | NULLABLE | User agent string at consent |
+| `consented_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | When consent was given |
+| `withdrawn_at` | TIMESTAMPTZ | NULLABLE | When consent was withdrawn |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Record creation timestamp |
+
+**Indexes:**
+- `ix_tos_consent_records_user_id` on `user_id`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+- One-to-many with `ml_training_data_provenance` (tos_consent_id, SET NULL)
+
+---
+
+#### `gdpr_data_requests` (Updated Schema)
+
+Tracks GDPR Article 15 (access) and Article 17 (erasure) requests with full processing audit trail.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique request identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Requesting user |
+| `request_type` | VARCHAR(20) | NOT NULL, INDEX | `export`, `deletion` |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT 'pending', INDEX | `pending`, `processing`, `completed`, `rejected` |
+| `requester_email` | VARCHAR(255) | NOT NULL | Email for notification |
+| `processed_at` | TIMESTAMPTZ | NULLABLE | Processing completion timestamp |
+| `processed_by` | UUID | NULLABLE | Admin user ID who processed |
+| `export_file_path` | VARCHAR(500) | NULLABLE | Path to generated export file |
+| `export_expires_at` | TIMESTAMPTZ | NULLABLE | Export download expiry timestamp |
+| `deletion_confirmed_at` | TIMESTAMPTZ | NULLABLE | Data deletion confirmation timestamp |
+| `error_message` | TEXT | NULLABLE | Processing error message |
+| `request_ip_address` | VARCHAR(45) | NULLABLE | IP address of requester |
+| `request_user_agent` | TEXT | NULLABLE | User agent of requester |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now(), INDEX | Request submission timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_gdpr_data_requests_user_id` on `user_id`
+- `ix_gdpr_data_requests_status` on `status`
+- `ix_gdpr_data_requests_request_type` on `request_type`
+- `ix_gdpr_data_requests_created_at` on `created_at`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+
+---
+
+## Alerts and User Feedback (February 2026)
+
+### New Tables
+
+#### `user_feedback`
+
+General platform feedback submissions from users, separate from AI-specific ratings.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique feedback identifier |
+| `user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | Submitting user |
+| `category` | VARCHAR(50) | NOT NULL, INDEX | Feedback category (e.g., `bug`, `feature_request`, `general`) |
+| `subject` | VARCHAR(255) | NOT NULL | Feedback subject line |
+| `message` | TEXT | NOT NULL | Full feedback message |
+| `contact_email` | VARCHAR(255) | NULLABLE | Optional contact email |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT 'pending', INDEX | `pending`, `in_review`, `resolved`, `closed` |
+| `page_url` | VARCHAR(500) | NULLABLE | Page URL where feedback was submitted |
+| `user_agent` | VARCHAR(500) | NULLABLE | Browser user agent string |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Submission timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_user_feedback_user_id` on `user_id`
+- `ix_user_feedback_category` on `category`
+- `ix_user_feedback_status` on `status`
+
+**Relationships:**
+- Many-to-one with `users` (user_id, CASCADE DELETE)
+
+---
+
+## JIRA Integration (February 2026)
+
+Bidirectional JIRA issue synchronization for vulnerability tracking in external project management systems.
+
+### New Tables
+
+#### `jira_project_mappings`
+
+Maps Apogee projects to JIRA projects for automatic issue creation and synchronization.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique mapping identifier |
+| `integration_id` | UUID | NOT NULL, FK → integrations.id ON DELETE CASCADE, INDEX | Parent JIRA integration |
+| `blocksecops_project_id` | UUID | NOT NULL, FK → projects.id ON DELETE CASCADE, INDEX | Apogee project |
+| `jira_project_id` | VARCHAR(255) | NOT NULL | JIRA project ID |
+| `jira_project_key` | VARCHAR(50) | NOT NULL | JIRA project key (e.g., `BSO`) |
+| `jira_project_name` | VARCHAR(255) | NOT NULL | JIRA project display name |
+| `issue_type` | VARCHAR(100) | NOT NULL, DEFAULT 'Bug' | JIRA issue type for created issues |
+| `auto_create_issues` | BOOLEAN | NOT NULL, DEFAULT true | Auto-create issues for new vulnerabilities |
+| `min_severity_to_sync` | VARCHAR(20) | NOT NULL, DEFAULT 'medium' | Minimum severity threshold for sync |
+| `field_mappings` | JSONB | NULLABLE, DEFAULT '{}' | Custom field mapping configuration |
+| `issues_created` | INTEGER | NOT NULL, DEFAULT 0 | Total issues created via this mapping |
+| `last_sync_at` | TIMESTAMPTZ | NULLABLE | Last synchronization timestamp |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_jira_project_mappings_integration_id` on `integration_id`
+- `ix_jira_project_mappings_blocksecops_project_id` on `blocksecops_project_id`
+- `ix_jira_project_mappings_unique` UNIQUE on (`integration_id`, `jira_project_id`)
+
+**Relationships:**
+- Many-to-one with `integrations` (integration_id, CASCADE DELETE)
+- Many-to-one with `projects` (blocksecops_project_id, CASCADE DELETE)
+- One-to-many with `jira_issue_syncs` (CASCADE DELETE)
+
+---
+
+#### `jira_issue_syncs`
+
+Individual vulnerability-to-JIRA-issue synchronization records tracking issue state.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique sync record identifier |
+| `mapping_id` | UUID | NOT NULL, FK → jira_project_mappings.id ON DELETE CASCADE, INDEX | Parent project mapping |
+| `vulnerability_id` | UUID | NOT NULL, FK → vulnerabilities.id ON DELETE CASCADE, INDEX | Synced vulnerability |
+| `jira_issue_id` | VARCHAR(255) | NOT NULL | JIRA internal issue ID |
+| `jira_issue_key` | VARCHAR(50) | NOT NULL, INDEX | JIRA issue key (e.g., `BSO-42`) |
+| `jira_issue_url` | VARCHAR(2048) | NOT NULL | JIRA issue URL |
+| `jira_status` | VARCHAR(100) | NULLABLE | Current JIRA issue status |
+| `last_synced_at` | TIMESTAMPTZ | NULLABLE | Last bidirectional sync timestamp |
+| `sync_direction` | VARCHAR(20) | NOT NULL, DEFAULT 'outbound' | `outbound` (Apogee→JIRA) or `bidirectional` |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Sync record creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_jira_issue_syncs_mapping_id` on `mapping_id`
+- `ix_jira_issue_syncs_vulnerability_id` on `vulnerability_id`
+- `ix_jira_issue_syncs_jira_issue_key` on `jira_issue_key`
+- `ix_jira_issue_syncs_unique` UNIQUE on (`mapping_id`, `vulnerability_id`)
+
+**Relationships:**
+- Many-to-one with `jira_project_mappings` (mapping_id, CASCADE DELETE)
+- Many-to-one with `vulnerabilities` (vulnerability_id, CASCADE DELETE)
+
+---
+
+**Last Updated**: February 28, 2026
