@@ -38,6 +38,7 @@ When working on specific repositories, use the appropriate agent by referencing 
 
 | Repository | Agent File | Use For |
 |------------|------------|---------|
+| Documentation Agent | @.claude/agents/docs-agent.md | Update all platform documentation |
 | TaskDocs-Apogee | @.claude/agents/taskdocs-blocksecops.md | Development task documentation |
 
 ## Platform Standards

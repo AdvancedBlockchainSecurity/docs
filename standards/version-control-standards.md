@@ -4,6 +4,10 @@
 **Last Updated:** October 20, 2025
 **Status:** Active
 
+## Owner Approval Required
+
+**MANDATORY:** All git operations — branch creation, commits, pushes, PR creation, and PR merging — require explicit approval from the repository owner before execution. No automated tooling or agent may perform these operations without the owner's direct sign-off. See [Core Development Rules — Rule 0](./core-development-rules.md#rule-0-gitops-requires-owner-approval).
+
 ## Commit Message Format
 
 **MANDATORY format for all commits:**

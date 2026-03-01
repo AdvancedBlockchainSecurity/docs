@@ -3,6 +3,10 @@
 **Version:** 4.1.0
 **Last Updated:** February 22, 2026
 
+## Owner Approval Required
+
+**MANDATORY:** All build, push, and deploy operations require explicit approval from the repository owner before execution. Do not build images, push to any registry, or apply Kustomize manifests without the owner's direct sign-off. See [Core Development Rules — Rule 0](./core-development-rules.md#rule-0-gitops-requires-owner-approval).
+
 ## Overview
 
 Images are built locally with Docker, pushed to a container registry, and deployed via `kubectl apply`. The registry is configurable via the `REGISTRY` environment variable, defaulting to `harbor.blocksecops.local` for the server environment.

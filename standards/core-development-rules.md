@@ -13,6 +13,29 @@ This document defines the critical rules and codebase-first development workflow
 
 ## Critical Rules
 
+### Rule 0: GitOps Requires Owner Approval
+
+**MANDATORY:** All GitOps operations require explicit approval from the repository owner before execution. No automated tooling or agent may perform any of the following without the owner's direct approval:
+
+- **Docker build and push** (building images, pushing to Harbor or any registry)
+- **Kubernetes deployment** (`kubectl apply`, `kubectl rollout restart`, Kustomize apply)
+- **Git operations** (branch creation, commits, pushes, PR creation, PR merging)
+- **Version bumps** (changes to `pyproject.toml`, `package.json`, `kustomization.yaml` version fields)
+
+**Workflow:**
+1. Prepare all code changes and present a summary of what will be built/deployed/committed
+2. **Wait for explicit owner approval** before proceeding with any GitOps action
+3. Execute only the approved operations
+4. Report results back to the owner
+
+**Why this matters:**
+- **Change control:** The owner must review and approve all changes before they reach the cluster or repository
+- **Safety:** Prevents unintended deployments, version bumps, or commits
+- **Auditability:** Every GitOps action has a clear approval chain
+- **Blast radius:** The owner decides when changes are ready to ship
+
+**This rule takes precedence over all other workflow rules. Violations are considered CRITICAL incidents.**
+
 ### Rule 1: Codebase-First Development
 
 **MANDATORY:** All changes must exist in the codebase. Always test locally before committing.

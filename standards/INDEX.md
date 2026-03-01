@@ -265,17 +265,18 @@ These standards ensure proper versioning and configuration management:
 
 ### Most Common Violations
 
-1. **Making kubectl changes without updating Git first** → See [Core Development Rules](./core-development-rules.md)
-2. **Not creating database backups before config changes** → See [Database Management](./database-management.md)
-3. **Using `localhost` instead of `127.0.0.1`** → See [Local Development Setup](./local-development-setup.md)
-4. **Committing directly to main instead of using feature branches** → See [Version Control Standards](./version-control-standards.md)
-5. **Not incrementing version tags when rebuilding images** → See [Testing & Deployment](./testing-deployment.md)
-6. **Using manual port-forwards for regular access** → See [Service Availability](./service-availability.md)
-7. **Using `get_current_user_or_api_key` for write endpoints** → See [API Endpoint Authentication](./api-endpoint-auth.md) - MUST use `require_auth_with_scope()`
-8. **Missing `revisionHistoryLimit` on Deployments** → See [Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md) - causes stale pod accumulation
-9. **Missing security context on pods/containers** → See [Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md) - required for security compliance
-10. **Missing NetworkPolicy for services** → See [Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md) - required for network isolation
-11. **Shipping code with known vulnerabilities** → See [Secure Coding Standards](./secure-coding.md) - no code ships with known vulnerabilities
+1. **Performing GitOps without owner approval** → See [Core Development Rules — Rule 0](./core-development-rules.md#rule-0-gitops-requires-owner-approval)
+2. **Making kubectl changes without updating Git first** → See [Core Development Rules](./core-development-rules.md)
+3. **Not creating database backups before config changes** → See [Database Management](./database-management.md)
+4. **Using `localhost` instead of `127.0.0.1`** → See [Local Development Setup](./local-development-setup.md)
+5. **Committing directly to main instead of using feature branches** → See [Version Control Standards](./version-control-standards.md)
+6. **Not incrementing version tags when rebuilding images** → See [Testing & Deployment](./testing-deployment.md)
+7. **Using manual port-forwards for regular access** → See [Service Availability](./service-availability.md)
+8. **Using `get_current_user_or_api_key` for write endpoints** → See [API Endpoint Authentication](./api-endpoint-auth.md) - MUST use `require_auth_with_scope()`
+9. **Missing `revisionHistoryLimit` on Deployments** → See [Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md) - causes stale pod accumulation
+10. **Missing security context on pods/containers** → See [Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md) - required for security compliance
+11. **Missing NetworkPolicy for services** → See [Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md) - required for network isolation
+12. **Shipping code with known vulnerabilities** → See [Secure Coding Standards](./secure-coding.md) - no code ships with known vulnerabilities
 
 ### Most Frequent Issues
 
