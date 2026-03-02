@@ -256,7 +256,7 @@ done
 # Encryption service configured (readiness endpoint includes encryption check)
 curl -sk https://app.0xapogee.local/api/v1/health/ready | python3 -c "
 import sys,json; d=json.load(sys.stdin)
-print('PASS' if d.get('checks',{}).get('encryption_configured') else 'FAIL: encryption not configured')"
+print('PASS' if d.get('checks',{}).get('encryption') else 'FAIL: encryption not configured')"
 
 # Vault unsealed
 kubectl exec -n vault-local vault-0 -- vault status -format=json 2>/dev/null | \
@@ -402,7 +402,7 @@ check "Database query" "1" "$DB_OK"
 
 echo ""
 echo "=== Encryption & Secrets ==="
-ENC_OK=$(curl -sk https://app.0xapogee.local/api/v1/health/ready 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print('true' if d.get('checks',{}).get('encryption_configured') else 'false')" 2>/dev/null)
+ENC_OK=$(curl -sk https://app.0xapogee.local/api/v1/health/ready 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print('true' if d.get('checks',{}).get('encryption') else 'false')" 2>/dev/null)
 check "Encryption configured" "true" "$ENC_OK"
 
 VAULT_OK=$(kubectl exec -n vault-local vault-0 -- vault status -format=json 2>/dev/null | python3 -c "import sys,json; print('unsealed' if not json.load(sys.stdin)['sealed'] else 'sealed')" 2>/dev/null)
