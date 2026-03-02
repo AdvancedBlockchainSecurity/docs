@@ -250,20 +250,6 @@ for ns in $(kubectl get cronjob -A --no-headers 2>/dev/null | awk '{print $1}' |
 done
 ```
 
-**Current versions (as of February 28, 2026):**
-
-| Service | Version |
-|---------|---------|
-| api-service | 0.29.42 |
-| dashboard | 0.46.11 |
-| admin-portal | 0.7.6 |
-| tool-integration | 0.5.12 |
-| orchestration | 0.10.8 |
-| notification | 0.2.6 |
-| intelligence-engine | 0.3.7 |
-| data-service | 0.2.7 |
-| contract-parser | 0.2.2 |
-
 ## Encryption & Security Checks
 
 ```bash

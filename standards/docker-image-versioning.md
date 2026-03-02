@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 3.6.0
-**Last Updated:** February 27, 2026
+**Version:** 3.7.0
+**Last Updated:** March 1, 2026
 
 ## Owner Approval Required
 
@@ -166,6 +166,42 @@ docker push ${REGISTRY}/blocksecops/api-service:${VERSION}
 kubectl apply -k k8s/overlays/local/api-service/
 ```
 
+### Admin Portal (blocksecops-admin-portal)
+
+The admin portal requires Supabase build-time environment variables (baked into static assets by Vite):
+
+```bash
+cd /home/pwner/Git/blocksecops-admin-portal
+
+VERSION=$(grep '"version"' package.json | head -1 | cut -d'"' -f4)
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+
+# Build with Supabase build args + OCI labels
+docker build \
+  --build-arg VITE_ADMIN_SUPABASE_URL=${SUPABASE_URL} \
+  --build-arg VITE_ADMIN_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY} \
+  --build-arg VITE_ENVIRONMENT=local \
+  --build-arg SERVICE_VERSION=${VERSION} \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(git rev-parse --short HEAD) \
+  -t ${REGISTRY}/blocksecops/admin-portal:${VERSION} .
+
+# Push and deploy
+docker push ${REGISTRY}/blocksecops/admin-portal:${VERSION}
+kubectl apply -k k8s/overlays/local/
+```
+
+**Required environment variables:**
+- `SUPABASE_URL` — Supabase project URL (shared with dashboard)
+- `SUPABASE_ANON_KEY` — Supabase anon key (shared with dashboard)
+
+These are passed as `VITE_ADMIN_SUPABASE_URL` and `VITE_ADMIN_SUPABASE_ANON_KEY` build args. The Dockerfile validates they are non-empty at build time.
+
+**Key differences from dashboard:**
+- Builds from **service directory** (no parent context needed — no shared lib dependency)
+- Uses `VITE_ADMIN_SUPABASE_*` env var prefix (not `VITE_SUPABASE_*`)
+- Kustomization overlay at `k8s/overlays/local/` (not a subdirectory)
+
 ### Other Services
 
 Most services follow the standard pattern (build from service directory):
@@ -173,6 +209,7 @@ Most services follow the standard pattern (build from service directory):
 | Service | Build Context | Special Requirements |
 |---------|---------------|---------------------|
 | api-service | Service directory | None |
+| admin-portal | Service directory | Supabase build args (`VITE_ADMIN_SUPABASE_*`) |
 | dashboard | **Parent directory** | Supabase build args, shared lib, tier-config build |
 | data-service | Service directory | None |
 | intelligence-engine | Service directory | None |
@@ -306,49 +343,6 @@ Per [Kubernetes documentation](https://kubernetes.io/docs/concepts/containers/im
 | Easy rollback | No rollback target |
 | Reproducible builds | May vary between pulls |
 | Tag change triggers rollout | Requires manual restart |
-
----
-
-## Current Service Versions
-
-| Service | Version | Kustomization Path | Notes |
-|---------|---------|-------------------|-------|
-| admin-portal | 0.7.6 | `k8s/overlays/local/` | Apogee rebrand: UI branding, metadata, vite config |
-| api-service | 0.29.49 | `k8s/overlays/local/api-service/` | Referral system, APICallTracker EXCLUDED_PREFIXES fix |
-| contract-parser | 0.2.2 | `k8s/overlays/local/contract-parser/` | Apogee rebrand: OCI source URL, .env.example |
-| dashboard | 0.46.13 | `k8s/overlays/local/` | Referral system UI (ReferralCard, signup ref capture) |
-| data-service | 0.2.7 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, README |
-| findings | 0.2.1 | `k8s/overlays/local/findings/` | Apogee rebrand: OCI labels, .env.example |
-| analysis | 0.2.1 | `k8s/overlays/local/analysis/` | Apogee rebrand: OCI labels, .env.example |
-| ui-core | 0.2.1 | `k8s/overlays/local/ui-core/` | Apogee rebrand: OCI labels, .env.example |
-| intelligence-engine | 0.3.7 | `k8s/overlays/local/` | Apogee rebrand: OCI source/vendor, base images, .env |
-| notification | 0.2.6 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL |
-| orchestration | 0.10.8 | `k8s/overlays/local/` | Apogee rebrand: OCI source URL, README |
-| tool-integration | 0.5.12 | `k8s/overlays/local/` | Fix auth header for outgoing API service requests |
-| scanner-slither | 0.3.3 | N/A (scanner image) | find -L symlink fix |
-| scanner-aderyn | 0.7.3 | N/A (scanner image) | find -L symlink fix |
-| scanner-semgrep | 0.3.8 | N/A (scanner image) | find -L symlink fix |
-| scanner-solhint | 0.1.8 | N/A (scanner image) | Robust JSON extraction fix |
-| scanner-vyper | 0.3.1 | N/A (scanner image) | find -L symlink fix |
-| scanner-moccasin | 0.3.1 | N/A (scanner image) | find -L symlink fix |
-| scanner-halmos | 0.3.1 | N/A (scanner image) | find -L symlink fix |
-| scanner-echidna | 0.3.2 | N/A (scanner image) | find -L symlink fix |
-| scanner-medusa | 0.3.2 | N/A (scanner image) | find -L symlink fix |
-| scanner-wake | 0.3.8 | N/A (scanner image) | find -L symlink fix |
-| scanner-soliditydefend | 0.9.1 | N/A (scanner image) | find -L fix + code snippet extraction |
-| scanner-sol-azy | 0.4.2 | N/A (scanner image) | find -L symlink fix |
-| scanner-cargo-fuzz-solana | 0.3.1 | N/A (scanner image) | find -L symlink fix |
-| scanner-trident | 0.3.1 | N/A (scanner image) | find -L symlink fix |
-| scanner-rustdefend | 0.4.2 | N/A (scanner image) | v0.5.1: FP reduction (347 fewer), 61 detectors, custom rules engine |
-
-### Infrastructure Images (Harbor)
-
-| Image | Version | Harbor Path | Notes |
-|-------|---------|-------------|-------|
-| prometheus | v3.2.1 | `blocksecops/prometheus` | Metrics collection, disabled by default |
-| prometheus-adapter | v0.11.2 | `blocksecops/prometheus-adapter` | HPA custom metrics bridge |
-
-All services are `0.x.x` (development phase). Version `1.0.0` indicates stable, production-ready API.
 
 ---
 
