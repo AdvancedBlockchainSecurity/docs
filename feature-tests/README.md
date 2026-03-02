@@ -81,6 +81,7 @@ Manual testing checklists for all user-facing features.
 | [SCAN-TEST-2026-02-22.md](./SCAN-TEST-2026-02-22.md) | **NEW** - Cluster health audit scan tests: single/multi/full scanner, deduplication verification, auth 401 fix validation |
 | [82-cors-domain-regression.md](./82-cors-domain-regression.md) | **NEW** - Automated CORS wildcard and legacy domain regression tests (64 tests across all repos) |
 | [88-referral-system.md](./88-referral-system.md) | **NEW** - Referral system: code generation, sharing, applying, reward threshold, admin settings, dashboard UI, Stripe integration (v0.29.49 API, v0.46.13 Dashboard) |
+| [89-gdpr-admin-data-requests.md](./89-gdpr-admin-data-requests.md) | **NEW** - GDPR admin data request processing: deletion (anonymization), export (0600 perms, 7-day expiry), ML-withdrawal (consent + provenance), path traversal protection, scan error_message fix (v0.29.55 API, v0.7.10 Admin Portal) |
 
 ---
 
@@ -344,48 +345,49 @@ For the comprehensive GCP production launch audit (cross-cutting, integration-le
 
 ```
 [Date] | [Tester] | [File] | [Result]
-2026-03-01 | Claude Code | 88-referral-system.md | NEW - Referral system: 14/16 tests passing (2 pending: Stripe webhook, disable gate). Code gen, apply, self-referral block, rate limit, reward threshold, admin settings, dashboard UI (v0.29.49 API, v0.46.13 Dashboard)
+2026-03-02 | Manual | 89-gdpr-admin-data-requests.md | NEW - GDPR admin data requests: 7/7 tests passing. Deletion (anonymization), export (0600 perms), ML-withdrawal (10/10 provenance excluded), path traversal protection, scan error_message fix (v0.29.55 API, v0.7.10 Admin Portal)
+2026-03-01 | Apogee Team | 88-referral-system.md | NEW - Referral system: 14/16 tests passing (2 pending: Stripe webhook, disable gate). Code gen, apply, self-referral block, rate limit, reward threshold, admin settings, dashboard UI (v0.29.49 API, v0.46.13 Dashboard)
 2026-02-25 | Automated | 81-platform-security-audit.md | NEW - Full platform security audit: 145/145 tests passing across 5 audit suites (K8s, AppSec, Auth, DB integrity, Auth x402). 3 critical + 7 high + 8 medium issues remediated.
-2026-02-16 | Claude Code | GO-LIVE-AUDIT-TESTING-CHECKLIST.md | NEW - GCP production launch audit: 14 sections, 140+ cross-cutting tests, 6 automation scripts
+2026-02-16 | Apogee Team | GO-LIVE-AUDIT-TESTING-CHECKLIST.md | NEW - GCP production launch audit: 14 sections, 140+ cross-cutting tests, 6 automation scripts
 2026-02-14 | Automated | 61-ai-inline-results.md | NEW - AI inline results: Code Review & Code Repair fully inline on vulnerability detail page, auth middleware fix for code-repair/copilot endpoints (v0.45.3 Dashboard, v0.28.32 API)
-2026-02-12 | Claude Code | 14-enterprise-features.md, 10-tier-upgrades.md, 37-stripe-billing.md | UPDATE - localStorage data isolation (userId-scoped keys), tier change modal tests, billing page invite card (v0.42.0 Dashboard)
-2026-02-09 | Claude Code | 60-collapsible-sidebar-quick-access.md | NEW - Collapsible sidebar + quick access page pins, localStorage persistence (v0.41.4 Dashboard)
-2026-02-07 | Claude Code | 59-admin-portal-v0.4.0.md | NEW - Admin Portal v0.4.0: GCP Cost Estimator, Scanners page, Dependencies endpoint (v0.4.0 Admin Portal, v0.27.7 API)
-2026-02-01 | Claude Code | 52-dual-payment-options.md | NEW - Dual Payment Options: Stripe + x402 crypto payment selector on pricing page (v0.36.0 Dashboard)
-2026-02-01 | Claude Code | 51-kubernetes-security.md | NEW - Kubernetes Security: revisionHistoryLimit, security contexts, NetworkPolicies, pod lifecycle (GCP Launch Phase 2)
-2026-01-30 | Claude Code | 48-ml-data-strategy.md | NEW - ML Data Strategy: consent tracking, provenance, GDPR compliance (v0.16.0 API, v0.34.0 Dashboard)
-2026-01-26 | Claude Code | 27-ai-ml-features.md | UPDATE - ML dependency split: embeddings moved to intelligence-engine, api-service reduced from 12.6GB to 934MB
-2026-01-26 | Claude Code | 24-cross-scanner-deduplication.md | UPDATE - Architecture change: semantic deduplication now uses intelligence-engine for embeddings
-2026-01-23 | Claude Code | 46-platform-admin-panel.md | NEW - Platform admin panel: MFA, user management, emergency actions (Phase 4.6)
-2026-01-23 | Claude Code | 44-platform-integrations.md | NEW - GitHub/GitLab/Bitbucket/Jira integrations, OAuth flow, repository import, Jira issue sync
-2026-01-22 | Claude Code | 43-dashboard-enhancement-jan2026.md | NEW - Dashboard layout, theme toggle, API key tier limits, vulnerability status, Users/Roles/RecentScans pages
-2026-01-19 | Claude Code | 42-ide-integration.md | IMPLEMENTED - IDE plugins (VS Code, JetBrains, Neovim), CLI --local flag, scan_source tracking (Migration 034)
-2026-01-16 | Claude Code | 16-user-activity-logging.md | FIX - Activity logging integration, events now logged on scan/contract/upload (v0.10.6 API)
-2026-01-16 | Claude Code | 24-cross-scanner-deduplication.md | FIX - Pattern code fallback to canonical finding (v0.10.6 API)
-2026-01-15 | Claude Code | 41-vulnerability-filtering.md | NEW - Severity filter, scanner dropdown, pattern input, copy button bug fixes (v0.10.3 API, v0.30.6 Dashboard)
-2026-01-13 | Claude Code | 25-dark-mode-global-search.md | FIX - Advanced Search filter overflow fixed, added Test 12 for filter layout (v0.29.0 Dashboard)
-2026-01-12 | Claude Code | 40-quality-gates.md | IMPLEMENTED - Quality Gates, ProjectDetail integration, contracts search, advanced-search rename (v0.10.2 API, v0.29.0 Dashboard)
-2026-01-12 | Claude Code | 25-dark-mode-global-search.md | UPDATED - Added Test 9-11 for advanced search, contracts search, contract links (v0.29.0 Dashboard)
-2026-01-12 | Claude Code | 39-economic-security-analysis.md | IMPLEMENTED - Economic panel, flash loan/MEV/DeFi detection, AI explanations (v0.10.0 API, v0.28.0 Dashboard)
+2026-02-12 | Apogee Team | 14-enterprise-features.md, 10-tier-upgrades.md, 37-stripe-billing.md | UPDATE - localStorage data isolation (userId-scoped keys), tier change modal tests, billing page invite card (v0.42.0 Dashboard)
+2026-02-09 | Apogee Team | 60-collapsible-sidebar-quick-access.md | NEW - Collapsible sidebar + quick access page pins, localStorage persistence (v0.41.4 Dashboard)
+2026-02-07 | Apogee Team | 59-admin-portal-v0.4.0.md | NEW - Admin Portal v0.4.0: GCP Cost Estimator, Scanners page, Dependencies endpoint (v0.4.0 Admin Portal, v0.27.7 API)
+2026-02-01 | Apogee Team | 52-dual-payment-options.md | NEW - Dual Payment Options: Stripe + x402 crypto payment selector on pricing page (v0.36.0 Dashboard)
+2026-02-01 | Apogee Team | 51-kubernetes-security.md | NEW - Kubernetes Security: revisionHistoryLimit, security contexts, NetworkPolicies, pod lifecycle (GCP Launch Phase 2)
+2026-01-30 | Apogee Team | 48-ml-data-strategy.md | NEW - ML Data Strategy: consent tracking, provenance, GDPR compliance (v0.16.0 API, v0.34.0 Dashboard)
+2026-01-26 | Apogee Team | 27-ai-ml-features.md | UPDATE - ML dependency split: embeddings moved to intelligence-engine, api-service reduced from 12.6GB to 934MB
+2026-01-26 | Apogee Team | 24-cross-scanner-deduplication.md | UPDATE - Architecture change: semantic deduplication now uses intelligence-engine for embeddings
+2026-01-23 | Apogee Team | 46-platform-admin-panel.md | NEW - Platform admin panel: MFA, user management, emergency actions (Phase 4.6)
+2026-01-23 | Apogee Team | 44-platform-integrations.md | NEW - GitHub/GitLab/Bitbucket/Jira integrations, OAuth flow, repository import, Jira issue sync
+2026-01-22 | Apogee Team | 43-dashboard-enhancement-jan2026.md | NEW - Dashboard layout, theme toggle, API key tier limits, vulnerability status, Users/Roles/RecentScans pages
+2026-01-19 | Apogee Team | 42-ide-integration.md | IMPLEMENTED - IDE plugins (VS Code, JetBrains, Neovim), CLI --local flag, scan_source tracking (Migration 034)
+2026-01-16 | Apogee Team | 16-user-activity-logging.md | FIX - Activity logging integration, events now logged on scan/contract/upload (v0.10.6 API)
+2026-01-16 | Apogee Team | 24-cross-scanner-deduplication.md | FIX - Pattern code fallback to canonical finding (v0.10.6 API)
+2026-01-15 | Apogee Team | 41-vulnerability-filtering.md | NEW - Severity filter, scanner dropdown, pattern input, copy button bug fixes (v0.10.3 API, v0.30.6 Dashboard)
+2026-01-13 | Apogee Team | 25-dark-mode-global-search.md | FIX - Advanced Search filter overflow fixed, added Test 12 for filter layout (v0.29.0 Dashboard)
+2026-01-12 | Apogee Team | 40-quality-gates.md | IMPLEMENTED - Quality Gates, ProjectDetail integration, contracts search, advanced-search rename (v0.10.2 API, v0.29.0 Dashboard)
+2026-01-12 | Apogee Team | 25-dark-mode-global-search.md | UPDATED - Added Test 9-11 for advanced search, contracts search, contract links (v0.29.0 Dashboard)
+2026-01-12 | Apogee Team | 39-economic-security-analysis.md | IMPLEMENTED - Economic panel, flash loan/MEV/DeFi detection, AI explanations (v0.10.0 API, v0.28.0 Dashboard)
 2026-02-20 | Manual | 68-rate-limiting-security-audit.md | UPDATE - Added 10 remaining endpoint files (55+ endpoints) to rate limiting coverage, completing all non-exempt files (v0.29.5 API)
 2026-02-19 | Manual | 70-platform-bugfixes-features.md | NEW - Platform bug fixes & features: 16 tasks across 4 services, pattern sorting, patterns view toggle, SCM PR creation, ML label fix, security hardening (v0.28.46 API, v0.45.9 Dashboard, v0.9.15 Orchestration, v0.4.8 Tool Integration)
 2026-02-18 | Manual | 68-rate-limiting-security-audit.md | IMPLEMENTED - 28 rate limit decorators, 5 analytics dual-auth, webhook model fix (v0.28.42 API)
 2026-01-10 | Manual | 38-cursor-pagination.md | VERIFIED - Migration 029 applied, indexes used in queries, cursor encode/decode working
-2026-01-04 | Claude Code | 36-cicd-integration.md | IMPLEMENTED - GitHub Actions, GitLab CI, Jenkins, Azure Pipelines integration tests
-2026-01-04 | Claude Code | 35-cli-tool.md | IMPLEMENTED - 0xapogee-cli v0.1.0, auth/scan commands, 4 output formats, pre-commit hooks
-2026-01-04 | Claude Code | 34-notification-channels.md | IMPLEMENTED - Migration 025, Slack/Teams/Discord notifiers, API endpoints (v0.7.1 API)
-2025-12-31 | Claude Code | 33-pricing-page-usage.md | IMPLEMENTED - CurrentPlanBanner, tier highlighting, WebSocket notification fix (v0.23.1 Dashboard)
-2025-12-31 | Claude Code | 32-contract-name-duplication.md | IMPLEMENTED - 409 conflict detection, DuplicateContractModal (v0.8.0 API, v0.22.0 Dashboard)
-2025-12-30 | Claude Code | 31-risk-scoring.md | PASS - Color badge display implemented (v0.21.0), replaces numeric 60.8k with "Critical Risk" badge
-2025-12-30 | Claude Code | 30-dashboard-production.md | PASS - Production build with build args verified
-2025-12-30 | Claude Code | 06-scanning.md (Sections 12.6, 13) | PASS - Fuzzer results display E2E verified
-2025-12-28 | Claude Code | 28-webapp-security.md | PASS - All security headers, CORS, request limits verified
-2025-12-27 | Claude Code | 27-ai-ml-features.md | PARTIAL - ML endpoints implemented, FP classifier needs training data
-2025-12-27 | Claude Code | 26-team-collaboration.md | PASS - Teams API, project access, assignments, comments verified
-2025-12-26 | Claude Code | 25-dark-mode-global-search.md | PASS - Dark mode persists, Command Palette works, Source code search verified
-2025-12-25 | Claude Code | 24-cross-scanner-deduplication.md | PASS - 137 groups, 421 findings deduplicated, API verified
-2025-12-23 | Claude Code | 23-vulnerability-categorization.md | PASS - All 832 vulns categorized, scan stats fixed
+2026-01-04 | Apogee Team | 36-cicd-integration.md | IMPLEMENTED - GitHub Actions, GitLab CI, Jenkins, Azure Pipelines integration tests
+2026-01-04 | Apogee Team | 35-cli-tool.md | IMPLEMENTED - 0xapogee-cli v0.1.0, auth/scan commands, 4 output formats, pre-commit hooks
+2026-01-04 | Apogee Team | 34-notification-channels.md | IMPLEMENTED - Migration 025, Slack/Teams/Discord notifiers, API endpoints (v0.7.1 API)
+2025-12-31 | Apogee Team | 33-pricing-page-usage.md | IMPLEMENTED - CurrentPlanBanner, tier highlighting, WebSocket notification fix (v0.23.1 Dashboard)
+2025-12-31 | Apogee Team | 32-contract-name-duplication.md | IMPLEMENTED - 409 conflict detection, DuplicateContractModal (v0.8.0 API, v0.22.0 Dashboard)
+2025-12-30 | Apogee Team | 31-risk-scoring.md | PASS - Color badge display implemented (v0.21.0), replaces numeric 60.8k with "Critical Risk" badge
+2025-12-30 | Apogee Team | 30-dashboard-production.md | PASS - Production build with build args verified
+2025-12-30 | Apogee Team | 06-scanning.md (Sections 12.6, 13) | PASS - Fuzzer results display E2E verified
+2025-12-28 | Apogee Team | 28-webapp-security.md | PASS - All security headers, CORS, request limits verified
+2025-12-27 | Apogee Team | 27-ai-ml-features.md | PARTIAL - ML endpoints implemented, FP classifier needs training data
+2025-12-27 | Apogee Team | 26-team-collaboration.md | PASS - Teams API, project access, assignments, comments verified
+2025-12-26 | Apogee Team | 25-dark-mode-global-search.md | PASS - Dark mode persists, Command Palette works, Source code search verified
+2025-12-25 | Apogee Team | 24-cross-scanner-deduplication.md | PASS - 137 groups, 421 findings deduplicated, API verified
+2025-12-23 | Apogee Team | 23-vulnerability-categorization.md | PASS - All 832 vulns categorized, scan stats fixed
 2025-12-22 | Manual | 13-vyper-rust-scanners.md | PASS - Phase 3.5 E2E integration complete
 2025-12-22 | Manual | 06-scanning.md | PASS - Language-based scanner selection working
-2025-12-21 | Claude Code (Automated) | 06-scanning.md (Section 11) | PASS - Scanner Pattern Coverage validated
+2025-12-21 | Apogee Team (Automated) | 06-scanning.md (Section 11) | PASS - Scanner Pattern Coverage validated
 ```
