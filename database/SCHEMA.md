@@ -8,7 +8,7 @@
 > **Important Note on Database Naming:**
 > The database is named `solidity_security`, NOT `blocksecops`. This name was established during initial platform development when the focus was solely on Solidity security scanning. The name has been retained for backward compatibility and to avoid migration complexity. All services, connection strings, and documentation should reference `solidity_security`.
 >
-> **Verified:** March 1, 2026 (Current stats: 184 contracts, 555 scans, 7,342 vulnerabilities, 14 users, 91 tables in `solidity_security` database)
+> **Verified:** March 1, 2026 (Current stats: 189 contracts, 563 scans, 9,188 vulnerabilities, 16 users, 91 tables in `solidity_security` database)
 
 ## Table of Contents
 
@@ -2636,6 +2636,22 @@ Vulnerability lifecycle tracking.
 
 ---
 
+### `tier_enum`
+
+User subscription tier classification. Controls feature access, rate limits, scan quotas, and API key availability.
+
+**Values:**
+- `developer` - Free tier with basic features
+- `team` - Team tier with collaboration features
+- `growth` - Growth tier with increased quotas
+- `enterprise` - Enterprise tier with full platform access
+
+**Usage:** `users.tier`, `user_quotas.tier`
+
+See [Tier Standards](../standards/tier-standards.md) for tier-based feature matrix.
+
+---
+
 ### `sbom_format`
 
 **PLANNED** (Phase 3.1) - SBOM format specification.
@@ -3298,6 +3314,44 @@ Encrypted OAuth tokens for integration connections. Access and refresh tokens ar
 - Encryption is **mandatory in production** — API service refuses to start without key
 - Encrypted values prefixed with `gAAAAA` (Fernet format)
 - Error messages stored in `integrations.last_error` are sanitized via `get_safe_error_detail()`
+
+---
+
+#### `integration_repositories`
+
+Synced repositories from third-party integrations (GitHub, GitLab, Bitbucket). Tracks which repositories are connected, their scan settings, and sync status.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique repository identifier |
+| `integration_id` | UUID | NOT NULL, FK → integrations.id ON DELETE CASCADE, INDEX | Parent integration |
+| `project_id` | UUID | NULLABLE, FK → projects.id ON DELETE SET NULL, INDEX | Linked Apogee project |
+| `external_repo_id` | VARCHAR(255) | NOT NULL, INDEX | Provider's repository ID |
+| `repo_name` | VARCHAR(255) | NOT NULL | Repository name |
+| `repo_full_name` | VARCHAR(500) | NOT NULL | Full repository name (org/repo) |
+| `repo_url` | VARCHAR(2048) | NOT NULL | Repository URL |
+| `default_branch` | VARCHAR(255) | NULLABLE, DEFAULT 'main' | Default branch name |
+| `is_private` | BOOLEAN | NOT NULL, DEFAULT false | Private repository flag |
+| `auto_scan_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Automatic scanning enabled |
+| `scan_on_push` | BOOLEAN | NOT NULL, DEFAULT true | Scan on push events |
+| `scan_on_pr` | BOOLEAN | NOT NULL, DEFAULT true | Scan on pull request events |
+| `last_synced_at` | TIMESTAMPTZ | NULLABLE | Last sync timestamp |
+| `last_synced_commit` | VARCHAR(40) | NULLABLE | Last synced commit SHA |
+| `contracts_found` | INTEGER | NOT NULL, DEFAULT 0 | Count of contracts found |
+| `sync_status` | VARCHAR(50) | NOT NULL, DEFAULT 'pending' | `pending`, `syncing`, `synced`, `error` |
+| `sync_error` | TEXT | NULLABLE | Last sync error message |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- `ix_integration_repositories_integration_id` on `integration_id`
+- `ix_integration_repositories_project_id` on `project_id`
+- `ix_integration_repositories_external_repo_id` on `external_repo_id`
+- `ix_integration_repositories_unique` UNIQUE on (`integration_id`, `external_repo_id`)
+
+**Relationships:**
+- Many-to-one with `integrations` (integration_id, CASCADE DELETE)
+- Many-to-one with `projects` (project_id, SET NULL)
 
 ### Related Documentation
 

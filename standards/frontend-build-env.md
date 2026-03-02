@@ -1,8 +1,8 @@
 # Frontend Build-Time Environment Variables
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 1.0.0
-**Last Updated:** December 30, 2025
+**Version:** 1.1.0
+**Last Updated:** March 1, 2026
 **Status:** Active
 
 ## Overview
@@ -36,14 +36,18 @@ This document defines standards for managing build-time environment variables in
 
 These values are intentionally public and designed to be visible in browser code:
 
-| Variable | Example | Why It's Safe |
-|----------|---------|---------------|
-| `VITE_SUPABASE_URL` | `https://xxx.supabase.co` | Public endpoint, protected by RLS |
-| `VITE_SUPABASE_ANON_KEY` | `eyJhbGci...` | Anonymous key, RLS enforces access |
-| `VITE_WS_URL` | `wss://app.0xapogee.local/ws` | WebSocket endpoint, auth required (use wss:// for server/staging/production) |
-| `VITE_WALLETCONNECT_PROJECT_ID` | `abc123...` | Public project identifier |
-| `VITE_USE_TESTNET` | `true` | Feature flag, no security impact |
-| `VITE_API_URL` | `https://api.example.com` | Public API endpoint |
+| Variable | Service | Example | Why It's Safe |
+|----------|---------|---------|---------------|
+| `VITE_SUPABASE_URL` | Dashboard | `https://xxx.supabase.co` | Public endpoint, protected by RLS |
+| `VITE_SUPABASE_ANON_KEY` | Dashboard | `eyJhbGci...` | Anonymous key, RLS enforces access |
+| `VITE_ADMIN_SUPABASE_URL` | Admin Portal | `https://xxx.supabase.co` | Same Supabase project, admin access via MFA + role checks |
+| `VITE_ADMIN_SUPABASE_ANON_KEY` | Admin Portal | `eyJhbGci...` | Anonymous key, admin role enforced server-side |
+| `VITE_API_BASE_URL` | Admin Portal | `/api/v1` | Relative API path routed via Traefik |
+| `VITE_ENVIRONMENT` | Admin Portal | `local` | Environment identifier, no security impact |
+| `VITE_WS_URL` | Dashboard | `wss://app.0xapogee.local/ws` | WebSocket endpoint, auth required (use wss:// for server/staging/production) |
+| `VITE_WALLETCONNECT_PROJECT_ID` | Dashboard | `abc123...` | Public project identifier |
+| `VITE_USE_TESTNET` | Dashboard | `true` | Feature flag, no security impact |
+| `VITE_API_URL` | Dashboard | `https://api.example.com` | Public API endpoint |
 
 ### Private Variables (Never in Frontend)
 
@@ -163,6 +167,32 @@ docker push ${REGISTRY}/blocksecops/dashboard:0.19.0
 # 5. Deploy
 kubectl apply -k blocksecops-dashboard/k8s/overlays/local/
 ```
+
+### Admin Portal Build
+
+The admin portal uses the same Supabase project but with `VITE_ADMIN_*` prefixed variables. It builds from its own service directory (no parent context needed).
+
+```bash
+cd /home/pwner/Git/blocksecops-admin-portal
+
+VERSION=$(grep '"version"' package.json | head -1 | cut -d'"' -f4)
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+
+# SUPABASE_URL and SUPABASE_ANON_KEY are set in shell environment
+docker build \
+  --build-arg VITE_ADMIN_SUPABASE_URL=${SUPABASE_URL} \
+  --build-arg VITE_ADMIN_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY} \
+  --build-arg VITE_ENVIRONMENT=local \
+  --build-arg SERVICE_VERSION=${VERSION} \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(git rev-parse --short HEAD) \
+  -t ${REGISTRY}/blocksecops/admin-portal:${VERSION} .
+
+docker push ${REGISTRY}/blocksecops/admin-portal:${VERSION}
+kubectl apply -k k8s/overlays/local/
+```
+
+**Key difference from dashboard:** The admin portal env vars use the `VITE_ADMIN_SUPABASE_*` prefix to distinguish from the dashboard's `VITE_SUPABASE_*` variables. Both point to the same Supabase project.
 
 ### CI/CD Pipeline Build
 

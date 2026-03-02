@@ -64,13 +64,6 @@ Base images are versioned using a hash of their dependency specification:
 - **Hash source**: SHA256 of Dockerfile content (first 8 chars)
 - **Rebuild trigger**: Any change to Dockerfile or requirements triggers new hash
 
-### Current Versions
-
-| Base Image | Tag | Dockerfile Hash |
-|------------|-----|-----------------|
-| `blocksecops-intelligence-base-cpu` | `1.0.0-5ede3c61` | 5ede3c61 (trimmed base-ml.txt, 7 packages, 1.85GB) |
-| `blocksecops-orchestration-base` | `1.0.0-ac02c353` | ac02c353 |
-
 ---
 
 ## Directory Structure

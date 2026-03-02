@@ -614,21 +614,6 @@ monthly_nl_conversions_limit = -1
 
 ---
 
-## Changelog
-
-| Date | Change | Author |
-|------|--------|--------|
-| 2026-02-24 | **v3.5**: Added API Endpoint Tier Gates section documenting all `require_tier()` enforcement. 5 missing gates fixed (search, api-keys, integrations, notification-channels, webhooks). 20 regression tests. | Apogee Team |
-| 2026-02-13 | **v3.4**: Added PoC Exploit Generation (Growth+ tier, 10s cooldown, output safety validation). Tier-config v3.3 updated with `monthlyAiExploitsLimit`. | Claude Code |
-| 2026-02-07 | **v3.3**: AI Features now ACTIVE (v0.28.2). Updated all AI quotas to match implementation. Added security controls, feature flags, rate limits, Vault secret path, and related pipeline documentation links. | Claude Code |
-| 2026-01-26 | **v3.1**: Added Phase 5 AI feature quotas (AI Copilot, Code Review, Code Repair, Compliance assessments) for upcoming AI/ML implementation. | Claude Code |
-| 2026-01-20 | **v3.0**: Updated to 4-tier model (Developer, Team, Growth, Enterprise). New pricing: $0/$299/$699/$1,999+. Updated limits to contracts (not scans). Added 25+ scanners, private repos, multi-chain, continuous monitoring features. Updated x402 to credit packages (Starter/Builder/Pro/Bulk). | Claude Code |
-| 2026-01-11 | **v2.1**: Added AI Features section with tier quotas (AI Explanations, Invariant Generations, NL Conversions). Claude API costs documented. Database schema updated. | Claude Code |
-| 2026-01-11 | Competitive pricing update: Free (3 scans, 5K LoC, no export), Developer ($189), Startup ($489), Professional ($1,956). x402 hybrid model finalized ($3/$7/$15/$25). | Claude Code |
-| 2026-01-11 | Initial creation, consolidated from all sources | Claude Code |
-
----
-
 ## Related Documentation
 
 - [Database Migrations](../database/MIGRATIONS.md) - Migration 024 tier restructure
