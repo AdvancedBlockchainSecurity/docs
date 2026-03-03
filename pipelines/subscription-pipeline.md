@@ -48,7 +48,7 @@ Blockchain confirm  →    Facilitator HTTP call         →   ScanCreditModel
 
 | Tier | Monthly | Annual |
 |------|---------|--------|
-| Team | `STRIPE_PRICE_TEAM_MONTHLY` | `STRIPE_PRICE_TEAM_ANNUAL` |
+| Starter | `STRIPE_PRICE_STARTER_MONTHLY` | `STRIPE_PRICE_STARTER_ANNUAL` |
 | Growth | `STRIPE_PRICE_GROWTH_MONTHLY` | `STRIPE_PRICE_GROWTH_ANNUAL` |
 | Enterprise | `STRIPE_PRICE_ENTERPRISE_MONTHLY` | `STRIPE_PRICE_ENTERPRISE_ANNUAL` |
 
@@ -262,7 +262,7 @@ Enterprise Subscription Active
 # parse_subscription_metadata() — only reads expected keys
 Expected keys: plan_tier, billing_interval, user_id, payment_type, package_id
 All other metadata keys: IGNORED
-Invalid tier value: defaults to "team", logged as security event
+Invalid tier value: defaults to "starter", logged as security event
 Invalid billing_interval: defaults to "monthly"
 ```
 
@@ -280,7 +280,7 @@ Invalid billing_interval: defaults to "monthly"
 | `stripe_subscription_id` | String (unique) | Stripe sub_* ID |
 | `stripe_customer_id` | String | Stripe cus_* ID |
 | `stripe_price_id` | String | Active price ID |
-| `plan_tier` | String | team, growth, enterprise |
+| `plan_tier` | String | starter, growth, enterprise |
 | `billing_interval` | String | monthly, annual |
 | `status` | String | active, past_due, canceled, etc. |
 | `current_period_start` | DateTime | Billing period start |
@@ -355,8 +355,8 @@ Invalid billing_interval: defaults to "monthly"
 
 | Variable | Description |
 |----------|-------------|
-| `STRIPE_PRICE_TEAM_MONTHLY` | Team tier monthly price ID |
-| `STRIPE_PRICE_TEAM_ANNUAL` | Team tier annual price ID |
+| `STRIPE_PRICE_STARTER_MONTHLY` | Starter tier monthly price ID |
+| `STRIPE_PRICE_STARTER_ANNUAL` | Starter tier annual price ID |
 | `STRIPE_PRICE_GROWTH_MONTHLY` | Growth tier monthly price ID |
 | `STRIPE_PRICE_GROWTH_ANNUAL` | Growth tier annual price ID |
 | `STRIPE_PRICE_ENTERPRISE_MONTHLY` | Enterprise tier monthly price ID |
@@ -392,7 +392,7 @@ Invalid billing_interval: defaults to "monthly"
 | Tier | Monthly | Annual (17% savings) | Contracts/Month |
 |------|---------|----------------------|-----------------|
 | Developer | $0 | $0 | 3 |
-| Team | $299 | ~$2,988/yr | 15 |
+| Starter | $299 | ~$2,988/yr | 15 |
 | Growth | $699 | ~$7,188/yr | 50 |
 | Enterprise | $1,999+ | Custom | Unlimited |
 

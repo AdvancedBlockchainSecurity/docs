@@ -8,7 +8,7 @@ AI-powered economic security analysis for DeFi smart contracts. Filters vulnerab
 Dashboard (Scan Results)     API Service (economic_analysis.py)                 External
 ────────────────────────     ─────────────────────────────────                 ────────
 GET /summary           →     1. Authenticate (JWT)                              PostgreSQL
-                             2. Validate tier (team+)
+                             2. Validate tier (starter+)
                              3. Filter economic findings (BVD codes)
                              4. Calculate risk score (0-100)
                       ←      Return EconomicSummaryResponse (200)
@@ -33,7 +33,7 @@ POST /explain          →     5. Check AI explanation quota
 | # | Step | Component | Description |
 |---|------|-----------|-------------|
 | 1 | Authentication | `get_current_user` | JWT required |
-| 2 | Tier gate | `require_tier("team")` | Developer tier blocked |
+| 2 | Tier gate | `require_tier("starter")` | Developer tier blocked |
 | 3 | Filter findings | BVD pattern codes | Match `BVD-SOLIDITY-FLASH-*`, `BVD-SOLIDITY-MEV-*`, `BVD-SOLIDITY-DEFI-*` |
 | 4 | Risk scoring | `EconomicSummaryService` | Aggregate risk score 0-100 based on severity distribution |
 
@@ -77,10 +77,10 @@ Returns **402 Payment Required** when quota is exhausted (not 429).
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| GET | `/economic-analysis/scans/{scan_id}/summary` | JWT + `require_tier("team")` | Economic risk summary |
-| GET | `/economic-analysis/projects/{project_id}/risk` | JWT + `require_tier("team")` | Project-level economic risk |
-| GET | `/economic-analysis/contracts/{contract_id}/findings` | JWT + `require_tier("team")` | Economic findings for contract |
-| POST | `/economic-analysis/scans/{scan_id}/explain` | JWT + `require_tier("team")` + quota | AI explanation (quota-gated) |
+| GET | `/economic-analysis/scans/{scan_id}/summary` | JWT + `require_tier("starter")` | Economic risk summary |
+| GET | `/economic-analysis/projects/{project_id}/risk` | JWT + `require_tier("starter")` | Project-level economic risk |
+| GET | `/economic-analysis/contracts/{contract_id}/findings` | JWT + `require_tier("starter")` | Economic findings for contract |
+| POST | `/economic-analysis/scans/{scan_id}/explain` | JWT + `require_tier("starter")` + quota | AI explanation (quota-gated) |
 | GET | `/economic-analysis/quota` | JWT | Current quota status |
 
 ## Files

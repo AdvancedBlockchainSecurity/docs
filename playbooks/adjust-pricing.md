@@ -68,7 +68,7 @@ Edit `blocksecops-shared/tier-config/tiers.json` with your changes.
 ```json
 {
   "tiers": {
-    "team": {
+    "starter": {
       "pricing": {
         "monthly": 349,        // Was 299
         "annual": 3490,        // Was 2988
@@ -103,9 +103,9 @@ Edit `blocksecops-shared/tier-config/tiers.json` with your changes.
 ```json
 {
   "tiers": {
-    "team": {
+    "starter": {
       "features": {
-        "multiChainEnabled": true,    // Now enabled for Team tier
+        "multiChainEnabled": true,    // Now enabled for Starter tier
         "newFeatureName": true        // Add new feature
       }
     }
@@ -182,8 +182,8 @@ from blocksecops_tier_config import get_tier_config, get_tier
 config = get_tier_config()
 print(f'Version: {config.version}')
 print(f'Tiers: {list(config.tiers.keys())}')
-team = get_tier('team')
-print(f'Team monthly price: \${team.pricing.monthly}')
+starter = get_tier('starter')
+print(f'Starter monthly price: \${starter.pricing.monthly}')
 "
 ```
 
@@ -209,9 +209,9 @@ If subscription prices changed, update Stripe:
 ```json
 {
   "tiers": {
-    "team": {
-      "stripePriceIdMonthly": "price_new_team_monthly",
-      "stripePriceIdAnnual": "price_new_team_annual"
+    "starter": {
+      "stripePriceIdMonthly": "price_new_starter_monthly",
+      "stripePriceIdAnnual": "price_new_starter_annual"
     }
   }
 }
@@ -257,8 +257,8 @@ Edit `blocksecops_com/lib/pricing-data.ts` to match `tiers.json`:
 ```typescript
 export const PRICING_TIERS: PricingTier[] = [
   {
-    id: 'team',
-    name: 'Team',
+    id: 'starter',
+    name: 'Starter',
     price: 349,           // Match tiers.json
     priceDisplay: '$349',
     scansPerMonth: 15,    // Match quotas.monthlyContractLimit
@@ -302,7 +302,7 @@ Edit `docs/standards/tier-standards.md` to reflect any changes:
 
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-02 | **v3.2**: Updated Team tier pricing to $349/mo. Increased Growth AI quotas. | Your Name |
+| 2026-02-02 | **v3.2**: Updated Starter tier pricing to $349/mo. Increased Growth AI quotas. | Your Name |
 ```
 
 ---
@@ -515,12 +515,12 @@ Compare values directly:
 
 ```bash
 # Frontend values
-grep -A5 "id: 'team'" blocksecops_com/lib/pricing-data.ts
+grep -A5 "id: 'starter'" blocksecops_com/lib/pricing-data.ts
 
 # Backend values
 python -c "
 from blocksecops_tier_config import get_tier
-t = get_tier('team')
+t = get_tier('starter')
 print(f'Price: {t.pricing.monthly}')
 print(f'Contracts: {t.quotas.monthly_contract_limit}')
 "

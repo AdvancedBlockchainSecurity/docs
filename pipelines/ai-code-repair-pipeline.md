@@ -8,7 +8,7 @@ AI-powered code fix generation for vulnerabilities. Takes original vulnerable co
 Dashboard (Finding Detail)   API Service (code_repair.py → CodeRepairService)   External
 ──────────────────────────   ────────────────────────────────────────────────   ────────
 POST /code-repair/generate → 1. Authenticate (JWT)                              PostgreSQL
-                             2. Validate tier (team+)
+                             2. Validate tier (starter+)
                              3. Check feature flags
                              4. Rate limit check
                              5. Build repair context (vuln + source code)
@@ -29,7 +29,7 @@ POST /code-repair/generate → 1. Authenticate (JWT)                            
 | # | Step | Component | Description |
 |---|------|-----------|-------------|
 | 1 | Authentication | `get_current_user` | JWT required |
-| 2 | Tier gate | `require_tier("team")` | Developer tier blocked |
+| 2 | Tier gate | `require_tier("starter")` | Developer tier blocked |
 | 3 | Feature flags | `ai_features_enabled` + `ai_code_repair_enabled` | Returns 503 if disabled |
 | 4 | Rate limiting | `@limiter.limit(get_rate_limit_string("ai", "codeRepair"))` | Per-tier rate limits (BSO-SEC-AI-003) |
 | 5 | Load context | Database query | Fetch vulnerability details, surrounding code context. If `original_code` not provided, extract from contract source |
@@ -48,7 +48,7 @@ POST /code-repair/generate → 1. Authenticate (JWT)                            
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| POST | `/code-repair/generate` | JWT + `require_tier("team")` + rate limit | Generate AI repair |
+| POST | `/code-repair/generate` | JWT + `require_tier("starter")` + rate limit | Generate AI repair |
 | GET | `/code-repair/repairs/{repair_id}` | JWT | Get specific repair |
 | GET | `/code-repair/vulnerabilities/{vuln_id}/repairs` | JWT | List repairs for finding |
 | GET | `/code-repair/repairs` | JWT | List all user repairs |

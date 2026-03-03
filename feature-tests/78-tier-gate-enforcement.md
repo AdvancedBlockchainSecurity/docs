@@ -28,57 +28,57 @@ All 36 endpoint/tier combinations verified:
 | Tier | Level | API Access | Feature Access |
 |------|-------|-----------|----------------|
 | developer | 0 | Blocked (429) | N/A |
-| team | 1 | Blocked (429) | N/A |
+| starter | 1 | Blocked (429) | N/A |
 | growth | 2 | Allowed | Full except enterprise |
 | enterprise | 3 | Allowed | Full |
 
 ### Endpoint Tests by Tier
 
-#### Search (`require_tier("team")`)
+#### Search (`require_tier("starter")`)
 - [ ] developer -> 429 (API access blocked)
-- [ ] team -> 429 (API access blocked)
-- [ ] growth -> 200 (allowed, growth >= team)
+- [ ] starter -> 429 (API access blocked)
+- [ ] growth -> 200 (allowed, growth >= starter)
 - [ ] enterprise -> 200 (allowed)
 
 #### API Keys (`require_tier("growth")`)
 - [ ] developer -> 429 (API access blocked)
-- [ ] team -> 429 (API access blocked)
+- [ ] starter -> 429 (API access blocked)
 - [ ] growth -> 200 (allowed)
 - [ ] enterprise -> 200 (allowed)
 
-#### Integrations (`require_tier("team")`) — Updated v0.29.42
+#### Integrations (`require_tier("starter")`) — Updated v0.29.42
 - [ ] developer -> 403 (tier too low)
-- [ ] team -> 200 (allowed, integrations available to all paying tiers)
+- [ ] starter -> 200 (allowed, integrations available to all paying tiers)
 - [ ] growth -> 200 (allowed)
 - [ ] enterprise -> 200 (allowed)
 
 #### Notification Channels (`require_tier("growth")`)
 - [ ] developer -> 429 (API access blocked)
-- [ ] team -> 429 (API access blocked)
+- [ ] starter -> 429 (API access blocked)
 - [ ] growth -> 200 (allowed)
 - [ ] enterprise -> 200 (allowed)
 
 #### Webhooks (`require_tier("growth")`)
 - [ ] developer -> 429 (API access blocked)
-- [ ] team -> 429 (API access blocked)
+- [ ] starter -> 429 (API access blocked)
 - [ ] growth -> 200 (allowed)
 - [ ] enterprise -> 200 (allowed)
 
 #### Audit Logs (`require_tier("growth")`)
 - [ ] developer -> 429 (API access blocked)
-- [ ] team -> 429 (API access blocked)
+- [ ] starter -> 429 (API access blocked)
 - [ ] growth -> 200 (allowed)
 - [ ] enterprise -> 200 (allowed)
 
 #### Economic Analysis Reports (`require_tier("enterprise")`)
 - [ ] developer -> 429 (API access blocked)
-- [ ] team -> 429 (API access blocked)
+- [ ] starter -> 429 (API access blocked)
 - [ ] growth -> 403 (tier too low)
 - [ ] enterprise -> 200 (allowed)
 
 #### Economic Analysis Simulate (`require_tier("enterprise")`)
 - [ ] developer -> 429 (API access blocked)
-- [ ] team -> 429 (API access blocked)
+- [ ] starter -> 429 (API access blocked)
 - [ ] growth -> 403 (tier too low)
 - [ ] enterprise -> 200 (allowed)
 
@@ -91,9 +91,9 @@ All 36 endpoint/tier combinations verified:
 
 20 structural tests in `tests/unit/presentation/test_tier_gate_enforcement.py`:
 
-- [ ] TestSearchTierGate (3 tests) - verifies `require_tier("team")` on POST `/search`
+- [ ] TestSearchTierGate (3 tests) - verifies `require_tier("starter")` on POST `/search`
 - [ ] TestApiKeysTierGate (3 tests) - verifies `require_tier("growth")` on GET `/api-keys`
-- [ ] TestIntegrationsTierGate (2 tests) - verifies `require_tier("team")` on GET integrations list
+- [ ] TestIntegrationsTierGate (2 tests) - verifies `require_tier("starter")` on GET integrations list
 - [ ] TestNotificationChannelsTierGate (2 tests) - verifies `require_tier("growth")` on GET list
 - [ ] TestWebhooksTierGate (2 tests) - verifies `require_tier("growth")` on GET list
 - [ ] TestAuditLogsTierGate (1 test) - verifies `require_tier("growth")` on GET `/audit-logs`
@@ -113,8 +113,8 @@ All 36 endpoint/tier combinations verified:
 
 | Version | PR | Changes |
 |---------|-----|---------|
-| 0.29.23 | #258 | Added tier gates: search (team), api-keys (growth), integrations (growth) |
+| 0.29.23 | #258 | Added tier gates: search (starter), api-keys (growth), integrations (growth) |
 | 0.29.24 | #259 | Added tier gates: notification-channels (growth), webhooks (growth) |
 | 0.29.25 | #260 | Added 20 structural unit tests for tier gate enforcement |
 | 0.29.26 | #261 | Fixed 5 stale unit tests; full suite clean (1032/0/24) |
-| 0.29.42 | — | Integrations tier gate changed from growth to team; IDE tokens changed from team to growth |
+| 0.29.42 | — | Integrations tier gate changed from growth to starter; IDE tokens changed from starter to growth |

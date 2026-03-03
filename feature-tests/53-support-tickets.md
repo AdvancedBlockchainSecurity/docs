@@ -496,7 +496,7 @@ curl -X GET "http://app.0xapogee.local/api/v1/support-tickets/550e8400-e29b-41d4
   "subject": "Test support ticket",
   "description": "Detailed description of the issue...",
   "user_email": "user@example.com",
-  "user_tier": "team",
+  "user_tier": "starter",
   "jira_issue_key": "SUPPORT-123",
   "jira_issue_url": "https://blocksecops.atlassian.net/browse/SUPPORT-123",
   "jira_sync_status": "synced",

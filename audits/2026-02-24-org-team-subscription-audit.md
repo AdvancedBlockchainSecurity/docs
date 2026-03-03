@@ -27,9 +27,9 @@
 | Status | Test | HTTP | Detail |
 |--------|------|------|--------|
 | PASS | GET /billing/plans returns 200 | 200 | - |
-| PASS | All 4 tiers present in plans | - | Found: ['developer', 'team', 'growth', 'enterprise'] |
+| PASS | All 4 tiers present in plans | - | Found: ['developer', 'starter', 'growth', 'enterprise'] |
 | PASS | Developer tier is free | - | price_monthly=0 |
-| PASS | Team tier is $299/mo | - | price_monthly=299 |
+| PASS | Starter tier is $299/mo | - | price_monthly=299 |
 | PASS | Growth tier is $699/mo | - | price_monthly=699 |
 | PASS | Enterprise tier is $1999/mo | - | price_monthly=1999 |
 

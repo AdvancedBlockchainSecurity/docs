@@ -126,7 +126,7 @@
 | # | Test | Tier | Limit | Expected Result | Status |
 |---|------|------|-------|-----------------|--------|
 | 3.1.1 | Developer: scan beyond monthly limit | Developer | 3/month | 402 quota error | [x] |
-| 3.1.2 | Team: scan beyond monthly limit | Team | 15/month | 402 quota error | [x] |
+| 3.1.2 | Starter: scan beyond monthly limit | Starter | 15/month | 402 quota error | [x] |
 | 3.1.3 | Growth: scan beyond monthly limit | Growth | 50/month | 402 quota error | [x] |
 | 3.1.4 | Enterprise: unlimited scans | Enterprise | Unlimited | No quota block | [x] |
 
@@ -134,15 +134,15 @@
 
 | # | Test | Expected Result | Status |
 |---|------|-----------------|--------|
-| 3.2.1 | Developer/Team: attempt API key creation | Denied (Growth+ only) | [x] |
-| 3.2.2 | Developer/Team: attempt service account creation | Denied (Growth+ only) | [x] |
-| 3.2.3 | Developer/Team: attempt IDE token generation | Denied (Growth+ only) | [x] |
-| 3.2.4 | Developer: private repository scanning | Denied (Team+ only) | [~] |
-| 3.2.5 | Developer/Team: multi-chain scanning (Vyper, Rust, Cairo, Move) | Denied (Growth+ only) | [~] |
-| 3.2.6 | Developer/Team: continuous monitoring | Denied (Growth+ only) | [~] |
-| 3.2.7 | Non-paying tier: JIRA integration | Denied (Team+ only) | [x] |
+| 3.2.1 | Developer/Starter: attempt API key creation | Denied (Growth+ only) | [x] |
+| 3.2.2 | Developer/Starter: attempt service account creation | Denied (Growth+ only) | [x] |
+| 3.2.3 | Developer/Starter: attempt IDE token generation | Denied (Growth+ only) | [x] |
+| 3.2.4 | Developer: private repository scanning | Denied (Starter+ only) | [~] |
+| 3.2.5 | Developer/Starter: multi-chain scanning (Vyper, Rust, Cairo, Move) | Denied (Growth+ only) | [~] |
+| 3.2.6 | Developer/Starter: continuous monitoring | Denied (Growth+ only) | [~] |
+| 3.2.7 | Non-paying tier: JIRA integration | Denied (Starter+ only) | [x] |
 | 3.2.8 | Non-Enterprise: SSO/SAML | Denied (Enterprise only) | [~] |
-| 3.2.9 | Developer: ML-powered false positive filtering | Denied (Team+ only) | [~] |
+| 3.2.9 | Developer: ML-powered false positive filtering | Denied (Starter+ only) | [~] |
 
 ### 3.3 Tier Change Enforcement
 
@@ -158,7 +158,7 @@
 | # | Test | Tier | Rate Limit | Expected Result | Status |
 |---|------|------|------------|-----------------|--------|
 | 3.4.1 | Developer rate limit | Developer | Per config | 429 after threshold | [x] |
-| 3.4.2 | Team rate limit | Team | Per config | 429 after threshold | [x] |
+| 3.4.2 | Starter rate limit | Starter | Per config | 429 after threshold | [x] |
 | 3.4.3 | Growth rate limit | Growth | 300/min, 10k/hour | 429 after threshold | [x] |
 | 3.4.4 | Enterprise rate limit | Enterprise | Custom | Per SLA agreement | [~] |
 
@@ -167,7 +167,7 @@
 | # | Test | Tier | Concurrent Limit | Expected Result | Status |
 |---|------|------|------------------|-----------------|--------|
 | 3.5.1 | Developer concurrent scans | Developer | 1 | Excess scans queued | [~] |
-| 3.5.2 | Team concurrent scans | Team | 2 | Excess scans queued | [~] |
+| 3.5.2 | Starter concurrent scans | Starter | 2 | Excess scans queued | [~] |
 | 3.5.3 | Growth concurrent scans | Growth | 5 | Excess scans queued | [~] |
 | 3.5.4 | Enterprise concurrent scans | Enterprise | Custom | Per agreement | [~] |
 
@@ -300,7 +300,7 @@
 | # | Test | Expected Result | Status |
 |---|------|-----------------|--------|
 | 6.3.1 | Basic vulnerability report (all tiers) | Report generated with findings | [x] |
-| 6.3.2 | Compliance report (SOC 2 mapping, Team+) | Compliance sections populated | [~] |
+| 6.3.2 | Compliance report (SOC 2 mapping, Starter+) | Compliance sections populated | [~] |
 | 6.3.3 | Audit-ready PDF report (Growth+) | PDF with remediation guidance | [x] |
 | 6.3.4 | White-label report (Enterprise) | Custom branding applied | [~] |
 | 6.3.5 | On-demand audit report generation ($149/report) | Charge applied, report delivered | [~] |
@@ -361,9 +361,9 @@
 
 | # | Test | Expected Result | Status |
 |---|------|-----------------|--------|
-| 8.1.1 | New subscription: Developer -> Team via Stripe Checkout | Tier updated, session invalidated | [~] |
-| 8.1.2 | Subscription upgrade: Team -> Growth | Immediate feature unlock, prorated charge | [~] |
-| 8.1.3 | Subscription downgrade: Growth -> Team | Effective at renewal, features revoked | [~] |
+| 8.1.1 | New subscription: Developer -> Starter via Stripe Checkout | Tier updated, session invalidated | [~] |
+| 8.1.2 | Subscription upgrade: Starter -> Growth | Immediate feature unlock, prorated charge | [~] |
+| 8.1.3 | Subscription downgrade: Growth -> Starter | Effective at renewal, features revoked | [~] |
 | 8.1.4 | Subscription cancellation | Downgrade to Developer at period end | [~] |
 | 8.1.5 | Annual billing discount (15%) applied | Correct pricing on checkout | [~] |
 
@@ -781,7 +781,7 @@
 
 | # | Test | Expected Result | Status |
 |---|------|-----------------|--------|
-| 19.1.1 | SOC 2 mapping: controls documented (Team+) | All controls mapped | [~] |
+| 19.1.1 | SOC 2 mapping: controls documented (Starter+) | All controls mapped | [~] |
 | 19.1.2 | ISO 27001 compliance mapping (Growth+) | Controls documented | [~] |
 | 19.1.3 | NIST framework mapping (Growth+) | Controls documented | [~] |
 | 19.1.4 | Audit trail: all security events logged and immutable | Append-only audit log | [x] |
@@ -799,7 +799,7 @@
 
 | # | Test | Expected Result | Status |
 |---|------|-----------------|--------|
-| 19.3.1 | Compliance reports available per tier (SOC 2 - Team+) | Reports accessible | [~] |
+| 19.3.1 | Compliance reports available per tier (SOC 2 - Starter+) | Reports accessible | [~] |
 | 19.3.2 | Executive reporting and board-ready dashboards (Enterprise) | Reports generated | [~] |
 | 19.3.3 | Annual security review sessions (Enterprise) | Process documented | [~] |
 
@@ -813,7 +813,7 @@
 |---|------|-----------------|--------|
 | 20.1.1 | New user onboarding: register -> free tier -> first scan -> results | Smooth flow with correct gates | [~] |
 | 20.1.2 | Full scan lifecycle: upload -> select scanners -> scan -> results -> dedup -> report | Complete flow, no errors | [x] |
-| 20.1.3 | Upgrade flow: free -> Team -> Growth -> Enterprise | Each upgrade unlocks features | [~] |
+| 20.1.3 | Upgrade flow: free -> Starter -> Growth -> Enterprise | Each upgrade unlocks features | [~] |
 | 20.1.4 | Multi-scanner comparison: same contract, all Solidity scanners | Comparison view works with dedup | [~] |
 
 ### 20.2 Integration Workflows
@@ -917,8 +917,8 @@
 
 | # | Severity | Section | Finding | Status |
 |---|----------|---------|---------|--------|
-| F1 | **HIGH** | 3.2.7 / 9.4.2 | JIRA integration was gated at `require_tier("growth")`. Per business decision, all integrations (including JIRA) available to any paying tier (Team+). **FIXED**: Changed to `require_tier("team")` in `integrations.py:309`. | Fixed |
-| F2 | **HIGH** | 3.2.3 / 9.5.1 | IDE token required `require_tier("team")` but Team tier has `api_access_enabled=false`, creating a tier mismatch. **FIXED**: Changed to `require_tier("growth")` in `ide_integrations.py:151` to match API access availability. | Fixed |
+| F1 | **HIGH** | 3.2.7 / 9.4.2 | JIRA integration was gated at `require_tier("growth")`. Per business decision, all integrations (including JIRA) available to any paying tier (Starter+). **FIXED**: Changed to `require_tier("starter")` in `integrations.py:309`. | Fixed |
+| F2 | **HIGH** | 3.2.3 / 9.5.1 | IDE token required `require_tier("starter")` but Starter tier has `api_access_enabled=false`, creating a tier mismatch. **FIXED**: Changed to `require_tier("growth")` in `ide_integrations.py:151` to match API access availability. | Fixed |
 | F3 | **HIGH** | 18.1.x | No automated backup CronJob existed. **FIXED**: Created CronJob `postgresql-backup` in `postgresql-local` namespace. Runs daily at 2 AM, 7-day retention, PVC-backed storage. Verified: 7.2MB backup completed successfully. | Fixed |
 | F4 | **MEDIUM** | 4.3.4 | API exposed `server: uvicorn` header disclosing server technology. **FIXED** in v0.29.43: Added `--no-server-header` to Dockerfile CMD. Verified: no `server:` header in response. | Fixed (v0.29.43) |
 | F5 | **MEDIUM** | 12.3.3 | tool-integration deployment missing liveness/readiness probes. **FIXED** in v0.5.12: Added HTTP probes to deployment-patch.yaml. Verified: liveness=/health readiness=/health. | Fixed (v0.5.12) |

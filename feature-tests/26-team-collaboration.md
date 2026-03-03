@@ -136,7 +136,7 @@ curl -s -X POST -H "Authorization: Bearer ${TOKEN}" \
 | Tier | Price | Max Team Members |
 |------|-------|------------------|
 | Developer | $0 | 1 (solo) |
-| Team | $299/mo | 5 |
+| Starter | $299/mo | 5 |
 | Growth | $699/mo | 15 |
 | Enterprise | $1,999+/mo | Unlimited |
 
@@ -154,8 +154,8 @@ curl -s -X POST -H "Authorization: Bearer ${TOKEN}" \
 {
   "detail": {
     "error": "team_member_limit_exceeded",
-    "message": "Organization has reached the maximum of 5 team members for the team tier",
-    "tier": "team",
+    "message": "Organization has reached the maximum of 5 team members for the starter tier",
+    "tier": "starter",
     "current_members": 5,
     "max_team_members": 5,
     "upgrade_url": "/pricing"
@@ -165,8 +165,8 @@ curl -s -X POST -H "Authorization: Bearer ${TOKEN}" \
 
 **Test Cases**:
 - [ ] Developer tier: Cannot add team members (solo only)
-- [ ] Team tier: Can add up to 5 members
-- [ ] Team tier: 6th member returns 403 with upgrade prompt
+- [ ] Starter tier: Can add up to 5 members
+- [ ] Starter tier: 6th member returns 403 with upgrade prompt
 - [ ] Growth tier: Can add up to 15 members
 - [ ] Growth tier: 16th member returns 403 with upgrade prompt
 - [ ] Enterprise tier: No member limit (max_team_members = -1)

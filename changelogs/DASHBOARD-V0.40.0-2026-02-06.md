@@ -91,7 +91,7 @@ Global dark mode support with `bg-gray-50 dark:bg-dark-400` pattern:
 **File:** `src/lib/api/search.ts`
 - Changed `contract_id` to `contract_ids` mapping to match API schema
 - Removed `execution_count` display (field not available from API)
-- Added tier-based export availability check (team tier required)
+- Added tier-based export availability check (starter tier required)
 
 ### D5: Audit Logs Error Display
 
@@ -262,7 +262,7 @@ Removed all "info" and "informational" severity references from dashboard code:
 ### Breaking Changes
 - "Info" and "Informational" severity no longer appear in any UI component
 - Deduplication no longer accepts "info" severity filter
-- Search export requires team tier
+- Search export requires starter tier
 
 ### Performance
 - `keepPreviousData` on deduplication and vulnerabilities prevents layout shift during filter changes

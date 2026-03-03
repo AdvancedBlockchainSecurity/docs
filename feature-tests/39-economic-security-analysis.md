@@ -422,4 +422,4 @@ Returns aggregated economic risk across all project scans.
 
 **Fix:** Replaced with `getErrorStatus(err) === 403` using proper AxiosError status code inspection via the new `getErrorStatus()` helper in `client.ts`. Error fallback now uses hardcoded safe message instead of raw error text.
 
-**Verified:** February 23, 2026 — Economic Security panel correctly shows upgrade prompt for developer tier and data for team+ tiers.
+**Verified:** February 23, 2026 — Economic Security panel correctly shows upgrade prompt for developer tier and data for starter+ tiers.

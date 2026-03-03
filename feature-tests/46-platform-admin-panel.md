@@ -221,10 +221,10 @@ curl -sk -X PATCH -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
   -H "Content-Type: application/json" \
   "https://app.0xapogee.local/api/v1/admin/users/${USER_ID}" \
-  -d '{"tier": "team"}' | jq '.'
+  -d '{"tier": "starter"}' | jq '.'
 ```
 
-**Status**: [x] PASSED (2026-01-25) - Tier changed from developer to team
+**Status**: [x] PASSED (2026-01-25) - Tier changed from developer to starter
 
 ---
 
@@ -265,7 +265,7 @@ curl -sk -H "Authorization: Bearer ${TOKEN}" \
     "total": 6,
     "active": 5,
     "inactive": 1,
-    "by_tier": {"developer": 2, "team": 1, "growth": 1, "enterprise": 2}
+    "by_tier": {"developer": 2, "starter": 1, "growth": 1, "enterprise": 2}
   },
   "organizations": {"total": 2},
   "scans": {"total": 228, "today": 0, "this_week": 104},

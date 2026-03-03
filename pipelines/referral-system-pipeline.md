@@ -43,7 +43,7 @@ Rate limit keys      ←      slowapi (5/hour on /apply)
 ```sql
 INSERT INTO platform_settings (key, value, description) VALUES
   ('referral_threshold', '3', 'Number of referrals needed to earn reward'),
-  ('referral_reward_tier', 'team', 'Subscription tier granted as reward'),
+  ('referral_reward_tier', 'starter', 'Subscription tier granted as reward'),
   ('referral_reward_days', '30', 'Duration of reward in days'),
   ('referral_enabled', 'true', 'Whether referral system is active');
 ```
@@ -86,7 +86,8 @@ INSERT INTO platform_settings (key, value, description) VALUES
 ```
 Referral threshold met
         │
-        ├── Create referral_rewards record (status=pending, expires_at=+90d)
+        ├── Create referral_rewards record (status=pending, expires_at=+reward_days)
+        │   (reward_days read from platform_settings.referral_reward_days)
         │
         ├── Check: Does referrer have active Stripe subscription?
         │     │
@@ -98,7 +99,8 @@ Referral threshold met
         │
         └── On future checkout.session.completed webhook:
               handle_checkout_session_completed() checks for pending rewards
-              Auto-applies coupon if pending reward exists
+              Only the first pending reward is applied per checkout event;
+              remaining pending rewards stay pending for future events
 ```
 
 ### Webhook Integration
@@ -122,7 +124,7 @@ In `handle_checkout_session_completed()`:
 
 **UI Elements:**
 - Referral code display with copy button
-- Share URL (copies `https://app.0xapogee.local/signup?ref=CODE`)
+- Share URL (copies `{settings.dashboard_base_url}/signup?ref=CODE`; config-driven, not hardcoded)
 - Progress bar: `referral_count / referral_threshold`
 - Reward status badges (pending = yellow, applied = green, expired = gray)
 
@@ -192,6 +194,7 @@ EXCLUDED_PREFIXES = (
 | 0.29.47 | Initial referral system implementation |
 | 0.29.48 | Fix: Add `response: Response` to rate-limited endpoints |
 | 0.29.49 | Fix: Add dashboard-facing paths to APICallTracker EXCLUDED_PREFIXES |
+| 0.29.50 | Fix: Share URL config-driven via `settings.dashboard_base_url`; `expires_at` uses `referral_reward_days` from platform_settings; only first pending reward applied per checkout event; `datetime.utcnow()` replaced with `datetime.now(timezone.utc)` in webhook |
 
 ### Deploy Commands
 

@@ -2589,7 +2589,7 @@ Get enhanced user profile with tier and quota information.
 ```
 
 **Field Descriptions**:
-- `tier`: User tier (developer, team, growth, enterprise)
+- `tier`: User tier (developer, starter, growth, enterprise)
 - `quota.monthly_scan_limit`: Monthly contract limit (-1 for unlimited)
 - `quota.monthly_scans_used`: Contracts used this month
 - `quota.scans_remaining`: Remaining contracts (null if unlimited)
@@ -2597,7 +2597,7 @@ Get enhanced user profile with tier and quota information.
 - `quota.max_files_per_scan`: Maximum files per scan (-1 for unlimited)
 - `quota.webhooks_enabled`: Webhooks feature enabled (growth+)
 - `quota.api_access_enabled`: API access enabled (growth+)
-- `quota.export_enabled`: Export reports feature enabled (team+)
+- `quota.export_enabled`: Export reports feature enabled (starter+)
 - `quota.scan_priority`: Scan queue priority (5=highest/enterprise, 50=lowest/developer)
 - `quota.quota_reset_at`: Next quota reset date
 
@@ -2606,7 +2606,7 @@ Get enhanced user profile with tier and quota information.
 | Tier | Contracts/Month | Files/Scan | Priority | Export | Webhooks | API Access |
 |------|----------------|------------|----------|--------|----------|------------|
 | Developer (free) | 3 | 5 | 50 (lowest) | No | No | No |
-| Team ($299/mo) | 15 | 50 | 30 | Yes | No | No |
+| Starter ($299/mo) | 15 | 50 | 30 | Yes | No | No |
 | Growth ($699/mo) | 50 | 100 | 15 | Yes | Yes | Yes |
 | Enterprise ($1,999+/mo) | Unlimited | Unlimited | 5 (highest) | Yes | Yes | Yes |
 
@@ -3236,7 +3236,7 @@ Create Stripe Checkout session for subscription purchase.
 **Request Body**:
 ```json
 {
-  "plan_tier": "team",
+  "plan_tier": "starter",
   "billing_interval": "monthly",
   "success_url": "https://app.0xapogee.com/billing?success=true",
   "cancel_url": "https://app.0xapogee.com/billing?canceled=true"
@@ -3245,7 +3245,7 @@ Create Stripe Checkout session for subscription purchase.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| plan_tier | string | Yes | Plan: team, growth, enterprise |
+| plan_tier | string | Yes | Plan: starter, growth, enterprise |
 | billing_interval | string | Yes | monthly or annual |
 | success_url | string | No | Redirect URL on success |
 | cancel_url | string | No | Redirect URL on cancel |
@@ -3299,7 +3299,7 @@ Get current user's subscription details.
 ```json
 {
   "id": "uuid",
-  "plan_tier": "team",
+  "plan_tier": "starter",
   "billing_interval": "monthly",
   "status": "active",
   "current_period_start": "2026-01-01T00:00:00Z",
@@ -3340,7 +3340,7 @@ Cancel current subscription.
 ```json
 {
   "id": "uuid",
-  "plan_tier": "team",
+  "plan_tier": "starter",
   "status": "active",
   "cancel_at_period_end": true,
   ...
@@ -3366,7 +3366,7 @@ Reactivate a subscription scheduled for cancellation.
 ```json
 {
   "id": "uuid",
-  "plan_tier": "team",
+  "plan_tier": "starter",
   "status": "active",
   "cancel_at_period_end": false,
   ...
@@ -3389,13 +3389,13 @@ Preview cost of changing subscription tier (proration calculation).
 **Query Parameters**:
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| new_tier | string | Yes | Target tier: team, growth, enterprise |
+| new_tier | string | Yes | Target tier: starter, growth, enterprise |
 | billing_interval | string | No | monthly or annual (defaults to current) |
 
 **Response** (200 OK):
 ```json
 {
-  "current_tier": "team",
+  "current_tier": "starter",
   "new_tier": "growth",
   "billing_interval": "monthly",
   "proration_amount": 26633,
@@ -3433,7 +3433,7 @@ Change subscription tier (upgrade or downgrade).
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| new_tier | string | Yes | Target tier: team, growth, enterprise |
+| new_tier | string | Yes | Target tier: starter, growth, enterprise |
 | billing_interval | string | No | monthly or annual (defaults to current) |
 
 **Response** (200 OK):
@@ -3469,7 +3469,7 @@ Get current plan's scan/contract limit for quota display.
 **Response** (200 OK):
 ```json
 {
-  "tier": "team",
+  "tier": "starter",
   "monthly_contract_limit": 15,
   "contracts_used": 7,
   "contracts_remaining": 8
@@ -3699,8 +3699,8 @@ Get available subscription plans with pricing (public endpoint).
       "features": ["3 contracts per month", "All 25+ scanners", "7-day retention"]
     },
     {
-      "tier": "team",
-      "name": "Team",
+      "tier": "starter",
+      "name": "Starter",
       "scans_per_month": 15,
       "price_monthly": 299,
       "price_annual": 2988,

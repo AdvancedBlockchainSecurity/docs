@@ -177,7 +177,7 @@ curl -X GET https://api.0xapogee.local/api/v1/invariants/quota \
   "used": 3,
   "limit": 10,
   "remaining": 7,
-  "tier": "team",
+  "tier": "starter",
   "resets_at": "2026-02-01T00:00:00Z",
   "rate_limit": {
     "requests_per_minute": 10,

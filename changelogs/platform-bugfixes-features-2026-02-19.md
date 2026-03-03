@@ -31,7 +31,7 @@
 
 ### Invariant Generation Errors
 - Added proper error handling for missing/invalid Anthropic API key (returns 503 instead of 500)
-- Fixed tier display name from `growth` to `team` in 403 handler
+- Fixed tier display name from `growth` to `starter` in 403 handler
 - Added distinct error messages for 429 (rate limit) and 503 (service unavailable)
 - Added source code guard message for multi-file contracts without source
 

@@ -13,7 +13,7 @@ Run load tests against the Apogee API to measure latency, throughput, error rate
 ## Prerequisites
 
 - [ ] API service running and healthy (`/api/v1/health/ready` returns 200)
-- [ ] Test users exist in database for each tier (developer, team, growth, enterprise)
+- [ ] Test users exist in database for each tier (developer, starter, growth, enterprise)
 - [ ] Python venv with `httpx` and `PyJWT` available (api-service venv works)
 
 ---
@@ -43,11 +43,11 @@ Results are printed to terminal and saved to `docs/audits/2026-02-24-load-test-r
 | Core | `/contracts` | GET | JWT | Any |
 | Core | `/scans` | GET | JWT | Any |
 | Core | `/vulnerabilities` | GET | JWT | Any |
-| Search | `/search` | GET | JWT | team+ |
-| Features | `/api-keys` | GET | JWT | team+ |
-| Features | `/webhooks` | GET | JWT | team+ |
-| Features | `/notification-channels` | GET | JWT | team+ |
-| Features | `/economic-analysis/quota` | GET | JWT | team+ |
+| Search | `/search` | GET | JWT | starter+ |
+| Features | `/api-keys` | GET | JWT | starter+ |
+| Features | `/webhooks` | GET | JWT | starter+ |
+| Features | `/notification-channels` | GET | JWT | starter+ |
+| Features | `/economic-analysis/quota` | GET | JWT | starter+ |
 | Admin | `/audit-logs` | GET | JWT | enterprise |
 
 ### Concurrency Levels
@@ -65,8 +65,8 @@ Results are printed to terminal and saved to `docs/audits/2026-02-24-load-test-r
 | Tier | API Access | Expected Response |
 |------|-----------|-------------------|
 | Developer | Blocked (limit=0) | 429 on all endpoints |
-| Team | Blocked (limit=0) | 429 on all endpoints |
-| Growth | Allowed (limit=-1) | 200 on team+, 403 on enterprise-only |
+| Starter | Blocked (limit=0) | 429 on all endpoints |
+| Growth | Allowed (limit=-1) | 200 on starter+, 403 on enterprise-only |
 | Enterprise | Allowed (limit=-1) | 200 on all endpoints |
 
 ---
@@ -78,7 +78,7 @@ Test users are pre-seeded in the database with predictable UUIDs:
 | Tier | UUID | Email |
 |------|------|-------|
 | Developer | `11111111-1111-1111-1111-111111111111` | `test-developer@blocksecops.local` |
-| Team | `22222222-2222-2222-2222-222222222222` | `test-team@blocksecops.local` |
+| Starter | `22222222-2222-2222-2222-222222222222` | `test-starter@blocksecops.local` |
 | Growth | `33333333-3333-3333-3333-333333333333` | `test-growth@blocksecops.local` |
 | Enterprise | `44444444-4444-4444-4444-444444444444` | `test-enterprise@blocksecops.local` |
 
@@ -137,7 +137,7 @@ Edit the script's `main()` function to test only the desired tier:
 ```python
 # In load-test-by-tier.py, comment out unwanted tiers
 # await run_rate_limited_tier(client, "developer", ...)
-# await run_rate_limited_tier(client, "team", ...)
+# await run_rate_limited_tier(client, "starter", ...)
 await run_full_tier(client, "growth", ...)
 # await run_full_tier(client, "enterprise", ...)
 ```
@@ -149,7 +149,7 @@ Add entries to the `ENDPOINTS` list in the script:
 ```python
 ENDPOINTS = [
     # ...existing endpoints...
-    Endpoint("/new-endpoint", "New feature", "GET", "team"),
+    Endpoint("/new-endpoint", "New feature", "GET", "starter"),
 ]
 ```
 

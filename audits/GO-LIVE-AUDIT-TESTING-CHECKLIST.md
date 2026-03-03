@@ -349,7 +349,7 @@ curl -sk -X POST "https://app.0xapogee.com/api/v1/notifications/channels/{channe
 ```bash
 # Test webhook with Stripe CLI (test mode)
 stripe trigger customer.subscription.updated \
-  --override customer.subscription.updated:metadata.tier=team
+  --override customer.subscription.updated:metadata.tier=starter
 
 # Verify webhook endpoint
 curl -sk -X POST "https://app.0xapogee.com/api/v1/billing/webhook" \

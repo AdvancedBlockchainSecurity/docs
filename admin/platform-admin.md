@@ -137,7 +137,7 @@ Manage all platform users:
 
 **Query Parameters (GET /admin/users):**
 - `search` - Search by email or display name
-- `tier` - Filter by tier (developer, team, growth, enterprise)
+- `tier` - Filter by tier (developer, starter, growth, enterprise)
 - `is_active` - Filter by active status (true/false)
 - `is_superuser` - Filter by admin status (true/false)
 - `page` - Page number (default: 1)

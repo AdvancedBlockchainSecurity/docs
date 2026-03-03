@@ -11,7 +11,7 @@ POST /conversations    →     1. Authenticate (JWT)                            
                              2. Create conversation record
                       ←      Return ConversationResponse (201)
 
-POST /messages         →     3. Validate tier (team+)
+POST /messages         →     3. Validate tier (starter+)
                              4. Check feature flags
                              5. Sanitize user input (BSO-SEC-AI-001)
                              6. Retrieve RAG context (scan/project scope)
@@ -32,7 +32,7 @@ POST /messages         →     3. Validate tier (team+)
 | # | Step | Component | Description |
 |---|------|-----------|-------------|
 | 1 | Authentication | `get_current_user` | JWT-based authentication required |
-| 2 | Tier gate | `require_tier("team")` | Developer tier blocked — Team, Growth, Enterprise only |
+| 2 | Tier gate | `require_tier("starter")` | Developer tier blocked — Starter, Growth, Enterprise only |
 | 3 | Feature flag check | `settings.ai_features_enabled` + `settings.ai_copilot_enabled` | Returns 503 if disabled |
 | 4 | Input sanitization | `_sanitize_for_prompt()` | Truncate to 10KB, remove control chars, HTML-escape (BSO-SEC-AI-001) |
 | 5 | RAG retrieval | `RAGRetriever.retrieve_context()` | Fetch relevant context from vulnerabilities, scans, contracts |
@@ -115,7 +115,7 @@ Save to DB: message content, tokens_input, tokens_output, model_used, generation
 | POST | `/copilot/conversations` | JWT | Create conversation |
 | GET | `/copilot/conversations` | JWT | List conversations (paginated) |
 | GET | `/copilot/conversations/{id}` | JWT | Get conversation with messages |
-| POST | `/copilot/conversations/{id}/messages` | JWT + `require_tier("team")` | Send message, get AI response |
+| POST | `/copilot/conversations/{id}/messages` | JWT + `require_tier("starter")` | Send message, get AI response |
 | POST | `/copilot/conversations/{id}/archive` | JWT | Archive conversation |
 | DELETE | `/copilot/conversations/{id}` | JWT | Delete conversation |
 | POST | `/copilot/messages/{id}/rate` | JWT | Rate AI response quality |

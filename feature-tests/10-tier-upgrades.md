@@ -11,7 +11,7 @@
 | Tier | Price | Scans/Mo | Files/Scan | Users | Projects | API Calls/Mo |
 |------|-------|----------|------------|-------|----------|--------------|
 | Developer | $0 | 10 | 5 | 1 | 3 | 0 (no API) |
-| Team | $299/mo | 100 | Unlimited | 5 | 10 | 1,000 |
+| Starter | $299/mo | 100 | Unlimited | 5 | 10 | 1,000 |
 | Growth | $699/mo | 500 | Unlimited | 15 | 25 | 10,000 |
 | Enterprise | $1,999+/mo | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
 
@@ -32,8 +32,8 @@
 - [ ] Payment confirmation displayed
 
 ### 1.3 Post-Upgrade Verification
-- [ ] User tier updated to "team" in database
-- [ ] Quota widget shows "Team" tier label
+- [ ] User tier updated to "starter" in database
+- [ ] Quota widget shows "Starter" tier label
 - [ ] Scan limit increased to 100/month
 - [ ] Files per scan now unlimited (-1)
 - [ ] LoC per scan now unlimited (-1)
@@ -333,7 +333,7 @@ localStorage.removeItem('upgrade-banner-dismissed:{userId}')
 ```json
 {
   "detail": "API call limit reached (1000/month). Resets 2026-02-01. Upgrade for more calls.",
-  "current_tier": "team",
+  "current_tier": "starter",
   "upgrade_url": "/pricing"
 }
 ```
@@ -342,7 +342,7 @@ localStorage.removeItem('upgrade-banner-dismissed:{userId}')
 ```json
 {
   "detail": "Team seat limit reached (5/5). Upgrade to Growth for 15 seats.",
-  "current_tier": "team",
+  "current_tier": "starter",
   "required_tier": "growth"
 }
 ```

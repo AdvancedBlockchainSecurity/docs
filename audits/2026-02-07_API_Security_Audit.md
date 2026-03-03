@@ -86,7 +86,7 @@ This comprehensive API security audit covered authentication, authorization (64 
 - Verified: `update_organization()` calls `verify_member_management_permission()` + `get_organization_with_ownership_check()`
 
 #### BSO-SEC-AUTHZ-002: Tier Restriction Runtime Validation — RESOLVED (v0.28.1)
-- **AI/ML endpoints now have `require_tier("team")`:**
+- **AI/ML endpoints now have `require_tier("starter")`:**
   - `copilot.py` (8 endpoints) — tier gated
   - `code_review.py` (6 endpoints) — tier gated
   - `code_repair.py` (7 endpoints) — tier gated
@@ -180,7 +180,7 @@ All 12 admin files properly enforce `require_admin_role()` or `require_admin_rol
 - **Status:** FIXED — Replaced with `_get_client_ip_for_rate_limit()` using trusted proxy validation.
 
 **Fail closed in production:** Verified — `swallow_errors=False` in prod/staging.
-**Concurrent scan limiter:** Properly tier-based (developer:1, team:2, growth:5, enterprise:unlimited).
+**Concurrent scan limiter:** Properly tier-based (developer:1, starter:2, growth:5, enterprise:unlimited).
 **Request size limit:** 10MB enforced — live test confirmed (HTTP 413).
 
 ### 4C. AI/ML Security
@@ -310,13 +310,13 @@ Tests executed against running cluster (API v0.28.1).
 | assignments.py | CU | - | - | OWN | verify_assignment_access() |
 | audit_logs.py | CU | - | - | - | Meta-auditing logged |
 | billing.py | CU | - | - | OWN | User's own billing |
-| code_repair.py | CU | - | T(team) | OWN | Fixed in v0.28.1 |
-| code_review.py | CU | - | T(team) | OWN | Fixed in v0.28.1 |
+| code_repair.py | CU | - | T(starter) | OWN | Fixed in v0.28.1 |
+| code_review.py | CU | - | T(starter) | OWN | Fixed in v0.28.1 |
 | comments.py | CU | - | - | OWN | verify_entity_access() |
 | consent.py | CU | - | - | OWN | |
 | contract_structure.py | CU | - | - | OWN | |
 | contracts.py | CU/AK | ORG | - | OWN | verify_resource_access() |
-| copilot.py | CU | - | T(team) | OWN | Fixed in v0.28.1 |
+| copilot.py | CU | - | T(starter) | OWN | Fixed in v0.28.1 |
 | deduplication.py | CU | - | - | OWN | |
 | economic_analysis.py | CU | - | - | OWN | |
 | favorites.py | CU | - | - | OWN | |
@@ -326,9 +326,9 @@ Tests executed against running cluster (API v0.28.1).
 | ide_integrations.py | CU | - | - | OWN | |
 | integrations.py | CU | - | - | OWN | |
 | intelligence.py | CU | - | - | OWN | |
-| invariants.py | CU | - | T(team) | OWN | Properly gated |
+| invariants.py | CU | - | T(starter) | OWN | Properly gated |
 | invites.py | CU | - | - | OWN | team_id required |
-| ml.py | CU | - | T(team) | OWN | Fixed in v0.28.1 |
+| ml.py | CU | - | T(starter) | OWN | Fixed in v0.28.1 |
 | monitoring.py | CU | - | - | OWN | |
 | notification_channels.py | CU | - | - | OWN | SSRF validated (v0.28.1) |
 | oauth_callbacks.py | CU | - | - | OWN | |
@@ -404,10 +404,10 @@ Tests executed against running cluster (API v0.28.1).
 | `src/presentation/api/v1/endpoints/admin/purchases.py` | ILIKE escape parameter | BSO-SEC-ILIKE-001 |
 | `src/presentation/api/v1/endpoints/admin/support.py` | ILIKE escape parameter | BSO-SEC-ILIKE-001 |
 | `src/ml/storage/model_signing.py` | HMAC-SHA256 model signing for joblib.load() | BSO-SEC-DESER-001 |
-| `src/presentation/api/v1/endpoints/copilot.py` | Add `require_tier("team")` | BSO-SEC-AUTHZ-002 |
-| `src/presentation/api/v1/endpoints/code_review.py` | Add `require_tier("team")` | BSO-SEC-AUTHZ-002 |
-| `src/presentation/api/v1/endpoints/code_repair.py` | Add `require_tier("team")` | BSO-SEC-AUTHZ-002 |
-| `src/presentation/api/v1/endpoints/ml.py` | Add `require_tier("team")` | BSO-SEC-AUTHZ-002 |
+| `src/presentation/api/v1/endpoints/copilot.py` | Add `require_tier("starter")` | BSO-SEC-AUTHZ-002 |
+| `src/presentation/api/v1/endpoints/code_review.py` | Add `require_tier("starter")` | BSO-SEC-AUTHZ-002 |
+| `src/presentation/api/v1/endpoints/code_repair.py` | Add `require_tier("starter")` | BSO-SEC-AUTHZ-002 |
+| `src/presentation/api/v1/endpoints/ml.py` | Add `require_tier("starter")` | BSO-SEC-AUTHZ-002 |
 | `src/presentation/api/v1/endpoints/stripe_webhook.py` | Metadata length validation | BSO-SEC-BIZ-001 |
 | `src/presentation/api/v1/endpoints/quality_gates.py` | Replace `str(e)` with `get_safe_error_detail()` | BSO-SEC-LOG-003 |
 | `src/presentation/api/v1/endpoints/payments.py` | Replace `str(e)` with `get_safe_error_detail()` | BSO-SEC-LOG-003 |
