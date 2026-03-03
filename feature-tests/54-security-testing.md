@@ -31,7 +31,7 @@ This guide covers testing procedures for security features implemented in the Ja
 | SSRF in notification channels | Webhook URL with internal IP | Rejected |
 | ILIKE wildcard injection | Search with `%_` in admin | Literal match only |
 | Error message leakage | Trigger exception | Generic error, no stack trace |
-| AI/ML tier gating | Access copilot/ML without team tier | 403 forbidden |
+| AI/ML tier gating | Access copilot/ML without starter tier | 403 forbidden |
 | Model deserialization | Load unsigned model | Rejected with signature error |
 | X-Forwarded-For spoofing | Spoof XFF header | Rate limit uses real IP |
 

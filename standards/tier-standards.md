@@ -22,12 +22,12 @@ This document serves as **human-readable documentation** of those values. When v
 ## Tier Hierarchy
 
 ```
-developer (0) < team (1) < growth (2) < enterprise (3)
+developer (0) < starter (1) < growth (2) < enterprise (3)
 ```
 
 **Tier Names** (official, use these exact strings in API/database):
 - `developer` (Free tier)
-- `team`
+- `starter`
 - `growth`
 - `enterprise`
 
@@ -70,7 +70,7 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 
 ---
 
-### Tier 2: Team
+### Tier 2: Starter
 
 | Attribute | Value |
 |-----------|-------|
@@ -172,7 +172,7 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 
 ### Quota Limits
 
-| Metric | Developer | Team | Growth | Enterprise |
+| Metric | Developer | Starter | Growth | Enterprise |
 |--------|-----------|------|--------|------------|
 | Monthly Contracts | 3 | 15 | 50 | -1 |
 | Max LoC per Scan | -1 | -1 | -1 | -1 |
@@ -190,7 +190,7 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 
 ### Feature Availability
 
-| Feature | Developer | Team | Growth | Enterprise |
+| Feature | Developer | Starter | Growth | Enterprise |
 |---------|-----------|------|--------|------------|
 | All 25+ Scanners | Yes | Yes | Yes | Yes |
 | Export Reports | Yes | Yes | Yes | Yes |
@@ -214,7 +214,7 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 | Tier | Monthly | Annual | Savings | Per-Contract |
 |------|---------|--------|---------|--------------|
 | Developer | $0 | $0 | - | - |
-| Team | $299 | ~$2,988 | 17% | $19.93 |
+| Starter | $299 | ~$2,988 | 17% | $19.93 |
 | Growth | $699 | ~$7,188 | 17% | $13.98 |
 | Enterprise | $1,999+ | Custom | - | ~$0 |
 
@@ -222,7 +222,7 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 
 | Tier Jump | Multiplier |
 |-----------|------------|
-| Team → Growth | 2.3x |
+| Starter → Growth | 2.3x |
 | Growth → Enterprise | 2.9x |
 
 ### Support Levels
@@ -230,7 +230,7 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 | Tier | Support Type | Response Time |
 |------|--------------|---------------|
 | Developer | Community | Best effort |
-| Team | Email | 24 hours |
+| Starter | Email | 24 hours |
 | Growth | Priority | 4 hours |
 | Enterprise | Dedicated | Named contact |
 
@@ -245,7 +245,7 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 | Tier | API Access |
 |------|------------|
 | Developer | No |
-| Team | No |
+| Starter | No |
 | Growth | Yes |
 | Enterprise | Yes |
 
@@ -254,18 +254,18 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 | Tier | Requests/Min | Requests/Hour | Requests/Day |
 |------|--------------|---------------|--------------|
 | Developer | N/A | N/A | N/A |
-| Team | N/A | N/A | N/A |
+| Starter | N/A | N/A | N/A |
 | Growth | 300 | 10,000 | Unlimited |
 | Enterprise | Custom | Custom | Custom |
 
-**Note:** Developer and Team tiers have no API access. Use the dashboard or CI/CD integrations instead.
+**Note:** Developer and Starter tiers have no API access. Use the dashboard or CI/CD integrations instead.
 
 ### Dashboard/CI Rate Limits (All Tiers)
 
 | Tier | Web Requests/Min | Concurrent Scans | Scan Priority |
 |------|------------------|------------------|---------------|
 | Developer | 60 | 1 | 50 (lowest) |
-| Team | 120 | 2 | 40 |
+| Starter | 120 | 2 | 40 |
 | Growth | 300 | 5 | 25 |
 | Enterprise | Custom | Custom | 5 (highest) |
 
@@ -274,7 +274,7 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 | Tier | Concurrent Scans |
 |------|------------------|
 | Developer | 1 |
-| Team | 2 |
+| Starter | 2 |
 | Growth | 5 |
 | Enterprise | Custom |
 
@@ -286,7 +286,7 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 **Added**: January 11, 2026
 **Deployed**: February 7, 2026
 
-AI-powered features use the Anthropic Claude API and are tier-gated with monthly quotas. Most AI endpoints require Team tier or above (`require_tier("team")`). PoC Exploit Generation requires Growth tier or above (`require_tier("growth")`).
+AI-powered features use the Anthropic Claude API and are tier-gated with monthly quotas. Most AI endpoints require Starter tier or above (`require_tier("starter")`). PoC Exploit Generation requires Growth tier or above (`require_tier("growth")`).
 
 ### AI Feature Overview
 
@@ -301,7 +301,7 @@ AI-powered features use the Anthropic Claude API and are tier-gated with monthly
 
 ### AI Quota Summary (Monthly)
 
-| Feature | Developer | Team | Growth | Enterprise |
+| Feature | Developer | Starter | Growth | Enterprise |
 |---------|-----------|------|--------|------------|
 | AI Copilot queries | 0 | 25 | 100 | -1 |
 | Code Review requests | 0 | 25 | 100 | -1 |
@@ -312,7 +312,7 @@ AI-powered features use the Anthropic Claude API and are tier-gated with monthly
 | NL Conversions | 0 | 25 | 100 | -1 |
 | Priority Queue | No | No | No | Yes |
 
-**Note:** `-1` means unlimited. Enterprise has a daily cap of 500 invariant generations and 100 exploit generations to prevent runaway usage. PoC exploit generation requires Growth+ tier (Developer/Team blocked) due to its security-sensitive nature.
+**Note:** `-1` means unlimited. Enterprise has a daily cap of 500 invariant generations and 100 exploit generations to prevent runaway usage. PoC exploit generation requires Growth+ tier (Developer/Starter blocked) due to its security-sensitive nature.
 
 ### AI Rate Limits
 
@@ -356,7 +356,7 @@ AI-powered features use the Anthropic Claude API and are tier-gated with monthly
 | Tier | Typical AI Usage | Est. Monthly Cost |
 |------|------------------|-------------------|
 | Developer | 0 | $0 |
-| Team | ~120 requests (mixed models) | ~$3-5 |
+| Starter | ~120 requests (mixed models) | ~$3-5 |
 | Growth | ~500 requests (mixed models) | ~$15-25 |
 | Enterprise | Variable | Usage-based billing |
 
@@ -384,7 +384,7 @@ anthropic_max_tokens_invariant: int = 4096
 ```python
 @router.post("/generate")
 async def generate(
-    current_user=Depends(require_tier("team")),  # Developer blocked
+    current_user=Depends(require_tier("starter")),  # Developer blocked
     ...
 ):
 ```
@@ -443,7 +443,7 @@ Pay-per-scan credit packages via x402 (USDC on Base) for users who prefer flexib
 |----------------------|-----------|---------------|
 | 5 scans/month | $15 | x402 (Starter) |
 | 10 scans/month | $30 | x402 (Starter) |
-| 15+ scans/month | $45+ | Team ($299) |
+| 15+ scans/month | $45+ | Starter ($299) |
 
 ### Environment Variables
 
@@ -465,23 +465,23 @@ CREDIT_PACKAGE_BULK_CREDITS=1000
 
 All premium API endpoints are protected by `require_tier()` dependencies. Core endpoints (scans, contracts, vulnerabilities) are accessible to all authenticated users regardless of tier.
 
-**Note:** Developer and Team tiers also have `api_access_enabled=false` in `user_quotas`, which causes the `APICallTrackerMiddleware` to return 429 before the tier gate is even reached. The tier gate provides defense-in-depth for tiers with API access.
+**Note:** Developer and Starter tiers also have `api_access_enabled=false` in `user_quotas`, which causes the `APICallTrackerMiddleware` to return 429 before the tier gate is even reached. The tier gate provides defense-in-depth for tiers with API access.
 
 | Endpoint | Required Tier | Blocked Tiers |
 |----------|--------------|---------------|
-| `POST /api/v1/search` | team | developer |
-| `GET /api/v1/api-keys` | growth | developer, team |
-| `GET /api/v1/integrations` | team | developer |
-| `GET /api/v1/notification-channels` | growth | developer, team |
-| `GET /api/v1/webhooks` | growth | developer, team |
-| `GET /api/v1/audit-logs` | growth | developer, team |
-| `POST /api/v1/organizations` | enterprise | developer, team, growth |
-| `PUT /api/v1/organizations/{id}/settings/ai-opt-out` | enterprise | developer, team, growth |
-| `POST /api/v1/economic-analysis/reports` | enterprise | developer, team, growth |
-| `POST /api/v1/economic-analysis/simulate` | enterprise | developer, team, growth |
-| `POST /api/v1/ide-tokens` | growth | developer, team |
-| AI generation endpoints | team | developer |
-| PoC exploit generation | growth | developer, team |
+| `POST /api/v1/search` | starter | developer |
+| `GET /api/v1/api-keys` | growth | developer, starter |
+| `GET /api/v1/integrations` | starter | developer |
+| `GET /api/v1/notification-channels` | growth | developer, starter |
+| `GET /api/v1/webhooks` | growth | developer, starter |
+| `GET /api/v1/audit-logs` | growth | developer, starter |
+| `POST /api/v1/organizations` | enterprise | developer, starter, growth |
+| `PUT /api/v1/organizations/{id}/settings/ai-opt-out` | enterprise | developer, starter, growth |
+| `POST /api/v1/economic-analysis/reports` | enterprise | developer, starter, growth |
+| `POST /api/v1/economic-analysis/simulate` | enterprise | developer, starter, growth |
+| `POST /api/v1/ide-tokens` | growth | developer, starter |
+| AI generation endpoints | starter | developer |
+| PoC exploit generation | growth | developer, starter |
 
 **Regression tests:** 22 structural tests in `tests/unit/presentation/test_tier_gate_enforcement.py` verify these gates at the source level.
 
@@ -551,7 +551,7 @@ monthly_ai_explanations_limit = 0,
 monthly_invariant_generations_limit = 0,
 monthly_nl_conversions_limit = 0
 
--- Team tier
+-- Starter tier
 monthly_contract_limit = 15,
 max_loc_per_scan = -1,
 max_files_per_scan = -1,

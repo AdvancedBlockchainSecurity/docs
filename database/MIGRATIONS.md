@@ -726,7 +726,7 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 - `stripe_subscription_id` (VARCHAR(255)) - Stripe subscription ID, unique
 - `stripe_customer_id` (VARCHAR(255)) - Stripe customer ID
 - `stripe_price_id` (VARCHAR(255)) - Stripe price ID
-- `plan_tier` (VARCHAR(50)) - Plan tier: developer, team, growth, enterprise
+- `plan_tier` (VARCHAR(50)) - Plan tier: developer, starter, growth, enterprise
 - `billing_interval` (VARCHAR(20)) - Billing interval: monthly, annual
 - `status` (VARCHAR(50)) - Status: active, past_due, canceled, trialing, incomplete
 - `current_period_start` (TIMESTAMPTZ) - Current billing period start
@@ -1625,7 +1625,7 @@ asyncio.run(verify())
 - **Columns Added to `users`**:
   - `referral_code` (VARCHAR(20), UNIQUE, nullable) — Personal referral code
   - `referred_by_user_id` (UUID, nullable, FK → users.id ON DELETE SET NULL) — Who referred this user
-- **Seed Data**: 4 platform_settings rows: `referral_threshold=3`, `referral_reward_tier=team`, `referral_reward_days=30`, `referral_enabled=true`
+- **Seed Data**: 4 platform_settings rows: `referral_threshold=3`, `referral_reward_tier=starter`, `referral_reward_days=30`, `referral_enabled=true`
 - **Indexes Created**:
   - `ix_referrals_referrer_user_id`, `ix_referrals_referred_user_id`, `ix_referrals_referral_code`
   - `ix_referral_rewards_referrer_user_id`

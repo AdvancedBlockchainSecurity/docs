@@ -1,6 +1,6 @@
 # Workflow Documentation
 
-**Last Updated:** February 22, 2026
+**Last Updated:** March 3, 2026
 
 ---
 
@@ -59,6 +59,38 @@ Upload → Validate → Queue → Execute Scanners → Process Results → Displ
 ```
 Version check → CronJob suspend → Build → Push → Apply → Resume → Verify
 ```
+
+---
+
+### Token Rotation Workflow
+
+**Key Services:**
+- GCP Secret Manager - Centralized secret storage with versioning
+- Pub/Sub - Event-driven messaging for rotation triggers
+- Cloud Function - Automated token rotation orchestrator
+- Kubernetes ExternalSecrets Operator - Syncs new secrets to cluster
+
+**Rotation Flow:**
+```
+Terraform schedule → Secret Manager event → Pub/Sub message → Cloud Function → Create new version → ESO syncs to pods
+```
+
+**Supported Token Types:**
+- JWT tokens (API authentication, signing)
+- Session tokens (user session management)
+- Encryption keys (data protection, TLS)
+
+**Automation:**
+- Auto-rotation triggered by lifecycle policy in Secret Manager
+- Pub/Sub notifies Cloud Function of new secret versions
+- ExternalSecrets Operator automatically syncs updated secrets to Kubernetes
+- Pod restarts not required (application re-reads from mounted secret files)
+
+**Features:**
+- Zero-downtime rotation (no service restart required)
+- Audit trail via Secret Manager versioning
+- Automatic cleanup of old versions per retention policy
+- Terraform-managed configuration and scheduling
 
 ---
 

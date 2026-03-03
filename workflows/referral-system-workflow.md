@@ -1,7 +1,7 @@
 # Referral System Workflow
 
 **Version:** 1.0.0
-**Last Updated:** March 1, 2026
+**Last Updated:** March 3, 2026
 
 ## Overview
 
@@ -31,8 +31,9 @@ User → Settings page → GET /referrals/my-code
 
 Phase 2: Sharing
 ────────────────
-User copies share URL: https://app.0xapogee.local/signup?ref=CODE
-                              │
+User copies share URL: {settings.dashboard_base_url}/signup?ref=CODE
+                              │   (config-driven; set via dashboard_base_url
+                              │    in platform ConfigMap, not hardcoded)
                               └── Shares via email, social, etc.
 
 Phase 3: Signup + Apply
@@ -66,7 +67,8 @@ After each successful referral:
                         ├── plan_tier = platform_settings['referral_reward_tier']
                         ├── status = 'pending'
                         ├── qualifying_referral_count = count
-                        └── expires_at = NOW() + 90 days
+                        └── expires_at = NOW() + referral_reward_days
+                                    (read from platform_settings)
 
 Phase 5: Reward Application (Stripe)
 ─────────────────────────────────────
@@ -81,8 +83,9 @@ Option B: Referrer subscribes later
                 │
                 ├── Stripe webhook: checkout.session.completed
                 ├── handle_checkout_session_completed() checks for pending rewards
-                ├── If pending reward found → apply coupon (same as Option A)
-                └── Update reward status
+                ├── Only the first pending reward is applied per checkout event
+                │   (remaining pending rewards stay pending for future events)
+                └── Update applied reward status
 ```
 
 ## API Summary

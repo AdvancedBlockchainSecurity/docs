@@ -88,7 +88,7 @@ UPDATE vulnerability_patterns SET severity = 'low' WHERE severity IN ('info', 'i
 ### A8: Search Export Tier Enforcement
 
 **File:** `src/presentation/api/v1/endpoints/search.py`
-- Added `require_tier("team")` dependency to search export endpoint
+- Added `require_tier("starter")` dependency to search export endpoint
 - Free-tier users now receive 403 when attempting to export search results
 
 ### A9: Role Management Access Control

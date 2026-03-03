@@ -119,7 +119,7 @@ Admin-configurable key-value store for platform-wide settings.
 | Key | Default | Description |
 |-----|---------|-------------|
 | `referral_threshold` | `3` | Referrals needed for reward |
-| `referral_reward_tier` | `team` | Tier granted as reward |
+| `referral_reward_tier` | `starter` | Tier granted as reward |
 | `referral_reward_days` | `30` | Reward duration in days |
 | `referral_enabled` | `true` | System active flag |
 
@@ -142,7 +142,7 @@ Admin-configurable key-value store for platform-wide settings.
 | `id` | UUID | No | Primary key |
 | `referrer_user_id` | UUID | No | FK to users.id (CASCADE delete) |
 | `reward_type` | VARCHAR(50) | No | Default: 'free_month' |
-| `plan_tier` | VARCHAR(50) | No | Default: 'team' |
+| `plan_tier` | VARCHAR(50) | No | Default: 'starter' |
 | `status` | VARCHAR(20) | No | pending / applied / expired |
 | `qualifying_referral_count` | INTEGER | No | Count snapshot when earned |
 | `applied_at` | TIMESTAMP | Yes | When applied to subscription |
@@ -165,7 +165,7 @@ Admin-configurable key-value store for platform-wide settings.
 4. Referral codes must match pattern `^[A-Za-z0-9_-]{6,20}$`
 5. Rewards are created when `completed_referral_count >= platform_settings['referral_threshold']`
 6. Reward expiry window: 90 days from creation
-7. Stripe coupon applied as 100% off for one billing cycle (team tier)
+7. Stripe coupon applied as 100% off for one billing cycle (starter tier)
 
 ### Migration
 

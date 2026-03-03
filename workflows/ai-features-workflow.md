@@ -253,7 +253,7 @@ Request → JWT Authentication → Tier Gate → Feature Flag → Rate Limit →
 | Layer | Implementation | Failure Response |
 |-------|----------------|------------------|
 | JWT Auth | `get_current_user` dependency | 401 Unauthorized |
-| Tier Gate | `require_tier("team")` | 403 Forbidden |
+| Tier Gate | `require_tier("starter")` | 403 Forbidden |
 | Feature Flag | `settings.ai_*_enabled` | 503 Service Unavailable |
 | Rate Limit | `@limiter.limit(get_rate_limit_string(...))` | 429 Too Many Requests |
 | Quota | Monthly/daily checks against `user_quotas` | 402/429 |

@@ -213,7 +213,7 @@ curl -s -k -X POST https://app.0xapogee.local/api/v1/referrals/apply \
 
 - [x] After 1st and 2nd referral: no reward created
 - [x] After 3rd referral: `referral_rewards` record created
-- [x] Reward has `status='pending'`, `reward_type='free_month'`, `plan_tier='team'`
+- [x] Reward has `status='pending'`, `reward_type='free_month'`, `plan_tier='starter'`
 - [x] `qualifying_referral_count=3`
 - [x] `expires_at` set to 90 days from creation
 
@@ -285,10 +285,11 @@ curl -s -k https://app.0xapogee.local/api/v1/admin/referrals/settings \
 
 ### Expected
 
-- [ ] Code generation returns appropriate message when disabled
-- [ ] Apply endpoint rejects new referrals when disabled
+- [x] Code generation returns 403 "Referral program is currently disabled"
+- [x] Apply endpoint returns 403 when disabled
+- [x] Status endpoint returns `referral_enabled: false`
 
-**Result:** PENDING (feature gate not yet enforced at endpoint level)
+**Result:** PASS
 
 ---
 
@@ -412,13 +413,13 @@ kubectl exec postgresql-0 -n postgresql-local -- psql -U blocksecops -d solidity
 | TC-88-009 Reward Threshold | PASS | Reward created at threshold |
 | TC-88-010 Admin Get Settings | PASS | 4 settings returned |
 | TC-88-011 Admin Update Settings | PASS | Threshold change reflected |
-| TC-88-012 System Disabled | PENDING | Feature gate not yet enforced |
+| TC-88-012 System Disabled | PASS | All endpoints return 403 when disabled |
 | TC-88-013 Dashboard Card | PASS | UI renders correctly |
 | TC-88-014 Signup Flow | PASS | ref param captured |
 | TC-88-015 Stripe Reward | PENDING | Requires live Stripe webhook |
 | TC-88-016 Database Integrity | PASS | All tables, indexes, seed data verified |
 
-**Overall: 14/16 PASS, 2 PENDING** (Stripe webhook and disable feature gate require production environment)
+**Overall: 15/16 PASS, 1 PENDING** (Stripe webhook requires live Stripe environment)
 
 ---
 

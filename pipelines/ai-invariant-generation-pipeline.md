@@ -31,7 +31,7 @@ POST /invariants/generate →       1. Authenticate (JWT)                       
 | # | Step | Component | Description |
 |---|------|-----------|-------------|
 | 1 | Authentication | `get_current_user` | JWT required |
-| 2 | Tier gate | `require_tier("team")` | Developer tier blocked with upgrade message |
+| 2 | Tier gate | `require_tier("starter")` | Developer tier blocked with upgrade message |
 | 3 | Feature flag | `settings.ai_features_enabled` | Returns 503 if disabled |
 | 4 | Quota check | Monthly (tier-based) + daily (500 enterprise cap) | Returns 429 with quota details |
 | 5 | Cooldown check | 5-second minimum between requests | Returns 429 with `Retry-After` header |
@@ -72,7 +72,7 @@ Error responses for quota exhaustion:
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| POST | `/invariants/generate` | JWT + `require_tier("team")` + rate limit + quota | Generate invariants |
+| POST | `/invariants/generate` | JWT + `require_tier("starter")` + rate limit + quota | Generate invariants |
 | GET | `/invariants/{invariant_id}` | JWT | Get specific invariant |
 | GET | `/invariants` | JWT | List user invariants (filtered) |
 | GET | `/invariants/contracts/{contract_id}` | JWT | List invariants for contract |

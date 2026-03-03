@@ -82,7 +82,7 @@ Create the following products in Stripe Dashboard (**Products → Add product**)
 | Product Name | Monthly Price | Annual Price | Features |
 |--------------|---------------|--------------|----------|
 | Developer (Free) | $0 | $0 | No Stripe product needed |
-| Team | $299/month | $2,988/year ($249/mo) | 50 scans/mo, 5 team members, API access |
+| Starter | $299/month | $2,988/year ($249/mo) | 50 scans/mo, 5 team members, API access |
 | Growth | $699/month | $7,188/year ($599/mo) | 200 scans/mo, 20 team members, priority support |
 | Enterprise | $1,999/month | Contact Sales | Unlimited scans, SSO, dedicated support |
 
@@ -127,10 +127,10 @@ Pricing:     $1500.00 USD - One time
 
 For subscription tiers, each product needs TWO prices (monthly and annual):
 
-**Team Tier**
+**Starter Tier**
 ```
-Name:        Apogee Team
-Description: Team plan - 50 scans/month, 5 team members, API access, email support
+Name:        Apogee Starter
+Description: Starter plan - 50 scans/month, 5 team members, API access, email support
 
 Add two prices:
   - $299.00 USD - Recurring monthly
@@ -168,9 +168,9 @@ credits_builder:      price_1Nxxxxxxxxxxxxx
 credits_pro:          price_1Nxxxxxxxxxxxxx
 credits_bulk:         price_1Nxxxxxxxxxxxxx
 
-# Team Tier (Subscription)
-team_monthly:         price_1Nxxxxxxxxxxxxx
-team_annual:          price_1Nxxxxxxxxxxxxx
+# Starter Tier (Subscription)
+starter_monthly:      price_1Nxxxxxxxxxxxxx
+starter_annual:       price_1Nxxxxxxxxxxxxx
 
 # Growth Tier (Subscription)
 growth_monthly:       price_1Nxxxxxxxxxxxxx
@@ -233,10 +233,10 @@ Find the `creditPackages` section and update the `stripePriceId` values:
 
 Find each tier in the `tiers` section and update the Stripe Price IDs:
 
-**Team Tier** (in `tiers.team`):
+**Starter Tier** (in `tiers.starter`):
 ```json
-"team": {
-  "name": "Team",
+"starter": {
+  "name": "Starter",
   "pricing": {
     "monthly": 299,
     "annual": 2988

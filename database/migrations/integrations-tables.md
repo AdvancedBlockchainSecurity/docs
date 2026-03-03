@@ -195,9 +195,9 @@ Backend should enforce tier requirements:
 
 | Provider | Required Tier | Check |
 |----------|---------------|-------|
-| github | team | `user.tier >= 'team'` |
-| gitlab | team | `user.tier >= 'team'` |
-| bitbucket | team | `user.tier >= 'team'` |
+| github | starter | `user.tier >= 'starter'` |
+| gitlab | starter | `user.tier >= 'starter'` |
+| bitbucket | starter | `user.tier >= 'starter'` |
 | jira | enterprise | `user.tier == 'enterprise'` |
 
 ---

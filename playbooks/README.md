@@ -97,6 +97,12 @@ Step-by-step operational guides for common tasks.
 | [SCM PR Creation from AI Repair](scm-pr-creation.md) | Create GitHub/GitLab pull requests directly from AI-generated code repairs |
 | [Deduplication Maintenance](deduplication-maintenance.md) | Monitor hybrid dedup (inline post-scan + weekly housekeeping), troubleshoot CronJob |
 
+### Token Management
+
+| Playbook | Description |
+|----------|-------------|
+| [Token Rotation Troubleshooting](token-rotation-troubleshooting.md) | Diagnose and recover from failed automatic token rotations, verify rotation status |
+
 ## Playbook Format
 
 Each playbook follows this structure:

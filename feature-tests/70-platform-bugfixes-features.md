@@ -9,7 +9,7 @@
 - All 4 services deployed at versions listed above
 - At least one scanned contract with vulnerabilities (Reentrancy.sol recommended)
 - SCM integration (GitHub or GitLab) connected for PR creation tests
-- User with `team` tier or higher for AI features
+- User with `starter` tier or higher for AI features
 
 ---
 
@@ -114,13 +114,13 @@
 
 ## Test 11: Invariant Generation
 
-**Page:** `/vulnerabilities/{id}` (team tier or higher)
+**Page:** `/vulnerabilities/{id}` (starter tier or higher)
 
 - [ ] 11.1 Click "Generate Invariants" with valid contract source
 - [ ] 11.2 If Anthropic API key configured: verify invariants generated
 - [ ] 11.3 If Anthropic API key NOT configured: verify user-friendly "AI service not configured" message
 - [ ] 11.4 On developer tier: verify tier gate blocks access with upgrade prompt
-- [ ] 11.5 On team tier: verify button shows "team" not "growth" in tier message
+- [ ] 11.5 On starter tier: verify button shows "starter" not "growth" in tier message
 
 ## Test 12: Zip Upload (413 Error Fix)
 

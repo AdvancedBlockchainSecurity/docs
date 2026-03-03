@@ -209,11 +209,11 @@ def validate_url(cls, v):
 
 ### AI/ML Tier Gating
 
-All AI/ML endpoints require `team` tier or higher:
+All AI/ML endpoints require `starter` tier or higher:
 
 ```python
 router = APIRouter(
-    dependencies=[Depends(require_tier("team"))]
+    dependencies=[Depends(require_tier("starter"))]
 )
 ```
 

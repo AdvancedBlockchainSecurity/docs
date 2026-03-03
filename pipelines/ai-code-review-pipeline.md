@@ -8,7 +8,7 @@ AI-powered vulnerability review and explanation. Generates risk analysis, attack
 Dashboard (Finding Detail)   API Service (code_review.py → CodeReviewService)   External
 ──────────────────────────   ────────────────────────────────────────────────   ────────
 POST /review/suggestions →   1. Authenticate (JWT)                              PostgreSQL
-                             2. Validate tier (team+)
+                             2. Validate tier (starter+)
                              3. Check feature flags
                              4. Rate limit check
                              5. Load vulnerability + contract context
@@ -27,7 +27,7 @@ POST /review/suggestions →   1. Authenticate (JWT)                            
 | # | Step | Component | Description |
 |---|------|-----------|-------------|
 | 1 | Authentication | `get_current_user` | JWT required |
-| 2 | Tier gate | `require_tier("team")` | Developer tier blocked |
+| 2 | Tier gate | `require_tier("starter")` | Developer tier blocked |
 | 3 | Feature flags | `ai_features_enabled` + `ai_code_review_enabled` | Returns 503 if disabled |
 | 4 | Rate limiting | `@limiter.limit(get_rate_limit_string("ai", "codeReview"))` | Per-tier rate limits (BSO-SEC-AI-003) |
 | 5 | Load context | Database query | Fetch vulnerability, contract source, scan metadata |
@@ -46,7 +46,7 @@ POST /review/suggestions →   1. Authenticate (JWT)                            
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| POST | `/review/suggestions` | JWT + `require_tier("team")` + rate limit | Generate AI review |
+| POST | `/review/suggestions` | JWT + `require_tier("starter")` + rate limit | Generate AI review |
 | GET | `/review/suggestions/{vulnerability_id}` | JWT | List suggestions for finding |
 | GET | `/review/suggestions` | JWT | List all user suggestions |
 | POST | `/review/feedback` | JWT | Submit feedback on suggestion |

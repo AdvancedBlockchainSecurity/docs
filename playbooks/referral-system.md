@@ -44,7 +44,7 @@ curl -s -k -X PATCH https://app.0xapogee.local/api/v1/admin/referrals/settings \
 ### 1.3 Update Reward Configuration
 
 ```bash
-# Change reward tier (e.g., from team to growth)
+# Change reward tier (e.g., from starter to growth)
 curl -s -k -X PATCH https://app.0xapogee.local/api/v1/admin/referrals/settings \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \

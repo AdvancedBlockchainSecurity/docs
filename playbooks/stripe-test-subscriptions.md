@@ -73,7 +73,7 @@ kubectl rollout status deployment/api-service -n api-service-local
 
 1. **Create a test user account** in the dashboard
 2. Navigate to **Pricing** or **Upgrade** page
-3. Select a tier (Team, Growth, or Enterprise)
+3. Select a tier (Starter, Growth, or Enterprise)
 4. Use test card number: `4242 4242 4242 4242`
    - Expiry: Any future date (e.g., 12/34)
    - CVC: Any 3 digits (e.g., 123)
@@ -146,7 +146,7 @@ INSERT INTO subscriptions (
 ) VALUES (
   gen_random_uuid(),
   'YOUR_USER_UUID',  -- Replace with actual user ID
-  'growth',          -- tier: developer, team, growth, enterprise
+  'growth',          -- tier: developer, starter, growth, enterprise
   'active',
   'sub_test_mock_' || substr(md5(random()::text), 1, 14),
   'cus_test_mock_' || substr(md5(random()::text), 1, 14),
@@ -221,12 +221,12 @@ curl -X POST http://127.0.0.1:8000/api/v1/billing/subscription/change-tier \
     "proration_behavior": "auto"
   }'
 
-# Downgrade to Team tier (takes effect at period end)
+# Downgrade to Starter tier (takes effect at period end)
 curl -X POST http://127.0.0.1:8000/api/v1/billing/subscription/change-tier \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "new_tier": "team",
+    "new_tier": "starter",
     "billing_interval": "monthly",
     "proration_behavior": "auto"
   }'

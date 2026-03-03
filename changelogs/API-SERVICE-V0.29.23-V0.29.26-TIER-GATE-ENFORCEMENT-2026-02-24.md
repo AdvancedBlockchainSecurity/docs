@@ -14,7 +14,7 @@ Added tier-based access control (`require_tier()`) to all premium API endpoints,
 ### v0.29.23 (PR #258) - Initial Tier Gates
 
 Added `require_tier()` dependencies to 3 premium endpoints:
-- `POST /api/v1/search` — `require_tier("team")`
+- `POST /api/v1/search` — `require_tier("starter")`
 - `GET /api/v1/api-keys` — `require_tier("growth")`
 - `GET /api/v1/integrations` — `require_tier("growth")`
 
@@ -62,19 +62,19 @@ Files modified:
 
 | Endpoint | Required Tier | Effect |
 |----------|--------------|--------|
-| POST /search | team | developer blocked |
-| GET /api-keys | growth | developer, team blocked |
-| GET /integrations | growth | developer, team blocked |
-| GET /notification-channels | growth | developer, team blocked |
-| GET /webhooks | growth | developer, team blocked |
-| GET /audit-logs | growth | developer, team blocked |
-| POST /economic-analysis/reports | enterprise | developer, team, growth blocked |
-| POST /economic-analysis/simulate | enterprise | developer, team, growth blocked |
+| POST /search | starter | developer blocked |
+| GET /api-keys | growth | developer, starter blocked |
+| GET /integrations | growth | developer, starter blocked |
+| GET /notification-channels | growth | developer, starter blocked |
+| GET /webhooks | growth | developer, starter blocked |
+| GET /audit-logs | growth | developer, starter blocked |
+| POST /economic-analysis/reports | enterprise | developer, starter, growth blocked |
+| POST /economic-analysis/simulate | enterprise | developer, starter, growth blocked |
 
 ## Dual-Layer Access Control
 
 The platform enforces two layers:
-1. **API access gate** (`APICallTrackerMiddleware`): developer/team tiers get 429 (api_access_enabled=false)
+1. **API access gate** (`APICallTrackerMiddleware`): developer/starter tiers get 429 (api_access_enabled=false)
 2. **Feature tier gate** (`require_tier()`): growth tier gets 403 on enterprise-only endpoints
 
 ## Verification

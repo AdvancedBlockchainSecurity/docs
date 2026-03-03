@@ -150,7 +150,7 @@ User accounts with Supabase authentication and tier tracking (Phase 3.1a - Migra
 | `is_superuser` | BOOLEAN | NOT NULL, DEFAULT false | Admin privileges flag |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Account creation timestamp |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
-| `tier` | VARCHAR(20) | NOT NULL, DEFAULT 'developer', INDEX | User tier (developer, team, growth, enterprise) |
+| `tier` | VARCHAR(20) | NOT NULL, DEFAULT 'developer', INDEX | User tier (developer, starter, growth, enterprise) |
 | `tier_updated_at` | TIMESTAMPTZ | NULLABLE, DEFAULT now() | Last tier change timestamp |
 | `supabase_user_id` | UUID | NULLABLE, UNIQUE, INDEX | **Supabase Auth user identifier (PRIMARY auth key)** |
 | `stripe_customer_id` | VARCHAR(255) | NULLABLE | Stripe customer identifier for billing |
@@ -320,15 +320,15 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 |--------|------|-------------|-------------|
 | `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique quota identifier |
 | `user_id` | UUID | NOT NULL, UNIQUE, FK → users.id ON DELETE CASCADE | Associated user |
-| `tier` | VARCHAR(20) | NOT NULL, DEFAULT 'developer', INDEX | Current tier (developer, team, growth, enterprise) |
+| `tier` | VARCHAR(20) | NOT NULL, DEFAULT 'developer', INDEX | Current tier (developer, starter, growth, enterprise) |
 | `monthly_scan_limit` | INTEGER | NOT NULL, DEFAULT 3 | Monthly scan limit (-1 = unlimited) |
 | `monthly_scans_used` | INTEGER | NOT NULL, DEFAULT 0 | Scans used this month |
 | `max_files_per_scan` | INTEGER | NOT NULL, DEFAULT 5 | Maximum files per scan (-1 = unlimited) |
 | `max_loc_per_scan` | INTEGER | NOT NULL, DEFAULT 5000 | Maximum lines of code per scan (-1 = unlimited) |
 | `scan_priority` | INTEGER | NOT NULL, DEFAULT 50 | Scan queue priority (5=enterprise highest, 50=developer lowest) |
 | `webhooks_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Webhooks feature enabled (growth+) |
-| `api_access_enabled` | BOOLEAN | NOT NULL, DEFAULT false | API access enabled (team+) |
-| `export_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Export feature enabled (team+) |
+| `api_access_enabled` | BOOLEAN | NOT NULL, DEFAULT false | API access enabled (starter+) |
+| `export_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Export feature enabled (starter+) |
 | `result_retention_days` | INTEGER | NOT NULL, DEFAULT 7 | Scan result retention period |
 | `max_projects` | INTEGER | NOT NULL, DEFAULT 3 | Maximum projects (-1 = unlimited) |
 | `monthly_api_calls_limit` | INTEGER | NOT NULL, DEFAULT 0 | Monthly API call limit (0=no access, -1=unlimited) |
@@ -353,19 +353,19 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 | Tier | Price | Scans/Mo | Files/Scan | LoC/Scan | Projects | API Calls/Mo | Team | AI Explain/Mo | Export | Retention | Priority |
 |------|-------|----------|------------|----------|----------|--------------|------|---------------|--------|-----------|----------|
 | **Developer** | $0 | 10 | 5 | 5,000 | 3 | 0 (no API) | 1 | 0 | No | 7 days | 50 |
-| **Team** | $299/mo | 100 | Unlimited | Unlimited | 10 | 1,000 | 5 | 10 | Yes | 90 days | 40 |
+| **Starter** | $299/mo | 100 | Unlimited | Unlimited | 10 | 1,000 | 5 | 10 | Yes | 90 days | 40 |
 | **Growth** | $699/mo | 500 | Unlimited | Unlimited | 20 | 10,000 | 10 | 100 | Yes | 180 days | 25 |
 | **Enterprise** | $1,999+/mo | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Yes | 730 days | 5 |
 
 **File Size Limits**:
 - Developer: 1 MB single / 5 MB archive ($0 tier)
-- Team: 5 MB single / 25 MB archive ($299/mo)
+- Starter: 5 MB single / 25 MB archive ($299/mo)
 - Growth: 10 MB single / 50 MB archive ($699/mo)
 - Enterprise: 20 MB single / 100 MB archive ($1,999+/mo)
 
 **Feature Access by Tier**:
-- API Access: team+ ($299/mo)
-- AI Explanations: team+ (quota-limited)
+- API Access: starter+ ($299/mo)
+- AI Explanations: starter+ (quota-limited)
 - Webhooks: growth+ ($699/mo)
 - Team Management: growth+
 - Organizations: enterprise ($1,999+/mo)
@@ -375,7 +375,7 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 | Tier | Price | Monthly Limit | Notes |
 |------|-------|--------------|-------|
 | Developer | $0 | 0 | Not available |
-| Team | $299/mo | 10 | Reset monthly |
+| Starter | $299/mo | 10 | Reset monthly |
 | Growth | $699/mo | 100 | Reset monthly |
 | Enterprise | $1,999+/mo | -1 | Unlimited |
 
@@ -418,7 +418,7 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
     "reset_date": "2026-02-01T00:00:00+00:00",
     "days_until_reset": 17,
     "upgrade_url": "/pricing",
-    "upgrade_message": "Upgrade to Team for 100 scans/month or wait until your quota resets"
+    "upgrade_message": "Upgrade to Starter for 100 scans/month or wait until your quota resets"
   }
 }
 ```
@@ -434,14 +434,14 @@ Enforced at upload endpoint (`POST /api/v1/upload`):
 
 1. **File Size Limits** (tier-based):
    - Developer: 1 MB per file, 5 MB archives ($0)
-   - Team: 5 MB per file, 25 MB archives ($299/mo)
+   - Starter: 5 MB per file, 25 MB archives ($299/mo)
    - Growth: 10 MB per file, 50 MB archives ($699/mo)
    - Enterprise: 20 MB per file, 100 MB archives ($1,999+/mo)
    - Returns HTTP 413 if file size exceeds tier limit
 
 2. **Files-per-Scan Limits** (from `max_files_per_scan` column):
    - Developer: 25 files max per archive ($0)
-   - Team: 50 files max per archive ($299/mo)
+   - Starter: 50 files max per archive ($299/mo)
    - Growth: 100 files max per archive ($699/mo)
    - Enterprise: Unlimited (-1) ($1,999+/mo)
    - Returns HTTP 402 if archive exceeds file count limit
@@ -675,7 +675,7 @@ Security scan execution records.
 | `high_count` | INTEGER | NOT NULL | Count of high severity issues |
 | `medium_count` | INTEGER | NOT NULL | Count of medium severity issues |
 | `low_count` | INTEGER | NOT NULL | Count of low severity issues |
-| `priority` | INTEGER | NOT NULL, DEFAULT 50, INDEX | Scan priority (lower = higher priority). Enterprise=5, Growth=25, Team=40, Developer=50 |
+| `priority` | INTEGER | NOT NULL, DEFAULT 50, INDEX | Scan priority (lower = higher priority). Enterprise=5, Growth=25, Starter=40, Developer=50 |
 | `scanners_used` | ARRAY(VARCHAR(50)) | NULLABLE | Array of scanner IDs used in this scan |
 | `scan_config` | JSONB | NULLABLE, DEFAULT '{}' | Scanner configuration parameters |
 | `duration_seconds` | INTEGER | NULLABLE | Scan duration in seconds |
@@ -1548,7 +1548,7 @@ Multi-tenant organization support for enterprise features (Phase 4.5).
 | `slug` | VARCHAR(100) | NOT NULL, UNIQUE, INDEX | URL-friendly identifier |
 | `description` | TEXT | NULLABLE | Organization description |
 | `logo_url` | VARCHAR(2048) | NULLABLE | Logo URL |
-| `tier` | VARCHAR(50) | NOT NULL, DEFAULT 'developer' | Organization tier (developer, team, growth, enterprise) |
+| `tier` | VARCHAR(50) | NOT NULL, DEFAULT 'developer' | Organization tier (developer, starter, growth, enterprise) |
 | `stripe_customer_id` | VARCHAR(255) | NULLABLE, UNIQUE | Stripe customer ID for billing |
 | `stripe_subscription_id` | VARCHAR(255) | NULLABLE | Stripe subscription ID |
 | `sso_enabled` | BOOLEAN | NOT NULL, DEFAULT false | SSO enabled flag |
@@ -2642,7 +2642,7 @@ User subscription tier classification. Controls feature access, rate limits, sca
 
 **Values:**
 - `developer` - Free tier with basic features
-- `team` - Team tier with collaboration features
+- `starter` - Starter tier with collaboration features
 - `growth` - Growth tier with increased quotas
 - `enterprise` - Enterprise tier with full platform access
 
@@ -4177,7 +4177,7 @@ Stripe subscription records tracking billing cycles, plan tiers, and cancellatio
 | `stripe_subscription_id` | VARCHAR(255) | NOT NULL, UNIQUE | Stripe subscription ID (sub_xxx) |
 | `stripe_customer_id` | VARCHAR(255) | NOT NULL, INDEX | Stripe customer ID (cus_xxx) |
 | `stripe_price_id` | VARCHAR(255) | NULLABLE | Stripe price ID (price_xxx) |
-| `plan_tier` | VARCHAR(50) | NOT NULL, INDEX | `developer`, `team`, `growth`, `enterprise` |
+| `plan_tier` | VARCHAR(50) | NOT NULL, INDEX | `developer`, `starter`, `growth`, `enterprise` |
 | `billing_interval` | VARCHAR(20) | NOT NULL | `monthly`, `annual` |
 | `status` | VARCHAR(50) | NOT NULL, INDEX | `active`, `past_due`, `canceled`, `trialing` |
 | `current_period_start` | TIMESTAMPTZ | NOT NULL | Current billing period start |
@@ -4492,7 +4492,7 @@ Admin-configurable key-value store for platform-wide settings (initially used fo
 | Key | Value | Description |
 |-----|-------|-------------|
 | `referral_threshold` | `3` | Number of referrals needed to earn a reward |
-| `referral_reward_tier` | `team` | Tier granted as reward |
+| `referral_reward_tier` | `starter` | Tier granted as reward |
 | `referral_reward_days` | `30` | Duration of reward in days |
 | `referral_enabled` | `true` | Whether referral system is active |
 
@@ -4535,7 +4535,7 @@ Tracks rewards earned by referrers when they reach the referral threshold.
 | `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique reward identifier |
 | `referrer_user_id` | UUID | NOT NULL, FK → users.id ON DELETE CASCADE, INDEX | User who earned the reward |
 | `reward_type` | VARCHAR(50) | NOT NULL, DEFAULT 'free_month' | Type of reward |
-| `plan_tier` | VARCHAR(50) | NOT NULL, DEFAULT 'team' | Subscription tier granted |
+| `plan_tier` | VARCHAR(50) | NOT NULL, DEFAULT 'starter' | Subscription tier granted |
 | `status` | VARCHAR(20) | NOT NULL, DEFAULT 'pending' | pending / applied / expired |
 | `qualifying_referral_count` | INTEGER | NOT NULL | Snapshot of referral count when earned |
 | `applied_at` | TIMESTAMPTZ | NULLABLE | When the reward was applied to subscription |
