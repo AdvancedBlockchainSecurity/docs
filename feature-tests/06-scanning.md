@@ -264,6 +264,8 @@ _Record scanning test results here:_
 
 ```
 [Date] | [Scanner] | [Contract Type] | [Result] | [Notes]
+2026-03-03 | All 11 scanners | 4 contract types | PASS | EXIT trap callback fix - all 30/30 callbacks delivered (OZ TransparentProxy, OZ ERC20Upgradeable, Damn Vulnerable DeFi Foundry, Hardhat Starter Kit)
+2026-03-03 | Framework detection | Foundry/Hardhat | PASS | Correctly identifies Foundry and Hardhat projects, applies appropriate scanner configs
 2026-01-20 | solhint | Solidity | PASS | Callback fix - scan completes, status changes to "completed"
 2025-12-23 | sol-azy | Rust/Solana | PASS | Vulnerabilities detected and displayed in dashboard
 2025-12-22 | sol-azy | Rust/Solana | PASS | Dashboard auto-selects based on language

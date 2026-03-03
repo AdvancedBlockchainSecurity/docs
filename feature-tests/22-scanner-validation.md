@@ -1,7 +1,7 @@
 # Scanner Validation Tests
 
 **Priority**: P0 - Critical
-**Last Tested**: February 17, 2026
+**Last Tested**: March 3, 2026
 **Active Scanners**: 17 (10 Solidity, 2 Vyper, 5 Rust/Solana)
 **Test Contract Location**: `/Users/pwner/Git/vulnerable-smart-contract-examples`
 **Registry**: Harbor (`harbor.blocksecops.local/blocksecops/scanner-*`)
@@ -34,22 +34,22 @@ docker images | grep "harbor.blocksecops.local.*scanner-"
 
 | Scanner | Harbor Image | Version | Status |
 |---------|--------------|---------|--------|
-| slither | harbor.blocksecops.local/blocksecops/scanner-slither | 0.3.2 | ✅ Verified |
-| aderyn | harbor.blocksecops.local/blocksecops/scanner-aderyn | 0.7.2 | ✅ Verified |
-| semgrep | harbor.blocksecops.local/blocksecops/scanner-semgrep | 0.3.7 | ✅ Verified |
-| solhint | harbor.blocksecops.local/blocksecops/scanner-solhint | 0.1.6 | ✅ Verified |
-| wake | harbor.blocksecops.local/blocksecops/scanner-wake | 0.3.6 | ✅ Verified |
-| soliditydefend | harbor.blocksecops.local/blocksecops/scanner-soliditydefend | 0.9.0 | ✅ Verified |
+| slither | harbor.blocksecops.local/blocksecops/scanner-slither | 0.3.4 | ✅ Verified |
+| aderyn | harbor.blocksecops.local/blocksecops/scanner-aderyn | 0.7.4 | ✅ Verified |
+| semgrep | harbor.blocksecops.local/blocksecops/scanner-semgrep | 0.3.9 | ✅ Verified |
+| solhint | harbor.blocksecops.local/blocksecops/scanner-solhint | 0.1.9 | ✅ Verified |
+| wake | harbor.blocksecops.local/blocksecops/scanner-wake | 0.3.9 | ✅ Verified |
+| soliditydefend | harbor.blocksecops.local/blocksecops/scanner-soliditydefend | 0.9.2 | ✅ Verified |
 | echidna | harbor.blocksecops.local/blocksecops/scanner-echidna | 0.3.1 | ✅ Verified |
-| medusa | harbor.blocksecops.local/blocksecops/scanner-medusa | 0.3.1 | ✅ Verified |
-| halmos | harbor.blocksecops.local/blocksecops/scanner-halmos | 0.3.0 | ✅ Verified |
-| vyper | harbor.blocksecops.local/blocksecops/scanner-vyper | 0.3.0 | ✅ Verified |
-| moccasin | harbor.blocksecops.local/blocksecops/scanner-moccasin | 0.3.0 | ✅ Verified |
+| medusa | harbor.blocksecops.local/blocksecops/scanner-medusa | 0.3.3 | ✅ Verified |
+| halmos | harbor.blocksecops.local/blocksecops/scanner-halmos | 0.3.4 | ✅ Verified |
+| vyper | harbor.blocksecops.local/blocksecops/scanner-vyper | 0.3.2 | ✅ Verified |
+| moccasin | harbor.blocksecops.local/blocksecops/scanner-moccasin | 0.3.2 | ✅ Verified |
 | sol-azy | harbor.blocksecops.local/blocksecops/scanner-sol-azy | 0.4.1 | ✅ Verified |
 | sec3-xray | harbor.blocksecops.local/blocksecops/scanner-sec3-xray | 0.3.1 | ✅ Verified |
 | trident | harbor.blocksecops.local/blocksecops/scanner-trident | 0.3.0 | ✅ Verified |
 | cargo-fuzz-solana | harbor.blocksecops.local/blocksecops/scanner-cargo-fuzz-solana | 0.3.0 | ✅ Verified |
-| rustdefend | harbor.blocksecops.local/blocksecops/scanner-rustdefend | 0.3.1 | ✅ Verified |
+| rustdefend | harbor.blocksecops.local/blocksecops/scanner-rustdefend | 0.4.3 | ✅ Verified |
 
 **Last Verified:** February 17, 2026
 
@@ -756,6 +756,12 @@ docker run --rm -v "$TMPDIR:/contracts" scanner-rustdefend:0.3.1
 
 ```
 [Date] | [Scanner] | [Test Type] | [Result] | [Notes]
+2026-03-03 | All 11 scanners | EXIT trap callback | PASS | Callbacks guaranteed via trap post_callback EXIT (30/30 delivered)
+2026-03-03 | slither, aderyn, semgrep | Version bumps | PASS | Updated to 0.3.4, 0.7.4, 0.3.9 respectively
+2026-03-03 | solhint, wake, soliditydefend | Version bumps | PASS | Updated to 0.1.9, 0.3.9, 0.9.2 respectively
+2026-03-03 | medusa, halmos, vyper, moccasin | Version bumps | PASS | Updated to 0.3.3, 0.3.4, 0.3.2, 0.3.2 respectively
+2026-03-03 | rustdefend | Version bump | PASS | Updated to 0.4.3 (from 0.3.1)
+2026-03-03 | Framework detection | Foundry/Hardhat | PASS | OZ TransparentProxy, OZ ERC20Upgradeable, Damn Vulnerable DeFi Foundry, Hardhat Starter Kit all correctly detected
 2026-02-12 | All 6 core | Platform E2E | PASS | All 6 scanners deliver callbacks with findings parsed
 2026-02-12 | slither | Platform scan | PASS | 12 vulnerabilities (ReentrancyVault.sol)
 2026-02-12 | aderyn | Platform scan | PASS | 13 vulnerabilities (ReentrancyVault.sol)
