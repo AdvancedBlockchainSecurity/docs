@@ -89,8 +89,17 @@ POST /scans/{id}/trigger →  1. Validate scanner name
 | Environment | `CALLBACK_URL`, `SCAN_ID`, `SOLC_VERSION`, `WORK_DIR=/contracts` |
 | Security | Non-root (UID 1000), seccomp RuntimeDefault, all capabilities dropped |
 | DNS | `single-request-reopen` option (fixes Alpine musl parallel A+AAAA issue) |
-| Execute | Entrypoint script (`run-{scanner}.sh`) runs scanner against contract |
-| Callback | Scanner container POSTs JSON results to `CALLBACK_URL` |
+| Execute | Entrypoint script (`run-{scanner}.sh`) runs scanner against contract with `trap post_callback EXIT` |
+| Callback | Scanner container POSTs JSON results to `CALLBACK_URL` (guaranteed via EXIT trap) |
+
+**EXIT Trap Callback Guarantee (March 2026)**
+
+All scanner wrapper scripts now include `trap post_callback EXIT` at the beginning. This ensures callback delivery even if:
+- Scanner execution fails with non-zero exit code
+- `set -euo pipefail` terminates script on command error
+- Service is forcibly killed or times out
+
+This replaces the previous pattern where callbacks only fired on success, causing callback deliveries to fail in error scenarios.
 
 **Job spec highlights**:
 
@@ -174,36 +183,37 @@ capabilities:
 
 | Scanner | Tool Version | Image Tag | Memory Limit | Developer |
 |---------|-------------|-----------|--------------|-----------|
-| slither | 0.11.5 | scanner-slither:0.3.2 | 1Gi | Trail of Bits |
-| aderyn | 0.6.7 | scanner-aderyn:0.7.2 | 512Mi | Cyfrin |
-| semgrep | 1.144.0 | scanner-semgrep:0.3.5 | 1Gi | Semgrep Inc |
-| solhint | 6.0.2 | scanner-solhint:0.1.6 | 512Mi | Protofire |
-| wake | 4.22.0 | scanner-wake:0.3.6 | 1Gi | Ackee Blockchain |
-| soliditydefend | 2.0.1 | scanner-soliditydefend:0.8.0 | 1Gi | Apogee |
+| slither | 0.11.5 | scanner-slither:0.3.4 | 1Gi | Trail of Bits |
+| aderyn | 0.6.7 | scanner-aderyn:0.7.4 | 512Mi | Cyfrin |
+| semgrep | 1.144.0 | scanner-semgrep:0.3.9 | 1Gi | Semgrep Inc |
+| solhint | 6.0.2 | scanner-solhint:0.1.9 | 512Mi | Protofire |
+| wake | 4.22.0 | scanner-wake:0.3.9 | 1Gi | Ackee Blockchain |
+| soliditydefend | 2.0.1 | scanner-soliditydefend:0.9.2 | 1Gi | Apogee |
 
 ### Solidity Fuzzing & Symbolic (3)
 
 | Scanner | Tool Version | Image Tag | Memory Limit | Developer |
 |---------|-------------|-----------|--------------|-----------|
 | echidna | 2.2.7 | scanner-echidna:0.3.1 | 1Gi | Trail of Bits |
-| medusa | 1.5.0 | scanner-medusa:0.3.1 | 2Gi | Trail of Bits |
-| halmos | 0.3.3 | scanner-halmos:0.3.0 | 2Gi | a16z |
+| medusa | 1.5.0 | scanner-medusa:0.3.3 | 2Gi | Trail of Bits |
+| halmos | 0.3.3 | scanner-halmos:0.3.4 | 2Gi | a16z |
 
 ### Vyper (2)
 
 | Scanner | Tool Version | Image Tag | Memory Limit | Developer |
 |---------|-------------|-----------|--------------|-----------|
-| vyper | 0.4.3 | scanner-vyper:0.3.0 | 1Gi | Vyper Team |
-| moccasin | 0.4.3 | scanner-moccasin:0.3.0 | 1Gi | Cyfrin |
+| vyper | 0.4.3 | scanner-vyper:0.3.2 | 1Gi | Vyper Team |
+| moccasin | 0.4.3 | scanner-moccasin:0.3.2 | 1Gi | Cyfrin |
 
 ### Solana/Rust (4)
 
 | Scanner | Tool Version | Image Tag | Memory Limit | Developer |
 |---------|-------------|-----------|--------------|-----------|
-| sol-azy | 0.4.0 | scanner-sol-azy:0.4.0 | 1Gi | FuzzingLabs |
+| sol-azy | 0.4.0 | scanner-sol-azy:0.4.1 | 1Gi | FuzzingLabs |
 | sec3-xray | 0.3.0 | scanner-sec3-xray:0.3.1 | 2Gi | Sec3 |
 | trident | 0.12.0 | scanner-trident:0.3.0 | 1Gi | Ackee Blockchain |
 | cargo-fuzz-solana | 0.13.1 | scanner-cargo-fuzz-solana:0.3.0 | 1Gi | rust-fuzz |
+| rustdefend | 0.3.0 | scanner-rustdefend:0.4.3 | 1Gi | Apogee |
 
 ## Standardized Vulnerability Schema
 

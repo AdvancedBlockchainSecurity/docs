@@ -1,6 +1,6 @@
 # Scanner Documentation
 
-**Last Updated**: February 17, 2026
+**Last Updated**: March 3, 2026
 **API Pipeline Tested**: February 13, 2026
 **Parser Tests Passing**: February 13, 2026 (335 tests — unit, integration, regression)
 **Fuzzer Filtering Tested**: December 29, 2025 (is_project filtering verified)
@@ -91,21 +91,21 @@ Security scanner integration, management, and troubleshooting guides for the Apo
 
 | Scanner | Version | Detectors | Project Mode | Requires Project | Status |
 |---------|---------|-----------|--------------|------------------|--------|
-| **Slither** | 0.2.0 | 93 | ✅ Foundry/Hardhat | ❌ No | ✅ Active |
-| **Aderyn** | 0.6.5 | 88 | ✅ Foundry | ❌ No | ✅ Active |
+| **Slither** | 0.3.4 | 93 | ✅ Foundry/Hardhat | ❌ No | ✅ Active |
+| **Aderyn** | 0.7.4 | 88 | ✅ Foundry | ❌ No | ✅ Active |
 | **Mythril** | - | 4 | ❌ Single-file | ❌ No | ✅ Active |
-| **Semgrep** | 0.3.0 | 47 | ❌ Single-file | ❌ No | ✅ Active |
-| **Solhint** | 0.2.0 | 20 | ❌ Single-file | ❌ No | ✅ Active |
-| **Wake** | 0.3.1 | - | ✅ Foundry | ❌ No | ✅ Active |
-| **SolidityDefend** | 0.2.1 | 204+ | ✅ Foundry/Hardhat | ❌ No | ✅ Active |
+| **Semgrep** | 0.3.9 | 47 | ❌ Single-file | ❌ No | ✅ Active |
+| **Solhint** | 0.1.9 | 20 | ❌ Single-file | ❌ No | ✅ Active |
+| **Wake** | 0.3.9 | - | ✅ Foundry | ❌ No | ✅ Active |
+| **SolidityDefend** | 0.9.2 | 204+ | ✅ Foundry/Hardhat | ❌ No | ✅ Active |
 
 ### Solidity Fuzzing & Symbolic (3)
 
 | Scanner | Version | Type | Project Mode | Requires Project | Status |
 |---------|---------|------|--------------|------------------|--------|
-| **Echidna** | 0.2.2 | Fuzzer | ✅ Foundry | ✅ Yes | ✅ Active |
-| **Medusa** | 0.2.3 | Fuzzer | ✅ Foundry | ✅ Yes | ✅ Active |
-| **Halmos** | 0.2.1 | Symbolic | ❌ Single-file | ✅ Yes | ✅ Active |
+| **Echidna** | 0.3.1 | Fuzzer | ✅ Foundry | ✅ Yes | ✅ Active |
+| **Medusa** | 0.3.3 | Fuzzer | ✅ Foundry | ✅ Yes | ✅ Active |
+| **Halmos** | 0.3.4 | Symbolic | ❌ Single-file | ✅ Yes | ✅ Active |
 
 > **Note on "Requires Project"**: Scanners marked with "Requires Project = Yes" are hidden from the scanner list when uploading single-file contracts. These scanners need test harnesses or project structure to provide meaningful results. They appear only for project uploads (ZIP/Foundry/Hardhat).
 
@@ -135,8 +135,8 @@ Fuzzer scanners now properly store and display results in the dashboard:
 
 | Scanner | Version | Type | Requires Project | Status |
 |---------|---------|------|------------------|--------|
-| **Vyper** | 0.2.0 | Compiler/Analyzer | ❌ No | ✅ Active |
-| **Moccasin** | 0.2.0 | Fuzzer | ✅ Yes | ✅ Active |
+| **Vyper** | 0.3.2 | Compiler/Analyzer | ❌ No | ✅ Active |
+| **Moccasin** | 0.3.2 | Fuzzer | ✅ Yes | ✅ Active |
 
 ### Solana/Rust Scanners (4) — 2 Active, 2 Pending
 
@@ -145,7 +145,7 @@ Docker images built and deployed to Harbor. Sol-azy and RustDefend are fully ope
 | Scanner | Version | Type | Requires Project | Status |
 |---------|---------|------|------------------|--------|
 | **Sol-azy** | 0.4.1 | Static Analysis | ❌ No | ✅ Active |
-| **RustDefend** | 0.3.3 | Static Analysis (AST) | ❌ No | ✅ Active |
+| **RustDefend** | 0.4.3 | Static Analysis (AST) | ❌ No | ✅ Active |
 | **Trident** | 0.3.0 | Fuzzer | ✅ Yes | ⏳ Unavailable |
 | **cargo-fuzz-solana** | 0.3.0 | Fuzzer | ✅ Yes | ⏳ Unavailable |
 
