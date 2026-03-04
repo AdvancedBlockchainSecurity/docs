@@ -1,7 +1,7 @@
 # Playbook: Deploy New Image to Cluster
 
-**Version:** 1.3.0
-**Last Updated:** February 28, 2026
+**Version:** 1.4.0
+**Last Updated:** March 4, 2026
 
 ## Overview
 
@@ -195,7 +195,17 @@ curl -s https://harbor.blocksecops.local/api/v2.0/projects/blocksecops/repositor
 
 ---
 
-## Step 4: Update Kustomization
+## Step 4: Auto-Sync Kustomization (Recommended)
+
+As of March 2026, version sync is automated. After updating the source file, run:
+
+```bash
+/home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh .
+```
+
+This automatically updates all kustomization.yaml `newTag` values under `k8s/` to match the source version.
+
+### Manual Kustomization Update (if auto-sync fails)
 
 Edit the kustomization.yaml for the target environment:
 
@@ -207,7 +217,7 @@ File: `k8s/overlays/local/api-service/kustomization.yaml`
 images:
   - name: blocksecops-api-service
     newName: harbor.blocksecops.local/blocksecops/api-service
-    newTag: "0.11.4"  # Update this
+    newTag: "0.11.4"  # Update to match source version
 ```
 
 ### Dashboard
@@ -218,7 +228,7 @@ File: `k8s/overlays/local/kustomization.yaml`
 images:
   - name: blocksecops-dashboard
     newName: harbor.blocksecops.local/blocksecops/dashboard
-    newTag: "0.30.13"  # Update this
+    newTag: "0.30.13"  # Update to match source version
 ```
 
 ---

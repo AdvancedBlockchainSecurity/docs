@@ -1,7 +1,7 @@
 # Version Source-of-Truth Workflow
 
-**Version:** 1.0.0
-**Last Updated:** March 1, 2026
+**Version:** 1.1.0
+**Last Updated:** March 4, 2026
 
 ## Overview
 
@@ -29,14 +29,18 @@ Developer → Update pyproject.toml (or package.json)
                     └── version = "0.29.54"
 
 
-Phase 2: Kustomization Sync (Developer)
-────────────────────────────────────────
-Developer → Update kustomization.yaml newTag
+Phase 2: Kustomization Auto-Sync
+────────────────────────────────
+After source version is updated, sync-version.sh auto-syncs all kustomization.yaml files:
+
+deploy.sh or manual sync call:
                     │
-                    ├── k8s/overlays/local/<service>/kustomization.yaml
-                    │       └── newTag: "0.29.54"
+                    ├── /home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh
+                    │       └── Reads source version (pyproject.toml)
+                    │       └── Updates all k8s/overlays/*/kustomization.yaml newTag: "0.29.54"
+                    │       └── Updates app.kubernetes.io/version labels
                     │
-                    └── MUST match source file exactly
+                    └── Result: All kustomization files now match source version
 
 
 Phase 3: Build + Tag (deploy.sh or CI)
@@ -120,8 +124,8 @@ git commit   ← source + kustomization committed together (MANDATORY)
 |--------|---------------|--------------|
 | Source of truth | `pyproject.toml` / `package.json` | Same |
 | Version extraction | `deploy.sh` reads source file | GitHub Actions reads source file |
-| Kustomization update | Developer (manual) | CI bot commits `newTag` to infra repo |
-| Mismatch detection | `deploy.sh` hard-fails | CI validates before build |
+| Kustomization update | `sync-version.sh` (automatic) | CI bot commits `newTag` to infra repo |
+| Mismatch detection | `deploy.sh` auto-syncs on mismatch | CI validates before build |
 | Build | `docker build` on dev machine | GitHub Actions runner |
 | Registry | Harbor (immutable tags) | GCP Artifact Registry |
 | Deploy trigger | `kubectl apply -k` (manual) | Config Sync polls Git (automatic) |
@@ -133,9 +137,9 @@ git commit   ← source + kustomization committed together (MANDATORY)
 
 | Check | Where | Consequence |
 |-------|-------|-------------|
-| Source == kustomization `newTag` | `deploy.sh` step 2 | Hard failure — build does not start |
+| Source == kustomization `newTag` | `deploy.sh` step 2 | Auto-sync if mismatch, then proceed |
 | Immutable tags | Harbor project config | Push rejected if tag already exists |
-| Post-deploy image tag verification | `deploy.sh` step 8 | Non-zero exit + error output |
+| Post-deploy image tag verification | `deploy.sh` step 8 | Non-zero exit + error output if mismatch |
 | Platform-wide drift | `check-version-drift.sh` | Exit code 1 if any service drifted |
 | Owner approval | All GitOps operations | Rule 0 — no automation without sign-off |
 
