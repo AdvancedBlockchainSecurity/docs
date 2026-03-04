@@ -616,6 +616,7 @@ monthly_nl_conversions_limit = -1
 
 ## Related Documentation
 
+- [Organization, Team, and User Hierarchy](./organization-team-user-hierarchy.md) - Org→Team→User data model, RBAC, invite workflow
 - [Database Migrations](../database/MIGRATIONS.md) - Migration 024 tier restructure
 - [Database Schema](../database/SCHEMA.md) - user_quotas table
 - [API Billing Endpoints](../../blocksecops-docs/API/endpoints.md) - Billing API

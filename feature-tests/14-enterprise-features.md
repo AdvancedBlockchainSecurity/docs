@@ -89,7 +89,7 @@
 
 ### 1.10 Tier Restrictions
 - [ ] Developer tier cannot create webhooks
-- [ ] Team tier limited to 5 webhooks
+- [ ] Starter tier limited to 5 webhooks
 - [ ] Growth tier limited to 10 webhooks
 - [ ] Enterprise tier unlimited webhooks
 - [ ] Tier upgrade enables webhook creation
@@ -359,10 +359,10 @@
 - [ ] Developer tier user sees upgrade prompt on Webhooks page
 - [ ] Developer tier user sees upgrade prompt on Audit Logs page
 - [ ] Developer tier user sees upgrade prompt on Organizations page
-- [ ] Team tier user can access API Keys page
-- [ ] Team tier user can access Webhooks page
-- [ ] Team tier user sees upgrade prompt on Audit Logs page
-- [ ] Team tier user sees upgrade prompt on Organizations page
+- [ ] Starter tier user can access API Keys page
+- [ ] Starter tier user can access Webhooks page
+- [ ] Starter tier user sees upgrade prompt on Audit Logs page
+- [ ] Starter tier user sees upgrade prompt on Organizations page
 - [ ] Growth tier user can access API Keys, Webhooks
 - [ ] Growth tier user sees upgrade prompt on Organizations page
 - [ ] Enterprise tier user can access all 4 pages
@@ -703,7 +703,7 @@
 - [ ] 7 days audit logs
 - [ ] No audit export
 
-### 8.2 Team Tier ($299/mo)
+### 8.2 Starter Tier ($299/mo)
 - [ ] 5 webhooks
 - [ ] 1 organization
 - [ ] 5 team members
@@ -763,8 +763,8 @@
 
 #### Tier Gating Verification
 
-| Feature | Developer | Team | Growth | Enterprise |
-|---------|-----------|------|--------|------------|
+| Feature | Developer | Starter | Growth | Enterprise |
+|---------|-----------|---------|--------|------------|
 | View API Keys | ✅ | ✅ | ✅ | ✅ |
 | Create API Keys | ❌ | ✅ | ✅ | ✅ |
 | View Organizations | ✅ | ✅ | ✅ | ✅ |
@@ -879,8 +879,8 @@ WHERE user_id = '<user_uuid>';
 
 ### 8.6 Tier-Specific Limits Table
 
-| Feature | Developer | Team | Growth | Enterprise |
-|---------|-----------|------|--------|------------|
+| Feature | Developer | Starter | Growth | Enterprise |
+|---------|-----------|---------|--------|------------|
 | Monthly Scan Limit | 10 | 100 | 500 | Unlimited |
 | Max Files Per Scan | 5 | Unlimited | Unlimited | Unlimited |
 | Scan Priority | 50 | 30 | 15 | 5 |

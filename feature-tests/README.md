@@ -99,7 +99,7 @@ Connect to external VCS and issue tracking platforms:
 | OAuth Security | Implemented | URL validation, token encryption |
 
 **Tier Requirements:**
-- GitHub/GitLab/Bitbucket: Team+ tier
+- GitHub/GitLab/Bitbucket: Starter+ tier
 - Jira: Enterprise tier only
 
 **Note:** Jenkins integration not implemented - use CLI tool with webhooks instead.
@@ -122,7 +122,7 @@ Economic security analysis for detecting flash loan attacks, MEV exploitation, a
 
 **AI Explanation Quotas (4-Tier Model)**:
 - Developer ($0): 0 (not available)
-- Team ($299/mo): 10/month
+- Starter ($299/mo): 10/month
 - Growth ($699/mo): 100/month
 - Enterprise ($1,999+/mo): Unlimited
 

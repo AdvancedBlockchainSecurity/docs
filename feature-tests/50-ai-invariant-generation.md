@@ -11,7 +11,7 @@ AI Invariant Generation uses Claude AI to automatically generate formal verifica
 
 ## Prerequisites
 
-- [ ] User authenticated with Team tier or higher
+- [ ] User authenticated with Starter tier or higher
 - [ ] Contract uploaded to platform
 - [ ] Valid Anthropic API key configured (admin)
 - [ ] Database migrations 058 and 059 applied
@@ -21,8 +21,8 @@ AI Invariant Generation uses Claude AI to automatically generate formal verifica
 ### 1. Access Control
 
 #### 1.1 Tier Restrictions
-- [ ] **Developer tier**: Should receive 403 "AI Invariants require Team tier or higher"
-- [ ] **Team tier**: Should have access with 10 requests/month limit
+- [ ] **Developer tier**: Should receive 403 "AI Invariants require Starter tier or higher"
+- [ ] **Starter tier**: Should have access with 10 requests/month limit
 - [ ] **Growth tier**: Should have access with 50 requests/month limit
 - [ ] **Enterprise tier**: Should have unlimited access
 

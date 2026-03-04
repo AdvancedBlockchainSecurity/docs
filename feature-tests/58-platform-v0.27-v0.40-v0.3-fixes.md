@@ -56,7 +56,7 @@
 ### 2.4 Search Page
 - [ ] Search page — keyword search returns results
 - [ ] Search page — no "used X times" on saved searches
-- [ ] Search page — export buttons require Team tier
+- [ ] Search page — export buttons require Starter tier
 
 ### 2.5 Deduplication
 - [ ] Deduplication — no "Info" severity option

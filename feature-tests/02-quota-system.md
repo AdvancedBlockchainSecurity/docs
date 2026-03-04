@@ -12,7 +12,7 @@
 | Tier | Price | Scans/Mo | Files/Scan | LoC/Scan | Projects | Single File | Archive | API Calls | Team |
 |------|-------|----------|------------|----------|----------|-------------|---------|-----------|------|
 | Developer | $0 | 10 | 5 | 5,000 | 3 | 1 MB | 5 MB | 0 | 1 |
-| Team | $299/mo | 100 | Unlimited | Unlimited | 10 | 5 MB | 25 MB | 1,000 | 5 |
+| Starter | $299/mo | 100 | Unlimited | Unlimited | 10 | 5 MB | 25 MB | 1,000 | 5 |
 | Growth | $699/mo | 500 | Unlimited | Unlimited | 25 | 10 MB | 50 MB | 10,000 | 15 |
 | Enterprise | $1,999+/mo | Unlimited | Unlimited | Unlimited | Unlimited | 20 MB | 100 MB | Unlimited | Unlimited |
 
@@ -34,8 +34,8 @@
 - [ ] Progress bar reflects usage
 - [ ] Shows "Solo developer" for team (1 user)
 
-### 1.2 Team Tier Display ($299/mo)
-- [ ] QuotaWidget shows "Team" tier label
+### 1.2 Starter Tier Display ($299/mo)
+- [ ] QuotaWidget shows "Starter" tier label
 - [ ] Shows scans used / 100 max
 - [ ] Shows unlimited files-per-scan
 - [ ] Shows projects used / 10 max
@@ -74,10 +74,10 @@
 - [ ] Upgrade URL provided in error response (/pricing)
 - [ ] UI shows quota exhausted state
 
-### 2.2 Team Tier (100 scans/month - $299/mo)
+### 2.2 Starter Tier (100 scans/month - $299/mo)
 - [ ] Scans 1-100 succeed
 - [ ] 101st scan blocked
-- [ ] Error message appropriate for Team tier
+- [ ] Error message appropriate for Starter tier
 - [ ] Suggests upgrade to Growth
 
 ### 2.3 Growth Tier (500 scans/month - $699/mo)
@@ -101,7 +101,7 @@
 - [ ] Error shows file count and limit
 - [ ] Upgrade message shown
 
-### 3.2 Team/Growth/Enterprise Tier (Unlimited)
+### 3.2 Starter/Growth/Enterprise Tier (Unlimited)
 - [ ] Large archive uploads successfully
 - [ ] No file count limit applied
 - [ ] max_files_per_scan = -1 in database
@@ -119,7 +119,7 @@
 - [ ] Error shows total LoC and limit
 - [ ] Upgrade message suggests Team tier
 
-### 3b.2 Team/Growth/Enterprise (Unlimited)
+### 3b.2 Starter/Growth/Enterprise (Unlimited)
 - [ ] Large codebases upload successfully
 - [ ] No LoC limit applied
 - [ ] max_loc_per_scan = -1 in database
@@ -135,7 +135,7 @@
 - [ ] Archive over 5 MB shows 413 error
 - [ ] Error shows tier and limit info
 
-### 4.2 Team Tier ($299/mo)
+### 4.2 Starter Tier ($299/mo)
 - [ ] Single file up to 5 MB succeeds
 - [ ] Archive up to 25 MB succeeds
 - [ ] Oversized files show appropriate error
@@ -180,12 +180,12 @@
 |------|---------------|-------------|
 | Enterprise | 5 | Highest priority |
 | Growth | 15 | High priority |
-| Team | 30 | Medium priority |
+| Starter | 30 | Medium priority |
 | Developer | 50 | Normal priority |
 
 - [ ] Enterprise scans processed first (priority 5)
 - [ ] Growth scans processed second (priority 15)
-- [ ] Team scans processed third (priority 30)
+- [ ] Starter scans processed third (priority 30)
 - [ ] Developer scans processed last (priority 50)
 - [ ] Queue order visible in scan status
 
@@ -199,7 +199,7 @@
 - [ ] Error message shows quota and upgrade path
 - [ ] UI reflects project count/limit
 
-### 7.2 Team Tier (10 projects max - $299/mo)
+### 7.2 Starter Tier (10 projects max - $299/mo)
 - [ ] Projects 1-10 created successfully
 - [ ] 11th project blocked with 403 error
 - [ ] Suggests upgrade to Growth
@@ -233,7 +233,7 @@
 - [ ] Upgrade message suggests Growth tier (API access starts at Growth)
 - [ ] API key creation blocked
 
-### 8.2 Team Tier (1,000 calls/month - $299/mo)
+### 8.2 Starter Tier (1,000 calls/month - $299/mo)
 - [ ] API calls 1-1,000 succeed
 - [ ] 1,001st call returns 429 error
 - [ ] Counter increments per request
@@ -263,7 +263,7 @@
 - [ ] Solo user only
 - [ ] Upgrade prompt for team features
 
-### 9.2 Team Tier (5 users - $299/mo)
+### 9.2 Starter Tier (5 users - $299/mo)
 - [ ] Invites 1-4 succeed (plus owner = 5)
 - [ ] 5th invite blocked
 - [ ] Current seat count shown
@@ -288,7 +288,7 @@
 - [ ] Error response includes upgrade URL
 - [ ] Error message: "Export feature is not available on your current tier"
 
-### 10.2 Team/Growth/Enterprise (Export Enabled)
+### 10.2 Starter/Growth/Enterprise (Export Enabled)
 - [ ] Export buttons visible and functional
 - [ ] PDF export works
 - [ ] JSON export works
