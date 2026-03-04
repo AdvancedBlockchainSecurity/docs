@@ -218,9 +218,15 @@ These standards ensure proper versioning and configuration management:
     - API key availability per tier
     - Rate limiting by tier
 
+25. **[Organization, Team, and User Hierarchy](./organization-team-user-hierarchy.md)** [NEW]
+    - Organization → Team → User data model and relationships
+    - RBAC roles (owner, admin, member, viewer) and permissions
+    - Tier requirements for org creation (starter+) and service accounts (growth+)
+    - Invite workflow, data scoping rules, enterprise features (SSO/SAML)
+
 ### ☸️ Kubernetes Standards
 
-25. **[Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md)** [NEW]
+26. **[Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md)** [NEW]
     - Revision history limits (`revisionHistoryLimit: 3`)
     - Pod-level and container-level security contexts
     - NetworkPolicy patterns (default-deny, ingress, egress)
@@ -228,7 +234,7 @@ These standards ensure proper versioning and configuration management:
     - Volume mounts for read-only root filesystem
     - Troubleshooting pod lifecycle issues
 
-26. **[Kustomize Standards](./kustomize-standards.md)** [NEW]
+27. **[Kustomize Standards](./kustomize-standards.md)** [NEW]
     - Base vs overlay directory structure
     - Patch file naming conventions
     - Environment-specific configuration patterns
@@ -236,7 +242,7 @@ These standards ensure proper versioning and configuration management:
     - Common patterns and anti-patterns
     - Validation and troubleshooting
 
-27. **[Cluster Baseline](./cluster-baseline.md)** [NEW]
+28. **[Cluster Baseline](./cluster-baseline.md)** [NEW]
     - Expected healthy cluster state (pods, deployments, replicas)
     - revisionHistoryLimit validation
     - Resource thresholds (CPU, memory, disk)
@@ -247,13 +253,13 @@ These standards ensure proper versioning and configuration management:
 
 ### ✅ Compliance & Verification
 
-28. **[Compliance Checklist](./compliance-checklist.md)**
+29. **[Compliance Checklist](./compliance-checklist.md)**
     - Daily development checklist
     - Making changes checklist
     - Database configuration changes checklist
     - Code review checklist
 
-29. **[Smoke Test](./smoke-test.md)** [NEW]
+30. **[Smoke Test](./smoke-test.md)** [NEW]
     - Platform smoke test after deployments
     - Pre-flight infrastructure checks
     - External and internal service health checks
@@ -317,6 +323,7 @@ docs/standards/
 ├── ingress-networking.md
 ├── api-endpoint-auth.md           # NEW: API authentication and scope enforcement
 ├── tier-standards.md
+├── organization-team-user-hierarchy.md  # NEW: Org→Team→User data model, RBAC, invite workflow
 ├── kubernetes-pod-lifecycle.md    # NEW: Pod lifecycle, security contexts, NetworkPolicies
 ├── kustomize-standards.md         # NEW: Kustomize base/overlay patterns
 ├── secure-coding.md               # NEW: Security-first development, OWASP Top 10

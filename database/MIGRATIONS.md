@@ -1648,6 +1648,35 @@ asyncio.run(verify())
 
 ---
 
+### Migration 079: Rename Team Tier to Starter
+- **Status**: ✅ Completed
+- **Created**: 2026-03-03
+- **Revision ID**: `079_rename_team_tier_to_starter`
+- **Previous Revision**: `078_add_referral_system`
+- **Description**: Rename "team" tier to "starter" to better communicate its position as entry-level paid tier
+- **Changes**:
+  - DROP CHECK constraints: `check_tier_valid`, `check_user_quota_tier_valid`
+  - UPDATE `users` SET `tier` = 'starter' WHERE `tier` = 'team'
+  - UPDATE `user_quotas` SET `tier` = 'starter' WHERE `tier` = 'team'
+  - UPDATE `referral_rewards` SET `plan_tier` = 'starter' WHERE `plan_tier` = 'team'
+  - ALTER TYPE `tier_enum` RENAME VALUE 'team' TO 'starter'
+  - Recreate CHECK constraints with updated valid values: (developer, starter, growth, enterprise)
+  - Update server default on `referral_rewards.plan_tier`
+- **Downgrade**: Reverses all changes (rename 'starter' back to 'team', update all affected tables, recreate constraints)
+- **Migration File**: `alembic/versions/20260303_1000-079_rename_team_tier_to_starter.py`
+- **Related Files**:
+  - Models: `blocksecops-api-service/src/infrastructure/database/models.py` (TierEnum)
+  - SCHEMA.md: Updated tier_enum documentation to show (developer, starter, growth, enterprise)
+- **Tables Affected**:
+  - `users` — All 'team' tier values renamed to 'starter'
+  - `user_quotas` — All 'team' tier values renamed to 'starter'
+  - `referral_rewards` — All 'team' plan_tier values renamed to 'starter'
+  - `organizations` — All 'team' tier values renamed to 'starter' (if applicable)
+  - `subscriptions` — All 'team' plan_tier values renamed to 'starter' (if applicable)
+- **Deployed**: API Service v0.29.62
+
+---
+
 ### Migration Compatibility Check (Deduplication Maintenance Job)
 
 **Added:** February 22, 2026

@@ -402,7 +402,7 @@ Click **History** button on a channel:
 ### 6.8 Access Control
 
 - [ ] Page requires "growth" tier or higher (full API access)
-- [ ] Developer/Team tier users see upgrade prompt
+- [ ] Developer/Starter tier users see upgrade prompt
 - [ ] Each user sees only their own channels
 
 ---

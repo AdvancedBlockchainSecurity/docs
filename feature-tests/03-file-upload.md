@@ -11,20 +11,20 @@
 ### 0.1 Files-Per-Scan Limit
 - [ ] Developer tier: Archive with 5 files succeeds
 - [ ] Developer tier: Archive with 6+ files returns 402
-- [ ] Team+: No file limit (max_files_per_scan = -1)
+- [ ] Starter+: No file limit (max_files_per_scan = -1)
 - [ ] Error includes file_count and limit
 
 ### 0.2 Lines-of-Code Limit (NEW)
 - [ ] Developer tier: Code under 5,000 LoC succeeds
 - [ ] Developer tier: Code over 5,000 LoC returns 402 error
-- [ ] Team+: No LoC limit (max_loc_per_scan = -1)
+- [ ] Starter+: No LoC limit (max_loc_per_scan = -1)
 - [ ] Error includes total_loc and max_loc_per_scan
 
 ### 0.3 File Size Limits (Tier-Based)
 | Tier | Price | Single File | Archive |
 |------|-------|-------------|---------|
 | Developer | $0 | 1 MB | 5 MB |
-| Team | $299/mo | 5 MB | 25 MB |
+| Starter | $299/mo | 5 MB | 25 MB |
 | Growth | $699/mo | 10 MB | 50 MB |
 | Enterprise | $1,999+/mo | 20 MB | 100 MB |
 

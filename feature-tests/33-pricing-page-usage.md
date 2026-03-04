@@ -90,15 +90,15 @@ The Pricing page now displays the authenticated user's current plan and usage st
 
 ---
 
-### TC-33.5: Team/Growth/Enterprise Tier User View
+### TC-33.5: Starter/Growth/Enterprise Tier User View
 
-**Objective**: Verify Team/Growth/Enterprise users see appropriate display
+**Objective**: Verify Starter/Growth/Enterprise users see appropriate display
 
 **Prerequisites**:
-- User on Team, Growth, or Enterprise tier
+- User on Starter, Growth, or Enterprise tier
 
 **Steps**:
-1. Log in as Team/Growth/Enterprise user
+1. Log in as Starter/Growth/Enterprise user
 2. Navigate to /pricing
 
 **Expected Results**:
@@ -163,7 +163,7 @@ The Pricing page now displays the authenticated user's current plan and usage st
 - [ ] "Limit Reached" badge displayed
 - [ ] Progress bar is red
 - [ ] Upgrade CTA section visible
-- [ ] "Buy Credits" and "Upgrade to Team" buttons displayed
+- [ ] "Buy Credits" and "Upgrade to Starter" buttons displayed
 
 ---
 
@@ -205,19 +205,19 @@ The Pricing page now displays the authenticated user's current plan and usage st
 
 ### TC-33.11: Scroll to Tier on Upgrade Click
 
-**Objective**: Verify "Upgrade to Team" scrolls to Team tier card
+**Objective**: Verify "Upgrade to Starter" scrolls to Starter tier card
 
 **Prerequisites**:
 - User at limit with upgrade CTAs visible
 
 **Steps**:
 1. Navigate to /pricing as at-limit user
-2. Click "Upgrade to Team" button in CurrentPlanBanner
+2. Click "Upgrade to Starter" button in CurrentPlanBanner
 
 **Expected Results**:
-- [ ] Page scrolls to Team tier card
+- [ ] Page scrolls to Starter tier card
 - [ ] Scroll is smooth animation
-- [ ] Team tier card is visible in viewport
+- [ ] Starter tier card is visible in viewport
 
 ---
 
@@ -263,7 +263,7 @@ The Pricing page now displays the authenticated user's current plan and usage st
 ┌─────────────────────┐     ┌─────────────────────┐
 │                     │     │ ═══════════════════ │ ← Green ring
 │     DEVELOPER       │     │     YOUR PLAN       │
-│                     │     │        TEAM         │
+│                     │     │      STARTER        │
 │    10 scans/mo      │     │   45 / 100          │ ← Usage stats
 │                     │     │   [████░░░░░░░░░░]  │ ← Progress bar
 │   [Get Started]     │     │    [Manage Plan]    │

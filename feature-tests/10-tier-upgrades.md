@@ -17,7 +17,7 @@
 
 ---
 
-## 1. Developer to Team Upgrade
+## 1. Developer to Starter Upgrade
 
 ### 1.1 Upgrade Initiation
 - [ ] Upgrade button visible on pricing page for Developer users
@@ -52,10 +52,10 @@
 
 ---
 
-## 2. Team to Growth Upgrade
+## 2. Starter to Growth Upgrade
 
 ### 2.1 Upgrade Initiation
-- [ ] "Upgrade to Growth" button visible for Team users
+- [ ] "Upgrade to Growth" button visible for Starter users
 - [ ] Upgrade benefits clearly shown (more users, full API access, webhooks, CI/CD)
 - [ ] Price shown ($699/month)
 - [ ] Clicking upgrade navigates to payment flow
@@ -227,23 +227,23 @@
 - [ ] Shows sparkles icon on left
 - [ ] Message shows "Upgrade to {next tier} to unlock more features"
 - [ ] Shows up to 3 feature highlights for next tier (desktop only)
-- [ ] Price badge visible (e.g., "$189/mo")
+- [ ] Price badge visible (e.g., "$299/mo")
 - [ ] "View Plans" button links to /pricing
 
 ### 8.2 Tier-Based Messaging
-- [ ] Developer user sees: "Upgrade to Team..."
-- [ ] Team user sees: "Upgrade to Growth..."
+- [ ] Developer user sees: "Upgrade to Starter..."
+- [ ] Starter user sees: "Upgrade to Growth..."
 - [ ] Growth user sees: "Upgrade to Enterprise..."
 - [ ] Enterprise user: Banner NOT shown
 
 ### 8.3 Feature Highlights per Tier
 
-**Team tier highlights shown to Developer users:**
+**Starter tier highlights shown to Developer users:**
 - [ ] Quality Gates
 - [ ] CI/CD Integration
 - [ ] Team Collaboration (5 users)
 
-**Growth tier highlights shown to Team users:**
+**Growth tier highlights shown to Starter users:**
 - [ ] Full API Access
 - [ ] 100 AI Explanations/month
 - [ ] Up to 15 team members
@@ -314,7 +314,7 @@ localStorage.removeItem('upgrade-banner-dismissed:{userId}')
 **Scan Quota (402)**:
 ```json
 {
-  "detail": "Monthly scan limit reached (10/10). Upgrade to Team for 100 scans/month.",
+  "detail": "Monthly scan limit reached (10/10). Upgrade to Starter for 100 scans/month.",
   "current_tier": "developer",
   "upgrade_url": "/pricing"
 }

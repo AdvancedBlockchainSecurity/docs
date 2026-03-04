@@ -19,9 +19,9 @@ Platform integrations enable connecting Apogee to external version control syste
 
 | Provider | Type | Tier Required | Features |
 |----------|------|---------------|----------|
-| GitHub | VCS | Team+ | Repository import, auto-scan on push/PR |
-| GitLab | VCS | Team+ | Repository import, auto-scan on push/PR |
-| Bitbucket | VCS | Team+ | Repository import, auto-scan on push/PR |
+| GitHub | VCS | Starter+ | Repository import, auto-scan on push/PR |
+| GitLab | VCS | Starter+ | Repository import, auto-scan on push/PR |
+| Bitbucket | VCS | Starter+ | Repository import, auto-scan on push/PR |
 | Jira | Issue Tracking | Enterprise | Vulnerability-to-issue sync, project mapping |
 
 **Note:** Jenkins integration is NOT implemented. CI/CD scanning is available via the CLI tool and webhooks instead.
@@ -47,7 +47,7 @@ Platform integrations enable connecting Apogee to external version control syste
 |------|--------|-----------------|
 | 1 | Login as Developer tier user | Login successful |
 | 2 | Navigate to `/integrations` | TierGate blocks access, shows upgrade prompt |
-| 3 | Login as Team tier user | Login successful |
+| 3 | Login as Starter tier user | Login successful |
 | 4 | Navigate to `/integrations` | Page loads, all integrations show "Connect" button (GitHub, GitLab, Bitbucket, Jira, Jenkins) |
 | 5 | Check Jira integration card | Shows "Connect" button (available to all paying tiers) |
 | 6 | Login as Enterprise tier user | Login successful |
@@ -60,7 +60,7 @@ Platform integrations enable connecting Apogee to external version control syste
 **Goal:** Verify GitHub OAuth connection flow
 
 **Prerequisites:**
-- Team+ tier account
+- Starter+ tier account
 - GitHub OAuth app configured in backend
 
 **Test Steps:**
@@ -85,7 +85,7 @@ Platform integrations enable connecting Apogee to external version control syste
 **Goal:** Verify GitLab OAuth connection flow
 
 **Prerequisites:**
-- Team+ tier account
+- Starter+ tier account
 - GitLab OAuth app configured in backend
 
 **Test Steps:**
@@ -104,7 +104,7 @@ Platform integrations enable connecting Apogee to external version control syste
 **Goal:** Verify Bitbucket OAuth connection flow
 
 **Prerequisites:**
-- Team+ tier account
+- Starter+ tier account
 - Bitbucket OAuth app configured in backend
 
 **Test Steps:**
@@ -271,7 +271,7 @@ Platform integrations enable connecting Apogee to external version control syste
 **Goal:** Verify Jira project mapping configuration
 
 **Prerequisites:**
-- Connected Jira integration (Team+ tier)
+- Connected Jira integration (Starter+ tier)
 
 **API Endpoint:** `POST /organizations/{orgId}/integrations/{integrationId}/jira/mappings`
 
