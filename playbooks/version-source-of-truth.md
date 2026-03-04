@@ -1,7 +1,7 @@
 # Playbook: Version Source-of-Truth Management
 
-**Version:** 1.0.0
-**Last Updated:** March 1, 2026
+**Version:** 1.1.0
+**Last Updated:** March 4, 2026
 **Status:** Active
 
 ## Overview
@@ -19,7 +19,23 @@ Operational procedures for managing service versions across the Apogee platform,
 
 ## Part 1: Version Bump
 
-### 1.1 Bump a Python Service
+### 1.1 Recommended: Bump a Python Service (Using bump-version.sh)
+
+```bash
+cd ~/Git/blocksecops-<service>
+
+# Bump patch/minor/major version (auto-syncs kustomization)
+./scripts/bump-version.sh patch   # 0.29.0 → 0.29.1
+./scripts/bump-version.sh minor   # 0.29.1 → 0.30.0
+./scripts/bump-version.sh major   # 0.30.0 → 1.0.0
+
+# The script:
+# 1. Updates pyproject.toml with new version
+# 2. Calls sync-version.sh to update all kustomization.yaml newTag values
+# 3. Both are committed together
+```
+
+### 1.1 (Alternative) Manual Bump a Python Service
 
 ```bash
 cd ~/Git/blocksecops-<service>
@@ -28,15 +44,10 @@ cd ~/Git/blocksecops-<service>
 #    Edit pyproject.toml: version = "X.Y.Z"
 sed -i 's/version = ".*"/version = "0.30.0"/' pyproject.toml
 
-# 2. Update kustomization to match
-#    Edit k8s/overlays/local/<service>/kustomization.yaml: newTag: "X.Y.Z"
-sed -i 's/newTag: ".*"/newTag: "0.30.0"/' k8s/overlays/local/<service>/kustomization.yaml
+# 2. Auto-sync all kustomization newTag values to match source
+/home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh .
 
-# 3. If kustomization has app.kubernetes.io/version label, update that too
-sed -i 's/app.kubernetes.io\/version: ".*"/app.kubernetes.io\/version: "0.30.0"/' \
-  k8s/overlays/local/<service>/kustomization.yaml
-
-# 4. Verify both match
+# 3. Verify both match
 grep '^version' pyproject.toml
 grep 'newTag:' k8s/overlays/local/<service>/kustomization.yaml
 ```
@@ -49,8 +60,8 @@ cd ~/Git/blocksecops-<service>
 # 1. Update source of truth
 npm version 0.47.0 --no-git-tag-version
 
-# 2. Update kustomization to match
-sed -i 's/newTag: ".*"/newTag: "0.47.0"/' k8s/overlays/local/kustomization.yaml
+# 2. Auto-sync all kustomization newTag values to match source
+/home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh .
 
 # 3. Verify
 grep '"version"' package.json | head -1
@@ -74,20 +85,21 @@ grep 'newTag:' k8s/overlays/local/kustomization.yaml
 ```bash
 cd ~/Git/blocksecops-<service>
 
-# Full cycle: version check -> build -> push -> apply -> verify
+# Full cycle: version check -> build -> push -> sync -> apply -> verify
 ./scripts/deploy.sh
 ```
 
 The script will:
 1. Extract version from `pyproject.toml`/`package.json`
-2. Verify kustomization `newTag` matches (fails if not)
+2. Auto-sync kustomization `newTag` to match source (calls sync-version.sh)
 3. Build Docker image with version as tag + build arg
 4. Push to Harbor
-5. Suspend CronJobs
-6. `kubectl apply -k`
+5. Suspend CronJobs (prevents stale image execution)
+6. `kubectl apply -k` (updates Deployment AND CronJob to synced newTag)
 7. Wait for rollout
-8. Verify deployed image tags
+8. Verify deployed image tags match source version
 9. Resume CronJobs
+10. Commit version + kustomization changes together
 
 ### 2.2 Apply-Only Deploy (Skip Build)
 
@@ -96,6 +108,12 @@ When the image already exists in Harbor and you only need to update Kubernetes:
 ```bash
 ./scripts/deploy.sh --skip-build
 ```
+
+This will:
+1. Auto-sync kustomization `newTag` to match source version
+2. Apply kustomization
+3. Verify deployed images match source version
+4. Commit kustomization changes
 
 ### 2.3 Dry Run
 
@@ -241,10 +259,12 @@ curl -s -k -u admin:${HARBOR_PASSWORD} \
 
 **Symptom:** `Version mismatch! pyproject.toml: 0.30.0, kustomization.yaml: 0.29.39`
 
-**Fix:** Update kustomization `newTag` to match source file:
+**Context:** This error indicates kustomization is out of sync with the source version. As of March 2026, `deploy.sh` auto-syncs kustomization, so this error should not occur unless the sync failed.
+
+**Fix:** Manually sync kustomization `newTag` to match source file:
 
 ```bash
-sed -i 's/newTag: ".*"/newTag: "0.30.0"/' k8s/overlays/local/<service>/kustomization.yaml
+/home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh .
 ./scripts/deploy.sh
 ```
 

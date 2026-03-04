@@ -29,7 +29,7 @@ x402 is a crypto-native payment protocol that enables:
 | **Pro** | 200 | $400 | $2.00 | 33% |
 | **Bulk** | 1,000 | $1,500 | $1.50 | 50% |
 
-**Pricing logic**: Team subscription is $299/month for 15 contracts (~$20/contract). x402 credits offer flexibility for occasional users without subscription commitment. For regular scanning, subscriptions provide better value.
+**Pricing logic**: Starter subscription is $299/month for 15 contracts (~$20/contract). x402 credits offer flexibility for occasional users without subscription commitment. For regular scanning, subscriptions provide better value.
 
 ---
 

@@ -1,7 +1,7 @@
 # Version Source-of-Truth Pipeline
 
-**Version:** 1.0.0
-**Last Updated:** March 1, 2026
+**Version:** 1.1.0
+**Last Updated:** March 4, 2026
 
 ## Overview
 
@@ -13,7 +13,8 @@ Technical pipeline for version propagation from source file through deployed Kub
 Source File                  deploy.sh                    Kubernetes Cluster
 ───────────                  ─────────                    ──────────────────
 pyproject.toml ──extract──►  Step 1: VERSION var
-                             Step 2: Verify kustomization ◄── kustomization.yaml
+                             Step 2: Auto-sync kustomization ◄── kustomization.yaml
+                                      (calls sync-version.sh)
                              Step 3: docker build ────────►  Harbor Registry
                              Step 4: docker push ─────────►  (immutable tag)
                              Step 5: Suspend CronJobs ────►  CronJobs paused
@@ -47,16 +48,21 @@ Method:
   Rust:   grep '^version' Cargo.toml | head -1 | cut -d'"' -f2
 ```
 
-### Stage 2: Kustomization Validation
+### Stage 2: Kustomization Auto-Sync
 
 ```
 Input:  SOURCE_VERSION, k8s/overlays/local/<service>/kustomization.yaml
-Check:  newTag == SOURCE_VERSION
-Fail:   Exit 1 with error message showing both values
-Fix:    Update kustomization newTag to match source file
+Action: Call /home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh
+Output: All kustomization.yaml files updated to newTag: SOURCE_VERSION
+        app.kubernetes.io/version labels updated to SOURCE_VERSION
+Fix:    If sync fails, manually run sync-version.sh
 ```
 
-This is a **hard gate** — no build occurs if versions don't match.
+The sync-version.sh script:
+1. Reads version from source file (pyproject.toml, package.json, or Cargo.toml)
+2. Updates all kustomization.yaml `newTag` values under `k8s/` to match
+3. Updates `app.kubernetes.io/version` labels in kustomization files
+4. Result: No version drift between source file and kustomization
 
 ### Stage 3: Docker Build
 
@@ -177,7 +183,7 @@ For each service in registry:
 
 | Failure Point | Behavior | Recovery |
 |---------------|----------|----------|
-| Version mismatch (stage 2) | Script exits before build | Update kustomization `newTag` to match source |
+| Kustomization sync fails (stage 2) | Script exits before build | Manually run sync-version.sh, check for file permission issues |
 | Docker build fails (stage 3) | Script exits, CronJobs still suspended | Fix build error, re-run; or manually resume CronJobs |
 | Docker push fails (stage 4) | Script exits | Check Harbor connectivity; if immutable tag conflict, bump version |
 | kubectl apply fails (stage 6) | Script exits | Check RBAC, manifests; manually resume CronJobs |
@@ -200,11 +206,13 @@ kubectl get cronjob -n <namespace> -o name | \
 | `pyproject.toml` | `<service-repo>/pyproject.toml` | Python version source of truth |
 | `package.json` | `<service-repo>/package.json` | Node.js version source of truth |
 | `Cargo.toml` | `<service-repo>/Cargo.toml` | Rust version source of truth |
-| `kustomization.yaml` | `<service-repo>/k8s/overlays/local/<service>/` | Kubernetes image tag reference |
+| `kustomization.yaml` | `<service-repo>/k8s/overlays/local/<service>/` | Kubernetes image tag reference (auto-synced) |
 | `Dockerfile` | `<service-repo>/Dockerfile` | Consumes `SERVICE_VERSION` build arg |
 | `deploy.sh` | `<service-repo>/scripts/deploy.sh` | Full deploy pipeline automation |
+| `sync-version.sh` | `blocksecops-shared/scripts/docker/sync-version.sh` | **NEW** — Auto-syncs all kustomization newTag values |
+| `common.sh` | `blocksecops-shared/scripts/docker/common.sh` | Shared version detection functions |
 | `check-version-drift.sh` | `/home/pwner/Git/scripts/check-version-drift.sh` | Platform-wide drift detection |
-| `bump-version.sh` | `<service-repo>/scripts/bump-version.sh` | **Legacy** — updates `VERSION` file only |
+| `bump-version.sh` | `<service-repo>/scripts/bump-version.sh` | Rewritten — reads pyproject.toml, calls sync-version.sh |
 
 ---
 

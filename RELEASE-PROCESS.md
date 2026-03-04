@@ -1,6 +1,6 @@
 # Apogee Platform - Release Process
 
-**Last Updated**: October 12, 2025
+**Last Updated**: March 4, 2026
 **Status**: Active
 **Owner**: Platform Engineering Team
 
@@ -175,12 +175,12 @@ FROM python:3.13.7-slim as runtime
 
 **Requirements**:
 - Node.js 24.9+ (LTS)
-- VERSION file at repository root
 - package.json with version field
 - npm test with coverage
 
 **Release Notes**:
 - `blocksecops-ui-core` is a shared library, no Docker image built
+- ui-core is **not deployed to the cluster** — repository remains on GitHub but is not live
 
 ### Rust Services
 

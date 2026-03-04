@@ -150,10 +150,10 @@ Stripe Price IDs are stored in `tiers.json`:
 ```json
 {
   "tiers": {
-    "team": {
-      "stripeProductId": "prod_team",
-      "stripePriceIdMonthly": "price_team_monthly",
-      "stripePriceIdAnnual": "price_team_annual"
+    "starter": {
+      "stripeProductId": "prod_starter",
+      "stripePriceIdMonthly": "price_starter_monthly",
+      "stripePriceIdAnnual": "price_starter_annual"
     }
   }
 }
