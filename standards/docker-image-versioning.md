@@ -508,8 +508,185 @@ FROM ${BASE_REGISTRY}/blocksecops/blocksecops-orchestration-base:${BASE_IMAGE_TA
 
 ---
 
+## Scanner Image Versioning
+
+Scanner images follow a **different versioning model** than service images. Scanners are standalone Docker images that run in Kubernetes Jobs, managed by the tool-integration service.
+
+### Source of Truth
+
+**ConfigMap `scanner-versions`** in the `tool-integration-local` namespace is the single source of truth for scanner image versions and metadata.
+
+**File:** `blocksecops-tool-integration/k8s/base/scanner-versions-configmap.yaml`
+
+```yaml
+data:
+  SCANNER_METADATA: |
+    {
+      "slither": {
+        "version": "0.11.5",
+        "developer": "Crytic/Trail of Bits",
+        "_note": "Updated 2026-03-04, upgraded from 0.11.3"
+      },
+      "mythril": {
+        "version": "0.23.0",
+        "developer": "ConsenSys",
+        "_note": "Updated 2026-02-28, added memory limit handling"
+      }
+    }
+  SCANNER_IMAGE_SLITHER: "harbor.blocksecops.local/blocksecops/scanner-slither:0.3.2"
+  SCANNER_IMAGE_MYTHRIL: "harbor.blocksecops.local/blocksecops/scanner-mythril:0.4.1"
+  # ... more scanners
+```
+
+### Dual Version Model
+
+Each scanner has **two version numbers**:
+
+| Version Type | Example | Purpose | Source |
+|--------------|---------|---------|--------|
+| **Upstream Tool Version** | `0.11.5` (slither) | Third-party scanner tool release | `SCANNER_METADATA[scanner].version` |
+| **Apogee Scanner Image Version** | `0.3.2` | Our wrapper image version for K8s tracking | `SCANNER_IMAGE_*` tag |
+
+**Why two versions?**
+- Upstream versions change with each scanner release
+- Image versions track wrapper changes, base image updates, and bug fixes
+- Both are immutable in Harbor
+- Each increment requires a rebuild and push
+
+### Scanner Image Tag Format
+
+```
+harbor.blocksecops.local/blocksecops/scanner-{name}:{image-version}
+
+Examples:
+- harbor.blocksecops.local/blocksecops/scanner-slither:0.3.2
+- harbor.blocksecops.local/blocksecops/scanner-mythril:0.4.1
+```
+
+### Semantic Versioning for Scanner Images
+
+| Increment | When | Example |
+|-----------|------|---------|
+| **PATCH** | Wrapper script fix, base image update | `0.3.1` → `0.3.2` |
+| **MINOR** | Upstream tool upgrade (new features) | `0.3.2` → `0.4.0` |
+| **MAJOR** | Breaking wrapper changes | `0.4.0` → `1.0.0` |
+
+### Dockerfile ARG Defaults
+
+All scanner Dockerfiles use `ARG` with defaults that must match the ConfigMap:
+
+**File:** `blocksecops-tool-integration/scanner-images/slither/Dockerfile`
+
+```dockerfile
+ARG SCANNER_IMAGE_VERSION=0.3.2
+ARG UPSTREAM_TOOL_VERSION=0.11.5
+ARG BUILD_DATE
+ARG VCS_REF
+
+FROM python:3.11-slim
+
+LABEL org.opencontainers.image.title="Apogee Slither Scanner"
+LABEL org.opencontainers.image.version="${SCANNER_IMAGE_VERSION}"
+LABEL org.opencontainers.image.vendor="Apogee"
+LABEL scanner.tool.version="${UPSTREAM_TOOL_VERSION}"
+
+# Clone upstream scanner at specific version
+RUN git clone --branch v${UPSTREAM_TOOL_VERSION} --depth 1 \
+  https://github.com/crytic/slither.git .
+```
+
+**Critical:** The `ARG SCANNER_IMAGE_VERSION=X.Y.Z` default must exactly match the value in `SCANNER_IMAGE_*` ConfigMap key.
+
+### KJM Fallback Defaults
+
+The Kubernetes Job Manager (`src/scanners/kubernetes_job_manager.py`) in tool-integration maintains a `default_images` dict as a fallback when ConfigMap is unavailable:
+
+```python
+default_images = {
+    "slither": "harbor.blocksecops.local/blocksecops/scanner-slither:0.3.2",
+    "mythril": "harbor.blocksecops.local/blocksecops/scanner-mythril:0.4.1",
+    # ... more scanners
+}
+```
+
+**Critical:** This fallback must be kept in sync with ConfigMap values. Update it whenever ConfigMap `SCANNER_IMAGE_*` tags change.
+
+### OCI Labels
+
+All scanner Dockerfiles use OCI-compliant labels (standard across all images):
+
+```dockerfile
+ARG SCANNER_IMAGE_VERSION=0.3.2
+ARG UPSTREAM_TOOL_VERSION=0.11.5
+ARG BUILD_DATE
+ARG VCS_REF
+
+LABEL org.opencontainers.image.title="Apogee Slither Scanner"
+LABEL org.opencontainers.image.description="Slither security analysis tool"
+LABEL org.opencontainers.image.version="${SCANNER_IMAGE_VERSION}"
+LABEL org.opencontainers.image.created="${BUILD_DATE}"
+LABEL org.opencontainers.image.revision="${VCS_REF}"
+LABEL org.opencontainers.image.vendor="Apogee"
+LABEL scanner.tool.version="${UPSTREAM_TOOL_VERSION}"
+```
+
+Build with all ARGs:
+
+```bash
+docker build \
+  --build-arg SCANNER_IMAGE_VERSION=0.3.2 \
+  --build-arg UPSTREAM_TOOL_VERSION=0.11.5 \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(git rev-parse --short HEAD) \
+  -t harbor.blocksecops.local/blocksecops/scanner-slither:0.3.2 \
+  scanner-images/slither/
+```
+
+### Immutable Tags in Harbor
+
+Like all Apogee images, scanner image tags are immutable in Harbor. **Any change to a Dockerfile requires a version bump** — you cannot overwrite an existing tag.
+
+```
+❌ WRONG: Rebuild scanner-slither:0.3.2 after Dockerfile change
+           → Harbor push will be rejected (tag already exists)
+
+✅ CORRECT: Bump to 0.3.3, rebuild, push new tag
+```
+
+### Version Bump Workflow for Scanners
+
+Complete procedure when updating a scanner:
+
+```
+1. Update ConfigMap SCANNER_METADATA version (upstream version)
+2. Update ConfigMap SCANNER_METADATA _note field (changelog)
+3. Update Dockerfile ARG SCANNER_IMAGE_VERSION default
+4. Update Dockerfile ARG UPSTREAM_TOOL_VERSION (if upgrading tool)
+5. Update KJM default_images dict to match ConfigMap
+6. Build with all ARGs: BUILD_DATE, VCS_REF, SCANNER_IMAGE_VERSION, UPSTREAM_TOOL_VERSION
+7. Push to Harbor
+8. Apply ConfigMap: kubectl apply -k k8s/overlays/local/
+9. Rebuild + push tool-integration service (since KJM default_images changed)
+10. Verify scanner jobs use new image
+```
+
+See [Scanner Image Version Bump Workflow](../workflows/scanner-image-version-bump.md) for detailed steps.
+
+### No pyproject.toml for Scanners
+
+Unlike services (which use `pyproject.toml` as source of truth), scanner images:
+- Are standalone Docker images in `scanner-images/<name>/`
+- Have no Python project file
+- Use ConfigMap as the single source of truth
+- Require manual version updates in Dockerfile and ConfigMap
+
+---
+
 ## Related Documentation
 
 - [Docker Base Images](./docker-base-images.md) - Pre-built base images for heavy dependencies
+- [Scanner Image Version Bump Workflow](../workflows/scanner-image-version-bump.md) - Step-by-step version bump procedure
+- [Scanner Image Build Pipeline](../pipelines/scanner-image-build-pipeline.md) - Build and push pipeline
+- [Scanner Image Rebuild Playbook](../playbooks/scanner-image-rebuild-all.md) - Rebuilding all 16 scanners
 - [Docker Standardization Plan](/home/pwner/Git/TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-01-17-DOCKER-STANDARDIZATION-PLAN.md)
 - [Harbor Local Installation](/home/pwner/Git/TaskDocs-Apogee/phases/02-phase-3.1a1-add-harbor/HARBOR-LOCAL-INSTALLATION.md)
