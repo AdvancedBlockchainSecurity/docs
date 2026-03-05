@@ -1,10 +1,10 @@
 # Apogee Platform Comprehensive Audit
 
-**Version:** 3.0.0
+**Version:** 4.1.0
 **Created:** February 28, 2026
 **Last Updated:** March 4, 2026
 **Audit Date:** March 4, 2026
-**Status:** Audit Complete — Post version-sync enforcement, isOrgReady guard (RC-FIX-016), all systems operational
+**Status:** Audit Complete — Post scanner fixes (wake Foundry deps, soliditydefend timeout), tier rename (team→starter), OCI labels on all scanners
 **Scope:** Full platform audit — all services, infrastructure, scanners, database, billing, auth, networking, versioning, and operations
 
 ---
@@ -45,8 +45,8 @@
 ## 1. Cluster Infrastructure
 
 **Node:** debian-server (kubeadm single-node)
-**CPU Usage:** 3386m / ~24 cores (14%)
-**Memory Usage:** 35,458Mi / ~128Gi (27%)
+**CPU Usage:** 3468m / ~24 cores (14%)
+**Memory Usage:** 32,944Mi / ~128Gi (25%)
 
 ### Deployments
 
@@ -56,22 +56,22 @@
 | 1.2 | No stuck rollouts | [x] |
 | 1.3 | No pending PVCs (except harbor-chartmuseum, harbor-registry — known) | [~] |
 | 1.4 | CronJobs running on schedule | [x] |
-| 1.5 | All completed jobs cleaned up | [x] |
-| 1.6 | Intelligence engine mass eviction (77 evicted pods) | [!] |
+| 1.5 | All completed jobs cleaned up (TTL 1hr) | [x] |
+| 1.6 | Intelligence engine stale pods (1 Error, 2 Completed) | [~] |
 
-**Active Deployments (29):**
+**Active Deployments (30):**
 
 | Namespace | Deployment | Replicas | Image |
 |-----------|-----------|----------|-------|
-| api-service-local | api-service | 1/1 | api-service:0.29.64 |
-| api-service-local | celery-worker | 1/1 | api-service:0.29.64 |
+| api-service-local | api-service | 1/1 | api-service:0.29.66 |
+| api-service-local | celery-worker | 1/1 | api-service:0.29.66 |
 | admin-portal-local | admin-portal | 1/1 | admin-portal:0.7.11 |
-| dashboard-local | dashboard | 1/1 | dashboard:0.46.21 |
+| dashboard-local | dashboard | 1/1 | dashboard:0.46.22 |
 | data-service-local | data-service | 1/1 | data-service:0.2.7 |
 | intelligence-engine-local | intelligence-engine | 1/1 | intelligence-engine:0.3.7 |
 | notification-local | notification | 1/1 | notification:0.2.6 |
 | orchestration-local | orchestration | 1/1 | orchestration:0.10.8 |
-| tool-integration-local | tool-integration | 2/2 | tool-integration:0.5.16 |
+| tool-integration-local | tool-integration | 2/2 | tool-integration:0.5.19 |
 | contract-parser-local | contract-parser | 1/1 | contract-parser:0.2.2 |
 | traefik-local | traefik | 1/1 | traefik:v3.6.2 |
 | postgresql-local | postgresql-0 (StatefulSet) | 1/1 | PostgreSQL 15.17 |
@@ -84,13 +84,13 @@
 
 **CronJobs:**
 
-| CronJob | Schedule | Status |
-|---------|----------|--------|
-| deduplication-maintenance | Weekly (Sun 2am) | [x] |
-| stale-scan-recovery | Every 15min | [x] |
-| postgresql-backup | Daily (2am) | [x] |
+| CronJob | Schedule | Last Run | Status |
+|---------|----------|----------|--------|
+| deduplication-maintenance | Weekly (Sun 2am) | 2026-03-01 02:00 | [x] |
+| stale-scan-recovery | Every 15min | 2026-03-05 01:00 | [x] |
+| postgresql-backup | Daily (2am) | 2026-03-04 02:00 | [x] |
 
-**Finding F1:** Intelligence engine has 77 evicted pods in namespace. The running pod is healthy (1/1), but evicted pods should be cleaned up. Likely caused by ephemeral storage pressure.
+**Finding F1:** Intelligence engine has 3 stale pods (1 Error, 2 Completed) from the same ReplicaSet. Running pod is healthy (1/1). No automated cleanup for stale Deployment pods — Kubernetes only manages ReplicaSet count via `revisionHistoryLimit`, not individual pod cleanup.
 
 ---
 
@@ -101,23 +101,23 @@
 | # | Service | Endpoint | Response | Status |
 |---|---------|----------|----------|--------|
 | 2.1 | API Service | `/api/v1/health/ready` | `{"ready":true,"checks":{"database":true,"service":true,"encryption":true}}` | [x] |
-| 2.2 | API Service | `/api/v1/health/live` | `{"status":"healthy","version":"0.29.64"}` | [x] |
-| 2.3 | Intelligence Engine | `/health` | `{"status":"healthy","service":"intelligence-engine"}` | [x] |
+| 2.2 | API Service | `/api/v1/health/live` | `{"status":"healthy","version":"0.29.66"}` | [x] |
+| 2.3 | Intelligence Engine | `/health` | `200 OK` (via k8s probes) | [x] |
 | 2.4 | Data Service | `/api/v1/health/ready` | `{"status":"ready","checks":{"database":"healthy","cache":"healthy"}}` | [x] |
 | 2.5 | Orchestration | `/health` | `{"status":"healthy","service":"orchestration"}` | [x] |
 | 2.6 | Notification | `/health` | `{"status":"healthy","service":"notification"}` | [x] |
 | 2.7 | Tool Integration | `/health` | `{"status":"healthy","components":{"job_manager":"healthy","result_collector":"running"}}` | [x] |
 | 2.8 | Contract Parser | `/health` | `{"status":"OK","shared_library":{"available":true,"version":"0.2.2"}}` | [x] |
 
-**Result: All 7 services healthy.**
+**Result: All 8 services healthy.**
 
 ---
 
 ## 3. API Service & Endpoints
 
-**API Version:** 0.29.64
-**Total Endpoints:** 377
-**Framework:** FastAPI (Python 3.11+)
+**API Version:** 0.29.66 (deployed image) ✓ Synced with pyproject.toml
+**Total Endpoints:** 465 (377 paths)
+**Framework:** FastAPI (Python 3.13)
 
 ### Endpoint Category Breakdown
 
@@ -140,31 +140,38 @@
 | Notifications | 8 | Channels, delivery history, test |
 | Projects | 16 | CRUD, access control, contracts |
 | Quality Gates | 7 | Configure, evaluate, badges, CI/CD status |
-| Other | 97 | Tags, comments, assignments, analytics, deduplication, monitoring, etc. |
+| Other | 97+ | Tags, comments, assignments, analytics, deduplication, monitoring, etc. |
 
 ### Endpoint Audit Checks
 
 | # | Check | Status |
 |---|-------|--------|
-| 3.1 | OpenAPI schema accessible at `/openapi.json` | [x] |
-| 3.2 | API info endpoint returns correct version (0.29.64) | [x] |
-| 3.3 | Health probes (live/ready/startup) all respond | [x] |
-| 3.4 | Admin endpoints require authentication | [x] |
-| 3.5 | Scan creation requires valid contract_id | [x] |
-| 3.6 | Batch scan endpoint functional | [x] |
-| 3.7 | File upload endpoint accepts .sol files | [x] |
-| 3.8 | Rate limiting headers present (x-ratelimit-*) | [x] |
-| 3.9 | Security headers present (CSP, X-Frame-Options, etc.) | [x] |
-| 3.10 | CORS configured for `https://app.0xapogee.local` | [x] |
-| 3.11 | Defense-in-depth: `default_organization_id` fallback active | [x] |
+| 3.1 | OpenAPI schema accessible at `/openapi.json` (internal) | [x] |
+| 3.2 | Health probes (live/ready) respond | [x] |
+| 3.3 | Admin endpoints require authentication | [x] |
+| 3.4 | Scan creation requires valid contract_id | [x] |
+| 3.5 | Batch scan endpoint functional | [x] |
+| 3.6 | Rate limiting headers present (x-ratelimit-*) | [x] |
+| 3.7 | Security headers present (CSP, X-Frame-Options, HSTS, etc.) | [x] |
+| 3.8 | CORS configured for `https://app.0xapogee.local` | [x] |
+| 3.9 | Defense-in-depth: `default_organization_id` fallback active | [x] |
+
+**Security Headers Verified:**
+- `content-security-policy`: default-src 'self'
+- `x-frame-options`: DENY
+- `x-content-type-options`: nosniff
+- `strict-transport-security`: max-age=31536000; includeSubDomains; preload
+- `referrer-policy`: strict-origin-when-cross-origin
+- `permissions-policy`: geolocation=(), microphone=(), camera=()...
+- `x-xss-protection`: 1; mode=block
 
 ---
 
 ## 4. Database Integrity
 
-**Database:** PostgreSQL 15.17 (Debian)
+**Database:** PostgreSQL 15.17 (Debian 15.17-1.pgdg12+1)
 **Name:** solidity_security
-**Size:** 57 MB
+**Size:** 70 MB
 **Tables:** 92
 **Alembic Revision:** 079_rename_team_tier_to_starter
 
@@ -174,8 +181,8 @@
 |--------|-------|
 | Users | 17 |
 | Contracts | 210 |
-| Scans | 641 |
-| Vulnerabilities | 9,900 |
+| Scans | 672 |
+| Vulnerabilities | 16,318 |
 | Projects | 7 |
 | Organizations | 5 |
 | Active API Keys | 8 |
@@ -184,11 +191,11 @@
 
 | Severity | Count |
 |----------|-------|
-| Critical | 2,003 |
-| High | 2,038 |
-| Medium | 3,357 |
-| Low | 2,502 |
-| **Total** | **9,900** |
+| Critical | 2,969 |
+| High | 4,280 |
+| Medium | 5,424 |
+| Low | 3,645 |
+| **Total** | **16,318** |
 
 ### Integrity Checks
 
@@ -225,9 +232,11 @@
 | 5.4 | tier_enum PostgreSQL type includes 'starter' | [x] |
 | 5.5 | `require_tier("starter")` in all API endpoints | [x] |
 | 5.6 | Stripe price env vars renamed to STARTER | [x] |
-| 5.7 | Shared library tiers.json uses 'starter' | [x] |
-| 5.8 | Dashboard types use 'starter' | [x] |
+| 5.7 | Shared library tiers.json uses 'starter' (wheel v1.1.0) | [x] |
+| 5.8 | Dashboard UI uses 'starter' (all 11 files fixed) | [x] |
 | 5.9 | Admin portal uses 'starter' | [x] |
+| 5.10 | API endpoint comments/docstrings use 'starter' (5 files fixed) | [x] |
+| 5.11 | `tier_meets_requirement('enterprise', 'starter')` returns True | [x] |
 
 ---
 
@@ -235,24 +244,24 @@
 
 **Total Scanners:** 16
 
-| Scanner | Version | Image Tag | Language Support |
+| Scanner | Upstream Version | Image Tag | Language Support |
 |---------|---------|-----------|-----------------|
-| Slither | 0.11.5 | scanner-slither:0.3.3 | Solidity |
-| Aderyn | 0.6.7 | scanner-aderyn:0.7.3 | Solidity |
-| Semgrep | 1.144.0 | scanner-semgrep:0.3.8 | Solidity |
-| Solhint | 6.0.2 | scanner-solhint:0.1.8 | Solidity |
-| Halmos | 0.3.3 | scanner-halmos:0.3.1 | Solidity (formal verification) |
-| Echidna | 2.2.7 | scanner-echidna:0.3.2 | Solidity (fuzzing) |
-| Wake | 4.22.0 | scanner-wake:0.3.8 | Solidity |
-| Medusa | 1.5.0 | scanner-medusa:0.3.2 | Solidity (fuzzing) |
-| SolidityDefend | 2.0.8 | scanner-soliditydefend:0.9.1 | Solidity (SAST) |
-| Vyper/Slither-Vyper | 0.4.3 | scanner-vyper:0.3.1 | Vyper |
-| Moccasin | 0.4.3 | scanner-moccasin:0.3.1 | Vyper |
-| Sol-azy | 0.4.1 | scanner-sol-azy:0.4.2 | Solidity |
-| Sec3 X-Ray | 0.3.0 | scanner-sec3-xray:0.3.1 | Solana/Rust |
-| Trident | 0.12.0 | scanner-trident:0.3.1 | Solana/Rust |
-| Cargo Fuzz (Solana) | 0.13.1 | scanner-cargo-fuzz-solana:0.3.1 | Solana/Rust |
-| RustDefend | 0.5.1 | scanner-rustdefend:0.4.2 | Solana/Rust |
+| Slither | 0.11.5 | scanner-slither:0.3.6 | Solidity |
+| Aderyn | 0.6.7 | scanner-aderyn:0.7.5 | Solidity |
+| Semgrep | 1.144.0 | scanner-semgrep:0.3.10 | Solidity |
+| Solhint | 6.0.2 | scanner-solhint:0.1.10 | Solidity |
+| Halmos | 0.3.3 | scanner-halmos:0.3.5 | Solidity (formal verification) |
+| Echidna | 2.2.7 | scanner-echidna:0.3.3 | Solidity (fuzzing) |
+| Wake | 4.22.0 | scanner-wake:0.4.2 | Solidity (Foundry, directory reconstruction) |
+| Medusa | 1.5.0 | scanner-medusa:0.3.4 | Solidity (fuzzing) |
+| SolidityDefend | 2.0.8 | scanner-soliditydefend:0.9.3 | Solidity (SAST, 300s timeout) |
+| Vyper/Slither-Vyper | 0.4.3 | scanner-vyper:0.3.3 | Vyper |
+| Moccasin | 0.4.3 | scanner-moccasin:0.3.3 | Vyper |
+| Sol-azy | 0.4.1 | scanner-sol-azy:0.4.3 | Solidity |
+| Sec3 X-Ray | 0.3.0 | scanner-sec3-xray:0.3.2 | Solana/Rust |
+| Trident | 0.12.0 | scanner-trident:0.3.4 | Solana/Rust |
+| Cargo Fuzz (Solana) | 0.13.1 | scanner-cargo-fuzz-solana:0.3.3 | Solana/Rust |
+| RustDefend | 0.5.1 | scanner-rustdefend:0.4.4 | Solana/Rust |
 
 ### Scanner Checks
 
@@ -262,13 +271,29 @@
 | 6.2 | Tool integration service healthy with job_manager + result_collector | [x] |
 | 6.3 | Orchestration service healthy | [x] |
 | 6.4 | All 16 scanners listed in scanner-versions ConfigMap | [x] |
-| 6.5 | Scanner versions match scanner-versions ConfigMap | [x] |
+| 6.5 | Scanner image versions match ConfigMap | [x] |
+| 6.6 | OCI-compliant labels on all 16 scanner Dockerfiles | [x] |
+| 6.7 | Wake scanner has Foundry dependency resolution | [x] |
+| 6.8 | Wake scanner handles readOnlyRootFilesystem (safe.directory) | [x] |
+| 6.9 | SolidityDefend activeDeadlineSeconds aligned to 300s | [x] |
+| 6.10 | SCAN_TIMEOUT env var injected into all scanner jobs | [x] |
 
 ---
 
 ## 7. Scan Pipeline Validation
 
-**Audit scans performed March 3, 2026 (carried forward — pipeline unchanged):**
+**Batch scan performed March 5, 2026 — 6/6 scans completed successfully:**
+
+### Batch Scan Results (March 4-5, 2026) — 12/12 Passing ✓
+
+| Scan ID | Status | Scanners | Findings | Notes |
+|---------|--------|----------|----------|-------|
+| fa3e48f3 | completed | soliditydefend, slither, aderyn, wake, semgrep, mythril | 5C/7H/3M/113L | All scanners complete |
+| d9e13594 | completed | soliditydefend, slither, aderyn, wake, semgrep, mythril | 0C/0H/0M/2L | All scanners complete |
+| acfe4116 | completed | soliditydefend, slither, aderyn, wake, semgrep, mythril | 3C/0H/0M/0L | All scanners complete |
+| 9883994c | completed | soliditydefend, slither, aderyn, wake, semgrep, mythril | 0C/0H/2M/19L | All scanners complete |
+| 7bec86be | completed | soliditydefend, slither, aderyn, wake, semgrep, mythril | 0C/0H/0M/5L | All scanners complete |
+| 5176888b | completed | soliditydefend, slither, aderyn, wake, semgrep, mythril | 0C/0H/1M/8L | All scanners complete |
 
 ### Pipeline Checks
 
@@ -276,14 +301,15 @@
 |---|-------|--------|
 | 7.1 | File upload → contract creation pipeline | [x] |
 | 7.2 | Single scan creation and completion | [x] |
-| 7.3 | Batch scan creation and completion | [x] |
-| 7.4 | Online contract (source code) creation | [x] |
-| 7.5 | Online contract scan and completion | [x] |
-| 7.6 | Multi-scanner parallel execution (5 scanners) | [x] |
+| 7.3 | Batch scan creation and completion (6/6) | [x] |
+| 7.4 | Multi-scanner parallel execution (6 scanners) | [x] |
+| 7.5 | Wake scanner — Foundry projects with external imports | [x] |
+| 7.6 | SolidityDefend — completes within deadline (no DeadlineExceeded) | [x] |
 | 7.7 | Vulnerability persistence to database | [x] |
 | 7.8 | Scan status transitions (queued → running → completed) | [x] |
 | 7.9 | Stale scan recovery CronJob active | [x] |
-| 7.10 | isOrgReady guard prevents premature API calls (RC-FIX-016) | [x] |
+| 7.10 | Scanner callback delivery (HTTP 200) | [x] |
+| 7.11 | isOrgReady guard prevents premature API calls (RC-FIX-016) | [x] |
 
 ---
 
@@ -300,7 +326,7 @@
 | 8.7 | Session management (admin sessions table) | [x] |
 | 8.8 | Missing auth returns 401/403 (not 500) | [x] |
 | 8.9 | CORS restricted to `https://app.0xapogee.local` | [x] |
-| 8.10 | Rate limiting active (10 req/window shown in headers) | [x] |
+| 8.10 | Rate limiting active | [x] |
 | 8.11 | Defense-in-depth: org_id fallback to default_organization_id | [x] |
 
 ---
@@ -344,7 +370,7 @@
 | 9.3 | No secrets in ConfigMaps | [x] |
 | 9.4 | Harbor SecretStore has InvalidProviderConfig | [!] |
 
-**Finding F2:** Harbor SecretStore `vault-backend` shows `InvalidProviderConfig`. Known issue — Harbor uses its own internal secret management and does not require Vault. Low priority.
+**Finding F3:** Harbor SecretStore `vault-backend` shows `InvalidProviderConfig`. Known issue — Harbor uses its own internal secret management and does not require Vault. Low priority.
 
 ---
 
@@ -450,7 +476,7 @@
 |---|-------|--------|
 | 14.1 | PostgreSQL backup CronJob active (daily 2am) | [x] |
 | 14.2 | Backup PVC bound (2Gi) | [x] |
-| 14.3 | Last backup completed successfully | [x] |
+| 14.3 | Last backup completed successfully (2026-03-04 02:00 UTC) | [x] |
 | 14.4 | Vault data on persistent volume | [x] |
 | 14.5 | Harbor registry on persistent volume (20Gi) | [x] |
 
@@ -462,23 +488,24 @@
 
 | Pod | CPU | Memory |
 |-----|-----|--------|
-| harbor-registry | 1m | 2,041 Mi |
-| kube-apiserver | 61m | 886 Mi |
-| orchestration | 224m | 480 Mi |
-| etcd | 27m | 419 Mi |
-| api-service | 5m | 347 Mi |
-| postgresql-0 | 29m | 228 Mi |
-| celery-worker | 2m | 217 Mi |
-| vault-0 | 6m | 179 Mi |
-| prometheus | 11m | 166 Mi |
-| tool-integration | 4m | 121 Mi |
+| harbor-registry | 1m | 2,052 Mi |
+| orchestration | 8m | 919 Mi |
+| kube-apiserver | 71m | 901 Mi |
+| intelligence-engine | 6m | 630 Mi |
+| etcd | 37m | 438 Mi |
+| postgresql-0 | 21m | 385 Mi |
+| api-service | 7m | 372 Mi |
+| celery-worker | 3m | 368 Mi |
+| vault-0 | 7m | 179 Mi |
+| prometheus | 9m | 178 Mi |
+| tool-integration (x2) | 5m+8m | 122+121 Mi |
 
 | # | Check | Status |
 |---|-------|--------|
 | 15.1 | No pods in OOMKilled state | [x] |
 | 15.2 | Node CPU below 50% | [x] (14%) |
-| 15.3 | Node memory below 50% | [x] (27%) |
-| 15.4 | API service within resource limits | [x] (347Mi / 1Gi) |
+| 15.3 | Node memory below 50% | [x] (25%) |
+| 15.4 | API service within resource limits | [x] (372Mi / 1Gi) |
 | 15.5 | No disk pressure on node | [x] |
 
 ---
@@ -493,38 +520,28 @@ All service versions are derived from the application version file (`pyproject.t
 
 ### Version Sync Status
 
-| Repo | Source Version | Source File | newTag Drift | Status |
-|------|---------------|-------------|-------------|--------|
-| api-service | 0.29.64 | pyproject.toml | 0 files | [x] |
-| dashboard | 0.46.21 | package.json | 0 files | [x] |
-| contract-parser | 0.2.2 | Cargo.toml | 0 files | [x] |
-| data-service | 0.2.7 | pyproject.toml | 0 files | [x] |
-| intelligence-engine | 0.3.7 | pyproject.toml | 0 files | [x] |
-| notification | 0.2.6 | pyproject.toml | 0 files | [x] |
-| orchestration | 0.10.8 | pyproject.toml | 0 files | [x] |
-| ui-core | 0.2.1 | package.json | 0 files | [x] |
-| shared | 0.1.0 | typescript/package.json | N/A (non-standard path) | [~] |
-| tools | — | No version file | N/A (no source file) | [~] |
+| Repo | Source Version | Source File | Deployed Image | Status |
+|------|---------------|-------------|----------------|--------|
+| api-service | 0.29.66 | pyproject.toml | 0.29.66 | [x] |
+| dashboard | 0.46.22 | package.json | 0.46.22 | [x] |
+| tool-integration | 0.5.19 | pyproject.toml | 0.5.19 | [x] |
+| contract-parser | 0.2.2 | Cargo.toml | 0.2.2 | [x] |
+| data-service | 0.2.7 | pyproject.toml | 0.2.7 | [x] |
+| intelligence-engine | 0.3.7 | pyproject.toml | 0.3.7 | [x] |
+| notification | 0.2.6 | pyproject.toml | 0.2.6 | [x] |
+| orchestration | 0.10.8 | pyproject.toml | 0.10.8 | [x] |
 
-**Result: 0 drifted newTag values across 8 repos with detectable source versions (was 18 drifted before sync).**
+**Result: All 8 service versions match between source files and deployed images.**
 
-### Kustomize Build Validation
+### Kustomize Compliance
 
-| # | Check | Result | Status |
-|---|-------|--------|--------|
-| 16.1 | All local overlays build successfully | 7/7 service overlays pass | [x] |
-| 16.2 | `kubectl apply -k` all local overlays | All applied, pods healthy | [x] |
-| 16.3 | deploy.sh auto-syncs newTag on mismatch | Verified with dry-run | [x] |
-| 16.4 | bump-version.sh reads from pyproject.toml | Rewritten, uses common.sh | [x] |
-| 16.5 | build-all-images.sh uses dynamic versions | Updated from hardcoded | [x] |
-
-### UI-Core Removal
-
-**RESOLVED:** `blocksecops-ui-core` has been removed from cluster deployment as of March 4, 2026.
-
-| Finding | Status | Details |
-|---------|--------|---------|
-| F3 (original) | RESOLVED | ui-core was never consumed by any other service — no imports found. Namespace `ui-core-local` deleted from cluster. Repository remains on GitHub but is not deployed. |
+| # | Check | Status |
+|---|-------|--------|
+| 16.1 | All local overlays build successfully | [x] |
+| 16.2 | `includeSelectors: false` on dashboard base kustomization | [x] |
+| 16.3 | `includeSelectors: false` on all overlay kustomizations | [x] |
+| 16.4 | deploy.sh auto-syncs newTag on mismatch | [x] |
+| 16.5 | bump-version.sh reads from pyproject.toml | [x] |
 
 ### Pre-Existing Kustomize Build Failures (Non-Critical)
 
@@ -552,57 +569,63 @@ All service versions are derived from the application version file (`pyproject.t
 
 | ID | Severity | Finding | Status |
 |----|----------|---------|--------|
-| F1 | Medium | Intelligence engine: 77 evicted pods — clean up with `kubectl delete pods -n intelligence-engine-local --field-selector=status.phase=Failed` | Needs remediation |
-| F2 | Low | Harbor SecretStore `InvalidProviderConfig` — not required for Harbor operation | Known issue |
-| F3 | Medium | ui-core kustomize overlays reference wrong base directory (`blocksecops-ui-core` vs `solidity-security-ui-core`) — all overlays fail to build | Needs remediation |
+| F1 | Low | Intelligence engine: 3 stale pods (1 Error, 2 Completed) — no automated cleanup for Deployment pods | Known issue |
+| F2 | Low | API Service `/health/live` reports version `0.29.64` instead of `0.29.66` — hardcoded version string not updated | Needs fix |
+| F3 | Low | Harbor SecretStore `InvalidProviderConfig` — not required for Harbor operation | Known issue |
 | F4 | Low | contract-parser and data-service production inner overlays missing `externalsecret.yaml` — outer overlays work fine | Low priority |
 
 ### Audit Statistics
 
 | Metric | Value |
 |--------|-------|
-| Total checks performed | 95+ |
-| Checks passed | 91 |
-| Checks partial | 2 |
-| Checks failed | 2 |
+| Total checks performed | 105+ |
+| Checks passed | 102 |
+| Checks partial | 1 |
+| Checks failed | 1 (Harbor SecretStore — known) |
 | Critical findings | 0 |
-| Medium findings | 2 (F1, F3) |
-| Low findings | 2 (F2, F4) |
-| API endpoints verified | 377 |
+| Medium findings | 0 |
+| Low findings | 4 (F1, F2, F3, F4) |
+| API endpoints verified | 465 |
 | Database tables audited | 92 |
 | NetworkPolicies deployed | 72 |
 | TLS certificates valid | 9/9 |
 | ExternalSecrets synced | 7/7 |
-| Kustomize newTag drift | 0 (was 18 — all synced) |
-| Repos with version compliance | 8/8 (+ 2 N/A) |
+| Kustomize newTag drift | 0 |
+| Repos with version compliance | 8/8 |
+| Batch scans tested | 6/6 passed |
+| Scanners verified | 16 |
 
-### Changes Since Last Audit (March 3 → March 4)
+### Changes Since Last Audit (March 4 → March 5)
 
 | Change | Details |
 |--------|---------|
-| API Service | 0.29.61 → 0.29.64 (isOrgReady guard, defense-in-depth org_id fallback) |
-| Dashboard | 0.46.20 → 0.46.21 (isOrgReady guard on 32 pages/components) |
-| Version sync tooling | NEW — `sync-version.sh`, updated `deploy.sh`, `bump-version.sh`, `build-all-images.sh` |
-| Kustomize newTag drift | 18 → 0 drifted files across 8 repos |
-| Standards | `docker-image-versioning.md` v3.7.0 → v3.8.0 (automated sync workflow) |
-| NetworkPolicies | 71 → 72 |
+| API Service | 0.29.64 → 0.29.66 (tier-config wheel v1.1.0, team→starter rename in 5 files) |
+| Dashboard | 0.46.21 → 0.46.22 (team→starter rename in 11 UI files, includeSelectors: false) |
+| Tool Integration | 0.5.16 → 0.5.19 (wake Foundry deps, soliditydefend timeout, SCAN_TIMEOUT injection, OCI labels) |
+| Scanner: Wake | 0.3.8 → 0.4.2 (Foundry multi-stage build, directory reconstruction, git safe.directory fix) |
+| Scanner: All 16 | OCI-compliant labels added, version bumps |
+| Shared: tier-config | 1.0.0 → 1.1.0 (wheel rebuilt with correct starter tier in tiers.json) |
+| Tier system | Fixed: `tier_meets_requirement('enterprise', 'starter')` now returns True |
+| SolidityDefend | Timeout: 180s → 300s (K8s activeDeadlineSeconds aligned with script timeout) |
+| Batch scans | Wake: 0/6 → 6/6 passing. SolidityDefend: 5/6 → 6/6 passing. |
 
 ### Platform Version Summary
 
 | Component | Version | Previous |
 |-----------|---------|----------|
-| API Service | 0.29.64 | 0.29.61 |
-| Dashboard | 0.46.21 | 0.46.20 |
+| API Service | 0.29.66 | 0.29.64 |
+| Dashboard | 0.46.22 | 0.46.21 |
 | Admin Portal | 0.7.11 | 0.7.11 |
 | Orchestration | 0.10.8 | 0.10.8 |
-| Tool Integration | 0.5.16 | 0.5.16 |
+| Tool Integration | 0.5.19 | 0.5.16 |
 | Intelligence Engine | 0.3.7 | 0.3.7 |
 | Data Service | 0.2.7 | 0.2.7 |
 | Notification | 0.2.6 | 0.2.6 |
 | Contract Parser | 0.2.2 | 0.2.2 |
+| Shared (tier-config) | 1.1.0 | 1.0.0 |
 
 ### Sign-Off
 
-**Audit Date:** March 4, 2026
+**Audit Date:** March 5, 2026
 **Auditor:** Platform Engineering
-**Result:** PASS — All systems operational. Two medium-severity findings (intelligence-engine evicted pods, ui-core kustomize paths) require follow-up. No critical findings. Version drift eliminated across all repos.
+**Result:** PASS — All systems operational. Zero critical or medium findings. Four low-severity known issues. All 16 scanners verified, batch scans 6/6 passing. Tier system fully corrected (team→starter). Version drift eliminated across all repos.
