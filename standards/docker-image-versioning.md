@@ -30,30 +30,16 @@ All versions follow [Semantic Versioning 2.0.0](https://semver.org/):
 
 ## Version Bump Workflow
 
-### Step 1: Bump Version (Source + Kustomization Synced Automatically)
+### Step 1: Bump Version
 
-Use the bump script to update the source file and sync all kustomization `newTag` values:
+Update two files manually — no scripts required:
 
-```bash
-# Bump patch/minor/major — updates pyproject.toml AND all kustomization.yaml newTag values
-./scripts/bump-version.sh patch   # 0.2.0 → 0.2.1
-./scripts/bump-version.sh minor   # 0.2.1 → 0.3.0
-./scripts/bump-version.sh major   # 0.3.0 → 1.0.0
-```
+1. **Source version file** (`pyproject.toml` / `package.json` / `Cargo.toml`)
+2. **Base kustomization** (`k8s/base/<service>/kustomization.yaml`) — update `newTag` and `app.kubernetes.io/version`
 
-The bump script:
-1. Reads the current version from `pyproject.toml` / `package.json` / `Cargo.toml`
-2. Increments the version in the source file
-3. Runs `sync-version.sh` to update all `kustomization.yaml` `newTag` values under `k8s/`
+**CRITICAL:** Only the base kustomization has `newTag`. Overlays inherit it and must never set their own `newTag` or `app.kubernetes.io/version`. This prevents version drift across environments.
 
-**Manual version edits:** If you edit `pyproject.toml` or `package.json` directly, run the sync script to propagate:
-
-```bash
-# Sync all kustomization newTag values to match source version
-/home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh .
-```
-
-**Note:** `deploy.sh` also auto-syncs `newTag` before applying — if the kustomization doesn't match the source, it updates it automatically instead of failing.
+See [Version Bump Workflow](../workflows/version-bump.md) for the full procedure.
 
 ### Step 2: Build, Push, and Apply
 
@@ -91,39 +77,26 @@ kubectl get cronjob -n ${SERVICE}-local -o jsonpath='{range .items[*]}{.metadata
 ### Step 4: Commit Together
 
 ```bash
-git add pyproject.toml k8s/
+git add pyproject.toml k8s/base/
 git commit -m "chore(<service>): bump version to 0.2.1"
 ```
 
-**CRITICAL:** Source version + kustomization must be committed together to stay in sync.
+**CRITICAL:** Source version + base kustomization must be committed together to stay in sync. Overlays are not touched during version bumps.
 
 ---
 
-## Version Sync Tooling
+## Version Sync Tooling (Optional)
 
 ### sync-version.sh
 
 **Location:** `blocksecops-shared/scripts/docker/sync-version.sh`
 
-Reads the version from the project's source of truth (`pyproject.toml`, `package.json`, or `Cargo.toml`) and updates all `kustomization.yaml` `newTag` values under `k8s/` to match.
+Optional convenience script that reads the version from the source of truth and updates base kustomization `newTag` values to match. **Not required** — the [Version Bump Workflow](../workflows/version-bump.md) documents the manual two-file edit that replaces script dependency.
 
 ```bash
-# Sync current project
+# Optional: sync base kustomization newTag to match source version
 /home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh .
-
-# Sync a specific repo
-/home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh /home/pwner/Git/blocksecops-api-service
 ```
-
-Also updates `app.kubernetes.io/version` labels in kustomization files.
-
-### Integration Points
-
-| Tool | Behavior |
-|------|----------|
-| `bump-version.sh` | Calls `sync-version.sh` after bumping the source version |
-| `deploy.sh` | Auto-syncs `newTag` if it doesn't match source before applying |
-| Manual edits | Run `sync-version.sh` after editing `pyproject.toml`/`package.json` directly |
 
 ### Shared Functions
 

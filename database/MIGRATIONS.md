@@ -1301,7 +1301,26 @@ asyncio.run(verify())
 
 ---
 
-### Migration 060: Cleanup Invalid Scanner IDs (Data Integrity)
+### Migration 060: Add Quota CHECK Constraints (Security — Branch A)
+- **Status**: ✅ Completed (fixed March 4, 2026)
+- **Created**: January 31, 2026
+- **Revision ID**: `060_add_quota_check_constraints`
+- **Previous Revision**: `059_add_invariant_tables`
+- **Description**: Adds CHECK constraints to `user_quotas` to prevent quota manipulation via direct SQL (BSO-SEC-013). Also creates `quota_audit_log` table with trigger for audit trail.
+- **Branch Note**: This is branch A from migration 059. Branch B is `060_cleanup_invalid_scanner_ids`. Both share `down_revision = '059_add_invariant_tables'`. They are merged at migration 067.
+- **Objects Created**:
+  - 10 CHECK constraints on `user_quotas` (non-negative usage, valid limits, retention days)
+  - `quota_audit_log` table with indexes
+  - `fn_audit_quota_changes()` trigger function
+  - `trg_audit_quota_changes` trigger on `user_quotas`
+- **asyncpg Fix (March 4, 2026)**: Original migration used Python `try/except: pass` blocks around each `ALTER TABLE ADD CONSTRAINT`. This pattern fails with asyncpg because a failed SQL statement aborts the entire PostgreSQL transaction — the Python exception is caught but the connection is in a failed transaction state, causing all subsequent statements to fail with `InFailedSqlTransaction`. Fix replaced all `try/except` blocks with PL/pgSQL `DO` blocks that check `pg_constraint` before adding constraints. The `result_retention_days` constraint is additionally guarded by a column existence check (`information_schema.columns`) since the column may not exist yet depending on branch execution order.
+- **Migration File**: `alembic/versions/20260131_1000-060_add_quota_check_constraints.py`
+- **Related Documentation**:
+  - [Quota Audit System](../blocksecops-api-service/docs/database/QUOTA-AUDIT.md)
+
+---
+
+### Migration 060: Cleanup Invalid Scanner IDs (Data Integrity — Branch B)
 - **Status**: ✅ Completed
 - **Created**: January 31, 2026
 - **Revision ID**: `060_cleanup_invalid_scanner_ids`

@@ -1,8 +1,8 @@
 # Kustomize Standards
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 1.3.0
-**Last Updated:** February 28, 2026
+**Version:** 1.4.0
+**Last Updated:** March 4, 2026
 **Status:** Active
 
 ## Overview
@@ -125,6 +125,8 @@ spec:
 
 ### Overlay kustomization.yaml
 
+Overlays set `newName` (registry path) only. **Never set `newTag` or `app.kubernetes.io/version` in an overlay** — those are inherited from base.
+
 ```yaml
 # k8s/overlays/local/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -142,8 +144,15 @@ patches:
 
 images:
   - name: <service>
-    newName: blocksecops-<service>
-    newTag: "0.1.0"  # Must match pyproject.toml/package.json
+    newName: harbor.blocksecops.local/blocksecops/<service>
+    # newTag is inherited from base — NEVER set it here
+
+labels:
+- includeSelectors: false
+  pairs:
+    app.kubernetes.io/instance: local-<service>
+    environment: local
+    # version, name, component, part-of, managed-by inherited from base
 ```
 
 ### Patch File Standards
@@ -194,14 +203,15 @@ namespace: <service>-local
 images:
   - name: <service>
     newName: harbor.blocksecops.local/blocksecops/<service>
-    newTag: "0.1.0"
+    # newTag inherited from base
 ```
 
 **Build command:**
 ```bash
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
 REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
-docker build -t ${REGISTRY}/blocksecops/<service>:0.1.0 .
-docker push ${REGISTRY}/blocksecops/<service>:0.1.0
+docker build -t ${REGISTRY}/blocksecops/<service>:${VERSION} .
+docker push ${REGISTRY}/blocksecops/<service>:${VERSION}
 kubectl apply -k k8s/overlays/local/
 ```
 
@@ -214,14 +224,7 @@ namespace: <service>-local  # Still uses -local suffix
 images:
   - name: <service>
     newName: harbor.blocksecops.local/blocksecops/<service>
-    newTag: "0.1.0"
-```
-
-**Build command:**
-```bash
-docker build -t harbor.blocksecops.local/blocksecops/<service>:0.1.0 .
-docker push harbor.blocksecops.local/blocksecops/<service>:0.1.0
-kubectl apply -k k8s/overlays/local/  # Server uses local overlay for base
+    # newTag inherited from base
 ```
 
 ### GCP Production
@@ -233,7 +236,7 @@ namespace: <service>
 images:
   - name: <service>
     newName: us-central1-docker.pkg.dev/blocksecops/platform/<service>
-    newTag: "0.1.0"
+    # newTag inherited from base
 ```
 
 ---
@@ -249,29 +252,19 @@ The **application version file** is the single source of truth:
 | Python | `pyproject.toml` | `version = "X.Y.Z"` |
 | Node.js | `package.json` | `"version": "X.Y.Z"` |
 
-### Version Sync Process
+### Version Bump Process
 
-1. **Update source version:**
-   ```bash
-   # Python
-   sed -i 's/version = ".*"/version = "0.2.0"/' pyproject.toml
+See [Version Bump Workflow](../workflows/version-bump.md) for the full procedure. Summary:
 
-   # Node.js
-   npm version 0.2.0 --no-git-tag-version
-   ```
-
-2. **Update kustomization newTag:**
-   ```yaml
-   images:
-     - name: <service>
-       newTag: "0.2.0"  # Must match source
-   ```
-
+1. **Update source version** (`pyproject.toml`, `package.json`, or `Cargo.toml`)
+2. **Update base kustomization** `newTag` and `app.kubernetes.io/version` to match
 3. **Commit together:**
    ```bash
-   git add pyproject.toml k8s/overlays/local/kustomization.yaml
+   git add pyproject.toml k8s/base/
    git commit -m "chore(<service>): bump version to 0.2.0"
    ```
+
+**CRITICAL:** Only the base kustomization has `newTag`. Overlays inherit it. Never add `newTag` to an overlay — this causes version drift across environments.
 
 ### CRITICAL: CronJobs Use Same Image
 
@@ -422,7 +415,36 @@ kubectl apply -k k8s/overlays/local/ --dry-run=client
        newTag: "latest"  # Use explicit version
    ```
 
-3. **Duplicate resources across overlays:**
+3. **Set `newTag` or `app.kubernetes.io/version` in an overlay:**
+   ```yaml
+   # BAD - overlay duplicates the version, will drift from base
+   # k8s/overlays/production/kustomization.yaml
+   images:
+     - name: api-service
+       newName: registry.example.com/api-service
+       newTag: "0.29.64"  # WRONG — newTag belongs in base only
+
+   labels:
+   - pairs:
+       app.kubernetes.io/version: "0.29.64"  # WRONG — version label belongs in base only
+
+   # GOOD - overlay only sets the registry path
+   images:
+     - name: api-service
+       newName: registry.example.com/api-service
+       # newTag inherited from base — always in sync
+
+   labels:
+   - includeSelectors: false
+     pairs:
+       app.kubernetes.io/instance: prod-api-service
+       environment: production
+       # version inherited from base
+   ```
+
+   **Why this breaks things:** Each overlay becomes a separate copy of the version that must be manually updated on every bump. In practice, overlays for staging and production drift behind the base because developers update the base and local overlay but forget the others. This was discovered in March 2026 when 3 of 10 repos had production overlays 1-2 versions behind the source of truth.
+
+4. **Duplicate resources across overlays:**
    ```yaml
    # BAD - copying entire deployment.yaml to overlay
    # Use patches instead
