@@ -1,7 +1,7 @@
 # Local Deployment Workflow
 
-**Version:** 1.0.0
-**Last Updated:** February 22, 2026
+**Version:** 2.0.0
+**Last Updated:** March 6, 2026
 
 ## Overview
 
@@ -21,48 +21,9 @@ docker build → docker push → kubectl apply -k → rollout verify
                             CronJob suspend/resume
 ```
 
-## Automated Deploy (Recommended)
+## Deploy Workflow
 
-### deploy.sh Script
-
-Each service that supports automated deployment has a `scripts/deploy.sh` script:
-
-```bash
-cd /home/pwner/Git/blocksecops-<service>
-
-# Full deploy cycle
-./scripts/deploy.sh
-
-# Apply only (skip build/push)
-./scripts/deploy.sh --skip-build
-
-# Dry run (preview only)
-./scripts/deploy.sh --dry-run
-```
-
-### What deploy.sh Does
-
-1. **Version extraction** - Reads version from `pyproject.toml` (Python) or `package.json` (Node.js)
-2. **Kustomization check** - Verifies `newTag` in kustomization.yaml matches the source version. Fails immediately if mismatch detected.
-3. **CronJob suspend** - Suspends all CronJobs in the service namespace to prevent stale image execution during the deploy window
-4. **Docker build** - Builds the image with OCI labels (`SERVICE_VERSION`, `BUILD_DATE`, `VCS_REF`)
-5. **Docker push** - Pushes to Harbor at `harbor.blocksecops.local/blocksecops/<service>:<version>`
-6. **kubectl apply -k** - Applies kustomization overlay, updating both Deployments and CronJobs
-7. **CronJob resume** - Re-enables CronJobs after apply completes
-8. **Rollout wait** - Waits for deployment rollout to complete
-9. **Image verification** - Checks that Deployment and CronJob images match the expected version
-
-### Makefile Targets (api-service)
-
-```bash
-make deploy          # Full deploy
-make deploy-apply    # Apply only (--skip-build)
-make deploy-dry-run  # Dry run
-```
-
-## Manual Deploy
-
-When not using deploy.sh, follow these steps in order:
+Follow these steps in order:
 
 ```bash
 SERVICE="api-service"
@@ -124,10 +85,10 @@ CronJobs are particularly vulnerable to version drift because:
 - If `kubectl apply -k` is missed after a version bump, CronJobs silently run old code
 - Unlike Deployments, there is no equivalent of `kubectl rollout restart` for CronJobs
 
-The deploy.sh script addresses this by:
-- Suspending CronJobs before the apply step
-- Resuming after apply completes
-- Setting `startingDeadlineSeconds: 600` to prevent missed schedules from queuing up
+Mitigation:
+- Always run `kubectl apply -k` after version bumps (updates both Deployments AND CronJobs)
+- Use `check-version-drift.sh` to detect CronJob/Deployment image tag mismatches
+- CronJobs use `startingDeadlineSeconds: 600` to prevent missed schedules from queuing up
 
 ## Related Documentation
 

@@ -80,50 +80,50 @@ grep 'newTag:' k8s/overlays/local/kustomization.yaml
 
 ## Part 2: Deploy
 
-### 2.1 Full Deploy (Recommended)
+### 2.1 Standard Deploy
 
 ```bash
 cd ~/Git/blocksecops-<service>
 
-# Full cycle: version check -> build -> push -> sync -> apply -> verify
-./scripts/deploy.sh
-```
+SERVICE="<service>"
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
-The script will:
-1. Extract version from `pyproject.toml`/`package.json`
-2. Auto-sync kustomization `newTag` to match source (calls sync-version.sh)
-3. Build Docker image with version as tag + build arg
-4. Push to Harbor
-5. Suspend CronJobs (prevents stale image execution)
-6. `kubectl apply -k` (updates Deployment AND CronJob to synced newTag)
-7. Wait for rollout
-8. Verify deployed image tags match source version
-9. Resume CronJobs
-10. Commit version + kustomization changes together
+# 1. Sync kustomization newTag
+/home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh .
+
+# 2. Build with OCI labels
+docker build \
+  --build-arg SERVICE_VERSION=${VERSION} \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(git rev-parse --short HEAD) \
+  -t ${REGISTRY}/blocksecops/${SERVICE}:${VERSION} .
+
+# 3. Push to Harbor
+docker push ${REGISTRY}/blocksecops/${SERVICE}:${VERSION}
+
+# 4. Apply kustomization (updates Deployment AND CronJob)
+kubectl apply -k k8s/overlays/local/${SERVICE}/
+
+# 5. Wait and verify
+kubectl rollout status deployment/${SERVICE} -n ${SERVICE}-local --timeout=120s
+
+# 6. Commit version + kustomization changes together
+git add pyproject.toml k8s/
+git commit -m "chore(${SERVICE}): bump version to ${VERSION}"
+```
 
 ### 2.2 Apply-Only Deploy (Skip Build)
 
 When the image already exists in Harbor and you only need to update Kubernetes:
 
 ```bash
-./scripts/deploy.sh --skip-build
+# Sync and apply
+/home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh .
+kubectl apply -k k8s/overlays/local/${SERVICE}/
 ```
 
-This will:
-1. Auto-sync kustomization `newTag` to match source version
-2. Apply kustomization
-3. Verify deployed images match source version
-4. Commit kustomization changes
-
-### 2.3 Dry Run
-
-Preview what would happen without executing:
-
-```bash
-./scripts/deploy.sh --dry-run
-```
-
-### 2.4 Dashboard Deploy (Special Case)
+### 2.3 Dashboard Deploy (Special Case)
 
 Dashboard requires parent directory build context:
 

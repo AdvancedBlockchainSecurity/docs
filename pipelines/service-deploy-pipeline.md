@@ -1,7 +1,7 @@
 # Service Deploy Pipeline
 
-**Version:** 1.0.0
-**Last Updated:** February 22, 2026
+**Version:** 2.0.0
+**Last Updated:** March 6, 2026
 **Status:** Active
 
 ## Overview
@@ -10,7 +10,7 @@ This document defines the service deployment pipeline for both the development c
 
 ```
                     DEVELOPMENT CLUSTER                          GCP PRODUCTION
-                    (Manual / deploy.sh)                         (ArgoCD + GitHub Actions)
+                    (Manual build/push/apply)                    (ArgoCD + GitHub Actions)
 
 Developer           Developer
     │                   │
@@ -25,12 +25,11 @@ docker push         → lint → test → build → push
 Harbor              GCP Artifact Registry
     │                   │
     ▼                   ▼
-deploy.sh           ArgoCD sync
-├─ suspend CJs      ├─ sync wave 0: Deployments
-├─ kubectl apply    ├─ sync wave 1: CronJobs (after Deployments healthy)
+kubectl apply -k    ArgoCD sync
+├─ updates Deploys  ├─ sync wave 0: Deployments
+├─ updates CronJobs ├─ sync wave 1: CronJobs (after Deployments healthy)
 ├─ rollout wait     ├─ health check
-├─ verify images    └─ status: Synced
-└─ resume CJs
+└─ verify images    └─ status: Synced
 ```
 
 ---
@@ -41,19 +40,19 @@ deploy.sh           ArgoCD sync
 
 | Tool | Location | Purpose |
 |------|----------|---------|
-| `deploy.sh` | `<service>/scripts/deploy.sh` | Full build-push-apply-verify cycle |
+| `sync-version.sh` | `blocksecops-shared/scripts/docker/sync-version.sh` | Sync kustomization newTag to source version |
+| `bump-version.sh` | `<service>/scripts/bump-version.sh` | Bump version and auto-sync kustomization |
 | `check-version-drift.sh` | `/home/pwner/Git/scripts/check-version-drift.sh` | Platform-wide version consistency check |
-| `Makefile` | `<service>/Makefile` | Convenience targets (`make deploy`) |
 
-### Pipeline Steps (deploy.sh)
+### Pipeline Steps (Manual)
 
 ```
-Step 1: Extract Version
-        Read version from pyproject.toml (Python) or package.json (Node.js)
+Step 1: Update Version
+        Bump version in pyproject.toml (Python) or package.json (Node.js)
 
-Step 2: Verify Kustomization
-        Compare newTag in kustomization.yaml against source version
-        FAIL if mismatch → prevents applying stale manifests
+Step 2: Sync Kustomization
+        Run sync-version.sh to update all newTag values under k8s/
+        Or use bump-version.sh which calls sync automatically
 
 Step 3: Docker Build
         Build image with OCI labels (SERVICE_VERSION, BUILD_DATE, VCS_REF)
@@ -61,43 +60,39 @@ Step 3: Docker Build
 Step 4: Docker Push
         Push to ${REGISTRY:-harbor.blocksecops.local}/blocksecops/<service>:<version>
 
-Step 5: Suspend CronJobs                  ◄── SAFETY: prevents stale image execution
-        Patch all CronJobs in namespace to suspend: true
-        Track which CronJobs were suspended for later resumption
-
-Step 6: kubectl apply -k
+Step 5: kubectl apply -k
         Apply kustomization overlay (updates Deployment AND CronJob image tags)
 
-Step 7: Rollout Wait
+Step 6: Rollout Wait
         kubectl rollout status — wait for Deployment pods to be ready
 
-Step 8: Verify Images
+Step 7: Verify Images
         Confirm Deployment container image matches expected version
         Confirm CronJob container image matches expected version
-
-Step 9: Resume CronJobs                   ◄── SAFETY: only after verified
-        Unpatch CronJobs that were suspended in Step 5
 ```
 
 ### Usage
 
 ```bash
-# Full deploy: build → push → apply → verify
-./scripts/deploy.sh
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
+REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+SERVICE="api-service"
 
-# Apply only (after manual build/push)
-./scripts/deploy.sh --skip-build
+# Build
+docker build \
+  --build-arg SERVICE_VERSION=${VERSION} \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(git rev-parse --short HEAD) \
+  -t ${REGISTRY}/blocksecops/${SERVICE}:${VERSION} .
 
-# Preview without executing
-./scripts/deploy.sh --dry-run
+# Push
+docker push ${REGISTRY}/blocksecops/${SERVICE}:${VERSION}
 
-# Override registry
-./scripts/deploy.sh --registry us-west1-docker.pkg.dev/blocksecops-prod/blocksecops
+# Apply
+kubectl apply -k k8s/overlays/local/${SERVICE}/
 
-# Via Makefile (api-service)
-make deploy
-make deploy-apply
-make deploy-dry-run
+# Verify
+kubectl rollout status deployment/${SERVICE} -n ${SERVICE}-local --timeout=120s
 ```
 
 ### Version Drift Detection
@@ -298,9 +293,9 @@ spec:
 | Aspect | Dev Cluster (kubeadm) | GCP Production (GKE) |
 |--------|----------------------|---------------------|
 | Registry | Harbor (`harbor.blocksecops.local`) | GCP Artifact Registry |
-| Build trigger | Manual / `deploy.sh` | GitHub Actions on push to main |
+| Build trigger | Manual (`docker build` + `docker push`) | GitHub Actions on push to main |
 | Deploy trigger | `kubectl apply -k` | ArgoCD auto-sync |
-| CronJob safety | Script suspends/resumes | Sync waves + optional hooks |
+| CronJob safety | `kubectl apply -k` updates both Deployment + CronJob atomically | Sync waves + optional hooks |
 | Drift detection | `check-version-drift.sh` | ArgoCD drift detection (auto-heal) |
 | Rollback | Manual (`kubectl rollout undo`) | ArgoCD revision history |
 | Image tags | Semver (`0.29.8`) | Semver + SHA (`sha-abc1234`) |

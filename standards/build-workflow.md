@@ -1,7 +1,7 @@
 # Build Workflow
 
-**Version:** 4.1.0
-**Last Updated:** February 22, 2026
+**Version:** 5.0.0
+**Last Updated:** March 6, 2026
 
 ## Owner Approval Required
 
@@ -63,34 +63,6 @@ docker push ${REGISTRY}/blocksecops/<service>:${VERSION}
 kubectl apply -k k8s/overlays/local/<service>/
 ```
 
-### Using Deploy Script (Recommended)
-
-The deploy script enforces the full build-push-apply cycle, suspends CronJobs during deploy to prevent stale image execution, and verifies all images match after rollout:
-
-```bash
-# Full deploy: build → push → apply → verify
-./scripts/deploy.sh
-
-# Apply kustomization only (after manual build/push)
-./scripts/deploy.sh --skip-build
-
-# Preview what would happen
-./scripts/deploy.sh --dry-run
-
-# Or via Makefile (api-service)
-make deploy
-make deploy-apply
-make deploy-dry-run
-```
-
-The script:
-1. Extracts version from `pyproject.toml`/`package.json`
-2. Verifies kustomization `newTag` matches — **fails if mismatch**
-3. Builds and pushes Docker image
-4. Runs `kubectl apply -k` (updates Deployments AND CronJobs)
-5. Waits for rollout completion
-6. Verifies all resource image tags match the source version
-
 ### Version Drift Checker
 
 Run the platform-wide drift checker to detect version mismatches across all services:
@@ -102,20 +74,6 @@ Run the platform-wide drift checker to detect version mismatches across all serv
 # Only show drift (exit code 1 if any)
 /home/pwner/Git/scripts/check-version-drift.sh --quiet
 ```
-
-### Using Build Scripts (Legacy)
-
-Each service has a build script for the build step only:
-
-```bash
-# Uses REGISTRY env var (defaults to harbor.blocksecops.local)
-./scripts/build-image.sh
-
-# Override registry
-REGISTRY=us-west1-docker.pkg.dev/blocksecops-prod/blocksecops ./scripts/build-image.sh
-```
-
-**Note:** `build-image.sh` only builds — it does NOT push or apply. Use `deploy.sh` for the complete workflow.
 
 ### Kustomization Image Reference
 
