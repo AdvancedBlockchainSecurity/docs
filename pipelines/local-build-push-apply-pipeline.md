@@ -1,11 +1,11 @@
 # Local Build-Push-Apply Pipeline
 
-**Version:** 1.0.0
-**Last Updated:** February 22, 2026
+**Version:** 2.0.0
+**Last Updated:** March 6, 2026
 
 ## Overview
 
-This document describes the local build-push-apply pipeline used for deploying services to the kubeadm development cluster with Harbor as the container registry. Unlike the GCP GitOps pipeline (ArgoCD + Artifact Registry), the local pipeline is developer-driven and uses the `deploy.sh` script for automation.
+This document describes the local build-push-apply pipeline used for deploying services to the kubeadm development cluster with Harbor as the container registry. Unlike the GCP GitOps pipeline (ArgoCD + Artifact Registry), the local pipeline is developer-driven using manual `docker build`, `docker push`, and `kubectl apply -k` commands.
 
 ## Pipeline Architecture
 

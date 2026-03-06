@@ -1,7 +1,7 @@
 # Playbook: Deployment Runbook
 
-**Version:** 1.2.0
-**Last Updated:** March 4, 2026
+**Version:** 2.0.0
+**Last Updated:** March 6, 2026
 **Audience:** Platform Operator
 **Priority:** High (must complete before go-live)
 
@@ -16,7 +16,7 @@ Standard operating procedures for deploying services to GKE production and local
 - [ ] All unit tests passing (`pytest` — 0 failures)
 - [ ] Feature branch merged to main via PR
 - [ ] Version bumped in `pyproject.toml` / `package.json`
-- [ ] Kustomization `newTag` auto-synced via `sync-version.sh` or `deploy.sh`
+- [ ] Kustomization `newTag` synced via `sync-version.sh`
 - [ ] Docker image built and pushed to registry
 - [ ] Database migrations tested (if applicable)
 - [ ] Smoke test passing on staging/local
@@ -27,32 +27,7 @@ Standard operating procedures for deploying services to GKE production and local
 
 ## Standard Deployment (Local — kubectl)
 
-### Single Service (Recommended: Using deploy.sh)
-
-```bash
-cd ~/Git/blocksecops-<service>
-
-# Full deployment cycle: build → push → auto-sync → apply → verify
-./scripts/deploy.sh
-
-# Or apply-only (if image already exists):
-./scripts/deploy.sh --skip-build
-
-# Or dry-run to preview:
-./scripts/deploy.sh --dry-run
-```
-
-The `deploy.sh` script automatically:
-1. Reads version from source file (`pyproject.toml`/`package.json`)
-2. Syncs kustomization `newTag` to match source version
-3. Builds and pushes Docker image with version tag
-4. Suspends CronJobs during deployment (prevents stale image execution)
-5. Applies kustomization (updates Deployment + CronJob)
-6. Resumes CronJobs after successful apply
-7. Waits for rollout completion
-8. Verifies all image tags match
-
-### Manual Deployment (Single Service)
+### Single Service
 
 ```bash
 SERVICE="api-service"

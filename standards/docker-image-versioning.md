@@ -53,23 +53,23 @@ The bump script:
 /home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh .
 ```
 
-**Note:** `deploy.sh` also auto-syncs `newTag` before applying — if the kustomization doesn't match the source, it updates it automatically instead of failing.
+**Note:** Always run `sync-version.sh` after editing the source version to keep kustomization `newTag` in sync.
 
 ### Step 2: Build, Push, and Apply
 
 **All three steps are MANDATORY and must happen together:**
 
 ```bash
-# Option A: Use deploy.sh (recommended — handles everything)
-./scripts/deploy.sh
-
-# Option B: Manual steps
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
 SERVICE="api-service"
 REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
 
 # Build and push
-docker build -t ${REGISTRY}/blocksecops/${SERVICE}:${VERSION} .
+docker build \
+  --build-arg SERVICE_VERSION=${VERSION} \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(git rev-parse --short HEAD) \
+  -t ${REGISTRY}/blocksecops/${SERVICE}:${VERSION} .
 docker push ${REGISTRY}/blocksecops/${SERVICE}:${VERSION}
 
 # Apply kustomization — updates BOTH Deployment AND CronJob
