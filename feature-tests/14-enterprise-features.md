@@ -881,13 +881,13 @@ WHERE user_id = '<user_uuid>';
 
 | Feature | Developer | Starter | Growth | Enterprise |
 |---------|-----------|---------|--------|------------|
-| Monthly Scan Limit | 10 | 100 | 500 | Unlimited |
-| Max Files Per Scan | 5 | Unlimited | Unlimited | Unlimited |
-| Scan Priority | 50 | 30 | 15 | 5 |
+| Monthly Scan Limit | 3 | 15 | 50 | Unlimited |
+| Max Files Per Scan | Unlimited | Unlimited | Unlimited | Unlimited |
+| Scan Priority | 50 | 40 | 25 | 5 |
 | Webhooks | ❌ | ✅ | ✅ | ✅ |
-| API Access | ❌ | ✅ | ✅ (Full) | ✅ |
-| Result Retention | 7 days | 90 days | 180 days | 730 days |
-| Max Team Members | 1 | 5 | 15 | Unlimited |
+| API Access | ❌ | ❌ | ✅ (Full) | ✅ |
+| Result Retention | 7 days | 90 days | 180 days | 365 days |
+| Max Team Members | 2 | 5 | 15 | Unlimited |
 | Organizations | ❌ | ❌ | ❌ | ✅ |
 | Audit Logs | ❌ | ❌ | ❌ | ✅ |
 | Custom Roles | ❌ | ❌ | ❌ | ✅ |

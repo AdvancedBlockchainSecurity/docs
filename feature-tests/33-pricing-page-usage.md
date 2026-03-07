@@ -84,7 +84,7 @@ The Pricing page now displays the authenticated user's current plan and usage st
 
 **Expected Results**:
 - [ ] CurrentPlanBanner shows "Developer" tier badge
-- [ ] Usage shows "X / 10 scans" format
+- [ ] Usage shows "X / 3 scans" format
 - [ ] Developer tier card highlighted
 - [ ] Other tiers show upgrade options
 
@@ -133,7 +133,7 @@ The Pricing page now displays the authenticated user's current plan and usage st
 **Objective**: Verify warning display when near quota limit
 
 **Prerequisites**:
-- User with 80%+ quota usage (e.g., 8/10 scans on Developer tier)
+- User with 80%+ quota usage (e.g., 3/3 scans on Developer tier, or 12/15 on Starter)
 
 **Steps**:
 1. Log in as user near limit
@@ -152,7 +152,7 @@ The Pricing page now displays the authenticated user's current plan and usage st
 **Objective**: Verify display when at quota limit
 
 **Prerequisites**:
-- User at 100% quota (e.g., 10/10 scans on Developer tier)
+- User at 100% quota (e.g., 3/3 scans on Developer tier)
 
 **Steps**:
 1. Log in as user at limit
@@ -264,7 +264,7 @@ The Pricing page now displays the authenticated user's current plan and usage st
 │                     │     │ ═══════════════════ │ ← Green ring
 │     DEVELOPER       │     │     YOUR PLAN       │
 │                     │     │      STARTER        │
-│    10 scans/mo      │     │   45 / 100          │ ← Usage stats
+│     3 scans/mo      │     │    8 / 15           │ ← Usage stats
 │                     │     │   [████░░░░░░░░░░]  │ ← Progress bar
 │   [Get Started]     │     │    [Manage Plan]    │
 └─────────────────────┘     └─────────────────────┘
@@ -282,11 +282,11 @@ The Pricing page uses data from the existing `/users/me/enhanced` endpoint via t
 {
   "quota": {
     "tier": "developer",
-    "monthly_scan_limit": 10,
-    "monthly_scans_used": 8,
-    "scans_remaining": 2,
-    "percentage_used": 80.0,
-    "quota_reset_at": "2026-01-15T00:00:00Z"
+    "monthly_scan_limit": 3,
+    "monthly_scans_used": 2,
+    "scans_remaining": 1,
+    "percentage_used": 66.7,
+    "quota_reset_at": "2026-04-01T00:00:00Z"
   }
 }
 ```

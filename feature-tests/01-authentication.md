@@ -53,7 +53,7 @@
 
 ### 3.3 New User Defaults
 - [ ] New user assigned to developer tier
-- [ ] New user quota initialized correctly (10 scans/month, 1 user)
+- [ ] New user quota initialized correctly (3 scans/month, 2 team members)
 - [ ] New user can access dashboard
 
 ---
