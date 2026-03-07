@@ -8,7 +8,7 @@
 > **Important Note on Database Naming:**
 > The database is named `solidity_security`, NOT `blocksecops`. This name was established during initial platform development when the focus was solely on Solidity security scanning. The name has been retained for backward compatibility and to avoid migration complexity. All services, connection strings, and documentation should reference `solidity_security`.
 >
-> **Verified:** March 3, 2026 (Current stats: 189 contracts, 563 scans, 9,188 vulnerabilities, 16 users, 91 tables in `solidity_security` database)
+> **Verified:** March 7, 2026 (Current stats: 213 contracts, 691 scans, 18,913 vulnerabilities, 17 users, 91 tables in `solidity_security` database)
 
 ## Table of Contents
 
@@ -321,23 +321,33 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 | `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique quota identifier |
 | `user_id` | UUID | NOT NULL, UNIQUE, FK → users.id ON DELETE CASCADE | Associated user |
 | `tier` | VARCHAR(20) | NOT NULL, DEFAULT 'developer', INDEX | Current tier (developer, starter, growth, enterprise) |
-| `monthly_scan_limit` | INTEGER | NOT NULL, DEFAULT 3 | Monthly scan limit (-1 = unlimited) |
+| `monthly_scan_limit` | INTEGER | NOT NULL, DEFAULT 10 | Monthly scan limit (-1 = unlimited). Trigger overrides per tier. |
 | `monthly_scans_used` | INTEGER | NOT NULL, DEFAULT 0 | Scans used this month |
-| `max_files_per_scan` | INTEGER | NOT NULL, DEFAULT 5 | Maximum files per scan (-1 = unlimited) |
-| `max_loc_per_scan` | INTEGER | NOT NULL, DEFAULT 5000 | Maximum lines of code per scan (-1 = unlimited) |
-| `scan_priority` | INTEGER | NOT NULL, DEFAULT 50 | Scan queue priority (5=enterprise highest, 50=developer lowest) |
-| `webhooks_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Webhooks feature enabled (growth+) |
-| `api_access_enabled` | BOOLEAN | NOT NULL, DEFAULT false | API access enabled (starter+) |
-| `export_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Export feature enabled (starter+) |
-| `result_retention_days` | INTEGER | NOT NULL, DEFAULT 7 | Scan result retention period |
+| `max_files_per_scan` | INTEGER | NOT NULL, DEFAULT 25 | Maximum files per scan (-1 = unlimited). Trigger sets -1. |
+| `max_loc_per_scan` | INTEGER | NOT NULL, DEFAULT -1 | Maximum lines of code per scan (-1 = unlimited) |
+| `scan_priority` | INTEGER | NOT NULL, DEFAULT 25 | Scan queue priority (5=enterprise highest, 50=developer lowest) |
+| `webhooks_enabled` | BOOLEAN | NOT NULL, DEFAULT false | Webhooks feature enabled (starter+) |
+| `api_access_enabled` | BOOLEAN | NOT NULL, DEFAULT false | API access enabled (growth+) |
+| `export_enabled` | BOOLEAN | NOT NULL, DEFAULT true | Export feature enabled. Trigger sets developer=false, others=true. |
+| `result_retention_days` | INTEGER | NOT NULL, DEFAULT 30 | Scan result retention period. Trigger overrides per tier. |
 | `max_projects` | INTEGER | NOT NULL, DEFAULT 3 | Maximum projects (-1 = unlimited) |
 | `monthly_api_calls_limit` | INTEGER | NOT NULL, DEFAULT 0 | Monthly API call limit (0=no access, -1=unlimited) |
 | `monthly_api_calls_used` | INTEGER | NOT NULL, DEFAULT 0 | API calls used this month |
 | `max_team_members` | INTEGER | NOT NULL, DEFAULT 1 | Maximum team members (-1 = unlimited) |
 | `monthly_ai_explanations_limit` | INTEGER | NOT NULL, DEFAULT 0 | Monthly AI explanation quota (0=none, -1=unlimited) |
 | `monthly_ai_explanations_used` | INTEGER | NOT NULL, DEFAULT 0 | AI explanations used this month |
+| `concurrent_scans_limit` | INTEGER | NOT NULL, DEFAULT 1 | Max concurrent scans (-1 = unlimited) |
+| `web_requests_per_minute` | INTEGER | NOT NULL, DEFAULT 60 | Web request rate limit per minute (-1 = unlimited) |
+| `api_requests_per_minute` | INTEGER | NOT NULL, DEFAULT 0 | API request rate limit per minute (-1 = unlimited) |
+| `api_requests_per_hour` | INTEGER | NOT NULL, DEFAULT 0 | API request rate limit per hour (-1 = unlimited) |
+| `invariant_daily_used` | INTEGER | NOT NULL, DEFAULT 0 | Invariant generations used today |
+| `invariant_last_generated_at` | TIMESTAMPTZ | NULLABLE | Last invariant generation timestamp |
+| `invariant_daily_reset_at` | TIMESTAMPTZ | NULLABLE | Next daily invariant reset |
+| `monthly_ai_exploit_generations_used` | INTEGER | NULLABLE, DEFAULT 0 | Monthly AI exploit generations used |
+| `exploit_daily_used` | INTEGER | NULLABLE, DEFAULT 0 | Exploit generations used today |
+| `exploit_daily_reset_at` | TIMESTAMPTZ | NULLABLE | Next daily exploit reset |
+| `exploit_last_generated_at` | TIMESTAMPTZ | NULLABLE | Last exploit generation timestamp |
 | `quota_reset_at` | TIMESTAMPTZ | NOT NULL, DEFAULT next month | Next quota reset date (monthly or annual) |
-| `last_scan_at` | TIMESTAMPTZ | NULLABLE | Last scan timestamp |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Quota record creation |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last update timestamp |
 
@@ -348,38 +358,34 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 **Relationships:**
 - One-to-one with `users` (user_id, CASCADE DELETE)
 
-**Tier Limits (Updated January 22, 2026 - New 4-Tier Pricing Model)**:
+**Tier Limits (Updated March 7, 2026 — aligned to `blocksecops-shared/tier-config/tiers.json` v3.3)**:
 
 | Tier | Price | Scans/Mo | Files/Scan | LoC/Scan | Projects | API Calls/Mo | Team | AI Explain/Mo | Export | Retention | Priority |
 |------|-------|----------|------------|----------|----------|--------------|------|---------------|--------|-----------|----------|
-| **Developer** | $0 | 10 | 5 | 5,000 | 3 | 0 (no API) | 1 | 0 | No | 7 days | 50 |
-| **Starter** | $299/mo | 100 | Unlimited | Unlimited | 10 | 1,000 | 5 | 10 | Yes | 90 days | 40 |
-| **Growth** | $699/mo | 500 | Unlimited | Unlimited | 20 | 10,000 | 10 | 100 | Yes | 180 days | 25 |
-| **Enterprise** | $1,999+/mo | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Yes | 730 days | 5 |
+| **Developer** | $0 | 3 | Unlimited | Unlimited | 3 | 0 (no API) | 2 | 0 | No | 7 days | 50 |
+| **Starter** | $299/mo | 15 | Unlimited | Unlimited | 10 | 0 (no API) | 5 | 50 | Yes | 90 days | 40 |
+| **Growth** | $699/mo | 50 | Unlimited | Unlimited | Unlimited | Unlimited | 15 | 200 | Yes | 180 days | 25 |
+| **Enterprise** | $1,999+/mo | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Yes | 365 days | 5 |
 
-**File Size Limits**:
-- Developer: 1 MB single / 5 MB archive ($0 tier)
-- Starter: 5 MB single / 25 MB archive ($299/mo)
-- Growth: 10 MB single / 50 MB archive ($699/mo)
-- Enterprise: 20 MB single / 100 MB archive ($1,999+/mo)
+**Rate Limits (per tiers.json)**:
+
+| Tier | Web RPM | API RPM | API RPH |
+|------|---------|---------|---------|
+| **Developer** | 60 | 0 | 0 |
+| **Starter** | 120 | 0 | 0 |
+| **Growth** | 300 | 300 | 10,000 |
+| **Enterprise** | Unlimited | Unlimited | Unlimited |
 
 **Feature Access by Tier**:
-- API Access: starter+ ($299/mo)
-- AI Explanations: starter+ (quota-limited)
-- Webhooks: growth+ ($699/mo)
-- Team Management: growth+
+- Export: starter+ (developer=no)
+- API Access: growth+ ($699/mo)
+- Webhooks: starter+ ($299/mo)
+- AI Explanations: starter+ (quota-limited: 50/200/unlimited)
 - Organizations: enterprise ($1,999+/mo)
 - Audit Logging: enterprise
+- SSO/SAML: enterprise
 
-**AI Explanation Quotas (Phase 5.5a - January 2026)**:
-| Tier | Price | Monthly Limit | Notes |
-|------|-------|--------------|-------|
-| Developer | $0 | 0 | Not available |
-| Starter | $299/mo | 10 | Reset monthly |
-| Growth | $699/mo | 100 | Reset monthly |
-| Enterprise | $1,999+/mo | -1 | Unlimited |
-
-**SSO/SAML**: Enterprise tier only
+**Trigger:** `create_user_quota()` — auto-creates quota row on user INSERT, values sourced from tiers.json (migration 080)
 
 **Auto-Creation Trigger:**
 - Trigger function `create_user_quota()` automatically creates quota record on user insert

@@ -54,7 +54,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | **Continuous Monitoring** | No |
 | **95% FP Reduction** | No |
 | **Webhooks** | No |
-| **Export Reports** | Yes (PDF, JSON, SARIF) |
+| **Export Reports** | No |
 | **AI Explanations/Month** | 0 |
 | **AI Invariant Generations/Month** | 0 |
 | **Scanners** | All 25+ |
@@ -193,7 +193,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | Feature | Developer | Starter | Growth | Enterprise |
 |---------|-----------|------|--------|------------|
 | All 25+ Scanners | Yes | Yes | Yes | Yes |
-| Export Reports | Yes | Yes | Yes | Yes |
+| Export Reports | No | Yes | Yes | Yes |
 | 95% FP Reduction | No | Yes | Yes | Yes |
 | Private Repos | No | 3 | Unlimited | Unlimited |
 | API Access | No | No | Yes | Yes |

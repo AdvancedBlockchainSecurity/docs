@@ -1,18 +1,18 @@
 # Tier Upgrade Tests
 
 **Priority**: P1 - High
-**Last Updated**: January 13, 2026
+**Last Updated**: March 7, 2026
 **Related**: Freemium Model, Pricing Tiers, Migration 024, Migration 030, UpgradeBanner (v0.30.1)
 
 ---
 
-## Tier Reference (4-Tier Model - January 2026)
+## Tier Reference (4-Tier Model - March 2026)
 
-| Tier | Price | Scans/Mo | Files/Scan | Users | Projects | API Calls/Mo |
-|------|-------|----------|------------|-------|----------|--------------|
-| Developer | $0 | 10 | 5 | 1 | 3 | 0 (no API) |
-| Starter | $299/mo | 100 | Unlimited | 5 | 10 | 1,000 |
-| Growth | $699/mo | 500 | Unlimited | 15 | 25 | 10,000 |
+| Tier | Price | Scans/Mo | Files/Scan | Team Members | Projects | API Calls |
+|------|-------|----------|------------|--------------|----------|-----------|
+| Developer | $0 | 3 | Unlimited | 2 | 3 | 0 (no API) |
+| Starter | $299/mo | 15 | Unlimited | 5 | 10 | 0 (no API) |
+| Growth | $699/mo | 50 | Unlimited | 15 | Unlimited | Unlimited |
 | Enterprise | $1,999+/mo | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
 
 ---
@@ -34,14 +34,13 @@
 ### 1.3 Post-Upgrade Verification
 - [ ] User tier updated to "starter" in database
 - [ ] Quota widget shows "Starter" tier label
-- [ ] Scan limit increased to 100/month
+- [ ] Scan limit increased to 15/month
 - [ ] Files per scan now unlimited (-1)
 - [ ] LoC per scan now unlimited (-1)
-- [ ] File size limit increased to 5 MB single / 25 MB archive
 - [ ] Export enabled (PDF, JSON, SARIF)
 - [ ] Projects limit increased to 10
-- [ ] API access enabled (1,000 calls/month)
-- [ ] Priority queue level updated (30)
+- [ ] API access NOT enabled (Starter has no API access)
+- [ ] Priority queue level updated (40)
 - [ ] All 17+ scanners now accessible
 - [ ] Team members limit increased to 5
 
@@ -68,16 +67,16 @@
 ### 2.3 Post-Upgrade Verification
 - [ ] User tier updated to "growth" in database
 - [ ] Quota widget shows "Growth" tier label
-- [ ] Scan limit increased to 500/month
+- [ ] Scan limit increased to 50/month
 - [ ] Files per scan remains unlimited (-1)
-- [ ] File size limit increased to 10 MB single / 50 MB archive
-- [ ] Projects limit increased to 25
-- [ ] API calls increased to 10,000/month
+- [ ] Projects limit becomes unlimited (-1)
+- [ ] API calls become unlimited (-1)
 - [ ] Full API access enabled
-- [ ] Priority queue level updated (15)
+- [ ] Priority queue level updated (25)
 - [ ] Team management enabled (up to 15 members)
 - [ ] Webhooks enabled
 - [ ] Result retention increased to 180 days
+- [ ] Continuous monitoring enabled
 
 ### 2.4 Team Features Expanded
 - [ ] Team invite functionality expanded
@@ -165,9 +164,9 @@
 - [ ] No gap in service
 
 ### 6.2 At Quota Limit Upgrade
-- [ ] User at 10/10 scans (Developer tier) can initiate upgrade
-- [ ] After upgrade to Team, user shows 10/100
-- [ ] After upgrade to Enterprise, user shows 10/Unlimited
+- [ ] User at 3/3 scans (Developer tier) can initiate upgrade
+- [ ] After upgrade to Starter, user shows 3/15
+- [ ] After upgrade to Enterprise, user shows 3/Unlimited
 - [ ] User can scan immediately after upgrade
 - [ ] No scan loss during upgrade
 
