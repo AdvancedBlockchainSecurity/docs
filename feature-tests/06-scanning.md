@@ -26,6 +26,12 @@
 - [ ] Can't scan other user's contract (403)
 - [ ] Quota checked before scan starts
 
+### 1.4 Failed Scan Error Messages
+- [ ] Failed scan response includes `error_message` field
+- [ ] Project-required scanner on single file shows descriptive error
+- [ ] error_message is null for successful scans
+- [ ] error_message persisted in database for failed scans
+
 ---
 
 ## 2. Scan Status

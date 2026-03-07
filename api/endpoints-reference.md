@@ -632,6 +632,11 @@ List all scans for authenticated user.
       "high_count": 0,
       "medium_count": 0,
       "low_count": 0,
+      "scanners_used": ["slither", "aderyn"],
+      "scan_config": {"scanners": ["slither", "aderyn"]},
+      "duration_seconds": null,
+      "scan_source": "web",
+      "error_message": null,
       "created_at": "2025-10-06T22:00:00Z",
       "updated_at": "2025-10-06T22:00:00Z"
     }
@@ -664,6 +669,11 @@ Get details of a specific scan.
   "high_count": 5,
   "medium_count": 8,
   "low_count": 12,
+  "scanners_used": ["slither", "aderyn", "wake"],
+  "scan_config": {"scanners": ["slither", "aderyn", "wake"]},
+  "duration_seconds": 12,
+  "scan_source": "web",
+  "error_message": null,
   "created_at": "2025-10-06T22:00:00Z",
   "updated_at": "2025-10-06T22:05:00Z"
 }
@@ -681,9 +691,19 @@ Create a new security scan for a contract.
 ```json
 {
   "contract_id": "uuid",
-  "scan_type": "full"
+  "scan_type": "custom",
+  "scanner_ids": ["slither", "aderyn"],
+  "scan_source": "web"
 }
 ```
+
+**Request Fields**:
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `contract_id` | UUID | Yes | Contract to scan |
+| `scan_type` | string | No | `quick`, `full`, `deep`, or `custom` (default: `full`) |
+| `scanner_ids` | list[string] | Yes | Scanner IDs to run (e.g., `["slither", "aderyn"]`) |
+| `scan_source` | string | No | Source: `web`, `cli`, `vscode`, `jetbrains`, `neovim`, `github_actions` (default: `web`) |
 
 **Response** (201 Created):
 ```json
@@ -691,15 +711,29 @@ Create a new security scan for a contract.
   "id": "uuid",
   "contract_id": "uuid",
   "user_id": "uuid",
-  "scan_type": "full",
+  "scan_type": "custom",
   "status": "queued",
-  "created_at": "2025-10-06T22:00:00Z"
+  "started_at": null,
+  "completed_at": null,
+  "critical_count": 0,
+  "high_count": 0,
+  "medium_count": 0,
+  "low_count": 0,
+  "scanners_used": ["slither", "aderyn"],
+  "scan_config": {"scanners": ["slither", "aderyn"]},
+  "duration_seconds": null,
+  "scan_source": "web",
+  "error_message": null,
+  "created_at": "2025-10-06T22:00:00Z",
+  "updated_at": "2025-10-06T22:00:00Z"
 }
 ```
 
 **Scan Types**:
 - `quick` - Fast scan, basic checks only
 - `full` - Comprehensive analysis (default)
+- `deep` - Full analysis plus fuzzers and symbolic execution
+- `custom` - Use with `scanner_ids` for explicit scanner selection
 
 **Status Codes**:
 - `201` Created - Scan queued
