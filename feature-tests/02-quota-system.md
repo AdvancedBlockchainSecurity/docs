@@ -1,22 +1,22 @@
 # Quota System Tests
 
 **Priority**: P0 - Critical
-**Last Updated**: January 11, 2026
+**Last Updated**: March 7, 2026
 **Related**: Phase 3.1a Freemium Auth, Migration 024, Migration 030
-**Source of Truth**: `/docs/standards/tier-standards.md`
+**Source of Truth**: `/home/pwner/Git/blocksecops-shared/tier-config/tiers.json`
 
 ---
 
-## Tier Reference (Updated January 2026 - 4-Tier Model)
+## Tier Reference (Updated March 2026 - 4-Tier Model)
 
-| Tier | Price | Scans/Mo | Files/Scan | LoC/Scan | Projects | Single File | Archive | API Calls | Team |
-|------|-------|----------|------------|----------|----------|-------------|---------|-----------|------|
-| Developer | $0 | 10 | 5 | 5,000 | 3 | 1 MB | 5 MB | 0 | 1 |
-| Starter | $299/mo | 100 | Unlimited | Unlimited | 10 | 5 MB | 25 MB | 1,000 | 5 |
-| Growth | $699/mo | 500 | Unlimited | Unlimited | 25 | 10 MB | 50 MB | 10,000 | 15 |
-| Enterprise | $1,999+/mo | Unlimited | Unlimited | Unlimited | Unlimited | 20 MB | 100 MB | Unlimited | Unlimited |
+| Tier | Price | Scans/Mo | Files/Scan | LoC/Scan | Projects | Team Members | API Calls |
+|------|-------|----------|------------|----------|----------|--------------|-----------|
+| Developer | $0 | 3 | Unlimited | Unlimited | 3 | 2 | 0 |
+| Starter | $299/mo | 15 | Unlimited | Unlimited | 10 | 5 | 0 |
+| Growth | $699/mo | 50 | Unlimited | Unlimited | Unlimited | 15 | Unlimited |
+| Enterprise | $1,999+/mo | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
 
-**Note:** 4-tier pricing model effective January 2026. Developer tier (formerly free) includes 10 scans/month. API access available on Growth tier and above.
+**Note:** 4-tier pricing model. Developer tier is free with limited scans. API access available on Growth tier and above.
 
 ---
 
@@ -24,34 +24,34 @@
 
 ### 1.1 Developer Tier Display (Free - $0/mo)
 - [ ] QuotaWidget shows "Developer" tier label
-- [ ] Shows scans used / 10 max
-- [ ] Shows files-per-scan limit (5)
-- [ ] Shows LoC-per-scan limit (5,000)
+- [ ] Shows scans used / 3 max
+- [ ] Shows files-per-scan as unlimited
+- [ ] Shows LoC-per-scan as unlimited
 - [ ] Shows projects used / 3 max
 - [ ] Shows "No API access" for API calls
 - [ ] Shows "Export disabled" indicator
 - [ ] Shows upgrade prompt
 - [ ] Progress bar reflects usage
-- [ ] Shows "Solo developer" for team (1 user)
+- [ ] Shows team members used / 2 max
 
 ### 1.2 Starter Tier Display ($299/mo)
 - [ ] QuotaWidget shows "Starter" tier label
-- [ ] Shows scans used / 100 max
+- [ ] Shows scans used / 15 max
 - [ ] Shows unlimited files-per-scan
 - [ ] Shows projects used / 10 max
-- [ ] Shows API calls used / 1,000 max
+- [ ] Shows "No API access" for API calls
 - [ ] Shows team members used / 5 max
 - [ ] Shows export enabled
 - [ ] Progress bar reflects usage
 
 ### 1.3 Growth Tier Display ($699/mo)
 - [ ] QuotaWidget shows "Growth" tier label
-- [ ] Shows scans used / 500 max
+- [ ] Shows scans used / 50 max
 - [ ] Shows unlimited files-per-scan
-- [ ] Shows projects used / 25 max
-- [ ] Shows API calls used / 10,000 max
+- [ ] Shows projects as unlimited
+- [ ] Shows API calls as unlimited
 - [ ] Shows team members used / 15 max
-- [ ] Shows API access enabled
+- [ ] Shows API access enabled (unlimited)
 - [ ] Progress bar reflects usage
 
 ### 1.4 Enterprise Tier Display ($1,999+/mo)
@@ -67,22 +67,22 @@
 
 ## 2. Scan Quota Enforcement
 
-### 2.1 Developer Tier (10 scans/month - Free)
-- [ ] First 10 scans succeed
-- [ ] 11th scan blocked with 402 error
+### 2.1 Developer Tier (3 scans/month - Free)
+- [ ] First 3 scans succeed
+- [ ] 4th scan blocked with 402 error
 - [ ] Error message mentions quota exceeded
 - [ ] Upgrade URL provided in error response (/pricing)
 - [ ] UI shows quota exhausted state
 
-### 2.2 Starter Tier (100 scans/month - $299/mo)
-- [ ] Scans 1-100 succeed
-- [ ] 101st scan blocked
+### 2.2 Starter Tier (15 scans/month - $299/mo)
+- [ ] Scans 1-15 succeed
+- [ ] 16th scan blocked
 - [ ] Error message appropriate for Starter tier
 - [ ] Suggests upgrade to Growth
 
-### 2.3 Growth Tier (500 scans/month - $699/mo)
-- [ ] Scans 1-500 succeed
-- [ ] 501st scan blocked
+### 2.3 Growth Tier (50 scans/month - $699/mo)
+- [ ] Scans 1-50 succeed
+- [ ] 51st scan blocked
 - [ ] Error message appropriate for Growth tier
 - [ ] Suggests upgrade to Enterprise
 
@@ -95,11 +95,10 @@
 
 ## 3. Files-Per-Scan Limits
 
-### 3.1 Developer Tier (5 files max - Free)
-- [ ] Archive with 5 files uploads successfully
-- [ ] Archive with 6+ files shows 402 error
-- [ ] Error shows file count and limit
-- [ ] Upgrade message shown
+### 3.1 Developer Tier (Unlimited - Free)
+- [ ] Large archive uploads successfully
+- [ ] No file count limit applied
+- [ ] max_files_per_scan = -1 in database
 
 ### 3.2 Starter/Growth/Enterprise Tier (Unlimited)
 - [ ] Large archive uploads successfully
@@ -107,17 +106,16 @@
 - [ ] max_files_per_scan = -1 in database
 
 ### 3.3 Smart Dependency Extraction
-- [ ] OpenZeppelin project (200+ files) extracts to <5 files for Developer tier
-- [ ] Smart extraction respects tier limits
-- [ ] Only imported files count toward limit
+- [ ] OpenZeppelin project (200+ files) extracts successfully
+- [ ] Smart extraction works for all tiers
+- [ ] Only imported files included in extraction
 
-## 3b. Lines-of-Code Per Scan Limits (NEW)
+## 3b. Lines-of-Code Per Scan Limits
 
-### 3b.1 Developer Tier (5,000 LoC max - Free)
-- [ ] Code under 5,000 LoC uploads successfully
-- [ ] Code over 5,000 LoC shows 402 error
-- [ ] Error shows total LoC and limit
-- [ ] Upgrade message suggests Team tier
+### 3b.1 Developer Tier (Unlimited - Free)
+- [ ] Large codebases upload successfully
+- [ ] No LoC limit applied
+- [ ] max_loc_per_scan = -1 in database
 
 ### 3b.2 Starter/Growth/Enterprise (Unlimited)
 - [ ] Large codebases upload successfully
@@ -129,24 +127,24 @@
 ## 4. File Size Limits
 
 ### 4.1 Developer Tier (Free)
-- [ ] Single file up to 1 MB succeeds
-- [ ] Single file over 1 MB shows 413 error
-- [ ] Archive up to 5 MB succeeds
-- [ ] Archive over 5 MB shows 413 error
-- [ ] Error shows tier and limit info
+- [ ] Files have no per-file size limits in tiers.json
+- [ ] Archive uploads succeed
+- [ ] Error handling for oversized files
 
 ### 4.2 Starter Tier ($299/mo)
-- [ ] Single file up to 5 MB succeeds
-- [ ] Archive up to 25 MB succeeds
-- [ ] Oversized files show appropriate error
+- [ ] Files have no per-file size limits in tiers.json
+- [ ] Archive uploads succeed
+- [ ] Error handling for oversized files
 
 ### 4.3 Growth Tier ($699/mo)
-- [ ] Single file up to 10 MB succeeds
-- [ ] Archive up to 50 MB succeeds
+- [ ] Files have no per-file size limits in tiers.json
+- [ ] Archive uploads succeed
+- [ ] Error handling for oversized files
 
 ### 4.4 Enterprise Tier ($1,999+/mo)
-- [ ] Single file up to 20 MB succeeds
-- [ ] Archive up to 100 MB succeeds
+- [ ] Files have no per-file size limits in tiers.json
+- [ ] Archive uploads succeed
+- [ ] Error handling for oversized files
 
 ---
 
@@ -204,10 +202,10 @@
 - [ ] 11th project blocked with 403 error
 - [ ] Suggests upgrade to Growth
 
-### 7.3 Growth Tier (25 projects max - $699/mo)
-- [ ] Projects 1-25 created successfully
-- [ ] 26th project blocked with 403 error
-- [ ] Suggests upgrade to Enterprise
+### 7.3 Growth Tier (Unlimited projects - $699/mo)
+- [ ] Large number of projects succeed
+- [ ] No project limit applied
+- [ ] max_projects = -1 in database
 
 ### 7.4 Enterprise Tier (Unlimited - $1,999+/mo)
 - [ ] Large number of projects succeed
@@ -233,17 +231,16 @@
 - [ ] Upgrade message suggests Growth tier (API access starts at Growth)
 - [ ] API key creation blocked
 
-### 8.2 Starter Tier (1,000 calls/month - $299/mo)
-- [ ] API calls 1-1,000 succeed
-- [ ] 1,001st call returns 429 error
-- [ ] Counter increments per request
-- [ ] Suggests upgrade to Growth
+### 8.2 Starter Tier (0 API calls - $299/mo)
+- [ ] API requests return 403 "API access not available"
+- [ ] Upgrade message suggests Growth tier
+- [ ] API key creation blocked
 
-### 8.3 Growth Tier (10,000 calls/month - $699/mo)
-- [ ] API calls 1-10,000 succeed
-- [ ] 10,001st call returns 429 error
-- [ ] Suggests upgrade to Enterprise
+### 8.3 Growth Tier (Unlimited API calls - $699/mo)
+- [ ] API calls succeed without limits
+- [ ] Counter tracks usage for analytics
 - [ ] Full API access enabled
+- [ ] No 429 rate limit responses for quota
 
 ### 8.4 Enterprise (Unlimited - $1,999+/mo)
 - [ ] No API call limit
@@ -258,13 +255,14 @@
 
 ## 9. Team Seat Quota Enforcement (New in Migration 024)
 
-### 9.1 Developer Tier (1 user - Free)
-- [ ] No invite option shown
-- [ ] Solo user only
-- [ ] Upgrade prompt for team features
+### 9.1 Developer Tier (2 users - Free)
+- [ ] Invites up to 1 succeed (plus owner = 2)
+- [ ] 2nd invite blocked
+- [ ] Current seat count shown
+- [ ] Suggests upgrade to Starter
 
 ### 9.2 Starter Tier (5 users - $299/mo)
-- [ ] Invites 1-4 succeed (plus owner = 5)
+- [ ] Invites up to 4 succeed (plus owner = 5)
 - [ ] 5th invite blocked
 - [ ] Current seat count shown
 - [ ] Suggests upgrade to Growth

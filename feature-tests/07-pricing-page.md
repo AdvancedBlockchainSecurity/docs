@@ -1,7 +1,7 @@
 # Pricing Page Tests
 
 **Priority**: P2 - Medium
-**Last Updated**: January 11, 2026
+**Last Updated**: March 7, 2026
 **Related**: Phase 3.1b Frontend, Migration 024, Migration 030
 
 ---
@@ -18,55 +18,54 @@
 - [ ] "Developer" label displayed
 - [ ] Price shown ($0/month)
 - [ ] Feature list:
-  - [ ] 10 scans/month
-  - [ ] 5 files per scan
-  - [ ] 5,000 LoC per scan
-  - [ ] 1 MB file limit (5 MB archives)
+  - [ ] 3 scans/month
+  - [ ] Unlimited files per scan
+  - [ ] Unlimited LoC per scan
   - [ ] 3 projects
   - [ ] All scanners (basic mode)
   - [ ] Community support
   - [ ] No API access
   - [ ] No export (dashboard view only)
   - [ ] 7-day retention
-  - [ ] 1 user (solo)
+  - [ ] 2 team members (solo + 1)
 - [ ] "Current Plan" indicator (if user is Developer)
 - [ ] "Get Started" button (if not logged in)
 
-### 1.3 Team Tier Card ($299/mo)
-- [ ] "Team" label displayed with green styling
+### 1.3 Starter Tier Card ($299/mo)
+- [ ] "Starter" label displayed with blue styling
 - [ ] Price shown ($299/month)
 - [ ] Feature list:
-  - [ ] 100 scans/month
+  - [ ] 15 scans/month
   - [ ] Unlimited files per scan
   - [ ] Unlimited LoC per scan
-  - [ ] 5 MB file limit (25 MB archives)
   - [ ] 10 projects
   - [ ] All 17+ scanners
-  - [ ] 1,000 API calls/month
+  - [ ] No API access
   - [ ] Export enabled (PDF, JSON, SARIF)
   - [ ] 90-day retention
   - [ ] Up to 5 team members
-- [ ] "Upgrade to Team" button (if user is Developer)
-- [ ] "Current Plan" indicator (if user is Team)
+  - [ ] Webhooks enabled
+- [ ] "Upgrade to Starter" button (if user is Developer)
+- [ ] "Current Plan" indicator (if user is Starter)
 
 ### 1.4 Growth Tier Card ($699/mo)
-- [ ] "Growth" label displayed with blue styling
+- [ ] "Growth" label displayed with purple styling
 - [ ] "Popular" badge shown
 - [ ] Price shown ($699/month)
 - [ ] Feature list:
-  - [ ] 500 scans/month
+  - [ ] 50 scans/month
   - [ ] Unlimited files per scan
   - [ ] Unlimited LoC per scan
-  - [ ] 10 MB file limit (50 MB archives)
-  - [ ] 25 projects
+  - [ ] Unlimited projects
   - [ ] All scanners
-  - [ ] 10,000 API calls/month
+  - [ ] Unlimited API calls
   - [ ] Full API access enabled
   - [ ] Webhooks enabled
   - [ ] CI/CD integration
   - [ ] Up to 15 team members
   - [ ] 180-day retention
-- [ ] "Upgrade to Growth" button (if user is Developer/Team)
+  - [ ] Continuous monitoring
+- [ ] "Upgrade to Growth" button (if user is Developer/Starter)
 - [ ] "Current Plan" indicator (if user is Growth)
 
 ### 1.5 Enterprise Tier Card ($1,999+/mo)
@@ -121,16 +120,16 @@
 
 ### 3.2 Limit Comparison
 Features to verify in matrix:
-- [ ] Monthly Scans: 10 / 100 / 500 / Unlimited / Pay per scan
-- [ ] Team Members: 1 / 5 / 15 / Unlimited / 1
-- [ ] Projects: 3 / 10 / 25 / Unlimited / 5
-- [ ] API Calls/Month: None / 1,000 / 10,000 / Unlimited / 1,000
-- [ ] Files/Scan: 5 / Unlimited / Unlimited / Unlimited / Per tier
-- [ ] LoC/Scan: 5,000 / Unlimited / Unlimited / Unlimited / Per tier
-- [ ] Result Retention: 7 days / 90 days / 180 days / 730 days / 90 days
-- [ ] All Scanners: Basic / Yes / Yes / Yes / Yes
-- [ ] API Access: No / Yes / Yes (Full) / Yes / Yes
-- [ ] Webhooks: No / No / Yes / Yes / Yes
+- [ ] Monthly Scans: 3 / 15 / 50 / Unlimited / Pay per scan
+- [ ] Team Members: 2 / 5 / 15 / Unlimited / 1
+- [ ] Projects: 3 / 10 / Unlimited / Unlimited / 5
+- [ ] API Calls/Month: None / None / Unlimited / Unlimited / Per tier
+- [ ] Files/Scan: Unlimited / Unlimited / Unlimited / Unlimited / Per tier
+- [ ] LoC/Scan: Unlimited / Unlimited / Unlimited / Unlimited / Per tier
+- [ ] Result Retention: 7 days / 90 days / 180 days / 365 days / 90 days
+- [ ] All Scanners: Yes / Yes / Yes / Yes / Yes
+- [ ] API Access: No / No / Yes (Full) / Yes / Yes
+- [ ] Webhooks: No / Yes / Yes / Yes / Yes
 - [ ] Teams: No / Yes / Yes / Yes / No
 - [ ] Organizations: No / No / No / Yes / No
 - [ ] SSO/SAML: No / No / No / Yes / No
@@ -141,10 +140,10 @@ Features to verify in matrix:
 ## 4. Upgrade Flow
 
 ### 4.1 Upgrade Buttons
-- [ ] Developer -> Team: "Upgrade to Team" button works
+- [ ] Developer -> Starter: "Upgrade to Starter" button works
 - [ ] Developer -> Growth: "Upgrade to Growth" button works
-- [ ] Team -> Growth: "Upgrade to Growth" button works
-- [ ] Team -> Enterprise: "Upgrade to Enterprise" button works
+- [ ] Starter -> Growth: "Upgrade to Growth" button works
+- [ ] Starter -> Enterprise: "Contact Sales" button works
 - [ ] Growth -> Enterprise: "Upgrade to Enterprise" button works
 - [ ] Any tier -> Enterprise: "Contact Sales" button works
 
