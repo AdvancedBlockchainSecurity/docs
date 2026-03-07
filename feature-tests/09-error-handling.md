@@ -81,7 +81,26 @@
 
 ---
 
-## 4. Scan Errors
+## 4. Scan Failure Errors
+
+### 4.1 Scanner Validation Errors (400)
+- [ ] Project scanner on single file returns error with scanner name
+- [ ] error_message field populated in scan record
+- [ ] Error message references "multi-file upload"
+
+### 4.2 Scanner Triggering Failures (503)
+- [ ] All scanners fail to trigger returns 503
+- [ ] error_message includes "Tool-integration service unavailable"
+- [ ] Consecutive failure abort includes failure count
+
+### 4.3 Scanner Job Failures
+- [ ] Scanner-reported failure persists error_message on scan
+- [ ] error_message visible in GET /scans/{id} response
+- [ ] Batch scan shows individual scan errors
+
+---
+
+## 5. Scan Errors
 
 ### 4.1 Scanner Errors
 - [ ] Scanner timeout handled

@@ -27,6 +27,24 @@ kubectl logs -n tool-integration-local deployment/tool-integration --tail=100 | 
 
 ---
 
+## Check Scan Error Message (v0.29.67+)
+
+Failed scans now include an `error_message` field in the API response:
+
+```bash
+# Check error message via API
+curl -sk https://app.0xapogee.local/api/v1/scans/{scan_id} \
+  -H "Authorization: Bearer $TOKEN" | jq '{status, error_message}'
+```
+
+Common error messages:
+- `"Scanners ['halmos'] require a project..."` — Scanner needs a multi-file project, not a single file
+- `"Failed to trigger any scanners..."` — Tool-integration service is down
+- `"Scanner triggering aborted after N failures"` — Multiple scanners failed to trigger
+- `null` (on failed scan) — Legacy scan from before v0.29.67
+
+---
+
 ## Common Issues
 
 ### Issue 1: Scanner Pod Exits with 0 Findings (UID Mismatch)
