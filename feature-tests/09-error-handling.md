@@ -198,7 +198,44 @@
 
 ---
 
-## 10. Graceful Degradation
+## 10. AI Actions Error Handling
+
+### 10.1 Anthropic API Errors
+- [x] Rate limited (429) returns user-friendly 429 message
+- [x] Auth failure (401) returns 502/503 with sanitized message
+- [x] Overloaded (529) returns 503 with retry message
+- [x] Generic API error returns 502 with sanitized message
+- [x] Unexpected error returns 500 with generic message
+- [x] No internal details leaked in error responses (BSO-SEC-LOG-003)
+
+### 10.2 AI Actions — Code Review
+- [x] Missing API key returns 502 (not unhandled 500)
+- [x] Rate limit returns 429
+- [x] Generic exception caught and logged
+
+### 10.3 AI Actions — Code Repair
+- [x] Missing API key returns 502
+- [x] Generic exception caught (was missing before v0.29.74)
+
+### 10.4 AI Actions — PoC Exploit Generation
+- [x] Missing API key returns 502 (was unhandled 500 before v0.29.74)
+- [x] Rate limit returns 429
+- [x] Tier/quota/cooldown errors handled
+- [x] Generic exception caught
+
+### 10.5 AI Actions — Invariant Generation
+- [x] Auth failure returns 503 with "not configured" message
+- [x] Rate limit returns 429
+- [x] Overloaded returns 503
+- [x] Route ordering: `/invariants/templates` resolves correctly (not caught by `/{invariant_id}`)
+
+### 10.6 ML Similar Vulnerabilities
+- [x] Contracts without project association handled (uses ProjectContractModel join table)
+- [x] No `AttributeError` on `ContractModel.project_id` (fixed v0.29.74)
+
+---
+
+## 11. Graceful Degradation
 
 - [ ] Scanner service down - informative error
 - [ ] Database slow - timeout handled
@@ -207,7 +244,7 @@
 
 ---
 
-## 11. Error Message Quality
+## 12. Error Message Quality
 
 ### 11.1 User-Friendly Messages
 - [ ] No technical jargon
