@@ -118,6 +118,9 @@ Error responses for quota exhaustion:
 | Cooldown active | 429 | `Retry-After` header |
 | Contract too large | 400 | Size limit exceeded |
 | Injection detected | 400 | Validation error |
-| Rate limited | 429 | Too many requests |
-| Anthropic API key missing | 503 | "AI service not configured" |
-| Anthropic API failure | 503 | "AI service temporarily unavailable" (sanitized) |
+| Rate limited (app) | 429 | Too many requests |
+| Anthropic rate limited | 429 | `"AI service rate limit reached. Please wait a moment before trying again."` |
+| Anthropic API auth failure (401) | 503 | `"AI service is not configured. Please contact support."` |
+| Anthropic API overloaded (529) | 503 | `"AI service is temporarily overloaded. Please try again in a few moments."` |
+| Anthropic API error (other) | 502 | `"AI service is temporarily unavailable. Please try again later."` |
+| Unexpected error | 500 | `"An unexpected error occurred during invariant generation. Please try again later."` |

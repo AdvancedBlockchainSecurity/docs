@@ -77,9 +77,13 @@ All review results are displayed **inline on the vulnerability detail page** —
 |-------|------|----------|
 | Feature disabled | 503 | `{"detail": "AI Code Review is currently disabled"}` |
 | Tier insufficient | 403 | Tier gate rejection |
-| Rate limited | 429 | Too many requests |
+| Rate limited (app) | 429 | Too many requests |
 | Vulnerability not found | 404 | Standard not found |
-| Anthropic API failure | 500 | Sanitized error via `get_safe_error_detail()` |
+| Anthropic rate limited | 429 | `"AI service rate limit reached. Please wait a moment before trying again."` |
+| Anthropic API auth failure | 502 | `"AI service is temporarily unavailable. Please try again later."` |
+| Anthropic API overloaded (529) | 503 | `"AI service is temporarily overloaded. Please try again in a few moments."` |
+| Anthropic API error (other) | 502 | `"AI service is temporarily unavailable. Please try again later."` |
+| Unexpected error | 500 | `"An unexpected error occurred during code review. Please try again later."` |
 
 ## Tier Quotas
 
