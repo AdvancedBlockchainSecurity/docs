@@ -488,5 +488,5 @@ Before deploying any service with secrets:
 ## Related Standards
 
 - [Core Development Rules](./core-development-rules.md) - Codebase-first development workflow
-- [Local Development Setup](./local-development-setup.md) - Local environment configuration
+- [Local Development Setup](../local-development/local-development-setup.md) - Local environment configuration
 - [Compliance Checklist](./compliance-checklist.md) - Security compliance requirements

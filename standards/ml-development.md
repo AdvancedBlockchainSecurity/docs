@@ -366,6 +366,6 @@ async def health():
 ## Related Documentation
 
 - [Phase 5 AI/ML Features](/TaskDocs-Apogee/phases/05-phase-5-ai-ml/README.md)
-- [Intelligence Integration Standards](./INTELLIGENCE-INTEGRATION-STANDARDS.md)
+- [Intelligence Integration Standards](../INTELLIGENCE-INTEGRATION-STANDARDS.md)
 - [Testing Standards](./testing-deployment.md)
 - [Core Development Rules](./core-development-rules.md)

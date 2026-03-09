@@ -480,7 +480,7 @@ kubectl apply -k k8s/overlays/local/ --dry-run=client
    # Selector is inherited from base — never override it in a patch
    ```
 
-   **Why this breaks things:** Strategic merge patch on a Service's `selector` field MERGES the patch labels with base labels. If the merged set doesn't match pod labels, the Service has no endpoints. This caused outages in data-service, contract-parser, and 4 other services (February 28, 2026 audit). See [Cluster Baseline — Resolved Deviations](./cluster-baseline.md#resolved-deviations).
+   **Why this breaks things:** Strategic merge patch on a Service's `selector` field MERGES the patch labels with base labels. If the merged set doesn't match pod labels, the Service has no endpoints. This caused outages in data-service, contract-parser, and 4 other services (February 28, 2026 audit). See [Cluster Baseline — Resolved Deviations](../cluster-baseline.md#resolved-deviations).
 
    **Rule:** `service-patch.yaml` files must NEVER contain a `selector:` block. Selectors are defined in `k8s/base/service.yaml` and inherited by overlays.
 
@@ -501,7 +501,7 @@ kubectl apply -k k8s/overlays/local/ --dry-run=client
        includeSelectors: false  # Default and correct behavior
    ```
 
-   **Why this breaks things:** `includeSelectors: true` adds version labels to both `spec.selector.matchLabels` (Deployment) and `spec.selector` (Service). On version bump, the Deployment's `matchLabels` changes, but Kubernetes rejects the update because `spec.selector.matchLabels` is **immutable**. The workaround (delete and recreate the Deployment) causes downtime. Even without version labels, injecting kustomize labels into selectors can cause mismatches with pods from other tools (Helm, manual kubectl). See [Local Development Setup — Kubernetes Service Selector Standards](./local-development-setup.md#kubernetes-service-selector-standards).
+   **Why this breaks things:** `includeSelectors: true` adds version labels to both `spec.selector.matchLabels` (Deployment) and `spec.selector` (Service). On version bump, the Deployment's `matchLabels` changes, but Kubernetes rejects the update because `spec.selector.matchLabels` is **immutable**. The workaround (delete and recreate the Deployment) causes downtime. Even without version labels, injecting kustomize labels into selectors can cause mismatches with pods from other tools (Helm, manual kubectl). See [Local Development Setup — Kubernetes Service Selector Standards](../local-development/local-development-setup.md#kubernetes-service-selector-standards).
 
 8. **Commit ExternalSecrets with values:**
    ```yaml
@@ -550,7 +550,7 @@ kustomize build k8s/overlays/local/ --enable-alpha-plugins
 ## Related Standards
 
 - [Docker Image Versioning](./docker-image-versioning.md) - Version management
-- [Port Forwarding](./port-forwarding.md) - Service access patterns
+- [Service Availability](./service-availability.md) - Service access patterns
 - [Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md) - Pod configuration
 - [Core Development Rules](./core-development-rules.md) - Codebase-first development
 

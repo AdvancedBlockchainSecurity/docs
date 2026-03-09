@@ -395,4 +395,4 @@ The following measures are now MANDATORY to prevent recurrence:
 **See Also:**
 - [Core Development Rules](./core-development-rules.md) - Critical development workflow rules
 - [Secrets Management](./secrets-management.md) - Database credential management
-- [Local Development Setup](./local-development-setup.md) - Local environment configuration
+- [Local Development Setup](../local-development/local-development-setup.md) - Local environment configuration

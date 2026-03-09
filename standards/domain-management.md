@@ -316,7 +316,7 @@ Until this migration is completed, all `kustomization.yaml` files use `harbor.bl
 ---
 
 **See Also:**
-- [Service Access Standards](./port-forwarding.md) - Always-available access patterns
+- [Service Availability](./service-availability.md) - Always-available access patterns
 - [Kustomize Standards](./kustomize-standards.md) - Base/overlay patterns
 - [Supabase User Creation Pipeline](../pipelines/supabase-user-creation-pipeline.md) - Signup redirect flow
 - [Core Development Rules](./core-development-rules.md) - Development workflow

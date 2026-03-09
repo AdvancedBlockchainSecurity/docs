@@ -186,6 +186,6 @@ curl https://app.0xapogee.com/api/v1/health/live
 
 ## Related Standards
 
-- [Service Access Standards](./port-forwarding.md) - Environment-specific access patterns
+- [Domain Management](./domain-management.md) - Environment-specific access patterns
 - [Domain Management](./domain-management.md) - DNS and domain configuration
 - [Core Development Rules](./core-development-rules.md) - Development workflow

@@ -82,7 +82,7 @@ All development must follow these standards (see `standards/` for full documenta
 - @standards/version-control-standards.md - Git workflow
 - @standards/database-management.md - Database operations
 - @standards/docker-image-versioning.md - Semantic versioning
-- @standards/port-forwarding.md - Port mappings
+- @standards/service-availability.md - Service access patterns
 
 ## Usage Examples
 
@@ -100,19 +100,3 @@ Read @.claude/agents/soliditydefend.md and implement a new reentrancy detector
 Read @.claude/agents/blocksecops-gcp-infrastructure.md and add a new Kubernetes service for GCP
 ```
 
-## Port Reference
-
-| Port | Service |
-|------|---------|
-| 3000 | Dashboard (via Traefik) |
-| 3001 | Findings UI / Grafana |
-| 3002 | Analysis UI |
-| 8000 | API Service |
-| 8001 | Data Service |
-| 8002 | Intelligence Engine |
-| 8003 | Notification Service |
-| 8004 | Orchestration |
-| 8005 | Tool Integration |
-| 5432 | PostgreSQL |
-| 6379 | Redis |
-| 9000 | Contract Parser |
