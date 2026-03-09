@@ -89,18 +89,21 @@ kubectl get nodes
 
 ### Single Service Deployment
 
+Each service deploys from its own repository's `k8s/overlays/gcp/` directory:
+
 ```bash
 SERVICE="api-service"
 
-# 1. Deploy (namespace + ExternalSecret + deployment)
-kubectl apply -k k8s/overlays/gcp/services/${SERVICE}/
+# 1. Deploy from the service repo (namespace + ExternalSecret + deployment)
+cd ~/Git/blocksecops-${SERVICE}
+kubectl apply -k k8s/overlays/gcp/
 
 # 2. Verify ExternalSecret synced
-kubectl get externalsecret -n ${SERVICE}-gcp
+kubectl get externalsecret -n ${SERVICE}-prod
 # STATUS should show "SecretSynced"
 
 # 3. Wait for rollout
-kubectl rollout status deployment/${SERVICE} -n ${SERVICE}-gcp --timeout=300s
+kubectl rollout status deployment/${SERVICE} -n ${SERVICE}-prod --timeout=300s
 
 # 4. Verify health
 curl -I https://app.0xApogee.com/api/v1/health/live
@@ -109,16 +112,23 @@ curl -I https://app.0xApogee.com/api/v1/health/live
 ### Full Platform Deployment (Dependency Order)
 
 ```
-1. Infrastructure: kubectl apply -k k8s/overlays/gcp/  (PostgreSQL, Redis, Ingress, PriorityClasses, ExternalSecrets)
-2. Create PostgreSQL credentials: kubectl create secret generic postgresql-credentials -n postgresql-gcp
-3. data-service (database layer)
-4. api-service (HTTP gateway — most services depend on it)
-5. orchestration (workflow engine)
-6. intelligence-engine (ML/AI)
-7. notification (real-time, depends on Redis)
-8. tool-integration, contract-parser (backend services)
-9. analysis, findings (supporting services)
-10. dashboard, admin-portal (frontends — last, depend on API)
+Step 1 — Infrastructure (from blocksecops-gcp-infrastructure):
+  kubectl apply -k k8s/overlays/gcp/
+  (cert-manager, PostgreSQL, Redis, ESO, Ingress, NetworkPolicies, PriorityClasses)
+
+Step 2 — Create PostgreSQL credentials:
+  kubectl create secret generic postgresql-credentials -n postgresql-prod
+
+Step 3 — Services (from each service repo):
+  cd ~/Git/blocksecops-data-service && kubectl apply -k k8s/overlays/gcp/
+  cd ~/Git/blocksecops-api-service && kubectl apply -k k8s/overlays/gcp/
+  cd ~/Git/blocksecops-orchestration && kubectl apply -k k8s/overlays/gcp/
+  cd ~/Git/blocksecops-intelligence-engine && kubectl apply -k k8s/overlays/gcp/
+  cd ~/Git/blocksecops-notification && kubectl apply -k k8s/overlays/gcp/
+  cd ~/Git/blocksecops-tool-integration && kubectl apply -k k8s/overlays/gcp/
+  cd ~/Git/blocksecops-contract-parser && kubectl apply -k k8s/overlays/gcp/
+  cd ~/Git/blocksecops-dashboard && kubectl apply -k k8s/overlays/gcp/
+  cd ~/Git/blocksecops-admin-portal && kubectl apply -k k8s/overlays/gcp/
 ```
 
 ### Secrets (GCP Secret Manager + ESO)

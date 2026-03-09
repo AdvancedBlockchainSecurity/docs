@@ -236,8 +236,8 @@ GitHub Actions automatically:
 2. **Test** — Unit tests (`pytest` for Python, `vitest` for React, `cargo test` for Rust)
 3. **Build** — Docker build with OCI labels
 4. **Push** — Push image to GCP Artifact Registry
-5. **Update manifests** — Update `newTag` in `blocksecops-gcp-infrastructure/k8s/overlays/gcp/services/<service>/kustomization.yaml`
-6. **Commit** — Push manifest change to gcp-infrastructure repo
+5. **Update manifests** — Update `newTag` in the service repo's `k8s/overlays/gcp/kustomization.yaml`
+6. **Commit** — Push manifest change to the service repo
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -247,7 +247,7 @@ GitHub Actions automatically:
 │                                        │                         │
 │                               update kustomization newTag        │
 │                                        │                         │
-│                               commit to gcp-infrastructure       │
+│                               commit to service repo             │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -269,15 +269,15 @@ See [Dev-to-Prod Pipeline](../pipelines/dev-to-prod-pipeline.md) for full CI sta
 
 ## Phase 5: CD — Google Config Sync
 
-**Trigger:** Manifest change committed to `blocksecops-gcp-infrastructure` repo (by CI in Phase 4).
+**Trigger:** Manifest change committed to the service repo (by CI in Phase 4).
 
-Config Sync continuously watches the Git repository and applies changes to the GKE cluster:
+Config Sync continuously watches Git repositories and applies changes to the GKE cluster. Each service repo's `k8s/overlays/gcp/` is synced independently:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  Config Sync (running on GKE)                                    │
 │                                                                  │
-│  1. Poll gcp-infrastructure repo (configurable interval)         │
+│  1. Poll service repos (configurable interval)                   │
 │  2. Detect manifest diff (kustomization newTag changed)          │
 │  3. Render kustomize overlays                                    │
 │  4. Apply to GKE cluster (rolling update)                        │
@@ -359,10 +359,10 @@ curl -sI https://app.0xapogee.com/api/v1/health/live | grep -E "strict-transport
 
 ```bash
 # Check pod status on GKE
-kubectl get pods -n <service>-gcp
+kubectl get pods -n <service>-prod
 
 # Check for CrashLoopBackOff or OOMKilled
-kubectl get events -n <service>-gcp --sort-by='.lastTimestamp' | tail -10
+kubectl get events -n <service>-prod --sort-by='.lastTimestamp' | tail -10
 ```
 
 ---
@@ -389,7 +389,7 @@ git push origin main
 # Config Sync detects the revert and rolls back the cluster
 
 # Option 2: kubectl rollback (emergency only)
-kubectl rollout undo deployment/<service> -n <service>-gcp
+kubectl rollout undo deployment/<service> -n <service>-prod
 # WARNING: This creates drift between Git and cluster state.
 # Follow up by reverting the Git change immediately.
 ```
@@ -421,13 +421,13 @@ For the fastest possible deployment, the developer can also manually push the im
 
 ```bash
 # Manual emergency push to Artifact Registry
-REGISTRY="us-west1-docker.pkg.dev/project-8a2657b9-d96c-4c0a-a69/blocksecops"
+REGISTRY="us-west1-docker.pkg.dev/project-8a2657b9-d96c-4c0a-a69/apogee"
 docker build -t ${REGISTRY}/<service>:<version> .
 docker push ${REGISTRY}/<service>:<version>
 
-# Update GCP overlay manually
-cd /home/pwner/Git/blocksecops-gcp-infrastructure
-# Edit k8s/overlays/gcp/services/<service>/kustomization.yaml
+# Update GCP overlay manually (in the service repo)
+cd /home/pwner/Git/blocksecops-<service>
+# Edit k8s/overlays/gcp/kustomization.yaml (update newTag)
 git add . && git commit -m "hotfix: <description>" && git push
 # Config Sync picks up the change
 ```
@@ -466,7 +466,7 @@ git add . && git commit -m "hotfix: <description>" && git push
 | Harbor push rejected | Immutable tag exists | Bump version — cannot overwrite existing tags |
 | GitHub Actions fails | Test failures | Fix tests locally, push again |
 | Config Sync not syncing | Git credentials expired | Refresh `git-creds` secret in `config-management-system` namespace |
-| Production pod CrashLoop | Missing env vars / secrets | Check ExternalSecret status: `kubectl get es -n <service>-gcp` |
+| Production pod CrashLoop | Missing env vars / secrets | Check ExternalSecret status: `kubectl get es -n <service>-prod` |
 | Version drift | CI didn't update manifest | Check GitHub Actions run; manually update if needed |
 | HSTS missing in prod | Load Balancer config | Verify GCP FrontendConfig has HTTPS redirect |
 
