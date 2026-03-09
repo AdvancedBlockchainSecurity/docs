@@ -311,5 +311,5 @@ kubectl rollout restart deployment/dashboard -n dashboard-local
 
 - [Secrets Management](./secrets-management.md) - Backend secret management via Vault
 - [Build Workflow](./build-workflow.md) - Docker build procedures
-- [Dashboard Development](./dashboard-development.md) - Dashboard development workflow
+- [Dashboard Development](../local-development/dashboard-development.md) - Dashboard development workflow
 - [Docker Image Versioning](./docker-image-versioning.md) - Image tagging standards

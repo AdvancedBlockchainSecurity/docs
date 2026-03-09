@@ -447,6 +447,6 @@ echo "  Failed: $FAIL"
 
 **See Also:**
 - [Testing & Deployment](./testing-deployment.md) — Build and deploy workflow
-- [Port Forwarding / Service Access](./port-forwarding.md) — Service URLs and ports
+- [Service Availability](./service-availability.md) — Service access patterns
 - [Docker Image Versioning](./docker-image-versioning.md) — Version bump workflow
 - [Build Workflow](./build-workflow.md) — Deploy script and drift checker

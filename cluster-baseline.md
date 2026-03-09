@@ -416,5 +416,5 @@ Track known deviations here until they are resolved:
 - [Kubernetes Pod Lifecycle Standards](./kubernetes-pod-lifecycle.md)
 - [Docker Image Versioning](./docker-image-versioning.md)
 - [Smoke Test](./smoke-test.md)
-- [Port Forwarding / Service Access](./port-forwarding.md)
+- [Service Availability](./service-availability.md)
 - [RCA: Stale Pods & ReplicaSets](../../TaskDocs-BlockSecOps/RCA-2026-02-28-STALE-PODS-REPLICASETS.md)

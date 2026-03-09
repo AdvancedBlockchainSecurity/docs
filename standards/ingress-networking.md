@@ -640,4 +640,4 @@ Frontend applications should connect to WebSocket through Traefik, not directly 
 - [Traefik Documentation](https://doc.traefik.io/traefik/)
 - [Traefik Kubernetes CRD](https://doc.traefik.io/traefik/routing/providers/kubernetes-crd/)
 - [Kustomize Structure Template](../architecture-templates/kubernetes-kustomize-structure-template.md)
-- [Local Development Setup](./local-development-setup.md)
+- [Local Development Setup](../local-development/local-development-setup.md)
