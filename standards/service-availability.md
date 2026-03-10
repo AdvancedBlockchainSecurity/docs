@@ -1,7 +1,7 @@
 # Service Availability Standards
 
-**Version:** 1.0.0
-**Last Updated:** January 15, 2026
+**Version:** 1.1.0
+**Last Updated:** March 9, 2026
 **Status:** Active
 
 ## Core Principle
@@ -30,7 +30,7 @@ After cluster start, all services should be accessible immediately without runni
 |-------------|--------|----------------|----------------|
 | **Local (kubeadm)** | hostPort 80/443 + Traefik (TLS) | `https://app.0xapogee.local` | DNS entries |
 | **Server (kubeadm)** | hostPort 80/443 + Traefik | `http://app.0xapogee.local` | DNS entries |
-| **Production (GCP)** | GCP Load Balancer | `https://app.0xapogee.com` | None (managed) |
+| **Production (GCP)** | GKE Gateway + Cloudflare | `https://app.0xapogee.com` | None (managed) |
 
 ---
 
@@ -153,10 +153,13 @@ curl http://app.0xapogee.local/api/v1/health/live
 ### Production (GCP)
 
 ```bash
-# 1. Check load balancer
-kubectl get svc -n traefik
+# 1. Check Gateway is programmed
+kubectl get gateway apogee-gateway -n ingress-prod
 
-# 2. Test access
+# 2. Check all services are running
+kubectl get pods -A | grep -E "prod.*Running"
+
+# 3. Test access (via Cloudflare)
 curl https://app.0xapogee.com/api/v1/health/live
 ```
 

@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 3.8.0
-**Last Updated:** March 4, 2026
+**Version:** 3.9.0
+**Last Updated:** March 9, 2026
 
 ## Owner Approval Required
 
@@ -314,13 +314,27 @@ kubectl apply -k k8s/overlays/local/${SERVICE}/
 
 ### GCP with Artifact Registry (Production)
 
-CI/CD handles everything automatically:
+Build locally and push to Artifact Registry:
 
-1. Commit code with updated version
-2. CI reads version from source file
-3. CI builds and pushes to Artifact Registry
-4. CI updates kustomization `newTag`
-5. ArgoCD detects change and deploys
+```bash
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
+SERVICE="api-service"
+REGISTRY="us-west1-docker.pkg.dev/project-8a2657b9-d96c-4c0a-a69/apogee"
+
+# Build with BuildKit and OCI labels
+DOCKER_BUILDKIT=1 docker build \
+  --build-arg SERVICE_VERSION=${VERSION} \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(git rev-parse --short HEAD) \
+  --target runtime \
+  -t ${REGISTRY}/${SERVICE}:${VERSION} .
+
+# Push to Artifact Registry
+docker push ${REGISTRY}/${SERVICE}:${VERSION}
+
+# Apply kustomization
+kubectl apply -k k8s/overlays/gcp/
+```
 
 ---
 

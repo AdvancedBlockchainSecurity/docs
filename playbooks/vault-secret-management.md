@@ -8,6 +8,8 @@
 
 Manage secrets in HashiCorp Vault for the Apogee local development cluster. Vault stores all sensitive configuration consumed by services via the External Secrets Operator (ESO).
 
+> **Environment Note:** This playbook covers **local development** (HashiCorp Vault). For **GCP production**, secrets are managed via GCP Secret Manager with ExternalSecrets Operator. See the [GCP Secrets Playbook](gcp-secret-management.md).
+
 ---
 
 ## Prerequisites
