@@ -1,7 +1,7 @@
 # Database Management and Recovery Standards
 
-**Version:** 2.1.0
-**Last Updated:** February 28, 2026
+**Version:** 2.2.0
+**Last Updated:** March 9, 2026
 **Status:** Active
 
 ## Database Configuration
@@ -45,6 +45,28 @@ kubectl exec postgresql-0 -n postgresql-local -- psql -U blocksecops -c "SHOW ss
 kubectl exec postgresql-0 -n postgresql-local -- psql -U blocksecops -d solidity_security \
   -c "SELECT pid, usename, datname, ssl, client_addr FROM pg_stat_ssl JOIN pg_stat_activity USING (pid) WHERE datname IS NOT NULL;"
 ```
+
+---
+
+## GCP Environment Database
+
+In GCP production, PostgreSQL runs as a self-hosted StatefulSet on GKE (not Cloud SQL):
+
+| Setting | Value |
+|---------|-------|
+| Namespace | `postgresql-prod` |
+| Image | `pgvector/pgvector:pg15` |
+| Storage | GCE Persistent Disk (10Gi, `standard-rwo`) |
+| SSL | Enabled via cert-manager (self-signed CA) |
+| Credentials | GCP Secret Manager → ExternalSecret |
+| Backup | Pending: GCS-based backup CronJob |
+
+Connection string format (asyncpg):
+```
+postgresql+asyncpg://blocksecops:<password>@postgresql.postgresql-prod.svc.cluster.local:5432/solidity_security
+```
+
+**Note:** PostgreSQL enforces SSL server-side via `hostssl` in pg_hba.conf. Do NOT add `?sslmode=require` or `?ssl=require` to the URL — asyncpg does not support URL-based SSL parameters. The server enforces SSL automatically.
 
 ---
 

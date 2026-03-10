@@ -1,8 +1,8 @@
 # Secrets Management
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 3.0.0
-**Last Updated:** February 27, 2026
+**Version:** 3.1.0
+**Last Updated:** March 9, 2026
 **Status:** Active
 
 ## Overview
@@ -72,7 +72,7 @@ apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
   name: api-service-secrets
-  namespace: api-service-gcp
+  namespace: api-service-prod
 spec:
   refreshInterval: 1h
   secretStoreRef:
@@ -116,7 +116,7 @@ spec:
           clusterName: blocksecops-gcp-gke
           serviceAccountRef:
             name: external-secrets-sa
-            namespace: external-secrets-gcp
+            namespace: external-secrets-prod
 ```
 
 The Terraform `secret-manager` module creates the GCP service account and Workload Identity binding automatically.

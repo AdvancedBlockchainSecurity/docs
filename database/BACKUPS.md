@@ -512,6 +512,32 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 
 ---
 
+## GCP Production Backups
+
+PostgreSQL in GCP runs as a StatefulSet on GKE with GCE Persistent Disk storage.
+
+### Current Status
+
+GCP backup automation is pending. Manual backups can be taken:
+
+```bash
+# Create manual backup from GKE
+kubectl exec -n postgresql-prod postgresql-0 -- \
+  pg_dump -U blocksecops -d solidity_security -F c \
+  > solidity_security_gcp_$(date +%Y%m%d_%H%M%S).dump
+
+# Restore to GKE PostgreSQL
+kubectl cp backup.dump postgresql-prod/postgresql-0:/tmp/restore.dump
+kubectl exec -n postgresql-prod postgresql-0 -- \
+  pg_restore -U blocksecops -d solidity_security --clean --if-exists /tmp/restore.dump
+```
+
+### Planned: GCS Backup CronJob
+
+A Kubernetes CronJob will automate daily backups to a GCS bucket with lifecycle rules for retention. This mirrors the local `postgresql-backup` CronJob pattern.
+
+---
+
 ## Notes
 
 - All backups include `--clean --if-exists` flags to drop existing objects before restore

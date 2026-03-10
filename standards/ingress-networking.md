@@ -1,13 +1,13 @@
 # Ingress and Networking Standards
 
 **Standard ID**: NET-001
-**Version**: 1.1.0
-**Last Updated**: 2026-01-15
+**Version**: 2.0.0
+**Last Updated**: 2026-03-09
 **Status**: Active
 
 ## Overview
 
-This document defines the standards for ingress controllers, routing, and networking in Apogee platform infrastructure across all environments (local, staging, production).
+This document defines the standards for ingress controllers, routing, and networking in Apogee platform infrastructure across all environments (local, staging, production). Local and server environments use **Traefik** as the ingress controller. GCP production uses the **GKE Gateway API** (`gke-l7-global-external-managed` GatewayClass), not Traefik.
 
 ## Ingress Controller Standard
 
@@ -330,6 +330,108 @@ kubectl exec -n <namespace> <pod> -- \
 - Use cloud provider LoadBalancer
 - Configure external-dns for automatic DNS management
 - Enable TLS with cert-manager
+
+## GCP Environment (GKE)
+
+### Ingress Controller: GKE Gateway API
+
+GCP production uses the **GKE Gateway API** with the `gke-l7-global-external-managed` GatewayClass — NOT Traefik.
+
+- **Gateway**: Global external Application Load Balancer
+- **TLS**: Google-managed certificates via Certificate Manager
+- **DDoS**: Cloudflare proxy + Cloud Armor WAF
+- **Routing**: HTTPRoute resources for path-based routing
+
+### Architecture
+
+```
+Internet → Cloudflare (DDoS/WAF) → GCP ALB (34.149.16.104)
+    │
+    ▼
+GKE Gateway (gke-l7-global-external-managed)
+    ├── /api/v1/* → api-service:8000 (api-service-prod)
+    ├── /ws/*     → notification:3001 (notification-prod)
+    └── /*        → dashboard:3000 (dashboard-prod)
+```
+
+### Gateway Resource
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: apogee-gateway
+  namespace: ingress-prod
+  annotations:
+    networking.gke.io/certmap: apogee-cert-map
+spec:
+  gatewayClassName: gke-l7-global-external-managed
+  addresses:
+    - type: NamedAddress
+      value: apogee-production-lb-ip
+  listeners:
+    - name: https
+      protocol: HTTPS
+      port: 443
+    - name: http-redirect
+      protocol: HTTP
+      port: 80
+```
+
+### HTTPRoute Resource
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: apogee-routes
+  namespace: ingress-prod
+spec:
+  hostnames: ["app.0xapogee.com"]
+  parentRefs:
+    - name: apogee-gateway
+      sectionName: https
+  rules:
+    - matches:
+        - path: {type: PathPrefix, value: "/api/v1"}
+      backendRefs:
+        - name: api-service
+          namespace: api-service-prod
+          port: 8000
+    - matches:
+        - path: {type: PathPrefix, value: "/ws"}
+      backendRefs:
+        - name: notification
+          namespace: notification-prod
+          port: 3001
+    - matches:
+        - path: {type: PathPrefix, value: "/"}
+      backendRefs:
+        - name: dashboard
+          namespace: dashboard-prod
+          port: 3000
+```
+
+### Security Layers
+
+| Layer | Technology | Protection |
+|-------|-----------|------------|
+| Edge | Cloudflare Proxy | L3/L4/L7 DDoS, Bot protection |
+| WAF | Cloud Armor (`apogee-production-waf-policy`) | XSS, SQLi, LFI, RFI, RCE, scanner detection |
+| Rate Limiting | Cloud Armor | 30 req/min per IP, 5-min ban |
+| TLS | Google-managed certificate | Auto-renewal via Certificate Manager |
+| Network | NetworkPolicy (default-deny) | Pod-level isolation per namespace |
+
+### Key Differences from Local (Traefik)
+
+| Aspect | Local (Traefik) | GCP (Gateway API) |
+|--------|----------------|-------------------|
+| Ingress | Traefik IngressRoute CRDs | Gateway API HTTPRoute |
+| TLS | Self-signed / Let's Encrypt | Google-managed certs |
+| DDoS | None | Cloudflare + Cloud Armor |
+| Load Balancer | hostPort + NodePort | Global external ALB |
+| Namespaces | `*-local` | `*-prod` |
+| Registry | Harbor | Artifact Registry |
 
 ## RBAC Requirements
 

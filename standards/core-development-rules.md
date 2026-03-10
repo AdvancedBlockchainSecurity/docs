@@ -1,8 +1,8 @@
 # Core Development Rules
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 1.9.0
-**Last Updated:** December 4, 2025
+**Version:** 2.0.0
+**Last Updated:** March 9, 2026
 **Status:** Active
 
 ## Overview
@@ -82,7 +82,7 @@ This document defines the critical rules and codebase-first development workflow
 - http://app.0xapogee.local (HTTP — must use HTTPS)
 ```
 
-All traffic goes through Traefik ingress with TLS. HTTP automatically redirects to HTTPS.
+Local traffic goes through Traefik ingress with TLS. GCP production traffic routes through Cloudflare → GKE Gateway with Google-managed TLS. HTTP automatically redirects to HTTPS in both environments.
 
 **CORS Configuration:**
 
