@@ -29,8 +29,8 @@ Procedures for recovering the Apogee platform from catastrophic failures includi
 
 | Component | Method | Frequency | Retention | Location |
 |-----------|--------|-----------|-----------|----------|
-| PostgreSQL (GCP) | Cloud SQL automated backup | Daily | 30 days | Same region |
-| PostgreSQL (GCP) | Point-in-time recovery | Continuous (WAL) | 7 days | Same region |
+| PostgreSQL (GCP) | In-cluster StatefulSet (GCE PD) | On-demand (GCS CronJob pending) | 30 days | GCS bucket |
+| PostgreSQL (GCP) | PVC snapshot | On-demand | 7 days | Same region |
 | PostgreSQL (local) | Manual `pg_dump` | On-demand | 7 days | `docs/database/backups/` |
 | Vault secrets | `init-vault-local.sh` | On cluster init | N/A | Git (script only) |
 | GCP secrets | Secret Manager versioning | Every change | All versions | GCP |
@@ -42,7 +42,8 @@ Procedures for recovering the Apogee platform from catastrophic failures includi
 
 | Component | Recovery Method |
 |-----------|----------------|
-| Redis cache | Ephemeral — rebuilt on restart, no data loss |
+| Redis cache (local) | Ephemeral — rebuilt on restart, no data loss |
+| Redis cache (GCP) | PVC-backed persistence with RDB snapshots |
 | Vault data (local) | Re-run `init-vault-local.sh` to reseed |
 | User sessions | Users re-authenticate after recovery |
 | Scan job state | Jobs retry from last checkpoint |
@@ -107,46 +108,72 @@ kubectl rollout restart deployment/api-service -n api-service-local
 
 ---
 
-## Scenario 2: Database Corruption (GCP — Cloud SQL)
+## Scenario 2: Database Corruption (GCP — In-Cluster PostgreSQL)
 
-### Point-in-Time Recovery
+### From PVC Snapshot
 
 ```bash
-# 1. Identify recovery point
-gcloud sql instances describe blocksecops-db \
-  --format="value(settings.backupConfiguration)"
+# 1. Scale down PostgreSQL
+kubectl scale statefulset/postgresql -n postgresql-prod --replicas=0
 
-# 2. Create recovery instance
-gcloud sql instances clone blocksecops-db blocksecops-db-recovery \
-  --point-in-time="2026-02-25T02:00:00Z"
+# 2. Create a VolumeSnapshot of the PVC (if VolumeSnapshot CRD installed)
+cat <<EOF | kubectl apply -f -
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: postgresql-recovery-snapshot
+  namespace: postgresql-prod
+spec:
+  source:
+    persistentVolumeClaimName: postgresql-data-postgresql-0
+EOF
 
-# 3. Verify recovered data
-gcloud sql connect blocksecops-db-recovery --user=blocksecops
-# Run verification queries
+# 3. Delete and recreate PVC from snapshot
+kubectl delete pvc postgresql-data-postgresql-0 -n postgresql-prod
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgresql-data-postgresql-0
+  namespace: postgresql-prod
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: standard-rwo
+  resources:
+    requests:
+      storage: 10Gi
+  dataSource:
+    name: postgresql-recovery-snapshot
+    kind: VolumeSnapshot
+    apiGroup: snapshot.storage.k8s.io
+EOF
 
-# 4. Promote recovery instance (or update connection string)
-# Option A: Update DATABASE_URL secret to point to recovery instance
-# Option B: Export/import data back to original instance
+# 4. Scale up PostgreSQL
+kubectl scale statefulset/postgresql -n postgresql-prod --replicas=1
 
 # 5. Restart services
-kubectl rollout restart deployment/api-service -n api-service
+for svc in api-service data-service intelligence-engine orchestration; do
+  kubectl rollout restart deployment/$svc -n ${svc}-prod
+done
 ```
 
-### From Daily Backup
+### From GCS Backup (when CronJob backup is configured)
 
 ```bash
-# 1. List available backups
-gcloud sql backups list --instance=blocksecops-db
+# 1. Download backup from GCS
+gsutil cp gs://apogee-backups/postgresql/latest.sql.gz /tmp/
 
-# 2. Restore specific backup
-gcloud sql backups restore BACKUP_ID --restore-instance=blocksecops-db
+# 2. Copy to PostgreSQL pod
+gunzip /tmp/latest.sql.gz
+kubectl cp /tmp/latest.sql postgresql-prod/postgresql-0:/tmp/restore.sql
 
-# 3. Wait for restore to complete
-gcloud sql operations list --instance=blocksecops-db | head -5
+# 3. Restore
+kubectl exec -n postgresql-prod postgresql-0 -- \
+  pg_restore -U blocksecops -d solidity_security -c /tmp/restore.sql
 
-# 4. Restart all services
+# 4. Restart services
 for svc in api-service data-service intelligence-engine orchestration; do
-  kubectl rollout restart deployment/$svc -n $svc
+  kubectl rollout restart deployment/$svc -n ${svc}-prod
 done
 ```
 
@@ -207,18 +234,40 @@ curl -sk https://app.0xapogee.local/api/v1/health/ready
 
 ```bash
 # 1. Recreate GKE cluster via Terraform
-cd terraform/environments/production
+cd terraform/environments/gcp
 terraform apply
 
-# 2. ArgoCD will auto-deploy all applications
-# Or manual: kubectl apply -k for each service
+# 2. Reconnect to cluster
+gcloud container clusters get-credentials blocksecops-staging-gke \
+  --region us-west1 --project project-8a2657b9-d96c-4c0a-a69
 
-# 3. Restore database if needed (Cloud SQL is independent of GKE)
-# Cloud SQL persists through GKE cluster loss
+# 3. Deploy infrastructure (PostgreSQL, Redis, ESO, NetworkPolicies, Ingress)
+kubectl apply -k ~/Git/blocksecops-gcp-infrastructure/k8s/overlays/gcp/
 
-# 4. Verify all services
+# 4. Recreate PostgreSQL credentials secret
+kubectl create secret generic postgresql-credentials -n postgresql-prod \
+  --from-literal=POSTGRES_DB=solidity_security \
+  --from-literal=POSTGRES_USER=blocksecops \
+  --from-literal=POSTGRES_PASSWORD=<secure-password>
+
+# 5. Restore PostgreSQL data from GCS backup (if available)
+# See Scenario 2 above
+
+# 6. Deploy services from each service repo
+for svc in data-service api-service orchestration intelligence-engine \
+  notification tool-integration contract-parser dashboard admin-portal; do
+  cd ~/Git/blocksecops-${svc}
+  kubectl apply -k k8s/overlays/gcp/
+done
+
+# 7. Or re-enable Config Sync for automatic deployment
+# See: docs/runbooks/DEPLOYMENT-RUNBOOK.md Phase 6
+
+# 8. Verify all services
 kubectl get pods --all-namespaces | grep -v Running
 ```
+
+**Note:** PostgreSQL and Redis run in-cluster on GKE. A cluster loss means database data is also lost unless PVC snapshots or GCS backups exist. Ensure backup CronJob is configured.
 
 ---
 
@@ -226,7 +275,7 @@ kubectl get pods --all-namespaces | grep -v Running
 
 If `us-west1` becomes unavailable:
 
-1. **Database:** Cloud SQL cross-region replica (if configured) or restore from backup in new region
+1. **Database:** Restore from GCS backup in new region (in-cluster PostgreSQL does not have cross-region replication)
 2. **GKE:** Create new cluster in alternate region via Terraform
 3. **Secrets:** GCP Secret Manager is multi-regional by default
 4. **DNS:** Update DNS to point to new region's load balancer

@@ -427,8 +427,8 @@ cosign sign --key kms://... ${ARTIFACT_REGISTRY}/${SERVICE}:${VERSION}
 | Setting | Local | GCP |
 |---------|-------|-----|
 | `REGISTRY` | `harbor.blocksecops.local` | `us-west1-docker.pkg.dev/<project>/blocksecops` |
-| `DATABASE_URL` | `postgresql+asyncpg://...@postgresql.postgresql-local:5432/solidity_security` | `postgresql+asyncpg://...@127.0.0.1:5432/solidity_security` (via Cloud SQL Proxy) |
-| `REDIS_URL` | `redis://redis.redis-local:6379` | `redis://<memorystore-ip>:6379` |
+| `DATABASE_URL` | `postgresql+asyncpg://...@postgresql.postgresql-local:5432/solidity_security` | `postgresql+asyncpg://...@postgresql.postgresql-prod:5432/solidity_security` |
+| `REDIS_URL` | `redis://redis.redis-local:6379` | `redis://redis.redis-prod:6379` |
 | `CORS_ORIGINS` | `https://app.0xapogee.local` | `https://app.0xapogee.com` |
 | `VAULT_ADDR` | `http://vault.vault-local:8200` | N/A (GCP Secret Manager) |
 | `SECRET_BACKEND` | Vault + ESO | GCP SM + ESO |

@@ -335,12 +335,172 @@ echo "=== Verification Complete ==="
 
 ---
 
+## Test 6: GCP Production Security Configuration
+
+### 6.1 GKE Cluster Security
+
+| Check | Expected | Status |
+|-------|----------|--------|
+| Private cluster | API server restricted to admin IP | [ ] |
+| Shielded nodes | Secure boot + integrity monitoring | [ ] |
+| Workload Identity | Enabled on cluster | [ ] |
+| Network Policy (Calico) | Enabled | [ ] |
+| Release channel | REGULAR | [ ] |
+| etcd encryption | Cloud KMS CMEK | [ ] |
+| Insecure RBAC bindings | Disabled | [ ] |
+
+```bash
+# Verify private cluster
+gcloud container clusters describe blocksecops-staging-gke \
+  --region us-west1 --format='value(privateClusterConfig.enablePrivateNodes)'
+# Expected: True
+
+# Verify etcd encryption
+gcloud container clusters describe blocksecops-staging-gke \
+  --region us-west1 --format='value(databaseEncryption.state)'
+# Expected: ENCRYPTED
+
+# Verify Workload Identity
+gcloud container clusters describe blocksecops-staging-gke \
+  --region us-west1 --format='value(workloadIdentityConfig.workloadPool)'
+# Expected: project-8a2657b9-d96c-4c0a-a69.svc.id.goog
+
+# Verify insecure RBAC bindings disabled
+gcloud container clusters describe blocksecops-staging-gke \
+  --region us-west1 --format='value(masterAuth.clientCertificateConfig)'
+```
+
+### 6.2 Dedicated Node Service Account
+
+| Check | Expected | Status |
+|-------|----------|--------|
+| Node SA | `apogee-production-gke-nodes@...` (not default compute) | [ ] |
+| Roles | logging.logWriter, monitoring.metricWriter, monitoring.viewer, artifactregistry.reader | [ ] |
+| No editor role | `roles/editor` NOT assigned | [ ] |
+
+```bash
+# Verify node SA is not default compute
+kubectl get nodes -o jsonpath='{.items[0].metadata.labels.iam\.gke\.io/gke-metadata-server-enabled}'
+# Expected: true
+
+# List node pool SA
+gcloud container node-pools describe default-pool \
+  --cluster blocksecops-staging-gke --region us-west1 \
+  --format='value(config.serviceAccount)'
+# Expected: apogee-production-gke-nodes@project-8a2657b9-d96c-4c0a-a69.iam.gserviceaccount.com
+```
+
+### 6.3 Container Scanning
+
+| Check | Expected | Status |
+|-------|----------|--------|
+| API enabled | containerscanning.googleapis.com | [ ] |
+| Artifact Registry scanning | Automatic on push | [ ] |
+
+```bash
+# Verify container scanning API enabled
+gcloud services list --enabled --filter="name:containerscanning" \
+  --format='value(name)'
+# Expected: containerscanning.googleapis.com
+
+# Check for vulnerabilities in images
+gcloud artifacts docker images list \
+  us-west1-docker.pkg.dev/project-8a2657b9-d96c-4c0a-a69/apogee \
+  --show-occurrences --occurrence-filter='kind="VULNERABILITY"'
+```
+
+### 6.4 Firewall and Network Security
+
+| Check | Expected | Status |
+|-------|----------|--------|
+| Firewall logging | INCLUDE_ALL_METADATA on all rules | [ ] |
+| Internal rule scoped | target_tags = gke-node | [ ] |
+| VPC Flow Logs | 50% sampling | [ ] |
+| Default VPC | Deleted | [ ] |
+
+```bash
+# Verify firewall logging
+gcloud compute firewall-rules list \
+  --format='table(name,logConfig.enable)' \
+  --filter="network:apogee-production-vpc"
+# All rules should show True
+
+# Verify no default VPC
+gcloud compute networks list --format='value(name)' | grep -c default
+# Expected: 0
+```
+
+### 6.5 Cloud Armor WAF
+
+| Check | Expected | Status |
+|-------|----------|--------|
+| WAF policy attached | apogee-production-waf | [ ] |
+| OWASP rules | XSS, SQLi, LFI, RFI, Scanner, Protocol, Session fixation | [ ] |
+| Rate limiting | 300 req/min, 5-min ban | [ ] |
+| Cloudflare-only | Source IP restricted to Cloudflare ranges | [ ] |
+
+```bash
+# Verify Cloud Armor policy
+gcloud compute security-policies describe apogee-production-waf \
+  --format='table(rules.priority,rules.action,rules.description)'
+```
+
+### 6.6 Monitoring Alerts
+
+| Alert | Metric | Status |
+|-------|--------|--------|
+| Node not ready | kubernetes.io/node/status_condition | [ ] |
+| Pod crash loops | kubernetes.io/container/restart_count | [ ] |
+| High 5xx error rate | loadbalancing.googleapis.com/https/backend_request_count | [ ] |
+| Log ingestion warning | logging.googleapis.com/billing/bytes_ingested | [ ] |
+| Log ingestion critical | logging.googleapis.com/billing/bytes_ingested | [ ] |
+
+```bash
+# List active alert policies
+gcloud alpha monitoring policies list \
+  --format='table(displayName,enabled,conditions.displayName)'
+```
+
+### 6.7 GCP Network Policies (Production)
+
+| Namespace | default-deny-all | allow-dns | Status |
+|-----------|------------------|-----------|--------|
+| api-service-prod | Yes | Yes | [ ] |
+| dashboard-prod | Yes | Yes | [ ] |
+| data-service-prod | Yes | Yes | [ ] |
+| intelligence-engine-prod | Yes | Yes | [ ] |
+| notification-prod | Yes | Yes | [ ] |
+| orchestration-prod | Yes | Yes | [ ] |
+| tool-integration-prod | Yes | Yes | [ ] |
+| contract-parser-prod | Yes | Yes | [ ] |
+| admin-portal-prod | Yes | Yes | [ ] |
+| postgresql-prod | Yes | Yes | [ ] |
+| redis-prod | Yes | Yes | [ ] |
+| external-secrets-prod | Yes | Yes | [ ] |
+| ingress-prod | Yes | Yes | [ ] |
+| scanner-jobs-prod | Yes | Yes | [ ] |
+
+```bash
+# Verify all 14 namespaces have default-deny-all
+for ns in api-service-prod dashboard-prod data-service-prod intelligence-engine-prod \
+  notification-prod orchestration-prod tool-integration-prod contract-parser-prod \
+  admin-portal-prod postgresql-prod redis-prod external-secrets-prod ingress-prod \
+  scanner-jobs-prod; do
+  if kubectl get networkpolicy default-deny-all -n $ns &>/dev/null; then
+    echo "  $ns: default-deny-all exists"
+  else
+    echo "  $ns: default-deny-all MISSING"
+  fi
+done
+```
+
+---
+
 ## Sign-Off
 
 | Tester | Date | Environment | Result |
 |--------|------|-------------|--------|
 | | | local | |
-| | | GCP staging | |
 | | | GCP production | |
 
 ---
@@ -348,5 +508,7 @@ echo "=== Verification Complete ==="
 ## Related Documentation
 
 - [Kubernetes Pod Lifecycle Standards](../standards/kubernetes-pod-lifecycle.md)
-- [GCP Launch Phase 2](../../TaskDocs-Apogee/DOCUMENTATION-UPDATE-2026-02-01-GCP-LAUNCH-PHASE-2.md)
+- [GCP Security Checklist](../../TaskDocs-BlockSecOps/phases/07-phase-7-gcp-deployment/GCP-SECURITY-CHECKLIST.md)
 - [Application Security Testing](./29-application-security.md)
+- [Encryption Standards](../standards/encryption-standards.md)
+- [Ingress & Networking Standards](../standards/ingress-networking.md)

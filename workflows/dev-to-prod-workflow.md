@@ -45,12 +45,12 @@ Developer                Local Cluster              GitHub                CI (Ac
 |--------|-----------------|-------------------|
 | **Cluster** | kubeadm on Debian server | GKE on GCP |
 | **Registry** | Harbor (`harbor.blocksecops.local`) | Artifact Registry (`us-west1-docker.pkg.dev`) |
-| **Namespace suffix** | `-local` (e.g., `api-service-local`) | `-gcp` (e.g., `api-service-gcp`) |
+| **Namespace suffix** | `-local` (e.g., `api-service-local`) | `-prod` (e.g., `api-service-prod`) |
 | **Domain** | `app.0xapogee.local` | `app.0xapogee.com` |
 | **Ingress** | Traefik (hostPort 80/443, self-signed TLS) | GCP HTTPS Load Balancer (managed cert) |
 | **Secrets** | HashiCorp Vault + ESO | GCP Secret Manager + ESO |
-| **Database** | PostgreSQL pod (in-cluster) | Cloud SQL (managed) |
-| **Redis** | Redis pod (in-cluster) | Memorystore (managed) |
+| **Database** | PostgreSQL pod (in-cluster) | PostgreSQL pod (in-cluster, GKE) |
+| **Redis** | Redis pod (in-cluster) | Redis pod (in-cluster, GKE with PVC) |
 | **CD tool** | `kubectl apply -k` (manual) | Config Sync (GitOps, automatic) |
 | **Kustomize overlay** | `k8s/overlays/local/` | `k8s/overlays/gcp/` |
 | **Deploy trigger** | Developer runs build + apply | Git push triggers CI → Config Sync |
@@ -83,7 +83,7 @@ k8s/
 │   └── gcp/                       ← GKE + Artifact Registry
 │       ├── services/
 │       │   ├── api-service/
-│       │   │   ├── kustomization.yaml ← namespace: api-service-gcp
+│       │   │   ├── kustomization.yaml ← namespace: api-service-prod
 │       │   │   │                        images: us-west1-docker.pkg.dev/...
 │       │   │   ├── namespace.yaml
 │       │   │   ├── deployment.yaml
@@ -104,11 +104,11 @@ k8s/
 | Resource | Local Overlay | GCP Overlay |
 |----------|---------------|-------------|
 | Image registry | `harbor.blocksecops.local/blocksecops/` | `us-west1-docker.pkg.dev/.../blocksecops/` |
-| Namespace | `<service>-local` | `<service>-gcp` |
+| Namespace | `<service>-local` | `<service>-prod` |
 | Ingress | Traefik IngressRoute CRDs | GKE Ingress + BackendConfig |
 | Secrets | Vault `ClusterSecretStore` | GCP SM `ClusterSecretStore` |
-| Database | In-cluster PostgreSQL pod | Cloud SQL Proxy sidecar |
-| Redis | In-cluster Redis pod | Memorystore connection |
+| Database | In-cluster PostgreSQL pod | In-cluster PostgreSQL pod |
+| Redis | In-cluster Redis pod | In-cluster Redis pod (with PVC) |
 | HPA | Not used | Enabled (min 2, max 10) |
 | PDB | Optional | Required |
 
@@ -203,9 +203,9 @@ See [Version Control Standards](../standards/version-control-standards.md) for b
 │  │    │                         │                                │
 │  │    ├── renders kustomize     │                                │
 │  │    │                         │                                │
-│  │    ├── applies to cluster    │──────► api-service-gcp         │
-│  │    │                         │──────► dashboard-gcp           │
-│  │    │                         │──────► orchestration-gcp       │
+│  │    ├── applies to cluster    │──────► api-service-prod         │
+│  │    │                         │──────► dashboard-prod           │
+│  │    │                         │──────► orchestration-prod       │
 │  │    │                         │──────► ... (all services)      │
 │  │    │                         │                                │
 │  │    └── drift detection       │                                │

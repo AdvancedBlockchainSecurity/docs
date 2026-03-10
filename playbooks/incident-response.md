@@ -213,6 +213,128 @@ sudo crictl rmi --prune
 
 ---
 
+## GCP Production Incident Response
+
+### Initial Assessment (GCP)
+
+```bash
+# Quick cluster health
+kubectl get pods --all-namespaces | grep -v Running | grep -v Completed
+
+# API health (via external endpoint)
+curl -s https://app.0xapogee.com/api/v1/health/ready
+
+# Recent events
+kubectl get events --all-namespaces --field-selector type=Warning \
+  --sort-by='.lastTimestamp' | tail -20
+
+# Check monitoring alerts
+gcloud alpha monitoring policies list \
+  --format='table(displayName,enabled)' \
+  --filter="enabled=true"
+```
+
+### Service Unreachable (GCP — SEV1/SEV2)
+
+```bash
+# 1. Check pod status
+kubectl get pods -n ${SERVICE}-prod
+
+# 2. Check pod events
+kubectl describe pod -n ${SERVICE}-prod -l app.kubernetes.io/name=${SERVICE}
+
+# 3. Check logs
+kubectl logs -n ${SERVICE}-prod deploy/${SERVICE} --tail=100
+
+# 4. GCP-specific causes:
+#    - ExternalSecret sync failure → Check ESO: kubectl get es -n ${SERVICE}-prod
+#    - Workload Identity misconfigured → Check SA annotations
+#    - Node pool scaling → Check: kubectl get nodes
+#    - Cloud Armor blocking → Check WAF logs in Cloud Console
+
+# 5. Quick fix: restart
+kubectl rollout restart deployment/${SERVICE} -n ${SERVICE}-prod
+
+# 6. If restart fails, rollback via Git (Config Sync auto-applies)
+cd ~/Git/blocksecops-${SERVICE}
+git revert HEAD && git push origin main
+```
+
+### Database Connection Failures (GCP — SEV1)
+
+```bash
+# 1. Check in-cluster PostgreSQL pod
+kubectl get pods -n postgresql-prod
+kubectl logs -n postgresql-prod postgresql-0 --tail=50
+
+# 2. Verify pg_isready
+kubectl exec -n postgresql-prod postgresql-0 -- pg_isready -U blocksecops -d solidity_security
+
+# 3. Check connection count
+kubectl exec -n postgresql-prod postgresql-0 -- \
+  psql -U blocksecops -d solidity_security \
+  -c "SELECT count(*) FROM pg_stat_activity;"
+
+# 4. Restart services to reset connection pools
+kubectl rollout restart deployment/api-service -n api-service-prod
+```
+
+### ExternalSecret Sync Failure (GCP — SEV2)
+
+```bash
+# 1. Check status
+kubectl get externalsecret --all-namespaces
+
+# 2. Identify failing secret
+kubectl describe externalsecret -n ${NS} ${NAME}
+
+# 3. Check GCP Secret Manager
+gcloud secrets versions access latest --secret=apogee-gcp-${SECRET_NAME}
+
+# 4. If secret missing, create it
+echo -n "value" | gcloud secrets versions add apogee-gcp-${SECRET_NAME} --data-file=-
+
+# 5. Force ESO resync
+kubectl annotate externalsecret ${NAME} -n ${NS} \
+  force-sync=$(date +%s) --overwrite
+```
+
+### etcd Encryption Issues (GCP — SEV2)
+
+```bash
+# 1. Verify encryption state
+gcloud container clusters describe blocksecops-staging-gke \
+  --region us-west1 --format='value(databaseEncryption.state)'
+# Expected: ENCRYPTED
+
+# 2. Check KMS key status
+gcloud kms keys describe apogee-production-gke-etcd-key \
+  --keyring=apogee-production-gke-etcd --location=us-west1 \
+  --format='value(primary.state)'
+# Expected: ENABLED
+
+# 3. If key is disabled/destroyed, re-enable immediately
+gcloud kms keys versions enable <VERSION_ID> \
+  --key=apogee-production-gke-etcd-key \
+  --keyring=apogee-production-gke-etcd --location=us-west1
+```
+
+### Monitoring Alert False Positives
+
+```bash
+# 1. Check alert policy details
+gcloud alpha monitoring policies list --format='json' | \
+  python3 -c "import sys,json; [print(p['displayName'], p['conditions'][0]['conditionThreshold']['thresholdValue']) for p in json.load(sys.stdin)]"
+
+# 2. Silence an alert temporarily (create snooze)
+# Use Cloud Console: Monitoring → Alerting → Snooze
+
+# 3. Adjust threshold if needed
+# Edit the alert policy in terraform/environments/gcp/main.tf
+```
+
+---
+
 ## Security Incident Response
 
 ### Suspected Credential Leak (SEV1)
