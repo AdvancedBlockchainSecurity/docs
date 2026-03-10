@@ -28,8 +28,8 @@ All network communication MUST be encrypted with TLS 1.2+.
 ### TLS Certificate Management
 
 - **Local:** cert-manager with local CA (`Certificate` resources)
-- **Production:** cert-manager with Let's Encrypt (ACME)
-- **Minimum protocol:** TLS 1.2 (enforced via Traefik `TLSOption` CRD)
+- **Production:** Google-managed Certificate Manager (DNS-authorized, auto-renewed)
+- **Minimum protocol:** TLS 1.2 (enforced via Traefik `TLSOption` CRD locally, GKE Gateway in production)
 - **Cipher suites:** ECDHE + AES-GCM/ChaCha20 only (no RC4, 3DES, weak ciphers)
 - **HSTS Header:** Applied globally to all HTTPS responses with 1-year max-age, includeSubDomains, and preload flags (enforced Mar 1, 2026 per audit finding F12)
 - Private keys: 0600 permissions, mounted via initContainer from K8s secrets
@@ -55,6 +55,7 @@ Client-side `ssl=prefer` is supplemented by server-side enforcement via `pg_hba.
 | Layer | Method |
 |-------|--------|
 | Disk encryption | Host-level volume encryption (LUKS on server, GCP PD encryption) |
+| etcd encryption | Cloud KMS CMEK in GCP (`apogee-production-gke-etcd-key`, 90-day rotation) |
 | Connection auth | Credentials stored in Vault, synced via ExternalSecret |
 | Sensitive columns | Application-level encryption for PII (OAuth tokens, MFA secrets) |
 

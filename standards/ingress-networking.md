@@ -423,8 +423,13 @@ spec:
 | WAF | Cloud Armor (`apogee-production-waf-policy`) | XSS, SQLi, LFI, RFI, RCE, scanner detection |
 | Rate Limiting | Cloud Armor | 300 req/min per IP, 5-min ban |
 | TLS | Google-managed certificate | Auto-renewal via Certificate Manager |
-| Network | NetworkPolicy (default-deny) | Pod-level isolation per namespace |
+| Network | NetworkPolicy (default-deny) | Pod-level isolation (14 namespaces) |
+| Firewall | VPC firewall rules (logged) | All rules logged, internal scoped to gke-node tags |
 | Resource Controls | ResourceQuota + LimitRange | Per-namespace CPU/memory/pod caps |
+| etcd | Cloud KMS CMEK | Application-layer encryption at rest |
+| RBAC | Insecure bindings disabled | system:authenticated/unauthenticated hardened |
+| Node SA | Dedicated least-privilege SA | logging, monitoring, artifact registry only |
+| Container Scanning | Artifact Registry | Automatic vulnerability scanning on push |
 
 ### Key Differences from Local (Traefik)
 

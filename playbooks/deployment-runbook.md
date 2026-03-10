@@ -144,37 +144,39 @@ cd scripts/
 
 See [Secrets Management](../standards/secrets-management.md) for full details.
 
-## Standard Deployment (GCP Production — ArgoCD)
+## Standard Deployment (GCP Production — Config Sync)
 
-### ArgoCD Sync
+### Config Sync (GitOps)
 
 ```bash
-# 1. Push version changes to main
+# 1. Push version changes to main (in the service repo)
 git push origin main
 
-# 2. ArgoCD auto-syncs (3-minute poll interval)
-# Or manual sync:
-argocd app sync blocksecops-api-service
+# 2. Config Sync auto-applies (continuous sync from Git)
+# Check sync status:
+gcloud container fleet config-management status \
+  --project=project-8a2657b9-d96c-4c0a-a69
 
-# 3. Monitor rollout
-argocd app get blocksecops-api-service --show-operation
+# 3. Or via kubectl:
+kubectl get rootsync -n config-management-system
 
 # 4. Verify health
-argocd app get blocksecops-api-service | grep Health
+curl -s https://app.0xapogee.com/api/v1/health/live
 ```
 
-### Manual Sync (If ArgoCD Unavailable)
+### Manual Deployment (If Config Sync Unavailable)
 
 ```bash
 # Connect to GKE cluster
-gcloud container clusters get-credentials blocksecops-prod \
-  --region us-west1 --project blocksecops-prod
+gcloud container clusters get-credentials blocksecops-staging-gke \
+  --region us-west1 --project project-8a2657b9-d96c-4c0a-a69
 
-# Apply kustomization
-kubectl apply -k k8s/overlays/gcp-production/${SERVICE}/
+# Apply kustomization from service repo
+cd ~/Git/blocksecops-${SERVICE}
+kubectl apply -k k8s/overlays/gcp/
 
 # Wait for rollout
-kubectl rollout status deployment/${SERVICE} -n ${SERVICE} --timeout=180s
+kubectl rollout status deployment/${SERVICE} -n ${SERVICE}-prod --timeout=180s
 ```
 
 ---
@@ -367,7 +369,7 @@ Is this a database migration?
 
 ## Emergency Deployment
 
-When ArgoCD is unavailable or immediate action is required:
+When Config Sync is unavailable or immediate action is required:
 
 ```bash
 # 1. Build image locally
