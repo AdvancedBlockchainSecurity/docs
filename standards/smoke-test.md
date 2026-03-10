@@ -1,7 +1,7 @@
 # Platform Smoke Test Standards
 
-**Version:** 1.7.0
-**Last Updated:** February 28, 2026
+**Version:** 2.0.0
+**Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Overview
@@ -12,13 +12,9 @@ Smoke tests verify the platform is operational after deployments, upgrades, or i
 
 | Setting | Value |
 |---------|-------|
-| **Server access** | `https://app.0xapogee.local` (Traefik with hostPort 80/443, HTTP redirects to HTTPS) |
-| **Admin access** | `http://admin.0xapogee.local` (Traefik hostPort 80) |
-| **Cluster type** | kubeadm with containerd |
-| **Registry** | Harbor at `harbor.blocksecops.local` |
+| **Access** | `https://<env-domain>` |
 | **Auth provider** | Supabase (external) |
 | **Database** | PostgreSQL 15.4, database name `solidity_security`, user `blocksecops` |
-| **curl flag** | Use `-sk` for HTTPS (self-signed cert) |
 
 ## Pre-Flight Checks
 
@@ -30,16 +26,16 @@ kubectl get pods --all-namespaces --no-headers | grep -v "Running\|Completed" | 
 # Expected: empty output (all pods running)
 
 # 2. Core infrastructure pods
-kubectl get pod -n postgresql-local postgresql-0 --no-headers
-kubectl get pod -n redis-local -l app.kubernetes.io/name=redis --no-headers
-kubectl get pod -n vault-local vault-0 --no-headers
-kubectl get pod -n traefik-local -l app.kubernetes.io/name=traefik --no-headers
+kubectl get pod -n postgresql-${ENV} postgresql-0 --no-headers
+kubectl get pod -n redis-${ENV} -l app.kubernetes.io/name=redis --no-headers
+kubectl get pod -n vault-${ENV} vault-0 --no-headers
+kubectl get pod -n traefik-${ENV} -l app.kubernetes.io/name=traefik --no-headers
 
 # 3. Vault unsealed
-kubectl exec -n vault-local vault-0 -- vault status -format=json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print('OK' if not d['sealed'] else 'SEALED')"
+kubectl exec -n vault-${ENV} vault-0 -- vault status -format=json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print('OK' if not d['sealed'] else 'SEALED')"
 
 # 4. Database accessible
-kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -c "SELECT 1;" 2>/dev/null
+kubectl exec -n postgresql-${ENV} postgresql-0 -- psql -U blocksecops -d solidity_security -c "SELECT 1;" 2>/dev/null
 
 # 5. Version drift check (all services)
 /home/pwner/Git/scripts/check-version-drift.sh
@@ -61,23 +57,24 @@ kubectl get deployments -A -o jsonpath='{range .items[*]}{.metadata.namespace}/{
 
 ## Service Health Checks
 
-### External Access (via Traefik)
+### External Access (via Ingress)
 
 ```bash
 # Dashboard - expect 200 with HTML
-curl -sk -o /dev/null -w "%{http_code}" https://app.0xapogee.local/
+curl -o /dev/null -w "%{http_code}" "https://${PLATFORM_URL}/"
+# Note: use -k for self-signed certs in development
 
 # API Service - expect JSON with status "healthy"
-curl -sk https://app.0xapogee.local/api/v1/health/live
+curl "https://${PLATFORM_URL}/api/v1/health/live"
 
 # API Readiness - expect ready:true with database:true
-curl -sk https://app.0xapogee.local/api/v1/health/ready
+curl "https://${PLATFORM_URL}/api/v1/health/ready"
 
 # API OpenAPI docs - expect 200
-curl -sk -o /dev/null -w "%{http_code}" https://app.0xapogee.local/docs
+curl -o /dev/null -w "%{http_code}" "https://${PLATFORM_URL}/docs"
 
-# Admin Portal - expect 200 with HTML (HTTP, not HTTPS)
-curl -s -o /dev/null -w "%{http_code}" http://admin.0xapogee.local/
+# Admin Portal - expect 200 with HTML
+curl -o /dev/null -w "%{http_code}" "https://${ADMIN_URL}/"
 ```
 
 ### Internal Service Health (via kubectl exec)
@@ -87,16 +84,16 @@ Run from any pod in the cluster. The API service pod is a good choice:
 ```bash
 # All 6 internal services in one loop
 for check in \
-  "tool-integration.tool-integration-local.svc.cluster.local:8005/health" \
-  "orchestration.orchestration-local.svc.cluster.local:8004/health" \
-  "notification.notification-local.svc.cluster.local:8003/health" \
-  "intelligence-engine.intelligence-engine-local.svc.cluster.local:80/health" \
-  "data-service.data-service-local.svc.cluster.local:8001/health" \
-  "contract-parser.contract-parser-local.svc.cluster.local:80/health" \
+  "tool-integration.tool-integration-${ENV}.svc.cluster.local:8005/health" \
+  "orchestration.orchestration-${ENV}.svc.cluster.local:8004/health" \
+  "notification.notification-${ENV}.svc.cluster.local:8003/health" \
+  "intelligence-engine.intelligence-engine-${ENV}.svc.cluster.local:80/health" \
+  "data-service.data-service-${ENV}.svc.cluster.local:8001/health" \
+  "contract-parser.contract-parser-${ENV}.svc.cluster.local:80/health" \
 ; do
   svc=$(echo "$check" | cut -d. -f1)
   echo -n "$svc: "
-  kubectl exec -n api-service-local deployment/api-service -- \
+  kubectl exec -n api-service-${ENV} deployment/api-service -- \
     curl -s -m 5 "http://$check" 2>/dev/null | head -c 200
   echo ""
 done
@@ -140,22 +137,23 @@ All should return 200 with valid auth, 401 without:
 AUTH="-H 'Authorization: Bearer $TOKEN'"
 
 # Must return 200
-curl -sk $AUTH "https://app.0xapogee.local/api/v1/scans?limit=2"
-curl -sk $AUTH "https://app.0xapogee.local/api/v1/contracts?limit=2"
-curl -sk $AUTH "https://app.0xapogee.local/api/v1/vulnerabilities?limit=2"
-curl -sk $AUTH "https://app.0xapogee.local/api/v1/organizations"
-curl -sk $AUTH "https://app.0xapogee.local/api/v1/scanners"
-curl -sk $AUTH "https://app.0xapogee.local/api/v1/deduplication/groups"
-curl -sk $AUTH "https://app.0xapogee.local/api/v1/projects"
+curl $AUTH "https://${PLATFORM_URL}/api/v1/scans?limit=2"
+# Note: use -k for self-signed certs in development
+curl $AUTH "https://${PLATFORM_URL}/api/v1/contracts?limit=2"
+curl $AUTH "https://${PLATFORM_URL}/api/v1/vulnerabilities?limit=2"
+curl $AUTH "https://${PLATFORM_URL}/api/v1/organizations"
+curl $AUTH "https://${PLATFORM_URL}/api/v1/scanners"
+curl $AUTH "https://${PLATFORM_URL}/api/v1/deduplication/groups"
+curl $AUTH "https://${PLATFORM_URL}/api/v1/projects"
 
 # Must return 401 without auth
-curl -sk -o /dev/null -w "%{http_code}" "https://app.0xapogee.local/api/v1/scans"
+curl -o /dev/null -w "%{http_code}" "https://${PLATFORM_URL}/api/v1/scans"
 # Expected: 401
 
 # Search (POST)
-curl -sk $AUTH -X POST -H "Content-Type: application/json" \
+curl $AUTH -X POST -H "Content-Type: application/json" \
   -d '{"query":"reentrancy","limit":5}' \
-  "https://app.0xapogee.local/api/v1/search"
+  "https://${PLATFORM_URL}/api/v1/search"
 ```
 
 ### Regression Tests (v0.27.0+)
@@ -164,31 +162,31 @@ These tests verify specific bug fixes. Expected behaviors after deploying v0.27.
 
 ```bash
 # A1: Info severity removed — expect 422 (not 500)
-curl -sk $AUTH "https://app.0xapogee.local/api/v1/deduplication/groups?severity=info"
+curl $AUTH "https://${PLATFORM_URL}/api/v1/deduplication/groups?severity=info"
 
 # A2: Pending status mapped — expect 200 (mapped to queued) or 422 (not 500)
-curl -sk $AUTH "https://app.0xapogee.local/api/v1/scans?status=pending"
+curl $AUTH "https://${PLATFORM_URL}/api/v1/scans?status=pending"
 
 # A3: Invalid severity validation — expect 422 (not 500)
-curl -sk $AUTH "https://app.0xapogee.local/api/v1/deduplication/groups?severity=INVALID"
+curl $AUTH "https://${PLATFORM_URL}/api/v1/deduplication/groups?severity=INVALID"
 
 # A4: Audit logs — expect 200 or 403 (not 500)
-curl -sk $AUTH "https://app.0xapogee.local/api/v1/audit-logs"
+curl $AUTH "https://${PLATFORM_URL}/api/v1/audit-logs"
 
 # A6: Scanner effectiveness — expect 200 with populated data
-curl -sk $AUTH "https://app.0xapogee.local/api/v1/analytics/scanner-effectiveness"
+curl $AUTH "https://${PLATFORM_URL}/api/v1/analytics/scanner-effectiveness"
 ```
 
 ## Database Checks
 
 ```bash
 # Table count (expect ~88)
-kubectl exec -n postgresql-local postgresql-0 -- \
+kubectl exec -n postgresql-${ENV} postgresql-0 -- \
   psql -U blocksecops -d solidity_security -t -c \
   "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='public';"
 
 # Key record counts
-kubectl exec -n postgresql-local postgresql-0 -- \
+kubectl exec -n postgresql-${ENV} postgresql-0 -- \
   psql -U blocksecops -d solidity_security -c \
   "SELECT 'users' as tbl, COUNT(*) FROM users
    UNION ALL SELECT 'scans', COUNT(*) FROM scans
@@ -197,7 +195,7 @@ kubectl exec -n postgresql-local postgresql-0 -- \
    UNION ALL SELECT 'vulnerability_patterns', COUNT(*) FROM vulnerability_patterns;"
 
 # Verify no info severity in patterns (post-migration)
-kubectl exec -n postgresql-local postgresql-0 -- \
+kubectl exec -n postgresql-${ENV} postgresql-0 -- \
   psql -U blocksecops -d solidity_security -t -c \
   "SELECT COUNT(*) FROM vulnerability_patterns WHERE severity IN ('info', 'informational');"
 # Expected: 0
@@ -208,15 +206,15 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 ```bash
 # Check all service image tags
 for ns_svc in \
-  "api-service-local/api-service" \
-  "dashboard-local/dashboard" \
-  "admin-portal-local/admin-portal" \
-  "tool-integration-local/tool-integration" \
-  "orchestration-local/orchestration" \
-  "notification-local/notification" \
-  "intelligence-engine-local/intelligence-engine" \
-  "data-service-local/data-service" \
-  "contract-parser-local/contract-parser" \
+  "api-service-${ENV}/api-service" \
+  "dashboard-${ENV}/dashboard" \
+  "admin-portal-${ENV}/admin-portal" \
+  "tool-integration-${ENV}/tool-integration" \
+  "orchestration-${ENV}/orchestration" \
+  "notification-${ENV}/notification" \
+  "intelligence-engine-${ENV}/intelligence-engine" \
+  "data-service-${ENV}/data-service" \
+  "contract-parser-${ENV}/contract-parser" \
 ; do
   NS=$(echo "$ns_svc" | cut -d/ -f1)
   SVC=$(echo "$ns_svc" | cut -d/ -f2)
@@ -254,12 +252,12 @@ done
 
 ```bash
 # Encryption service configured (readiness endpoint includes encryption check)
-curl -sk https://app.0xapogee.local/api/v1/health/ready | python3 -c "
+curl "https://${PLATFORM_URL}/api/v1/health/ready" | python3 -c "
 import sys,json; d=json.load(sys.stdin)
 print('PASS' if d.get('checks',{}).get('encryption') else 'FAIL: encryption not configured')"
 
 # Vault unsealed
-kubectl exec -n vault-local vault-0 -- vault status -format=json 2>/dev/null | \
+kubectl exec -n vault-${ENV} vault-0 -- vault status -format=json 2>/dev/null | \
   python3 -c "import sys,json; d=json.load(sys.stdin); print('PASS' if not d['sealed'] else 'FAIL: Vault sealed')"
 
 # All ExternalSecrets synced
@@ -271,13 +269,13 @@ echo "ExternalSecrets unsynced: $UNSYNCED (expected: 0)"
 
 ```bash
 # No scans stuck in queued/running for >1 hour (stale scan check)
-STALE=$(kubectl exec -n postgresql-local postgresql-0 -- \
+STALE=$(kubectl exec -n postgresql-${ENV} postgresql-0 -- \
   psql -U blocksecops -d solidity_security -t -c \
   "SELECT COUNT(*) FROM scans WHERE status IN ('queued','running') AND created_at < NOW() - INTERVAL '1 hour';" 2>/dev/null | tr -d ' ')
 echo "Stale scans: $STALE (expected: 0)"
 
 # No failed scans without error_message
-MISSING_ERR=$(kubectl exec -n postgresql-local postgresql-0 -- \
+MISSING_ERR=$(kubectl exec -n postgresql-${ENV} postgresql-0 -- \
   psql -U blocksecops -d solidity_security -t -c \
   "SELECT COUNT(*) FROM scans WHERE status='failed' AND error_message IS NULL;" 2>/dev/null | tr -d ' ')
 echo "Failed scans missing error_message: $MISSING_ERR (expected: 0)"
@@ -286,13 +284,9 @@ echo "Failed scans missing error_message: $MISSING_ERR (expected: 0)"
 ## Infrastructure Health Checks
 
 ```bash
-# Harbor health (registry should be under memory limit)
-HARBOR_MEM=$(kubectl top pod -n harbor-local -l app=harbor --no-headers 2>/dev/null | awk '{print $3}' | head -1)
-echo "Harbor registry memory: $HARBOR_MEM"
-
 # Prometheus and adapter running (required for HPA custom metrics)
-PROM=$(kubectl get pod -n monitoring-local -l app=prometheus --no-headers -o custom-columns=S:.status.phase 2>/dev/null | head -1)
-ADAPTER=$(kubectl get pod -n monitoring-local -l app=prometheus-adapter --no-headers -o custom-columns=S:.status.phase 2>/dev/null | head -1)
+PROM=$(kubectl get pod -n monitoring-${ENV} -l app=prometheus --no-headers -o custom-columns=S:.status.phase 2>/dev/null | head -1)
+ADAPTER=$(kubectl get pod -n monitoring-${ENV} -l app=prometheus-adapter --no-headers -o custom-columns=S:.status.phase 2>/dev/null | head -1)
 echo "Prometheus: ${PROM:-NOT FOUND}  Adapter: ${ADAPTER:-NOT FOUND}"
 
 # HPA status (check all HPAs can read metrics)
@@ -308,16 +302,17 @@ done
 
 ```bash
 # CORRECT: Force HTTP/1.1 for WebSocket upgrade
-curl -sk --http1.1 -H "Connection: Upgrade" -H "Upgrade: websocket" \
+curl --http1.1 -H "Connection: Upgrade" -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
   -o /dev/null -w "%{http_code}" \
-  https://app.0xapogee.local/ws/
+  "https://${PLATFORM_URL}/ws/"
+# Note: use -k for self-signed certs in development
 # Expected: 101 (Switching Protocols)
 
 # WRONG: Default curl may negotiate HTTP/2 via ALPN, which does not support
 # the Connection: Upgrade header → returns 404 (false negative)
-curl -sk -H "Connection: Upgrade" -H "Upgrade: websocket" \
-  https://app.0xapogee.local/ws/
+curl -H "Connection: Upgrade" -H "Upgrade: websocket" \
+  "https://${PLATFORM_URL}/ws/"
 # May return 404 even though WebSocket is working
 ```
 
@@ -330,7 +325,7 @@ async def test():
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
-    async with websockets.connect('wss://app.0xapogee.local/ws/', ssl=ctx) as ws:
+    async with websockets.connect('wss://${PLATFORM_URL}/ws/', ssl=ctx) as ws:
         print('WebSocket connected successfully')
 asyncio.run(test())
 "
@@ -344,6 +339,16 @@ Run all checks in one script:
 #!/bin/bash
 # Platform smoke test — run after any deployment
 set -euo pipefail
+
+PLATFORM_URL="${PLATFORM_URL:?Set PLATFORM_URL}"
+ADMIN_URL="${ADMIN_URL:-}"
+ENV="${ENV:-prod}"
+
+# Use -k for self-signed certs in development, empty for production
+CURL_TLS_FLAG=""
+if [ "$ENV" != "prod" ]; then
+  CURL_TLS_FLAG="-k"
+fi
 
 PASS=0
 FAIL=0
@@ -361,31 +366,33 @@ check() {
 }
 
 echo "=== Pre-Flight ==="
-check "PostgreSQL running" "Running" "$(kubectl get pod -n postgresql-local postgresql-0 --no-headers -o custom-columns=S:.status.phase 2>/dev/null)"
-check "Redis running" "Running" "$(kubectl get pod -n redis-local -l app.kubernetes.io/name=redis --no-headers -o custom-columns=S:.status.phase 2>/dev/null | head -1)"
-check "Vault running" "Running" "$(kubectl get pod -n vault-local vault-0 --no-headers -o custom-columns=S:.status.phase 2>/dev/null)"
-check "Traefik running" "Running" "$(kubectl get pod -n traefik-local -l app.kubernetes.io/name=traefik --no-headers -o custom-columns=S:.status.phase 2>/dev/null)"
+check "PostgreSQL running" "Running" "$(kubectl get pod -n postgresql-${ENV} postgresql-0 --no-headers -o custom-columns=S:.status.phase 2>/dev/null)"
+check "Redis running" "Running" "$(kubectl get pod -n redis-${ENV} -l app.kubernetes.io/name=redis --no-headers -o custom-columns=S:.status.phase 2>/dev/null | head -1)"
+check "Vault running" "Running" "$(kubectl get pod -n vault-${ENV} vault-0 --no-headers -o custom-columns=S:.status.phase 2>/dev/null)"
+check "Traefik running" "Running" "$(kubectl get pod -n traefik-${ENV} -l app.kubernetes.io/name=traefik --no-headers -o custom-columns=S:.status.phase 2>/dev/null)"
 
 echo ""
 echo "=== External Access ==="
-check "Dashboard HTTPS" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.local/ 2>/dev/null)"
-check "API health" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.local/api/v1/health/live 2>/dev/null)"
-check "API ready" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.local/api/v1/health/ready 2>/dev/null)"
-check "Admin portal" "200" "$(curl -s -o /dev/null -w '%{http_code}' http://admin.0xapogee.local/ 2>/dev/null)"
+check "Dashboard HTTPS" "200" "$(curl -s ${CURL_TLS_FLAG} -o /dev/null -w '%{http_code}' "https://${PLATFORM_URL}/" 2>/dev/null)"
+check "API health" "200" "$(curl -s ${CURL_TLS_FLAG} -o /dev/null -w '%{http_code}' "https://${PLATFORM_URL}/api/v1/health/live" 2>/dev/null)"
+check "API ready" "200" "$(curl -s ${CURL_TLS_FLAG} -o /dev/null -w '%{http_code}' "https://${PLATFORM_URL}/api/v1/health/ready" 2>/dev/null)"
+if [ -n "$ADMIN_URL" ]; then
+  check "Admin portal" "200" "$(curl -s ${CURL_TLS_FLAG} -o /dev/null -w '%{http_code}' "https://${ADMIN_URL}/" 2>/dev/null)"
+fi
 
 echo ""
 echo "=== Internal Services ==="
 for svc_url in \
-  "tool-integration|tool-integration.tool-integration-local.svc.cluster.local:8005/health" \
-  "orchestration|orchestration.orchestration-local.svc.cluster.local:8004/api/v1/health/live" \
-  "notification|notification.notification-local.svc.cluster.local:8003/api/v1/health/live" \
-  "intelligence|intelligence-engine.intelligence-engine-local.svc.cluster.local:80/health" \
-  "data-service|data-service.data-service-local.svc.cluster.local:8001/health" \
-  "contract-parser|contract-parser.contract-parser-local.svc.cluster.local:80/health" \
+  "tool-integration|tool-integration.tool-integration-${ENV}.svc.cluster.local:8005/health" \
+  "orchestration|orchestration.orchestration-${ENV}.svc.cluster.local:8004/api/v1/health/live" \
+  "notification|notification.notification-${ENV}.svc.cluster.local:8003/api/v1/health/live" \
+  "intelligence|intelligence-engine.intelligence-engine-${ENV}.svc.cluster.local:80/health" \
+  "data-service|data-service.data-service-${ENV}.svc.cluster.local:8001/health" \
+  "contract-parser|contract-parser.contract-parser-${ENV}.svc.cluster.local:80/health" \
 ; do
   svc=$(echo "$svc_url" | cut -d'|' -f1)
   url=$(echo "$svc_url" | cut -d'|' -f2)
-  resp=$(kubectl exec -n api-service-local deployment/api-service -- curl -s -m 5 "http://$url" 2>/dev/null)
+  resp=$(kubectl exec -n api-service-${ENV} deployment/api-service -- curl -s -m 5 "http://$url" 2>/dev/null)
   if echo "$resp" | grep -q '"status"'; then
     echo "  PASS: $svc"
     ((PASS++))
@@ -397,15 +404,15 @@ done
 
 echo ""
 echo "=== Database ==="
-DB_OK=$(kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -t -c "SELECT 1;" 2>/dev/null | tr -d ' ')
+DB_OK=$(kubectl exec -n postgresql-${ENV} postgresql-0 -- psql -U blocksecops -d solidity_security -t -c "SELECT 1;" 2>/dev/null | tr -d ' ')
 check "Database query" "1" "$DB_OK"
 
 echo ""
 echo "=== Encryption & Secrets ==="
-ENC_OK=$(curl -sk https://app.0xapogee.local/api/v1/health/ready 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print('true' if d.get('checks',{}).get('encryption') else 'false')" 2>/dev/null)
+ENC_OK=$(curl -s ${CURL_TLS_FLAG} "https://${PLATFORM_URL}/api/v1/health/ready" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print('true' if d.get('checks',{}).get('encryption') else 'false')" 2>/dev/null)
 check "Encryption configured" "true" "$ENC_OK"
 
-VAULT_OK=$(kubectl exec -n vault-local vault-0 -- vault status -format=json 2>/dev/null | python3 -c "import sys,json; print('unsealed' if not json.load(sys.stdin)['sealed'] else 'sealed')" 2>/dev/null)
+VAULT_OK=$(kubectl exec -n vault-${ENV} vault-0 -- vault status -format=json 2>/dev/null | python3 -c "import sys,json; print('unsealed' if not json.load(sys.stdin)['sealed'] else 'sealed')" 2>/dev/null)
 check "Vault unsealed" "unsealed" "$VAULT_OK"
 
 UNSYNCED=$(kubectl get externalsecret -A --no-headers 2>/dev/null | grep -v "SecretSynced" | wc -l | tr -d ' ')
@@ -413,10 +420,10 @@ check "ExternalSecrets synced" "0" "$UNSYNCED"
 
 echo ""
 echo "=== Scan Health ==="
-STALE=$(kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -t -c "SELECT COUNT(*) FROM scans WHERE status IN ('queued','running') AND created_at < NOW() - INTERVAL '1 hour';" 2>/dev/null | tr -d ' ')
+STALE=$(kubectl exec -n postgresql-${ENV} postgresql-0 -- psql -U blocksecops -d solidity_security -t -c "SELECT COUNT(*) FROM scans WHERE status IN ('queued','running') AND created_at < NOW() - INTERVAL '1 hour';" 2>/dev/null | tr -d ' ')
 check "No stale scans" "0" "$STALE"
 
-MISSING_ERR=$(kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity_security -t -c "SELECT COUNT(*) FROM scans WHERE status='failed' AND error_message IS NULL;" 2>/dev/null | tr -d ' ')
+MISSING_ERR=$(kubectl exec -n postgresql-${ENV} postgresql-0 -- psql -U blocksecops -d solidity_security -t -c "SELECT COUNT(*) FROM scans WHERE status='failed' AND error_message IS NULL;" 2>/dev/null | tr -d ' ')
 check "Failed scans have error_message" "0" "$MISSING_ERR"
 
 echo ""

@@ -2,7 +2,7 @@
 
 **Part of:** [Platform Development Standards](./INDEX.md)
 **Version:** 2.0.0
-**Last Updated:** March 9, 2026
+**Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Overview
@@ -73,29 +73,29 @@ This document defines the critical rules and codebase-first development workflow
 
 ```
 ✅ CORRECT:
-- Server:     https://app.0xapogee.local
-- Production: https://app.0xapogee.com
+- Always access via the environment's configured domain with HTTPS
+- Example: https://app.0xapogee.com (production)
 
 ❌ INCORRECT:
 - http://127.0.0.1:3000
 - http://localhost:8000
-- http://app.0xapogee.local (HTTP — must use HTTPS)
+- Using HTTP instead of HTTPS
 ```
 
-Local traffic goes through Traefik ingress with TLS. GCP production traffic routes through Cloudflare → GKE Gateway with Google-managed TLS. HTTP automatically redirects to HTTPS in both environments.
+Traffic routes through the environment's ingress controller with TLS. HTTP automatically redirects to HTTPS.
 
 **CORS Configuration:**
 
 CORS origins are managed via ConfigMap (source of truth), not hardcoded in application code:
 
 ```yaml
-# k8s/overlays/local/api-service/configmap-patch.yaml
-cors_origins: "https://app.0xapogee.local"
-allowed_hosts: "app.0xapogee.local"
-dashboard_base_url: "https://app.0xapogee.local"
+# k8s/overlays/<env>/api-service/configmap-patch.yaml
+cors_origins: "https://<environment-domain>"
+allowed_hosts: "<environment-domain>"
+dashboard_base_url: "https://<environment-domain>"
 ```
 
-The base deployment (`k8s/base/api-service/deployment.yaml`) maps these ConfigMap keys to environment variables. Application defaults in `config.py` target production (`app.0xapogee.com`).
+The base deployment (`k8s/base/api-service/deployment.yaml`) maps these ConfigMap keys to environment variables. Application defaults in `config.py` target production.
 
 See [Domain Management Standards](./domain-management.md) for the full source of truth chain and switching between environments.
 
@@ -134,37 +134,34 @@ See [Domain Management Standards](./domain-management.md) for the full source of
 
 ```bash
 # 1. Pull latest code
-cd /Users/pwner/Git/ABS/blocksecops-api-service
+cd <service-repo>
 git checkout main
 git pull
 
-# 2. Restart the API service pod to pick up changes
-kubectl rollout restart deployment/api-service -n api-service-local
+# 2. Restart the service pod
+kubectl rollout restart deployment/<service> -n <service>-<env>
 
 # 3. Wait for rollout to complete
-kubectl rollout status deployment/api-service -n api-service-local
+kubectl rollout status deployment/<service> -n <service>-<env>
 
 # 4. Verify new code is running
-kubectl logs -n api-service-local -l app.kubernetes.io/name=api-service --tail=20
-
-# 5. Verify API health
-curl -s http://127.0.0.1:8000/api/v1/health/ready | jq '.'
+kubectl logs -n <service>-<env> -l app.kubernetes.io/name=<service> --tail=20
 ```
 
 **Common Services That Need Restart:**
 
 ```bash
 # API Service (after backend code changes)
-kubectl rollout restart deployment/api-service -n api-service-local
+kubectl rollout restart deployment/api-service -n api-service-<env>
 
 # Data Service (after data processing code changes)
-kubectl rollout restart deployment/data-service -n data-service-local
+kubectl rollout restart deployment/data-service -n data-service-<env>
 
 # Tool Integration (after scanner integration changes)
-kubectl rollout restart deployment/tool-integration -n tool-integration-local
+kubectl rollout restart deployment/tool-integration -n tool-integration-<env>
 
 # Workers (after background job code changes)
-kubectl rollout restart deployment/celery-worker -n workers-local
+kubectl rollout restart deployment/celery-worker -n workers-<env>
 ```
 
 **Why This Matters:**
@@ -172,16 +169,6 @@ kubectl rollout restart deployment/celery-worker -n workers-local
 - **Testing Failures:** New features won't work if pods aren't restarted
 - **Confusing Bugs:** Seeing old behavior when expecting new fixes
 - **Wasted Time:** Debugging issues that don't exist in the new code
-
-**Port Forward Note:** After restarting API service, you may need to restart the port-forward:
-
-```bash
-# Kill old port-forward
-ps aux | grep "port-forward.*svc/api-service" | grep -v grep | awk '{print $2}' | xargs kill
-
-# Start new port-forward
-kubectl port-forward -n api-service-local svc/api-service 8000:8000 > /tmp/pf-api-service.log 2>&1 &
-```
 
 ---
 
@@ -223,10 +210,10 @@ kubectl port-forward -n api-service-local svc/api-service 8000:8000 > /tmp/pf-ap
 
 ```bash
 # 1. NEVER do this directly
-kubectl edit deployment api-service -n api-service-local  ❌
+kubectl edit deployment api-service -n api-service-<env>  ❌
 
 # 2. ALWAYS do this instead
-cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/api-service
+cd <infrastructure-repo>/k8s/overlays/<env>/api-service
 
 # 3. Edit the manifest file
 vim deployment-patch.yaml
@@ -244,18 +231,18 @@ Refs: #123"
 kubectl apply -k .
 
 # 6. Verify change
-kubectl get deployment api-service -n api-service-local -o yaml | grep memory
+kubectl get deployment api-service -n api-service-<env> -o yaml | grep memory
 ```
 
 #### Making Configuration Changes
 
 ```bash
 # 1. Update configuration file in repository
-cd /Users/pwner/Git/ABS/blocksecops-api-service
+cd <repo-root>/blocksecops-api-service
 vim src/config.py
 
 # 2. Update corresponding ConfigMap
-cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/api-service
+cd <infrastructure-repo>/k8s/overlays/<env>/api-service
 vim configmap-patch.yaml
 
 # 3. Commit both changes together
@@ -268,16 +255,16 @@ git commit -m "Add request timeout configuration
 - Configurable via environment variable"
 
 # 4. Rebuild and deploy
-cd /Users/pwner/Git/ABS/blocksecops-api-service
-docker build -t localhost:8080/library/api-service:0.3.7 .
-docker push localhost:8080/library/api-service:0.3.7
+cd <repo-root>/blocksecops-api-service
+docker build -t ${REGISTRY}/blocksecops/api-service:${VERSION} .
+docker push ${REGISTRY}/blocksecops/api-service:${VERSION}
 
 # 5. Apply ConfigMap changes
-cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
-kubectl apply -k k8s/overlays/local/api-service
+cd <infrastructure-repo>
+kubectl apply -k k8s/overlays/<env>/api-service
 
 # 6. Restart deployment to pick up changes
-kubectl rollout restart deployment api-service -n api-service-local
+kubectl rollout restart deployment api-service -n api-service-<env>
 ```
 
 #### Emergency Hotfixes
@@ -286,14 +273,14 @@ kubectl rollout restart deployment api-service -n api-service-local
 
 ```bash
 # 1. Make temporary fix (if absolutely necessary)
-kubectl patch deployment api-service -n api-service-local \
+kubectl patch deployment api-service -n api-service-<env> \
   -p '{"spec":{"template":{"spec":{"containers":[{"name":"api-service","resources":{"limits":{"memory":"2Gi"}}}]}}}}'
 
 # 2. IMMEDIATELY document the change
 echo "EMERGENCY HOTFIX: Increased API service memory to 2Gi at $(date)" >> HOTFIX.log
 
 # 3. Within 1 hour, update the codebase
-cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/api-service
+cd <infrastructure-repo>/k8s/overlays/<env>/api-service
 vim deployment-patch.yaml
 git add deployment-patch.yaml
 git commit -m "HOTFIX: Increase API service memory to 2Gi
@@ -303,7 +290,7 @@ Root cause: Memory leak in scan result processing
 Permanent fix tracked in: #456"
 
 # 4. Verify code matches running state
-kubectl diff -k k8s/overlays/local/api-service
+kubectl diff -k k8s/overlays/<env>/api-service
 ```
 
 ### Documentation Requirements for Changes

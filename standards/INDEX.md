@@ -1,7 +1,7 @@
 # Platform Development Standards - Index
 
-**Version:** 2.5.1
-**Last Updated:** March 1, 2026
+**Version:** 3.0.0
+**Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Overview
@@ -25,7 +25,7 @@ These standards contain the most critical rules that, if violated, can cause dat
 1. **[Core Development Rules](./core-development-rules.md)**
    - Critical development workflow rules
    - Codebase-first development (NEVER make changes without updating Git first)
-   - Local development endpoint requirements (127.0.0.1)
+   - Development endpoint requirements
    - Pod restart requirements after code changes
    - Emergency hotfix procedures
 
@@ -34,7 +34,7 @@ These standards contain the most critical rules that, if violated, can cause dat
    - MANDATORY: Never apply database config changes without backups
    - Automated backup setup
    - Recovery procedures (with and without backups)
-   - Cautionary example: October 16, 2025 database corruption incident
+   - Prevention: cautionary incident documented in changelogs
 
 3. **[Secrets Management](./secrets-management.md)**
    - HashiCorp Vault with External Secrets Operator
@@ -58,7 +58,7 @@ These standards define how you should work with code, Git, and deployments:
    - Test before deploy workflow
    - CRITICAL: Do not rollback working deployments
    - CRITICAL: Test before committing fixes
-   - Docker build caching with Harbor registry
+   - Docker build caching with container registry
    - Rollback procedures
    - Deployment checklist
 
@@ -77,10 +77,9 @@ These standards define how you should work with code, Git, and deployments:
    - Startup verification checklist
 
 8. **[Domain Management](./domain-management.md)**
-    - Environment-specific domain configuration (local, server, GCP)
-    - GCP migration checklist for `app.0xapogee.com`
+    - Environment-specific domain configuration
     - Kustomize overlay strategy for domains
-    - CORS and IngressRoute configuration
+    - CORS and ingress configuration
 
 ### 🔵 Configuration & Versioning Standards
 
@@ -93,7 +92,7 @@ These standards ensure proper versioning and configuration management:
     - Why explicit versions (not `latest`)
 
 10. **[Docker Base Images](./docker-base-images.md)**
-    - Pre-built base images stored in Harbor for persistence
+    - Pre-built base images stored in container registry for persistence
     - Reduces build times from ~20 min to ~2-3 min for code changes
     - Applies to: intelligence-engine (ML), orchestration (security tools)
     - Security hardening: checksum verification, pinned digests, pipx isolation
@@ -101,10 +100,9 @@ These standards ensure proper versioning and configuration management:
     - Complete build and push workflow
 
 11. **[Build Workflow](./build-workflow.md)**
-    - Local Docker build with Harbor registry
+    - Docker build with container registry
     - Build and deploy steps
     - Using build cache
-    - Registry-agnostic build workflow
 
 12. **[Frontend Build-Time Environment Variables](./frontend-build-env.md)**
     - Vite environment variable handling (baked at build time)
@@ -219,7 +217,7 @@ These standards ensure proper versioning and configuration management:
 1. **Performing GitOps without owner approval** → See [Core Development Rules — Rule 0](./core-development-rules.md#rule-0-gitops-requires-owner-approval)
 2. **Making kubectl changes without updating Git first** → See [Core Development Rules](./core-development-rules.md)
 3. **Not creating database backups before config changes** → See [Database Management](./database-management.md)
-4. **Using `localhost` instead of `127.0.0.1`** → Use `127.0.0.1` for local development
+4. **Using incorrect hostnames for development endpoints** → See [Core Development Rules](./core-development-rules.md)
 5. **Committing directly to main instead of using feature branches** → See [Version Control Standards](./version-control-standards.md)
 6. **Not incrementing version tags when rebuilding images** → See [Testing & Deployment](./testing-deployment.md)
 7. **Using manual port-forwards for regular access** → See [Service Availability](./service-availability.md)
@@ -309,5 +307,5 @@ Contact the development team or create an issue in the `blocksecops-docs` reposi
 
 ---
 
-**Last Updated:** February 28, 2026
+**Last Updated:** March 10, 2026
 **Maintained By:** Apogee Team

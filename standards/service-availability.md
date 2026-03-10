@@ -1,7 +1,7 @@
 # Service Availability Standards
 
-**Version:** 1.1.0
-**Last Updated:** March 9, 2026
+**Version:** 2.0.0
+**Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Core Principle
@@ -26,11 +26,10 @@ After cluster start, all services should be accessible immediately without runni
 
 ## Environment Access Matrix
 
-| Environment | Method | Access Pattern | One-Time Setup |
-|-------------|--------|----------------|----------------|
-| **Local (kubeadm)** | hostPort 80/443 + Traefik (TLS) | `https://app.0xapogee.local` | DNS entries |
-| **Server (kubeadm)** | hostPort 80/443 + Traefik | `http://app.0xapogee.local` | DNS entries |
-| **Production (GCP)** | GKE Gateway + Cloudflare | `https://app.0xapogee.com` | None (managed) |
+| Environment | Method | Access Pattern |
+|-------------|--------|----------------|
+| Development | Ingress controller with hostPort/NodePort | `https://<env-domain>` |
+| Production | Managed load balancer | `https://app.0xapogee.com` |
 
 ---
 
@@ -40,13 +39,12 @@ After cluster start, all services should be accessible immediately without runni
 
 ```bash
 # WRONG - Manual port-forward for regular development
-kubectl port-forward -n traefik-local svc/traefik 3000:80 &
-kubectl port-forward -n api-service-local svc/api-service 8000:8000 &
+kubectl port-forward -n <ingress-namespace> svc/traefik 3000:80 &
+kubectl port-forward -n <service>-<env> svc/api-service 8000:8000 &
 # ... more port-forwards
 
 # RIGHT - Use always-available access
-# Local: hostPort 80/443 + Traefik with DNS (one-time setup)
-# Server: hostPort 80/443 + Traefik with DNS (one-time setup)
+# Development: hostPort 80/443 + Traefik with DNS (one-time setup)
 # Production: managed infrastructure
 ```
 
@@ -69,45 +67,7 @@ Use manual port-forwards only for:
 
 ## Setup Per Environment
 
-### Local Development (kubeadm)
-
-**One-Time Setup:**
-```bash
-# On the local machine (server resolves to itself)
-echo "127.0.0.1  app.0xapogee.local" | sudo tee -a /etc/hosts
-
-# On client machines accessing the server
-echo "192.168.86.225  app.0xapogee.local" | sudo tee -a /etc/hosts
-```
-
-**Verification:**
-```bash
-curl -k https://app.0xapogee.local/api/v1/health/live
-```
-
-**Requirements:**
-- Traefik with hostPort 80/443 deployed
-- DNS entries configured
-
-### Server Environment (kubeadm)
-
-**One-Time Setup:**
-```bash
-# On server (for local API testing)
-echo "127.0.0.1  app.0xapogee.local" | sudo tee -a /etc/hosts
-
-# On client machines
-echo "192.168.86.225  app.0xapogee.local" | sudo tee -a /etc/hosts
-```
-
-**Verification:**
-```bash
-curl http://app.0xapogee.local/api/v1/health/live
-```
-
-**Requirements:**
-- Traefik with hostPort 80/443 deployed
-- DNS entries configured
+Each environment has its own one-time setup. See environment-specific documentation for details.
 
 ### Production (GCP)
 
@@ -124,30 +84,12 @@ curl https://app.0xapogee.com/api/v1/health/live
 
 After cluster start or restart, verify services are accessible:
 
-### Local (kubeadm)
-
 ```bash
-# 1. Check Traefik is running
-kubectl get pods -n traefik-local
+# 1. Check ingress controller is running
+kubectl get pods -n <ingress-namespace>
 
-# 2. Check hostPort is active
-curl -k https://127.0.0.1/api/v1/health/live
-
-# 3. Test domain access
-curl -k https://app.0xapogee.local/api/v1/health/live
-```
-
-### Server (kubeadm)
-
-```bash
-# 1. Check Traefik is running
-kubectl get pods -n traefik-local
-
-# 2. Check hostPort is active
-curl http://127.0.0.1/api/v1/health/live
-
-# 3. Test domain access
-curl http://app.0xapogee.local/api/v1/health/live
+# 2. Check services are healthy
+curl https://<env-domain>/api/v1/health/live
 ```
 
 ### Production (GCP)
@@ -169,21 +111,15 @@ curl https://app.0xapogee.com/api/v1/health/live
 
 ### Services Not Accessible After Cluster Start
 
-**Local (kubeadm):**
-1. Check Traefik is running: `kubectl get pods -n traefik-local`
-2. Check hostPort is active: `curl -k https://127.0.0.1/api/v1/health/live`
-3. If DNS fails, check /etc/hosts entry
-
-**Server (kubeadm):**
-1. Check Traefik is running: `kubectl get pods -n traefik-local`
-2. Check DNS resolves: `ping app.0xapogee.local`
-3. If DNS fails, check /etc/hosts entry
+1. Check ingress controller is running: `kubectl get pods -n <ingress-namespace>`
+2. Check hostPort/NodePort is active: `curl -k https://<node-ip>/api/v1/health/live`
+3. If DNS fails, check DNS configuration for your environment
 
 ### Connection Refused Errors
 
 1. Check if pods are running: `kubectl get pods -A`
 2. Check if service has endpoints: `kubectl get endpoints -n <namespace>`
-3. Check Traefik logs: `kubectl logs -n traefik-local -l app.kubernetes.io/name=traefik`
+3. Check ingress controller logs: `kubectl logs -n <ingress-namespace> -l app.kubernetes.io/name=traefik`
 
 ---
 

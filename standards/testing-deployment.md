@@ -1,7 +1,7 @@
 # Testing and Deployment Standards
 
-**Version:** 1.9.0
-**Last Updated:** December 12, 2025
+**Version:** 2.0.0
+**Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Testing Standards
@@ -12,17 +12,17 @@
 
 ```bash
 # 1. Unit tests (in service repository)
-cd /Users/pwner/Git/ABS/blocksecops-api-service
+cd blocksecops-api-service
 pytest tests/unit/
 
 # 2. Build Docker image
-docker build -t localhost:8080/library/api-service:0.3.7 .
+docker build -t ${REGISTRY}/blocksecops/api-service:${VERSION} .
 
 # 3. Push to registry
-docker push localhost:8080/library/api-service:0.3.7
+docker push ${REGISTRY}/blocksecops/api-service:${VERSION}
 
 # 4. Update Kubernetes manifests (commit first!)
-cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
+cd <infrastructure-repo>
 vim k8s/overlays/local/api-service/kustomization.yaml
 git add .
 git commit -m "Update API service to v0.3.7"
@@ -104,7 +104,7 @@ kubectl logs -n api-service-local -l app.kubernetes.io/name=api-service --tail=5
 vim src/presentation/api/v1/endpoints/analytics.py
 
 # 2. Build and deploy (DON'T COMMIT YET)
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:?REGISTRY not set}"
 docker build -t ${REGISTRY}/blocksecops/api-service:0.4.2 .
 docker push ${REGISTRY}/blocksecops/api-service:0.4.2
 kubectl rollout restart deployment/api-service -n api-service-local
@@ -125,8 +125,8 @@ git commit -m "fix: Correct analytics resolved vulnerabilities count
 
 Tested: Dashboard analytics now shows correct resolved count"
 
-# 5. Push to Harbor and create PR
-docker push <harbor-clusterip>:443/blocksecops/api-service:0.4.2
+# 5. Push to registry and create PR
+docker push ${REGISTRY}/blocksecops/api-service:0.4.2
 git push
 ```
 
@@ -142,22 +142,22 @@ git push
 - Database migrations (verify data integrity)
 - Deployment configuration changes (verify services remain healthy)
 
-### Docker Build Caching with Harbor Registry
+### Docker Build Caching with Container Registry
 
-**With Harbor registry and versioned tags, `--no-cache` is no longer required for most builds.**
+**With a container registry and versioned tags, `--no-cache` is no longer required for most builds.**
 
 **Why `--no-cache` is no longer mandatory:**
 
-With the Harbor container registry:
+With a container registry:
 - Each version gets a unique tag (0.4.0, 0.4.1, etc.)
-- Images are pushed to Harbor with versioned tags
-- Kubernetes pulls images from Harbor by tag
+- Images are pushed to the registry with versioned tags
+- Kubernetes pulls images from the registry by tag
 - The original Docker cache issue (stale `:latest` images) is solved by versioned tags
 
 **Standard Build Workflow:**
 
 ```bash
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:?REGISTRY not set}"
 
 # 1. Build with new version tag
 docker build -t ${REGISTRY}/blocksecops/api-service:0.4.1 .
@@ -212,7 +212,7 @@ kubectl rollout undo deployment api-service -n api-service-local
 kubectl rollout status deployment api-service -n api-service-local
 
 # 4. Update code to match deployed version
-cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure
+cd <infrastructure-repo>
 git revert HEAD
 git push
 

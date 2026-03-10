@@ -1,8 +1,8 @@
 # Frontend Build-Time Environment Variables
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 1.1.0
-**Last Updated:** March 1, 2026
+**Version:** 2.0.0
+**Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Overview
@@ -146,11 +146,11 @@ VITE_USE_TESTNET=true
 # 1. Ensure .env.local exists with required values
 cat .env.local
 
-# 2. Set Harbor registry
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+# 2. Set container registry
+REGISTRY="${REGISTRY:?REGISTRY not set}"
 
 # 3. Source environment variables and build
-cd /Users/pwner/Git/ABS
+cd /path/to/workspace
 source blocksecops-dashboard/.env.local
 
 docker build \
@@ -161,7 +161,7 @@ docker build \
   -t ${REGISTRY}/blocksecops/dashboard:0.19.0 \
   -f blocksecops-dashboard/Dockerfile .
 
-# 4. Push to Harbor registry
+# 4. Push to container registry
 docker push ${REGISTRY}/blocksecops/dashboard:0.19.0
 
 # 5. Deploy
@@ -176,7 +176,7 @@ The admin portal uses the same Supabase project but with `VITE_ADMIN_*` prefixed
 cd /home/pwner/Git/blocksecops-admin-portal
 
 VERSION=$(grep '"version"' package.json | head -1 | cut -d'"' -f4)
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:?REGISTRY not set}"
 
 # SUPABASE_URL and SUPABASE_ANON_KEY are set in shell environment
 docker build \

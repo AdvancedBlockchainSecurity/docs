@@ -1,7 +1,7 @@
 # Build Workflow
 
-**Version:** 5.0.0
-**Last Updated:** March 6, 2026
+**Version:** 6.0.0
+**Last Updated:** March 10, 2026
 
 ## Owner Approval Required
 
@@ -9,7 +9,7 @@
 
 ## Overview
 
-Images are built locally with Docker, pushed to a container registry, and deployed via `kubectl apply`. The registry is configurable via the `REGISTRY` environment variable, defaulting to `harbor.blocksecops.local` for the server environment.
+Images are built locally with Docker, pushed to a container registry, and deployed via `kubectl apply`. The registry is configurable per environment via the `REGISTRY` environment variable.
 
 ```
 docker build → docker push ${REGISTRY}/blocksecops/<service>:<version> → kubectl apply -k
@@ -20,18 +20,14 @@ docker build → docker push ${REGISTRY}/blocksecops/<service>:<version> → kub
 All build commands use the `REGISTRY` variable for registry-agnostic builds:
 
 ```bash
-# Default: Harbor (server environment)
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
-
-# Override for GCP Artifact Registry
-REGISTRY="us-west1-docker.pkg.dev/blocksecops-prod/blocksecops"
-
-# Override for any other registry
-REGISTRY="my-registry.example.com"
+# Set for your environment:
+# GCP:   REGISTRY="us-west1-docker.pkg.dev/<project>/apogee"
+# Other: REGISTRY="my-registry.example.com/blocksecops"
+export REGISTRY="<your-registry>"
 ```
 
 **Why a variable?**
-- Supports Harbor (current server), GCP Artifact Registry (production), or any future registry
+- Supports any container registry (self-hosted, GCP Artifact Registry, etc.)
 - Build scripts, Dockerfiles, and CI/CD pipelines all use the same pattern
 - Switch environments by changing one variable
 
@@ -47,7 +43,7 @@ VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)  # Python
 # or
 VERSION=$(grep '"version"' package.json | head -1 | cut -d'"' -f4)  # Node.js
 
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:?REGISTRY not set}"
 
 # Build
 docker build \
@@ -80,13 +76,14 @@ Run the platform-wide drift checker to detect version mismatches across all serv
 Kustomization overlays specify the registry for their environment:
 
 ```yaml
-# k8s/overlays/local/<service>/kustomization.yaml (Harbor)
+# k8s/overlays/<env>/<service>/kustomization.yaml
 images:
 - name: <service>
-  newName: harbor.blocksecops.local/blocksecops/<service>
+  newName: <registry>/blocksecops/<service>
   newTag: "0.29.0"
 
-# k8s/overlays/gcp-production/<service>/kustomization.yaml (GCP)
+# Example: GCP Artifact Registry
+# k8s/overlays/gcp-production/<service>/kustomization.yaml
 images:
 - name: <service>
   newName: us-west1-docker.pkg.dev/blocksecops-prod/blocksecops/<service>
@@ -97,7 +94,7 @@ images:
 
 See [Docker Image Versioning](./docker-image-versioning.md) for detailed service-specific requirements, including:
 - **Dashboard**: Requires parent directory build context + Supabase build args
-- **Orchestration/Intelligence Engine**: Use pre-built base images from Harbor (see [Docker Base Images](./docker-base-images.md))
+- **Orchestration/Intelligence Engine**: Use pre-built base images from the container registry (see [Docker Base Images](./docker-base-images.md))
 
 ## Force Deployment Update
 
@@ -151,7 +148,7 @@ kubectl rollout status deployment/<service> -n <namespace>
 
 ### containerd Fallback (No Registry Available)
 
-If Harbor is unavailable, import directly to containerd:
+Fallback for environments without a container registry — import directly to containerd:
 
 ```bash
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)

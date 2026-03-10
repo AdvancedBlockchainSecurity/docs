@@ -1,8 +1,8 @@
 # Kustomize Standards
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 1.3.0
-**Last Updated:** February 28, 2026
+**Version:** 2.0.0
+**Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Overview
@@ -24,7 +24,7 @@ k8s/
 │   ├── configmap.yaml
 │   └── serviceaccount.yaml
 └── overlays/
-    ├── local/                  # Local development (kubeadm + Harbor)
+    ├── local/                  # Development environment
     │   ├── kustomization.yaml
     │   ├── deployment-patch.yaml
     │   └── configmap-patch.yaml
@@ -185,7 +185,7 @@ patches:
 
 ## Environment-Specific Patterns
 
-### Local Development (kubeadm + Harbor)
+### Development Environment
 
 ```yaml
 # k8s/overlays/local/kustomization.yaml
@@ -193,38 +193,39 @@ namespace: <service>-local
 
 images:
   - name: <service>
-    newName: harbor.blocksecops.local/blocksecops/<service>
+    newName: ${REGISTRY}/blocksecops/<service>
     newTag: "0.1.0"
 ```
 
 **Build command:**
 ```bash
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:?REGISTRY not set}"
 docker build -t ${REGISTRY}/blocksecops/<service>:0.1.0 .
 docker push ${REGISTRY}/blocksecops/<service>:0.1.0
 kubectl apply -k k8s/overlays/local/
 ```
 
-### Server (kubeadm with Harbor)
+### Server/Staging Environment
 
 ```yaml
 # k8s/overlays/server/kustomization.yaml
-namespace: <service>-local  # Still uses -local suffix
+namespace: <service>-<env>
 
 images:
   - name: <service>
-    newName: harbor.blocksecops.local/blocksecops/<service>
+    newName: ${REGISTRY}/blocksecops/<service>
     newTag: "0.1.0"
 ```
 
 **Build command:**
 ```bash
-docker build -t harbor.blocksecops.local/blocksecops/<service>:0.1.0 .
-docker push harbor.blocksecops.local/blocksecops/<service>:0.1.0
-kubectl apply -k k8s/overlays/local/  # Server uses local overlay for base
+REGISTRY="${REGISTRY:?REGISTRY not set}"
+docker build -t ${REGISTRY}/blocksecops/<service>:0.1.0 .
+docker push ${REGISTRY}/blocksecops/<service>:0.1.0
+kubectl apply -k k8s/overlays/server/
 ```
 
-### GCP Production
+### Production
 
 ```yaml
 # k8s/overlays/gcp-production/kustomization.yaml
@@ -232,7 +233,7 @@ namespace: <service>
 
 images:
   - name: <service>
-    newName: us-central1-docker.pkg.dev/blocksecops/platform/<service>
+    newName: ${REGISTRY}/<service>
     newTag: "0.1.0"
 ```
 
@@ -281,7 +282,7 @@ The **application version file** is the single source of truth:
 # This applies to BOTH deployment.yaml AND cronjob-*.yaml
 images:
   - name: blocksecops-api-service
-    newName: harbor.blocksecops.local/blocksecops/api-service
+    newName: ${REGISTRY}/blocksecops/api-service
     newTag: "0.25.7"  # Applied to Deployment AND CronJob
 ```
 
@@ -296,12 +297,12 @@ kubectl kustomize k8s/overlays/local | grep -A2 "image:"
 - Failed jobs due to schema mismatches
 - Hard-to-debug production issues
 
-**Root Cause (February 2026 incident):** During rapid version iteration (30+ bumps in 4 days), `kubectl apply -k` was missed after bumping from 0.29.5 to 0.29.7. The CronJob continued running 0.29.5 for 2 days, producing failed jobs. The Deployment also remained at 0.29.5 but appeared functional after a `kubectl rollout restart`.
+**Common Failure Mode:** If `kubectl apply -k` is missed after a version bump, CronJobs will silently run old code.
 
 **Prevention:** After every version bump, always run the full deploy cycle:
 ```bash
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:?REGISTRY not set}"
 docker build -t ${REGISTRY}/blocksecops/<service>:${VERSION} .
 docker push ${REGISTRY}/blocksecops/<service>:${VERSION}
 kubectl apply -k k8s/overlays/local/<service>/   # NEVER skip this step
@@ -310,8 +311,8 @@ kubectl apply -k k8s/overlays/local/<service>/   # NEVER skip this step
 **Post-deploy verification:**
 ```bash
 # Verify CronJob image matches Deployment image
-kubectl get deployment -n <service>-local <service> -o jsonpath='{.spec.template.spec.containers[0].image}'
-kubectl get cronjob -n <service>-local -o jsonpath='{range .items[*]}{.metadata.name}: {.spec.jobTemplate.spec.template.spec.containers[0].image}{"\n"}{end}'
+kubectl get deployment -n <service>-<env> <service> -o jsonpath='{.spec.template.spec.containers[0].image}'
+kubectl get cronjob -n <service>-<env> -o jsonpath='{range .items[*]}{.metadata.name}: {.spec.jobTemplate.spec.template.spec.containers[0].image}{"\n"}{end}'
 ```
 
 ---
@@ -430,10 +431,10 @@ kubectl apply -k k8s/overlays/local/ --dry-run=client
 
 4. **Include cross-namespace resources in kustomization with `namespace:` set:**
    ```yaml
-   # BAD - vault-policy.yaml has namespace: vault-local but kustomization overrides it
-   namespace: postgresql-local  # Overrides ALL resources including vault-policy
+   # BAD - vault-policy.yaml has namespace: vault-<env> but kustomization overrides it
+   namespace: postgresql-<env>  # Overrides ALL resources including vault-policy
    resources:
-     - vault-policy.yaml  # This Job needs vault-local, not postgresql-local!
+     - vault-policy.yaml  # This Job needs vault-<env>, not postgresql-<env>!
 
    # GOOD - apply cross-namespace resources separately
    # Remove from kustomization, apply directly:

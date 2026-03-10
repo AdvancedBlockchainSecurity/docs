@@ -1,13 +1,13 @@
 # Compliance Checklist
 
-**Version:** 1.8.0
-**Last Updated:** October 20, 2025
+**Version:** 2.0.0
+**Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Daily Development
 
-- [ ] Using `127.0.0.1` for all local development endpoints
-- [ ] All services include `127.0.0.1:3000` in CORS
+- [ ] Using correct hostname for all development endpoints
+- [ ] All services include correct CORS origins per environment
 - [ ] Port forwards configured correctly
 - [ ] Dashboard `.env.local` uses correct endpoints
 - [ ] Recent database backup exists (within 24 hours)

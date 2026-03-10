@@ -1,7 +1,7 @@
 # Kubernetes Pod Lifecycle Standards
 
-**Version:** 1.0.0
-**Last Updated:** February 1, 2026
+**Version:** 2.0.0
+**Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Overview
@@ -263,7 +263,7 @@ egress:
   - to:
       - namespaceSelector:
           matchLabels:
-            kubernetes.io/metadata.name: postgresql-local
+            kubernetes.io/metadata.name: postgresql-<env>
         podSelector:              # Same list item = AND
           matchLabels:
             app.kubernetes.io/name: postgresql
@@ -273,7 +273,7 @@ egress:
   - to:
       - namespaceSelector:
           matchLabels:
-            kubernetes.io/metadata.name: postgresql-local
+            kubernetes.io/metadata.name: postgresql-<env>
       - podSelector:              # Separate list item = OR
           matchLabels:
             app.kubernetes.io/name: postgresql
@@ -289,7 +289,7 @@ On non-enforcing CNIs (Flannel) both patterns appear to work, but on enforcing C
 # CORRECT:
 namespaceSelector:
   matchLabels:
-    kubernetes.io/metadata.name: postgresql-local
+    kubernetes.io/metadata.name: postgresql-<env>
 
 # WRONG (custom label that may not exist):
 namespaceSelector:
@@ -305,7 +305,7 @@ egress:
   - to:
       - namespaceSelector:
           matchLabels:
-            kubernetes.io/metadata.name: postgresql-local
+            kubernetes.io/metadata.name: postgresql-<env>
         podSelector:
           matchLabels:
             app.kubernetes.io/name: postgresql
@@ -320,7 +320,7 @@ egress:
   - to:
       - namespaceSelector:
           matchLabels:
-            kubernetes.io/metadata.name: redis-local
+            kubernetes.io/metadata.name: redis-<env>
         podSelector:
           matchLabels:
             app.kubernetes.io/name: redis
@@ -336,7 +336,7 @@ egress:
   - to:
       - namespaceSelector:
           matchLabels:
-            kubernetes.io/metadata.name: vault-local
+            kubernetes.io/metadata.name: vault-<env>
         podSelector:
           matchLabels:
             app.kubernetes.io/name: vault
@@ -390,7 +390,7 @@ ingress:
   - from:
       - namespaceSelector:
           matchLabels:
-            kubernetes.io/metadata.name: traefik-local
+            kubernetes.io/metadata.name: traefik-<env>
     ports:
       - protocol: TCP
         port: 3000
@@ -400,7 +400,7 @@ egress:
   - to:
       - namespaceSelector:
           matchLabels:
-            kubernetes.io/metadata.name: api-service-local
+            kubernetes.io/metadata.name: api-service-<env>
     ports:
       - protocol: TCP
         port: 8000
@@ -414,7 +414,7 @@ ingress:
   - from:
       - namespaceSelector:
           matchLabels:
-            kubernetes.io/metadata.name: api-service-local
+            kubernetes.io/metadata.name: api-service-<env>
     ports:
       - protocol: TCP
         port: 8000
@@ -424,7 +424,7 @@ egress:
   - to:
       - namespaceSelector:
           matchLabels:
-            kubernetes.io/metadata.name: postgresql-local
+            kubernetes.io/metadata.name: postgresql-<env>
     ports:
       - protocol: TCP
         port: 5432

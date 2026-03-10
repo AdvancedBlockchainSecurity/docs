@@ -1,12 +1,12 @@
 # Docker Base Image Standards
 
-**Version:** 2.1.0
-**Last Updated:** January 26, 2026
+**Version:** 3.0.0
+**Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Overview
 
-This standard defines the strategy for optimizing Docker build times using pre-built base images stored in Harbor. Services with heavy dependencies that rarely change should use dedicated base images to separate dependency installation from application code changes.
+This standard defines the strategy for optimizing Docker build times using pre-built base images stored in a container registry. Services with heavy dependencies that rarely change should use dedicated base images to separate dependency installation from application code changes.
 
 ## Problem
 
@@ -14,16 +14,16 @@ Some services have long build times (~15-20 minutes) because they install large 
 
 ## Solution
 
-Create separate base images containing pre-installed heavy dependencies, store them in Harbor, and have application Dockerfiles build FROM these base images. Code changes only require copying files (~2-3 minutes instead of ~15-20 minutes).
+Create separate base images containing pre-installed heavy dependencies, store them in a container registry, and have application Dockerfiles build FROM these base images. Code changes only require copying files (~2-3 minutes instead of ~15-20 minutes).
 
 ---
 
 ## Services Using Base Images
 
-| Service | Base Image (Harbor) |
-|---------|---------------------|
-| `blocksecops-intelligence-engine` | `harbor.blocksecops.local/blocksecops/blocksecops-intelligence-base-cpu` |
-| `blocksecops-orchestration` | `harbor.blocksecops.local/blocksecops/blocksecops-orchestration-base` |
+| Service | Base Image |
+|---------|------------|
+| `blocksecops-intelligence-engine` | `${REGISTRY}/blocksecops/blocksecops-intelligence-base-cpu` |
+| `blocksecops-orchestration` | `${REGISTRY}/blocksecops/blocksecops-orchestration-base` |
 
 **Note:** GPU variant available: `blocksecops-intelligence-base-gpu`
 
@@ -41,17 +41,16 @@ Create separate base images containing pre-installed heavy dependencies, store t
 
 Base images MUST be stored in a container registry to ensure availability and prevent deletion:
 
-| Environment | Registry (`REGISTRY` value) | Example |
-|-------------|----------|---------|
-| **Local/Server** | `harbor.blocksecops.local` | `${REGISTRY}/blocksecops/blocksecops-intelligence-base-cpu:1.0.0-<hash>` |
-| **Production** | `us-central1-docker.pkg.dev/solidity-security` | `${REGISTRY}/blocksecops/blocksecops-intelligence-base-cpu:1.0.0` |
+| Environment | Registry (`REGISTRY` value) |
+|-------------|---------------------------|
+| Example | `${REGISTRY}/blocksecops/<base-image>:<tag>` |
 
-### Why Harbor for Base Images
+### Why a Container Registry for Base Images
 
 1. **Persistence** - Images won't be deleted by `docker prune`
 2. **Availability** - Always available for builds without rebuilding
 3. **Versioning** - Proper tag management and history
-4. **Security Scanning** - Harbor can scan for vulnerabilities
+4. **Security Scanning** - Registry can scan for vulnerabilities
 5. **Team Sharing** - All developers use the same base images
 
 ---
@@ -217,7 +216,7 @@ The script:
 ### Step 2: Push to Registry
 
 ```bash
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:?REGISTRY not set}"
 
 # Tag for registry
 docker tag blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353 \
@@ -233,10 +232,10 @@ docker push ${REGISTRY}/blocksecops/blocksecops-orchestration-base:latest
 
 ### Step 3: Update Application Dockerfile
 
-Update the `FROM` line to reference Harbor using the `BASE_REGISTRY` ARG pattern:
+Update the `FROM` line to reference the registry using the `BASE_REGISTRY` ARG pattern:
 
 ```dockerfile
-ARG BASE_REGISTRY=harbor.blocksecops.local
+ARG BASE_REGISTRY
 ARG BASE_VARIANT=cpu
 ARG BASE_IMAGE_TAG=latest
 
@@ -245,8 +244,8 @@ FROM ${BASE_REGISTRY}/blocksecops/blocksecops-intelligence-base-${BASE_VARIANT}:
 
 **Why `BASE_REGISTRY` ARG?**
 - Allows switching registries without modifying Dockerfile
-- Supports both local Harbor and production GCP Artifact Registry
-- Can override at build time: `--build-arg BASE_REGISTRY=us-central1-docker.pkg.dev/project/repo`
+- Supports any container registry (self-hosted, GCP Artifact Registry, etc.)
+- Must be provided at build time: `--build-arg BASE_REGISTRY=${REGISTRY}`
 
 ### Step 4: Build Application Image
 
@@ -265,7 +264,7 @@ docker build \
 ### Step 5: Push Application Image to Registry
 
 ```bash
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:?REGISTRY not set}"
 docker tag blocksecops-orchestration:${VERSION} \
   ${REGISTRY}/blocksecops/orchestration:${VERSION}
 docker push ${REGISTRY}/blocksecops/orchestration:${VERSION}
@@ -279,7 +278,7 @@ docker push ${REGISTRY}/blocksecops/orchestration:${VERSION}
 
 | Requirement | Setting | Why |
 |-------------|---------|-----|
-| Image pull policy | `imagePullPolicy: IfNotPresent` | Allows Harbor pulls (not `Never`) |
+| Image pull policy | `imagePullPolicy: IfNotPresent` | Allows registry pulls (not `Never`) |
 | Kustomize labels | `includeSelectors: false` | Prevents immutable selector errors |
 | Kustomize newName | Full registry path | e.g., `${REGISTRY}/blocksecops/intelligence-engine` |
 
@@ -315,7 +314,7 @@ docker push ${REGISTRY}/blocksecops/orchestration:${VERSION}
 
 ## Verification Checklist
 
-Before pushing a base image to Harbor:
+Before pushing a base image to the registry:
 
 - [ ] All binary downloads have SHA256 checksum verification
 - [ ] Base image pinned by digest (not just tag)
@@ -350,12 +349,12 @@ The following services do not benefit from base images and should continue using
 | Problem | Symptom | Fix |
 |---------|---------|-----|
 | Tool not found | pipx tool missing | Check `which semgrep` shows `/opt/pipx/bin/semgrep` |
-| Base image not found | Build fails | `docker pull harbor.blocksecops.local/blocksecops/<base-image>:latest` |
-| ErrImageNeverPull | Pod stuck | Change `imagePullPolicy` to `IfNotPresent`, verify image in Harbor |
+| Base image not found | Build fails | `docker pull ${REGISTRY}/blocksecops/<base-image>:latest` |
+| ErrImageNeverPull | Pod stuck | Change `imagePullPolicy` to `IfNotPresent`, verify image in registry |
 | Read-only filesystem | ML model cache error | Set `HF_HOME`, `TRANSFORMERS_CACHE`, `SENTENCE_TRANSFORMERS_HOME` to `/app/models` |
 | Selector immutable | Deployment fails | Add `includeSelectors: false` to kustomization labels |
 | OOM Killed (exit 137) | Pod restarts | Increase memory limit to `2Gi` for ML services |
-| Disk space | Local disk full | `docker image prune -f` (Harbor images preserved) |
+| Disk space | Local disk full | `docker image prune -f` (registry images preserved) |
 
 ---
 

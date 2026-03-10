@@ -1,7 +1,7 @@
 # Database Management and Recovery Standards
 
-**Version:** 2.2.0
-**Last Updated:** March 9, 2026
+**Version:** 3.0.0
+**Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Database Configuration
@@ -12,7 +12,7 @@
 | **Database Name** | `solidity_security` | NOT `blocksecops` - see note below |
 | Default User | blocksecops | Via Vault/ExternalSecret |
 | Schema | public | |
-| **SSL** | **Enabled** | cert-manager local CA certs |
+| **SSL** | **Enabled** | TLS enabled via certificates |
 | SSL Mode | `hostssl` required for cluster connections | `hostnossl` rejected |
 | TLS Certificates | `/etc/postgresql/certs-fixed/` | Copied from secret via initContainer |
 | TLS Min Protocol | TLSv1.2 | |
@@ -23,7 +23,7 @@
 
 ### SSL/TLS Configuration (Updated February 2026)
 
-PostgreSQL SSL is **enabled in all environments** including local development, using cert-manager generated certificates.
+PostgreSQL SSL is **enabled in all environments**, using cert-manager generated certificates.
 
 **Connection behavior:**
 - Services using `asyncpg` connect with `ssl=prefer` by default, automatically upgrading to SSL when available
@@ -39,18 +39,18 @@ PostgreSQL SSL is **enabled in all environments** including local development, u
 **Verify SSL status:**
 ```bash
 # Check SSL is enabled
-kubectl exec postgresql-0 -n postgresql-local -- psql -U blocksecops -c "SHOW ssl;"
+kubectl exec postgresql-0 -n postgresql-<env> -- psql -U blocksecops -c "SHOW ssl;"
 
 # Check active SSL connections from services
-kubectl exec postgresql-0 -n postgresql-local -- psql -U blocksecops -d solidity_security \
+kubectl exec postgresql-0 -n postgresql-<env> -- psql -U blocksecops -d solidity_security \
   -c "SELECT pid, usename, datname, ssl, client_addr FROM pg_stat_ssl JOIN pg_stat_activity USING (pid) WHERE datname IS NOT NULL;"
 ```
 
 ---
 
-## GCP Environment Database
+## Production Database Configuration
 
-In GCP production, PostgreSQL runs as a self-hosted StatefulSet on GKE (not Cloud SQL):
+In production, PostgreSQL runs as a self-hosted StatefulSet on GKE (not Cloud SQL):
 
 | Setting | Value |
 |---------|-------|
@@ -104,17 +104,17 @@ postgresql+asyncpg://blocksecops:<password>@postgresql.postgresql-prod.svc.clust
 
 ### PostgreSQL Backup Script
 
-Create `/Users/pwner/Git/ABS/scripts/backup-local-db.sh`:
+Create `<repo-root>/scripts/backup-local-db.sh`:
 
 ```bash
 #!/bin/bash
 # Automated PostgreSQL backup for local development
-# Run daily via cron: 0 2 * * * /Users/pwner/Git/ABS/scripts/backup-local-db.sh
+# Run daily via cron: 0 2 * * * <repo-root>/scripts/backup-local-db.sh
 
 set -euo pipefail
 
 # Configuration
-BACKUP_DIR="/Users/pwner/Git/ABS/backups/postgresql"
+BACKUP_DIR="<repo-root>/backups/postgresql"
 RETENTION_DAYS=7
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 DB_NAME="solidity_security"
@@ -123,7 +123,7 @@ DB_NAME="solidity_security"
 mkdir -p "$BACKUP_DIR"
 
 # Port forward PostgreSQL (if not already running)
-kubectl port-forward -n postgresql-local svc/postgresql 5432:5432 &
+kubectl port-forward -n postgresql-<env> svc/postgresql 5432:5432 &
 PF_PID=$!
 sleep 3
 
@@ -162,7 +162,7 @@ echo "Backup complete: ${BACKUP_DIR}/${DB_NAME}_${TIMESTAMP}.sql.gz"
 **Make script executable:**
 
 ```bash
-chmod +x /Users/pwner/Git/ABS/scripts/backup-local-db.sh
+chmod +x <repo-root>/scripts/backup-local-db.sh
 ```
 
 **Set up automated backups (cron):**
@@ -172,7 +172,7 @@ chmod +x /Users/pwner/Git/ABS/scripts/backup-local-db.sh
 crontab -e
 
 # Add daily backup at 2 AM
-0 2 * * * /Users/pwner/Git/ABS/scripts/backup-local-db.sh >> /Users/pwner/Git/ABS/logs/backup.log 2>&1
+0 2 * * * <repo-root>/scripts/backup-local-db.sh >> <repo-root>/logs/backup.log 2>&1
 ```
 
 ### Manual Backup Before Changes
@@ -181,14 +181,14 @@ crontab -e
 
 ```bash
 # 1. Create immediate backup
-cd /Users/pwner/Git/ABS
+cd <repo-root>
 ./scripts/backup-local-db.sh
 
 # 2. Verify backup exists
 ls -lh backups/postgresql/
 
 # 3. Test backup integrity
-kubectl port-forward -n postgresql-local svc/postgresql 5432:5432 &
+kubectl port-forward -n postgresql-<env> svc/postgresql 5432:5432 &
 sleep 3
 PGPASSWORD=postgres pg_restore --list \
   -h 127.0.0.1 \
@@ -207,23 +207,23 @@ If database becomes corrupted or inaccessible:
 
 ```bash
 # 1. Find most recent backup
-ls -lt /Users/pwner/Git/ABS/backups/postgresql/
+ls -lt <repo-root>/backups/postgresql/
 
 # 2. Scale down PostgreSQL
-kubectl scale deployment postgresql -n postgresql-local --replicas=0
+kubectl scale deployment postgresql -n postgresql-<env> --replicas=0
 
 # 3. Delete corrupted PVC
-kubectl delete pvc postgresql-data -n postgresql-local
+kubectl delete pvc postgresql-data -n postgresql-<env>
 
 # 4. Scale up PostgreSQL (creates new PVC)
-kubectl scale deployment postgresql -n postgresql-local --replicas=1
-kubectl rollout status deployment postgresql -n postgresql-local
+kubectl scale deployment postgresql -n postgresql-<env> --replicas=1
+kubectl rollout status deployment postgresql -n postgresql-<env>
 
 # 5. Wait for PostgreSQL to be ready
 sleep 10
 
 # 6. Port forward PostgreSQL
-kubectl port-forward -n postgresql-local svc/postgresql 5432:5432 &
+kubectl port-forward -n postgresql-<env> svc/postgresql 5432:5432 &
 sleep 3
 
 # 7. Create database
@@ -234,7 +234,7 @@ PGPASSWORD=postgres psql \
   -c "CREATE DATABASE solidity_security;"
 
 # 8. Restore from backup
-BACKUP_FILE="/Users/pwner/Git/ABS/backups/postgresql/solidity_security_YYYYMMDD_HHMMSS.sql.gz"
+BACKUP_FILE="<repo-root>/backups/postgresql/solidity_security_YYYYMMDD_HHMMSS.sql.gz"
 gunzip -c "$BACKUP_FILE" | PGPASSWORD=postgres pg_restore \
   -h 127.0.0.1 \
   -p 5432 \
@@ -254,7 +254,7 @@ PGPASSWORD=postgres psql \
   -c "SELECT COUNT(*) FROM users;"
 
 # 10. Restart API service to reconnect
-kubectl rollout restart deployment api-service -n api-service-local
+kubectl rollout restart deployment api-service -n api-service-<env>
 ```
 
 ### Emergency Recovery Without Backup
@@ -263,21 +263,21 @@ kubectl rollout restart deployment api-service -n api-service-local
 
 ```bash
 # 1. Scale down PostgreSQL
-kubectl scale deployment postgresql -n postgresql-local --replicas=0
+kubectl scale deployment postgresql -n postgresql-<env> --replicas=0
 
 # 2. Delete corrupted PVC
-kubectl delete pvc postgresql-data -n postgresql-local
+kubectl delete pvc postgresql-data -n postgresql-<env>
 echo "⚠️  WARNING: All database data will be lost!"
 
 # 3. Scale up PostgreSQL (fresh start)
-kubectl scale deployment postgresql -n postgresql-local --replicas=1
-kubectl rollout status deployment postgresql -n postgresql-local
+kubectl scale deployment postgresql -n postgresql-<env> --replicas=1
+kubectl rollout status deployment postgresql -n postgresql-<env>
 
 # 4. Wait for PostgreSQL initialization
 sleep 15
 
 # 5. Port forward
-kubectl port-forward -n postgresql-local svc/postgresql 5432:5432 &
+kubectl port-forward -n postgresql-<env> svc/postgresql 5432:5432 &
 sleep 3
 
 # 6. Create database
@@ -288,7 +288,7 @@ PGPASSWORD=postgres psql \
   -c "CREATE DATABASE solidity_security;"
 
 # 7. Run Alembic migrations to recreate schema
-cd /Users/pwner/Git/ABS/blocksecops-api-service
+cd <repo-root>/blocksecops-api-service
 source .venv/bin/activate
 export DATABASE_URL="postgresql+asyncpg://postgres:postgres@127.0.0.1:5432/solidity_security"
 alembic upgrade head
@@ -307,7 +307,7 @@ PGPASSWORD=postgres psql \
   );"
 
 # 9. Restart API service
-kubectl rollout restart deployment api-service -n api-service-local
+kubectl rollout restart deployment api-service -n api-service-<env>
 
 # 10. Test login
 curl -X POST http://127.0.0.1:8000/api/v1/auth/login \
@@ -367,50 +367,9 @@ Before applying ANY changes to database configuration:
 
 **NEVER skip the backup step. Data loss is NOT acceptable.**
 
-## Cautionary Example: Database Corruption Incident (October 16, 2025)
+### Historical Incidents
 
-### What Happened
-
-On October 16, 2025, a simple CORS configuration change resulted in complete loss of the local development database:
-
-1. **Initial Change:** Updated CORS configuration in `configmap-patch.yaml` to prioritize `127.0.0.1`
-2. **Applied Change:** Ran `kubectl apply -k k8s/overlays/local/api-service`
-3. **Unintended Effect:** Kustomize also created/updated an ExternalSecret, changing database credentials
-4. **First Problem:** API service couldn't authenticate to PostgreSQL (wrong password)
-5. **Troubleshooting:** Multiple PostgreSQL restarts while attempting to fix authentication
-6. **Second Problem:** Discovered PostgreSQL required SSL connections (from Sprint 14 Security Hardening)
-7. **Attempted Fix:** Created local overlay to disable SSL for development
-8. **Critical Failure:** PostgreSQL `pg_authid` file corrupted during multiple restarts
-9. **Data Loss:** Database files intact but no users/roles exist - authentication system destroyed
-10. **No Recovery:** No backups available - 10 days of development data lost permanently
-
-### Root Causes
-
-1. **No backups** - No automated or manual backups of local development database
-2. **Dangerous changes** - Applied configuration changes to running database without safety net
-3. **Incomplete understanding** - Didn't realize ExternalSecret would be created
-4. **Multiple restarts** - Restarted PostgreSQL multiple times during troubleshooting
-5. **No verification** - Didn't verify backup before making changes
-
-### Lessons Learned
-
-1. **ALWAYS create backups** before any database-related changes
-2. **Test configuration changes** in isolation before applying to running systems
-3. **Understand cascading effects** of Kustomize and other tools
-4. **Minimize restarts** during troubleshooting - each restart increases corruption risk
-5. **Verify assumptions** - Don't assume local environment is safe to break
-
-### Prevention Measures
-
-The following measures are now MANDATORY to prevent recurrence:
-
-1. **Automated daily backups** of local development PostgreSQL database
-2. **Pre-change backup requirement** - NO database config changes without backup
-3. **Recovery procedure documentation** - Clear steps for database restoration
-4. **Configuration testing** - Test Kustomize changes with `kubectl diff` first
-5. **Change isolation** - Apply only the specific change needed, not entire overlays
-
-**Remember this incident:** 10 days of development data lost permanently because backup was skipped before a "simple" CORS configuration change.
+Past database incidents that led to these standards are documented in `docs/changelogs/STANDARDS-AGNOSTIC-MIGRATION-2026-03-10.md`. The prevention measures from those incidents are encoded in the rules above.
 
 ---
 
