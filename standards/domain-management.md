@@ -11,7 +11,8 @@ This document defines the domain configuration strategy for Apogee across enviro
 | Environment | Domain | TLS | Purpose |
 |-------------|--------|-----|---------|
 | **Server (kubeadm)** | `app.0xapogee.local` | Self-signed (cert-manager + local CA) | Pre-production testing on PowerEdge R720 |
-| **Production (GCP)** | `app.0xapogee.com` | Let's Encrypt (cert-manager) | Production deployment |
+| **Production (GCP)** | `app.0xapogee.com` | Google-managed (Certificate Manager) | Production dashboard + API |
+| **Production (GCP)** | `admin.0xapogee.com` | Google-managed (Certificate Manager) | Production admin portal |
 
 ---
 
@@ -130,6 +131,7 @@ curl -k https://app.0xapogee.local/api/v1/health/live
 | Service | URL |
 |---------|-----|
 | Dashboard | `https://app.0xapogee.com` |
+| Admin Portal | `https://admin.0xapogee.com` |
 | API | `https://app.0xapogee.com/api/v1/...` |
 
 **No ConfigMap overrides needed** for `cors_origins`, `allowed_hosts`, or `dashboard_base_url` — the `config.py` production defaults apply automatically.
@@ -193,6 +195,7 @@ When ready to deploy to GCP with `app.0xapogee.com`:
 - [ ] GCP project created
 - [ ] GKE cluster provisioned
 - [ ] DNS A record: `app.0xapogee.com` → GCP Load Balancer IP
+- [ ] DNS A record: `admin.0xapogee.com` → GCP Load Balancer IP
 
 ### Platform URL Changes
 

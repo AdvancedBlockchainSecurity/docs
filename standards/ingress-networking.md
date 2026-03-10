@@ -349,9 +349,12 @@ Internet → Cloudflare (DDoS/WAF) → GCP ALB (34.149.16.104)
     │
     ▼
 GKE Gateway (gke-l7-global-external-managed)
-    ├── /api/v1/* → api-service:8000 (api-service-prod)
-    ├── /ws/*     → notification:3001 (notification-prod)
-    └── /*        → dashboard:3000 (dashboard-prod)
+    ├── app.0xapogee.com
+    │     ├── /api/v1/* → api-service:8000 (api-service-prod)
+    │     ├── /ws/*     → notification:8003 (notification-prod)
+    │     └── /*        → dashboard:3000 (dashboard-prod)
+    └── admin.0xapogee.com
+          └── /*        → admin-portal:3000 (admin-portal-prod)
 ```
 
 ### Gateway Resource
@@ -403,7 +406,7 @@ spec:
       backendRefs:
         - name: notification
           namespace: notification-prod
-          port: 3001
+          port: 8003
     - matches:
         - path: {type: PathPrefix, value: "/"}
       backendRefs:
@@ -418,7 +421,7 @@ spec:
 |-------|-----------|------------|
 | Edge | Cloudflare Proxy | L3/L4/L7 DDoS, Bot protection |
 | WAF | Cloud Armor (`apogee-production-waf-policy`) | XSS, SQLi, LFI, RFI, RCE, scanner detection |
-| Rate Limiting | Cloud Armor | 30 req/min per IP, 5-min ban |
+| Rate Limiting | Cloud Armor | 300 req/min per IP, 5-min ban |
 | TLS | Google-managed certificate | Auto-renewal via Certificate Manager |
 | Network | NetworkPolicy (default-deny) | Pod-level isolation per namespace |
 
