@@ -1,7 +1,7 @@
 # Docker Image Versioning Standards
 
-**Version:** 3.9.0
-**Last Updated:** March 9, 2026
+**Version:** 4.0.0
+**Last Updated:** March 10, 2026
 
 ## Owner Approval Required
 
@@ -62,7 +62,7 @@ The bump script:
 ```bash
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
 SERVICE="api-service"
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:?REGISTRY not set}"
 
 # Build and push
 docker build \
@@ -152,7 +152,7 @@ The dashboard requires:
 cd /home/pwner/Git  # Parent directory containing both repos
 
 VERSION=$(grep '"version"' blocksecops-dashboard/package.json | head -1 | cut -d'"' -f4)
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:?REGISTRY not set}"
 
 # Get Supabase credentials from existing ConfigMap
 SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')
@@ -196,7 +196,7 @@ Standard build from service directory:
 cd /home/pwner/Git/blocksecops-api-service
 
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:?REGISTRY not set}"
 
 # Build image
 docker build \
@@ -218,7 +218,7 @@ The admin portal requires Supabase build-time environment variables (baked into 
 cd /home/pwner/Git/blocksecops-admin-portal
 
 VERSION=$(grep '"version"' package.json | head -1 | cut -d'"' -f4)
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:?REGISTRY not set}"
 
 # Build with Supabase build args + OCI labels
 docker build \
@@ -265,14 +265,14 @@ Most services follow the standard pattern (build from service directory):
 
 ## Environment-Specific Workflows
 
-### kubeadm with Harbor (Recommended)
+### Self-Hosted Registry (Recommended)
 
-Harbor provides proper registry semantics that match production:
+A container registry provides proper registry semantics that match production:
 
 ```bash
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
 SERVICE="api-service"
-REGISTRY="${REGISTRY:-harbor.blocksecops.local}"
+REGISTRY="${REGISTRY:?REGISTRY not set}"
 
 # Build locally
 docker build -t ${REGISTRY}/blocksecops/${SERVICE}:${VERSION} .
@@ -284,17 +284,15 @@ docker push ${REGISTRY}/blocksecops/${SERVICE}:${VERSION}
 kubectl apply -k k8s/overlays/local/${SERVICE}/
 ```
 
-**Note:** Services deployed on the server still use `k8s/overlays/local/` kustomization. The `server/` overlay in `blocksecops-gcp-infrastructure` only contains IngressRoutes and CORS middleware for the `app.0xapogee.local` domain.
-
-**Why a registry (Harbor/Artifact Registry) instead of direct containerd import:**
+**Why a container registry instead of direct containerd import:**
 - `imagePullPolicy: Always` actually works (triggers real pulls)
 - Digest tracking detects image updates
 - `:latest` tag behaves correctly
 - Matches GCP Artifact Registry workflow
 
-### kubeadm with containerd (Fallback)
+### Direct containerd Import (No Registry Fallback)
 
-Direct import to containerd when Harbor is unavailable:
+Direct import to containerd when no registry is available:
 
 ```bash
 VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
@@ -340,7 +338,7 @@ kubectl apply -k k8s/overlays/gcp/
 
 ## Immutable Tag Policy
 
-**MANDATORY:** All image tags in Harbor are immutable. Once a tag is pushed, it cannot be overwritten or deleted.
+**MANDATORY:** All image tags are immutable. Once a tag is pushed, it cannot be overwritten or deleted.
 
 ### Why Immutable Tags
 
@@ -352,17 +350,9 @@ kubectl apply -k k8s/overlays/gcp/
 | Audit trail | Every version is permanently traceable |
 | Environment parity | Same tag in local overlay translates to same content in GCP overlay |
 
-### Harbor Configuration
+### Registry Configuration
 
-Immutable tags are enforced at the Harbor project level via tag immutability rules:
-
-```bash
-# Verify immutable tag rule exists
-curl -s -k -u admin:${HARBOR_PASSWORD} \
-  https://harbor.blocksecops.local/api/v2.0/projects/blocksecops/immutabletagrules | jq
-```
-
-The rule matches all repositories (`**`) and all tags (`**`) in the `blocksecops` project.
+Immutable tags are enforced at the registry level (e.g., tag immutability rules in Harbor, IAM policies in GCP Artifact Registry). Consult your registry's documentation for configuration details.
 
 ### Version Bump Required for Changes
 
@@ -370,13 +360,13 @@ Because tags are immutable, any image change requires a version bump:
 
 ```bash
 # Cannot do this (tag already exists, push will fail):
-docker push harbor.blocksecops.local/blocksecops/api-service:0.28.2
+docker push ${REGISTRY}/blocksecops/api-service:0.28.2
 
 # Must bump version first:
 # 1. Update pyproject.toml: version = "0.28.3"
 # 2. Update kustomization.yaml: newTag: "0.28.3"
 # 3. Build and push with new tag
-docker push harbor.blocksecops.local/blocksecops/api-service:0.28.3
+docker push ${REGISTRY}/blocksecops/api-service:0.28.3
 ```
 
 ### GCP Equivalent
@@ -512,10 +502,10 @@ Some services use pre-built base images to optimize build times. See [Docker Bas
 Example: 1.0.0-5ede3c61
 ```
 
-Base images are stored in Harbor and referenced by application Dockerfiles:
+Base images are stored in a container registry and referenced by application Dockerfiles:
 
 ```dockerfile
-ARG BASE_REGISTRY=harbor.blocksecops.local
+ARG BASE_REGISTRY
 ARG BASE_IMAGE_TAG=1.0.0-ac02c353
 FROM ${BASE_REGISTRY}/blocksecops/blocksecops-orchestration-base:${BASE_IMAGE_TAG} AS builder
 ```
@@ -547,8 +537,8 @@ data:
         "_note": "Updated 2026-02-28, added memory limit handling"
       }
     }
-  SCANNER_IMAGE_SLITHER: "harbor.blocksecops.local/blocksecops/scanner-slither:0.3.2"
-  SCANNER_IMAGE_MYTHRIL: "harbor.blocksecops.local/blocksecops/scanner-mythril:0.4.1"
+  SCANNER_IMAGE_SLITHER: "${REGISTRY}/blocksecops/scanner-slither:0.3.2"
+  SCANNER_IMAGE_MYTHRIL: "${REGISTRY}/blocksecops/scanner-mythril:0.4.1"
   # ... more scanners
 ```
 
@@ -564,17 +554,17 @@ Each scanner has **two version numbers**:
 **Why two versions?**
 - Upstream versions change with each scanner release
 - Image versions track wrapper changes, base image updates, and bug fixes
-- Both are immutable in Harbor
+- Both are immutable in the registry
 - Each increment requires a rebuild and push
 
 ### Scanner Image Tag Format
 
 ```
-harbor.blocksecops.local/blocksecops/scanner-{name}:{image-version}
+${REGISTRY}/blocksecops/scanner-{name}:{image-version}
 
 Examples:
-- harbor.blocksecops.local/blocksecops/scanner-slither:0.3.2
-- harbor.blocksecops.local/blocksecops/scanner-mythril:0.4.1
+- ${REGISTRY}/blocksecops/scanner-slither:0.3.2
+- ${REGISTRY}/blocksecops/scanner-mythril:0.4.1
 ```
 
 ### Semantic Versioning for Scanner Images
@@ -617,9 +607,9 @@ The Kubernetes Job Manager (`src/scanners/kubernetes_job_manager.py`) in tool-in
 
 ```python
 default_images = {
-    "slither": "harbor.blocksecops.local/blocksecops/scanner-slither:0.3.2",
-    "mythril": "harbor.blocksecops.local/blocksecops/scanner-mythril:0.4.1",
-    # ... more scanners
+    "slither": f"{REGISTRY}/blocksecops/scanner-slither:0.3.2",
+    "mythril": f"{REGISTRY}/blocksecops/scanner-mythril:0.4.1",
+    # ... more scanners (REGISTRY from environment)
 }
 ```
 
@@ -652,17 +642,17 @@ docker build \
   --build-arg UPSTREAM_TOOL_VERSION=0.11.5 \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
-  -t harbor.blocksecops.local/blocksecops/scanner-slither:0.3.2 \
+  -t ${REGISTRY}/blocksecops/scanner-slither:0.3.2 \
   scanner-images/slither/
 ```
 
-### Immutable Tags in Harbor
+### Immutable Tags
 
-Like all Apogee images, scanner image tags are immutable in Harbor. **Any change to a Dockerfile requires a version bump** — you cannot overwrite an existing tag.
+Like all Apogee images, scanner image tags are immutable. **Any change to a Dockerfile requires a version bump** — you cannot overwrite an existing tag.
 
 ```
 ❌ WRONG: Rebuild scanner-slither:0.3.2 after Dockerfile change
-           → Harbor push will be rejected (tag already exists)
+           → Registry push will be rejected (tag already exists)
 
 ✅ CORRECT: Bump to 0.3.3, rebuild, push new tag
 ```
@@ -678,7 +668,7 @@ Complete procedure when updating a scanner:
 4. Update Dockerfile ARG UPSTREAM_TOOL_VERSION (if upgrading tool)
 5. Update KJM default_images dict to match ConfigMap
 6. Build with all ARGs: BUILD_DATE, VCS_REF, SCANNER_IMAGE_VERSION, UPSTREAM_TOOL_VERSION
-7. Push to Harbor
+7. Push to registry
 8. Apply ConfigMap: kubectl apply -k k8s/overlays/local/
 9. Rebuild + push tool-integration service (since KJM default_images changed)
 10. Verify scanner jobs use new image

@@ -1,13 +1,13 @@
 # Ingress and Networking Standards
 
 **Standard ID**: NET-001
-**Version**: 2.1.0
+**Version**: 3.0.0
 **Last Updated**: 2026-03-10
 **Status**: Active
 
 ## Overview
 
-This document defines the standards for ingress controllers, routing, and networking in Apogee platform infrastructure across all environments (local, staging, production). Local and server environments use **Traefik** as the ingress controller. GCP production uses the **GKE Gateway API** (`gke-l7-global-external-managed` GatewayClass), not Traefik.
+This document defines the standards for ingress controllers, routing, and networking in Apogee platform infrastructure across all environments (development, staging, production). Self-hosted environments use **Traefik** as the ingress controller. GCP production uses the **GKE Gateway API** (`gke-l7-global-external-managed` GatewayClass), not Traefik.
 
 ## Ingress Controller Standard
 
@@ -78,21 +78,21 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: api-service
-  namespace: api-service-local
+  namespace: <service>-<env>
   labels:
     app.kubernetes.io/name: api-service
-    app.kubernetes.io/instance: api-service-local
+    app.kubernetes.io/instance: api-service-<env>
     app.kubernetes.io/component: backend-api
-    environment: local
+    environment: <env>
 spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`api.local.example.com`)
+    - match: Host(`<env-domain>`)
       kind: Rule
       middlewares:
         - name: api-service-cors
-          namespace: api-service-local
+          namespace: <service>-<env>
       services:
         - name: api-service
           port: 8000
@@ -138,11 +138,11 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRouteTCP
 metadata:
   name: postgresql
-  namespace: postgresql-local
+  namespace: postgresql-<env>
   labels:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/component: infrastructure-database
-    environment: local
+    environment: <env>
 spec:
   entryPoints:
     - postgres
@@ -230,7 +230,7 @@ spec:
 ### Service Overlay Directory Pattern
 
 ```
-k8s/overlays/local/<service>/
+k8s/overlays/<env>/<service>/
 ├── kustomization.yaml
 ├── ingressroute.yaml          # For HTTP services (web entryPoint)
 ├── ingressroute-server.yaml   # For HTTPS services (websecure entryPoint)
@@ -244,7 +244,7 @@ k8s/overlays/local/<service>/
 ### Complete Example: HTTP Service with CORS
 
 ```
-k8s/overlays/local/api-service/
+k8s/overlays/<env>/api-service/
 ├── kustomization.yaml
 ├── ingressroute.yaml
 └── middleware-cors.yaml
@@ -255,7 +255,7 @@ k8s/overlays/local/api-service/
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: api-service-local
+namespace: api-service-<env>
 
 resources:
   - middleware-cors.yaml
@@ -265,21 +265,21 @@ resources:
 ### Complete Example: TCP Service
 
 ```
-k8s/overlays/local/postgresql/
+k8s/overlays/<env>/postgresql/
 ├── kustomization.yaml
 └── ingressroute-tcp.yaml
 ```
 
 ## Environment-Specific Configurations
 
-### Local Environment (kubeadm)
+### Self-Hosted Environment (Traefik)
 
 **Access Pattern**: hostPort + Traefik
 - HTTP: Port 80 (redirects to HTTPS)
 - HTTPS: Port 443
-- PostgreSQL: Port 31432
-- Redis: Port 31379
-- Traefik Dashboard: Port 31080
+- PostgreSQL: Configured per environment (e.g., NodePort 31432)
+- Redis: Configured per environment (e.g., NodePort 31379)
+- Traefik Dashboard: Configured per environment (e.g., NodePort 31080)
 
 **Service Configuration**:
 ```yaml
@@ -287,41 +287,37 @@ apiVersion: v1
 kind: Service
 metadata:
   name: traefik
-  namespace: traefik-local
+  namespace: traefik-<env>
 spec:
   type: NodePort
   ports:
     - name: web
       port: 80
-      nodePort: 30180
       targetPort: web
     - name: websecure
       port: 443
-      nodePort: 30543
       targetPort: websecure
     - name: postgres
       port: 5432
-      nodePort: 31432
       targetPort: postgres
     - name: redis
       port: 6379
-      nodePort: 31379
       targetPort: redis
 ```
 
-**Testing Local Routing**:
+**Testing Routing**:
 ```bash
 # HTTP service test
-curl -k -H "Host: app.0xapogee.local" https://127.0.0.1/api/v1/health/live
+curl -k -H "Host: <env-domain>" https://<node-ip>/api/v1/health/live
 
 # From inside cluster
 kubectl exec -n <namespace> <pod> -- \
-  wget -qO- --header="Host: api.local.example.com" \
-  http://traefik.traefik-local.svc.cluster.local/
+  wget -qO- --header="Host: <env-domain>" \
+  http://traefik.traefik-<env>.svc.cluster.local/
 
 # TCP service test
 kubectl exec -n <namespace> <pod> -- \
-  nc -zv traefik.traefik-local.svc.cluster.local 5432
+  nc -zv traefik.traefik-<env>.svc.cluster.local 5432
 ```
 
 ### Staging/Production Environments
@@ -431,16 +427,16 @@ spec:
 | Node SA | Dedicated least-privilege SA | logging, monitoring, artifact registry only |
 | Container Scanning | Artifact Registry | Automatic vulnerability scanning on push |
 
-### Key Differences from Local (Traefik)
+### Key Differences from Self-Hosted (Traefik)
 
-| Aspect | Local (Traefik) | GCP (Gateway API) |
-|--------|----------------|-------------------|
+| Aspect | Self-Hosted (Traefik) | GCP (Gateway API) |
+|--------|----------------------|-------------------|
 | Ingress | Traefik IngressRoute CRDs | Gateway API HTTPRoute |
 | TLS | Self-signed / Let's Encrypt | Google-managed certs |
 | DDoS | None | Cloudflare + Cloud Armor |
 | Load Balancer | hostPort + NodePort | Global external ALB |
-| Namespaces | `*-local` | `*-prod` |
-| Registry | Harbor | Artifact Registry |
+| Namespaces | `*-<env>` | `*-prod` |
+| Registry | Container registry | Artifact Registry |
 
 ## RBAC Requirements
 
@@ -523,7 +519,7 @@ kubectl describe ingressroute <name> -n <namespace>
 ### Test HTTP Routing from Inside Cluster
 
 ```bash
-kubectl exec -n traefik-local deployment/traefik -- \
+kubectl exec -n <ingress-namespace> deployment/traefik -- \
   wget -qO- --header="Host: example.com" http://localhost:80/
 ```
 
@@ -531,13 +527,13 @@ kubectl exec -n traefik-local deployment/traefik -- \
 
 ```bash
 kubectl exec -n <namespace> <pod> -- \
-  nc -zv traefik.traefik-local.svc.cluster.local <port>
+  nc -zv traefik.<ingress-namespace>.svc.cluster.local <port>
 ```
 
 ### Check Traefik Logs
 
 ```bash
-kubectl logs -n traefik-local deployment/traefik --tail=100
+kubectl logs -n <ingress-namespace> deployment/traefik --tail=100
 ```
 
 ## WebSocket Routing
@@ -553,19 +549,19 @@ WebSocket traffic should be routed to a dedicated IngressRoute with higher prior
 - Set `priority: 100` to ensure WebSocket route is evaluated before other routes
 - Exclude `/ws` path from other IngressRoutes using `!PathPrefix(\`/ws\`)`
 
-### Local Environment (HTTP)
+### Development Environment (HTTP)
 
 ```yaml
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: notification-websocket
-  namespace: notification-local
+  namespace: notification-<env>
 spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`app.0xapogee.local`) && PathPrefix(`/ws`)
+    - match: Host(`<env-domain>`) && PathPrefix(`/ws`)
       kind: Rule
       priority: 100
       services:
@@ -573,54 +569,34 @@ spec:
           port: 8003
 ```
 
-### Server Environment (HTTP with hostPort)
+### Development Environment (HTTPS with self-signed/default cert)
 
-```yaml
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
-metadata:
-  name: notification-websocket
-  namespace: notification-local
-spec:
-  entryPoints:
-    - web
-  routes:
-    - match: Host(`app.0xapogee.local`) && PathPrefix(`/ws`)
-      kind: Rule
-      priority: 100
-      services:
-        - name: notification
-          port: 8003
-```
-
-### Server Environment (HTTPS with self-signed/default cert)
-
-For the server environment (kubeadm), use `tls: {}` to enable HTTPS with Traefik's default certificate:
+For self-hosted environments, use `tls: {}` to enable HTTPS with Traefik's default certificate:
 
 ```yaml
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: <service>-ingressroute-server
-  namespace: <service>-local
+  namespace: <service>-<env>
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`<domain>.0xapogee.local`) && PathPrefix(`/api/v1`)
+    - match: Host(`<env-domain>`) && PathPrefix(`/api/v1`)
       kind: Rule
       services:
         - name: api-service
-          namespace: api-service-local
+          namespace: api-service-<env>
           port: 8000
-    - match: Host(`<domain>.0xapogee.local`) && !PathPrefix(`/api/v1`)
+    - match: Host(`<env-domain>`) && !PathPrefix(`/api/v1`)
       kind: Rule
       services:
         - name: <service>
           port: 3000
       middlewares:
         - name: <service>-security-headers
-          namespace: <service>-local
+          namespace: <service>-<env>
   tls: {}
 ```
 
@@ -655,7 +631,7 @@ When adding a WebSocket route, update existing IngressRoutes to exclude the `/ws
 # Dashboard IngressRoute - Exclude /ws
 spec:
   routes:
-    - match: Host(`app.0xapogee.local`) && !PathPrefix(`/ws`) && !PathPrefix(`/api/v1`)
+    - match: Host(`<env-domain>`) && !PathPrefix(`/ws`) && !PathPrefix(`/api/v1`)
       kind: Rule
       services:
         - name: dashboard
@@ -668,12 +644,12 @@ spec:
 ```bash
 # Test WebSocket upgrade returns 101 Switching Protocols
 curl -s -o /dev/null -w "%{http_code}" \
-  -H "Host: app.0xapogee.local" \
+  -H "Host: <env-domain>" \
   -H "Connection: Upgrade" \
   -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Version: 13" \
   -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
-  http://127.0.0.1/ws
+  http://<node-ip>/ws
 
 # Expected: 101
 ```
@@ -684,8 +660,7 @@ Frontend applications should connect to WebSocket through Traefik, not directly 
 
 | Environment | WebSocket URL |
 |-------------|---------------|
-| Local (kubeadm) | `wss://app.0xapogee.local/ws` |
-| Server (kubeadm) | `wss://app.0xapogee.local/ws` |
+| Development (self-hosted) | `wss://<env-domain>/ws` |
 | Production (GCP) | `wss://app.0xapogee.com/ws` |
 
 **Note:** Use `wss://` for all server/staging/production environments. `ws://localhost` is acceptable only for pure local development where traffic stays on the machine.
@@ -694,33 +669,7 @@ Frontend applications should connect to WebSocket through Traefik, not directly 
 
 ---
 
-## Migration from Nginx Ingress
-
-### Migration Timeline
-
-- **Q4 2025**: New services must use Traefik
-- **Q1 2026**: Migrate all existing services
-- **Q2 2026**: Remove Nginx Ingress Controller
-
-### Migration Checklist
-
-- [ ] Create IngressRoute/IngressRouteTCP equivalent
-- [ ] Create Middleware for CORS/headers
-- [ ] Test routing from inside cluster
-- [ ] Test routing from external access
-- [ ] Verify logs and metrics
-- [ ] Update documentation
-- [ ] Remove old nginx Ingress resource
-- [ ] Update application configuration if needed
-
-### Common Migration Patterns
-
-| Nginx Feature | Traefik Equivalent |
-|--------------|-------------------|
-| `nginx.ingress.kubernetes.io/cors-*` annotations | CORS Middleware |
-| `nginx.ingress.kubernetes.io/rewrite-target` | IngressRoute path matching |
-| `nginx.ingress.kubernetes.io/backend-protocol: "TCP"` | IngressRouteTCP |
-| `nginx.ingress.kubernetes.io/ssl-redirect` | TLS configuration |
+> **Note:** Migration from Nginx Ingress details moved to `changelogs/STANDARDS-AGNOSTIC-MIGRATION-2026-03-10.md`.
 
 ## Troubleshooting
 
@@ -728,7 +677,7 @@ Frontend applications should connect to WebSocket through Traefik, not directly 
 
 1. Check IngressRoute exists: `kubectl get ingressroute -n <namespace>`
 2. Check service exists: `kubectl get svc -n <namespace>`
-3. Check Traefik logs: `kubectl logs -n traefik-local deployment/traefik`
+3. Check Traefik logs: `kubectl logs -n <ingress-namespace> deployment/traefik`
 4. Verify RBAC permissions
 5. Test from inside cluster first
 
@@ -751,4 +700,3 @@ Frontend applications should connect to WebSocket through Traefik, not directly 
 - [Traefik Documentation](https://doc.traefik.io/traefik/)
 - [Traefik Kubernetes CRD](https://doc.traefik.io/traefik/routing/providers/kubernetes-crd/)
 - [Kustomize Structure Template](../architecture-templates/kubernetes-kustomize-structure-template.md)
-- [Local Development Setup](../local-development/local-development-setup.md)

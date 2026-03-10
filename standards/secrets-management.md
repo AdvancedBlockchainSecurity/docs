@@ -1,8 +1,8 @@
 # Secrets Management
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 3.1.0
-**Last Updated:** March 9, 2026
+**Version:** 4.0.0
+**Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Overview
@@ -180,7 +180,7 @@ apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: api-service-secret
-  namespace: api-service-local
+  namespace: api-service-<env>
 spec:
   refreshInterval: 30s
   secretStoreRef:
@@ -230,17 +230,17 @@ stringData:
 ```bash
 # 1. Store secret in Vault (use environment-specific path)
 # For local development:
-kubectl exec -n vault-local vault-0 -- vault kv put secret/local/api-service/new-api-key \
+kubectl exec -n vault-<env> vault-0 -- vault kv put secret/local/api-service/new-api-key \
   api_key="your-secret-value"
 
 # 2. Create ExternalSecret manifest in the service's overlay
-cd /Users/pwner/Git/ABS/blocksecops-api-service/k8s/overlays/local/api-service
+cd <service-repo>/k8s/overlays/<env>/<service>
 cat > externalsecret-new-api-key.yaml <<EOF
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: new-api-key
-  namespace: api-service-local
+  namespace: api-service-<env>
 spec:
   refreshInterval: 30s
   secretStoreRef:
@@ -273,26 +273,26 @@ Refs: #789"
 kubectl apply -k .
 
 # 6. Verify secret was created
-kubectl get secret new-api-key -n api-service-local
-kubectl get externalsecret new-api-key -n api-service-local
+kubectl get secret new-api-key -n api-service-<env>
+kubectl get externalsecret new-api-key -n api-service-<env>
 ```
 
 ### Rotating a Secret
 
 ```bash
 # 1. Update secret in Vault (use environment-specific path)
-kubectl exec -n vault-local vault-0 -- vault kv put secret/local/api-service/database \
+kubectl exec -n vault-<env> vault-0 -- vault kv put secret/local/api-service/database \
   password="new-rotated-password"
 
 # 2. Wait for External Secrets Operator to sync (or force sync)
 kubectl annotate externalsecret api-service-secrets \
-  force-sync=$(date +%s) -n api-service-local --overwrite
+  force-sync=$(date +%s) -n api-service-<env> --overwrite
 
 # 3. Restart pods to pick up new secret
-kubectl rollout restart deployment api-service -n api-service-local
+kubectl rollout restart deployment api-service -n api-service-<env>
 
 # 4. Verify new secret is in use
-kubectl logs -n api-service-local deployment/api-service | grep "Database connected"
+kubectl logs -n api-service-<env> deployment/api-service | grep "Database connected"
 ```
 
 ### Emergency Secret Revocation
@@ -302,19 +302,19 @@ kubectl logs -n api-service-local deployment/api-service | grep "Database connec
 vault kv delete secret/api-service/compromised-key
 
 # 2. Delete ExternalSecret to stop sync attempts
-kubectl delete externalsecret compromised-key -n api-service-local
+kubectl delete externalsecret compromised-key -n api-service-<env>
 
 # 3. Delete resulting Kubernetes Secret
-kubectl delete secret compromised-key -n api-service-local
+kubectl delete secret compromised-key -n api-service-<env>
 
 # 4. Restart affected pods
-kubectl rollout restart deployment api-service -n api-service-local
+kubectl rollout restart deployment api-service -n api-service-<env>
 
 # 5. Document the incident
 echo "SECURITY INCIDENT: Revoked compromised-key at $(date)" >> SECURITY.log
 
 # 6. Update codebase to remove references
-cd /Users/pwner/Git/ABS/blocksecops-gcp-infrastructure/k8s/overlays/local/api-service
+cd <infrastructure-repo>/k8s/overlays/<env>/<service>
 git rm externalsecret-compromised-key.yaml
 git commit -m "SECURITY: Revoke compromised API key
 
@@ -433,7 +433,7 @@ secret/
 
 ```bash
 # Initialize Vault secrets for local development
-# Run: kubectl exec -n vault-local vault-0 -- sh -c '<commands>'
+# Run: kubectl exec -n vault-<env> vault-0 -- sh -c '<commands>'
 
 # Shared secrets
 vault kv put secret/postgresql \

@@ -1,8 +1,8 @@
 # Encryption Standards
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 1.2.0
-**Last Updated:** March 1, 2026
+**Version:** 2.0.0
+**Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Overview
@@ -17,17 +17,17 @@ All network communication MUST be encrypted with TLS 1.2+.
 
 | Channel | Protocol | Enforcement |
 |---------|----------|-------------|
-| Browser to platform | HTTPS (TLS 1.2+) | Traefik terminates TLS; HTTP redirects to HTTPS |
+| Browser to platform | HTTPS (TLS 1.2+) | Ingress controller terminates TLS; HTTP redirects to HTTPS |
 | Service to service (K8s) | mTLS or TLS | NetworkPolicies restrict traffic; services use cluster DNS |
 | Service to PostgreSQL | TLS (asyncpg ssl=prefer) | `pg_hba.conf` rejects non-SSL cluster connections (`hostnossl ... reject`) |
 | Service to Redis | TLS optional (local), required (production) | `requirepass` for auth; Redis native TLS in production |
 | Service to Vault | HTTPS | Vault listener configured with TLS |
-| Docker push/pull (Harbor) | HTTPS | Harbor fronted by Traefik with TLS |
-| WebSocket (notifications) | WSS | Routed through Traefik `websecure` entrypoint |
+| Docker push/pull (Registry) | HTTPS | Container registry with TLS |
+| WebSocket (notifications) | WSS | Routed through ingress controller TLS entrypoint |
 
 ### TLS Certificate Management
 
-- **Local:** cert-manager with local CA (`Certificate` resources)
+- **Development:** cert-manager with local CA (`Certificate` resources)
 - **Production:** Google-managed Certificate Manager (DNS-authorized, auto-renewed)
 - **Minimum protocol:** TLS 1.2 (enforced via Traefik `TLSOption` CRD locally, GKE Gateway in production)
 - **Cipher suites:** ECDHE + AES-GCM/ChaCha20 only (no RC4, 3DES, weak ciphers)
