@@ -1,7 +1,7 @@
 # Domain Management Standards
 
-**Version:** 2.1.0
-**Last Updated:** February 27, 2026
+**Version:** 2.2.0
+**Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Overview
@@ -126,7 +126,7 @@ curl -k https://app.0xapogee.local/api/v1/health/live
 
 **Access:** `https://app.0xapogee.com`
 
-**TLS:** Let's Encrypt via cert-manager with `letsencrypt-prod` ClusterIssuer.
+**TLS:** Google-managed certificates via Certificate Manager. Cloudflare proxy (Full Strict SSL).
 
 | Service | URL |
 |---------|-----|
@@ -154,17 +154,20 @@ Certificate: app-tls
   dnsNames: [app.0xapogee.local]
 ```
 
-### Production (Let's Encrypt)
+### Production (GCP)
 
 ```
-cert-manager                     Traefik                        Browser
-────────────                     ───────                        ───────
-letsencrypt-prod issuer     →    TLSStore (default cert)   →    Valid certificate
-  ↓                              websecure entrypoint (443)
-Certificate: blocksecops-tls
-  secretName: blocksecops-tls-secret
-  dnsNames: [app.0xapogee.com]
+Cloudflare                    GKE Gateway API               Browser
+──────────                    ───────────────               ───────
+Edge TLS termination     →    Certificate Manager      →    Valid certificate
+  ↓                           (Google-managed certs)
+Full (Strict) SSL mode        Gateway: gke-l7-global-external-managed
+  ↓                           Cert Map: apogee-cert-map
+Proxied A record         →    Static IP: 34.149.16.104
+                              Domains: app.0xapogee.com, admin.0xapogee.com
 ```
+
+Internal database TLS uses cert-manager self-signed CA (same as local environment).
 
 ---
 
@@ -192,10 +195,10 @@ When ready to deploy to GCP with `app.0xapogee.com`:
 
 ### Prerequisites
 
-- [ ] GCP project created
-- [ ] GKE cluster provisioned
-- [ ] DNS A record: `app.0xapogee.com` → GCP Load Balancer IP
-- [ ] DNS A record: `admin.0xapogee.com` → GCP Load Balancer IP
+- [x] GCP project created
+- [x] GKE cluster provisioned
+- [x] DNS A record: `app.0xapogee.com` → GCP Load Balancer IP
+- [x] DNS A record: `admin.0xapogee.com` → GCP Load Balancer IP
 
 ### Platform URL Changes
 
@@ -214,7 +217,7 @@ When ready to deploy to GCP with `app.0xapogee.com`:
 
 | Current State | GCP Target | Action |
 |---------------|------------|--------|
-| Self-signed TLS certificates | Let's Encrypt via cert-manager | Replace ClusterIssuer |
+| Self-signed TLS certificates | Google-managed via Certificate Manager | Terraform-managed |
 | Sensitive values in ConfigMaps | GCP Secret Manager | Migrate secrets |
 
 **Priority 2 - Core Infrastructure:**
@@ -235,19 +238,22 @@ When ready to deploy to GCP with `app.0xapogee.com`:
 
 ```bash
 # 1. Connect to GKE cluster
-gcloud container clusters get-credentials blocksecops-prod --zone us-central1-a
+gcloud container clusters get-credentials apogee-production-gke --region us-west1 --project project-8a2657b9-d96c-4c0a-a69
 
-# 2. Apply production overlays (no ConfigMap overrides needed for URLs)
-kubectl apply -k k8s/overlays/gcp-production/api-service/
-kubectl apply -k k8s/overlays/gcp-production/dashboard/
+# 2. Apply infrastructure (from blocksecops-gcp-infrastructure)
+kubectl apply -k k8s/overlays/gcp/
 
-# 3. Verify TLS certificate
-kubectl get certificate -A
+# 3. Apply services (from each service repo)
+kubectl apply -k k8s/overlays/gcp/
 
-# 4. Test HTTPS access
+# 4. Verify TLS certificate
+kubectl get gateway apogee-gateway -n ingress-prod
+
+# 5. Test HTTPS access
 curl https://app.0xapogee.com/api/v1/health/live
+curl https://admin.0xapogee.com
 
-# 5. Update Supabase Dashboard Site URL to https://app.0xapogee.com
+# 6. Update Supabase Dashboard Site URL to https://app.0xapogee.com
 ```
 
 ---
@@ -326,4 +332,4 @@ Until this migration is completed, all `kustomization.yaml` files use `harbor.bl
 
 ---
 
-*Last Updated: February 27, 2026*
+*Last Updated: March 10, 2026*
