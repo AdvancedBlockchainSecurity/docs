@@ -63,8 +63,8 @@ All secrets use the `apogee-gcp-` prefix. Terraform auto-generates 3 secrets; th
 | `apogee-gcp-encryption-key` | Terraform (auto-generated) |
 | `apogee-gcp-database-url` | Manual (populate-secrets.sh) |
 | `apogee-gcp-redis-url` | Manual |
-| `apogee-gcp-postgres-db` | Terraform |
-| `apogee-gcp-postgres-user` | Terraform |
+| `apogee-gcp-postgres-db` | Terraform (corrected to `solidity_security`, 2026-03-11) |
+| `apogee-gcp-postgres-user` | Terraform (corrected to `blocksecops`, 2026-03-11) |
 | `apogee-gcp-postgres-password` | Terraform |
 | `apogee-gcp-redis-password` | Terraform |
 | `apogee-gcp-stripe-api-key` | Manual |
@@ -93,7 +93,8 @@ Secrets are synced to K8s via External Secrets Operator (ESO) with GCP Secret Ma
 | External IP | `34.149.16.104` (global static) |
 | SSL | Google-managed certificate (via Gateway) |
 | DNS | `app.0xapogee.com` → Cloudflare → `34.149.16.104` |
-| Cloud Armor | `apogee-production-waf-policy` (not yet attached to backends) |
+| Cloud Armor | `apogee-production-waf-policy` (attached to all 4 backends via GCPBackendPolicy) |
+| SSL Policy | `apogee-production-ssl-policy` (MODERN profile, TLS 1.2+) |
 
 Traffic flow: `Client → Cloudflare → GCP LB (34.149.16.104) → GKE Gateway → Service pods`
 
@@ -116,11 +117,11 @@ Traffic flow: `Client → Cloudflare → GCP LB (34.149.16.104) → GKE Gateway 
 | IP allocation | Auto (currently `136.109.182.120`) |
 | Dynamic port allocation | Enabled |
 | Min ports per VM | 64 |
-| Logging | Errors only |
+| Logging | All (translations + errors) |
 
 ## Enabled APIs
 
-Core APIs required by the platform:
+Core APIs required by the platform (28 total, unnecessary APIs disabled):
 
 - `container.googleapis.com` — GKE
 - `compute.googleapis.com` — Compute Engine, networking
@@ -130,7 +131,7 @@ Core APIs required by the platform:
 - `containerscanning.googleapis.com` — Vulnerability scanning
 - `containeranalysis.googleapis.com` — Image analysis
 - `certificatemanager.googleapis.com` — TLS certificates
-- `iam.googleapis.com` — IAM
+- `iam.googleapis.com` / `iamcredentials.googleapis.com` — IAM
 - `cloudresourcemanager.googleapis.com` — Resource management
 - `servicenetworking.googleapis.com` — Service networking
 - `monitoring.googleapis.com` — Cloud Monitoring
@@ -139,6 +140,9 @@ Core APIs required by the platform:
 - `gkebackup.googleapis.com` — GKE backup
 - `dns.googleapis.com` — Cloud DNS
 - `storage.googleapis.com` — Cloud Storage
+- `pubsub.googleapis.com` — Pub/Sub (GKE dependency)
+
+Disabled APIs: BigQuery (7), Cloud SQL (2), Memorystore Redis, Datastore, Deployment Manager, Dataform, Dataplex, Analytics Hub
 
 ## Terraform
 

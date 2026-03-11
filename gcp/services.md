@@ -4,14 +4,14 @@
 
 | Service | Namespace | Replicas | Image | Port |
 |---------|-----------|----------|-------|------|
-| api-service | api-service-prod | 1 | `apogee/api-service:0.29.75` | 8000 |
-| celery-worker | api-service-prod | 1 | `apogee/api-service:0.29.75` | — |
-| dashboard | dashboard-prod | 2 | `apogee/dashboard:0.46.23` | 3000 |
+| api-service | api-service-prod | 1 | `apogee/api-service:0.29.76` | 8000 |
+| celery-worker | api-service-prod | 1 | `apogee/api-service:0.29.76` | — |
+| dashboard | dashboard-prod | 2 | `apogee/dashboard:0.46.24` | 3000 |
 | admin-portal | admin-portal-prod | 1 | `apogee/admin-portal:0.7.11` | 3000 |
-| data-service | data-service-prod | 1 | `apogee/data-service:0.2.7` | 8001 |
+| data-service | data-service-prod | 1 | `apogee/data-service:0.2.7` | 80 (→8001) |
 | intelligence-engine | intelligence-engine-prod | 1 | `apogee/intelligence-engine:0.3.7` | 80 |
 | notification | notification-prod | 1 | `apogee/notification:0.2.6` | 8003 |
-| orchestration | orchestration-prod | 1 | `apogee/orchestration:0.10.8` | 8004 |
+| orchestration | orchestration-prod | 1 | `apogee/orchestration:0.10.8` | 8004 (API), 80 (Flower) |
 | tool-integration | tool-integration-prod | 2 | `apogee/tool-integration:0.5.19` | 8005 |
 | contract-parser | contract-parser-prod | 1 | `apogee/contract-parser:0.2.2` | 80 |
 
