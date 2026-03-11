@@ -1,11 +1,12 @@
 # Comprehensive Platform Audit
 
-**Version:** 8.0.0
+**Version:** 9.0.0
 **Created:** February 28, 2026
-**Last Updated:** March 7, 2026
-**Audit Date:** March 7, 2026
-**Status:** PASS (with advisories) — All critical/high findings remediated. Platform operational. Scanner pipeline verified.
-**Scope:** Full platform audit — cluster infrastructure, services, secrets, networking, security, versioning, scanner pipeline, documentation
+**Last Updated:** March 11, 2026
+**Audit Date:** March 11, 2026
+**Environment:** GCP Production (gke_project-8a2657b9-d96c-4c0a-a69_us-west1_apogee-production-gke)
+**Status:** PASS (with advisories) — All critical/high findings remediated. Platform operational. Smoke test 17/17.
+**Scope:** Full platform audit — GCP cluster infrastructure, services, secrets, networking, security, versioning, Cloud Armor, documentation
 
 ---
 
@@ -29,251 +30,207 @@
 6. [TLS and Certificates](#6-tls-and-certificates)
 7. [Versioning and Kustomize Compliance](#7-versioning-and-kustomize-compliance)
 8. [CronJobs and Scheduled Tasks](#8-cronjobs-and-scheduled-tasks)
-9. [Scanner Pipeline](#9-scanner-pipeline)
+9. [Database](#9-database)
 10. [Monitoring and Observability](#10-monitoring-and-observability)
-11. [Findings History](#11-findings-history)
-12. [Remaining Advisories](#12-remaining-advisories)
-13. [Remediations Applied](#13-remediations-applied)
-14. [Sign-Off](#14-sign-off)
+11. [Cloud Armor WAF](#11-cloud-armor-waf)
+12. [Findings History](#12-findings-history)
+13. [Remaining Advisories](#13-remaining-advisories)
+14. [Remediations Applied](#14-remediations-applied)
+15. [Sign-Off](#15-sign-off)
 
 ---
 
 ## 1. Cluster Overview
 
-### Node
+### Cluster
 
 | Property | Value |
 |----------|-------|
-| Hostname | debian-server |
-| Role | control-plane (kubeadm single-node) |
-| Kubernetes | v1.32.11 (client + server) |
-| Kustomize | v5.5.0 |
-| OS | Debian GNU/Linux 13 (trixie) |
-| Kernel | 6.12.63+deb13-amd64 |
-| Container Runtime | Docker 29.1.5 |
-| CNI | Flannel |
-| IP | 192.168.86.225 |
-| Status | Ready [x] |
+| Provider | Google Kubernetes Engine (GKE) |
+| Cluster | apogee-production-gke |
+| Region | us-west1 |
+| Kubernetes | v1.34.3-gke.1444000 |
+| OS | Container-Optimized OS from Google |
+| Container Runtime | containerd 2.1.5 |
+| CNI | GKE native (Dataplane V2 / Cilium) |
+| Node Count | 2 |
+| Node Pool | apogee-production |
 
-### Resource Usage
+### Nodes
 
-| Resource | Usage | Percentage |
-|----------|-------|------------|
-| CPU | 3490m | 14% |
-| Memory | 33323Mi | 25% |
-
-### Control Plane
-
-| Component | Status |
-|-----------|--------|
-| kube-apiserver | Running [x] |
-| kube-controller-manager | Running [x] |
-| kube-scheduler | Running [x] |
-| etcd | Running [x] |
-| kube-proxy | Running [x] |
-| CoreDNS | 2/2 Running [x] |
-| Metrics Server | Running [x] |
-| Flannel | Running [x] |
+| Node | CPU | CPU% | Memory | Mem% | Status |
+|------|-----|------|--------|------|--------|
+| ...-4z8h | 280m | 14% | 2658Mi | 44% | Ready [x] |
+| ...-84mg | 709m | 36% | 3506Mi | 58% | Ready [x] |
 
 ### Helm Releases
 
 | Release | Namespace | Chart | App Version | Status |
 |---------|-----------|-------|-------------|--------|
-| external-secrets | external-secrets-local | external-secrets-1.0.0 | v1.0.0 | deployed [x] |
-| harbor | harbor-local | harbor-1.18.1 | 2.14.1 | deployed [x] |
+| external-secrets | external-secrets-prod | external-secrets-2.1.0 | v2.1.0 | deployed [x] |
+
+### Namespaces (23)
+
+Platform namespaces: admin-portal-prod, api-service-prod, cert-manager, contract-parser-prod, dashboard-prod, data-service-prod, external-secrets-prod, ingress-prod, intelligence-engine-prod, notification-prod, orchestration-prod, postgresql-prod, redis-prod, tool-integration-prod
+
+System namespaces: default, gke-managed-networking-dra-driver, gke-managed-system, gke-managed-volumepopulator, gmp-public, gmp-system, kube-node-lease, kube-public, kube-system
 
 ---
 
 ## 2. Service Health and Versions
 
-### Deployments (32 total — all at desired replica count)
+### Deployments (16 platform + infrastructure — all at desired replica count)
 
 | Namespace | Deployment | Ready | Image | Status |
 |-----------|-----------|-------|-------|--------|
-| api-service-local | api-service | 1/1 | api-service:0.29.67 | [x] |
-| api-service-local | celery-worker | 1/1 | api-service:0.29.67 | [x] |
-| admin-portal-local | admin-portal | 1/1 | admin-portal:0.7.11 | [x] |
-| cert-manager-local | cert-manager | 1/1 | cert-manager | [x] |
-| cert-manager-local | cert-manager-cainjector | 1/1 | cert-manager-cainjector | [x] |
-| cert-manager-local | cert-manager-webhook | 1/1 | cert-manager-webhook | [x] |
-| contract-parser-local | contract-parser | 1/1 | contract-parser:0.2.2 | [x] |
-| dashboard-local | dashboard | 1/1 | dashboard:0.46.23 | [x] |
-| data-service-local | data-service | 1/1 | data-service:0.2.7 | [x] |
-| external-secrets-local | external-secrets | 1/1 | external-secrets | [x] |
-| external-secrets-local | external-secrets-webhook | 1/1 | external-secrets-webhook | [x] |
-| external-secrets-local | external-secrets-cert-controller | 0/0 | — | [~] Intentional |
-| harbor-local | harbor-core | 1/1 | harbor-core:v2.14.1 | [x] |
-| harbor-local | harbor-jobservice | 1/1 | harbor-jobservice:v2.14.1 | [x] |
-| harbor-local | harbor-nginx | 1/1 | nginx-photon:v2.14.1 | [x] |
-| harbor-local | harbor-portal | 1/1 | harbor-portal:v2.14.1 | [x] |
-| harbor-local | harbor-registry | 1/1 | registry-photon:v2.14.1 | [x] |
-| intelligence-engine-local | intelligence-engine | 1/1 | intelligence-engine:0.3.7 | [x] |
-| kube-system | coredns | 2/2 | coredns | [x] |
-| kube-system | metrics-server | 1/1 | metrics-server | [x] |
-| local-path-storage | local-path-provisioner | 1/1 | local-path-provisioner | [x] |
-| monitoring-local | prometheus | 1/1 | prometheus | [x] |
-| monitoring-local | prometheus-adapter | 1/1 | prometheus-adapter | [x] |
-| notification-local | notification | 1/1 | notification:0.2.6 | [x] |
-| openclaw | ollama | 1/1 | ollama | [x] |
-| openclaw | openclaw-gateway | 2/2 | openclaw-gateway | [x] |
-| orchestration-local | orchestration | 1/1 | orchestration:0.10.8 | [x] |
-| postgresql-local | postgres-exporter | 1/1 | postgres-exporter | [x] |
-| redis-local | redis | 1/1 | redis | [x] |
-| redis-local | redis-exporter | 1/1 | redis-exporter | [x] |
-| tool-integration-local | tool-integration | 2/2 | tool-integration:0.5.19 | [x] |
-| traefik-local | traefik | 1/1 | traefik | [x] |
+| api-service-prod | api-service | 1/1 | api-service:0.29.76 | [x] |
+| api-service-prod | celery-worker | 1/1 | api-service:0.29.76 | [x] |
+| admin-portal-prod | admin-portal | 1/1 | admin-portal:0.7.11 | [x] |
+| cert-manager | cert-manager | 1/1 | cert-manager-controller:v1.17.1 | [x] |
+| cert-manager | cert-manager-cainjector | 1/1 | cert-manager-cainjector:v1.17.1 | [x] |
+| cert-manager | cert-manager-webhook | 1/1 | cert-manager-webhook:v1.17.1 | [x] |
+| contract-parser-prod | contract-parser | 1/1 | contract-parser:0.2.2 | [x] |
+| dashboard-prod | dashboard | 2/2 | dashboard:0.46.24 | [x] |
+| data-service-prod | data-service | 1/1 | data-service:0.2.7 | [x] |
+| external-secrets-prod | external-secrets | 1/1 | external-secrets:v2.1.0 | [x] |
+| external-secrets-prod | external-secrets-cert-controller | 1/1 | external-secrets:v2.1.0 | [x] |
+| external-secrets-prod | external-secrets-webhook | 1/1 | external-secrets:v2.1.0 | [x] |
+| intelligence-engine-prod | intelligence-engine | 1/1 | intelligence-engine:0.3.7 | [x] |
+| notification-prod | notification | 1/1 | notification:0.2.6 | [x] |
+| orchestration-prod | orchestration | 1/1 | orchestration:0.10.8 | [x] |
+| tool-integration-prod | tool-integration | 2/2 | tool-integration:0.5.19 | [x] |
 
 ### StatefulSets
 
 | Namespace | StatefulSet | Ready | Status |
 |-----------|-----------|-------|--------|
-| harbor-local | harbor-database | 1/1 | [x] |
-| harbor-local | harbor-redis | 1/1 | [x] |
-| postgresql-local | postgresql | 1/1 | [x] |
-| vault-local | vault | 1/1 | [x] |
+| postgresql-prod | postgresql | 1/1 | [x] |
+| redis-prod | redis | 1/1 | [x] |
+| gmp-system | alertmanager | 0/0 | [~] GKE-managed |
 
 ### Version Alignment (source -> kustomize -> cluster)
 
-| Service | Source | Kustomize newTag | Cluster Image | CronJob Image | Status |
-|---------|--------|-----------------|---------------|---------------|--------|
-| api-service | 0.29.67 | 0.29.67 | 0.29.67 | 0.29.67 | [x] |
-| dashboard | 0.46.23 | 0.46.23 | 0.46.23 | — | [x] |
-| tool-integration | 0.5.19 | 0.5.19 | 0.5.19 | — | [x] |
-| orchestration | 0.10.8 | 0.10.8 | 0.10.8 | — | [x] |
-| data-service | 0.2.7 | 0.2.7 | 0.2.7 | — | [x] |
-| contract-parser | 0.2.2 | 0.2.2 | 0.2.2 | — | [x] |
-| notification | 0.2.6 | 0.2.6 | 0.2.6 | — | [x] |
-| intelligence-engine | 0.3.7 | 0.3.7 | 0.3.7 | — | [x] |
-| admin-portal | 0.7.11 | 0.7.11 | 0.7.11 | — | [x] |
+| Service | Source | Cluster Image | CronJob Image | Status |
+|---------|--------|---------------|---------------|--------|
+| api-service | 0.29.76 | 0.29.76 | 0.29.76 | [x] |
+| dashboard | 0.46.24 | 0.46.24 | — | [x] |
+| tool-integration | 0.5.19 | 0.5.19 | — | [x] |
+| orchestration | 0.10.8 | 0.10.8 | — | [x] |
+| data-service | 0.2.7 | 0.2.7 | — | [x] |
+| contract-parser | 0.2.2 | 0.2.2 | — | [x] |
+| notification | 0.2.6 | 0.2.6 | — | [x] |
+| intelligence-engine | 0.3.7 | 0.3.7 | — | [x] |
+| admin-portal | 0.7.11 | 0.7.11 | — | [x] |
 
-All images pulled from `harbor.blocksecops.local/blocksecops/`. Zero version drift.
+All images pulled from `us-west1-docker.pkg.dev/project-8a2657b9-d96c-4c0a-a69/apogee/`. Zero version drift.
 
 ### HTTPS Endpoints
 
 | Endpoint | Protocol | HTTP Status | Status |
 |----------|----------|-------------|--------|
-| `https://app.0xapogee.local/` | TLSv1.3 / HTTP/2 | 200 | [x] |
-| `https://app.0xapogee.local/api/v1/health/live` | TLSv1.3 / HTTP/2 | 200 | [x] |
-| `https://app.0xapogee.local/api/v1/health/ready` | TLSv1.3 / HTTP/2 | 200 | [x] |
-| `https://app.0xapogee.local/api/v1/scanners` | TLSv1.3 / HTTP/2 | 200 | [x] |
+| `https://app.0xapogee.com/` | HTTP/2 | 200 | [x] |
+| `https://app.0xapogee.com/api/v1/health/live` | HTTP/2 | 200 | [x] |
+| `https://app.0xapogee.com/api/v1/health/ready` | HTTP/2 | 200 (database:true, encryption:true) | [x] |
+| `wss://app.0xapogee.com/ws` | HTTP/1.1 | 101 Switching Protocols | [x] |
 | Dashboard login (Supabase auth) | — | Functional | [x] |
+
+### Internal Service Health (via kubectl exec)
+
+| Service | Endpoint | Response | Status |
+|---------|----------|----------|--------|
+| tool-integration | :8005/health | `{"status":"healthy"}` | [x] |
+| orchestration | :8004/health | `{"status":"healthy"}` | [x] |
+| notification | :8003/health | `{"status":"healthy"}` | [x] |
+| intelligence-engine | :80/health | `{"status":"healthy"}` | [x] |
+| data-service | :80/health | `{"status":"healthy"}` | [x] |
+| contract-parser | :80/health | `{"status":"OK"}` | [x] |
 
 ### HorizontalPodAutoscalers
 
 | Namespace | HPA | Target | Min/Max | Current | Status |
 |-----------|-----|--------|---------|---------|--------|
-| data-service-local | data-service-hpa | Deployment/data-service | 1/3 | 1 | [x] |
-| openclaw | openclaw-gateway | Deployment/openclaw-gateway | 2/5 | 2 | [x] |
-| tool-integration-local | tool-integration-hpa | Deployment/tool-integration | 2/10 | 2 | [x] |
+| tool-integration-prod | tool-integration-hpa | Deployment/tool-integration | 2/10 | 2 | [x] |
 
 ### PodDisruptionBudgets
 
 | Namespace | PDB | MinAvailable | Status |
 |-----------|-----|-------------|--------|
-| openclaw | ollama | 1 | [x] |
-| openclaw | openclaw-gateway | 1 | [x] |
-| orchestration-local | orchestration | 1 | [x] |
-| tool-integration-local | tool-integration | 1 | [x] |
+| orchestration-prod | orchestration | 1 | [x] |
+| tool-integration-prod | tool-integration | 1 | [x] |
 
 ---
 
 ## 3. Secrets Management
 
-### Vault
-
-| Check | Status |
-|-------|--------|
-| Vault pod running (vault-0) | [x] |
-| Vault unsealed (dev mode) | [x] |
-| Kubernetes auth method enabled | [x] |
-
-### External Secrets Operator (Helm-managed)
+### GCP Secret Manager + External Secrets Operator
 
 | Check | Status |
 |-------|--------|
 | ESO controller running | [x] |
 | ESO webhook running | [x] |
-| ESO cert-controller | [~] Scaled to 0 (intentional) |
+| ESO cert-controller running | [x] |
+| ClusterSecretStore (gcp-secret-manager) | [x] Valid, ReadWrite |
 
-### ExternalSecret Sync Status
+### ExternalSecret Sync Status (9/9 synced)
 
 | Namespace | ExternalSecret | Condition | Status |
 |-----------|---------------|-----------|--------|
-| api-service-local | api-service-secret | SecretSynced | [x] |
-| data-service-local | data-service-secrets | SecretSynced | [x] |
-| intelligence-engine-local | intelligence-engine-secrets | SecretSynced | [x] |
-| notification-local | notification-secrets | SecretSynced | [x] |
-| orchestration-local | orchestration-secrets | SecretSynced | [x] |
-| postgresql-local | postgresql-secret | SecretSynced | [x] |
-| redis-local | redis-secret | SecretSynced | [x] |
-| tool-integration-local | tool-integration-secrets | SecretSynced | [x] |
-
-### SecretStore Status
-
-| Namespace | Name | Capability | Status |
-|-----------|------|------------|--------|
-| api-service-local | vault-backend | ReadWrite | [x] Valid |
-| data-service-local | vault-backend | ReadWrite | [x] Valid |
-| harbor-local | vault-backend | ReadWrite | [x] Valid |
-| intelligence-engine-local | vault-backend | ReadWrite | [x] Valid |
-| notification-local | vault-backend | ReadWrite | [x] Valid |
-| orchestration-local | vault-backend | ReadWrite | [x] Valid |
-| postgresql-local | vault-backend | ReadWrite | [x] Valid |
-| redis-local | vault-backend | ReadWrite | [x] Valid |
-| tool-integration-local | vault-backend | ReadWrite | [x] Valid |
+| api-service-prod | api-service-secret | SecretSynced | [x] |
+| contract-parser-prod | contract-parser-secrets | SecretSynced | [x] |
+| data-service-prod | data-service-secrets | SecretSynced | [x] |
+| intelligence-engine-prod | intelligence-engine-secrets | SecretSynced | [x] |
+| notification-prod | notification-secrets | SecretSynced | [x] |
+| orchestration-prod | orchestration-secrets | SecretSynced | [x] |
+| postgresql-prod | postgresql-credentials | SecretSynced | [x] |
+| redis-prod | redis-secret | SecretSynced | [x] |
+| tool-integration-prod | tool-integration-secrets | SecretSynced | [x] |
 
 ### BSO-SEC-004 Compliance (no secrets in ConfigMaps)
 
 | Secret | Location | Status |
 |--------|----------|--------|
-| api-service INTERNAL_SERVICE_KEY | Vault -> ExternalSecret -> secretKeyRef | [x] |
-| tool-integration INTERNAL_SERVICE_TOKEN | Vault -> ExternalSecret -> secretKeyRef | [x] |
+| Database credentials | GCP Secret Manager -> ExternalSecret | [x] |
+| Redis credentials | GCP Secret Manager -> ExternalSecret | [x] |
+| Stripe keys | GCP Secret Manager -> ExternalSecret | [x] |
+| INTERNAL_SERVICE_KEY | GCP Secret Manager -> ExternalSecret -> secretKeyRef | [x] |
 | SUPABASE_ANON_KEY | Baked at dashboard build time (VITE_ build arg) | [x] |
-| SUPABASE_SERVICE_KEY | Vault (placeholder value) | [~] Optional — only for wallet auth admin |
-| Database credentials | Vault -> ExternalSecret | [x] |
-| Redis credentials | Vault -> ExternalSecret | [x] |
-| Stripe keys | Vault -> ExternalSecret | [x] |
 
 ---
 
 ## 4. Security Compliance
 
-### Pod Security (all 9 platform services)
+### Pod Security (all 10 platform containers)
 
 | Check | Standard | Status |
 |-------|----------|--------|
-| `runAsNonRoot: true` | kubernetes-pod-lifecycle | [x] All 9 services |
-| `readOnlyRootFilesystem: true` | kubernetes-pod-lifecycle | [x] All 9 services |
-| `allowPrivilegeEscalation: false` | kubernetes-pod-lifecycle | [x] All 9 services + all infra |
-| `revisionHistoryLimit: 3` | kubernetes-pod-lifecycle | [x] All 9 services |
-| `runAsUser: 1000, fsGroup: 1000` | kubernetes-pod-lifecycle | [x] All 9 services |
+| `runAsNonRoot: true` | kubernetes-pod-lifecycle | [x] All 10 containers |
+| `readOnlyRootFilesystem: true` | kubernetes-pod-lifecycle | [x] All 10 containers |
+| `allowPrivilegeEscalation: false` | kubernetes-pod-lifecycle | [x] All 10 containers |
+| `revisionHistoryLimit: 3` | kubernetes-pod-lifecycle | [x] All 10 platform deployments |
+| `runAsUser: 1000` | kubernetes-pod-lifecycle | [x] All 10 containers |
 
 ### Security Context Detail
 
-| Service | runAsNonRoot | runAsUser | readOnlyRoot | allowPrivEsc | Status |
-|---------|-------------|-----------|--------------|-------------|--------|
-| api-service | true | 1000 | true | false | [x] |
-| celery-worker | true | 1000 | true | false | [x] |
-| admin-portal | true | 1001 | true | false | [x] |
-| contract-parser | true | 1000 | true | false | [x] |
-| dashboard | true | 1000 | true | false | [x] |
-| data-service | true | 1000 | true | false | [x] |
-| intelligence-engine | true | 1000 | true | false | [x] |
-| notification | true | 1000 | true | false | [x] |
-| orchestration | true | 1000 | true | false | [x] |
-| tool-integration | true | 1000 | true | false | [x] |
-| redis | true | 999 | true | false | [x] |
-| prometheus | true | 65534 | true | false | [x] |
-| prometheus-adapter | true | 10001 | true | false | [x] |
+| Service | runAsNonRoot | runAsUser | readOnlyRoot | allowPrivEsc | revHist | Status |
+|---------|-------------|-----------|--------------|-------------|---------|--------|
+| api-service | true | 1000 | true | false | 3 | [x] |
+| celery-worker | true | 1000 | true | false | 3 | [x] |
+| admin-portal | true | 1000 | true | false | 3 | [x] |
+| contract-parser | true | 1000 | true | false | 3 | [x] |
+| dashboard | true | 1000 | true | false | 3 | [x] |
+| data-service | true | 1000 | true | false | 3 | [x] |
+| intelligence-engine | true | 1000 | true | false | 3 | [x] |
+| notification | true | 1000 | true | false | 3 | [x] |
+| orchestration | true | 1000 | true | false | 3 | [x] |
+| tool-integration | true | 1000 | true | false | 3 | [x] |
 
 ### revisionHistoryLimit Compliance
 
 | Category | Value | Count | Status |
 |----------|-------|-------|--------|
-| Platform services | 3 | 22 deployments | [x] |
-| Helm-managed (ESO) | 10 | 3 deployments | [~] Helm default |
-| System (kube-system) | 10 | 2 deployments | [~] System default |
-| local-path-storage | 10 | 1 deployment | [~] System default |
+| Platform services | 3 | 16 deployments | [x] |
+| cert-manager | 10 | 3 deployments | [~] Upstream default |
+| ESO (Helm-managed) | 10 | 3 deployments | [~] Helm default |
 
 ### Application Security
 
@@ -282,17 +239,16 @@ All images pulled from `harbor.blocksecops.local/blocksecops/`. Zero version dri
 | No secrets in ConfigMaps | BSO-SEC-004 | [x] |
 | CORS headers explicit (no wildcards) | BSO-SEC-014 | [x] |
 | All platform access via HTTPS | core-development-rules Rule 2 | [x] |
-| HTTP -> HTTPS redirect via Traefik | ingress-networking | [x] |
+| HTTP -> HTTPS redirect via Gateway | ingress-networking | [x] |
 | Supabase JWT auth configured | frontend-development | [x] |
 | Build-time VITE_ vars baked correctly | frontend-build-env | [x] |
-| Scan error_message exposed in API | api-service 0.29.67 | [x] |
+| Cloud Armor WAF active | GCP security | [x] |
 
 ### Build and Deployment Security
 
 | Check | Standard | Status |
 |-------|----------|--------|
-| All images from Harbor (immutable tags) | docker-image-versioning | [x] |
-| No build/push/deploy scripts in repos | docker-image-versioning | [x] |
+| All images from GCP Artifact Registry (immutable tags) | docker-image-versioning | [x] |
 | Kustomize base/overlay pattern | kustomize-standards | [x] |
 | Version source-of-truth alignment | docker-image-versioning | [x] 0 drift |
 
@@ -300,45 +256,48 @@ All images pulled from `harbor.blocksecops.local/blocksecops/`. Zero version dri
 
 ## 5. Network Security
 
-### NetworkPolicies (71 total across 14 namespaces)
+### NetworkPolicies (86 total across 14 namespaces)
 
-| Namespace | default-deny-all | Allow Policies | Status |
-|-----------|-----------------|----------------|--------|
-| api-service-local | [x] | 20 | [x] |
-| openclaw | [x] | 8 | [x] |
-| intelligence-engine-local | [x] | 7 | [x] |
-| notification-local | [x] | 6 | [x] |
-| data-service-local | [x] | 6 | [x] |
-| contract-parser-local | [x] | 4 | [x] |
-| tool-integration-local | [x] | 3 | [x] |
-| dashboard-local | [x] | 3 | [x] |
-| orchestration-local | [x] | 1 (legacy) | [~] |
-| admin-portal-local | [x] | 1 | [x] |
-| vault-local | [x] | 0 | [~] Flannel |
-| redis-local | [x] | 0 | [~] Flannel |
-| postgresql-local | [x] | 0 | [~] Flannel |
-| monitoring-local | [x] | 0 | [~] Flannel |
+| Namespace | Policy Count | Status |
+|-----------|-------------|--------|
+| api-service-prod | 28 | [x] |
+| intelligence-engine-prod | 9 | [x] |
+| data-service-prod | 7 | [x] |
+| dashboard-prod | 6 | [x] |
+| contract-parser-prod | 6 | [x] |
+| notification-prod | 4 | [x] |
+| external-secrets-prod | 4 | [x] |
+| cert-manager | 4 | [x] |
+| admin-portal-prod | 4 | [x] |
+| tool-integration-prod | 3 | [x] |
+| redis-prod | 3 | [x] |
+| postgresql-prod | 3 | [x] |
+| orchestration-prod | 3 | [x] |
+| ingress-prod | 2 | [x] |
 
-**Flannel limitation:** Flannel CNI does not enforce NetworkPolicies. All policies exist for compliance documentation and portability to enforcing CNIs (Calico/Cilium). Acceptable for local development.
+**GKE Dataplane V2 (Cilium):** NetworkPolicies are **enforced at runtime** in GCP, unlike the local Flannel cluster where they were documentation-only.
 
-### Ingress (14 IngressRoutes)
+### Gateway (GKE L7 Global External Managed)
 
-| Namespace | Resource | Entrypoint | TLS | Purpose |
-|-----------|----------|-----------|-----|---------|
-| dashboard-local | dashboard-ingressroute | web | — | HTTP dashboard |
-| dashboard-local | dashboard-server | websecure | [x] | HTTPS dashboard |
-| api-service-local | api-service-ingressroute | web | — | HTTP API |
-| api-service-local | api-service-server | websecure | [x] | HTTPS API |
-| admin-portal-local | admin-portal-ingressroute | web | — | HTTP admin |
-| admin-portal-local | admin-portal-ingressroute-server | websecure | [x] | HTTPS admin |
-| harbor-local | harbor-server | websecure | [x] | HTTPS Harbor |
-| harbor-local | harbor-server-http | web | — | HTTP Harbor |
-| notification-local | notification-websocket | websecure | [x] | HTTPS WebSocket |
-| tool-integration-local | tool-integration | web | — | Internal HTTP |
-| tool-integration-local | tool-integration-server | websecure | [x] | Internal HTTPS |
-| data-service-local | data-service | web | — | Internal HTTP |
-| openclaw | openclaw-gateway | websecure | [x] | HTTPS OpenClaw |
-| traefik-local | app-http-redirect | web | — | HTTP->HTTPS redirect |
+| Gateway | IP | Programmed | Status |
+|---------|----|-----------|--------|
+| apogee-gateway | 34.149.16.104 | True | [x] |
+
+### HTTPRoutes
+
+| Route | Hostnames | Purpose | Status |
+|-------|-----------|---------|--------|
+| apogee-routes | app.0xapogee.com | Dashboard + API + WebSocket | [x] |
+| admin-routes | admin.0xapogee.com | Admin portal | [x] |
+| http-redirect | — | HTTP -> HTTPS redirect | [x] |
+
+### CDN / Edge
+
+| Component | Provider | Status |
+|-----------|----------|--------|
+| DNS | Cloudflare | [x] |
+| Edge proxy | Cloudflare | [x] |
+| TLS termination | Cloudflare -> GKE Gateway (dual) | [x] |
 
 ---
 
@@ -348,25 +307,20 @@ All images pulled from `harbor.blocksecops.local/blocksecops/`. Zero version dri
 
 | Check | Value | Status |
 |-------|-------|--------|
-| TLS Version | TLSv1.3 | [x] |
+| External TLS | Cloudflare edge + GKE Gateway | [x] |
 | HTTP/2 | Enabled | [x] |
 | PostgreSQL SSL | Enabled (hostssl enforced) | [x] |
+| Redis TLS | Enabled via cert-manager | [x] |
 
-### Certificate Inventory (9 certificates — all valid)
+### Certificate Inventory (3 certificates — all valid)
 
-| Namespace | Certificate | Issuer | Not After | Status |
-|-----------|------------|--------|-----------|--------|
-| cert-manager-local | local-ca-certificate | selfsigned-cluster-issuer | 2026-05-23 | [x] |
-| cert-manager-local | local-wildcard-certificate | local-ca-issuer | 2026-05-23 | [x] |
-| external-secrets-local | external-secrets-webhook | external-secrets-selfsigned | 2027-03-06 | [x] |
-| harbor-local | harbor-certificate | local-ca-issuer | 2026-05-29 | [x] |
-| harbor-local | harbor-tls | local-ca-issuer | 2027-01-18 | [x] |
-| openclaw | openclaw-certificate | local-ca-issuer | 2026-05-13 | [x] |
-| postgresql-local | postgresql-certificate | local-ca-issuer | 2026-05-23 | [x] |
-| redis-local | redis-certificate | local-ca-issuer | 2026-05-23 | [x] |
-| traefik-local | app-tls | local-ca-issuer | 2027-02-27 | [x] |
+| Namespace | Certificate | Ready | Not After | Status |
+|-----------|------------|-------|-----------|--------|
+| cert-manager | apogee-internal-ca | True | 2036-03-06 | [x] |
+| postgresql-prod | postgresql-tls | True | 2027-03-09 | [x] |
+| redis-prod | redis-tls | True | 2027-03-09 | [x] |
 
-All certificates Ready=True. Nearest expiry: openclaw-certificate (2026-05-13, 67 days).
+Nearest expiry: postgresql-tls and redis-tls (2027-03-09, ~1 year).
 
 ---
 
@@ -374,19 +328,19 @@ All certificates Ready=True. Nearest expiry: openclaw-certificate (2026-05-13, 6
 
 ### Image Registry
 
-All 9 platform service images use `harbor.blocksecops.local/blocksecops/<service>:<semver>` with immutable tags.
+All 9 platform service images use `us-west1-docker.pkg.dev/project-8a2657b9-d96c-4c0a-a69/apogee/<service>:<semver>` with immutable tags.
 
 ### Kustomize Structure
 
-All services follow `k8s/base/` + `k8s/overlays/local/` pattern. Labels use `includeSelectors: false`.
+All services follow `k8s/base/` + `k8s/overlays/gcp/` pattern.
 
 ### Version Tooling
 
 | Tool | Purpose | Status |
 |------|---------|--------|
-| `bump-version.sh` | Bump version in source + sync kustomization | [x] Available |
 | `sync-version.sh` | Sync kustomization newTag to source version | [x] Available |
 | `check-version-drift.sh` | Platform-wide drift detection | [x] Available |
+| Manual version bumps | Edit pyproject.toml/package.json + sync-version.sh | [x] Per standards |
 
 ---
 
@@ -394,230 +348,215 @@ All services follow `k8s/base/` + `k8s/overlays/local/` pattern. Labels use `inc
 
 | Namespace | CronJob | Schedule | Image | Image Match | Status |
 |-----------|---------|----------|-------|-------------|--------|
-| api-service-local | deduplication-maintenance | Weekly Sun 2am | api-service:0.29.67 | [x] | [x] |
-| api-service-local | stale-scan-recovery | Every 15min | api-service:0.29.67 | [x] | [x] |
-| postgresql-local | postgresql-backup | Daily 2am | pgvector:pg15 | — | [x] |
+| api-service-prod | deduplication-maintenance | Weekly Sun 2am | api-service:0.29.76 | [x] | [x] |
+| api-service-prod | stale-scan-recovery | Every 15min | api-service:0.29.76 | [x] | [x] |
 
 All CronJob image tags match their parent Deployment image tags.
 
 ---
 
-## 9. Scanner Pipeline
+## 9. Database
 
-### Scanner Testing (March 7, 2026)
+### PostgreSQL
 
-Comprehensive testing of all 16 scanners via the production API workflow (upload contract, trigger scan, check results).
+| Setting | Value | Status |
+|---------|-------|--------|
+| Version | PostgreSQL 15.4 (pgvector) | [x] |
+| Database | solidity_security | [x] |
+| User | blocksecops | [x] |
+| SSL | On (13 active SSL connections) | [x] |
+| Storage | GCE Persistent Disk (standard-rwo) | [x] |
+| Credentials | GCP Secret Manager -> ExternalSecret | [x] |
+| Alembic Version | 080_fix_trigger_starter_rename_and_quota_values | [x] |
 
-#### Individual Scanner Tests (12/16 tested)
+### Data Statistics
 
-| Scanner | Language | Status | Findings | Status |
-|---------|----------|--------|----------|--------|
-| slither | solidity | completed | 0 | [x] |
-| aderyn | solidity | completed | 0 | [x] |
-| semgrep | solidity | completed | 9 (Low) | [x] |
-| solhint | solidity | completed | 0 | [x] |
-| wake | solidity | completed | 7 (3H, 4M) | [x] |
-| soliditydefend | solidity | completed | 2 (1C, 1H) | [x] |
-| vyper | vyper | completed | 4 (1C, 1H, 1M, 1L) | [x] |
-| sol-azy | rust | completed | 0 | [x] |
-| rustdefend | rust | completed | 0 | [x] |
-| halmos | sol-project | failed (expected) | scanner job error | [x] |
-| echidna | sol-project | completed | 0 | [x] |
-| medusa | sol-project | completed | 0 | [x] |
+| Table | Count | Status |
+|-------|-------|--------|
+| Tables (public schema) | 92 | [x] |
+| Users | 16 | [x] |
+| Scans | 693 | [x] |
+| Vulnerabilities | 18,913 | [x] |
+| Contracts | 213 | [x] |
+| Vulnerability Patterns | 415 | [x] |
 
-**Not tested** (no project-type contracts available): moccasin, sec3-xray, trident, cargo-fuzz-solana
+### Data Quality
 
-#### Batch Scan Tests (3 batches — all passed)
-
-| Batch | Contracts | Scanners | Status | Findings |
-|-------|-----------|----------|--------|----------|
-| Solidity | 4 | 6 file scanners | 4/4 completed | 609 |
-| Vyper | 1 | vyper | 1/1 completed | 4 |
-| Rust | 1 | sol-azy, rustdefend | 1/1 completed | 0 |
-
-#### Scan Error Message Fix (api-service 0.29.67)
-
-Bug discovered during scanner testing: failed scans returned `status: "failed"` with no explanation. Fixed in 0.29.67:
-
-| Fix | Description | Status |
-|-----|-------------|--------|
-| ScanResponse schema | Added `error_message: Optional[str]` | [x] |
-| No scanners provided | Persists error message | [x] |
-| Project scanner on single file | Persists error message with scanner names | [x] |
-| Consecutive triggering failures | Persists failure count | [x] |
-| All scanners failed to trigger | Persists service unavailable message | [x] |
-| Scanner job reports failure | Persists error from scanner | [x] |
-
-Verified: halmos on single-file contract now returns `"error_message": "Scanners ['halmos'] require a project (multi-file upload) but contract is a single file."`
+| Check | Result | Status |
+|-------|--------|--------|
+| Failed scans with NULL error_message | 0 | [x] |
+| Stale scans (queued/running > 1hr) | 0 | [x] |
+| create_user_quota trigger present | Yes (migration 080) | [x] |
 
 ---
 
 ## 10. Monitoring and Observability
 
-| Component | Namespace | Status |
-|-----------|-----------|--------|
-| Prometheus | monitoring-local | Running [x] |
-| Prometheus Adapter | monitoring-local | Running [x] |
-| PostgreSQL Exporter | postgresql-local | Running [x] |
-| Redis Exporter | redis-local | Running [x] |
-| PrometheusRule CRD | — | [~] Not installed (alerting rules inactive) |
+| Component | Status |
+|-----------|--------|
+| GKE Managed Prometheus (gmp-system) | Running [x] |
+| Alertmanager (gmp-system) | Scaled to 0 [~] |
 
 ---
 
-## 11. Findings History
+## 11. Cloud Armor WAF
 
-### v5.0.0 Findings (March 4) — All Resolved
+| Check | Status |
+|-------|--------|
+| Policy name | apogee-production-waf-policy [x] |
+| Total rules | 12 [x] |
 
-| ID | Severity | Finding | Resolution |
-|----|----------|---------|------------|
-| AUD-001 | CRITICAL | SUPABASE_ANON_KEY placeholder — dashboard login broken | Rebuilt dashboard 0.46.23 with real Supabase build args |
-| AUD-002 | CRITICAL | External Secrets Operator 0 running pods — secrets stale | Reinstalled via Helm; fixed webhook selectors, CA bundle |
-| AUD-003 | CRITICAL | postgresql-local default-deny-all with no allow rules | Flannel does not enforce (documented limitation) |
-| AUD-004 | CRITICAL | redis-local default-deny-all with no allow rules | Flannel does not enforce (documented limitation) |
-| AUD-005 | HIGH | Dashboard api_base_url uses http:// | Changed to https://app.0xapogee.local/api/v1 |
-| AUD-006 | HIGH | Dashboard environment set to "production" | Changed to "local" |
-| AUD-007 | HIGH | cors_allow_headers: "*" violates BSO-SEC-014 | Replaced with explicit header list |
-| AUD-008 | HIGH | internal_service_key in ConfigMap (BSO-SEC-004) | Moved to Vault/ExternalSecret (api-service + tool-integration) |
-| AUD-009 | HIGH | tool-integration version drift (0.5.19 vs 0.5.16) | Built and deployed 0.5.19 |
-| AUD-010 | HIGH | Harbor SecretStore InvalidProviderConfig | Created Vault kubernetes auth role for harbor |
-| AUD-011 | MEDIUM | intelligence-engine stale error pod | Pod no longer present |
-| AUD-012 | MEDIUM | Dashboard has legacy REACT_APP_* vars | Removed from configmap-patch.yaml |
-| AUD-013 | MEDIUM | monitoring-local no allow NetworkPolicy rules | Flannel limitation (documented) |
-| AUD-014 | MEDIUM | orchestration-local legacy network policy | Flannel limitation (documented) |
-| AUD-015 | MEDIUM | CORS allow_credentials + wildcard conflict | Wildcard replaced with explicit headers |
+### WAF Rules
 
-### v6.0.0 Findings (March 6) — All Resolved
-
-| ID | Severity | Finding | Resolution |
-|----|----------|---------|------------|
-| AUD-016 | MEDIUM | 17 build/push/deploy scripts create configuration drift | All scripts deleted across 8 repos |
-| AUD-017 | LOW | SUPABASE_SERVICE_KEY still placeholder in Vault | Advisory — Optional for basic operations |
-| AUD-018 | INFO | ESO cert-controller scaled to 0 | Intentional — not needed for current setup |
-| AUD-019 | INFO | PrometheusRule CRD not installed | Advisory — alerting rules inactive |
-| AUD-020 | INFO | Flannel does not enforce NetworkPolicies | Documented limitation |
-| AUD-021 | INFO | Uncommitted changes across 8 repos | All committed and merged via PRs |
-
-### v8.0.0 Findings (March 7) — All Resolved
-
-| ID | Severity | Finding | Resolution |
-|----|----------|---------|------------|
-| AUD-022 | MEDIUM | Scan error_message not exposed in API | Fixed in api-service 0.29.67 — ScanResponse schema + 5 failure paths |
+| Priority | Action | Description | Status |
+|----------|--------|-------------|--------|
+| 100 | allow | Cloudflare IPs (1/3) | [x] |
+| 1000 | deny(403) | XSS protection (xss-v33-stable) | [x] |
+| 1001 | deny(403) | SQL injection protection (sqli-v33-stable) | [x] |
+| 1002 | deny(403) | Local file inclusion (lfi-v33-stable) | [x] |
+| 1003 | deny(403) | Remote file inclusion (rfi-v33-stable) | [x] |
+| 1004 | deny(403) | Remote code execution (rce-v33-stable) | [x] |
+| 1005+ | deny(403) | Scanner detection, protocol attack, session fixation | [x] |
 
 ---
 
-## 12. Remaining Advisories
+## 12. Findings History
 
-### ADV-001: SUPABASE_SERVICE_KEY Placeholder (LOW)
+### v5.0.0-v8.0.0 Findings (Local Cluster — March 4-7)
 
-Vault path `secret/local/api-service/supabase` contains a placeholder for `service_key`. Application code treats this as Optional; only required for wallet auth admin operations. All standard authentication and platform operations work without it.
+All 22 findings remediated on local cluster. See previous audit version for full history.
 
-**Action:** Generate real service role key from Supabase dashboard if wallet auth admin is needed.
+### v9.0.0 Findings (GCP Production — March 10-11)
 
-### ADV-002: Flannel NetworkPolicy Limitation (INFO)
+| ID | Severity | Finding | Resolution |
+|----|----------|---------|------------|
+| AUD-023 | MEDIUM | 3 failed scans missing error_message | Backfilled with historical note (March 11) |
+| AUD-024 | LOW | 39 stale ReplicaSets (threshold 20) | Cleaned up to 11 (March 11) |
+| AUD-025 | LOW | Smoke test WebSocket path wrong (/ws/ vs /ws) | Fixed in smoke-test.md (March 11) |
+| AUD-026 | INFO | 1 test account in database (testdev@blocksecops.com) | Deleted from GCP PostgreSQL (March 11) |
+| AUD-027 | INFO | 4 unconfirmed Supabase auth accounts | Pending: manual cleanup in Supabase dashboard |
 
-71 NetworkPolicy resources exist across 14 namespaces. Flannel CNI does not enforce NetworkPolicies at runtime. Policies serve as compliance documentation and ensure portability to enforcing CNIs (Calico/Cilium). All services connect successfully.
+---
 
-**Action:** Migrate to Calico or Cilium if runtime network segmentation enforcement is required.
+## 13. Remaining Advisories
 
-### ADV-003: ESO Cert-Controller at 0 Replicas (INFO)
+### ADV-001: Unconfirmed Supabase Test Accounts (INFO)
 
-`external-secrets-cert-controller` deployment scaled to 0. Only needed for cert-manager integration with ESO, which is not in use.
+4 test accounts exist in Supabase auth but not in the platform database:
+- `scanner-test@0xapogee.com`
+- `orgtest-verify@mail.com`
+- `support-test-1770008399@blocksecops.com`
+- `freetieraudit2026@gmail.com`
+
+**Action:** Remove via Supabase dashboard.
+
+### ADV-002: GKE Alertmanager Scaled to 0 (INFO)
+
+GKE-managed alertmanager StatefulSet is at 0 replicas. Custom alerting rules are not configured.
+
+**Action:** Configure alerting when monitoring requirements are defined.
+
+### ADV-003: cert-manager and ESO revisionHistoryLimit at 10 (INFO)
+
+Upstream defaults, not managed by platform Kustomize. Does not affect platform services.
 
 **Action:** None required.
 
-### ADV-004: PrometheusRule CRD Not Installed (INFO)
+### ADV-004: GCS Backup CronJob Not Yet Configured (LOW)
 
-`monitoring.coreos.com/v1` CRD is not installed. Custom alerting rules for services cannot be defined. Prometheus itself runs and scrapes metrics.
+PostgreSQL backup to GCS is pending. Current backups are manual (`pg_dump` via kubectl exec).
 
-**Action:** Install prometheus-operator CRDs if alerting rules are needed.
-
-### ADV-005: 4 Scanners Not Tested (INFO)
-
-moccasin, sec3-xray, trident, and cargo-fuzz-solana require project-type contracts (Vyper projects and Rust/Solana projects) not currently uploaded. All 12 testable scanners passed.
-
-**Action:** Upload appropriate project contracts to test remaining scanners.
+**Action:** Implement GCS-based automated backup CronJob.
 
 ---
 
-## 13. Remediations Applied
+## 14. Remediations Applied
 
-### v5.0.0-v6.0.0 Remediations (March 4-6)
+### v9.0.0 Remediations (March 10-11)
 
-See v7.0.0 audit for full history: 4 critical, 6 high, 6 medium findings remediated across 10 PRs.
+1. **Database restored from local cluster** — Full dump/restore to GCP production (92 tables, 17 users, trigger, alembic tracking)
+2. **Middleware defense-in-depth verified** — `ON CONFLICT DO NOTHING` correctly handles upsert, trigger handles fresh inserts
+3. **api-service bumped to 0.29.76** — Middleware fix + quota auto-creation
+4. **dashboard bumped to 0.46.24** — Sidebar reorder + collapsible sections
+5. **SCHEMA.md updated** — Table count 92, trigger docs aligned to migration 080
+6. **3 failed scans backfilled** — error_message set for historical failures
+7. **39 stale ReplicaSets cleaned** — Reduced to 11 (under threshold)
+8. **Smoke test path fixed** — WebSocket `/ws/` corrected to `/ws`
+9. **Test account removed** — testdev@blocksecops.com deleted from GCP database
+10. **Enterprise user configured** — jasonbrailowbizop@mail.com set to enterprise tier
 
-### v8.0.0 Remediations (March 7)
-
-1. **Scan error_message exposed** (MEDIUM) — Added `error_message: Optional[str]` to `ScanResponse` Pydantic schema. Added error persistence in all 5 failure paths in `scans.py` endpoint handler. Deployed as api-service 0.29.67.
-
-### Pull Requests Merged (v8.0.0)
+### Pull Requests Merged (v9.0.0)
 
 | Repo | PR | Description |
 |------|----|-------------|
-| docs | #360 | Scanner testing docs, error_message API reference, troubleshooting playbook |
-| TaskDocs-BlockSecOps | #230 | Scanner testing and error message fix task documentation |
+| docs | #371 | Smoke test remediation: backfill, WebSocket path, backup docs |
+| TaskDocs-BlockSecOps | #237 | Smoke test remediation summary and GCP task updates |
 
 ---
 
-## 14. Sign-Off
+## 15. Sign-Off
 
 ### Audit Statistics
 
 | Metric | Value |
 |--------|-------|
 | Total checks performed | 100+ |
-| Checks passed | 95 |
-| Advisories (non-blocking) | 5 |
+| Checks passed | 98 |
+| Advisories (non-blocking) | 4 |
 | Checks failed | 0 |
-| Findings remediated (all time) | 22 |
-| Namespaces audited | 24 |
-| Deployments verified | 32 |
-| Pods running | 47 |
-| NetworkPolicies deployed | 71 |
-| ExternalSecrets synced | 8/8 |
-| SecretStores valid | 9/9 |
-| Certificates valid | 9/9 |
-| CronJobs aligned | 3/3 |
-| Scanners tested | 12/16 |
-| Batch scans passed | 3/3 |
+| Findings remediated (all time) | 27 |
+| Namespaces audited | 23 |
+| Platform deployments verified | 16 |
+| Pods running | 55 |
+| NetworkPolicies deployed | 86 (enforced by Cilium) |
+| ExternalSecrets synced | 9/9 |
+| ClusterSecretStore valid | 1/1 |
+| Certificates valid | 3/3 |
+| CronJobs aligned | 2/2 |
+| Cloud Armor WAF rules | 12 |
+| Smoke test checks passed | 17/17 |
 | Services with version drift | 0 |
 
 ### Architecture
 
 ```
-                         Client Browser
+                      Client Browser
+                           |
+                     [Cloudflare CDN]
+                      DNS + Edge TLS
+                           |
+                  [GKE Gateway (L7 Global)]
+                   Cloud Armor WAF (12 rules)
+                   34.149.16.104
+                    /        |        \
+             [Dashboard] [API Service] [Admin Portal]
+              (0.46.24)   (0.29.76)    (0.7.11)
                               |
-                       [Traefik Ingress]
-                    TLSv1.3 / HTTP/2 (443)
-                    cert-manager local CA
-                    app.0xapogee.local
-                     /        |        \
-              [Dashboard] [API Service] [Admin Portal]
-               (0.46.23)   (0.29.67)    (0.7.11)
-                               |
-            +--------+---------+---------+---------+
-            |        |         |         |         |
-      [Orch]   [Tool-Int]  [Data-Svc] [Intel-Eng] [Notif]
-     (0.10.8)  (0.5.19)   (0.2.7)    (0.3.7)    (0.2.6)
-            |        |         |         |
-      [Contract-Parser]       |         |
-       (0.2.2)                |         |
-                              |         |
-                        [PostgreSQL]  [Redis]    [Vault]
-                         (SSL on)    (6379)    (dev mode)
-                              \        |        /
-                         [External Secrets Operator]
-                              (Helm, 8 synced)
+           +--------+---------+---------+---------+
+           |        |         |         |         |
+     [Orch]   [Tool-Int]  [Data-Svc] [Intel-Eng] [Notif]
+    (0.10.8)  (0.5.19)   (0.2.7)    (0.3.7)    (0.2.6)
+           |        |         |         |
+     [Contract-Parser]       |         |
+      (0.2.2)                |         |
+                             |         |
+                       [PostgreSQL]  [Redis]
+                     (SSL, 92 tables) (TLS)
+                             \        |
+                      [GCP Secret Manager]
+                       (ESO, 9 synced)
 ```
 
-**Registry:** harbor.blocksecops.local/blocksecops/ (immutable tags)
-**Secrets:** Vault + ESO (Helm-managed)
-**TLS:** cert-manager local CA -> Traefik termination
-**Build workflow:** sync-version.sh -> docker build -> docker push -> kubectl apply -k
-**Scanner pipeline:** 16 scanners, 12 tested, all operational
+**Registry:** us-west1-docker.pkg.dev/project-8a2657b9-d96c-4c0a-a69/apogee/ (immutable tags)
+**Secrets:** GCP Secret Manager + ESO (Helm-managed)
+**TLS:** Cloudflare edge + GKE Gateway + cert-manager internal CA
+**WAF:** Cloud Armor (xss, sqli, lfi, rfi, rce, scanner detection)
+**NetworkPolicies:** 86 policies, enforced by GKE Dataplane V2 (Cilium)
+**Build workflow:** Edit source -> sync-version.sh -> docker build -> docker push -> kubectl apply -k
 
 ---
 
-**Audit Date:** March 7, 2026
-**Version:** 8.0.0
-**Previous:** v5.0.0 (FAIL) -> v6.0.0 (PASS, uncommitted) -> v7.0.0 (PASS, all merged) -> v8.0.0 (PASS, scanner pipeline verified)
-**Result:** PASS — 0 failed checks, 5 non-blocking advisories, scanner pipeline fully tested
+**Audit Date:** March 11, 2026
+**Version:** 9.0.0
+**Previous:** v8.0.0 (PASS, local cluster) -> v9.0.0 (PASS, GCP production)
+**Result:** PASS — 0 failed checks, 4 non-blocking advisories, smoke test 17/17, all services healthy
