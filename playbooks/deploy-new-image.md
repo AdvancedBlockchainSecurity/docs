@@ -23,10 +23,10 @@ This playbook covers deploying a new Docker image to the local Kubernetes cluste
 ```bash
 # Full deployment cycle
 1. Update version in source (pyproject.toml / package.json)
-2. Sync kustomization: /home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh .
+2. Update newTag + app.kubernetes.io/version in each k8s/overlays/*/kustomization.yaml
 3. Build image with OCI labels (SERVICE_VERSION, BUILD_DATE, VCS_REF)
-4. Push to Harbor
-5. Apply kustomization: kubectl apply -k k8s/overlays/local/
+4. Push to registry
+5. Apply kustomization: kubectl apply -k k8s/overlays/<env>/
 6. Verify rollout
 ```
 
@@ -161,17 +161,9 @@ curl -s https://harbor.blocksecops.local/api/v2.0/projects/blocksecops/repositor
 
 ---
 
-## Step 4: Auto-Sync Kustomization (Recommended)
+## Step 4: Update Kustomization Tags
 
-As of March 2026, version sync is automated. After updating the source file, run:
-
-```bash
-/home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh .
-```
-
-This automatically updates all kustomization.yaml `newTag` values under `k8s/` to match the source version.
-
-### Manual Kustomization Update (if auto-sync fails)
+After updating the source version, manually update `newTag` and `app.kubernetes.io/version` in each kustomization overlay:
 
 Edit the kustomization.yaml for the target environment:
 
