@@ -9,7 +9,7 @@
 | Machine type | `e2-standard-2` (2 vCPU, 8 GB RAM) |
 | Disk | 100 GB pd-ssd |
 | Min nodes | 2 |
-| Max nodes | 2 |
+| Max nodes | 4 |
 | Location policy | BALANCED |
 | Auto-repair | Yes |
 | Auto-upgrade | Yes |
@@ -20,7 +20,7 @@
 | Setting | Value |
 |---------|-------|
 | Machine type | `e2-standard-4` (4 vCPU, 16 GB RAM) |
-| Disk | 200 GB pd-ssd |
+| Disk | 50 GB pd-ssd |
 | Min nodes | 0 (scales to zero) |
 | Max nodes | 3 |
 | Location policy | ANY |
@@ -111,5 +111,5 @@ spec:
 
 | Database | CPU Request | CPU Limit | Memory Request | Memory Limit | Storage |
 |----------|-------------|-----------|----------------|--------------|---------|
-| PostgreSQL | 200m | 1000m | 256 Mi | 1 Gi | 10 Gi (standard-rwo) |
+| PostgreSQL | 75m | 1000m | 256 Mi | 1 Gi | 10 Gi (standard-rwo) |
 | Redis | 50m | 200m | 64 Mi | 256 Mi | 1 Gi (premium-rwo) |

@@ -1,58 +1,56 @@
 # Platform Smoke Test Standards
 
-**Version:** 2.0.0
+**Version:** 4.0.0
 **Last Updated:** March 10, 2026
 **Status:** Active
 
 ## Overview
 
-Smoke tests verify the platform is operational after deployments, upgrades, or infrastructure changes. Run after every version bump or service restart.
+Smoke tests verify the platform is operational after deployments, upgrades, or service restarts. Run after every version bump or service restart. These tests are environment-agnostic and test the application layer only.
+
+For GCP cluster infrastructure checks (Gateway, NetworkPolicy, TLS certificates, ESO, Cloud Armor), see [GCP Cluster Smoke Test](../gcp/smoke-test.md).
 
 ## Environment
 
 | Setting | Value |
 |---------|-------|
-| **Access** | `https://<env-domain>` |
+| **Platform URL** | `${PLATFORM_URL}` (e.g. `https://app.0xapogee.com`) |
 | **Auth provider** | Supabase (external) |
-| **Database** | PostgreSQL 15.4, database name `solidity_security`, user `blocksecops` |
+| **Database** | PostgreSQL 15.4 (pgvector), database name `solidity_security`, user `blocksecops` |
 
 ## Pre-Flight Checks
 
 Verify cluster health before smoke testing services:
 
 ```bash
-# 1. All pods running
-kubectl get pods --all-namespaces --no-headers | grep -v "Running\|Completed" | grep -v "kube-system"
-# Expected: empty output (all pods running)
+ENV="${ENV:-prod}"
+
+# 1. All pods running (expect empty output)
+kubectl get pods -A --no-headers | grep -v "Running\|Completed" | grep -v "kube-system"
 
 # 2. Core infrastructure pods
 kubectl get pod -n postgresql-${ENV} postgresql-0 --no-headers
 kubectl get pod -n redis-${ENV} -l app.kubernetes.io/name=redis --no-headers
-kubectl get pod -n vault-${ENV} vault-0 --no-headers
-kubectl get pod -n traefik-${ENV} -l app.kubernetes.io/name=traefik --no-headers
 
-# 3. Vault unsealed
-kubectl exec -n vault-${ENV} vault-0 -- vault status -format=json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print('OK' if not d['sealed'] else 'SEALED')"
-
-# 4. Database accessible
+# 3. Database accessible
 kubectl exec -n postgresql-${ENV} postgresql-0 -- psql -U blocksecops -d solidity_security -c "SELECT 1;" 2>/dev/null
 
-# 5. Version drift check (all services)
+# 4. Version drift check (all services)
 /home/pwner/Git/scripts/check-version-drift.sh
 # Expected: all services show "OK" (source == kustomize == cluster)
 
-# 6. Stale pod check (no Completed/Failed pods outside kube-system)
+# 5. Stale pod check (no Completed/Failed pods outside kube-system)
 kubectl get pods -A --field-selector='status.phase!=Running' --no-headers | grep -v "kube-system"
 # Expected: empty output
 
-# 7. Stale ReplicaSet check
+# 6. Stale ReplicaSet check
 STALE_RS=$(kubectl get rs -A --no-headers | awk '$3==0 && $4==0' | wc -l)
 echo "Stale ReplicaSets: $STALE_RS (warning if > 20)"
 
-# 8. revisionHistoryLimit check (all managed deployments should be 3)
+# 7. revisionHistoryLimit check (all managed deployments should be 3)
 kubectl get deployments -A -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}: {.spec.revisionHistoryLimit}{"\n"}{end}' | \
-  grep -v "kube-system\|local-path\|external-secrets" | grep -v ": 3$"
-# Expected: empty output (all managed deployments at 3)
+  grep -v "kube-system\|gmp-system\|gke-managed\|external-secrets" | grep -v ": 3$"
+# Expected: empty output
 ```
 
 ## Service Health Checks
@@ -60,21 +58,19 @@ kubectl get deployments -A -o jsonpath='{range .items[*]}{.metadata.namespace}/{
 ### External Access (via Ingress)
 
 ```bash
+PLATFORM_URL="${PLATFORM_URL:-app.0xapogee.com}"
+
 # Dashboard - expect 200 with HTML
-curl -o /dev/null -w "%{http_code}" "https://${PLATFORM_URL}/"
-# Note: use -k for self-signed certs in development
+curl -s -o /dev/null -w "%{http_code}" "https://${PLATFORM_URL}/"
 
 # API Service - expect JSON with status "healthy"
-curl "https://${PLATFORM_URL}/api/v1/health/live"
+curl -s "https://${PLATFORM_URL}/api/v1/health/live"
 
 # API Readiness - expect ready:true with database:true
-curl "https://${PLATFORM_URL}/api/v1/health/ready"
+curl -s "https://${PLATFORM_URL}/api/v1/health/ready"
 
 # API OpenAPI docs - expect 200
-curl -o /dev/null -w "%{http_code}" "https://${PLATFORM_URL}/docs"
-
-# Admin Portal - expect 200 with HTML
-curl -o /dev/null -w "%{http_code}" "https://${ADMIN_URL}/"
+curl -s -o /dev/null -w "%{http_code}" "https://${PLATFORM_URL}/docs"
 ```
 
 ### Internal Service Health (via kubectl exec)
@@ -82,13 +78,14 @@ curl -o /dev/null -w "%{http_code}" "https://${ADMIN_URL}/"
 Run from any pod in the cluster. The API service pod is a good choice:
 
 ```bash
-# All 6 internal services in one loop
+ENV="${ENV:-prod}"
+
 for check in \
   "tool-integration.tool-integration-${ENV}.svc.cluster.local:8005/health" \
   "orchestration.orchestration-${ENV}.svc.cluster.local:8004/health" \
   "notification.notification-${ENV}.svc.cluster.local:8003/health" \
   "intelligence-engine.intelligence-engine-${ENV}.svc.cluster.local:80/health" \
-  "data-service.data-service-${ENV}.svc.cluster.local:8001/health" \
+  "data-service.data-service-${ENV}.svc.cluster.local:80/health" \
   "contract-parser.contract-parser-${ENV}.svc.cluster.local:80/health" \
 ; do
   svc=$(echo "$check" | cut -d. -f1)
@@ -104,8 +101,8 @@ done
 | Service | Response Contains |
 |---------|-------------------|
 | tool-integration | `"status":"healthy"` |
-| orchestration | `"status":"alive"` |
-| notification | `"status":"alive"` |
+| orchestration | `"status":"healthy"` |
+| notification | `"status":"healthy"` |
 | intelligence-engine | `"status":"healthy"` |
 | data-service | `"status":"healthy"` |
 | contract-parser | `"status":"OK"` |
@@ -127,18 +124,16 @@ TOKEN=$(curl -s -X POST "${SUPABASE_URL}/auth/v1/token?grant_type=password" \
   python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))")
 ```
 
-**Note:** Test user emails use `.local` domain but Supabase requires valid email domains for new signups. Use existing accounts.
-
 ### Core Endpoints
 
 All should return 200 with valid auth, 401 without:
 
 ```bash
+PLATFORM_URL="${PLATFORM_URL:-app.0xapogee.com}"
 AUTH="-H 'Authorization: Bearer $TOKEN'"
 
 # Must return 200
 curl $AUTH "https://${PLATFORM_URL}/api/v1/scans?limit=2"
-# Note: use -k for self-signed certs in development
 curl $AUTH "https://${PLATFORM_URL}/api/v1/contracts?limit=2"
 curl $AUTH "https://${PLATFORM_URL}/api/v1/vulnerabilities?limit=2"
 curl $AUTH "https://${PLATFORM_URL}/api/v1/organizations"
@@ -147,7 +142,7 @@ curl $AUTH "https://${PLATFORM_URL}/api/v1/deduplication/groups"
 curl $AUTH "https://${PLATFORM_URL}/api/v1/projects"
 
 # Must return 401 without auth
-curl -o /dev/null -w "%{http_code}" "https://${PLATFORM_URL}/api/v1/scans"
+curl -s -o /dev/null -w "%{http_code}" "https://${PLATFORM_URL}/api/v1/scans"
 # Expected: 401
 
 # Search (POST)
@@ -156,30 +151,11 @@ curl $AUTH -X POST -H "Content-Type: application/json" \
   "https://${PLATFORM_URL}/api/v1/search"
 ```
 
-### Regression Tests (v0.27.0+)
-
-These tests verify specific bug fixes. Expected behaviors after deploying v0.27.0:
-
-```bash
-# A1: Info severity removed — expect 422 (not 500)
-curl $AUTH "https://${PLATFORM_URL}/api/v1/deduplication/groups?severity=info"
-
-# A2: Pending status mapped — expect 200 (mapped to queued) or 422 (not 500)
-curl $AUTH "https://${PLATFORM_URL}/api/v1/scans?status=pending"
-
-# A3: Invalid severity validation — expect 422 (not 500)
-curl $AUTH "https://${PLATFORM_URL}/api/v1/deduplication/groups?severity=INVALID"
-
-# A4: Audit logs — expect 200 or 403 (not 500)
-curl $AUTH "https://${PLATFORM_URL}/api/v1/audit-logs"
-
-# A6: Scanner effectiveness — expect 200 with populated data
-curl $AUTH "https://${PLATFORM_URL}/api/v1/analytics/scanner-effectiveness"
-```
-
 ## Database Checks
 
 ```bash
+ENV="${ENV:-prod}"
+
 # Table count (expect ~88)
 kubectl exec -n postgresql-${ENV} postgresql-0 -- \
   psql -U blocksecops -d solidity_security -t -c \
@@ -194,17 +170,17 @@ kubectl exec -n postgresql-${ENV} postgresql-0 -- \
    UNION ALL SELECT 'contracts', COUNT(*) FROM contracts
    UNION ALL SELECT 'vulnerability_patterns', COUNT(*) FROM vulnerability_patterns;"
 
-# Verify no info severity in patterns (post-migration)
+# SSL connections active
 kubectl exec -n postgresql-${ENV} postgresql-0 -- \
-  psql -U blocksecops -d solidity_security -t -c \
-  "SELECT COUNT(*) FROM vulnerability_patterns WHERE severity IN ('info', 'informational');"
-# Expected: 0
+  psql -U blocksecops -d solidity_security -c \
+  "SELECT COUNT(*) AS ssl_connections FROM pg_stat_ssl WHERE ssl = true;"
 ```
 
 ## Deployed Version Check
 
 ```bash
-# Check all service image tags
+ENV="${ENV:-prod}"
+
 for ns_svc in \
   "api-service-${ENV}/api-service" \
   "dashboard-${ENV}/dashboard" \
@@ -225,16 +201,14 @@ done
 
 ### CronJob Version Drift Check
 
-**CRITICAL:** CronJobs must use the same image version as their parent Deployment. If `kubectl apply -k` is missed after a version bump, CronJobs silently run old code while Deployments may appear updated.
+CronJobs must use the same image version as their parent Deployment. If `kubectl apply -k` is missed after a version bump, CronJobs silently run old code.
 
 ```bash
-# Check CronJob images match Deployment images
 echo "=== CronJob Version Drift Check ==="
 for ns in $(kubectl get cronjob -A --no-headers 2>/dev/null | awk '{print $1}' | sort -u); do
   for cj in $(kubectl get cronjob -n "$ns" --no-headers 2>/dev/null | awk '{print $1}'); do
     CJ_IMG=$(kubectl get cronjob -n "$ns" "$cj" -o jsonpath='{.spec.jobTemplate.spec.template.spec.containers[0].image}' 2>/dev/null)
     CJ_TAG=$(echo "$CJ_IMG" | rev | cut -d: -f1 | rev)
-    # Find matching deployment by image name
     IMG_NAME=$(echo "$CJ_IMG" | rev | cut -d: -f2- | rev)
     DEP_TAG=$(kubectl get deployment -n "$ns" -o jsonpath="{range .items[*]}{.spec.template.spec.containers[0].image}{'\n'}{end}" 2>/dev/null | grep "$IMG_NAME" | rev | cut -d: -f1 | rev)
     if [ -n "$DEP_TAG" ] && [ "$CJ_TAG" != "$DEP_TAG" ]; then
@@ -248,27 +222,23 @@ for ns in $(kubectl get cronjob -A --no-headers 2>/dev/null | awk '{print $1}' |
 done
 ```
 
-## Encryption & Security Checks
+## Encryption Check
 
 ```bash
-# Encryption service configured (readiness endpoint includes encryption check)
-curl "https://${PLATFORM_URL}/api/v1/health/ready" | python3 -c "
+PLATFORM_URL="${PLATFORM_URL:-app.0xapogee.com}"
+
+# Encryption service configured (application-level)
+curl -s "https://${PLATFORM_URL}/api/v1/health/ready" | python3 -c "
 import sys,json; d=json.load(sys.stdin)
 print('PASS' if d.get('checks',{}).get('encryption') else 'FAIL: encryption not configured')"
-
-# Vault unsealed
-kubectl exec -n vault-${ENV} vault-0 -- vault status -format=json 2>/dev/null | \
-  python3 -c "import sys,json; d=json.load(sys.stdin); print('PASS' if not d['sealed'] else 'FAIL: Vault sealed')"
-
-# All ExternalSecrets synced
-UNSYNCED=$(kubectl get externalsecret -A --no-headers 2>/dev/null | grep -v "SecretSynced" | wc -l)
-echo "ExternalSecrets unsynced: $UNSYNCED (expected: 0)"
 ```
 
 ## Scan Health Checks
 
 ```bash
-# No scans stuck in queued/running for >1 hour (stale scan check)
+ENV="${ENV:-prod}"
+
+# No scans stuck in queued/running for >1 hour
 STALE=$(kubectl exec -n postgresql-${ENV} postgresql-0 -- \
   psql -U blocksecops -d solidity_security -t -c \
   "SELECT COUNT(*) FROM scans WHERE status IN ('queued','running') AND created_at < NOW() - INTERVAL '1 hour';" 2>/dev/null | tr -d ' ')
@@ -281,54 +251,18 @@ MISSING_ERR=$(kubectl exec -n postgresql-${ENV} postgresql-0 -- \
 echo "Failed scans missing error_message: $MISSING_ERR (expected: 0)"
 ```
 
-## Infrastructure Health Checks
-
-```bash
-# Prometheus and adapter running (required for HPA custom metrics)
-PROM=$(kubectl get pod -n monitoring-${ENV} -l app=prometheus --no-headers -o custom-columns=S:.status.phase 2>/dev/null | head -1)
-ADAPTER=$(kubectl get pod -n monitoring-${ENV} -l app=prometheus-adapter --no-headers -o custom-columns=S:.status.phase 2>/dev/null | head -1)
-echo "Prometheus: ${PROM:-NOT FOUND}  Adapter: ${ADAPTER:-NOT FOUND}"
-
-# HPA status (check all HPAs can read metrics)
-kubectl get hpa -A --no-headers 2>/dev/null | while read ns name _ _ _ _ _; do
-  CONDS=$(kubectl get hpa -n "$ns" "$name" -o jsonpath='{.status.conditions[?(@.type=="ScalingActive")].status}' 2>/dev/null)
-  echo "  HPA $ns/$name: ScalingActive=$CONDS"
-done
-```
-
 ## WebSocket Health Check
 
-**Important:** WebSocket upgrade requires HTTP/1.1. When testing with `curl`, force HTTP/1.1 to avoid false negatives from HTTP/2 ALPN negotiation:
+WebSocket upgrade requires HTTP/1.1. Force it with curl to avoid false negatives from HTTP/2 ALPN:
 
 ```bash
-# CORRECT: Force HTTP/1.1 for WebSocket upgrade
+PLATFORM_URL="${PLATFORM_URL:-app.0xapogee.com}"
+
 curl --http1.1 -H "Connection: Upgrade" -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
   -o /dev/null -w "%{http_code}" \
   "https://${PLATFORM_URL}/ws/"
-# Note: use -k for self-signed certs in development
 # Expected: 101 (Switching Protocols)
-
-# WRONG: Default curl may negotiate HTTP/2 via ALPN, which does not support
-# the Connection: Upgrade header → returns 404 (false negative)
-curl -H "Connection: Upgrade" -H "Upgrade: websocket" \
-  "https://${PLATFORM_URL}/ws/"
-# May return 404 even though WebSocket is working
-```
-
-**For reliable WebSocket testing, use a proper WebSocket client:**
-```bash
-# Python websockets library
-python3 -c "
-import asyncio, websockets, ssl
-async def test():
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    async with websockets.connect('wss://${PLATFORM_URL}/ws/', ssl=ctx) as ws:
-        print('WebSocket connected successfully')
-asyncio.run(test())
-"
 ```
 
 ## Quick Full Smoke Test Script
@@ -340,19 +274,11 @@ Run all checks in one script:
 # Platform smoke test — run after any deployment
 set -euo pipefail
 
-PLATFORM_URL="${PLATFORM_URL:?Set PLATFORM_URL}"
-ADMIN_URL="${ADMIN_URL:-}"
+PLATFORM_URL="${PLATFORM_URL:-app.0xapogee.com}"
 ENV="${ENV:-prod}"
-
-# Use -k for self-signed certs in development, empty for production
-CURL_TLS_FLAG=""
-if [ "$ENV" != "prod" ]; then
-  CURL_TLS_FLAG="-k"
-fi
 
 PASS=0
 FAIL=0
-WARN=0
 
 check() {
   local name="$1" expected="$2" actual="$3"
@@ -368,26 +294,21 @@ check() {
 echo "=== Pre-Flight ==="
 check "PostgreSQL running" "Running" "$(kubectl get pod -n postgresql-${ENV} postgresql-0 --no-headers -o custom-columns=S:.status.phase 2>/dev/null)"
 check "Redis running" "Running" "$(kubectl get pod -n redis-${ENV} -l app.kubernetes.io/name=redis --no-headers -o custom-columns=S:.status.phase 2>/dev/null | head -1)"
-check "Vault running" "Running" "$(kubectl get pod -n vault-${ENV} vault-0 --no-headers -o custom-columns=S:.status.phase 2>/dev/null)"
-check "Traefik running" "Running" "$(kubectl get pod -n traefik-${ENV} -l app.kubernetes.io/name=traefik --no-headers -o custom-columns=S:.status.phase 2>/dev/null)"
 
 echo ""
 echo "=== External Access ==="
-check "Dashboard HTTPS" "200" "$(curl -s ${CURL_TLS_FLAG} -o /dev/null -w '%{http_code}' "https://${PLATFORM_URL}/" 2>/dev/null)"
-check "API health" "200" "$(curl -s ${CURL_TLS_FLAG} -o /dev/null -w '%{http_code}' "https://${PLATFORM_URL}/api/v1/health/live" 2>/dev/null)"
-check "API ready" "200" "$(curl -s ${CURL_TLS_FLAG} -o /dev/null -w '%{http_code}' "https://${PLATFORM_URL}/api/v1/health/ready" 2>/dev/null)"
-if [ -n "$ADMIN_URL" ]; then
-  check "Admin portal" "200" "$(curl -s ${CURL_TLS_FLAG} -o /dev/null -w '%{http_code}' "https://${ADMIN_URL}/" 2>/dev/null)"
-fi
+check "Dashboard HTTPS" "200" "$(curl -s -o /dev/null -w '%{http_code}' "https://${PLATFORM_URL}/" 2>/dev/null)"
+check "API health" "200" "$(curl -s -o /dev/null -w '%{http_code}' "https://${PLATFORM_URL}/api/v1/health/live" 2>/dev/null)"
+check "API ready" "200" "$(curl -s -o /dev/null -w '%{http_code}' "https://${PLATFORM_URL}/api/v1/health/ready" 2>/dev/null)"
 
 echo ""
 echo "=== Internal Services ==="
 for svc_url in \
   "tool-integration|tool-integration.tool-integration-${ENV}.svc.cluster.local:8005/health" \
-  "orchestration|orchestration.orchestration-${ENV}.svc.cluster.local:8004/api/v1/health/live" \
-  "notification|notification.notification-${ENV}.svc.cluster.local:8003/api/v1/health/live" \
-  "intelligence|intelligence-engine.intelligence-engine-${ENV}.svc.cluster.local:80/health" \
-  "data-service|data-service.data-service-${ENV}.svc.cluster.local:8001/health" \
+  "orchestration|orchestration.orchestration-${ENV}.svc.cluster.local:8004/health" \
+  "notification|notification.notification-${ENV}.svc.cluster.local:8003/health" \
+  "intelligence-engine|intelligence-engine.intelligence-engine-${ENV}.svc.cluster.local:80/health" \
+  "data-service|data-service.data-service-${ENV}.svc.cluster.local:80/health" \
   "contract-parser|contract-parser.contract-parser-${ENV}.svc.cluster.local:80/health" \
 ; do
   svc=$(echo "$svc_url" | cut -d'|' -f1)
@@ -408,15 +329,9 @@ DB_OK=$(kubectl exec -n postgresql-${ENV} postgresql-0 -- psql -U blocksecops -d
 check "Database query" "1" "$DB_OK"
 
 echo ""
-echo "=== Encryption & Secrets ==="
-ENC_OK=$(curl -s ${CURL_TLS_FLAG} "https://${PLATFORM_URL}/api/v1/health/ready" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print('true' if d.get('checks',{}).get('encryption') else 'false')" 2>/dev/null)
+echo "=== Encryption ==="
+ENC_OK=$(curl -s "https://${PLATFORM_URL}/api/v1/health/ready" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print('true' if d.get('checks',{}).get('encryption') else 'false')" 2>/dev/null)
 check "Encryption configured" "true" "$ENC_OK"
-
-VAULT_OK=$(kubectl exec -n vault-${ENV} vault-0 -- vault status -format=json 2>/dev/null | python3 -c "import sys,json; print('unsealed' if not json.load(sys.stdin)['sealed'] else 'sealed')" 2>/dev/null)
-check "Vault unsealed" "unsealed" "$VAULT_OK"
-
-UNSYNCED=$(kubectl get externalsecret -A --no-headers 2>/dev/null | grep -v "SecretSynced" | wc -l | tr -d ' ')
-check "ExternalSecrets synced" "0" "$UNSYNCED"
 
 echo ""
 echo "=== Scan Health ==="
@@ -440,7 +355,7 @@ echo "  Failed: $FAIL"
 | After docker build + push + kubectl apply | Yes |
 | After `kubectl rollout restart` | Yes |
 | After database migration | Yes |
-| After infrastructure changes (Traefik, Vault, etc.) | Yes |
+| After infrastructure changes | Yes |
 | Daily (morning check) | Recommended |
 | After cluster reboot | Yes |
 
@@ -453,6 +368,7 @@ echo "  Failed: $FAIL"
 ---
 
 **See Also:**
+- [GCP Cluster Smoke Test](../gcp/smoke-test.md) — Infrastructure-specific checks (Gateway, ESO, TLS, NetworkPolicy, Cloud Armor)
 - [Testing & Deployment](./testing-deployment.md) — Build and deploy workflow
 - [Service Availability](./service-availability.md) — Service access patterns
 - [Docker Image Versioning](./docker-image-versioning.md) — Version bump workflow

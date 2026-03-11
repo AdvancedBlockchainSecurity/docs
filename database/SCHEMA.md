@@ -8,7 +8,7 @@
 > **Important Note on Database Naming:**
 > The database is named `solidity_security`, NOT `blocksecops`. This name was established during initial platform development when the focus was solely on Solidity security scanning. The name has been retained for backward compatibility and to avoid migration complexity. All services, connection strings, and documentation should reference `solidity_security`.
 >
-> **Verified:** March 7, 2026 (Current stats: 213 contracts, 691 scans, 18,913 vulnerabilities, 17 users, 91 tables in `solidity_security` database)
+> **Verified:** March 10, 2026 (Current stats: 213 contracts, 691 scans, 18,913 vulnerabilities, 17 users, 92 tables in `solidity_security` database)
 
 ## Table of Contents
 
@@ -389,7 +389,7 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 
 **Auto-Creation Trigger:**
 - Trigger function `create_user_quota()` automatically creates quota record on user insert
-- Quota limits set based on user's initial tier (Migration 030 values)
+- Quota limits set based on user's initial tier (Migration 080 values, aligned to tiers.json v3.3)
 - Monthly/annual reset handled by background task (`src/infrastructure/tasks/quota_reset.py`)
 
 **Quota Reset Background Task (Added January 11, 2026):**

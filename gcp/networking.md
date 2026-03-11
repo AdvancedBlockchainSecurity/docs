@@ -85,7 +85,14 @@ Examples:
   postgresql.postgresql-prod.svc.cluster.local:5432
   redis.redis-prod.svc.cluster.local:6379
   api-service.api-service-prod.svc.cluster.local:8000
-  data-service.data-service-prod.svc.cluster.local:8001
+  data-service.data-service-prod.svc.cluster.local:80
+  intelligence-engine.intelligence-engine-prod.svc.cluster.local:80
+  contract-parser.contract-parser-prod.svc.cluster.local:80
+  orchestration.orchestration-prod.svc.cluster.local:8004
+  notification.notification-prod.svc.cluster.local:8003
+  tool-integration.tool-integration-prod.svc.cluster.local:8005
+  dashboard.dashboard-prod.svc.cluster.local:3000
+  admin-portal.admin-portal-prod.svc.cluster.local:3000
 ```
 
 ## GKE Gateway Routes

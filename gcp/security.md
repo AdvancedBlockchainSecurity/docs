@@ -22,7 +22,7 @@
 |---------|---------|-------|
 | `apogee-production-gke-nodes@...` | GKE node SA | `logging.logWriter`, `monitoring.metricWriter`, `monitoring.viewer`, `artifactregistry.reader` |
 | `eso-secrets-accessor@...` | ESO secret access | `secretmanager.secretAccessor` |
-| `739955249550-compute@developer...` | Compute default SA | `roles/editor` (should be disabled) |
+| `739955249550-compute@developer...` | Compute default SA | **Disabled** (no project roles, SA disabled via Terraform) |
 
 ### Workload Identity Bindings
 
@@ -47,15 +47,19 @@ Policy: `apogee-production-waf-policy`
 | 2000 | Rate limiting: 300 req/min per IP | Rate-based ban (5 min) |
 | 2147483647 | Default deny (non-Cloudflare) | Deny 403 |
 
-**Note:** WAF policy must be attached to each backend service to take effect.
+**Attached to all 4 service backends** via `GCPBackendPolicy` resources in `k8s/overlays/gcp/backend-policies/`. Each policy lives in the target service's namespace (api-service-prod, dashboard-prod, notification-prod, admin-portal-prod) to ensure GKE Gateway controller correctly associates it with the backend service.
 
 ## Network Policies
 
-74 NetworkPolicy resources across 14 namespaces. Every namespace has:
+86 NetworkPolicy resources across 14 namespaces. Every namespace has:
 
 - `default-deny-all` — Deny all ingress and egress by default
 - `allow-dns` — Allow DNS resolution to kube-system
 - Service-specific policies for allowed traffic paths
+
+Infrastructure namespaces have additional policies:
+- `cert-manager` — API server egress + webhook ingress (`allow-cert-manager.yaml`)
+- `external-secrets-prod` — API server egress + GCP Secret Manager egress + webhook ingress (`allow-external-secrets.yaml`)
 
 ## Encryption
 
@@ -65,16 +69,18 @@ Policy: `apogee-production-waf-policy`
 | Node disks | Google default encryption |
 | PostgreSQL TLS | cert-manager self-signed CA (`apogee-internal-ca-issuer`) |
 | Redis TLS | cert-manager self-signed CA, TLS-only (port 0, tls-port 6379) |
-| External traffic | Google-managed TLS via Gateway + Cloudflare |
+| External traffic | Google-managed TLS via Gateway + Cloudflare (TLS 1.2+ enforced via `apogee-production-ssl-policy`, MODERN profile) |
 | Secrets at rest | GCP Secret Manager (Google-managed encryption) |
 
 ## Monitoring Alerts
 
 | Alert | Condition |
 |-------|-----------|
-| Pod Crash Loop Detected | `restart_count` rate > 0 over 5 min |
+| Pod Crash Loop Detected | `restart_count` rate > 3 over 5 min |
 | GKE Node Not Ready | Node condition != Ready |
-| High 5xx Error Rate | 5xx responses detected |
+| High 5xx Error Rate | 5xx responses > 10 per 5 min |
+| Container CPU > 80% of Request | `cpu/request_utilization` > 0.8 for 5 min |
+| Node CPU Allocatable > 85% | `cpu/allocatable_utilization` > 0.85 for 5 min |
 | Log Ingestion > 1GB | Warning threshold |
 | Log Ingestion > 5GB (Critical) | Critical threshold |
 
