@@ -261,8 +261,9 @@ PLATFORM_URL="${PLATFORM_URL:-app.0xapogee.com}"
 curl --http1.1 -H "Connection: Upgrade" -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
   -o /dev/null -w "%{http_code}" \
-  "https://${PLATFORM_URL}/ws/"
+  "https://${PLATFORM_URL}/ws"
 # Expected: 101 (Switching Protocols)
+# Note: Do NOT use trailing slash — /ws/ returns 404 from FastAPI
 ```
 
 ## Quick Full Smoke Test Script

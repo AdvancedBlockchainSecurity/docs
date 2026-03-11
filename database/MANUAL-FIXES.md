@@ -1154,6 +1154,49 @@ WHERE false_positive_score IS NOT NULL;
 
 ---
 
+## March 11, 2026 - Backfill Missing error_message on Failed Scans (GCP Production)
+
+### Issue
+Platform smoke test identified 3 failed scans with `NULL` `error_message`. These scans originated from the local cluster (March 3-7, 2026) and were carried over during the database dump/restore to GCP production on March 10, 2026.
+
+**Symptom:** Smoke test check `Failed scans have error_message` returned `FAIL (expected=0, got=3)`.
+
+### Root Cause
+The 3 scans failed before the GCP deployment and never had their `error_message` populated. This is pre-existing data quality from the local cluster, not a production bug.
+
+### Affected Records
+| Scan ID | Type | Created |
+|---------|------|---------|
+| `c110f2cd-ced3-40c7-8d97-57eccfcbe2e4` | full | 2026-03-03 20:18:55 |
+| `b5c2ef58-7731-414d-8529-4d3e85408878` | full | 2026-03-03 21:54:15 |
+| `017d23bf-9246-43cc-b7f1-e1298c6f99b1` | custom | 2026-03-07 03:03:07 |
+
+### Backup
+**Created before fix:** `solidity_security_gcp_pre_backfill_20260311.dump` (14M)
+
+### Fix Applied
+```sql
+UPDATE scans
+SET error_message = 'Historical scan failure — error details not captured (pre-migration data)'
+WHERE status = 'failed' AND error_message IS NULL;
+-- Updated 3 rows
+```
+
+### Verification
+```sql
+SELECT COUNT(*) FROM scans WHERE status = 'failed' AND error_message IS NULL;
+-- Expected: 0
+```
+
+### Impact
+- **Before Fix:** Smoke test failed on scan health check
+- **After Fix:** All smoke test checks pass (17/17)
+
+### Prevention
+The stale-scan-recovery CronJob (`api-service-prod/stale-scan-recovery`) handles this going forward by setting `error_message` on scans that time out.
+
+---
+
 ## Notes
 
 - All manual fixes should ideally be incorporated into migrations or initialization scripts

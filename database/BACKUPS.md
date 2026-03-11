@@ -532,6 +532,41 @@ kubectl exec -n postgresql-prod postgresql-0 -- \
   pg_restore -U blocksecops -d solidity_security --clean --if-exists /tmp/restore.dump
 ```
 
+### March 11, 2026 - Pre Backfill Fix (GCP Production)
+
+**Filename:** `solidity_security_gcp_pre_backfill_20260311.dump`
+**Location:** `docs/database/backups/solidity_security_gcp_pre_backfill_20260311.dump`
+**Created:** March 11, 2026
+**Size:** 14M
+**Database Version:** PostgreSQL 15.4 (pgvector)
+**Format:** PostgreSQL custom format (`pg_dump -F c`)
+**Backup Method:** `kubectl exec -n postgresql-prod postgresql-0 -- pg_dump`
+
+**Database State:**
+- 92 tables, 17 users, 692 scans, 18,913 vulnerabilities, 213 contracts
+- Schema version: Migration 080
+
+**Reason for Backup:**
+Created before backfilling `error_message` on 3 failed scans that had `NULL` values (carried over from local cluster during March 10 database restore).
+
+**Changes Applied After This Backup:**
+```sql
+UPDATE scans
+SET error_message = 'Historical scan failure — error details not captured (pre-migration data)'
+WHERE status = 'failed' AND error_message IS NULL;
+-- Updated 3 rows
+```
+
+**Restore Command:**
+```bash
+kubectl cp docs/database/backups/solidity_security_gcp_pre_backfill_20260311.dump \
+  postgresql-prod/postgresql-0:/tmp/restore.dump
+kubectl exec -n postgresql-prod postgresql-0 -- \
+  pg_restore -U blocksecops -d solidity_security --clean --if-exists /tmp/restore.dump
+```
+
+---
+
 ### Planned: GCS Backup CronJob
 
 A Kubernetes CronJob will automate daily backups to a GCS bucket with lifecycle rules for retention. This mirrors the local `postgresql-backup` CronJob pattern.
