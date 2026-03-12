@@ -107,7 +107,7 @@ from starlette.responses import Response
 1. Economic analysis summary endpoint returns 200 (was 500):
    ```bash
    curl -sk -H "Authorization: Bearer $TOKEN" \
-     "https://app.0xapogee.local/api/v1/economic-analysis/scans/{scan_id}/summary"
+     "https://app.0xapogee.com/api/v1/economic-analysis/scans/{scan_id}/summary"
    ```
 
 2. Copilot conversation creation returns 429 for tier-gated users (was 500):
@@ -115,7 +115,7 @@ from starlette.responses import Response
    curl -sk -X POST -H "Authorization: Bearer $TOKEN" \
      -H "Content-Type: application/json" \
      -d '{"title":"test"}' \
-     "https://app.0xapogee.local/api/v1/copilot/conversations"
+     "https://app.0xapogee.com/api/v1/copilot/conversations"
    ```
 
 3. All 70 affected endpoints now return proper HTTP status codes instead of 500.

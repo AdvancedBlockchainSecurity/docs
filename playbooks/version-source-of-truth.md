@@ -342,7 +342,7 @@ The `VERSION` file is only used by the legacy `bump-version.sh` script, not by `
 
 - [ ] `deploy.sh` exited 0 (all verifications passed)
 - [ ] `check-version-drift.sh` shows no drift for the service
-- [ ] Health endpoint returns 200: `curl -sk https://app.0xapogee.local/api/v1/health/ready`
+- [ ] Health endpoint returns 200: `curl -sk https://app.0xapogee.com/api/v1/health/ready`
 - [ ] Source + kustomization committed together
 
 ---

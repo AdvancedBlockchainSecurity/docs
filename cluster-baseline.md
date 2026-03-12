@@ -264,13 +264,13 @@ kubectl get networkpolicy -A --no-headers | wc -l
 
 | Namespace | IngressRoute | Host Match | Routes To |
 |-----------|-------------|------------|-----------|
-| dashboard-local | dashboard-server | `app.0xapogee.local` (excl /api/v1, /ws) | dashboard:3000 |
-| api-service-local | api-service-server | `app.0xapogee.local` && `/api/v1` | api-service:8000 |
-| notification-local | notification-websocket | `app.0xapogee.local` && `/ws` | notification:8003 |
-| admin-portal-local | admin-portal-ingressroute-server | `admin.0xapogee.local` | admin-portal:3000 / api-service:8000 |
-| tool-integration-local | tool-integration-server | `app.0xapogee.local` && `/api/v1/tool-integration` | tool-integration:8005 |
+| dashboard-local | dashboard-server | `app.0xapogee.com` (excl /api/v1, /ws) | dashboard:3000 |
+| api-service-local | api-service-server | `app.0xapogee.com` && `/api/v1` | api-service:8000 |
+| notification-local | notification-websocket | `app.0xapogee.com` && `/ws` | notification:8003 |
+| admin-portal-local | admin-portal-ingressroute-server | `admin.0xapogee.com` | admin-portal:3000 / api-service:8000 |
+| tool-integration-local | tool-integration-server | `app.0xapogee.com` && `/api/v1/tool-integration` | tool-integration:8005 |
 | harbor-local | harbor-server | `harbor.blocksecops.local` | harbor:80 |
-| traefik-local | app-http-redirect | `app.0xapogee.local` (HTTP) | Redirect to HTTPS |
+| traefik-local | app-http-redirect | `app.0xapogee.com` (HTTP) | Redirect to HTTPS |
 
 **Check:**
 ```bash

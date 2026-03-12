@@ -36,7 +36,7 @@ Local Dev → Local Cluster → Test → Commit → GitHub Actions → Config Sy
 |----------|-------|------------|
 | Kubernetes cluster | kubeadm on `debian-server` | GKE on GCP |
 | Container registry | Harbor (`harbor.blocksecops.local`) | Artifact Registry (`us-west1-docker.pkg.dev`) |
-| Domain | `app.0xapogee.local` | `app.0xapogee.com` |
+| Domain | `app.0xapogee.com` | `app.0xapogee.com` |
 | Secrets | HashiCorp Vault + ESO | GCP Secret Manager + ESO |
 | Git repos | GitHub (push access) | GitHub (push access) |
 
@@ -44,10 +44,10 @@ Local Dev → Local Cluster → Test → Commit → GitHub Actions → Config Sy
 
 ```bash
 # On development server
-echo "127.0.0.1  app.0xapogee.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1  app.0xapogee.com" | sudo tee -a /etc/hosts
 
 # On client machines
-echo "192.168.86.225  app.0xapogee.local" | sudo tee -a /etc/hosts
+echo "192.168.86.225  app.0xapogee.com" | sudo tee -a /etc/hosts
 ```
 
 ---
@@ -126,11 +126,11 @@ See [Local Deployment Workflow](../workflows/local-deployment-workflow.md) for d
 
 ```bash
 # API health
-curl -sk https://app.0xapogee.local/api/v1/health/live
+curl -sk https://app.0xapogee.com/api/v1/health/live
 # Expected: {"status":"healthy","service":"Apogee API Service","version":"X.Y.Z"}
 
 # API ready (includes DB, Redis checks)
-curl -sk https://app.0xapogee.local/api/v1/health/ready
+curl -sk https://app.0xapogee.com/api/v1/health/ready
 # Expected: {"ready":true,"checks":{"database":true,"service":true,"encryption":true}}
 ```
 
@@ -147,7 +147,7 @@ kubectl get deployment ${SERVICE} -n ${SERVICE}-local \
   -o jsonpath='{.spec.template.spec.containers[0].image}'
 
 # Test the specific feature you changed
-curl -sk https://app.0xapogee.local/api/v1/<your-endpoint>
+curl -sk https://app.0xapogee.com/api/v1/<your-endpoint>
 ```
 
 See [Smoke Test Standards](../standards/smoke-test.md) for the full smoke test procedure.
@@ -155,7 +155,7 @@ See [Smoke Test Standards](../standards/smoke-test.md) for the full smoke test p
 ### 2.3 Security Headers
 
 ```bash
-curl -sk -I https://app.0xapogee.local/api/v1/health/live | grep -E "strict-transport|x-frame|x-content|content-security"
+curl -sk -I https://app.0xapogee.com/api/v1/health/live | grep -E "strict-transport|x-frame|x-content|content-security"
 ```
 
 ### 2.4 Acceptance Criteria

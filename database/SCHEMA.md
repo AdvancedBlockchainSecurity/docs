@@ -189,7 +189,7 @@ User accounts with Supabase authentication and tier tracking (Phase 3.1a - Migra
 
 **Platform Admin Columns (Phase 4.6 - January 2026):**
 
-> **Admin Portal Isolation (February 2026):** Admin functionality has been moved to a separate admin portal application (`admin.0xapogee.local` / `admin.0xapogee.com`). The admin portal shares the same Supabase project and database as the customer dashboard, but security is enforced through IP allowlisting, mandatory MFA, and admin_role checks. Admin routes have been removed from the main dashboard (`app.0xapogee.local`).
+> **Admin Portal Isolation (February 2026):** Admin functionality has been moved to a separate admin portal application (`admin.0xapogee.com` / `admin.0xapogee.com`). The admin portal shares the same Supabase project and database as the customer dashboard, but security is enforced through IP allowlisting, mandatory MFA, and admin_role checks. Admin routes have been removed from the main dashboard (`app.0xapogee.com`).
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|

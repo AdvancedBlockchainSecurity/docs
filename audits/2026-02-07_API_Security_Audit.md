@@ -2,7 +2,7 @@
 
 **Date:** February 7, 2026
 **Scope:** API Service v0.28.2, Dashboard v0.41.0, Admin Portal
-**Targets:** `app.0xapogee.local`, `admin.0xapogee.local`
+**Targets:** `app.0xapogee.com`, `admin.0xapogee.com`
 **Method:** 5-phase code review (64 endpoint files, 17 audit plan areas) + live testing against running cluster
 
 ---

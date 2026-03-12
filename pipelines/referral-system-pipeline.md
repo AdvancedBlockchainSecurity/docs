@@ -221,10 +221,10 @@ kubectl apply -k blocksecops-dashboard/k8s/overlays/local/
 
 ```bash
 # Health check
-curl -s -k https://app.0xapogee.local/api/v1/health/ready | jq '.status'
+curl -s -k https://app.0xapogee.com/api/v1/health/ready | jq '.status'
 
 # Referral endpoints responding
-curl -s -k https://app.0xapogee.local/api/v1/referrals/my-code -w '%{http_code}' -o /dev/null
+curl -s -k https://app.0xapogee.com/api/v1/referrals/my-code -w '%{http_code}' -o /dev/null
 # Expected: 401 (unauthenticated) or 200 (authenticated)
 
 # Database tables

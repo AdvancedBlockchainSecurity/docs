@@ -167,7 +167,7 @@ kubectl rollout restart deployment/tool-integration -n tool-integration-local
 ## Verification
 
 ### API Service Response Time
-1. Access Admin System page at `http://admin.0xapogee.local/system`
+1. Access Admin System page at `http://admin.0xapogee.com/system`
 2. Verify "API Service" row shows a response time value (e.g., "5ms") instead of "-"
 
 ### Semgrep Status

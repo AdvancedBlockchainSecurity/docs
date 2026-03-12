@@ -9,7 +9,7 @@
 
 | Setting | Value |
 |---------|-------|
-| API Base URL | `https://app.0xapogee.local/api/v1` |
+| API Base URL | `https://app.0xapogee.com/api/v1` |
 | Cluster | kubeadm (single node, 1 API replica) |
 | CPU | 200m request / 1 CPU limit |
 | Memory | 256Mi request / 1Gi limit |

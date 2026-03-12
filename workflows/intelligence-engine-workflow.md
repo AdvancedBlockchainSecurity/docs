@@ -219,7 +219,7 @@ kubectl get deployment intelligence-engine -n intelligence-engine-local \
 kubectl logs -n intelligence-engine-local -l app.kubernetes.io/name=intelligence-engine --tail=30
 
 # Test endpoint
-curl -sk https://app.0xapogee.local/api/v1/health/ready
+curl -sk https://app.0xapogee.com/api/v1/health/ready
 ```
 
 ---

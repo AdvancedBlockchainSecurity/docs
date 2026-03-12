@@ -74,8 +74,8 @@ These must be configured in the [Supabase Dashboard](https://supabase.com/dashbo
 
 | Setting | Local Value | Production Value |
 |---------|-------------|------------------|
-| Site URL | `http://app.0xapogee.local` | `https://app.0xapogee.com` |
-| Redirect URLs | `http://app.0xapogee.local/**` | `https://app.0xapogee.com/**` |
+| Site URL | `http://app.0xapogee.com` | `https://app.0xapogee.com` |
+| Redirect URLs | `http://app.0xapogee.com/**` | `https://app.0xapogee.com/**` |
 
 ### Environment Variables
 

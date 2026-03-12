@@ -147,7 +147,7 @@ LABEL version="0.1.3"
 # Result: All tests passed!
 
 # Verify scan status
-curl -sL "http://app.0xapogee.local/api/v1/scans/8a04dc90-a280-4952-8928-f69dc799326e" \
+curl -sL "http://app.0xapogee.com/api/v1/scans/8a04dc90-a280-4952-8928-f69dc799326e" \
   -H "Authorization: Bearer ${TOKEN}" | jq '.status'
 # Result: "completed"
 

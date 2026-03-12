@@ -17,10 +17,10 @@ Incomplete `kubectl apply -k` coverage during Phase 1/2 deployment. Some service
 
 | IngressRoute | Old Domain | New Domain |
 |---|---|---|
-| `notification-local/notification-websocket` | `app.0xapogee.local` | `app.0xapogee.local` |
-| `admin-portal-local/admin-portal-ingressroute` | `admin.0xapogee.local` | `admin.0xapogee.local` |
-| `admin-portal-local/admin-portal-ingressroute-server` | `admin.0xapogee.local` | `admin.0xapogee.local` |
-| `traefik-local/app-http-redirect` | `app.0xapogee.local` | `app.0xapogee.local` |
+| `notification-local/notification-websocket` | `app.0xapogee.com` | `app.0xapogee.com` |
+| `admin-portal-local/admin-portal-ingressroute` | `admin.0xapogee.com` | `admin.0xapogee.com` |
+| `admin-portal-local/admin-portal-ingressroute-server` | `admin.0xapogee.com` | `admin.0xapogee.com` |
+| `traefik-local/app-http-redirect` | `app.0xapogee.com` | `app.0xapogee.com` |
 
 ## Affected Production Overlays
 
@@ -41,7 +41,7 @@ Incomplete `kubectl apply -k` coverage during Phase 1/2 deployment. Some service
 
 ## Impact
 
-- Admin portal was only reachable via legacy `admin.0xapogee.local` (still in `/etc/hosts`)
+- Admin portal was only reachable via legacy `admin.0xapogee.com` (still in `/etc/hosts`)
 - WebSocket secondary IngressRoute was stale but primary route covered `/ws` — no functional impact
 - HTTP→HTTPS redirect only triggered for old domain — no functional impact (HTTPS used directly)
 - Production overlays not yet deployed — no production impact

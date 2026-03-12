@@ -21,7 +21,7 @@ Tests for the Platform Admin Panel including admin account management, MFA authe
 |-----------|-------|
 | Platform | kubeadm (server) |
 | API Service | v0.11.11 |
-| Access URL | https://app.0xapogee.local |
+| Access URL | https://app.0xapogee.com |
 | Test Date | 2026-01-25 |
 
 ---
@@ -77,7 +77,7 @@ TOKEN=$(/home/pwner/Git/docs/scripts/get_token_fixed.sh)
 **Test Command**:
 ```bash
 curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
-  "https://app.0xapogee.local/api/v1/admin/auth/mfa/setup" | jq '.'
+  "https://app.0xapogee.com/api/v1/admin/auth/mfa/setup" | jq '.'
 ```
 
 **Expected Response**:
@@ -106,7 +106,7 @@ TOTP_CODE=$(kubectl exec -n api-service-local deployment/api-service -- \
 
 curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
-  "https://app.0xapogee.local/api/v1/admin/auth/mfa/verify" \
+  "https://app.0xapogee.com/api/v1/admin/auth/mfa/verify" \
   -d "{\"code\": \"${TOTP_CODE}\"}" | jq '.'
 ```
 
@@ -130,7 +130,7 @@ curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
 ```bash
 curl -sk -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
-  "https://app.0xapogee.local/api/v1/admin/auth/session" | jq '.'
+  "https://app.0xapogee.com/api/v1/admin/auth/session" | jq '.'
 ```
 
 **Expected Response**:
@@ -157,7 +157,7 @@ curl -sk -H "Authorization: Bearer ${TOKEN}" \
 curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
   -H "Content-Type: application/json" \
-  "https://app.0xapogee.local/api/v1/admin/auth/logout" \
+  "https://app.0xapogee.com/api/v1/admin/auth/logout" \
   -w "\nHTTP_CODE:%{http_code}"
 ```
 
@@ -177,7 +177,7 @@ curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
 ```bash
 curl -sk -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
-  "https://app.0xapogee.local/api/v1/admin/users?page=1&page_size=10" | jq '.'
+  "https://app.0xapogee.com/api/v1/admin/users?page=1&page_size=10" | jq '.'
 ```
 
 **Expected Response**:
@@ -204,7 +204,7 @@ curl -sk -H "Authorization: Bearer ${TOKEN}" \
 USER_ID="11111111-1111-1111-1111-111111111111"
 curl -sk -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
-  "https://app.0xapogee.local/api/v1/admin/users/${USER_ID}" | jq '.'
+  "https://app.0xapogee.com/api/v1/admin/users/${USER_ID}" | jq '.'
 ```
 
 **Status**: [x] PASSED (2026-01-25)
@@ -220,7 +220,7 @@ curl -sk -H "Authorization: Bearer ${TOKEN}" \
 curl -sk -X PATCH -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
   -H "Content-Type: application/json" \
-  "https://app.0xapogee.local/api/v1/admin/users/${USER_ID}" \
+  "https://app.0xapogee.com/api/v1/admin/users/${USER_ID}" \
   -d '{"tier": "starter"}' | jq '.'
 ```
 
@@ -237,7 +237,7 @@ curl -sk -X PATCH -H "Authorization: Bearer ${TOKEN}" \
 curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
   -H "Content-Type: application/json" \
-  "https://app.0xapogee.local/api/v1/admin/users/${USER_ID}/disable" \
+  "https://app.0xapogee.com/api/v1/admin/users/${USER_ID}/disable" \
   -d '{"reason": "Test disable"}' | jq '.'
 ```
 
@@ -255,7 +255,7 @@ curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
 ```bash
 curl -sk -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
-  "https://app.0xapogee.local/api/v1/admin/system/stats" | jq '.'
+  "https://app.0xapogee.com/api/v1/admin/system/stats" | jq '.'
 ```
 
 **Actual Response** (2026-01-25):
@@ -287,7 +287,7 @@ curl -sk -H "Authorization: Bearer ${TOKEN}" \
 ```bash
 curl -sk -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
-  "https://app.0xapogee.local/api/v1/admin/audit/admin-actions?page=1&page_size=5" | jq '.'
+  "https://app.0xapogee.com/api/v1/admin/audit/admin-actions?page=1&page_size=5" | jq '.'
 ```
 
 **Status**: [x] PASSED (2026-01-25) - 17 audit log entries
@@ -305,7 +305,7 @@ curl -sk -H "Authorization: Bearer ${TOKEN}" \
 curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
   -H "Content-Type: application/json" \
-  "https://app.0xapogee.local/api/v1/admin/emergency/revoke-sessions/${USER_ID}" \
+  "https://app.0xapogee.com/api/v1/admin/emergency/revoke-sessions/${USER_ID}" \
   -d '{"reason": "Security test - revoking all user sessions for testing purposes"}' | jq '.'
 ```
 
@@ -324,7 +324,7 @@ curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
 curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
   -H "Content-Type: application/json" \
-  "https://app.0xapogee.local/api/v1/admin/emergency/disable-user/${USER_ID}" \
+  "https://app.0xapogee.com/api/v1/admin/emergency/disable-user/${USER_ID}" \
   -d '{"reason": "Emergency security test - disabling user account for security verification"}' | jq '.'
 ```
 
@@ -367,7 +367,7 @@ The following bugs were discovered and fixed during testing (2026-01-25):
 
 ### MFA Verification Page
 
-**URL**: `https://app.0xapogee.local/admin/mfa-verify`
+**URL**: `https://app.0xapogee.com/admin/mfa-verify`
 
 **Test Steps**:
 1. [ ] Login as admin user (regular Supabase auth)
@@ -385,7 +385,7 @@ The following bugs were discovered and fixed during testing (2026-01-25):
 
 ### Admin Dashboard
 
-**URL**: `https://app.0xapogee.local/admin`
+**URL**: `https://app.0xapogee.com/admin`
 
 **Test Steps**:
 1. [ ] Stats cards display correctly (users, orgs, scans, contracts)
@@ -399,7 +399,7 @@ The following bugs were discovered and fixed during testing (2026-01-25):
 
 ### User Management Page
 
-**URL**: `https://app.0xapogee.local/admin/users`
+**URL**: `https://app.0xapogee.com/admin/users`
 
 **Test Steps**:
 1. [ ] User table loads with pagination
@@ -417,7 +417,7 @@ The following bugs were discovered and fixed during testing (2026-01-25):
 
 ### Emergency Page
 
-**URL**: `https://app.0xapogee.local/admin/emergency`
+**URL**: `https://app.0xapogee.com/admin/emergency`
 
 **Test Steps**:
 1. [ ] Warning banner displayed
@@ -546,7 +546,7 @@ Added in API Service v0.26.0, Admin Portal v0.2.0.
 curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
   -H "Content-Type: application/json" \
-  "https://app.0xapogee.local/api/v1/admin/system/ml/retrain" \
+  "https://app.0xapogee.com/api/v1/admin/system/ml/retrain" \
   -d '{"force": false, "min_samples": 200}' | jq '.'
 ```
 
@@ -561,7 +561,7 @@ curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
 
 #### 6.2 Admin Portal ML Models Page
 
-**URL**: `admin.0xapogee.local/ml-models`
+**URL**: `admin.0xapogee.com/ml-models`
 
 | # | Test Case | Expected | Status |
 |---|-----------|----------|--------|

@@ -13,7 +13,7 @@ This document covers testing for API Keys security features implemented in the A
 
 - Growth or Enterprise tier account (Developer/Team do not have API access)
 - Valid Bearer token for authentication
-- Access to API service at `https://app.0xapogee.local`
+- Access to API service at `https://app.0xapogee.com`
 
 ### Setting Up Test User Tier
 
@@ -40,7 +40,7 @@ kubectl exec -n api-service-local deployment/api-service -- \
 
 ```bash
 TOKEN=$(./get_token_fixed.sh)
-curl -sk -X POST "https://app.0xapogee.local/api/v1/api-keys" \
+curl -sk -X POST "https://app.0xapogee.com/api/v1/api-keys" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name":"test-no-expiry","scopes":["contracts:read"]}'
@@ -60,7 +60,7 @@ curl -sk -X POST "https://app.0xapogee.local/api/v1/api-keys" \
 #### Test 1.2: Create Key With Expiration (Should Succeed)
 
 ```bash
-curl -sk -X POST "https://app.0xapogee.local/api/v1/api-keys" \
+curl -sk -X POST "https://app.0xapogee.com/api/v1/api-keys" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name":"test-key","scopes":["contracts:read"],"expires_in_days":30}'
@@ -86,7 +86,7 @@ curl -sk -X POST "https://app.0xapogee.local/api/v1/api-keys" \
 #### Test 2.1: Exceeding Rate Limit (Should Fail)
 
 ```bash
-curl -sk -X POST "https://app.0xapogee.local/api/v1/api-keys" \
+curl -sk -X POST "https://app.0xapogee.com/api/v1/api-keys" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name":"test","scopes":["contracts:read"],"expires_in_days":30,"rate_limit_per_minute":500}'
@@ -106,7 +106,7 @@ curl -sk -X POST "https://app.0xapogee.local/api/v1/api-keys" \
 #### Test 2.2: Valid Rate Limit (Should Succeed)
 
 ```bash
-curl -sk -X POST "https://app.0xapogee.local/api/v1/api-keys" \
+curl -sk -X POST "https://app.0xapogee.com/api/v1/api-keys" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name":"test","scopes":["contracts:read"],"expires_in_days":30,"rate_limit_per_minute":100}'
@@ -124,7 +124,7 @@ curl -sk -X POST "https://app.0xapogee.local/api/v1/api-keys" \
 
 ```bash
 # Create a key
-RESULT=$(curl -sk -X POST "https://app.0xapogee.local/api/v1/api-keys" \
+RESULT=$(curl -sk -X POST "https://app.0xapogee.com/api/v1/api-keys" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name":"test","scopes":["contracts:read"],"expires_in_days":30}')
@@ -132,7 +132,7 @@ RESULT=$(curl -sk -X POST "https://app.0xapogee.local/api/v1/api-keys" \
 API_KEY=$(echo "$RESULT" | jq -r '.key')
 
 # Use the key to access contracts
-curl -sk "https://app.0xapogee.local/api/v1/contracts" \
+curl -sk "https://app.0xapogee.com/api/v1/contracts" \
   -H "X-API-Key: $API_KEY"
 ```
 
@@ -141,7 +141,7 @@ curl -sk "https://app.0xapogee.local/api/v1/contracts" \
 #### Test 3.2: Invalid API Key
 
 ```bash
-curl -sk "https://app.0xapogee.local/api/v1/contracts" \
+curl -sk "https://app.0xapogee.com/api/v1/contracts" \
   -H "X-API-Key: bso_invalid_key"
 ```
 
@@ -152,7 +152,7 @@ curl -sk "https://app.0xapogee.local/api/v1/contracts" \
 ```bash
 # Create key with only contracts:read scope
 # Try to access vulnerabilities (requires vulnerabilities:read)
-curl -sk "https://app.0xapogee.local/api/v1/vulnerabilities" \
+curl -sk "https://app.0xapogee.com/api/v1/vulnerabilities" \
   -H "X-API-Key: $API_KEY"
 ```
 
@@ -168,7 +168,7 @@ curl -sk "https://app.0xapogee.local/api/v1/vulnerabilities" \
 
 ```bash
 # Create a key
-RESULT=$(curl -sk -X POST "https://app.0xapogee.local/api/v1/api-keys" \
+RESULT=$(curl -sk -X POST "https://app.0xapogee.com/api/v1/api-keys" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name":"track-test","scopes":["contracts:read"],"expires_in_days":30}')
@@ -177,16 +177,16 @@ API_KEY=$(echo "$RESULT" | jq -r '.key')
 KEY_ID=$(echo "$RESULT" | jq -r '.id')
 
 # Check initial state
-curl -sk "https://app.0xapogee.local/api/v1/api-keys/$KEY_ID" \
+curl -sk "https://app.0xapogee.com/api/v1/api-keys/$KEY_ID" \
   -H "Authorization: Bearer $TOKEN" | jq '.last_used_at, .total_requests'
 # Expected: null, 0
 
 # Use the key
-curl -sk "https://app.0xapogee.local/api/v1/contracts" \
+curl -sk "https://app.0xapogee.com/api/v1/contracts" \
   -H "X-API-Key: $API_KEY"
 
 # Check updated state
-curl -sk "https://app.0xapogee.local/api/v1/api-keys/$KEY_ID" \
+curl -sk "https://app.0xapogee.com/api/v1/api-keys/$KEY_ID" \
   -H "Authorization: Bearer $TOKEN" | jq '.last_used_at, .total_requests'
 # Expected: "2026-01-26T...", 1
 ```
@@ -205,11 +205,11 @@ API_KEY="..."
 KEY_ID="..."
 
 # Revoke the key
-curl -sk -X DELETE "https://app.0xapogee.local/api/v1/api-keys/$KEY_ID" \
+curl -sk -X DELETE "https://app.0xapogee.com/api/v1/api-keys/$KEY_ID" \
   -H "Authorization: Bearer $TOKEN"
 
 # Try to use revoked key
-curl -sk "https://app.0xapogee.local/api/v1/contracts" \
+curl -sk "https://app.0xapogee.com/api/v1/contracts" \
   -H "X-API-Key: $API_KEY"
 ```
 
@@ -229,18 +229,18 @@ API_KEY="..."
 KEY_ID="..."
 
 # Refresh the key
-RESULT=$(curl -sk -X POST "https://app.0xapogee.local/api/v1/api-keys/$KEY_ID/regenerate" \
+RESULT=$(curl -sk -X POST "https://app.0xapogee.com/api/v1/api-keys/$KEY_ID/regenerate" \
   -H "Authorization: Bearer $TOKEN")
 
 NEW_KEY=$(echo "$RESULT" | jq -r '.key')
 
 # Try old key
-curl -sk "https://app.0xapogee.local/api/v1/contracts" \
+curl -sk "https://app.0xapogee.com/api/v1/contracts" \
   -H "X-API-Key: $API_KEY"
 # Expected: 401 Unauthorized
 
 # Try new key
-curl -sk "https://app.0xapogee.local/api/v1/contracts" \
+curl -sk "https://app.0xapogee.com/api/v1/contracts" \
   -H "X-API-Key: $NEW_KEY"
 # Expected: 200 OK
 ```
@@ -253,12 +253,12 @@ After testing, revoke all test keys:
 
 ```bash
 # List all keys
-curl -sk "https://app.0xapogee.local/api/v1/api-keys" \
+curl -sk "https://app.0xapogee.com/api/v1/api-keys" \
   -H "Authorization: Bearer $TOKEN" | jq '.[] | select(.name | startswith("test")) | .id'
 
 # Revoke each test key
 for KEY_ID in ...; do
-  curl -sk -X DELETE "https://app.0xapogee.local/api/v1/api-keys/$KEY_ID" \
+  curl -sk -X DELETE "https://app.0xapogee.com/api/v1/api-keys/$KEY_ID" \
     -H "Authorization: Bearer $TOKEN"
 done
 ```

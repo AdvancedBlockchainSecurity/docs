@@ -39,7 +39,7 @@ Invalid value: "": may not be specified when `value` is not empty
 **Fix:** Added `allowed_hosts` and `dashboard_base_url` to the overlay configmap patch.
 
 **Files Changed:**
-- `k8s/overlays/local/configmap-patch.yaml` - Added `allowed_hosts: "app.0xapogee.local"` and `dashboard_base_url: "https://app.0xapogee.local"`
+- `k8s/overlays/local/configmap-patch.yaml` - Added `allowed_hosts: "app.0xapogee.com"` and `dashboard_base_url: "https://app.0xapogee.com"`
 
 ---
 
@@ -86,7 +86,7 @@ kubectl apply -k k8s/overlays/local/
 kubectl -n api-service-local get pods -o jsonpath='{.items[?(@.status.phase=="Running")].spec.containers[*].image}'
 # harbor.blocksecops.local/blocksecops/api-service:0.28.40
 
-curl -sk https://app.0xapogee.local/api/v1/health/live
+curl -sk https://app.0xapogee.com/api/v1/health/live
 # {"status":"healthy","version":"0.28.40"}
 ```
 
@@ -97,7 +97,7 @@ curl -sk https://app.0xapogee.local/api/v1/health/live
 - [x] `kubectl apply -k` succeeds without env config conflict
 - [x] Pod running: api-service:0.28.40, 1/1 READY
 - [x] Health endpoint returns version 0.28.40
-- [x] Code snippet visible on vulnerability detail page: `https://app.0xapogee.local/vulnerabilities/5bd16f06-1d70-401d-905d-c6876504509c`
+- [x] Code snippet visible on vulnerability detail page: `https://app.0xapogee.com/vulnerabilities/5bd16f06-1d70-401d-905d-c6876504509c`
 - [x] Code snippet persisted to database after first view
 
 ---

@@ -22,7 +22,7 @@ Operational procedures for managing the Apogee referral system, including thresh
 
 ```bash
 # Via API (requires platform_admin auth)
-curl -s -k https://app.0xapogee.local/api/v1/admin/referrals/settings \
+curl -s -k https://app.0xapogee.com/api/v1/admin/referrals/settings \
   -H "Authorization: Bearer $ADMIN_TOKEN" | jq '.'
 
 # Direct database query
@@ -35,7 +35,7 @@ kubectl exec postgresql-0 -n postgresql-local -- psql -U blocksecops -d solidity
 Change the number of referrals needed to earn a reward:
 
 ```bash
-curl -s -k -X PATCH https://app.0xapogee.local/api/v1/admin/referrals/settings \
+curl -s -k -X PATCH https://app.0xapogee.com/api/v1/admin/referrals/settings \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"referral_threshold": 5}' | jq '.'
@@ -45,7 +45,7 @@ curl -s -k -X PATCH https://app.0xapogee.local/api/v1/admin/referrals/settings \
 
 ```bash
 # Change reward tier (e.g., from starter to growth)
-curl -s -k -X PATCH https://app.0xapogee.local/api/v1/admin/referrals/settings \
+curl -s -k -X PATCH https://app.0xapogee.com/api/v1/admin/referrals/settings \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"referral_reward_tier": "growth", "referral_reward_days": 60}' | jq '.'
@@ -55,7 +55,7 @@ curl -s -k -X PATCH https://app.0xapogee.local/api/v1/admin/referrals/settings \
 
 ```bash
 # Disable referrals
-curl -s -k -X PATCH https://app.0xapogee.local/api/v1/admin/referrals/settings \
+curl -s -k -X PATCH https://app.0xapogee.com/api/v1/admin/referrals/settings \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"referral_enabled": false}' | jq '.'

@@ -15,7 +15,7 @@ This playbook covers retraining the **False Positive Classifier** — a Random F
 - [ ] API Service running (port 8000)
 - [ ] PostgreSQL database accessible
 - [ ] Sufficient labeled vulnerability data (see thresholds below)
-- [ ] Access to Admin Portal at `admin.0xapogee.local` or API endpoint
+- [ ] Access to Admin Portal at `admin.0xapogee.com` or API endpoint
 - [ ] `ML_MODEL_DIR` env var set to a writable path (K8s: `/app/.cache/ml-models`)
 
 ---
@@ -120,7 +120,7 @@ The classifier uses `class_weight="balanced"` to compensate for imbalance, but e
 
 ### Option A: Admin Portal UI
 
-1. Navigate to `admin.0xapogee.local/ml-models`
+1. Navigate to `admin.0xapogee.com/ml-models`
 2. Review the model status and training data sections
 3. Click **Retrain Model** (uses 200 sample minimum)
 4. Or click **Force Retrain** (bypasses to 50 sample minimum)

@@ -78,7 +78,7 @@ kubectl rollout status deployment/admin-portal -n admin-portal-local --timeout=6
 
 ```bash
 # Health check
-curl -sk https://admin.0xapogee.local/ -o /dev/null -w "%{http_code}"
+curl -sk https://admin.0xapogee.com/ -o /dev/null -w "%{http_code}"
 # Expected: 200
 
 # Verify Supabase URL baked in

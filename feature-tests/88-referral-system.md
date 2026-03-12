@@ -26,14 +26,14 @@ Verify the referral system: code generation, sharing, applying codes, reward thr
 ### Expected
 
 - [x] Returns 200 with `referral_code` (8 chars, alphanumeric + `_-`)
-- [x] Returns `share_url` in format `https://app.0xapogee.local/signup?ref=CODE`
+- [x] Returns `share_url` in format `https://app.0xapogee.com/signup?ref=CODE`
 - [x] Subsequent calls return the same code
 - [x] Returns 401 without authentication
 
 ### Verification
 
 ```bash
-curl -s -k https://app.0xapogee.local/api/v1/referrals/my-code \
+curl -s -k https://app.0xapogee.com/api/v1/referrals/my-code \
   -H "Authorization: Bearer $TOKEN" | jq '.'
 ```
 
@@ -63,7 +63,7 @@ curl -s -k https://app.0xapogee.local/api/v1/referrals/my-code \
 ### Verification
 
 ```bash
-curl -s -k https://app.0xapogee.local/api/v1/referrals/status \
+curl -s -k https://app.0xapogee.com/api/v1/referrals/status \
   -H "Authorization: Bearer $TOKEN" | jq '.'
 ```
 
@@ -94,7 +94,7 @@ curl -s -k https://app.0xapogee.local/api/v1/referrals/status \
 ### Verification
 
 ```bash
-curl -s -k -X POST https://app.0xapogee.local/api/v1/referrals/apply \
+curl -s -k -X POST https://app.0xapogee.com/api/v1/referrals/apply \
   -H "Authorization: Bearer $TOKEN_B" \
   -H "Content-Type: application/json" \
   -d '{"code": "USER_A_CODE"}' | jq '.'
@@ -240,7 +240,7 @@ curl -s -k -X POST https://app.0xapogee.local/api/v1/referrals/apply \
 ### Verification
 
 ```bash
-curl -s -k https://app.0xapogee.local/api/v1/admin/referrals/settings \
+curl -s -k https://app.0xapogee.com/api/v1/admin/referrals/settings \
   -H "Authorization: Bearer $ADMIN_TOKEN" | jq '.'
 ```
 

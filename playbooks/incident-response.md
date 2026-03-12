@@ -31,7 +31,7 @@ Procedures for detecting, responding to, and recovering from incidents affecting
 kubectl get pods --all-namespaces | grep -v Running | grep -v Completed
 
 # API health
-curl -sk https://app.0xapogee.local/api/v1/health/ready
+curl -sk https://app.0xapogee.com/api/v1/health/ready
 
 # Recent events
 kubectl get events --all-namespaces --field-selector type=Warning \

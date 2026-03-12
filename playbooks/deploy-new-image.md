@@ -254,10 +254,10 @@ kubectl get cronjob -n api-service-local -o custom-columns='NAME:.metadata.name,
 
 ```bash
 # API Service health
-curl -s https://app.0xapogee.local/api/v1/health/ready --insecure
+curl -s https://app.0xapogee.com/api/v1/health/ready --insecure
 
 # Dashboard (check title in response)
-curl -s https://app.0xapogee.local/ --insecure | grep -o '<title>.*</title>'
+curl -s https://app.0xapogee.com/ --insecure | grep -o '<title>.*</title>'
 ```
 
 ---

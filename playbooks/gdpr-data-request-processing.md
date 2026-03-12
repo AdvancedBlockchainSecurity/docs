@@ -15,7 +15,7 @@ This playbook covers processing GDPR data requests (export, deletion, ML consent
 - Admin account with appropriate role:
   - `support_admin` — view requests and details
   - `platform_admin` — process requests (approve/reject/complete)
-- Access to `https://admin.0xapogee.local/data-requests` (local) or `https://admin.0xapogee.com/data-requests` (production)
+- Access to `https://admin.0xapogee.com/data-requests` (local) or `https://admin.0xapogee.com/data-requests` (production)
 - MFA verified session
 
 ---
@@ -73,13 +73,13 @@ Export requests automatically generate a downloadable JSON file with the user's 
 
 **API equivalent:**
 ```bash
-curl -X POST https://app.0xapogee.local/api/v1/admin/gdpr/requests/{request_id}/process \
+curl -X POST https://app.0xapogee.com/api/v1/admin/gdpr/requests/{request_id}/process \
   -H "Cookie: admin_session=..." \
   -H "Content-Type: application/json" \
   -d '{"action": "approve"}'
 
 # Download export
-curl -X GET https://app.0xapogee.local/api/v1/gdpr/export/{request_id}/download \
+curl -X GET https://app.0xapogee.com/api/v1/gdpr/export/{request_id}/download \
   -H "Cookie: admin_session=..." \
   -o export.json
 ```
@@ -126,7 +126,7 @@ Deletion requests permanently remove the user's data from the platform.
 
 **API equivalent:**
 ```bash
-curl -X POST https://app.0xapogee.local/api/v1/admin/gdpr/requests/{request_id}/process \
+curl -X POST https://app.0xapogee.com/api/v1/admin/gdpr/requests/{request_id}/process \
   -H "Cookie: admin_session=..." \
   -H "Content-Type: application/json" \
   -d '{"action": "approve"}'
@@ -150,7 +150,7 @@ ML withdrawal requests withdraw the user's ML data collection consent and exclud
 
 **API equivalent:**
 ```bash
-curl -X POST https://app.0xapogee.local/api/v1/admin/gdpr/requests/{request_id}/process \
+curl -X POST https://app.0xapogee.com/api/v1/admin/gdpr/requests/{request_id}/process \
   -H "Cookie: admin_session=..." \
   -H "Content-Type: application/json" \
   -d '{"action": "approve"}'
@@ -168,7 +168,7 @@ For cases where an admin needs to withdraw ML consent directly (e.g., legal requ
 
 **API equivalent:**
 ```bash
-curl -X POST https://app.0xapogee.local/api/v1/admin/gdpr/users/{user_id}/withdraw-ml \
+curl -X POST https://app.0xapogee.com/api/v1/admin/gdpr/users/{user_id}/withdraw-ml \
   -H "Cookie: admin_session=..."
 ```
 

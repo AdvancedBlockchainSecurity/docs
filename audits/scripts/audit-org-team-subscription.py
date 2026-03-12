@@ -36,7 +36,7 @@ import jwt
 # Configuration
 # ============================================================================
 
-API_BASE = "https://app.0xapogee.local/api/v1"
+API_BASE = "https://app.0xapogee.com/api/v1"
 JWT_SECRET = "local-dev-jwt-secret-key-change-in-production"
 
 USERS = {

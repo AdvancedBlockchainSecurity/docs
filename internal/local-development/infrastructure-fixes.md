@@ -300,7 +300,7 @@ metadata:
   namespace: monitoring
 spec:
   rules:
-  - host: grafana.0xapogee.local
+  - host: grafana.0xapogee.com
     http:
       paths:
       - path: /
@@ -328,7 +328,7 @@ spec:
 kubectl port-forward svc/monitoring-grafana 3001:80 -n monitoring &
 
 # Ingress (requires host configuration)
-echo "$(minikube ip) grafana.0xapogee.local" | sudo tee -a /etc/hosts
+echo "$(minikube ip) grafana.0xapogee.com" | sudo tee -a /etc/hosts
 ```
 
 ## Troubleshooting Applied Fixes

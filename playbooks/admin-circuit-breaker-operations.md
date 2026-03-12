@@ -15,7 +15,7 @@ This playbook covers monitoring, troubleshooting, and manually recovering circui
 ## Prerequisites
 
 - Platform admin or super admin role
-- Access to `admin.0xapogee.local`
+- Access to `admin.0xapogee.com`
 - MFA verified
 
 ## Quick Reference

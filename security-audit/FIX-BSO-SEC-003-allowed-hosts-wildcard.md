@@ -81,7 +81,7 @@ ALLOWED_HOSTS="localhost,127.0.0.1"
 
 ### Server (kubeadm)
 ```bash
-ALLOWED_HOSTS="app.0xapogee.local,192.168.86.225"
+ALLOWED_HOSTS="app.0xapogee.com,192.168.86.225"
 ```
 
 ### Production (GCP)

@@ -503,6 +503,7 @@ PostgreSQL backup to GCS is pending. Current backups are manual (`pg_dump` via k
 6. **Legacy namespace cleanup** — `solidity-security` replaced with `tool-integration-local` in defaults and examples
 7. **Dockerfile SERVICE_VERSION** — Build arg persisted as ENV for runtime access
 8. **tool-integration bumped to 0.5.29** — All fixes deployed to GCP production
+- **scanner-slither 0.3.8**: Pre-installed 18 solc versions to eliminate runtime downloads. Stored in /opt/solc-select to survive emptyDir mount. GCP audit finding #40.
 
 ### Pull Requests Merged (v9.0.0)
 

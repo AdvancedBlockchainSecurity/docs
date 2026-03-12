@@ -17,7 +17,7 @@ API service v0.29.43 fixes 10 contracts stuck in "scanning" status, adds source 
 **Verification:**
 ```bash
 # Attempt to scan a contract with no source code
-curl -sk -X POST https://app.0xapogee.local/api/v1/scans \
+curl -sk -X POST https://app.0xapogee.com/api/v1/scans \
   -H "Authorization: Bearer $JWT" \
   -H "Content-Type: application/json" \
   -d '{"contract_id": "<no-source-contract-id>", "scanners": ["slither"]}' \
@@ -40,14 +40,14 @@ curl -sk -X POST https://app.0xapogee.local/api/v1/scans \
 **Verification:**
 ```bash
 # Empty contract (no address, no source)
-curl -sk -X POST https://app.0xapogee.local/api/v1/contracts \
+curl -sk -X POST https://app.0xapogee.com/api/v1/contracts \
   -H "Authorization: Bearer $JWT" \
   -H "Content-Type: application/json" \
   -d '{"name": "EmptyContract"}' | jq '.status_code'
 # Expected: 422
 
 # Contract with null bytes in source code
-curl -sk -X POST https://app.0xapogee.local/api/v1/contracts \
+curl -sk -X POST https://app.0xapogee.com/api/v1/contracts \
   -H "Authorization: Bearer $JWT" \
   -H "Content-Type: application/json" \
   -d "{\"name\": \"BadContract\", \"source_code\": \"pragma solidity\x00^0.8.0;\"}" | jq '.status_code'
@@ -67,7 +67,7 @@ curl -sk -X POST https://app.0xapogee.local/api/v1/contracts \
 **Verification:**
 ```bash
 # Manually trigger recovery (internal endpoint)
-curl -sk -X POST https://app.0xapogee.local/api/v1/scans/maintenance/recover-stale-scans \
+curl -sk -X POST https://app.0xapogee.com/api/v1/scans/maintenance/recover-stale-scans \
   -H "X-Internal-Service: true"
 # Expected: 200 with recovery summary including contracts fixed
 
@@ -123,19 +123,19 @@ kubectl get jobs -n api-service-local -l app=stale-scan-recovery \
 **Verification:**
 ```bash
 # Upload an ELF binary
-curl -sk -X POST https://app.0xapogee.local/api/v1/upload \
+curl -sk -X POST https://app.0xapogee.com/api/v1/upload \
   -H "Authorization: Bearer $JWT" \
   -F "file=@/bin/ls" | jq '.status_code'
 # Expected: 400
 
 # Upload a PDF
-curl -sk -X POST https://app.0xapogee.local/api/v1/upload \
+curl -sk -X POST https://app.0xapogee.com/api/v1/upload \
   -H "Authorization: Bearer $JWT" \
   -F "file=@/tmp/test.pdf" | jq '.status_code'
 # Expected: 400
 
 # Upload a valid Solidity file (should succeed)
-curl -sk -X POST https://app.0xapogee.local/api/v1/upload \
+curl -sk -X POST https://app.0xapogee.com/api/v1/upload \
   -H "Authorization: Bearer $JWT" \
   -F "file=@/tmp/Token.sol" | jq '.status_code'
 # Expected: 200
