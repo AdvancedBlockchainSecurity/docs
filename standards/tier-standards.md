@@ -1,7 +1,7 @@
 # Tier Standards - Source of Truth
 
-**Last Updated**: February 28, 2026
-**Version**: 3.5 (Integrations tier gate update, IDE token tier fix)
+**Last Updated**: March 12, 2026
+**Version**: 3.6 (Add monthly_ai_exploits_limit to TierQuotas model)
 **Status**: Official
 **Owner**: Product Team
 
@@ -183,6 +183,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | Private Repos | 0 | 3 | -1 | -1 |
 | AI Explanations/Month | 0 | 50 | 200 | -1 |
 | AI Invariant Gens/Month | 0 | 10 | 50 | -1 |
+| AI Exploit Gens/Month | 0 | 0 | 5 | 50 |
 | Result Retention (days) | 7 | 90 | 180 | 365 |
 | Scan Priority | 50 | 40 | 25 | 5 |
 
@@ -549,7 +550,8 @@ export_enabled = true,
 result_retention_days = 7,
 monthly_ai_explanations_limit = 0,
 monthly_invariant_generations_limit = 0,
-monthly_nl_conversions_limit = 0
+monthly_nl_conversions_limit = 0,
+monthly_ai_exploits_limit = 0
 
 -- Starter tier
 monthly_contract_limit = 15,
@@ -569,7 +571,8 @@ export_enabled = true,
 result_retention_days = 90,
 monthly_ai_explanations_limit = 50,
 monthly_invariant_generations_limit = 10,
-monthly_nl_conversions_limit = 25
+monthly_nl_conversions_limit = 25,
+monthly_ai_exploits_limit = 0
 
 -- Growth tier
 monthly_contract_limit = 50,
@@ -589,7 +592,8 @@ export_enabled = true,
 result_retention_days = 180,
 monthly_ai_explanations_limit = 200,
 monthly_invariant_generations_limit = 50,
-monthly_nl_conversions_limit = 100
+monthly_nl_conversions_limit = 100,
+monthly_ai_exploits_limit = 5
 
 -- Enterprise tier
 monthly_contract_limit = -1,
@@ -609,7 +613,8 @@ export_enabled = true,
 result_retention_days = 365,
 monthly_ai_explanations_limit = -1,
 monthly_invariant_generations_limit = -1,
-monthly_nl_conversions_limit = -1
+monthly_nl_conversions_limit = -1,
+monthly_ai_exploits_limit = 50
 ```
 
 ---
