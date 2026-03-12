@@ -3,7 +3,7 @@
 **Date:** March 11, 2026
 **Environment:** GCP Production (gke_project-8a2657b9-d96c-4c0a-a69_us-west1_apogee-production-gke)
 **Version:** 1.0.0
-**Status:** PASS (2 advisories, 2 low findings)
+**Status:** PASS (2 advisories, 0 open findings — 2 remediated)
 
 ---
 
@@ -86,13 +86,13 @@ Verify Cilium actually blocks denied paths and allows permitted paths.
 |---------|-----------|-----------------|--------|
 | api-service | 0.29.78 | 0.29.78 (via /api/v1/health/live) | [x] PASS |
 | tool-integration | 0.5.29 | 0.5.29 (via /health) | [x] PASS |
-| orchestration | 0.10.8 | Not reported in /health | [~] Advisory — no version field in health response |
+| orchestration | 0.10.9 | 0.10.9 (via /health) | [x] PASS — fixed in v0.10.9 |
 | notification | 0.2.6 | Not reported in /health | [~] Advisory |
 | intelligence-engine | 0.3.7 | Not reported in /health | [~] Advisory |
 | data-service | 0.2.7 | Not reported in /health | [~] Advisory |
 | contract-parser | 0.2.2 | Not reported in /health | [~] Advisory |
 
-**Result:** PASS — Services that report version are correct. 5 services don't include version in health response (advisory only).
+**Result:** PASS — Services that report version are correct. 4 services don't include version in health response (advisory only). Orchestration fixed in v0.10.9.
 
 ---
 
@@ -122,10 +122,10 @@ Verify Cilium actually blocks denied paths and allows permitted paths.
 
 | Repo | File | Reference | Severity | Result |
 |------|------|-----------|----------|--------|
-| tool-integration | `k8s/overlays/production/scanner-versions-patch.yaml:13` | `SCANNER_REGISTRY: "us-central1-docker.pkg.dev/solidity-security/blocksecops"` | LOW | [!] Legacy GCP project reference |
-| orchestration | `src/core/config.py:24` | `service_name: str = "solidity-security-orchestration"` | LOW | [!] Legacy service name default |
+| tool-integration | `k8s/overlays/production/scanner-versions-patch.yaml:13` | `SCANNER_REGISTRY: "us-central1-docker.pkg.dev/solidity-security/blocksecops"` | LOW | [x] FIXED — updated to current GCP registry (PR #137) |
+| orchestration | `src/core/config.py:24` | `service_name: str = "solidity-security-orchestration"` | LOW | [x] FIXED — changed to `blocksecops-orchestration` (PR #100, v0.10.9) |
 
-**Result:** 2 LOW findings. Neither causes runtime failures (scanner-versions-patch is production overlay not used in GCP; config.py default is overridden by env var), but should be cleaned up.
+**Result:** PASS — 2 LOW findings remediated. Both legacy `solidity-security` references replaced.
 
 ---
 
@@ -160,26 +160,28 @@ Scanned all ConfigMaps in all `-prod` namespaces for `-local`, `localhost`, `127
 | BEH-005: Version Consistency | HIGH | PASS (2/2 reporting services correct) |
 | BEH-006: RBAC Endpoints | HIGH | PASS |
 | BEH-007: Base vs Overlay Namespaces | MEDIUM | PASS (all overridden correctly) |
-| BEH-008: Legacy References | MEDIUM | 2 LOW findings (non-blocking) |
+| BEH-008: Legacy References | MEDIUM | PASS (2 LOW findings remediated) |
 | BEH-009: Dead-Letter Queue | MEDIUM | PASS |
 | BEH-010: ConfigMap Values | MEDIUM | PASS |
 
-**Overall:** PASS — 10/10 checks pass. 2 low-priority cleanup items found (legacy references in production overlay and orchestration config default).
+**Overall:** PASS — 10/10 checks pass. 2 low-priority findings remediated (orchestration PR #100 v0.10.9, tool-integration PR #137).
 
 ---
 
 ## Advisories
 
-### ADV-B01: 5 Services Missing Version in Health Response
+### ADV-B01: 4 Services Missing Version in Health Response
 
-orchestration, notification, intelligence-engine, data-service, and contract-parser do not include a `version` field in their `/health` endpoint response. This makes it impossible to verify version consistency via automated audit.
+notification, intelligence-engine, data-service, and contract-parser do not include a `version` field in their `/health` endpoint response. This makes it impossible to verify version consistency via automated audit.
 
-**Recommendation:** Add version to health endpoint responses in future updates.
+**Update:** orchestration fixed in v0.10.9 (PR #100) — now reports version in `/health`.
 
-### ADV-B02: Legacy `solidity-security` References
+**Recommendation:** Add version to health endpoint responses in remaining 4 services.
 
-Two non-critical references to the legacy `solidity-security` project name remain in codebases:
-1. `tool-integration/k8s/overlays/production/scanner-versions-patch.yaml` — `SCANNER_REGISTRY` points to old GCP project
-2. `orchestration/src/core/config.py` — hardcoded `service_name` default
+### ADV-B02: Legacy `solidity-security` References — RESOLVED
 
-Neither causes runtime failures but should be cleaned up to avoid confusion.
+~~Two non-critical references to the legacy `solidity-security` project name remained in codebases.~~
+
+**Remediated:**
+1. `tool-integration/k8s/overlays/production/scanner-versions-patch.yaml` — updated to current GCP registry (PR #137)
+2. `orchestration/src/core/config.py` — service_name changed to `blocksecops-orchestration`, version made dynamic (PR #100, v0.10.9)

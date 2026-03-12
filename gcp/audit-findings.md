@@ -72,6 +72,9 @@
 | 34 | ~~12 scan result forwarding error handlers missing dead-letter enqueue~~ — Fixed: All 12 handlers now call `dead_letter_store.enqueue()`. tool-integration v0.5.29 | Resolved (2026-03-11) |
 | 35 | ~~`/cluster/metrics` returned 403 due to missing RBAC~~ — Fixed: ClusterRole `tool-integration-cluster-reader` with nodes+pods list. GCP overlay patch for tool-integration-prod SA. tool-integration v0.5.29 | Resolved (2026-03-11) |
 | 36 | ~~Legacy namespace `solidity-security` in defaults and examples~~ — Fixed: Replaced with `tool-integration-local` in kubernetes_job_manager.py, result_collector.py, and example Job manifests. tool-integration v0.5.29 | Resolved (2026-03-11) |
+| 37 | ~~Orchestration service_name default `solidity-security-orchestration`~~ — Fixed: Changed to `blocksecops-orchestration`. orchestration v0.10.9 PR #100 | Resolved (2026-03-11) |
+| 38 | ~~Orchestration hardcoded version `0.1.0` in config and `0.7.1` in FastAPI~~ — Fixed: Dynamic version from SERVICE_VERSION env var / importlib.metadata. Dockerfile persists build arg as ENV. orchestration v0.10.9 PR #100 | Resolved (2026-03-11) |
+| 39 | ~~tool-integration production overlay SCANNER_REGISTRY legacy GCP project~~ — Fixed: Updated from `solidity-security` to current GCP project. tool-integration PR #137 | Resolved (2026-03-11) |
 
 ## Passed
 
