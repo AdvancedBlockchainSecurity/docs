@@ -38,20 +38,38 @@
 
 ## 3. Registration
 
-### 3.1 New User Registration
+### 3.1 New User Registration (Email)
 - [ ] Registration form accessible
 - [ ] Email field validates format
 - [ ] Password requirements displayed
 - [ ] Password confirmation matches
 - [ ] Successful registration creates account
 
-### 3.2 Registration Validation
+### 3.2 Registration via OAuth Signup
+- [ ] "Sign up with Google" button visible on Register page
+- [ ] Google OAuth signup redirects to Google consent screen
+- [ ] Successful Google OAuth signup creates account and redirects to dashboard
+- [ ] "Sign up with GitHub" button visible on Register page
+- [ ] GitHub OAuth signup redirects to GitHub consent screen
+- [ ] Successful GitHub OAuth signup creates account and redirects to dashboard
+
+### 3.3 Registration via Wallet Signup
+- [ ] "Sign up with Ethereum" option visible on Register page
+- [ ] Ethereum wallet signup triggers wallet connection prompt (MetaMask/WalletConnect)
+- [ ] Successful Ethereum wallet signup creates account linked to wallet address
+- [ ] User redirected to dashboard after Ethereum wallet signup
+- [ ] "Sign up with Solana" option visible on Register page
+- [ ] Solana wallet signup triggers wallet connection prompt (Phantom/Solflare)
+- [ ] Successful Solana wallet signup creates account linked to wallet address
+- [ ] User redirected to dashboard after Solana wallet signup
+
+### 3.4 Registration Validation
 - [ ] Duplicate email rejected
 - [ ] Weak password rejected
 - [ ] Empty fields show validation errors
 - [ ] Email confirmation sent (if enabled)
 
-### 3.3 New User Defaults
+### 3.5 New User Defaults
 - [ ] New user assigned to developer tier
 - [ ] New user quota initialized correctly (3 scans/month, 2 team members)
 - [ ] New user can access dashboard
@@ -81,46 +99,41 @@
 ## 6. OAuth Provider Login
 
 ### 6.1 Google OAuth
-- [ ] "Sign in with Google" button visible
+- [ ] "Sign in with Google" button visible on Login page
 - [ ] Clicking redirects to Google OAuth consent
 - [ ] Successful auth redirects back to dashboard
 - [ ] User created in database with Google provider
 
 ### 6.2 GitHub OAuth
-- [ ] "Sign in with GitHub" button visible
+- [ ] "Sign in with GitHub" button visible on Login page
 - [ ] Clicking redirects to GitHub OAuth consent
 - [ ] Successful auth redirects back to dashboard
 - [ ] User created in database with GitHub provider
 
-### 6.3 Microsoft/Azure OAuth
-- [ ] "Sign in with Microsoft" button visible
-- [ ] Clicking redirects to Microsoft OAuth consent
-- [ ] Successful auth redirects back to dashboard
-- [ ] User created in database with Azure provider
+### 6.3 Removed Providers — Verify Absence
+- [ ] Azure/Microsoft OAuth button is NOT present on Login page
+- [ ] Discord OAuth button is NOT present on Login page
+- [ ] Slack OAuth button is NOT present on Login page
+- [ ] BitBucket OAuth button is NOT present on Login page
+- [ ] X (Twitter) OAuth button is NOT present on Login page
+- [ ] Only Google and GitHub OAuth buttons are shown on Login page
+- [ ] No remnant OAuth callback routes exist for removed providers (Azure, Discord, Slack, BitBucket, Twitter)
 
-### 6.4 Discord OAuth
-- [ ] "Sign in with Discord" button visible
-- [ ] Clicking redirects to Discord OAuth consent
-- [ ] Successful auth redirects back to dashboard
-- [ ] User created in database with Discord provider
+---
 
-### 6.5 Slack OAuth
-- [ ] "Sign in with Slack" button visible
-- [ ] Clicking redirects to Slack OAuth consent
-- [ ] Successful auth redirects back to dashboard
-- [ ] User created in database with Slack provider
+## 7. Wallet Authentication
 
-### 6.6 BitBucket OAuth
-- [ ] "Sign in with BitBucket" button visible
-- [ ] Clicking redirects to BitBucket OAuth consent
-- [ ] Successful auth redirects back to dashboard
-- [ ] User created in database with BitBucket provider
+### 7.1 Ethereum Wallet Login
+- [ ] "Sign in with Ethereum" option visible on Login page
+- [ ] Wallet connection prompt appears (MetaMask/WalletConnect)
+- [ ] Successful wallet auth redirects to dashboard
+- [ ] User session linked to wallet address
 
-### 6.7 X (Twitter) OAuth
-- [ ] "Sign in with X" button visible
-- [ ] Clicking redirects to Twitter OAuth consent
-- [ ] Successful auth redirects back to dashboard
-- [ ] User created in database with Twitter provider
+### 7.2 Solana Wallet Login
+- [ ] "Sign in with Solana" option visible on Login page
+- [ ] Wallet connection prompt appears (Phantom/Solflare)
+- [ ] Successful wallet auth redirects to dashboard
+- [ ] User session linked to wallet address
 
 ---
 
