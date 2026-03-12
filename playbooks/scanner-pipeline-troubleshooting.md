@@ -1,7 +1,7 @@
 # Playbook: Scanner Pipeline Troubleshooting
 
-**Version:** 1.2.0
-**Last Updated:** February 22, 2026
+**Version:** 1.3.0
+**Last Updated:** March 11, 2026
 
 ## Overview
 
@@ -198,6 +198,59 @@ curl -s -w "\n%{http_code}" -X POST "$CALLBACK_URL" \
     --retry-all-errors \
     -d @"$OUTPUT_FILE"
 ```
+
+---
+
+### Issue 10: Scanner Returns 0 Results Despite Completing (NetworkPolicy)
+
+**Symptoms:**
+- Scanner Jobs complete successfully (status: Completed)
+- Scanner pod logs show analysis ran and found vulnerabilities
+- Tool-integration receives NO callback (no POST logged)
+- Database shows 0 vulnerabilities for the scan
+- Other scans of the same contract previously had results
+
+**Root Cause:** In namespaces with `default-deny-all` NetworkPolicy, scanner pods (label `app: scanner`) have no egress rule allowing them to POST results to tool-integration on port 8005. The `tool-integration-network-policy` only applies to pods with `app: tool-integration`, not scanner pods. Scanner pods can resolve DNS (via `allow-dns` policy) but cannot make HTTP connections.
+
+**Diagnosis:**
+```bash
+# Check if scanner pods have egress NetworkPolicy
+kubectl get networkpolicy -n tool-integration-<env> -o wide | grep scanner
+
+# Verify scanner pod labels
+kubectl get pods -n tool-integration-<env> -l app=scanner -o wide
+
+# Check if tool-integration allows ingress from scanner pods
+kubectl describe networkpolicy tool-integration-network-policy -n tool-integration-<env> | grep -A5 scanner
+
+# Test connectivity from a scanner-labeled pod
+kubectl run nettest --image=busybox --labels="app=scanner" -n tool-integration-<env> --rm -it -- \
+  wget -qO- --timeout=5 http://tool-integration.tool-integration-<env>.svc.cluster.local.:8005/health || echo "BLOCKED"
+```
+
+**Fix (applied in v0.5.26):**
+1. Added `k8s/base/scanner-network-policy.yaml` — grants scanner pods egress for DNS (port 53) and tool-integration callback (port 8005)
+2. Added ingress rule to `tool-integration-network-policy` (base and all overlays) allowing traffic FROM `app: scanner` pods on port 8005
+3. Both policies must exist: egress from scanner pods AND ingress to tool-integration from scanner pods
+
+**Verification:**
+```bash
+# Confirm scanner NetworkPolicy exists
+kubectl get networkpolicy scanner-network-policy -n tool-integration-<env>
+
+# Confirm tool-integration accepts scanner ingress
+kubectl describe networkpolicy tool-integration-network-policy -n tool-integration-<env> | grep -A3 "app: scanner"
+
+# Run regression tests
+pytest tests/regression/test_scanner_network_policy.py -v
+```
+
+**Prevention:** 10 regression tests in `tests/regression/test_scanner_network_policy.py` verify:
+- Scanner NetworkPolicy exists and targets correct pods
+- DNS and callback egress rules present
+- Ingress from scanner pods allowed in base, GCP, and local overlays
+- KJM pod template label matches NetworkPolicy selector
+- CALLBACK_URL port matches NetworkPolicy allowed port
 
 ---
 

@@ -362,6 +362,53 @@ egress:
 
 > **Note:** Use `ipBlock` with RFC1918 exclusions instead of `namespaceSelector: {}` to prevent internal cluster traffic from bypassing per-service egress rules.
 
+### Scanner Job Pods
+
+Scanner pods (created as K8s Jobs by tool-integration) need egress to POST results back to tool-integration:
+
+```yaml
+# Scanner egress (result callback)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: scanner-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: scanner
+  policyTypes:
+    - Egress
+  egress:
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app: tool-integration
+      ports:
+        - protocol: TCP
+          port: 8005
+```
+
+**IMPORTANT:** The receiving service (tool-integration) must also have an ingress rule allowing traffic FROM scanner pods:
+
+```yaml
+# In tool-integration NetworkPolicy, add to ingress rules:
+ingress:
+  - from:
+      - podSelector:
+          matchLabels:
+            app: scanner
+    ports:
+      - protocol: TCP
+        port: 8005
+```
+
+Both egress (scanner → tool-integration) and ingress (tool-integration ← scanner) rules are required. Without the ingress rule, the callback POST will be blocked even if egress is allowed.
+
 ### Kustomization Integration
 
 Add NetworkPolicy to kustomization.yaml:

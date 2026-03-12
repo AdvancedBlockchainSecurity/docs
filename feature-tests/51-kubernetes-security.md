@@ -1,9 +1,9 @@
 # Feature Test: Kubernetes Security Configuration
 
 **Feature ID**: 51
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Added**: v0.13.4 (API)
-**Last Updated**: 2026-02-01
+**Last Updated**: March 11, 2026
 
 ---
 
@@ -138,7 +138,7 @@ kubectl exec -n dashboard-local deployment/dashboard -- ps aux | head -5
 |---------|-----------|-------------------|--------|
 | api-service | api-service-local | ≥16 | [ ] |
 | orchestration | orchestration-local | ≥3 | [ ] |
-| tool-integration | tool-integration-local | ≥3 | [ ] |
+| tool-integration | tool-integration-local | ≥4 | [ ] |
 | dashboard | dashboard-local | ≥3 | [ ] |
 | data-service | data-service-local | ≥4 | [ ] |
 | intelligence-engine | intelligence-engine-local | ≥5 | [ ] |
@@ -184,6 +184,7 @@ done
 | api-service | postgresql | 5432 | Allowed | [ ] |
 | api-service | redis | 6379 | Allowed | [ ] |
 | All pods | DNS (kube-dns) | 53 | Allowed | [ ] |
+| scanner pods | tool-integration | 8005 | Allowed | [ ] |
 
 ```bash
 # Test DNS resolution (should work from all pods)
@@ -194,6 +195,10 @@ kubectl exec -n dashboard-local deployment/dashboard -- curl -s --connect-timeou
 
 # Test denied connectivity (example: dashboard should NOT reach postgresql directly)
 kubectl exec -n dashboard-local deployment/dashboard -- timeout 2 curl -s http://postgresql.postgresql-local.svc.cluster.local:5432 || echo "Connection blocked (expected)"
+
+# Test scanner pod callback connectivity (must be allowed by NetworkPolicy)
+kubectl run scannertest --image=busybox --labels="app=scanner" -n tool-integration-<env> --rm -it -- \
+  wget -qO- --timeout=5 http://tool-integration.tool-integration-<env>.svc.cluster.local.:8005/health || echo "BLOCKED (NetworkPolicy missing)"
 ```
 
 ### 3.4 List All NetworkPolicies
