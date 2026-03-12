@@ -31,7 +31,7 @@ POST /scans/{id}/trigger →  1. Validate scanner name
 | Property | Value |
 |----------|-------|
 | Repository | `blocksecops-tool-integration` |
-| Version | 0.4.0 |
+| Version | 0.5.26 |
 | Port | 8005 |
 | Namespace | `tool-integration-local` |
 | Language | Python 3.11 / FastAPI |
@@ -89,6 +89,7 @@ POST /scans/{id}/trigger →  1. Validate scanner name
 | Environment | `CALLBACK_URL`, `SCAN_ID`, `SOLC_VERSION`, `WORK_DIR=/contracts` |
 | Security | Non-root (UID 1000), seccomp RuntimeDefault, all capabilities dropped |
 | DNS | `single-request-reopen` option (fixes Alpine musl parallel A+AAAA issue) |
+| NetworkPolicy | Scanner pods need `scanner-network-policy` for egress to tool-integration:8005 |
 | Execute | Entrypoint script (`run-{scanner}.sh`) runs scanner against contract with `trap post_callback EXIT` |
 | Callback | Scanner container POSTs JSON results to `CALLBACK_URL` (guaranteed via EXIT trap) |
 
@@ -124,6 +125,14 @@ allow_privilege_escalation: false
 capabilities:
   drop: ["ALL"]
 ```
+
+**NetworkPolicy (v0.5.26+)**:
+
+Scanner pods require two NetworkPolicy rules to deliver results:
+1. `scanner-network-policy` — egress from `app: scanner` pods to DNS (53) and tool-integration (8005)
+2. `tool-integration-network-policy` — ingress from `app: scanner` pods on port 8005
+
+Without these rules, scanner pods in namespaces with `default-deny-all` cannot POST results back to tool-integration, resulting in zero vulnerabilities stored despite successful scanner execution.
 
 ### Phase 3: Result Collection (Callback)
 

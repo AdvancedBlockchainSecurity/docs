@@ -95,6 +95,30 @@ Examples:
   admin-portal.admin-portal-prod.svc.cluster.local:3000
 ```
 
+## Scanner Pod Networking
+
+Scanner Jobs run in the `tool-integration-prod` namespace with label `app: scanner`. After analysis, scanner pods POST results to tool-integration via the CALLBACK_URL.
+
+**Traffic flow:**
+```
+Scanner Pod (app=scanner) → tool-integration.tool-integration-prod.svc.cluster.local:8005 → /api/v1/scans/{scan_id}/results
+```
+
+**NetworkPolicy requirements (v0.5.26+):**
+
+| Policy | Applies To | Direction | Allows |
+|--------|-----------|-----------|--------|
+| `scanner-network-policy` | `app: scanner` | Egress | DNS (53/UDP+TCP), tool-integration (8005/TCP) |
+| `tool-integration-network-policy` | `app: tool-integration` | Ingress | FROM `app: scanner` on 8005/TCP |
+
+Both policies are defined in `k8s/base/` and inherited by all overlays. The GCP overlay additionally patches `tool-integration-network-policy` with namespace-scoped selectors via `networkpolicy-patch.yaml`.
+
+**Verification:**
+```bash
+kubectl get networkpolicy -n tool-integration-prod -l app=scanner
+kubectl describe networkpolicy tool-integration-network-policy -n tool-integration-prod | grep -A3 "app: scanner"
+```
+
 ## GKE Gateway Routes
 
 | Path | Backend | Namespace |

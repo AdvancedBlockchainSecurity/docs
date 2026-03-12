@@ -30,30 +30,25 @@ All versions follow [Semantic Versioning 2.0.0](https://semver.org/):
 
 ## Version Bump Workflow
 
-### Step 1: Bump Version (Source + Kustomization Synced Automatically)
+### Step 1: Bump Version in Source and Kustomization Files
 
-Use the bump script to update the source file and sync all kustomization `newTag` values:
+Update the version in the source of truth file and all kustomization `newTag` values manually:
 
-```bash
-# Bump patch/minor/major — updates pyproject.toml AND all kustomization.yaml newTag values
-./scripts/bump-version.sh patch   # 0.2.0 → 0.2.1
-./scripts/bump-version.sh minor   # 0.2.1 → 0.3.0
-./scripts/bump-version.sh major   # 0.3.0 → 1.0.0
-```
-
-The bump script:
-1. Reads the current version from `pyproject.toml` / `package.json` / `Cargo.toml`
-2. Increments the version in the source file
-3. Runs `sync-version.sh` to update all `kustomization.yaml` `newTag` values under `k8s/`
-
-**Manual version edits:** If you edit `pyproject.toml` or `package.json` directly, run the sync script to propagate:
+1. Edit `pyproject.toml` (Python), `package.json` (Node.js), or `Cargo.toml` (Rust) — update the `version` field
+2. Update all `kustomization.yaml` files under `k8s/overlays/` — set `newTag` to the new version
+3. Update `app.kubernetes.io/version` labels in kustomization files (where present)
 
 ```bash
-# Sync all kustomization newTag values to match source version
-/home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh .
+# Example: bumping from 0.5.25 to 0.5.26
+# 1. Edit source of truth
+sed -i 's/version = "0.5.25"/version = "0.5.26"/' pyproject.toml
+
+# 2. Update all kustomization overlays
+grep -rl 'newTag: "0.5.25"' k8s/ | xargs sed -i 's/newTag: "0.5.25"/newTag: "0.5.26"/'
+grep -rl 'app.kubernetes.io/version: "0.5.25"' k8s/ | xargs sed -i 's/app.kubernetes.io\/version: "0.5.25"/app.kubernetes.io\/version: "0.5.26"/'
 ```
 
-**Note:** Always run `sync-version.sh` after editing the source version to keep kustomization `newTag` in sync.
+**All version references must be updated together** — source file, kustomization `newTag`, and `app.kubernetes.io/version` labels.
 
 ### Step 2: Build, Push, and Apply
 
@@ -99,42 +94,23 @@ git commit -m "chore(<service>): bump version to 0.2.1"
 
 ---
 
-## Version Sync Tooling
+## Version Sync Checklist
 
-### sync-version.sh
+When bumping a version, ensure all three locations are updated:
 
-**Location:** `blocksecops-shared/scripts/docker/sync-version.sh`
+| Location | What to Update |
+|----------|---------------|
+| `pyproject.toml` / `package.json` / `Cargo.toml` | `version` field |
+| `k8s/overlays/*/kustomization.yaml` | `newTag` under `images:` |
+| `k8s/overlays/*/kustomization.yaml` | `app.kubernetes.io/version` label (where present) |
 
-Reads the version from the project's source of truth (`pyproject.toml`, `package.json`, or `Cargo.toml`) and updates all `kustomization.yaml` `newTag` values under `k8s/` to match.
-
+**Verification:**
 ```bash
-# Sync current project
-/home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh .
-
-# Sync a specific repo
-/home/pwner/Git/blocksecops-shared/scripts/docker/sync-version.sh /home/pwner/Git/blocksecops-api-service
+# Check all version references match
+VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
+echo "Source: $VERSION"
+grep -r "newTag:" k8s/overlays/ | grep -v "$VERSION" && echo "MISMATCH" || echo "All synced"
 ```
-
-Also updates `app.kubernetes.io/version` labels in kustomization files.
-
-### Integration Points
-
-| Tool | Behavior |
-|------|----------|
-| `bump-version.sh` | Calls `sync-version.sh` after bumping the source version |
-| `deploy.sh` | Auto-syncs `newTag` if it doesn't match source before applying |
-| Manual edits | Run `sync-version.sh` after editing `pyproject.toml`/`package.json` directly |
-
-### Shared Functions
-
-**Location:** `blocksecops-shared/scripts/docker/common.sh`
-
-| Function | Purpose |
-|----------|---------|
-| `detect_version()` | Auto-detect version from pyproject.toml, package.json, Cargo.toml, or Dockerfile |
-| `get_version_from_pyproject()` | Extract version from pyproject.toml |
-| `get_version_from_package_json()` | Extract version from package.json |
-| `get_version_from_cargo()` | Extract version from Cargo.toml |
 
 ---
 
