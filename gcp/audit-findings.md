@@ -57,6 +57,22 @@
 | 17 | GKE Gateway firewall rule has logging disabled | Accepted — GKE Gateway-managed rule, same limitation as #16 |
 | 18 | ~~Scanner node pool disk size 200 GB~~ — Fixed: Reduced to 50 GB (same as Finding #11) | Resolved (2026-03-10) |
 
+## Critical (March 11, 2026 — Namespace Audit)
+
+| # | Finding | Status |
+|---|---------|--------|
+| 31 | ~~GCP Secret Manager `apogee-gcp-api-service-url` pointed to `api-service-gcp` (non-existent namespace)~~ — Fixed: Updated to `http://api-service.api-service-prod.svc.cluster.local:8000`. ExternalSecrets force-synced for tool-integration-prod and orchestration-prod | Resolved (2026-03-11) |
+| 32 | ~~`api-service-ingress` NetworkPolicy missing ingress from internal services~~ — Fixed: Added ingress rules for tool-integration-prod and orchestration-prod with AND selector logic. api-service v0.29.78 | Resolved (2026-03-11) |
+
+## High (March 11, 2026 — Namespace Audit)
+
+| # | Finding | Status |
+|---|---------|--------|
+| 33 | ~~tool-integration reported hardcoded version `0.1.0`~~ — Fixed: Dynamic version from SERVICE_VERSION env var / importlib.metadata. Dockerfile persists build arg as ENV. tool-integration v0.5.29 | Resolved (2026-03-11) |
+| 34 | ~~12 scan result forwarding error handlers missing dead-letter enqueue~~ — Fixed: All 12 handlers now call `dead_letter_store.enqueue()`. tool-integration v0.5.29 | Resolved (2026-03-11) |
+| 35 | ~~`/cluster/metrics` returned 403 due to missing RBAC~~ — Fixed: ClusterRole `tool-integration-cluster-reader` with nodes+pods list. GCP overlay patch for tool-integration-prod SA. tool-integration v0.5.29 | Resolved (2026-03-11) |
+| 36 | ~~Legacy namespace `solidity-security` in defaults and examples~~ — Fixed: Replaced with `tool-integration-local` in kubernetes_job_manager.py, result_collector.py, and example Job manifests. tool-integration v0.5.29 | Resolved (2026-03-11) |
+
 ## Passed
 
 - Private GKE cluster with private nodes
