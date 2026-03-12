@@ -134,15 +134,23 @@ jq '[.[] | select(.ruleId != null) | ...]'
 
 ---
 
-### Issue 4: Slither Can't Find solc (HOME Not Set)
+### Issue 4: Slither Can't Find solc (HOME Not Set / emptyDir Shadows)
 
 **Symptoms:**
 - `PermissionError: [Errno 13] Permission denied: '/.solc-select'`
 - Slither fails during compilation step
+- Scanner pod stuck downloading solc from soliditylang.org
 
-**Root Cause:** When K8s overrides the user via `runAsUser: 1000`, the HOME env var is not set. solc-select defaults to `$HOME/.solc-select/`, which becomes `/.solc-select/`.
+**Root Cause:** Two related issues:
+1. When K8s overrides the user via `runAsUser: 1000`, the HOME env var is not set. solc-select defaults to `$HOME/.solc-select/`, which becomes `/.solc-select/`.
+2. KJM mounts an `emptyDir` at `/home/scanner` for `readOnlyRootFilesystem` compliance, which shadows any solc binaries baked into `~/.solc-select/` during Docker build.
 
-**Fix:** Add `ENV HOME=/home/scanner` to Dockerfile before `USER scanner`.
+**Fix (v0.3.8):**
+1. Add `ENV HOME=/home/scanner` to Dockerfile before `USER scanner`
+2. Pre-install solc versions to `/opt/solc-select/artifacts` (survives emptyDir mount)
+3. Add runtime seed step in `run-slither.sh` to copy from `/opt` to `$HOME/.solc-select/`
+
+**Current state:** 18 solc versions (0.5.16–0.8.28) pre-installed in scanner-slither:0.3.8. Runtime seed completes in <1s.
 
 ---
 
@@ -258,7 +266,7 @@ pytest tests/regression/test_scanner_network_policy.py -v
 
 | Scanner | Image | Version | Base | UID |
 |---------|-------|---------|------|-----|
-| slither | scanner-slither | 0.3.3 | python:3.11-slim | 1000 |
+| slither | scanner-slither | 0.3.8 | python:3.11-slim | 1000 |
 | aderyn | scanner-aderyn | 0.7.3 | debian:bookworm-slim | 1000 |
 | semgrep | scanner-semgrep | 0.3.8 | python:3.11-slim | 1000 |
 | solhint | scanner-solhint | 0.1.8 | node:20-alpine | 1000 (node) |

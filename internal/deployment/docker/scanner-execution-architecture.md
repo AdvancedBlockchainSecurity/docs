@@ -39,7 +39,7 @@ For the complete operational pipeline (trigger, execution, result collection, fo
 
 | Scanner | Tool Version | Image Tag | Memory Limit | Developer |
 |---------|-------------|-----------|--------------|-----------|
-| slither | 0.11.5 | scanner-slither:0.3.2 | 1Gi | Trail of Bits |
+| slither | 0.11.5 | scanner-slither:0.3.8 | 1Gi | Trail of Bits |
 | aderyn | 0.6.7 | scanner-aderyn:0.7.2 | 512Mi | Cyfrin |
 | semgrep | 1.144.0 | scanner-semgrep:0.3.5 | 1Gi | Semgrep Inc |
 | solhint | 6.0.2 | scanner-solhint:0.1.6 | 512Mi | Protofire |
@@ -224,12 +224,12 @@ data:
       "aderyn": {"version": "0.6.7", "developer": "Cyfrin"},
       ...
     }
-  SCANNER_IMAGE_SLITHER: "scanner-slither:0.3.2"
-  SCANNER_IMAGE_ADERYN: "scanner-aderyn:0.7.2"
+  SCANNER_IMAGE_SLITHER: "scanner-slither:0.3.8"
+  SCANNER_IMAGE_ADERYN: "scanner-aderyn:0.7.5"
   ...
 ```
 
-**Local overlay** adds Harbor registry prefix: `harbor.blocksecops.local/blocksecops/scanner-slither:0.3.2`
+**Local overlay** adds Harbor registry prefix: `harbor.blocksecops.local/blocksecops/scanner-slither:0.3.8`
 
 Both the API service (for displaying scanner info) and tool-integration (for selecting images) read from this ConfigMap.
 
