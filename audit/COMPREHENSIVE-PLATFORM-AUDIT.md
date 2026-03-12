@@ -7,6 +7,7 @@
 **Environment:** GCP Production (gke_project-8a2657b9-d96c-4c0a-a69_us-west1_apogee-production-gke)
 **Status:** PASS (with advisories) — All critical/high findings remediated. Platform operational. Smoke test 17/17.
 **Scope:** Full platform audit — GCP cluster infrastructure, services, secrets, networking, security, versioning, Cloud Armor, documentation
+**Last Code Changes:** tool-integration v0.5.29, api-service v0.29.78 (March 11, 2026)
 
 ---
 
@@ -83,8 +84,8 @@ System namespaces: default, gke-managed-networking-dra-driver, gke-managed-syste
 
 | Namespace | Deployment | Ready | Image | Status |
 |-----------|-----------|-------|-------|--------|
-| api-service-prod | api-service | 1/1 | api-service:0.29.76 | [x] |
-| api-service-prod | celery-worker | 1/1 | api-service:0.29.76 | [x] |
+| api-service-prod | api-service | 1/1 | api-service:0.29.78 | [x] |
+| api-service-prod | celery-worker | 1/1 | api-service:0.29.78 | [x] |
 | admin-portal-prod | admin-portal | 1/1 | admin-portal:0.7.11 | [x] |
 | cert-manager | cert-manager | 1/1 | cert-manager-controller:v1.17.1 | [x] |
 | cert-manager | cert-manager-cainjector | 1/1 | cert-manager-cainjector:v1.17.1 | [x] |
@@ -98,7 +99,7 @@ System namespaces: default, gke-managed-networking-dra-driver, gke-managed-syste
 | intelligence-engine-prod | intelligence-engine | 1/1 | intelligence-engine:0.3.7 | [x] |
 | notification-prod | notification | 1/1 | notification:0.2.6 | [x] |
 | orchestration-prod | orchestration | 1/1 | orchestration:0.10.8 | [x] |
-| tool-integration-prod | tool-integration | 2/2 | tool-integration:0.5.19 | [x] |
+| tool-integration-prod | tool-integration | 2/2 | tool-integration:0.5.29 | [x] |
 
 ### StatefulSets
 
@@ -112,9 +113,9 @@ System namespaces: default, gke-managed-networking-dra-driver, gke-managed-syste
 
 | Service | Source | Cluster Image | CronJob Image | Status |
 |---------|--------|---------------|---------------|--------|
-| api-service | 0.29.76 | 0.29.76 | 0.29.76 | [x] |
+| api-service | 0.29.78 | 0.29.78 | 0.29.78 | [x] |
 | dashboard | 0.46.24 | 0.46.24 | — | [x] |
-| tool-integration | 0.5.19 | 0.5.19 | — | [x] |
+| tool-integration | 0.5.29 | 0.5.29 | — | [x] |
 | orchestration | 0.10.8 | 0.10.8 | — | [x] |
 | data-service | 0.2.7 | 0.2.7 | — | [x] |
 | contract-parser | 0.2.2 | 0.2.2 | — | [x] |
@@ -348,8 +349,8 @@ All services follow `k8s/base/` + `k8s/overlays/gcp/` pattern.
 
 | Namespace | CronJob | Schedule | Image | Image Match | Status |
 |-----------|---------|----------|-------|-------------|--------|
-| api-service-prod | deduplication-maintenance | Weekly Sun 2am | api-service:0.29.76 | [x] | [x] |
-| api-service-prod | stale-scan-recovery | Every 15min | api-service:0.29.76 | [x] | [x] |
+| api-service-prod | deduplication-maintenance | Weekly Sun 2am | api-service:0.29.78 | [x] | [x] |
+| api-service-prod | stale-scan-recovery | Every 15min | api-service:0.29.78 | [x] | [x] |
 
 All CronJob image tags match their parent Deployment image tags.
 
@@ -435,6 +436,12 @@ All 22 findings remediated on local cluster. See previous audit version for full
 | AUD-025 | LOW | Smoke test WebSocket path wrong (/ws/ vs /ws) | Fixed in smoke-test.md (March 11) |
 | AUD-026 | INFO | 1 test account in database (testdev@blocksecops.com) | Deleted from GCP PostgreSQL (March 11) |
 | AUD-027 | INFO | 4 unconfirmed Supabase auth accounts | Pending: manual cleanup in Supabase dashboard |
+| AUD-028 | CRITICAL | GCP Secret Manager `apogee-gcp-api-service-url` pointed to non-existent `api-service-gcp` namespace — scan results silently lost | Fixed: Secret updated to `http://api-service.api-service-prod.svc.cluster.local:8000`, ExternalSecrets force-synced (March 11) |
+| AUD-029 | CRITICAL | `api-service-ingress` NetworkPolicy missing ingress from tool-integration-prod and orchestration-prod — internal ClusterIP traffic blocked by Cilium | Fixed: Added ingress rules with namespaceSelector+podSelector AND logic. api-service v0.29.78 (March 11) |
+| AUD-030 | HIGH | tool-integration reported version `0.1.0` — 3 hardcoded references instead of reading from source of truth | Fixed: Dynamic version via SERVICE_VERSION env var / importlib.metadata. tool-integration v0.5.29 (March 11) |
+| AUD-031 | HIGH | 12 scan result forwarding error handlers log errors but never enqueue to dead-letter store — results silently lost | Fixed: All 12 handlers now call `dead_letter_store.enqueue()`. tool-integration v0.5.29 (March 11) |
+| AUD-032 | MEDIUM | `/cluster/metrics` endpoint returned 403 — missing ClusterRole for nodes and pods list | Fixed: Added ClusterRole `tool-integration-cluster-reader` + GCP overlay patch. tool-integration v0.5.29 (March 11) |
+| AUD-033 | LOW | Legacy default namespace `solidity-security` in kubernetes_job_manager.py, result_collector.py, and example Job manifests | Fixed: Replaced with `tool-integration-local`. tool-integration v0.5.29 (March 11) |
 
 ---
 
@@ -485,12 +492,30 @@ PostgreSQL backup to GCS is pending. Current backups are manual (`pg_dump` via k
 9. **Test account removed** — testdev@blocksecops.com deleted from GCP database
 10. **Enterprise user configured** — jasonbrailowbizop@mail.com set to enterprise tier
 
+### v9.1.0 Remediations (March 11 — Namespace Audit)
+
+1. **GCP Secret Manager `apogee-gcp-api-service-url` corrected** — Was `api-service-gcp` (non-existent), now `http://api-service.api-service-prod.svc.cluster.local:8000`
+2. **api-service NetworkPolicy updated** — Added ingress from tool-integration-prod and orchestration-prod (v0.29.78)
+3. **tool-integration version source of truth** — Replaced 3 hardcoded `"0.1.0"` with dynamic resolution from env/metadata
+4. **Dead-letter queue enabled** — All 12 forwarding error handlers now enqueue to dead-letter store
+5. **RBAC ClusterRole added** — `tool-integration-cluster-reader` with nodes+pods list for `/cluster/metrics`
+6. **Legacy namespace cleanup** — `solidity-security` replaced with `tool-integration-local` in defaults and examples
+7. **Dockerfile SERVICE_VERSION** — Build arg persisted as ENV for runtime access
+8. **tool-integration bumped to 0.5.29** — All fixes deployed to GCP production
+
 ### Pull Requests Merged (v9.0.0)
 
 | Repo | PR | Description |
 |------|----|-------------|
 | docs | #371 | Smoke test remediation: backfill, WebSocket path, backup docs |
 | TaskDocs-BlockSecOps | #237 | Smoke test remediation summary and GCP task updates |
+
+### Pull Requests Merged (v9.1.0)
+
+| Repo | PR | Description |
+|------|----|-------------|
+| tool-integration | [#136](https://github.com/AdvancedBlockchainSecurity/blocksecops-tool-integration/pull/136) | Namespace audit, dead-letter queue, RBAC, version fix (v0.5.29) |
+| api-service | [#313](https://github.com/AdvancedBlockchainSecurity/blocksecops-api-service/pull/313) | Internal service ingress NetworkPolicy (v0.29.78) |
 
 ---
 
@@ -504,7 +529,7 @@ PostgreSQL backup to GCS is pending. Current backups are manual (`pg_dump` via k
 | Checks passed | 98 |
 | Advisories (non-blocking) | 4 |
 | Checks failed | 0 |
-| Findings remediated (all time) | 27 |
+| Findings remediated (all time) | 33 |
 | Namespaces audited | 23 |
 | Platform deployments verified | 16 |
 | Pods running | 55 |
@@ -530,12 +555,12 @@ PostgreSQL backup to GCS is pending. Current backups are manual (`pg_dump` via k
                    34.149.16.104
                     /        |        \
              [Dashboard] [API Service] [Admin Portal]
-              (0.46.24)   (0.29.76)    (0.7.11)
+              (0.46.24)   (0.29.78)    (0.7.11)
                               |
            +--------+---------+---------+---------+
            |        |         |         |         |
      [Orch]   [Tool-Int]  [Data-Svc] [Intel-Eng] [Notif]
-    (0.10.8)  (0.5.19)   (0.2.7)    (0.3.7)    (0.2.6)
+    (0.10.8)  (0.5.29)   (0.2.7)    (0.3.7)    (0.2.6)
            |        |         |         |
      [Contract-Parser]       |         |
       (0.2.2)                |         |
@@ -557,6 +582,6 @@ PostgreSQL backup to GCS is pending. Current backups are manual (`pg_dump` via k
 ---
 
 **Audit Date:** March 11, 2026
-**Version:** 9.0.0
-**Previous:** v8.0.0 (PASS, local cluster) -> v9.0.0 (PASS, GCP production)
+**Version:** 9.1.0
+**Previous:** v9.0.0 (PASS, GCP production) -> v9.1.0 (PASS, namespace audit remediation)
 **Result:** PASS — 0 failed checks, 4 non-blocking advisories, smoke test 17/17, all services healthy
