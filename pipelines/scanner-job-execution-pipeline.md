@@ -192,7 +192,7 @@ Without these rules, scanner pods in namespaces with `default-deny-all` cannot P
 
 | Scanner | Tool Version | Image Tag | Memory Limit | Developer |
 |---------|-------------|-----------|--------------|-----------|
-| slither | 0.11.5 | scanner-slither:0.3.4 | 1Gi | Trail of Bits |
+| slither | 0.11.5 | scanner-slither:0.3.8 | 1Gi | Trail of Bits |
 | aderyn | 0.6.7 | scanner-aderyn:0.7.4 | 512Mi | Cyfrin |
 | semgrep | 1.144.0 | scanner-semgrep:0.3.9 | 1Gi | Semgrep Inc |
 | solhint | 6.0.2 | scanner-solhint:0.1.9 | 512Mi | Protofire |

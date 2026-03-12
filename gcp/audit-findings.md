@@ -75,6 +75,7 @@
 | 37 | ~~Orchestration service_name default `solidity-security-orchestration`~~ — Fixed: Changed to `blocksecops-orchestration`. orchestration v0.10.9 PR #100 | Resolved (2026-03-11) |
 | 38 | ~~Orchestration hardcoded version `0.1.0` in config and `0.7.1` in FastAPI~~ — Fixed: Dynamic version from SERVICE_VERSION env var / importlib.metadata. Dockerfile persists build arg as ENV. orchestration v0.10.9 PR #100 | Resolved (2026-03-11) |
 | 39 | ~~tool-integration production overlay SCANNER_REGISTRY legacy GCP project~~ — Fixed: Updated from `solidity-security` to current GCP project. tool-integration PR #137 | Resolved (2026-03-11) |
+| 40 | ~~Scanner-slither pods stuck downloading solc from soliditylang.org~~ — Fixed: Pre-installed 18 solc versions (0.5.16–0.8.28) in Docker image at `/opt/solc-select`. Runtime seed step copies to `$HOME/.solc-select`. scanner-slither 0.3.8 | Resolved (2026-03-11) |
 
 ## Passed
 
