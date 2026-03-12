@@ -33,7 +33,7 @@ Failed scans now include an `error_message` field in the API response:
 
 ```bash
 # Check error message via API
-curl -sk https://app.0xapogee.local/api/v1/scans/{scan_id} \
+curl -sk https://app.0xapogee.com/api/v1/scans/{scan_id} \
   -H "Authorization: Bearer $TOKEN" | jq '{status, error_message}'
 ```
 

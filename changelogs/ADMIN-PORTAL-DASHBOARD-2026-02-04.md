@@ -200,7 +200,7 @@ interface DeduplicationStatsResponse {
 
 ### Manual Verification
 
-1. Access admin portal at `http://localhost:5173` or `http://admin.0xapogee.local:3000`
+1. Access admin portal at `http://localhost:5173` or `http://admin.0xapogee.com:3000`
 2. Login with admin credentials
 3. Navigate to Dashboard (default landing page)
 4. Verify all metric cards display data

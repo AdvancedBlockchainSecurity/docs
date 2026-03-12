@@ -42,7 +42,7 @@ Test procedure:
 kubectl exec -n api-service-local deploy/api-service -- python3 -c "..."
 
 # 2. Submit scanner results
-curl -sk -X POST https://app.0xapogee.local/api/v1/scans/{scan_id}/results \
+curl -sk -X POST https://app.0xapogee.com/api/v1/scans/{scan_id}/results \
   -H "Content-Type: application/json" -d @scan-results.json
 
 # 3. Verify dedup fields populated

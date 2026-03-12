@@ -46,7 +46,7 @@ Developer                Local Cluster              GitHub                CI (Ac
 | **Cluster** | kubeadm on Debian server | GKE on GCP |
 | **Registry** | Harbor (`harbor.blocksecops.local`) | Artifact Registry (`us-west1-docker.pkg.dev`) |
 | **Namespace suffix** | `-local` (e.g., `api-service-local`) | `-prod` (e.g., `api-service-prod`) |
-| **Domain** | `app.0xapogee.local` | `app.0xapogee.com` |
+| **Domain** | `app.0xapogee.com` | `app.0xapogee.com` |
 | **Ingress** | Traefik (hostPort 80/443, self-signed TLS) | GCP HTTPS Load Balancer (managed cert) |
 | **Secrets** | HashiCorp Vault + ESO | GCP Secret Manager + ESO |
 | **Database** | PostgreSQL pod (in-cluster) | PostgreSQL pod (in-cluster, GKE) |

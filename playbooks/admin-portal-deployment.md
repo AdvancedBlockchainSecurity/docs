@@ -354,8 +354,8 @@ After deploying admin portal, verify the System page health monitoring:
 
 ```bash
 # Access admin portal
-# Local: http://admin.0xapogee.local:3000
-# Server: http://admin.0xapogee.local
+# Local: http://admin.0xapogee.com:3000
+# Server: http://admin.0xapogee.com
 
 # Verify dashboard loads and shows all 8 KPI cards
 # Verify system health panel shows component statuses

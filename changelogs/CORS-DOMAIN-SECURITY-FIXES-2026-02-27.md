@@ -21,7 +21,7 @@ Added comprehensive regression test suites (64 tests) to prevent reintroduction 
 
 **Problem:** Five Traefik CORS middleware files used `accessControlAllowOriginList: ["*"]`, allowing unrestricted cross-origin requests. This violates the platform security standard that CORS origins must be explicit domains, never wildcards.
 
-**Fix:** Replaced wildcard with explicit `https://app.0xapogee.local` origin in all middleware files. Restricted allowed methods to `GET, POST, OPTIONS` and headers to `Content-Type, Authorization, Sec-WebSocket-*`. Disabled credentials (`accessControlAllowCredentials: false`).
+**Fix:** Replaced wildcard with explicit `https://app.0xapogee.com` origin in all middleware files. Restricted allowed methods to `GET, POST, OPTIONS` and headers to `Content-Type, Authorization, Sec-WebSocket-*`. Disabled credentials (`accessControlAllowCredentials: false`).
 
 | File | Repository |
 |------|-----------|
@@ -37,20 +37,20 @@ Added comprehensive regression test suites (64 tests) to prevent reintroduction 
 
 **Fix:** Updated all domain references to current standards:
 - Production: `*.0xapogee.com`
-- Local: `*.0xapogee.local`
+- Local: `*.0xapogee.com`
 - Harbor registry: `harbor.blocksecops.local` (unchanged — infrastructure concern, separate from application rebrand)
 
 **Files updated across repos:**
 
 | Category | Old Domain | New Domain | Files Changed |
 |----------|-----------|------------|---------------|
-| IngressRoutes (local) | `*.solidityops.com`, `*.soliditysecurity.dev` | `*.0xapogee.local` | 8 files |
+| IngressRoutes (local) | `*.solidityops.com`, `*.soliditysecurity.dev` | `*.0xapogee.com` | 8 files |
 | IngressRoutes (production) | `*.0xApogee.com` | `*.0xApogee.com` | 2 files |
 | Base ingress.yaml | `*.solidityops.com` | `*.0xapogee.com` | 6 files |
-| ConfigMaps | `soliditysecurity.dev` URLs | `app.0xapogee.local` | 3 files |
+| ConfigMaps | `soliditysecurity.dev` URLs | `app.0xapogee.com` | 3 files |
 | cert-manager emails | `soliditysecurity.example.com` | `0xapogee.com` | 2 files |
-| admin-portal IngressRoutes | `admin.0xapogee.local` | `admin.0xapogee.local` | 2 files |
-| API nginx CORS annotation | `*` (wildcard) | `https://app.0xapogee.local` | 1 file |
+| admin-portal IngressRoutes | `admin.0xapogee.com` | `admin.0xapogee.com` | 2 files |
+| API nginx CORS annotation | `*` (wildcard) | `https://app.0xapogee.com` | 1 file |
 
 **Harbor Registry Exception:** `harbor.blocksecops.local` was intentionally NOT changed. Harbor's TLS certificate, IngressRoute, and DNS all serve on `harbor.blocksecops.local`. Changing this requires coordinated infrastructure migration (new TLS cert, DNS update, IngressRoute update, registry re-trust on all nodes). This is tracked separately as an infrastructure task.
 
@@ -102,13 +102,13 @@ tool-integration:    2/2 Running
 
 ```bash
 # Correct origin returns Access-Control-Allow-Origin header
-curl -sk -X OPTIONS -H "Origin: https://app.0xapogee.local" \
-  https://app.0xapogee.local/api/v1/health/live -I
-# → access-control-allow-origin: https://app.0xapogee.local
+curl -sk -X OPTIONS -H "Origin: https://app.0xapogee.com" \
+  https://app.0xapogee.com/api/v1/health/live -I
+# → access-control-allow-origin: https://app.0xapogee.com
 
 # Bad origin does NOT return Access-Control-Allow-Origin
 curl -sk -X OPTIONS -H "Origin: https://evil.example.com" \
-  https://app.0xapogee.local/api/v1/health/live -I
+  https://app.0xapogee.com/api/v1/health/live -I
 # → no access-control-allow-origin header
 ```
 

@@ -82,7 +82,7 @@ The CLI will:
 
 ### First Login
 
-**Admin Portal URL:** `https://admin.0xapogee.com` (production) or `http://admin.0xapogee.local:3000` (local)
+**Admin Portal URL:** `https://admin.0xapogee.com` (production) or `http://admin.0xapogee.com:3000` (local)
 
 1. Navigate to the Admin Portal URL
 2. Login with your admin credentials (separate Admin Supabase account)

@@ -105,13 +105,13 @@ Validates no legacy domains remain in k8s YAML files.
 ```bash
 # Verify correct origin is reflected
 curl -sk -X OPTIONS \
-  -H "Origin: https://app.0xapogee.local" \
+  -H "Origin: https://app.0xapogee.com" \
   -H "Access-Control-Request-Method: GET" \
-  https://app.0xapogee.local/api/v1/health/live -I \
+  https://app.0xapogee.com/api/v1/health/live -I \
   | grep -i access-control
 
 # Expected:
-# access-control-allow-origin: https://app.0xapogee.local
+# access-control-allow-origin: https://app.0xapogee.com
 # access-control-allow-methods: GET, POST, OPTIONS
 # access-control-allow-headers: Content-Type, Authorization, ...
 
@@ -119,7 +119,7 @@ curl -sk -X OPTIONS \
 curl -sk -X OPTIONS \
   -H "Origin: https://evil.example.com" \
   -H "Access-Control-Request-Method: GET" \
-  https://app.0xapogee.local/api/v1/health/live -I \
+  https://app.0xapogee.com/api/v1/health/live -I \
   | grep -i access-control-allow-origin
 
 # Expected: no access-control-allow-origin header

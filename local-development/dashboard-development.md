@@ -640,7 +640,7 @@ The dashboard includes a real-time notification system that integrates with WebS
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                 Notification Service (8003)                 │
-│  WebSocket: wss://app.0xapogee.local/ws                  │
+│  WebSocket: wss://app.0xapogee.com/ws                  │
 └─────────────────┬───────────────────────────────────────────┘
                   │ WebSocket Events
                   ▼

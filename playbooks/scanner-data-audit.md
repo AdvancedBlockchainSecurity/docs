@@ -44,7 +44,7 @@ This playbook provides a systematic audit of scanner data integrity, pattern map
 
 ```bash
 # API Service
-curl -sL https://app.0xapogee.local/api/v1/health/ready | jq '.'
+curl -sL https://app.0xapogee.com/api/v1/health/ready | jq '.'
 
 # Tool Integration (from inside pod)
 kubectl exec -n tool-integration-local deployment/tool-integration -- \
@@ -152,7 +152,7 @@ kubectl get cm scanner-versions -n tool-integration-local \
 ### 3.2 Compare API Response vs ConfigMap
 
 ```bash
-curl -sk "https://app.0xapogee.local/api/v1/scanners" \
+curl -sk "https://app.0xapogee.com/api/v1/scanners" \
   -H "Authorization: Bearer $TOKEN" | jq '[.scanners[] | {id, version}]'
 ```
 
@@ -200,7 +200,7 @@ ORDER BY scanner_id;
 
 ```bash
 # Via API endpoint
-curl -sk -X POST "https://app.0xapogee.local/api/v1/deduplication/maintenance/run-full-backfill" \
+curl -sk -X POST "https://app.0xapogee.com/api/v1/deduplication/maintenance/run-full-backfill" \
   -H "Authorization: Bearer $TOKEN" | jq '.'
 ```
 
@@ -238,7 +238,7 @@ SELECT id, '$HASHED', '10.244.0.1', true, NOW(), NOW() + INTERVAL '4 hours', NOW
 FROM users WHERE email = '<ADMIN_EMAIL>';"
 
 # 3. Verify
-curl -sk 'https://app.0xapogee.local/api/v1/admin/patterns/mappings/audit' \
+curl -sk 'https://app.0xapogee.com/api/v1/admin/patterns/mappings/audit' \
   -H "Authorization: Bearer $TOKEN" \
   -H "X-Admin-Session: $RAW_TOKEN" | jq '.total_unmapped'
 ```
@@ -254,7 +254,7 @@ curl -sk 'https://app.0xapogee.local/api/v1/admin/patterns/mappings/audit' \
 **Via Admin API (recommended):**
 
 ```bash
-curl -sk "https://app.0xapogee.local/api/v1/admin/patterns/mappings/audit?limit=100" \
+curl -sk "https://app.0xapogee.com/api/v1/admin/patterns/mappings/audit?limit=100" \
   -H "Authorization: Bearer $TOKEN" \
   -H "X-Admin-Session: $RAW_TOKEN" | jq '.unmapped[] | "\(.scanner_id) / \(.detector_id): \(.finding_count) findings"' -r
 ```
@@ -455,14 +455,14 @@ WHERE critical_count != (SELECT COUNT(*) FROM vulnerabilities WHERE scan_id = sc
 ### 8.1 Scanner List
 
 ```bash
-curl -sk "https://app.0xapogee.local/api/v1/scanners" \
+curl -sk "https://app.0xapogee.com/api/v1/scanners" \
   -H "Authorization: Bearer $TOKEN" | jq '{count: (.scanners | length), ids: [.scanners[].id]}'
 ```
 
 ### 8.2 Scanner Effectiveness
 
 ```bash
-curl -sk "https://app.0xapogee.local/api/v1/analytics/scanner-effectiveness" \
+curl -sk "https://app.0xapogee.com/api/v1/analytics/scanner-effectiveness" \
   -H "Authorization: Bearer $TOKEN" | \
   jq '.scanners[] | {scanner_id, total_findings, unique_findings, overlap_rate, false_positive_rate}'
 ```
@@ -475,11 +475,11 @@ curl -sk "https://app.0xapogee.local/api/v1/analytics/scanner-effectiveness" \
 
 ```bash
 # Valid severity filter
-curl -sk "https://app.0xapogee.local/api/v1/deduplication/groups?severity=high" \
+curl -sk "https://app.0xapogee.com/api/v1/deduplication/groups?severity=high" \
   -H "Authorization: Bearer $TOKEN" | jq '{total: .total}'
 
 # Invalid severity should return 422
-curl -sk "https://app.0xapogee.local/api/v1/deduplication/groups?severity=info" \
+curl -sk "https://app.0xapogee.com/api/v1/deduplication/groups?severity=info" \
   -H "Authorization: Bearer $TOKEN" | jq '.detail'
 ```
 

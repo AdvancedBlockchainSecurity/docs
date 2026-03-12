@@ -22,7 +22,7 @@ The notification system provides real-time toast notifications and WebSocket int
 ┌─────────────────────────────────────────────────────────────┐
 │              Notification Service (Port 8003)               │
 │  Namespace: notification-local                              │
-│  WebSocket: wss://app.0xapogee.local/ws (server/prod)    │
+│  WebSocket: wss://app.0xapogee.com/ws (server/prod)    │
 │  Events: scan_progress, scan_completed, vulnerability_found │
 └─────────────────────┬───────────────────────────────────────┘
                       │ WebSocket Messages
@@ -410,7 +410,7 @@ curl http://127.0.0.1:8003/
 # For pure local dev:
 websocat ws://127.0.0.1:8003/ws/
 # For server/staging with TLS:
-websocat wss://app.0xapogee.local/ws --insecure
+websocat wss://app.0xapogee.com/ws --insecure
 
 # 4. In browser console, check WebSocket connection
 # Look for: [WebSocket] Connected to notification service

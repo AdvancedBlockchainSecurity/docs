@@ -16,7 +16,7 @@ As of v0.29.5, rate limiting coverage is complete across all non-exempt endpoint
 
 1. API service running v0.29.4+
 2. Authenticated user session (JWT token)
-3. Access to `https://app.0xapogee.local`
+3. Access to `https://app.0xapogee.com`
 
 ---
 
@@ -37,7 +37,7 @@ for i in $(seq 1 11); do
     -H "Content-Type: application/json" \
     -X POST \
     -d "{\"name\": \"RateLimitTest$i\", \"source_code\": \"pragma solidity ^0.8.0; contract Test$i {}\", \"language\": \"solidity\"}" \
-    "https://app.0xapogee.local/api/v1/contracts")
+    "https://app.0xapogee.com/api/v1/contracts")
   echo "Request $i: $HTTP_CODE"
 done
 ```
@@ -63,7 +63,7 @@ for i in $(seq 1 4); do
     -H "Content-Type: application/json" \
     -X POST \
     -d '{"contract_ids": ["<contract-uuid>"], "scanner_ids": ["slither"]}' \
-    "https://app.0xapogee.local/api/v1/scans/batch")
+    "https://app.0xapogee.com/api/v1/scans/batch")
   echo "Request $i: $HTTP_CODE"
 done
 ```
@@ -87,7 +87,7 @@ for i in $(seq 1 4); do
   HTTP_CODE=$(curl -sk -o /dev/null -w "%{http_code}" \
     -H "Authorization: Bearer $TOKEN" \
     -X POST \
-    "https://app.0xapogee.local/api/v1/webhooks/$WEBHOOK_ID/rotate-secret")
+    "https://app.0xapogee.com/api/v1/webhooks/$WEBHOOK_ID/rotate-secret")
   echo "Rotation $i: $HTTP_CODE"
 done
 ```
@@ -109,7 +109,7 @@ for i in $(seq 1 6); do
   HTTP_CODE=$(curl -sk -o /dev/null -w "%{http_code}" \
     -H "Authorization: Bearer $TOKEN" \
     -F "file=@test_contract.sol" \
-    "https://app.0xapogee.local/api/v1/upload")
+    "https://app.0xapogee.com/api/v1/upload")
   echo "Upload $i: $HTTP_CODE"
 done
 ```
@@ -141,7 +141,7 @@ done
 ```bash
 curl -sk \
   -H "X-API-Key: <api-key>" \
-  "https://app.0xapogee.local/api/v1/analytics/tool-effectiveness?contract_id=<uuid>"
+  "https://app.0xapogee.com/api/v1/analytics/tool-effectiveness?contract_id=<uuid>"
 ```
 
 **Expected Result:** `200 OK` with analytics data (previously required JWT only)
@@ -164,7 +164,7 @@ curl -sk \
 ```bash
 curl -sk -v \
   -H "Authorization: Bearer $TOKEN" \
-  "https://app.0xapogee.local/api/v1/contracts" \
+  "https://app.0xapogee.com/api/v1/contracts" \
   2>&1 | grep -i "x-ratelimit"
 ```
 
@@ -190,7 +190,7 @@ for i in $(seq 1 11); do
     -H "Content-Type: application/json" \
     -X PUT \
     -d '{"display_name": "Test User"}' \
-    "https://app.0xapogee.local/api/v1/users/me")
+    "https://app.0xapogee.com/api/v1/users/me")
   echo "Update $i: $HTTP_CODE"
 done
 ```

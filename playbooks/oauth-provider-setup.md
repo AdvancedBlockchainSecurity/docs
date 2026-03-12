@@ -301,7 +301,7 @@ Jenkins does not need OAuth client credentials in Vault. The user's API token is
 
 | Environment | Base URL | Example Callback |
 |-------------|----------|-----------------|
-| Server (local) | `https://app.0xapogee.local` | `https://app.0xapogee.local/api/v1/oauth/github/callback` |
+| Server (local) | `https://app.0xapogee.com` | `https://app.0xapogee.com/api/v1/oauth/github/callback` |
 | Production (GCP) | `https://app.0xapogee.com` | `https://app.0xapogee.com/api/v1/oauth/github/callback` |
 
 **Important:** OAuth providers must be able to reach the callback URL. This means:

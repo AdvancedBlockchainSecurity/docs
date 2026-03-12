@@ -59,7 +59,7 @@ kubectl rollout restart deployment/dashboard -n dashboard-local
 
 ### 4. Access Dashboard
 
-- **kubeadm**: http://app.0xapogee.local or http://192.168.86.225
+- **kubeadm**: http://app.0xapogee.com or http://192.168.86.225
 - **minikube**: http://127.0.0.1:3000
 
 ## Test Cases

@@ -81,7 +81,7 @@ kubectl rollout restart deployment/dashboard -n dashboard-local
 
 ### Step 4: Test Purchase
 
-1. Open dashboard: `http://app.0xapogee.local` or `http://127.0.0.1:3000`
+1. Open dashboard: `http://app.0xapogee.com` or `http://127.0.0.1:3000`
 2. Log in → Navigate to **Billing** or **Credits**
 3. Select a plan or credit package
 4. Click **Purchase** / **Subscribe**
@@ -171,7 +171,7 @@ kubectl logs deployment/api-service -n api-service-local --tail=50 | grep -i err
 | Environment | Dashboard URL | Webhook Endpoint |
 |-------------|--------------|------------------|
 | minikube | `http://127.0.0.1:3000` | `http://127.0.0.1:3000/api/v1/webhooks/stripe` |
-| kubeadm (server) | `http://app.0xapogee.local` | `http://192.168.86.225:30180/api/v1/webhooks/stripe` |
+| kubeadm (server) | `http://app.0xapogee.com` | `http://192.168.86.225:30180/api/v1/webhooks/stripe` |
 | GCP Production | `https://app.0xapogee.com` | `https://app.0xapogee.com/api/v1/webhooks/stripe` |
 
 ---

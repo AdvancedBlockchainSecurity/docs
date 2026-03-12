@@ -13,7 +13,7 @@ Verify that Traefik enforces TLS 1.2 as the minimum version and rejects TLS 1.0 
 
 - Traefik running in `traefik-local` namespace
 - TLSOption CRD named `default` deployed
-- HTTPS endpoint accessible (e.g., `app.0xapogee.local`)
+- HTTPS endpoint accessible (e.g., `app.0xapogee.com`)
 - `openssl` command available for TLS protocol testing
 - `curl` available for HTTPS connectivity testing
 
@@ -25,7 +25,7 @@ Verify that Traefik enforces TLS 1.2 as the minimum version and rejects TLS 1.0 
 
 **Command:**
 ```bash
-openssl s_client -connect app.0xapogee.local:443 -tls1 < /dev/null 2>&1
+openssl s_client -connect app.0xapogee.com:443 -tls1 < /dev/null 2>&1
 ```
 
 **Expected Result:**
@@ -48,7 +48,7 @@ openssl s_client -connect app.0xapogee.local:443 -tls1 < /dev/null 2>&1
 
 **Command:**
 ```bash
-openssl s_client -connect app.0xapogee.local:443 -tls1_1 < /dev/null 2>&1
+openssl s_client -connect app.0xapogee.com:443 -tls1_1 < /dev/null 2>&1
 ```
 
 **Expected Result:**
@@ -71,7 +71,7 @@ openssl s_client -connect app.0xapogee.local:443 -tls1_1 < /dev/null 2>&1
 
 **Command:**
 ```bash
-openssl s_client -connect app.0xapogee.local:443 -tls1_2 < /dev/null 2>&1 | grep -i "protocol\|tlsversion"
+openssl s_client -connect app.0xapogee.com:443 -tls1_2 < /dev/null 2>&1 | grep -i "protocol\|tlsversion"
 ```
 
 **Expected Result:**
@@ -94,7 +94,7 @@ openssl s_client -connect app.0xapogee.local:443 -tls1_2 < /dev/null 2>&1 | grep
 
 **Command:**
 ```bash
-openssl s_client -connect app.0xapogee.local:443 -tls1_3 < /dev/null 2>&1 | grep -i "protocol\|tlsversion"
+openssl s_client -connect app.0xapogee.com:443 -tls1_3 < /dev/null 2>&1 | grep -i "protocol\|tlsversion"
 ```
 
 **Expected Result:**
@@ -117,7 +117,7 @@ openssl s_client -connect app.0xapogee.local:443 -tls1_3 < /dev/null 2>&1 | grep
 
 **Command:**
 ```bash
-curl -k https://app.0xapogee.local --tlsv1.2 -I | head -5
+curl -k https://app.0xapogee.com --tlsv1.2 -I | head -5
 ```
 
 **Expected Result:**
@@ -141,7 +141,7 @@ curl -k https://app.0xapogee.local --tlsv1.2 -I | head -5
 
 **Command:**
 ```bash
-curl -k https://app.0xapogee.local/api/v1/health/live --tlsv1.2 -H "Content-Type: application/json" | jq '.status'
+curl -k https://app.0xapogee.com/api/v1/health/live --tlsv1.2 -H "Content-Type: application/json" | jq '.status'
 ```
 
 **Expected Result:**
@@ -165,7 +165,7 @@ curl -k https://app.0xapogee.local/api/v1/health/live --tlsv1.2 -H "Content-Type
 
 **Command:**
 ```bash
-openssl s_client -connect app.0xapogee.local:443 -tls1_2 < /dev/null 2>&1 | grep "Cipher"
+openssl s_client -connect app.0xapogee.com:443 -tls1_2 < /dev/null 2>&1 | grep "Cipher"
 ```
 
 **Expected Result:**
@@ -193,7 +193,7 @@ openssl s_client -connect app.0xapogee.local:443 -tls1_2 < /dev/null 2>&1 | grep
 
 **Command:**
 ```bash
-openssl s_client -connect app.0xapogee.local:443 -tls1_2 < /dev/null 2>&1 | \
+openssl s_client -connect app.0xapogee.com:443 -tls1_2 < /dev/null 2>&1 | \
   openssl x509 -noout -dates -issuer
 ```
 
@@ -218,7 +218,7 @@ openssl s_client -connect app.0xapogee.local:443 -tls1_2 < /dev/null 2>&1 | \
 
 **Command:**
 ```bash
-curl -I http://app.0xapogee.local 2>&1 | head -1
+curl -I http://app.0xapogee.com 2>&1 | head -1
 ```
 
 **Expected Result:**
@@ -241,7 +241,7 @@ curl -I http://app.0xapogee.local 2>&1 | head -1
 
 **Command:**
 ```bash
-openssl s_client -connect app.0xapogee.local:443 -ssl3 < /dev/null 2>&1 | head -5
+openssl s_client -connect app.0xapogee.com:443 -ssl3 < /dev/null 2>&1 | head -5
 ```
 
 **Expected Result:**

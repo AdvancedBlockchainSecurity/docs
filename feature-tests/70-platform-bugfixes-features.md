@@ -194,8 +194,8 @@
 
 ## Test 19: Authentication (Dashboard Build)
 
-- [ ] 19.1 Clear browser storage for `app.0xapogee.local`
-- [ ] 19.2 Navigate to `https://app.0xapogee.local`
+- [ ] 19.1 Clear browser storage for `app.0xapogee.com`
+- [ ] 19.2 Navigate to `https://app.0xapogee.com`
 - [ ] 19.3 Verify login page loads (Supabase auth)
 - [ ] 19.4 Login with valid credentials, verify redirect to dashboard
 
@@ -294,7 +294,7 @@ SELECT id, '$HASHED', '10.244.0.1', true, NOW(), NOW() + INTERVAL '4 hours', NOW
 FROM users WHERE email = 'jasonbrailowbizop@mail.com';"
 
 # 3. Test (pass raw token in header)
-curl -sk 'https://app.0xapogee.local/api/v1/admin/patterns/mappings/audit' \
+curl -sk 'https://app.0xapogee.com/api/v1/admin/patterns/mappings/audit' \
   -H "Authorization: Bearer $TOKEN" \
   -H "X-Admin-Session: $RAW_TOKEN"
 ```

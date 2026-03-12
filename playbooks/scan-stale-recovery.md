@@ -16,7 +16,7 @@ This playbook covers monitoring and recovering stale scans — scans stuck in `q
 ## Prerequisites
 
 - Admin portal access (`platform_admin` role or higher)
-- Access to `admin.0xapogee.local` or `admin.0xapogee.com`
+- Access to `admin.0xapogee.com` or `admin.0xapogee.com`
 
 ## How Auto-Recovery Works
 
@@ -163,7 +163,7 @@ HTTP endpoint for recovery of scans that the orchestration beat may miss (e.g., 
 ```bash
 # Recover scans stuck in queued/running for >1 hour
 # Records error_message with recovery context and original status
-curl -sk -X POST https://app.0xapogee.local/api/v1/scans/maintenance/recover-stale-scans \
+curl -sk -X POST https://app.0xapogee.com/api/v1/scans/maintenance/recover-stale-scans \
   -H "X-Internal-Service: true"
 ```
 

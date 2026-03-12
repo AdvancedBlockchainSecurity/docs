@@ -60,39 +60,39 @@ resources:
 
 **Test 1: Reject TLS 1.0**
 ```bash
-openssl s_client -connect app.0xapogee.local:443 -tls1
+openssl s_client -connect app.0xapogee.com:443 -tls1
 # Expected: Connection refused or protocol error
 # Result: PASS (handshake fails)
 ```
 
 **Test 2: Reject TLS 1.1**
 ```bash
-openssl s_client -connect app.0xapogee.local:443 -tls1_1
+openssl s_client -connect app.0xapogee.com:443 -tls1_1
 # Expected: Connection refused or protocol error
 # Result: PASS (handshake fails)
 ```
 
 **Test 3: Accept TLS 1.2**
 ```bash
-openssl s_client -connect app.0xapogee.local:443 -tls1_2
+openssl s_client -connect app.0xapogee.com:443 -tls1_2
 # Expected: Successful connection
 # Result: PASS (connection established)
 ```
 
 **Test 4: Accept TLS 1.3**
 ```bash
-openssl s_client -connect app.0xapogee.local:443 -tls1_3
+openssl s_client -connect app.0xapogee.com:443 -tls1_3
 # Expected: Successful connection
 # Result: PASS (connection established)
 ```
 
 **Test 5: Dashboard and API accessible via HTTPS**
 ```bash
-curl -k https://app.0xapogee.local
+curl -k https://app.0xapogee.com
 # Expected: 200 OK (dashboard)
 # Result: PASS
 
-curl -k https://app.0xapogee.local/api/v1/health/live
+curl -k https://app.0xapogee.com/api/v1/health/live
 # Expected: 200 OK (API alive)
 # Result: PASS
 ```
@@ -142,7 +142,7 @@ kubectl get tlsoption -n traefik-local
 # Expected: default TLSOption present
 
 # Verify TLS versions enforced
-openssl s_client -connect app.0xapogee.local:443 -tls1 2>&1 | grep -i "unsupported\|error\|refused"
+openssl s_client -connect app.0xapogee.com:443 -tls1 2>&1 | grep -i "unsupported\|error\|refused"
 # Expected: Connection error (TLS 1.0 not supported)
 ```
 

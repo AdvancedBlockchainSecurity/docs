@@ -755,7 +755,7 @@ const API_PREFIX = '/api/v1';  // Relative URL - routed by Traefik
 **WebSocket configuration** (if needed):
 ```bash
 # For server/staging/production with TLS:
-VITE_WS_URL=wss://app.0xapogee.local/ws
+VITE_WS_URL=wss://app.0xapogee.com/ws
 
 # For pure local development (traffic stays on machine), ws://localhost is acceptable:
 # VITE_WS_URL=ws://127.0.0.1:8003/ws

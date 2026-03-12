@@ -80,7 +80,7 @@ kubectl scale deployment/api-service -n api-service-local --replicas=1
 kubectl rollout status deployment/api-service -n api-service-local
 
 # 5. Verify
-curl -sk https://app.0xapogee.local/api/v1/health/ready
+curl -sk https://app.0xapogee.com/api/v1/health/ready
 ```
 
 ### Without Backup (Full Rebuild)
@@ -225,7 +225,7 @@ done
 # See Scenario 1 above
 
 # 8. Verify
-curl -sk https://app.0xapogee.local/api/v1/health/ready
+curl -sk https://app.0xapogee.com/api/v1/health/ready
 ```
 
 ---

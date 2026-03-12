@@ -645,7 +645,7 @@ kubectl exec -n tool-integration-local deployment/tool-integration -- \
   env | grep SCANNER_IMAGE_<KEY>
 
 # Run a test scan via API
-curl -sk -X POST "https://app.0xapogee.local/api/v1/scans/<scan-id>/trigger?scanner=<key>" \
+curl -sk -X POST "https://app.0xapogee.com/api/v1/scans/<scan-id>/trigger?scanner=<key>" \
   -H "Authorization: Bearer <TOKEN>" \
   -H "Content-Type: application/json" \
   -d '{"contract_source": "<test contract>"}'

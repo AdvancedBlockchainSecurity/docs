@@ -5,7 +5,7 @@
 **Last Updated:** February 28, 2026
 **Cluster:** debian-server (single-node kubeadm)
 **Registry:** Harbor at `harbor.blocksecops.local`
-**Platform URL:** `https://app.0xapogee.local`
+**Platform URL:** `https://app.0xapogee.com`
 
 ---
 
@@ -214,22 +214,22 @@ kubectl get pods -n kube-system --no-headers
 
 | # | Check | URL | Expected | Actual | Status |
 |---|-------|-----|----------|--------|--------|
-| 5.1 | Dashboard loads | `https://app.0xapogee.local/` | 200 | | [ ] |
-| 5.2 | API health live | `https://app.0xapogee.local/api/v1/health/live` | 200 + `"status":"healthy"` | | [ ] |
-| 5.3 | API health ready | `https://app.0xapogee.local/api/v1/health/ready` | 200 + `"ready":true` | | [ ] |
-| 5.4 | API OpenAPI docs | `https://app.0xapogee.local/docs` | 200 | | [ ] |
-| 5.5 | Admin portal | `http://admin.0xapogee.local/` | 200 | | [ ] |
-| 5.6 | HTTP -> HTTPS redirect | `http://app.0xapogee.local/` | 301/302 to HTTPS | | [ ] |
+| 5.1 | Dashboard loads | `https://app.0xapogee.com/` | 200 | | [ ] |
+| 5.2 | API health live | `https://app.0xapogee.com/api/v1/health/live` | 200 + `"status":"healthy"` | | [ ] |
+| 5.3 | API health ready | `https://app.0xapogee.com/api/v1/health/ready` | 200 + `"ready":true` | | [ ] |
+| 5.4 | API OpenAPI docs | `https://app.0xapogee.com/docs` | 200 | | [ ] |
+| 5.5 | Admin portal | `http://admin.0xapogee.com/` | 200 | | [ ] |
+| 5.6 | HTTP -> HTTPS redirect | `http://app.0xapogee.com/` | 301/302 to HTTPS | | [ ] |
 | 5.7 | Harbor UI | `https://harbor.blocksecops.local/` | 200 | | [ ] |
 
 ```bash
 # Run all external access checks
-echo "Dashboard:     $(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.local/)"
-echo "API health:    $(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.local/api/v1/health/live)"
-echo "API ready:     $(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.local/api/v1/health/ready)"
-echo "API docs:      $(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.local/docs)"
-echo "Admin portal:  $(curl -s -o /dev/null -w '%{http_code}' http://admin.0xapogee.local/)"
-echo "HTTP redirect: $(curl -sk -o /dev/null -w '%{http_code}' http://app.0xapogee.local/)"
+echo "Dashboard:     $(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.com/)"
+echo "API health:    $(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.com/api/v1/health/live)"
+echo "API ready:     $(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.com/api/v1/health/ready)"
+echo "API docs:      $(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.com/docs)"
+echo "Admin portal:  $(curl -s -o /dev/null -w '%{http_code}' http://admin.0xapogee.com/)"
+echo "HTTP redirect: $(curl -sk -o /dev/null -w '%{http_code}' http://app.0xapogee.com/)"
 echo "Harbor:        $(curl -sk -o /dev/null -w '%{http_code}' https://harbor.blocksecops.local/)"
 ```
 
@@ -437,7 +437,7 @@ echo "Unsynced ExternalSecrets: $UNSYNCED (expected: 0)"
 
 ```bash
 # Encryption configured
-curl -sk https://app.0xapogee.local/api/v1/health/ready | \
+curl -sk https://app.0xapogee.com/api/v1/health/ready | \
   python3 -c "import sys,json; d=json.load(sys.stdin); print('OK' if d.get('checks',{}).get('encryption_configured') else 'FAIL')"
 
 # Plaintext secret scan (basic grep)
@@ -605,13 +605,13 @@ done
 
 | # | Namespace | IngressRoute | Host | Routes To | Status |
 |---|-----------|-------------|------|-----------|--------|
-| 15.1 | dashboard-local | dashboard-server | `app.0xapogee.local` (excl /api/v1, /ws) | dashboard:3000 | [ ] |
-| 15.2 | api-service-local | api-service-server | `app.0xapogee.local` && `/api/v1` | api-service:8000 | [ ] |
-| 15.3 | notification-local | notification-websocket | `app.0xapogee.local` && `/ws` | notification:8003 | [ ] |
-| 15.4 | admin-portal-local | admin-portal-ingressroute-server | `admin.0xapogee.local` | admin-portal:3000 / api-service:8000 | [ ] |
-| 15.5 | tool-integration-local | tool-integration-server | `app.0xapogee.local` && `/api/v1/tool-integration` | tool-integration:8005 | [ ] |
+| 15.1 | dashboard-local | dashboard-server | `app.0xapogee.com` (excl /api/v1, /ws) | dashboard:3000 | [ ] |
+| 15.2 | api-service-local | api-service-server | `app.0xapogee.com` && `/api/v1` | api-service:8000 | [ ] |
+| 15.3 | notification-local | notification-websocket | `app.0xapogee.com` && `/ws` | notification:8003 | [ ] |
+| 15.4 | admin-portal-local | admin-portal-ingressroute-server | `admin.0xapogee.com` | admin-portal:3000 / api-service:8000 | [ ] |
+| 15.5 | tool-integration-local | tool-integration-server | `app.0xapogee.com` && `/api/v1/tool-integration` | tool-integration:8005 | [ ] |
 | 15.6 | harbor-local | harbor-server | `harbor.blocksecops.local` | harbor:80 | [ ] |
-| 15.7 | traefik-local | app-http-redirect | `app.0xapogee.local` (HTTP) | Redirect HTTPS | [ ] |
+| 15.7 | traefik-local | app-http-redirect | `app.0xapogee.com` (HTTP) | Redirect HTTPS | [ ] |
 
 ```bash
 kubectl get ingressroute -A
@@ -762,7 +762,7 @@ WS_CODE=$(curl -sk --http1.1 \
   -H "Connection: Upgrade" -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
   -o /dev/null -w "%{http_code}" \
-  https://app.0xapogee.local/ws/ 2>/dev/null)
+  https://app.0xapogee.com/ws/ 2>/dev/null)
 echo "WebSocket upgrade: $WS_CODE (expected: 101)"
 ```
 
@@ -802,14 +802,14 @@ echo "Harbor running pods: $HARBOR_PODS/7"
 
 | # | Check | Domain | Expected Resolution | Status |
 |---|-------|--------|---------------------|--------|
-| 22.1 | Platform domain | `app.0xapogee.local` | 127.0.0.1 (on server) | [ ] |
-| 22.2 | Admin domain | `admin.0xapogee.local` | 127.0.0.1 (on server) | [ ] |
+| 22.1 | Platform domain | `app.0xapogee.com` | 127.0.0.1 (on server) | [ ] |
+| 22.2 | Admin domain | `admin.0xapogee.com` | 127.0.0.1 (on server) | [ ] |
 | 22.3 | Harbor domain | `harbor.blocksecops.local` | 127.0.0.1 (on server) | [ ] |
 | 22.4 | Cluster DNS (CoreDNS) | `kubernetes.default.svc.cluster.local` | Resolves | [ ] |
 
 ```bash
 # Local DNS resolution (on server)
-for domain in app.0xapogee.local admin.0xapogee.local harbor.blocksecops.local; do
+for domain in app.0xapogee.com admin.0xapogee.com harbor.blocksecops.local; do
   IP=$(getent hosts "$domain" 2>/dev/null | awk '{print $1}')
   echo "  $domain -> ${IP:-NOT RESOLVED}"
 done
@@ -862,10 +862,10 @@ check "No non-running pods" "0" "$NON_RUNNING"
 
 echo ""
 echo "=== 3. External Access ==="
-check "Dashboard" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.local/ 2>/dev/null)"
-check "API health" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.local/api/v1/health/live 2>/dev/null)"
-check "API ready" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.local/api/v1/health/ready 2>/dev/null)"
-check "Admin portal" "200" "$(curl -s -o /dev/null -w '%{http_code}' http://admin.0xapogee.local/ 2>/dev/null)"
+check "Dashboard" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.com/ 2>/dev/null)"
+check "API health" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.com/api/v1/health/live 2>/dev/null)"
+check "API ready" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://app.0xapogee.com/api/v1/health/ready 2>/dev/null)"
+check "Admin portal" "200" "$(curl -s -o /dev/null -w '%{http_code}' http://admin.0xapogee.com/ 2>/dev/null)"
 check "Harbor" "200" "$(curl -sk -o /dev/null -w '%{http_code}' https://harbor.blocksecops.local/ 2>/dev/null)"
 
 echo ""

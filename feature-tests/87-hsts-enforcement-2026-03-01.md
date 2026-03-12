@@ -14,7 +14,7 @@ Verify that Traefik enforces HSTS (Strict-Transport-Security) headers with prope
 - Traefik running in `traefik-local` namespace
 - HSTS Middleware CRD named `hsts` deployed in `traefik-local` namespace
 - HSTS middleware bound to `websecure` entrypoint in Traefik ConfigMap
-- HTTPS endpoint accessible (e.g., `app.0xapogee.local`)
+- HTTPS endpoint accessible (e.g., `app.0xapogee.com`)
 - `curl` available for HTTP header inspection
 - `grep` available for header validation
 
@@ -26,7 +26,7 @@ Verify that Traefik enforces HSTS (Strict-Transport-Security) headers with prope
 
 **Command:**
 ```bash
-curl -I https://app.0xapogee.local
+curl -I https://app.0xapogee.com
 ```
 
 **Expected Result:**
@@ -50,7 +50,7 @@ curl -I https://app.0xapogee.local
 
 **Command:**
 ```bash
-curl -I https://app.0xapogee.local/api/v1/health/live
+curl -I https://app.0xapogee.com/api/v1/health/live
 ```
 
 **Expected Result:**
@@ -74,7 +74,7 @@ curl -I https://app.0xapogee.local/api/v1/health/live
 
 **Command:**
 ```bash
-curl -s -I https://app.0xapogee.local | grep -i "strict-transport-security"
+curl -s -I https://app.0xapogee.com | grep -i "strict-transport-security"
 ```
 
 **Expected Result:**
@@ -97,12 +97,12 @@ curl -s -I https://app.0xapogee.local | grep -i "strict-transport-security"
 
 **Command:**
 ```bash
-curl -s -I https://app.0xapogee.local | grep -i "strict-transport-security"
+curl -s -I https://app.0xapogee.com | grep -i "strict-transport-security"
 ```
 
 **Expected Result:**
 - Output includes `includeSubDomains`
-- Applies HSTS to all subdomains (e.g., `api.0xapogee.local`, `admin.0xapogee.local`, future subdomains)
+- Applies HSTS to all subdomains (e.g., `api.0xapogee.com`, `admin.0xapogee.com`, future subdomains)
 - Browser enforces HTTPS for any subdomain accessed
 
 **Actual Result:** PASS — includeSubDomains present
@@ -120,7 +120,7 @@ curl -s -I https://app.0xapogee.local | grep -i "strict-transport-security"
 
 **Command:**
 ```bash
-curl -s -I https://app.0xapogee.local | grep -i "strict-transport-security"
+curl -s -I https://app.0xapogee.com | grep -i "strict-transport-security"
 ```
 
 **Expected Result:**
@@ -145,12 +145,12 @@ curl -s -I https://app.0xapogee.local | grep -i "strict-transport-security"
 
 **Command:**
 ```bash
-curl -I http://app.0xapogee.local
+curl -I http://app.0xapogee.com
 ```
 
 **Expected Result:**
 - HTTP 301 (Moved Permanently) or 307 (Temporary Redirect)
-- Location header points to `https://app.0xapogee.local`
+- Location header points to `https://app.0xapogee.com`
 - **Response includes HSTS header** (on the redirect response itself)
 - No HSTS on redirect means future insecure requests won't be blocked
 
@@ -171,8 +171,8 @@ curl -I http://app.0xapogee.local
 ```bash
 # Test multiple endpoints
 for endpoint in "" "/api/v1/health/live" "/api/v1/health/ready" "/docs"; do
-  echo "=== https://app.0xapogee.local$endpoint ==="
-  curl -s -I https://app.0xapogee.local$endpoint | grep -i "strict-transport-security"
+  echo "=== https://app.0xapogee.com$endpoint ==="
+  curl -s -I https://app.0xapogee.com$endpoint | grep -i "strict-transport-security"
 done
 ```
 
@@ -257,7 +257,7 @@ kubectl get pods -n traefik-local -o jsonpath='{range .items[*]}{.metadata.name}
 **Command:**
 ```bash
 # Follow redirects to see where HSTS appears
-curl -I -L http://app.0xapogee.local 2>&1 | grep -E "(^< HTTP|Strict-Transport)"
+curl -I -L http://app.0xapogee.com 2>&1 | grep -E "(^< HTTP|Strict-Transport)"
 ```
 
 **Expected Result:**
@@ -282,7 +282,7 @@ curl -I -L http://app.0xapogee.local 2>&1 | grep -E "(^< HTTP|Strict-Transport)"
 
 **Command:**
 ```bash
-curl -s -I https://app.0xapogee.local | grep -i "strict-transport-security"
+curl -s -I https://app.0xapogee.com | grep -i "strict-transport-security"
 # Output example: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 ```
 
@@ -309,10 +309,10 @@ curl -s -I https://app.0xapogee.local | grep -i "strict-transport-security"
 **Commands:**
 ```bash
 # Attempt TLS 1.0 (should fail)
-openssl s_client -connect app.0xapogee.local:443 -tls1 2>&1 | head -5
+openssl s_client -connect app.0xapogee.com:443 -tls1 2>&1 | head -5
 
 # Attempt TLS 1.2 (should succeed with HSTS header)
-curl -I --tlsv1.2 https://app.0xapogee.local | grep -E "(HTTP|Strict-Transport)"
+curl -I --tlsv1.2 https://app.0xapogee.com | grep -E "(HTTP|Strict-Transport)"
 ```
 
 **Expected Result:**

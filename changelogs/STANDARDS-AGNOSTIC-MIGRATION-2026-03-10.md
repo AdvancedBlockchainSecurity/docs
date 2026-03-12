@@ -152,25 +152,25 @@ Regression tests used negative lookbehind regex `(?<!harbor\.)blocksecops\.local
 
 ### Server (PowerEdge R720)
 
-- **Access:** `https://app.0xapogee.local`
+- **Access:** `https://app.0xapogee.com`
 - **Node IP:** `192.168.86.225`
 - **TLS:** Self-signed certificate via cert-manager with local CA issuer
 
 **DNS Setup (one-time):**
 ```bash
 # On server
-echo "127.0.0.1  app.0xapogee.local harbor.blocksecops.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1  app.0xapogee.com harbor.blocksecops.local" | sudo tee -a /etc/hosts
 
 # On client machines
-echo "192.168.86.225  app.0xapogee.local harbor.blocksecops.local" | sudo tee -a /etc/hosts
+echo "192.168.86.225  app.0xapogee.com harbor.blocksecops.local" | sudo tee -a /etc/hosts
 ```
 
 ### Service Access Matrix (Historical)
 
 | Environment | Method | Access Pattern | One-Time Setup |
 |-------------|--------|----------------|----------------|
-| **Local (kubeadm)** | hostPort 80/443 + Traefik (TLS) | `https://app.0xapogee.local` | DNS entries |
-| **Server (kubeadm)** | hostPort 80/443 + Traefik | `http://app.0xapogee.local` | DNS entries |
+| **Local (kubeadm)** | hostPort 80/443 + Traefik (TLS) | `https://app.0xapogee.com` | DNS entries |
+| **Server (kubeadm)** | hostPort 80/443 + Traefik | `http://app.0xapogee.com` | DNS entries |
 | **Production (GCP)** | GKE Gateway + Cloudflare | `https://app.0xapogee.com` | None (managed) |
 
 ---
@@ -183,8 +183,8 @@ Historical environment settings for the kubeadm-based server:
 
 | Setting | Value |
 |---------|-------|
-| **Server access** | `https://app.0xapogee.local` (Traefik with hostPort 80/443) |
-| **Admin access** | `http://admin.0xapogee.local` (Traefik hostPort 80) |
+| **Server access** | `https://app.0xapogee.com` (Traefik with hostPort 80/443) |
+| **Admin access** | `http://admin.0xapogee.com` (Traefik hostPort 80) |
 | **Cluster type** | kubeadm with containerd |
 | **Registry** | Harbor at `harbor.blocksecops.local` |
 | **curl flag** | Use `-sk` for HTTPS (self-signed cert) |

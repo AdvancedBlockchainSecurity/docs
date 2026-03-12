@@ -90,10 +90,10 @@ kubectl rollout status deployment/api-service -n api-service-local
 
 ```bash
 # Test users endpoint (requires admin session)
-curl -s http://admin.0xapogee.local/api/v1/admin/users
+curl -s http://admin.0xapogee.com/api/v1/admin/users
 
 # Test organizations endpoint
-curl -s http://admin.0xapogee.local/api/v1/admin/organizations
+curl -s http://admin.0xapogee.com/api/v1/admin/organizations
 
 # Expected: 401 Unauthorized (authentication required)
 ```

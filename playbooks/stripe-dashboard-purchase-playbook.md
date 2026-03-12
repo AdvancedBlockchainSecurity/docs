@@ -186,7 +186,7 @@ cat /tmp/stripe-listener.log | tail -20
 
 ### 5.1 Access the Dashboard
 
-1. Open browser to `http://127.0.0.1:3000` (minikube) or `http://app.0xapogee.local` (kubeadm)
+1. Open browser to `http://127.0.0.1:3000` (minikube) or `http://app.0xapogee.com` (kubeadm)
 2. Log in with your account
 3. Navigate to **Billing** or **Credits** page
 

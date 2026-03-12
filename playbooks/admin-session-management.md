@@ -85,7 +85,7 @@ ADMIN_SESSION=$(cat /tmp/admin_session_token)
 
 curl -sk -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
-  "https://app.0xapogee.local/api/v1/admin/auth/session" | jq '.'
+  "https://app.0xapogee.com/api/v1/admin/auth/session" | jq '.'
 ```
 
 ---
@@ -160,7 +160,7 @@ USER_ID="target-user-uuid"
 curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
   -H "X-Admin-Session: ${ADMIN_SESSION}" \
   -H "Content-Type: application/json" \
-  "https://app.0xapogee.local/api/v1/admin/emergency/revoke-sessions/${USER_ID}" \
+  "https://app.0xapogee.com/api/v1/admin/emergency/revoke-sessions/${USER_ID}" \
   -d '{"reason": "Security incident - revoking all sessions for investigation"}' | jq '.'
 ```
 

@@ -23,7 +23,7 @@ Environment Setup Pipeline:
    └─ Fernet key for AES-128-CBC + HMAC-SHA256 token encryption
 
 5. Set dashboard_base_url
-   └─ https://app.0xapogee.com (GCP) or https://app.0xapogee.local (server)
+   └─ https://app.0xapogee.com (GCP) or https://app.0xapogee.com (server)
 
 6. Deploy and verify callback endpoints
    └─ /api/v1/oauth/{provider}/callback must be reachable from provider
@@ -240,7 +240,7 @@ JOIN integrations i ON i.id = ic.integration_id;
 | JIRA | `https://app.0xapogee.com/api/v1/oauth/jira/callback` |
 | Jenkins | `https://app.0xapogee.com/api/v1/oauth/jenkins/callback` |
 
-**Note:** Replace `app.0xapogee.com` with `app.0xapogee.local` for server environment. OAuth will only work on server environment if the providers can reach the callback URL (requires public DNS or tunneling).
+**Note:** Replace `app.0xapogee.com` with `app.0xapogee.com` for server environment. OAuth will only work on server environment if the providers can reach the callback URL (requires public DNS or tunneling).
 
 ## Troubleshooting
 

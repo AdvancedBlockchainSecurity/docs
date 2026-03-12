@@ -213,7 +213,7 @@ Cost targets: ~$55-65/mo (tier0), ~$684/mo (staging), ~$2,078/mo (production)
 
 ### GCP Domains
 
-- Local: `*.0xapogee.local`
+- Local: `*.0xapogee.com`
 - Staging: `*.staging.0xapogee.com`
 - Production: `*.0xapogee.com`
 - ArgoCD: `argocd.0xapogee.com`

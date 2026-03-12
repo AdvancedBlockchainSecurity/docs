@@ -56,7 +56,7 @@ CONTRACTS_DIR="/home/pwner/Git/vulnerable-smart-contract-examples/contracts/soli
 REGISTRY="${REGISTRY:-harbor.blocksecops.local/blocksecops}"
 
 # API Configuration
-API_URL="${API_URL:-https://app.0xapogee.local/api/v1}"
+API_URL="${API_URL:-https://app.0xapogee.com/api/v1}"
 SUPABASE_URL="https://huzjlpypdlelqnbjvxad.supabase.co"
 SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1empscHlwZGxlbHFuYmp2eGFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4MTQ5MzYsImV4cCI6MjA3ODM5MDkzNn0.AabcSkKyi6HP3sLnTR7Bj-jZfgGgeSlEQZ0YRajC3i4"
 TEST_EMAIL="jasonbrailowbizop@mail.com"

@@ -44,7 +44,7 @@ These values are intentionally public and designed to be visible in browser code
 | `VITE_ADMIN_SUPABASE_ANON_KEY` | Admin Portal | `eyJhbGci...` | Anonymous key, admin role enforced server-side |
 | `VITE_API_BASE_URL` | Admin Portal | `/api/v1` | Relative API path routed via Traefik |
 | `VITE_ENVIRONMENT` | Admin Portal | `local` | Environment identifier, no security impact |
-| `VITE_WS_URL` | Dashboard | `wss://app.0xapogee.local/ws` | WebSocket endpoint, auth required (use wss:// for server/staging/production) |
+| `VITE_WS_URL` | Dashboard | `wss://app.0xapogee.com/ws` | WebSocket endpoint, auth required (use wss:// for server/staging/production) |
 | `VITE_WALLETCONNECT_PROJECT_ID` | Dashboard | `abc123...` | Public project identifier |
 | `VITE_USE_TESTNET` | Dashboard | `true` | Feature flag, no security impact |
 | `VITE_API_URL` | Dashboard | `https://api.example.com` | Public API endpoint |
@@ -73,7 +73,7 @@ These values must **NEVER** be in frontend code:
 # Dockerfile
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
-ARG VITE_WS_URL=wss://app.0xapogee.local/ws
+ARG VITE_WS_URL=wss://app.0xapogee.com/ws
 
 ENV VITE_SUPABASE_URL=${VITE_SUPABASE_URL} \
     VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY} \
@@ -117,7 +117,7 @@ Store local development values in `.env.local`. This file is gitignored and cont
 VITE_SUPABASE_URL=https://huzjlpypdlelqnbjvxad.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 VITE_WS_ENABLED=true
-VITE_WS_URL=wss://app.0xapogee.local/ws
+VITE_WS_URL=wss://app.0xapogee.com/ws
 VITE_WALLETCONNECT_PROJECT_ID=your_project_id
 VITE_USE_TESTNET=true
 ```
@@ -131,7 +131,7 @@ Document required variables in `.env.example`. This file IS committed to Git.
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
 VITE_WS_ENABLED=true
-VITE_WS_URL=wss://app.0xapogee.local/ws
+VITE_WS_URL=wss://app.0xapogee.com/ws
 VITE_WALLETCONNECT_PROJECT_ID=
 VITE_USE_TESTNET=true
 ```
@@ -223,7 +223,7 @@ ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
 # Non-sensitive defaults are OK
 ARG VITE_WS_ENABLED=true
-ARG VITE_WS_URL=wss://app.0xapogee.local/ws
+ARG VITE_WS_URL=wss://app.0xapogee.com/ws
 
 # Validate required build args
 RUN if [ -z "$VITE_SUPABASE_URL" ]; then echo "VITE_SUPABASE_URL is required" && exit 1; fi

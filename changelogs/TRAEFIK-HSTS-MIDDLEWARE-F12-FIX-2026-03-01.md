@@ -35,7 +35,7 @@ spec:
 
 **Properties:**
 - `stsSeconds: 31536000` — HSTS max-age of 1 year (standard production value)
-- `stsIncludeSubdomains: true` — Applies HSTS to all subdomains of `0xapogee.local`/`0xapogee.com`
+- `stsIncludeSubdomains: true` — Applies HSTS to all subdomains of `0xapogee.com`/`0xapogee.com`
 - `stsPreload: true` — Allows inclusion in HSTS preload lists (browser hardcoding)
 
 **Resulting HTTP Header:**
@@ -115,7 +115,7 @@ resources:
 
 **Test 1: HSTS Header Present on Dashboard**
 ```bash
-curl -I https://app.0xapogee.local
+curl -I https://app.0xapogee.com
 # Expected: Strict-Transport-Security header present
 # Result: PASS
 # Header: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
@@ -123,7 +123,7 @@ curl -I https://app.0xapogee.local
 
 **Test 2: HSTS Header Present on API Endpoints**
 ```bash
-curl -I https://app.0xapogee.local/api/v1/health/live
+curl -I https://app.0xapogee.com/api/v1/health/live
 # Expected: Strict-Transport-Security header present
 # Result: PASS
 # Header: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
@@ -131,31 +131,31 @@ curl -I https://app.0xapogee.local/api/v1/health/live
 
 **Test 3: TLS 1.0 Rejection (F11 - Previously Fixed)**
 ```bash
-openssl s_client -connect app.0xapogee.local:443 -tls1
+openssl s_client -connect app.0xapogee.com:443 -tls1
 # Expected: Connection rejected
 # Result: PASS (handshake fails)
 ```
 
 **Test 4: TLS 1.2 Acceptance (F11 - Previously Fixed)**
 ```bash
-openssl s_client -connect app.0xapogee.local:443 -tls1_2
+openssl s_client -connect app.0xapogee.com:443 -tls1_2
 # Expected: Successful connection
 # Result: PASS (connection established)
 ```
 
 **Test 5: TLS 1.3 Acceptance**
 ```bash
-openssl s_client -connect app.0xapogee.local:443 -tls1_3
+openssl s_client -connect app.0xapogee.com:443 -tls1_3
 # Expected: Successful connection
 # Result: PASS (connection established)
 ```
 
 **Test 6: HTTP to HTTPS Redirect with HSTS**
 ```bash
-curl -i http://app.0xapogee.local
-# Expected: 301 redirect to https://app.0xapogee.local with HSTS header in redirect response
+curl -i http://app.0xapogee.com
+# Expected: 301 redirect to https://app.0xapogee.com with HSTS header in redirect response
 # Result: PASS
-# Redirect: Location: https://app.0xapogee.local/
+# Redirect: Location: https://app.0xapogee.com/
 # Header: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 ```
 
@@ -163,7 +163,7 @@ curl -i http://app.0xapogee.local
 ```bash
 # Verify header on multiple endpoints
 for endpoint in "" "/api/v1/health/live" "/docs"; do
-  curl -s -I https://app.0xapogee.local$endpoint | grep -i "strict-transport"
+  curl -s -I https://app.0xapogee.com$endpoint | grep -i "strict-transport"
 done
 # Result: PASS (all responses include HSTS header)
 ```
@@ -216,7 +216,7 @@ done
 - **Downgrade Attack Prevention:** HSTS prevents browsers from downgrading to HTTP
 - **Cookie Security:** Ensures all cookies marked Secure are only sent over HTTPS
 - **HSTS Preload:** Eligible for browser hardcoding in HSTS preload lists
-- **Subdomains:** All subdomains (e.g., `api.0xapogee.local`, future domains) inherit HSTS protection
+- **Subdomains:** All subdomains (e.g., `api.0xapogee.com`, future domains) inherit HSTS protection
 - **1-Year Max-Age:** Provides long-term protection with standard renewal cycle
 
 ## Related Standards
@@ -257,11 +257,11 @@ kubectl get middleware -n traefik-local
 kubectl get configmap traefik -n traefik-local -o yaml | grep -A5 "websecure"
 
 # Test HSTS header
-curl -I https://app.0xapogee.local | grep -i "strict-transport"
+curl -I https://app.0xapogee.com | grep -i "strict-transport"
 # Expected: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 
 # Test TLS enforcement (from F11 fix)
-openssl s_client -connect app.0xapogee.local:443 -tls1 2>&1 | grep -i "error\|refused"
+openssl s_client -connect app.0xapogee.com:443 -tls1 2>&1 | grep -i "error\|refused"
 # Expected: Connection error (TLS 1.0 not supported)
 ```
 

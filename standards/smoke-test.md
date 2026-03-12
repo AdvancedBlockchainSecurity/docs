@@ -251,6 +251,23 @@ MISSING_ERR=$(kubectl exec -n postgresql-${ENV} postgresql-0 -- \
 echo "Failed scans missing error_message: $MISSING_ERR (expected: 0)"
 ```
 
+### Scanner Image Health
+
+```bash
+# Verify scanner ConfigMap is loaded
+kubectl get configmap scanner-versions -n tool-integration-prod -o jsonpath='{.data.SCANNER_IMAGE_SLITHER}'
+# Expected: scanner-slither:0.3.8 (or current version)
+
+# Verify scanner image is pullable (quick spot-check)
+kubectl run scanner-smoke-test --image=$(kubectl get configmap scanner-versions -n tool-integration-prod -o jsonpath='{.data.SCANNER_REGISTRY}')/$(kubectl get configmap scanner-versions -n tool-integration-prod -o jsonpath='{.data.SCANNER_IMAGE_SLITHER}') \
+  --restart=Never --rm -it -n tool-integration-prod --command -- bash -c 'ls /opt/solc-select/artifacts/ 2>/dev/null | wc -l && echo "solc versions pre-installed"'
+# Expected: 18 solc versions pre-installed
+
+# Verify no scanner jobs stuck
+kubectl get jobs -n tool-integration-prod -l app=scanner --field-selector status.successful=0 --no-headers | wc -l
+# Expected: 0 (or very few in-progress)
+```
+
 ## WebSocket Health Check
 
 WebSocket upgrade requires HTTP/1.1. Force it with curl to avoid false negatives from HTTP/2 ALPN:

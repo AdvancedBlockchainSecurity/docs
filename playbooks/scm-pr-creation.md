@@ -51,7 +51,7 @@ flowchart TD
 
 ```bash
 # Create PR from repair
-curl -X POST https://app.0xapogee.local/api/v1/integrations/{integration_id}/repositories/{repo_id}/pull-requests \
+curl -X POST https://app.0xapogee.com/api/v1/integrations/{integration_id}/repositories/{repo_id}/pull-requests \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{

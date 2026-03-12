@@ -59,7 +59,7 @@ docker images | grep "harbor.blocksecops.local.*scanner-"
 
 ### 0.2 Scanner Registry
 ```bash
-curl -sk https://app.0xapogee.local/api/v1/scanners | jq '.scanners[] | {id, name, is_available}'
+curl -sk https://app.0xapogee.com/api/v1/scanners | jq '.scanners[] | {id, name, is_available}'
 ```
 - [ ] 17 scanners registered
 - [ ] All scanners show `is_available: true`

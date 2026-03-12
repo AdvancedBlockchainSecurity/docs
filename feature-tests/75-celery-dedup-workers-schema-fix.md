@@ -62,7 +62,7 @@ kubectl get deployment -n api-service-local celery-worker -o jsonpath='{.spec.te
 
 ```bash
 curl -sk -H "Authorization: Bearer $TOKEN" \
-  "https://app.0xapogee.local/api/v1/vulnerabilities?limit=5" | \
+  "https://app.0xapogee.com/api/v1/vulnerabilities?limit=5" | \
   python3 -c "import sys,json; [print(f'{v[\"title\"][:40]}: is_canonical={v[\"is_canonical\"]}') for v in json.load(sys.stdin)['vulnerabilities'][:5]]"
 ```
 
@@ -109,17 +109,17 @@ curl -sk -H "X-API-Key: $API_KEY" \
   -F "file=@VulnerableE2E.sol" \
   -F "contract_name=VulnerableE2E-IsCanonical-Test" \
   -F "network=ethereum" \
-  "https://app.0xapogee.local/api/v1/upload"
+  "https://app.0xapogee.com/api/v1/upload"
 
 # 2. Create scan with multiple scanners
 curl -sk -H "X-API-Key: $API_KEY" \
   -X POST -H "Content-Type: application/json" \
   -d '{"contract_id":"<id>","scan_type":"custom","scanner_ids":["slither","semgrep","aderyn"],"scan_source":"cli"}' \
-  "https://app.0xapogee.local/api/v1/scans"
+  "https://app.0xapogee.com/api/v1/scans"
 
 # 3. Query vulnerabilities and verify is_canonical
 curl -sk -H "X-API-Key: $API_KEY" \
-  "https://app.0xapogee.local/api/v1/vulnerabilities?scan_id=<id>&limit=20" | \
+  "https://app.0xapogee.com/api/v1/vulnerabilities?scan_id=<id>&limit=20" | \
   python3 -c "import sys,json; [print(f'{v[\"title\"][:40]}: is_canonical={v[\"is_canonical\"]}') for v in json.load(sys.stdin)['vulnerabilities']]"
 
 # 4. Verify in Celery worker logs
