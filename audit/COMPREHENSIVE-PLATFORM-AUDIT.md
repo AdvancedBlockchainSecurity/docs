@@ -99,7 +99,7 @@ System namespaces: default, gke-managed-networking-dra-driver, gke-managed-syste
 | external-secrets-prod | external-secrets-webhook | 1/1 | external-secrets:v2.1.0 | [x] |
 | intelligence-engine-prod | intelligence-engine | 1/1 | intelligence-engine:0.3.7 | [x] |
 | notification-prod | notification | 1/1 | notification:0.2.6 | [x] |
-| orchestration-prod | orchestration | 1/1 | orchestration:0.10.8 | [x] |
+| orchestration-prod | orchestration | 1/1 | orchestration:0.10.9 | [x] |
 | tool-integration-prod | tool-integration | 2/2 | tool-integration:0.5.29 | [x] |
 
 ### StatefulSets
@@ -117,7 +117,7 @@ System namespaces: default, gke-managed-networking-dra-driver, gke-managed-syste
 | api-service | 0.29.78 | 0.29.78 | 0.29.78 | [x] |
 | dashboard | 0.46.24 | 0.46.24 | — | [x] |
 | tool-integration | 0.5.29 | 0.5.29 | — | [x] |
-| orchestration | 0.10.8 | 0.10.8 | — | [x] |
+| orchestration | 0.10.9 | 0.10.9 | — | [x] |
 | data-service | 0.2.7 | 0.2.7 | — | [x] |
 | contract-parser | 0.2.2 | 0.2.2 | — | [x] |
 | notification | 0.2.6 | 0.2.6 | — | [x] |
