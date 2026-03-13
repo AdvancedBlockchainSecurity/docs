@@ -94,6 +94,16 @@ Terraform schedule → Secret Manager event → Pub/Sub message → Cloud Functi
 
 ---
 
+## Tier-Specific Workflows
+
+### Developer (Free) Tier
+
+| Workflow | Description |
+|----------|-------------|
+| [CI/CD CLI Workflow](tiers/developer/cicd-cli-workflow.md) | CLI-based CI/CD integration for free tier (3 scans/month) |
+
+---
+
 ## Contributing
 
 When adding new workflow documentation:

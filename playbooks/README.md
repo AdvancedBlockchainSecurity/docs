@@ -14,12 +14,13 @@ Step-by-step operational guides for common tasks.
 
 ### CI/CD Integration
 
-| Playbook | Description |
-|----------|-------------|
-| [GitHub Actions Integration](cicd-github-actions.md) | Scan on PR, block merge on critical findings |
-| [GitLab CI Integration](cicd-gitlab-ci.md) | GitLab pipeline integration |
-| [Jenkins Integration](cicd-jenkins.md) | Jenkins pipeline scanning |
-| [Generic Webhook CI/CD](cicd-webhook-generic.md) | Any CI system using webhooks + API |
+| Playbook | Description | Tier |
+|----------|-------------|------|
+| [Developer Tier CI/CD (CLI)](tiers/developer/cicd-cli-integration.md) | CLI-based CI/CD for free tier (3 scans/month) | Developer (Free) |
+| [GitHub Actions Integration](cicd-github-actions.md) | Scan on PR, block merge on critical findings | Growth+ |
+| [GitLab CI Integration](cicd-gitlab-ci.md) | GitLab pipeline integration | Growth+ |
+| [Jenkins Integration](cicd-jenkins.md) | Jenkins pipeline scanning | Growth+ |
+| [Generic Webhook CI/CD](cicd-webhook-generic.md) | Any CI system using webhooks + API | Growth+ |
 
 ### ChatOps & Notifications
 
