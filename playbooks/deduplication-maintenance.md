@@ -1,7 +1,7 @@
 # Playbook: Deduplication Maintenance
 
-**Version:** 2.1.0
-**Last Updated:** February 24, 2026
+**Version:** 2.2.0
+**Last Updated:** March 13, 2026
 **Audience:** Platform Operator | Developer
 
 ## Overview
@@ -300,6 +300,9 @@ python -m src.infrastructure.tasks.deduplication_maintenance
 - [ ] All dedup tests pass:
   ```bash
   pytest tests/unit/infrastructure/test_deduplication_maintenance.py \
+         tests/unit/infrastructure/test_celery_dedup.py \
+         tests/unit/infrastructure/test_dedup_data_model.py \
+         tests/unit/infrastructure/test_dedup_pipeline_regression.py \
          tests/unit/infrastructure/test_cronjob_manifest.py \
          tests/unit/infrastructure/test_cronjob_gcp_overlay.py \
          tests/unit/ml/test_semantic_deduplicator*.py \
@@ -370,6 +373,41 @@ kubectl delete job <job-name> -n api-service-gcp
 1. Verify IE URL: `kubectl get cronjob deduplication-maintenance -n api-service-gcp -o yaml | grep -A2 INTELLIGENCE_ENGINE_URL`
 2. Check IE pods: `kubectl get pods -n intelligence-engine-gcp`
 
+### Redis connection exhaustion (dedup tasks failing)
+
+**Symptoms:** Celery worker logs show `Retry limit exceeded` or `ConnectionError: Error connecting to Redis`. Dedup tasks are dispatched but never complete.
+
+**Cause:** Redis broker connections exhausted. This occurred on scan `412debbe` (March 2026) when multiple concurrent dedup tasks saturated the default connection pool.
+
+**Fix (v0.29.82):** Redis resilience settings were added to `celery_app.py`:
+- `broker_pool_limit=10` — caps broker connection pool
+- `broker_transport_options.max_retries=5` — retries Redis connection with backoff
+- `broker_connection_retry_on_startup=True` — recovers from Redis restarts
+- `redis_backend_health_check_interval=30` — detects stale connections
+
+**Verification:**
+```bash
+# Check worker can reach Redis
+kubectl exec -n api-service-prod deployment/celery-worker -- \
+  python3 -c "from src.infrastructure.celery_app import celery_app; print(celery_app.control.ping())"
+
+# Check Redis connection count
+kubectl exec -n redis-prod deployment/redis-master -- redis-cli info clients | grep connected
+```
+
+**Recovery for dead-lettered results:**
+If scanner results were stranded during the outage, recover them from tool-integration pods:
+```bash
+# Copy stranded results
+kubectl cp tool-integration-prod/<pod>:/app/results/<file>.json /tmp/<file>.json
+
+# Re-POST to API service
+curl -X POST https://app.0xapogee.com/api/v1/scans/<scan-id>/results \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d @/tmp/<file>.json
+```
+
 ### CronJob not scheduling
 
 **Cause:** `concurrencyPolicy: Forbid` blocking because a previous job is still running.
@@ -392,6 +430,8 @@ kubectl delete job <stuck-job-name> -n api-service-local
 - [ ] Weekly CronJob: Scheduled `0 2 * * 0` with `--weekly` flag
 - [ ] CronJob image matches api-service image version
 - [ ] Intelligence Engine running (for semantic fingerprints)
+- [ ] Redis broker healthy (no `ConnectionError` in worker logs)
+- [ ] `broker_pool_limit` configured in celery_app.py (prevents connection exhaustion)
 - [ ] No stale/stuck jobs blocking CronJob
 
 ---

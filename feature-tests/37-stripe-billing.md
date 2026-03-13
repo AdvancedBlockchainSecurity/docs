@@ -1,8 +1,8 @@
 # Feature Test: Stripe Billing Integration
 
 **Feature**: Phase 8a - Stripe Billing & Invoices
-**Status**: ✅ Local Testing Ready
-**Last Updated**: 2026-02-03
+**Status**: ✅ GCP Production Testing Complete
+**Last Updated**: 2026-03-13
 
 ## Overview
 
@@ -11,11 +11,13 @@ Stripe integration for subscription billing alongside x402 credit purchases.
 ## Prerequisites
 
 - [x] Stripe account configured (Test mode)
-- [ ] Stripe Products/Prices created for all tiers
+- [x] Stripe Products/Prices created for all tiers
 - [x] `STRIPE_API_KEY` in Vault (`secret/local/api-service/stripe`)
 - [x] `STRIPE_WEBHOOK_SECRET` in Vault
-- [ ] Dashboard rebuilt with `VITE_STRIPE_PUBLISHABLE_KEY`
+- [x] Dashboard rebuilt with `VITE_STRIPE_PUBLISHABLE_KEY`
 - [x] Stripe CLI installed for local testing
+- [x] GCP webhook endpoint created (`we_1TAe593ZtjkVcNXVjsJGk7rs`)
+- [x] GCP Secret Manager `apogee-gcp-stripe-webhook-secret` updated (version 3)
 
 ## Local Testing Setup (kubeadm Server)
 
@@ -66,7 +68,7 @@ kubectl rollout restart deployment/dashboard -n dashboard-local
 
 ### TC-37-001: Create Checkout Session
 **Priority**: High
-**Status**: ⏳ Pending
+**Status**: ✅ PASS
 
 **Steps**:
 1. Login to dashboard
@@ -80,6 +82,12 @@ kubectl rollout restart deployment/dashboard -n dashboard-local
 - Shows correct plan and price ($699/month)
 - Can complete payment with test card
 
+**Actual Result** (2026-03-13):
+- Redirect to Stripe Checkout worked correctly
+- Checkout session created with `customer_update={"address": "auto", "name": "auto"}` for automatic tax and tax ID collection (api-service 0.29.85)
+- Stripe Tax configuration active on checkout page
+- Payment completed successfully with test card `4242 4242 4242 4242`
+
 **Test Data**:
 - Test card (success): `4242 4242 4242 4242`
 - Test card (decline): `4000 0000 0000 9995`
@@ -90,7 +98,7 @@ kubectl rollout restart deployment/dashboard -n dashboard-local
 
 ### TC-37-002: Subscription Created After Payment
 **Priority**: High
-**Status**: ⏳ Pending
+**Status**: ✅ PASS
 
 **Steps**:
 1. Complete checkout with test card
@@ -103,6 +111,16 @@ kubectl rollout restart deployment/dashboard -n dashboard-local
 - Plan tier shows "Growth"
 - Current period dates are correct
 - User's tier updated in database
+
+**Actual Result** (2026-03-13):
+- Webhook `checkout.session.completed` delivered to `https://app.0xapogee.com/api/v1/webhooks/stripe`
+- Subscription created in database with correct tier and status
+- User tier upgraded from `developer` to `growth`
+- User quotas synced via `sync_user_quotas_to_tier()`
+
+**Bugs Found and Fixed**:
+- **0.29.86**: `UserModel.full_name` AttributeError in `tier_change_handler.py` — field was renamed to `display_name`. Fixed.
+- **0.29.86**: `invoice.subscription` AttributeError in `stripe_webhook.py` invoice handlers — `invoice` object uses dict-style access, not attribute. Fixed with `getattr()`.
 
 **Verification**:
 ```sql
@@ -412,9 +430,12 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 ## Known Limitations
 
 1. **Local Testing**: Webhooks require Stripe CLI forwarding
-2. **Production**: Need public HTTPS endpoint for webhooks
-3. **Enterprise**: Custom invoicing not yet implemented
-4. **Tax**: Stripe Tax not enabled (optional)
+2. **Enterprise**: Custom invoicing not yet implemented
+
+## Resolved Limitations
+
+1. ~~**Production**: Need public HTTPS endpoint for webhooks~~ — Webhook endpoint created at `https://app.0xapogee.com/api/v1/webhooks/stripe` (endpoint ID: `we_1TAe593ZtjkVcNXVjsJGk7rs`)
+2. ~~**Tax**: Stripe Tax not enabled~~ — Enabled via `customer_update={"address": "auto", "name": "auto"}` in checkout sessions (api-service 0.29.85)
 
 ---
 

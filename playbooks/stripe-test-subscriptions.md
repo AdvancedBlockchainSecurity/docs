@@ -1,7 +1,7 @@
 # Stripe Test Subscriptions Playbook
 
-**Version:** 1.0.0
-**Last Updated:** February 3, 2026
+**Version:** 1.1.0
+**Last Updated:** March 13, 2026
 **Status:** Active
 
 ## Overview
@@ -352,6 +352,31 @@ Before going to production, verify:
 
 ---
 
+## GCP Production Test Results (2026-03-13)
+
+### Checkout Flow Test (api-service 0.29.84 → 0.29.86, dashboard 0.46.32 → 0.46.34)
+
+**Test:** Full subscription checkout via dashboard on `https://app.0xapogee.com`
+
+**Results:**
+1. Dashboard redirected to Stripe Checkout successfully
+2. Stripe Tax and customer address/name auto-collection enabled (`customer_update` parameter added in 0.29.85)
+3. Test card payment completed
+4. Webhook delivered to production endpoint (`we_1TAe593ZtjkVcNXVjsJGk7rs`)
+5. Subscription created and user tier upgraded
+
+**Bugs Found and Fixed:**
+
+| Bug | Version | Fix |
+|-----|---------|-----|
+| SQLAlchemy ARRAY mutation not tracked for scan results | 0.29.84 | ARRAY mutation fix |
+| `UserModel.full_name` AttributeError in `tier_change_handler.py` | 0.29.86 | Changed to `display_name` |
+| `invoice.subscription` AttributeError in `stripe_webhook.py` | 0.29.86 | Wrapped with `getattr()` for invoice handlers |
+| Infinite re-render loop in `Pricing.tsx` after Stripe redirect | dashboard 0.46.33 | Added `useRef` guard + `window.history.replaceState` to clear URL params |
+| Dashboard missing Stripe publishable key in build | dashboard 0.46.32 → 0.46.34 | Rebuilt with `VITE_STRIPE_PUBLISHABLE_KEY` build arg (immutable tag policy required version bumps) |
+
+---
+
 ## Troubleshooting
 
 ### "No such customer" Error
@@ -420,4 +445,5 @@ PGPASSWORD=postgres psql -h 127.0.0.1 -p 5432 -U postgres -d solidity_security \
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0.0 | 2026-02-03 | Initial playbook for test subscriptions | Claude Code |
+| 1.0.0 | 2026-02-03 | Initial playbook for test subscriptions | Apogee Team |
+| 1.1.0 | 2026-03-13 | Added GCP production test results, documented bugs found during checkout testing | Apogee Team |
