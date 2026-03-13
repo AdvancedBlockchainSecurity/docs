@@ -1,6 +1,6 @@
 # Deduplication Engine - Technical Documentation
 
-**Version**: v0.8.0 (core), v0.29.13 (hybrid architecture + GCP audit)
+**Version**: v0.29.82 (March 2026 production fix)
 **Status**: Production Ready
 **Phase**: 4E - Intelligence Layer
 
@@ -50,9 +50,8 @@ The Deduplication Engine automatically identifies and groups duplicate vulnerabi
 ┌─────────────────────────────────────────────┐
 │           Database Layer                    │
 ├─────────────────────────────────────────────┤
-│ • deduplication_groups                      │
-│ • deduplication_group_members               │
-│ • Automated triggers                        │
+│ • deduplication_groups table                 │
+│ • vulnerabilities.deduplication_group_id FK  │
 └─────────────────────────────────────────────┘
 ```
 
@@ -62,9 +61,9 @@ The Deduplication Engine automatically identifies and groups duplicate vulnerabi
 
 ### Multi-Level Fingerprint Strategy
 
-The deduplication engine uses a tiered matching approach with four confidence levels:
+The deduplication engine uses a tiered matching approach with five confidence levels:
 
-#### Level 1: EXACT (100% confidence)
+#### Level 1: EXACT (99% confidence)
 **Fingerprints**: `code_hash` + `location_hash`
 
 **When Used**: Identical code at exact same location
@@ -132,7 +131,7 @@ function withdraw() public
 
 ---
 
-#### Level 4: LOW (60% confidence)
+#### Level 4: LOW (75% confidence)
 **Fingerprints**: `pattern_code` + `location_hash_fuzzy`
 
 **When Used**: Same vulnerability type, similar location
@@ -151,6 +150,32 @@ function transfer() public {
 ```
 
 **Match**: ⚠️ LOW - Same pattern (REE-001), needs review
+
+---
+
+#### Level 5: SEMANTIC (80%+ confidence)
+**Fingerprints**: `fingerprint_semantic` (intelligence-engine generated)
+
+**When Used**: Semantically equivalent vulnerabilities detected via ML-based analysis
+
+**Example**:
+```solidity
+// Scan 1 - Slither detects
+function withdraw(uint amount) public {
+    require(balances[msg.sender] >= amount);
+    (bool success, ) = msg.sender.call{value: amount}("");
+    balances[msg.sender] -= amount;
+}
+
+// Scan 2 - Aderyn detects similar semantic pattern
+function claim() external {
+    uint reward = rewards[msg.sender];
+    (bool ok, ) = payable(msg.sender).call{value: reward}("");
+    rewards[msg.sender] = 0;
+}
+```
+
+**Match**: ⚠️ SEMANTIC - ML-based semantic similarity, review recommended
 
 ---
 
@@ -199,45 +224,43 @@ def select_canonical(findings):
 ```sql
 CREATE TABLE deduplication_groups (
     id UUID PRIMARY KEY,
-    project_id UUID,                              -- Optional project scoping
+    contract_id UUID NOT NULL,                    -- Scoped to contract
     canonical_finding_id UUID NOT NULL UNIQUE,    -- Primary finding to show
     pattern_code VARCHAR(20),                     -- E.g., REE-001
-    confidence_level VARCHAR(20) NOT NULL,        -- exact, high, medium, low
-    matched_fingerprints TEXT,                    -- JSON array
-    finding_count INTEGER DEFAULT 0,              -- Auto-maintained
-    scanner_count INTEGER DEFAULT 0,              -- Auto-maintained
-    first_seen TIMESTAMP WITH TIME ZONE,
-    last_seen TIMESTAMP WITH TIME ZONE,
+    group_size INTEGER DEFAULT 0,                 -- Number of findings in group
+    strategy VARCHAR(20) NOT NULL,                -- Matching strategy used
+    confidence FLOAT NOT NULL,                    -- Confidence score (0.0-1.0)
+    fingerprint_code TEXT,                        -- Code fingerprint
+    fingerprint_ast TEXT,                         -- AST fingerprint
+    fingerprint_semantic TEXT,                    -- Semantic fingerprint
+    severity_distribution JSONB,                  -- Distribution of severities in group
+    scanner_distribution JSONB,                   -- Distribution of scanners in group
+    verified BOOLEAN DEFAULT FALSE,               -- Manually verified
+    verified_by UUID,                             -- User who verified
     created_at TIMESTAMP WITH TIME ZONE,
-    updated_at TIMESTAMP WITH TIME ZONE,
-
-    CHECK (confidence_level IN ('exact', 'high', 'medium', 'low'))
+    updated_at TIMESTAMP WITH TIME ZONE
 );
 ```
 
-### deduplication_group_members
+### Direct FK Approach (replaces join table)
+
+> **Note (v0.29.82):** The original design specified a `deduplication_group_members` join table,
+> but this was never created in production. The working architecture uses a direct foreign key
+> on the `vulnerabilities` table instead:
 
 ```sql
-CREATE TABLE deduplication_group_members (
-    id UUID PRIMARY KEY,
-    group_id UUID NOT NULL REFERENCES deduplication_groups(id) ON DELETE CASCADE,
-    finding_id UUID NOT NULL REFERENCES vulnerabilities(id) ON DELETE CASCADE,
-    match_confidence VARCHAR(20) NOT NULL,        -- Individual match confidence
-    matched_fingerprints TEXT,                    -- Which fingerprints matched
-    is_canonical BOOLEAN DEFAULT FALSE,           -- Is this the canonical finding?
-    added_at TIMESTAMP WITH TIME ZONE,
-
-    UNIQUE(group_id, finding_id),
-    CHECK (match_confidence IN ('exact', 'high', 'medium', 'low'))
-);
+-- Direct FK on vulnerabilities table
+ALTER TABLE vulnerabilities
+    ADD COLUMN deduplication_group_id UUID REFERENCES deduplication_groups(id);
 ```
+
+This approach is simpler, avoids an extra join for queries, and has been the production
+implementation since deduplication was first deployed.
 
 ### Automatic Statistics
 
-Database triggers automatically maintain:
-- `finding_count` - Number of findings in group
-- `scanner_count` - Number of unique scanners
-- `last_seen` - Most recent detection timestamp
+Statistics (`group_size`, `severity_distribution`, `scanner_distribution`) are maintained by
+the inline post-scan maintenance tasks and weekly CronJob housekeeping — not by database triggers.
 
 ---
 
@@ -610,7 +633,11 @@ await dedup_service.ungroup_finding(wrong_canonical_id)
 - **Completion Report**: PHASE-4E-DEDUPLICATION-COMPLETE.md
 - **Phase 4C**: Enrichment Engine
 - **Phase 4D**: Pattern Matching & Fingerprinting
-- **Version**: v0.8.0
+- **Version**: v0.29.82
+- **Regression Tests**:
+  - `tests/unit/infrastructure/test_dedup_data_model.py` — 26 functional tests
+  - `tests/unit/infrastructure/test_dedup_pipeline_regression.py` — 5 regression tests
+  - `tests/unit/infrastructure/test_celery_dedup.py` — Celery architecture tests
 
 ---
 
@@ -690,6 +717,21 @@ Group: "State Variable Could Be Constant"
 
 ---
 
+## Dedup Ownership Clarification (v0.29.82 - March 13, 2026)
+
+Deduplication is owned exclusively by the **API service Celery worker**. The orchestration service previously had a dead dedup implementation that:
+- Referenced a `deduplication_group_members` table that was never created on any cluster
+- Crashed on every scan attempt
+- Was removed in orchestration v0.10.11
+
+The working architecture uses a **direct FK** on the `vulnerabilities` table:
+- `vulnerabilities.deduplication_group_id` → `deduplication_groups.id`
+- No join table exists or is needed
+
+Redis resilience was also added to `celery_app.py` (broker pool limits, transport retry, health checks) to prevent the connection exhaustion that caused dedup failures on recent scans.
+
+---
+
 ## Hybrid Architecture (v0.29.11 - February 23, 2026)
 
 Added inline post-scan maintenance that runs 4 scoped dedup tasks during scan result ingestion:
@@ -707,5 +749,5 @@ See: [Deduplication Pipeline](../pipelines/deduplication-pipeline.md) | [Changel
 
 ---
 
-**Last Updated**: February 23, 2026
+**Last Updated**: March 13, 2026
 **Maintained By**: Apogee Platform Team

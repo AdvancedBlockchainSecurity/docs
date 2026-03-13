@@ -213,21 +213,28 @@ The script:
 2. Builds image with tag `{version}-{hash}`
 3. Tags as `latest`
 
+**Manual build (if not using the script):**
+
+```bash
+cd blocksecops-orchestration
+docker build \
+  --provenance=false \
+  -f docker/base/Dockerfile.orchestration \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg BASE_VERSION=1.0.0 \
+  --build-arg VCS_REF=$(git rev-parse --short HEAD) \
+  -t ${REGISTRY}/blocksecops/blocksecops-orchestration-base:1.0.0-{hash} .
+```
+
+**Note:** `--provenance=false` is required. Docker 23+ uses BuildKit by default, which adds attestation manifests to images. These cause push failures with some registries (including GCP Artifact Registry). This flag produces standard image manifests. Base Dockerfiles use BuildKit-only features (`RUN --mount=type=cache`) so BuildKit itself cannot be disabled — only attestations need to be suppressed.
+
 ### Step 2: Push to Registry
 
 ```bash
 REGISTRY="${REGISTRY:?REGISTRY not set}"
 
-# Tag for registry
-docker tag blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353 \
-  ${REGISTRY}/blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353
-
-docker tag blocksecops/blocksecops-orchestration-base:latest \
-  ${REGISTRY}/blocksecops/blocksecops-orchestration-base:latest
-
-# Push to registry
+# Push to registry (image already tagged with full registry path from build)
 docker push ${REGISTRY}/blocksecops/blocksecops-orchestration-base:1.0.0-ac02c353
-docker push ${REGISTRY}/blocksecops/blocksecops-orchestration-base:latest
 ```
 
 ### Step 3: Update Application Dockerfile

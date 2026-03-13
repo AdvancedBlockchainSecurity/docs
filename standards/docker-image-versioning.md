@@ -295,8 +295,9 @@ VERSION=$(grep '^version' pyproject.toml | cut -d'"' -f2)
 SERVICE="api-service"
 REGISTRY="us-west1-docker.pkg.dev/project-8a2657b9-d96c-4c0a-a69/apogee"
 
-# Build with BuildKit and OCI labels
-DOCKER_BUILDKIT=1 docker build \
+# Build with OCI labels
+docker build \
+  --provenance=false \
   --build-arg SERVICE_VERSION=${VERSION} \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
@@ -309,6 +310,8 @@ docker push ${REGISTRY}/${SERVICE}:${VERSION}
 # Apply kustomization
 kubectl apply -k k8s/overlays/gcp/
 ```
+
+**Note:** `--provenance=false` disables BuildKit attestation manifests that cause push failures with some registries. Docker 23+ uses BuildKit by default — this flag ensures standard image manifests are produced.
 
 ---
 

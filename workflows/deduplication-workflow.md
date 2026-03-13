@@ -1,8 +1,8 @@
 # Deduplication Workflow
 
-**Last Updated:** February 24, 2026
+**Last Updated:** March 13, 2026
 **Status:** Active
-**API Version:** 0.29.19+
+**API Version:** 0.29.82+
 
 ---
 
@@ -591,6 +591,36 @@ kubectl create job --from=cronjob/deduplication-maintenance smoke-$(date +%s) -n
 kubectl logs job/smoke-<id> -c deduplication-job -n api-service-gcp --follow
 kubectl logs job/smoke-<id> -c cloud-sql-proxy -n api-service-gcp  # verify sidecar exits cleanly
 ```
+
+---
+
+## Dead Code Removal & Redis Resilience (v0.29.82 - March 13, 2026)
+
+The orchestration service previously contained a dead deduplication implementation that:
+- Referenced a `deduplication_group_members` table that never existed on any cluster
+- Crashed on every scan (table not found error)
+- Was completely removed in orchestration v0.10.11
+
+**Dedup is owned exclusively by the API service Celery worker.** The scan pipeline is:
+```
+Orchestration triggers K8s scanner Jobs
+  → Scanner Jobs complete
+  → Tool-Integration collects results, POSTs to API Service
+  → API Service stores vulns + dispatches run_dedup_task.delay()
+  → Celery worker runs 3-phase dedup
+```
+
+Redis resilience was also added to prevent connection exhaustion that caused recent dedup failures:
+- `broker_pool_limit=10`
+- Transport retry with exponential backoff (5 retries, 1-30s interval)
+- `broker_connection_retry_on_startup=True`
+- `redis_backend_health_check_interval=30`
+
+**New regression tests ensure this stays fixed:**
+- `test_dedup_data_model.py` — 26 tests verifying direct FK approach (no join table)
+- `test_dedup_pipeline_regression.py` — 5 tests verifying Celery dispatch and obsolete migration removal
+- `test_celery_dedup.py` — Redis resilience configuration tests
+- `test_dedup_ownership.py` (orchestration repo) — 7 tests ensuring dead code stays removed
 
 ---
 

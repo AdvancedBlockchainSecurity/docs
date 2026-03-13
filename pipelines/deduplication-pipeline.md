@@ -1,7 +1,7 @@
 # Deduplication Maintenance Pipeline
 
-**Last Updated:** February 24, 2026
-**API Version:** 0.29.19
+**Last Updated:** March 13, 2026
+**API Version:** 0.29.82
 
 Hybrid deduplication system with three execution paths: Celery worker dedup (3 phases dispatched from API pod), post-scan maintenance (4 scoped tasks in worker), and weekly housekeeping (full 18-task sweep via CronJob).
 
@@ -212,6 +212,8 @@ Priority mapping: quality 1.0 → priority 1, quality 0.0 → priority 20.
 | `blocksecops-api-service/tests/unit/infrastructure/test_deduplication_maintenance.py` | Structural + functional regression tests (120 tests) |
 | `blocksecops-api-service/tests/unit/presentation/test_scans_phase3.py` | Celery dispatch + dedup_task structural tests |
 | `blocksecops-api-service/tests/unit/infrastructure/test_cronjob_manifest.py` | CronJob YAML validation tests |
+| `blocksecops-api-service/tests/unit/infrastructure/test_dedup_data_model.py` | Data model functional tests (26 tests) |
+| `blocksecops-api-service/tests/unit/infrastructure/test_dedup_pipeline_regression.py` | Pipeline regression tests (5 tests) |
 
 ## API Endpoints
 
@@ -289,6 +291,20 @@ Regression and security tests for the 5-level matching audit (February 15, 2026)
 | TestScannerIdValidation | 2 | Empty scanner_id prevention guard |
 | TestSecurityRegressions | 5 | Cross-contract, cross-type, hierarchical priority invariants |
 | TestIntraScanDedupStructure | 2 | Structural verification of GROUP BY and security comment |
+
+### Dead Code & Pipeline Regression Tests (v0.29.82)
+
+| Test Class | Tests | Purpose |
+|------------|-------|---------|
+| TestVulnerabilityDedupColumns | 8 | VulnerabilityModel has direct FK, fingerprint columns, no join table reference |
+| TestDeduplicationGroupModel | 8 | DeduplicationGroupModel uses contract_id scoping, has correct fields |
+| TestDedupMatcherLevels | 6 | DeduplicationMatcher implements all 5 matching levels |
+| TestIntraScanDedup | 2 | Intra-scan dedup function exists with detector_id scoping |
+| TestCrossScanDedup | 2 | Cross-scan dedup tracks occurrence_count |
+| TestDedupDispatch | 2 | Scan endpoint dispatches Celery task, no inline dedup |
+| TestDedupTaskRegistration | 1 | Task name matches Celery worker registration |
+| TestObsoleteMigrationRemoved | 2 | 004 migration deleted, no group_members reference in models |
+| TestCeleryAppConfig (new) | 4 | Redis broker pool, transport retry, health check, connection retry |
 
 Run locally:
 ```bash

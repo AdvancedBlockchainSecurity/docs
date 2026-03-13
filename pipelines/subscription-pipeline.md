@@ -61,6 +61,14 @@ Price IDs are environment-configurable via `src/infrastructure/config.py`. The `
 **Endpoint:** `POST /api/v1/webhooks/stripe`
 **File:** `blocksecops-api-service/src/presentation/api/v1/endpoints/stripe_webhook.py`
 
+### Production Webhook Endpoint
+
+| Setting | Value |
+|---------|-------|
+| URL | `https://app.0xapogee.com/api/v1/webhooks/stripe` |
+| Endpoint ID | `we_1TAe593ZtjkVcNXVjsJGk7rs` |
+| Signing Secret | `apogee-gcp-stripe-webhook-secret` (GCP Secret Manager, version 3) |
+
 ### Events Processed
 
 | Event | Handler | Effect |
@@ -494,4 +502,4 @@ kubectl exec -n postgresql-local postgresql-0 -- \
 
 ---
 
-*Last Updated: February 7, 2026*
+*Last Updated: March 13, 2026*

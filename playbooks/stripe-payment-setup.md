@@ -1,7 +1,7 @@
 # Stripe Payment Setup Playbook
 
-**Version:** 1.0.0
-**Last Updated:** February 2, 2026
+**Version:** 1.2.0
+**Last Updated:** March 13, 2026
 **Status:** Active
 
 ## Overview
@@ -342,16 +342,65 @@ Webhooks notify your application when payments complete.
 
 ### 5.1 Create Webhook Endpoint in Stripe
 
+#### Option A: Via Stripe API (Recommended)
+
+```bash
+# Create webhook endpoint via API
+curl https://api.stripe.com/v1/webhook_endpoints \
+  -u "sk_live_YOUR_KEY:" \
+  -d "url=https://app.0xapogee.com/api/v1/webhooks/stripe" \
+  -d "enabled_events[]=checkout.session.completed" \
+  -d "enabled_events[]=customer.subscription.updated" \
+  -d "enabled_events[]=customer.subscription.deleted" \
+  -d "enabled_events[]=invoice.payment_succeeded" \
+  -d "enabled_events[]=invoice.payment_failed" \
+  -d "enabled_events[]=customer.updated"
+```
+
+The response contains the `secret` field (starts with `whsec_...`) — save this for the next step.
+
+**Current Production Endpoint:**
+- **URL:** `https://app.0xapogee.com/api/v1/webhooks/stripe`
+- **Endpoint ID:** `we_1TAe593ZtjkVcNXVjsJGk7rs`
+- **Events:** checkout.session.completed, customer.subscription.updated, customer.subscription.deleted, invoice.payment_succeeded, invoice.payment_failed, customer.updated
+
+#### Option B: Via Stripe Dashboard
+
 1. Go to **Developers → Webhooks**
 2. Click **Add endpoint**
 3. Configure:
    - **Endpoint URL:** `https://app.0xapogee.com/api/v1/webhooks/stripe` (production)
    - **Events to send:** Select these events:
      - `checkout.session.completed`
-     - `payment_intent.succeeded`
-     - `payment_intent.payment_failed`
+     - `customer.subscription.updated`
+     - `customer.subscription.deleted`
+     - `invoice.payment_succeeded`
+     - `invoice.payment_failed`
+     - `customer.updated`
 4. Click **Add endpoint**
 5. Copy the **Signing secret** (starts with `whsec_...`)
+
+### 5.1.1 Update Webhook Secret in GCP Secret Manager
+
+After creating the webhook endpoint, update the signing secret in GCP:
+
+```bash
+# Update the existing secret with the new webhook signing secret
+echo -n "whsec_YOUR_NEW_SECRET" | \
+  gcloud secrets versions add apogee-gcp-stripe-webhook-secret --data-file=-
+
+# Verify the new version was created
+gcloud secrets versions list apogee-gcp-stripe-webhook-secret
+
+# Force ESO to resync the secret to Kubernetes
+kubectl annotate externalsecret api-service-secret -n api-service-prod \
+  force-sync="$(date +%s)" --overwrite
+
+# Restart API service to pick up the new secret
+kubectl rollout restart deployment/api-service -n api-service-prod
+```
+
+**Current secret version:** 3 (updated 2026-03-13)
 
 ### 5.2 Local Development Webhook Testing
 
@@ -594,3 +643,4 @@ Before going live:
 |---------|------|---------|--------|
 | 1.0.0 | 2026-02-02 | Initial playbook | Apogee Team |
 | 1.1.0 | 2026-02-03 | Updated secrets to use Vault (not ConfigMap), updated webhook forwarding for kubeadm NodePort | Apogee Team |
+| 1.2.0 | 2026-03-13 | Added API-based webhook creation, GCP Secret Manager update steps, updated event list for subscriptions | Apogee Team |

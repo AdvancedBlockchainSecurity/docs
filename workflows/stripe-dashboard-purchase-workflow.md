@@ -172,7 +172,7 @@ kubectl logs deployment/api-service -n api-service-local --tail=50 | grep -i err
 |-------------|--------------|------------------|
 | minikube | `http://127.0.0.1:3000` | `http://127.0.0.1:3000/api/v1/webhooks/stripe` |
 | kubeadm (server) | `http://app.0xapogee.com` | `http://192.168.86.225:30180/api/v1/webhooks/stripe` |
-| GCP Production | `https://app.0xapogee.com` | `https://app.0xapogee.com/api/v1/webhooks/stripe` |
+| GCP Production | `https://app.0xapogee.com` | `https://app.0xapogee.com/api/v1/webhooks/stripe` (endpoint ID: `we_1TAe593ZtjkVcNXVjsJGk7rs`) |
 
 ---
 
@@ -184,4 +184,4 @@ kubectl logs deployment/api-service -n api-service-local --tail=50 | grep -i err
 
 ---
 
-*Last Updated: February 3, 2026*
+*Last Updated: March 13, 2026*
