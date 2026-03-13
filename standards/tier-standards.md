@@ -57,6 +57,8 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | **Export Reports** | No |
 | **AI Explanations/Month** | 0 |
 | **AI Invariant Generations/Month** | 0 |
+| **CI/CD Integration** | CLI only (GitHub Actions, GitLab CI templates) |
+| **Integrations Hub** | No (requires Starter) |
 | **Scanners** | All 25+ |
 | **Support** | Community |
 
@@ -65,6 +67,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 **Restrictions**:
 - Public repositories only
 - No ML-powered false positive filtering
+- No dashboard Integrations Hub (use CLI for CI/CD)
 - No API access
 - Community support only
 
@@ -89,7 +92,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | **Continuous Monitoring** | No |
 | **95% FP Reduction** | Yes |
 | **Webhooks** | Yes |
-| **CI/CD Integration** | Yes |
+| **CI/CD Integration** | Yes (CLI + Integrations Hub) |
 | **Export Reports** | Yes (PDF, JSON, SARIF) |
 | **AI Explanations/Month** | 50 |
 | **AI Invariant Generations/Month** | 10 |
@@ -120,7 +123,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | **Continuous Monitoring** | Yes |
 | **95% FP Reduction** | Yes |
 | **Webhooks** | Yes |
-| **CI/CD Integration** | Yes |
+| **CI/CD Integration** | Yes (CLI + Integrations Hub) |
 | **Export Reports** | Yes (PDF, JSON, SARIF) |
 | **AI Explanations/Month** | 200 |
 | **AI Invariant Generations/Month** | 50 |
@@ -151,7 +154,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | **Continuous Monitoring** | Yes |
 | **95% FP Reduction** | Yes |
 | **Webhooks** | Yes |
-| **CI/CD Integration** | Yes |
+| **CI/CD Integration** | Yes (CLI + Integrations Hub) |
 | **Organizations** | Yes |
 | **Audit Logs** | Yes |
 | **SSO/SAML** | Yes |
@@ -199,7 +202,8 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | Private Repos | No | 3 | Unlimited | Unlimited |
 | API Access | No | No | Yes | Yes |
 | Webhooks | No | Yes | Yes | Yes |
-| CI/CD Integration | Yes | Yes | Yes | Yes |
+| CI/CD Integration (CLI) | Yes | Yes | Yes | Yes |
+| Integrations Hub (Dashboard) | No | Yes | Yes | Yes |
 | Multi-Chain Support | No | No | Yes | Yes |
 | Continuous Monitoring | No | No | Yes | Yes |
 | AI Explanations | No | Yes | Yes | Yes |
@@ -259,7 +263,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | Growth | 300 | 10,000 | Unlimited |
 | Enterprise | Custom | Custom | Custom |
 
-**Note:** Developer and Starter tiers have no API access. Use the dashboard or CI/CD integrations instead.
+**Note:** Developer and Starter tiers have no API access. Developer users can use CLI-based CI/CD integrations (GitHub Actions, GitLab CI templates). The Integrations Hub dashboard UI for configuring CI/CD pipelines requires Starter tier or above.
 
 ### Dashboard/CI Rate Limits (All Tiers)
 
