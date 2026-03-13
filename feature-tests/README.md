@@ -82,6 +82,7 @@ Manual testing checklists for all user-facing features.
 | [82-cors-domain-regression.md](./82-cors-domain-regression.md) | **NEW** - Automated CORS wildcard and legacy domain regression tests (64 tests across all repos) |
 | [88-referral-system.md](./88-referral-system.md) | **NEW** - Referral system: code generation, sharing, applying, reward threshold, admin settings, dashboard UI, Stripe integration (v0.29.49 API, v0.46.13 Dashboard) |
 | [89-gdpr-admin-data-requests.md](./89-gdpr-admin-data-requests.md) | **NEW** - GDPR admin data request processing: deletion (anonymization), export (0600 perms, 7-day expiry), ML-withdrawal (consent + provenance), path traversal protection, scan error_message fix (v0.29.55 API, v0.7.10 Admin Portal) |
+| [90-tier-upsell-cta.md](./90-tier-upsell-cta.md) | **NEW** - Tier upsell & CTA audit: sidebar lock icons, dashboard feature discovery, scan quota pre-checks, AI tier gates, CI/CD tier split, cross-tier smoke tests (v0.46.28-v0.46.29 Dashboard) |
 
 ---
 

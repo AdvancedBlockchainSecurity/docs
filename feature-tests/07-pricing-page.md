@@ -24,6 +24,8 @@
   - [ ] 3 projects
   - [ ] All scanners (basic mode)
   - [ ] Community support
+  - [ ] CI/CD Integration (CLI only)
+  - [ ] No Integrations Hub
   - [ ] No API access
   - [ ] No export (dashboard view only)
   - [ ] 7-day retention
@@ -45,6 +47,7 @@
   - [ ] 90-day retention
   - [ ] Up to 5 team members
   - [ ] Webhooks enabled
+  - [ ] CI/CD Integration (CLI + Integrations Hub)
 - [ ] "Upgrade to Starter" button (if user is Developer)
 - [ ] "Current Plan" indicator (if user is Starter)
 
@@ -61,7 +64,8 @@
   - [ ] Unlimited API calls
   - [ ] Full API access enabled
   - [ ] Webhooks enabled
-  - [ ] CI/CD integration
+  - [ ] CI/CD Integration (CLI)
+  - [ ] Integrations Hub
   - [ ] Up to 15 team members
   - [ ] 180-day retention
   - [ ] Continuous monitoring

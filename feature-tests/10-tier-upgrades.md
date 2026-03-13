@@ -199,6 +199,12 @@
 - [ ] Team invite blocked shows upgrade prompt
 - [ ] Feature gated shows upgrade prompt with required tier
 - [ ] All prompts link to pricing page
+- [ ] Sidebar locked nav items navigate to page with TierGate upgrade prompt
+- [ ] Dashboard feature discovery cards navigate to gated page with upgrade prompt
+- [ ] Scan quota pre-check (ContractDetail) shows toast error with upgrade link
+- [ ] Scan quota pre-check (ContractsList) redirects to /pricing
+- [ ] Batch scan modal disables submit and shows quota warning when at limit
+- [ ] TierGate shows next-tier pricing (not required-tier pricing)
 
 ### 7.2 Confirmation Flow
 - [ ] Upgrade confirmation modal shown
