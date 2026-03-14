@@ -24,9 +24,9 @@
 | Tier | Price | Single File | Archive |
 |------|-------|-------------|---------|
 | Developer | $0 | 1 MB | 5 MB |
-| Starter | $299/mo | 5 MB | 25 MB |
-| Growth | $699/mo | 10 MB | 50 MB |
-| Enterprise | $1,999+/mo | 20 MB | 100 MB |
+| Starter | $199/mo | 5 MB | 25 MB |
+| Growth | $499/mo | 10 MB | 50 MB |
+| Enterprise | $1,499+/mo | 20 MB | 100 MB |
 
 - [ ] Developer tier: Single file over 1MB returns 413
 - [ ] Developer tier: Archive over 5MB returns 413

@@ -1,6 +1,6 @@
 # x402 Pay-Per-Scan Credits
 
-**Last Updated**: January 19, 2026
+**Last Updated**: March 13, 2026
 
 ## Overview
 
@@ -24,12 +24,12 @@ x402 is a crypto-native payment protocol that enables:
 
 | Package | Credits | Price (USDC) | Per-Scan Cost | Savings |
 |---------|---------|--------------|---------------|---------|
-| **Starter** | 10 | $30 | $3.00 | - |
-| **Builder** | 50 | $125 | $2.50 | 17% |
-| **Pro** | 200 | $400 | $2.00 | 33% |
-| **Bulk** | 1,000 | $1,500 | $1.50 | 50% |
+| **Starter** | 10 | $25 | $2.50 | - |
+| **Builder** | 50 | $99 | $1.98 | 21% |
+| **Pro** | 250 | $399 | $1.60 | 36% |
+| **Bulk** | 1,000 | $1,250 | $1.25 | 50% |
 
-**Pricing logic**: Starter subscription is $299/month for 15 contracts (~$20/contract). x402 credits offer flexibility for occasional users without subscription commitment. For regular scanning, subscriptions provide better value.
+**Pricing logic**: Starter subscription is $199/month for 25 contracts (~$8/contract). x402 credits offer flexibility for occasional users without subscription commitment. For regular scanning, subscriptions provide better value.
 
 ---
 
@@ -85,17 +85,17 @@ One credit = One scan job, which includes:
 | Aspect | x402 Credits | Subscription |
 |--------|--------------|--------------|
 | Commitment | None | Monthly/Annual |
-| Cost per scan | $1.50-$3.00 | ~$20/contract* |
+| Cost per scan | $1.25-$2.50 | ~$8/contract* |
 | Best for | Occasional use | Regular use |
 | Payment method | USDC on Base | Credit card, ACH |
 | Features | All 25+ scanners | All features + 95% FP reduction |
 
-*Based on Team tier ($299/month for 15 contracts)
+*Based on Starter tier ($199/month for 25 contracts)
 
 **Recommendation**:
 - Occasional scanning (< 10 contracts/month) → x402 credits for flexibility
-- Regular scanning (10+ contracts/month) → Team subscription ($299/mo) is better value
-- Need private repos + FP filtering → Team subscription required
+- Regular scanning (10+ contracts/month) → Starter subscription ($199/mo) is better value
+- Need private repos + FP filtering → Starter subscription required
 
 ---
 
@@ -171,7 +171,7 @@ A: Credits are non-refundable but never expire.
 A: MetaMask, WalletConnect, Coinbase Wallet, and any EIP-1193 compatible wallet.
 
 **Q: Is there a minimum purchase?**
-A: The Starter package (10 credits, $30) is the minimum.
+A: The Starter package (10 credits, $25) is the minimum.
 
 **Q: Can I use credits on testnet?**
 A: Free tier includes testnet scans. Credits are for mainnet features.

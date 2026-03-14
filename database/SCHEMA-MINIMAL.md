@@ -155,9 +155,9 @@
 | Tier | Price | Scans/Mo | Files | LoC | Projects | API Calls |
 |------|-------|----------|-------|-----|----------|-----------|
 | Developer | $0 | 10 | 5 | 5K | 3 | 0 |
-| Team | $299 | 100 | Unlim | Unlim | 10 | 1K |
-| Growth | $699 | 500 | Unlim | Unlim | 20 | 10K |
-| Enterprise | $1,999+ | Unlim | Unlim | Unlim | Unlim | Unlim |
+| Starter | $199 | 100 | Unlim | Unlim | 15 | 1K |
+| Growth | $499 | 500 | Unlim | Unlim | 20 | 10K |
+| Enterprise | $1,499+ | Unlim | Unlim | Unlim | Unlim | Unlim |
 
 ---
 

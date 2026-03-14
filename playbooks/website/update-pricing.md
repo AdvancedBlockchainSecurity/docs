@@ -48,8 +48,8 @@ export const PRICING_TIERS: PricingTier[] = [
 
 | Field | Description | Example |
 |-------|-------------|---------|
-| `price` | Monthly price in USD | `299` |
-| `priceDisplay` | Formatted price string | `'$299'` |
+| `price` | Monthly price in USD | `199` |
+| `priceDisplay` | Formatted price string | `'$199'` |
 | `scansPerMonth` | Monthly scan limit | `100` or `'unlimited'` |
 | `users` | User limit | `5` or `'unlimited'` |
 | `features` | Marketing bullet points | `['100 scans/month', ...]` |
@@ -58,7 +58,7 @@ export const PRICING_TIERS: PricingTier[] = [
 
 ```typescript
 export const CREDIT_PACKAGES: CreditPackage[] = [
-  { name: 'Starter', credits: 10, price: 30, perScan: '3.00' },
+  { name: 'Starter', credits: 10, price: 25, perScan: '2.50' },
   // ...
 ]
 ```
@@ -83,9 +83,9 @@ content/docs/support/faq/billing.md      # FAQ pricing table
 | Plan | Monthly | Scans/Mo | Team Size |
 |------|---------|----------|-----------|
 | **Developer (Free)** | $0 | 10 | 1 user |
-| **Team** | $299 | 100 | 5 users |
-| **Growth** | $699 | 500 | 15 users |
-| **Enterprise** | $1,999+ | Unlimited | Unlimited |
+| **Starter** | $199 | 100 | 5 users |
+| **Growth** | $499 | 500 | 25 users |
+| **Enterprise** | $1,499+ | Unlimited | Unlimited |
 ```
 
 ## Step 3: Verify Locally
@@ -147,9 +147,9 @@ git push --force-with-lease origin main
 | Plan | Price | Scans | Users | Projects |
 |------|-------|-------|-------|----------|
 | Developer | $0 | 10 | 1 | 3 |
-| Team | $299 | 100 | 5 | 10 |
-| Growth | $699 | 500 | 15 | 25 |
-| Enterprise | $1,999+ | Unlimited | Unlimited | Unlimited |
+| Starter | $199 | 100 | 5 | 15 |
+| Growth | $499 | 500 | 25 | 25 |
+| Enterprise | $1,499+ | Unlimited | Unlimited | Unlimited |
 
 ## Related Files
 

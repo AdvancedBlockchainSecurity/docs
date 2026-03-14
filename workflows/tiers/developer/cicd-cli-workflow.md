@@ -1,13 +1,13 @@
 # Developer Tier: CI/CD Integration Workflow (CLI)
 
 **Version:** 1.0.0
-**Last Updated:** March 12, 2026
+**Last Updated:** March 13, 2026
 **Tier:** Developer (Free)
 **Status:** Active
 
 ## Overview
 
-Developer (free) tier users integrate smart contract security scanning into CI/CD pipelines using the **Apogee CLI**. The CLI is the only CI/CD integration method available on the free tier — the Integrations Hub dashboard UI and direct REST API access require Starter ($299/mo) or higher.
+Developer (free) tier users integrate smart contract security scanning into CI/CD pipelines using the **Apogee CLI**. The CLI is the only CI/CD integration method available on the free tier — the Integrations Hub dashboard UI and direct REST API access require Starter ($199/mo) or higher.
 
 This workflow documents how scanning fits into a typical development pipeline for free tier users, including quota management and upgrade paths.
 
@@ -80,7 +80,7 @@ flowchart TD
 1. Track monthly usage: `apogee quota status`
 2. Plan scans strategically — 3 per month means ~1 per week on key branches
 3. Consider scanning only on `main` branch merges, not every PR
-4. Upgrade to Starter ($299/mo) for 15 contracts/month and 90-day retention
+4. Upgrade to Starter ($199/mo) for 25 contracts/month and 90-day retention
 
 ---
 
@@ -119,12 +119,12 @@ When you outgrow the free tier:
 
 | Need | Upgrade To | Price |
 |------|-----------|-------|
-| More than 3 contracts/month | Starter | $299/mo |
-| CI/CD dashboard configuration | Starter | $299/mo |
-| Webhook notifications | Starter | $299/mo |
-| Direct REST API access | Growth | $699/mo |
-| Concurrent scans (5) | Growth | $699/mo |
-| AI vulnerability explanations | Starter (50/mo) | $299/mo |
+| More than 3 contracts/month | Starter | $199/mo |
+| CI/CD dashboard configuration | Starter | $199/mo |
+| Webhook notifications | Starter | $199/mo |
+| Direct REST API access | Growth | $499/mo |
+| Concurrent scans (5) | Growth | $499/mo |
+| AI vulnerability explanations | Starter (75/mo) | $199/mo |
 
 ---
 

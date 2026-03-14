@@ -45,10 +45,10 @@ USERS = {
         "email": "test-developer@blocksecops.local",
         "tier": "developer",
     },
-    "team": {
+    "starter": {
         "sub": "22222222-2222-2222-2222-222222222222",
-        "email": "test-team@blocksecops.local",
-        "tier": "team",
+        "email": "test-starter@blocksecops.local",
+        "tier": "starter",
     },
     "growth": {
         "sub": "33333333-3333-3333-3333-333333333333",
@@ -130,7 +130,7 @@ async def audit_billing_plans(client: httpx.AsyncClient):
         data = r.json()
         plans = data.get("plans", [])
         tiers_found = [p.get("tier") for p in plans]
-        expected = {"developer", "team", "growth", "enterprise"}
+        expected = {"developer", "starter", "growth", "enterprise"}
         record("billing", "All 4 tiers present in plans",
                expected.issubset(set(tiers_found)),
                f"Found: {tiers_found}")
@@ -142,17 +142,17 @@ async def audit_billing_plans(client: httpx.AsyncClient):
                 record("billing", "Developer tier is free",
                        price == 0,
                        f"price_monthly={price}")
-            elif p["tier"] == "team":
-                record("billing", "Team tier is $299/mo",
-                       price in (299, 29900),
+            elif p["tier"] == "starter":
+                record("billing", "Starter tier is $199/mo",
+                       price in (199, 19900),
                        f"price_monthly={price}")
             elif p["tier"] == "growth":
-                record("billing", "Growth tier is $699/mo",
-                       price in (699, 69900),
+                record("billing", "Growth tier is $499/mo",
+                       price in (499, 49900),
                        f"price_monthly={price}")
             elif p["tier"] == "enterprise":
-                record("billing", "Enterprise tier is $1999/mo",
-                       price in (1999, 199900),
+                record("billing", "Enterprise tier is $1499/mo",
+                       price in (1499, 149900),
                        f"price_monthly={price}")
 
 
@@ -201,7 +201,7 @@ async def audit_org_creation_tier_gate(client: httpx.AsyncClient):
     org_payload = {"name": f"Audit Tier Gate Test {int(time.time())}", "description": "Tier gate test"}
 
     # Developer and team are rate-limited (429) — they can't reach the endpoint
-    for tier in ["developer", "team"]:
+    for tier in ["developer", "starter"]:
         h = headers_for(tier)
         r = await client.post(f"{API_BASE}/organizations", headers=h, json=org_payload)
         record("org-creation", f"{tier}: POST /organizations blocked (429 rate limit)",

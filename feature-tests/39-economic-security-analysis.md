@@ -149,9 +149,9 @@ curl -s "http://localhost:8000/api/v1/scans/$SCAN_ID/economic-analysis" \
 | Tier | Price | Monthly AI Explanations |
 |------|-------|------------------------|
 | Developer | $0 | 0 (not available) |
-| Team | $299/mo | 10 |
-| Growth | $699/mo | 100 |
-| Enterprise | $1,999+/mo | Unlimited (-1) |
+| Starter | $199/mo | 10 |
+| Growth | $499/mo | 100 |
+| Enterprise | $1,499+/mo | Unlimited (-1) |
 
 **Steps for Developer Tier**:
 1. Login as Developer tier user
@@ -170,7 +170,7 @@ curl -s "http://localhost:8000/api/v1/scans/$SCAN_ID/economic-analysis" \
 **Objective**: Verify AI explanation endpoint works for eligible tiers
 
 **Prerequisites**:
-- User on Team tier or higher
+- User on Starter tier or higher
 - AI explanation quota not exhausted
 
 **Steps**:
@@ -400,9 +400,9 @@ Returns aggregated economic risk across all project scans.
 | Tier | Price | Monthly Quota | Reset |
 |------|-------|--------------|-------|
 | Developer | $0 | 0 | N/A |
-| Team | $299/mo | 10 | Monthly |
-| Growth | $699/mo | 100 | Monthly |
-| Enterprise | $1,999+/mo | -1 (unlimited) | N/A |
+| Starter | $199/mo | 10 | Monthly |
+| Growth | $499/mo | 100 | Monthly |
+| Enterprise | $1,499+/mo | -1 (unlimited) | N/A |
 
 ---
 

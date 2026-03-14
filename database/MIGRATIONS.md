@@ -617,12 +617,12 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
 | Tier | Price | Scans/Mo | Files/Scan | Projects | API Calls/Mo | Team | Retention | Priority |
 |------|-------|----------|------------|----------|--------------|------|-----------|----------|
 | Developer | $0 | 10 | 25 | 3 | 0 | 1 | 30 days | 50 |
-| Team | $299/mo | 100 | 50 | 5 | 1,000 | 5 | 90 days | 40 |
-| Growth | $699/mo | 500 | 100 | 20 | 10,000 | 10 | 180 days | 25 |
-| Enterprise | $1,999+/mo | -1 | -1 | -1 | -1 | -1 | 730 days | 5 |
+| Starter | $199/mo | 100 | 50 | 5 | 1,000 | 5 | 90 days | 40 |
+| Growth | $499/mo | 500 | 100 | 20 | 10,000 | 10 | 365 days | 25 |
+| Enterprise | $1,499+/mo | -1 | -1 | -1 | -1 | -1 | 730 days | 5 |
 
 **Feature Flags by Tier:**
-- `api_access_enabled`: team+
+- `api_access_enabled`: starter+
 - `webhooks_enabled`: growth+
 
 **Trigger Updated:**
@@ -906,9 +906,9 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
   - `export_enabled` (BOOLEAN) - Whether user can export reports (PDF/JSON/SARIF)
 - **Tier Changes**:
   - Developer: 10 scans/month, 5 files, 5K LoC max, 7-day retention, no export ($0)
-  - Team: 100 scans, unlimited files/LoC, 90-day retention, export enabled ($299/mo)
-  - Growth: 500 scans, unlimited files/LoC, 180-day retention, webhooks ($699/mo)
-  - Enterprise: Unlimited, 730-day retention ($1,999+/mo)
+  - Starter: 100 scans, unlimited files/LoC, 90-day retention, export enabled ($199/mo)
+  - Growth: 500 scans, unlimited files/LoC, 365-day retention, webhooks ($499/mo)
+  - Enterprise: Unlimited, 730-day retention ($1,499+/mo)
 - **Migration File**: `alembic/versions/20260111_0100-030_competitive_pricing_tier_update.py`
 
 ---
@@ -923,9 +923,9 @@ Example: 20251021_1800-005_add_vulnerability_intelligence_tables.py
   - `monthly_ai_explanations_used` (INTEGER) - AI explanations used this month
 - **Tier Quotas**:
   - Developer: 0 explanations/month ($0 tier)
-  - Team: 10 explanations/month ($299/mo)
-  - Growth: 100 explanations/month ($699/mo)
-  - Enterprise: -1 unlimited ($1,999+/mo)
+  - Starter: 10 explanations/month ($199/mo)
+  - Growth: 100 explanations/month ($499/mo)
+  - Enterprise: -1 unlimited ($1,499+/mo)
 - **Migration File**: `alembic/versions/20260112_0100-031_add_ai_explanation_quota.py`
 
 ---
@@ -1645,6 +1645,29 @@ asyncio.run(verify())
   - `GET /api/v1/admin/referrals/settings` — Get referral configuration (platform_admin)
   - `PATCH /api/v1/admin/referrals/settings` — Update referral configuration (platform_admin)
 - **Deployed**: API Service v0.29.49, Dashboard v0.46.13
+
+---
+
+### Migration 081: Competitive Pricing Quota Adjustment
+- **Status**: ✅ Completed
+- **Created**: 2026-03-13
+- **Revision ID**: `081_competitive_pricing_quota_adjustment`
+- **Previous Revision**: `080` (prior quota defaults)
+- **Description**: Updates `create_user_quota()` trigger to v4.0 values and migrates existing Starter/Growth user quotas
+- **Changes**:
+  - Replaces `create_user_quota()` trigger function with v4.0 defaults from `tiers.json`
+  - **Starter**: scans 15→25, projects 10→15, AI explanations 50→75
+  - **Growth**: scans 50→75, team members 15→25, retention 180→365 days, AI explanations 200→300
+  - Data migration: updates existing Starter and Growth rows in `user_quotas` to new limits
+  - Credit packages updated: Starter 10cr/$25, Builder 50cr/$99, Pro 250cr/$399, Bulk 1000cr/$1,250
+- **Downgrade**: Reverts trigger and user quotas to pre-v4.0 values
+- **Migration File**: `alembic/versions/20260313_1400-081_competitive_pricing_quota_adjustment.py`
+- **Related Files**:
+  - Tier config: `blocksecops-shared/tier-config/tiers.json` (v4.0)
+  - SCHEMA.md: Updated tier limits table and trigger documentation
+- **Tables Affected**:
+  - `user_quotas` — Trigger function replaced; existing Starter/Growth rows migrated to v4.0 limits
+- **Deployed**: API Service v0.29.88
 
 ---
 

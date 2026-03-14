@@ -1,7 +1,7 @@
 # Organization, Team, and User Hierarchy
 
 **Version:** 1.0.0
-**Last Updated:** March 3, 2026
+**Last Updated:** March 13, 2026
 **Status:** Active
 
 ## Overview
@@ -43,8 +43,8 @@ Organization (starter+ tier required to create)
 | Capability | Developer | Starter | Growth | Enterprise |
 |------------|-----------|---------|--------|------------|
 | Create organization | No | Yes | Yes | Yes |
-| Max team members | 2 | 5 | 15 | Unlimited |
-| Max projects | 3 | 10 | Unlimited | Unlimited |
+| Max team members | 2 | 5 | 25 | Unlimited |
+| Max projects | 3 | 15 | Unlimited | Unlimited |
 | Service accounts | No | No | Yes | Yes |
 | SSO/SAML | No | No | No | Yes |
 | Custom roles | No | No | No | Yes |
@@ -271,7 +271,7 @@ Resources are scoped to their owner level:
 
 ## Enterprise Features
 
-Available only on the Enterprise tier ($1,999+/month):
+Available only on the Enterprise tier ($1,499+/month):
 
 ### SSO/SAML
 - Configure via `sso_config` JSONB field on OrganizationModel

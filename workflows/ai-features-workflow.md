@@ -1,14 +1,14 @@
 # AI Features Workflow
 
 **Version:** 1.2.0
-**Last Updated:** February 19, 2026
+**Last Updated:** March 13, 2026
 **Status:** Active
 
 ---
 
 ## Overview
 
-This document covers the end-to-end workflow for all AI-powered features in the Apogee platform. All AI features use the Anthropic Claude API, are tier-gated (Team+), and follow consistent security patterns.
+This document covers the end-to-end workflow for all AI-powered features in the Apogee platform. All AI features use the Anthropic Claude API, are tier-gated (Starter+), and follow consistent security patterns.
 
 ### Architecture Diagram
 
@@ -107,10 +107,10 @@ All vulnerability-level AI features are accessed from the Vulnerability Detail p
 ```
 User views vulnerability detail → Right sidebar "AI Actions" panel
      │
-     ├──▶ "Generate AI Review" (Team+, indigo button)
+     ├──▶ "Generate AI Review" (Starter+, indigo button)
      │         → Vulnerability + contract context → Claude Haiku → Risk analysis + attack scenario
      │
-     ├──▶ "Generate AI Repair" (Team+, purple button)
+     ├──▶ "Generate AI Repair" (Starter+, purple button)
      │         → Original code + vulnerability context → Claude Sonnet → Patched code + explanation
      │
      ├──▶ "Generate PoC Exploit" (Growth+, red button)
@@ -332,13 +332,13 @@ All error responses use `get_safe_error_detail()` to prevent internal informatio
 
 ### Monthly Quotas
 
-| Feature | Developer | Team ($299) | Growth ($699) | Enterprise ($1,999+) |
-|---------|-----------|-------------|---------------|----------------------|
+| Feature | Developer | Starter ($199) | Growth ($499) | Enterprise ($1,499+) |
+|---------|-----------|----------------|---------------|----------------------|
 | AI Copilot | 0 | 25 | 100 | Unlimited |
 | Code Review | 0 | 25 | 100 | Unlimited |
 | Code Repair | 0 | 10 | 50 | Unlimited |
 | Invariant Gen | 0 | 10 | 50 | Unlimited |
-| AI Explanations | 0 | 50 | 200 | Unlimited |
+| AI Explanations | 0 | 75 | 300 | Unlimited |
 | NL Conversions | 0 | 25 | 100 | Unlimited |
 
 ### Rate Limits
@@ -346,7 +346,7 @@ All error responses use `get_safe_error_detail()` to prevent internal informatio
 | Tier | Dashboard Rate | AI Rate (per user) | Concurrent Scans |
 |------|----------------|--------------------|--------------------|
 | Developer | 60 req/min | N/A (no AI) | 1 |
-| Team | 120 req/min | 20 req/min | 2 |
+| Starter | 120 req/min | 20 req/min | 2 |
 | Growth | 300 req/min | 20 req/min | 5 |
 | Enterprise | Custom | 20 req/min | Custom |
 
@@ -355,7 +355,7 @@ All error responses use `get_safe_error_detail()` to prevent internal informatio
 | Tier | Typical Monthly AI Usage | Estimated Cost |
 |------|--------------------------|----------------|
 | Developer | 0 | $0 |
-| Team | ~120 requests (mixed) | ~$3-5 |
+| Starter | ~120 requests (mixed) | ~$3-5 |
 | Growth | ~500 requests (mixed) | ~$15-25 |
 | Enterprise | Variable | Usage-based billing |
 

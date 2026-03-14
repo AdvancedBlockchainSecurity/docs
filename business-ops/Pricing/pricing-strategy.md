@@ -1,7 +1,7 @@
 > **⚠️ ARCHIVED - January 20, 2026**
 >
 > This document contains the OLD 5-tier pricing strategy from October 2025.
-> It has been superseded by the new 4-tier model (Developer/Team/Growth/Enterprise).
+> It has been superseded by the new 4-tier model (Developer/Starter/Growth/Enterprise).
 >
 > **Current pricing documentation:**
 > - Source of truth: `docs/standards/tier-standards.md`

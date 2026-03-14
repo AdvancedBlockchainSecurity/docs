@@ -1,6 +1,6 @@
 # Apogee Pricing Tiers
 
-**Last Updated**: January 19, 2026
+**Last Updated**: March 13, 2026
 
 ## Overview
 
@@ -15,17 +15,17 @@ Apogee offers a premium smart contract security platform with 25+ integrated sca
 | Tier | Monthly | Annual | Target | Contracts/Month | Users |
 |------|---------|--------|--------|-----------------|-------|
 | **Developer (Free)** | $0 | $0 | Evaluation | 3 | 2 |
-| **Team** | $299 | ~$2,988 | Small teams | 15 | 5 |
-| **Growth** | $699 | ~$7,188 | Growing protocols | 50 | 15 |
-| **Enterprise** | $1,999+ | Custom | Large orgs | Unlimited | Unlimited |
+| **Starter** | $199 | ~$2,028 | Small teams | 25 | 5 |
+| **Growth** | $499 | ~$5,028 | Growing protocols | 75 | 25 |
+| **Enterprise** | $1,499+ | Custom | Large orgs | Unlimited | Unlimited |
 
 ### Land & Expand Strategy
 
 ```
-Developer (Free) → Team ($299) → Growth ($699) → Enterprise ($1,999+)
+Developer (Free) → Starter ($199) → Growth ($499) → Enterprise ($1,499+)
        ↓               ↓              ↓              ↓
    evaluation      small team     scaling up     compliance &
-   (3 contracts)   (15 contracts) (50 contracts) dedicated support
+   (3 contracts)   (25 contracts) (75 contracts) dedicated support
 ```
 
 ---
@@ -63,9 +63,9 @@ Developer (Free) → Team ($299) → Growth ($699) → Enterprise ($1,999+)
 
 ---
 
-## Team Tier
+## Starter Tier
 
-**Price**: $299/month ($249/month with annual billing)
+**Price**: $199/month ($169/month with annual billing)
 
 **Target Customer**:
 - Small development teams (3-5 people)
@@ -74,9 +74,9 @@ Developer (Free) → Team ($299) → Growth ($699) → Enterprise ($1,999+)
 - Early-stage startups
 
 **Included Features**:
-- 15 contracts per month
+- 25 contracts per month
 - 5 user seats
-- 3 private repositories
+- 5 private repositories
 - Everything in Developer, plus:
 - **Full 509-detector coverage** across all vulnerability categories
 - Private repository scanning
@@ -95,7 +95,7 @@ Developer (Free) → Team ($299) → Growth ($699) → Enterprise ($1,999+)
 **Competitive Position**:
 - Priced below MetaTrust ($599/mo)
 - Competitive with Aikido Basic ($300/mo) while offering Web3-specific value
-- **Cost per scanner: $12** vs competitors' $200-1,000 for single scanner
+- **Cost per scanner: $7.96** vs competitors' $200-1,000 for single scanner
 
 **Positioning**: "Professional security for small teams. All the scanners, none of the noise."
 
@@ -103,7 +103,7 @@ Developer (Free) → Team ($299) → Growth ($699) → Enterprise ($1,999+)
 
 ## Growth Tier
 
-**Price**: $699/month ($599/month with annual billing)
+**Price**: $499/month ($419/month with annual billing)
 
 **Target Customer**:
 - Growing protocols (Seed to Series A)
@@ -112,10 +112,10 @@ Developer (Free) → Team ($299) → Growth ($699) → Enterprise ($1,999+)
 - Companies preparing for audits
 
 **Included Features**:
-- 50 contracts per month
-- 15 user seats
+- 75 contracts per month
+- 25 user seats
 - Unlimited repositories
-- Everything in Team, plus:
+- Everything in Starter, plus:
 - **Multi-chain support** (Solidity, Vyper, Rust/Solana, Cairo, Move)
 - Real-time security dashboards
 - Custom rule configuration
@@ -132,9 +132,9 @@ Developer (Free) → Team ($299) → Growth ($699) → Enterprise ($1,999+)
 - No custom SLAs
 
 **Competitive Position**:
-- 2.3x price jump from Team justified by multi-chain and continuous monitoring
+- 2.5x price jump from Starter justified by multi-chain and continuous monitoring
 - Positioned as the "sweet spot" tier for serious DeFi projects
-- **Cost per scanner: $28** vs competitors' $500-1,000 for single scanner
+- **Cost per scanner: $19.96** vs competitors' $500-1,000 for single scanner
 
 **Positioning**: "The complete platform for serious protocols. Multi-chain security with continuous monitoring."
 
@@ -142,7 +142,7 @@ Developer (Free) → Team ($299) → Growth ($699) → Enterprise ($1,999+)
 
 ## Enterprise Tier
 
-**Price**: Starting at $1,999/month (custom quotes for large deployments)
+**Price**: Starting at $1,499/month (custom quotes for large deployments)
 
 **Target Customer**:
 - Large organizations
@@ -202,16 +202,16 @@ Layer usage-based pricing on top of tier subscriptions to capture expansion reve
 ## Upgrade Paths
 
 ```
-Developer (Free) → Team ($299): Need private repos, 95% false positive reduction
+Developer (Free) → Starter ($199): Need private repos, 95% false positive reduction
          ↓
-Team ($299) → Growth ($699): Need multi-chain, continuous monitoring, API access
+Starter ($199) → Growth ($499): Need multi-chain, continuous monitoring, API access
          ↓
-Growth ($699) → Enterprise ($1,999+): Need SSO, compliance, dedicated support
+Growth ($499) → Enterprise ($1,499+): Need SSO, compliance, dedicated support
 ```
 
 **Natural Upgrade Triggers**:
-- **Free → Team**: Hit 3 contracts/month limit, need private repo scanning
-- **Team → Growth**: Building on multiple chains, need continuous monitoring
+- **Free → Starter**: Hit 3 contracts/month limit, need private repo scanning
+- **Starter → Growth**: Building on multiple chains, need continuous monitoring
 - **Growth → Enterprise**: Compliance requirements, dedicated support needs
 
 ---
@@ -244,7 +244,7 @@ Growth ($699) → Enterprise ($1,999+): Need SSO, compliance, dedicated support
 ## Free Tier Strategy: 14-Day Reverse Trial
 
 **How It Works**:
-1. New users get full Team-tier features for 14 days
+1. New users get full Starter-tier features for 14 days
 2. After trial, account drops to Free tier limits
 3. Users experience premium features they'll miss when downgraded
 4. Creates strong conversion motivation
@@ -277,7 +277,7 @@ A: Yes, 50% discount on any tier for non-profits and educational institutions.
 A: You can purchase additional contracts at $19/contract or upgrade to the next tier.
 
 **Q: How does the 14-day trial work?**
-A: All new accounts get full Team-tier features for 14 days, then drop to Free tier. No credit card required to start.
+A: All new accounts get full Starter-tier features for 14 days, then drop to Free tier. No credit card required to start.
 
 ---
 
@@ -289,7 +289,7 @@ Price Scale (Monthly):
 $0 ──────────────────────────────────────────────────────────────── $2K+
 │                                                                     │
 Free Tools    Apogee    MetaTrust      Olympix      Enterprise
-(Slither)     ($0-$699)      ($599)         (~$1K)       Solutions
+(Slither)     ($0-$499)      ($599)         (~$1K)       Solutions
               25+ scanners   1 scanner      1 scanner
               95% FP reduce
 ```
@@ -308,5 +308,5 @@ Free Tools    Apogee    MetaTrust      Olympix      Enterprise
 | SolidityScan Individual | $200 | 1 | $200 |
 | MetaTrust | $599 | 1 | $599 |
 | Olympix | ~$1,000 | 1 | $1,000 |
-| **Apogee Team** | $299 | 25+ | **$12** |
-| **Apogee Growth** | $699 | 25+ | **$28** |
+| **Apogee Starter** | $199 | 25+ | **$7.96** |
+| **Apogee Growth** | $499 | 25+ | **$19.96** |

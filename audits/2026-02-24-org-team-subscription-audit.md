@@ -29,9 +29,9 @@
 | PASS | GET /billing/plans returns 200 | 200 | - |
 | PASS | All 4 tiers present in plans | - | Found: ['developer', 'starter', 'growth', 'enterprise'] |
 | PASS | Developer tier is free | - | price_monthly=0 |
-| PASS | Starter tier is $299/mo | - | price_monthly=299 |
-| PASS | Growth tier is $699/mo | - | price_monthly=699 |
-| PASS | Enterprise tier is $1999/mo | - | price_monthly=1999 |
+| PASS | Starter tier is $199/mo | - | price_monthly=199 |
+| PASS | Growth tier is $499/mo | - | price_monthly=499 |
+| PASS | Enterprise tier is $1499/mo | - | price_monthly=1499 |
 
 ### Subscription [PASS] (9/9)
 
@@ -52,7 +52,7 @@
 | Status | Test | HTTP | Detail |
 |--------|------|------|--------|
 | PASS | developer: POST /organizations blocked (429 rate limit) | 429 | status=429 |
-| PASS | team: POST /organizations blocked (429 rate limit) | 429 | status=429 |
+| PASS | starter: POST /organizations blocked (429 rate limit) | 429 | status=429 |
 | PASS | growth: POST /organizations blocked (should be 403) | 403 | FINDING: Growth user got 403 — missing require_tier('enterprise') decorator |
 | PASS | enterprise: POST /organizations succeeds (201 or 400 already owns) | 400 | status=400, body={"detail":"You already own an organization. Use teams to organize work within your  |
 

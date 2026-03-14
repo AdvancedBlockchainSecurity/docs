@@ -13,9 +13,9 @@ Pricing strategy and competitive analysis for Apogee smart contract security pla
 | Tier | Monthly | Annual | Contracts/Month | Users |
 |------|---------|--------|-----------------|-------|
 | **Developer (Free)** | $0 | $0 | 3 | 2 |
-| **Team** | $299 | ~$2,988 | 15 | 5 |
-| **Growth** | $699 | ~$7,188 | 50 | 15 |
-| **Enterprise** | $1,999+ | Custom | Unlimited | Unlimited |
+| **Starter** | $199 | $2,028 | 25 | 5 |
+| **Growth** | $499 | $5,028 | 75 | 25 |
+| **Enterprise** | $1,499+ | Custom | Unlimited | Unlimited |
 
 ### Usage-Based Add-Ons
 
@@ -31,10 +31,10 @@ Pricing strategy and competitive analysis for Apogee smart contract security pla
 
 | Package | Credits | Price (USDC) | Per-Scan |
 |---------|---------|--------------|----------|
-| Starter | 10 | $30 | $3.00 |
-| Builder | 50 | $125 | $2.50 |
-| Pro | 200 | $400 | $2.00 |
-| Bulk | 1,000 | $1,500 | $1.50 |
+| Starter | 10 | $25 | $2.50 |
+| Builder | 50 | $99 | $1.98 |
+| Pro | 250 | $399 | $1.60 |
+| Bulk | 1,000 | $1,250 | $1.25 |
 
 ---
 
@@ -57,7 +57,7 @@ Price Scale (Monthly):
 $0 ─────────────────────────────────────────────────────────────── $2K+
 │                                                                    │
 Free Tools    Apogee    MetaTrust      Olympix      Enterprise
-(Slither)     ($0-$699)      ($599)         (~$1K)       Solutions
+(Slither)     ($0-$499)      ($599)         (~$1K)       Solutions
               25+ scanners   1 scanner      1 scanner
               95% FP reduce
 ```
@@ -69,7 +69,7 @@ Free Tools    Apogee    MetaTrust      Olympix      Enterprise
 | SolidityScan | $200-500/mo | 1 | $200-500 |
 | MetaTrust | $599/mo | 1 | $599 |
 | Olympix | ~$1,000/mo | 1 | $1,000 |
-| **Apogee** | $299-699/mo | 25+ | **$12-28** |
+| **Apogee** | $199-499/mo | 25+ | **$8-20** |
 
 ---
 
@@ -90,8 +90,8 @@ Free Tools    Apogee    MetaTrust      Olympix      Enterprise
 
 | Segment | Priority | Tier Fit | Notes |
 |---------|----------|----------|-------|
-| Developers | Primary | Free/Team | Solo devs, evaluation |
-| Small Teams | Primary | Team | 3-5 developers |
+| Developers | Primary | Free/Starter | Solo devs, evaluation |
+| Small Teams | Primary | Starter | 3-5 developers |
 | Growing Protocols | Primary | Growth | Seed to Series A |
 | Enterprise | Secondary | Enterprise | Large orgs, exchanges |
 
@@ -115,13 +115,13 @@ Free Tools    Apogee    MetaTrust      Olympix      Enterprise
 ## Land & Expand Strategy
 
 ```
-Developer (Free) → Team ($299) → Growth ($699) → Enterprise ($1,999+)
+Developer (Free) → Starter ($199) → Growth ($499) → Enterprise ($1,499+)
        ↓               ↓              ↓              ↓
    evaluation      small team     scaling up     compliance &
-   (3 contracts)   (15 contracts) (50 contracts) dedicated support
+   (3 contracts)   (25 contracts) (75 contracts) dedicated support
 ```
 
-**14-Day Reverse Trial**: All new accounts get Team-tier features for 14 days, then drop to Free tier. Creates strong conversion motivation.
+**14-Day Reverse Trial**: All new accounts get Starter-tier features for 14 days, then drop to Free tier. Creates strong conversion motivation.
 
 ---
 

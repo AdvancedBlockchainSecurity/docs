@@ -37,7 +37,7 @@ Manual testing checklists for all user-facing features.
 | [19-scanner-effectiveness.md](./19-scanner-effectiveness.md) | Scanner effectiveness analytics |
 | [20-batch-scan.md](./20-batch-scan.md) | Batch scan operations |
 | [21-phase-3-dashboard-analytics.md](./21-phase-3-dashboard-analytics.md) | Phase 3 dashboard analytics |
-| [22-scanner-validation.md](./22-scanner-validation.md) | Per-scanner validation tests (all 17 scanners) |
+| [22-scanner-validation.md](./22-scanner-validation.md) | Per-scanner validation tests (all 25+ scanners) |
 | [23-vulnerability-categorization.md](./23-vulnerability-categorization.md) | Category validation, pattern mappings, scan stats |
 | [24-cross-scanner-deduplication.md](./24-cross-scanner-deduplication.md) | Deduplication API, cross-scanner matching, group management |
 | [25-dark-mode-global-search.md](./25-dark-mode-global-search.md) | Dark mode toggle, command palette (Cmd+K), source code search |
@@ -123,9 +123,9 @@ Economic security analysis for detecting flash loan attacks, MEV exploitation, a
 
 **AI Explanation Quotas (4-Tier Model)**:
 - Developer ($0): 0 (not available)
-- Starter ($299/mo): 10/month
-- Growth ($699/mo): 100/month
-- Enterprise ($1,999+/mo): Unlimited
+- Starter ($199/mo): 10/month
+- Growth ($499/mo): 100/month
+- Enterprise ($1,499+/mo): Unlimited
 
 ---
 
