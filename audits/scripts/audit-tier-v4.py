@@ -566,8 +566,8 @@ async def audit_health(client: httpx.AsyncClient):
     if r.status_code == 200:
         data = r.json()
         version = data.get("version", "unknown")
-        record("health", f"API version is 0.29.88",
-               version == "0.29.88",
+        record("health", f"API version is 0.29.91",
+               version == "0.29.91",
                f"Got version: {version}")
 
 
@@ -637,7 +637,7 @@ def write_results_markdown(total: int, passed: int, failed: int):
         f.write(f"# Tier v4.0 Audit Results\n\n")
         f.write(f"**Date:** {now}\n")
         f.write(f"**Result:** {passed}/{total} passed, {failed} failed\n")
-        f.write(f"**API Version:** 0.29.88\n")
+        f.write(f"**API Version:** 0.29.91\n")
         f.write(f"**Tier Config Version:** 4.0\n\n")
 
         f.write("## Summary\n\n")

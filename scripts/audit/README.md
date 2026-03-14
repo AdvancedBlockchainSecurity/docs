@@ -9,7 +9,6 @@ Automated test scripts for the Apogee GCP production launch audit.
 | Script | Section | Description |
 |--------|---------|-------------|
 | `run-all-audits.sh` | All | Master runner, executes all scripts and generates report |
-| `01-tier-quota-tests.sh` | 1 | Tier config validation, quota limits, feature gates, DB constraints |
 | `06-auth-tests.sh` | 6 | JWT login, API key auth, CORS, scope enforcement |
 | `07-k8s-security-audit.sh` | 7 | Pod security contexts, NetworkPolicies, resource limits, image tags |
 | `08-database-integrity.sh` | 8 | ENUM constraints, audit triggers, indexes, BVD patterns, migrations |
@@ -50,16 +49,19 @@ BASE_URL=https://app.0xapogee.com ./scripts/audit/smoke-test-production.sh
 | `CURL_FLAGS` | All HTTP scripts | curl flags (default: `-sk`) |
 | `TOKEN` | auth, smoke, appsec | JWT token for authenticated tests |
 | `API_KEY` | auth | API key for key-based auth tests |
-| `DEVELOPER_TOKEN` | tier-quota | JWT for Developer tier user |
-| `STARTER_TOKEN` | tier-quota | JWT for Starter tier user |
-| `GROWTH_TOKEN` | tier-quota | JWT for Growth tier user |
 | `SUPABASE_URL` | auth | Supabase project URL |
 | `SUPABASE_KEY` | auth | Supabase anon key |
 | `TEST_EMAIL` | auth | Test user email |
 | `TEST_PASSWORD` | auth | Test user password |
-| `DB_NAMESPACE` | tier-quota, database | K8s namespace for PostgreSQL (default: `postgresql-local`) |
-| `DB_USER` | tier-quota, database | Database user (default: `blocksecops`) |
-| `DB_NAME` | tier-quota, database | Database name (default: `solidity_security`) |
+| `DB_NAMESPACE` | database | K8s namespace for PostgreSQL (default: `postgresql-local`) |
+| `DB_USER` | database | Database user (default: `blocksecops`) |
+| `DB_NAME` | database | Database name (default: `solidity_security`) |
+
+> **Note:** Tier quota and billing tests have been consolidated into pytest tests
+> in `blocksecops-api-service/tests/`. See `tests/unit/test_tier_config_validation.py`,
+> `tests/integration/test_billing_api.py`, and `tests/regression/test_billing_plans_match_tiers_json.py`.
+> For production tier verification, use the Python audit script at
+> `docs/audits/scripts/audit-tier-v4.py`.
 
 ### Load testing
 
