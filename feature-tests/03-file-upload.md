@@ -30,7 +30,7 @@
 
 - [ ] Developer tier: Single file over 1MB returns 413
 - [ ] Developer tier: Archive over 5MB returns 413
-- [ ] Team tier: Single file up to 5MB succeeds
+- [ ] Starter tier: Single file up to 5MB succeeds
 - [ ] Error includes file_size_mb and max_size_mb
 
 ---

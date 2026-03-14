@@ -54,7 +54,7 @@ Existing feature-test specs (63+ files in `/docs/feature-tests/`) cover individu
 | # | Test | Tier | Limit | Expected Result | Status |
 |---|------|------|-------|-----------------|--------|
 | 1.1 | Developer tier: attempt scan beyond monthly limit | Developer | 3/month | Blocked with quota error (402) | [ ] |
-| 1.2 | Team tier: attempt scan beyond monthly limit | Team | 15/month | Blocked with quota error (402) | [ ] |
+| 1.2 | Starter tier: attempt scan beyond monthly limit | Starter | 25/month | Blocked with quota error (402) | [ ] |
 | 1.3 | Growth tier: attempt scan beyond monthly limit | Growth | 50/month | Blocked with quota error (402) | [ ] |
 | 1.4 | Enterprise tier: unlimited scans | Enterprise | Unlimited | No quota block | [ ] |
 
@@ -68,9 +68,9 @@ cat blocksecops-shared/tier-config/tiers.json | \
 
 | # | Test | Expected Result | Status |
 |---|------|-----------------|--------|
-| 1.5 | Developer/Team tier: attempt API key creation | Denied (Growth+ only) | [ ] |
-| 1.6 | Developer/Team tier: attempt service account creation | Denied (Growth+ only) | [ ] |
-| 1.7 | Developer tier: attempt IDE token generation | Denied (Team+ only) | [ ] |
+| 1.5 | Developer/Starter tier: attempt API key creation | Denied (Growth+ only) | [ ] |
+| 1.6 | Developer/Starter tier: attempt service account creation | Denied (Growth+ only) | [ ] |
+| 1.7 | Developer tier: attempt IDE token generation | Denied (Starter+ only) | [ ] |
 
 ```bash
 # Test API key creation denied for Developer tier
@@ -310,7 +310,7 @@ curl -sk -X POST "https://app.0xapogee.com/api/v1/notifications/channels/{channe
 
 | # | Test | Expected Result | Status |
 |---|------|-----------------|--------|
-| 4.10 | IDE token generation (Team+): create, display once, use | Token works for IDE auth | [ ] |
+| 4.10 | IDE token generation (Starter+): create, display once, use | Token works for IDE auth | [ ] |
 | 4.11 | IDE token: attempt to retrieve token value after creation | Only prefix shown | [ ] |
 | 4.12 | Service account (Growth+ admin-only): CRUD lifecycle | Key with `bso_sa_` prefix created | [ ] |
 | 4.13 | Service account auth: `X-Service-Account-Key` header | Authenticated and scoped | [ ] |
@@ -334,9 +334,9 @@ curl -sk -X POST "https://app.0xapogee.com/api/v1/notifications/channels/{channe
 
 | # | Test | Expected Result | Status |
 |---|------|-----------------|--------|
-| 5.1 | New subscription: Developer -> Team upgrade via Stripe Checkout | Tier updated, session invalidated | [ ] |
-| 5.2 | Subscription upgrade: Team -> Growth | Immediate feature unlock | [ ] |
-| 5.3 | Subscription downgrade: Growth -> Team | API keys/service accounts revoked | [ ] |
+| 5.1 | New subscription: Developer -> Starter upgrade via Stripe Checkout | Tier updated, session invalidated | [ ] |
+| 5.2 | Subscription upgrade: Starter -> Growth | Immediate feature unlock | [ ] |
+| 5.3 | Subscription downgrade: Growth -> Starter | API keys/service accounts revoked | [ ] |
 
 ### 5.2 Webhook Security
 

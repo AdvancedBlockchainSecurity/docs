@@ -319,7 +319,7 @@ localStorage.removeItem('upgrade-banner-dismissed:{userId}')
 **Scan Quota (402)**:
 ```json
 {
-  "detail": "Monthly scan limit reached (10/10). Upgrade to Starter for 100 scans/month.",
+  "detail": "Monthly scan limit reached (10/10). Upgrade to Starter for 25 scans/month.",
   "current_tier": "developer",
   "upgrade_url": "/pricing"
 }

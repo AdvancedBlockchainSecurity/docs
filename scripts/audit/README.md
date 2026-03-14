@@ -51,7 +51,7 @@ BASE_URL=https://app.0xapogee.com ./scripts/audit/smoke-test-production.sh
 | `TOKEN` | auth, smoke, appsec | JWT token for authenticated tests |
 | `API_KEY` | auth | API key for key-based auth tests |
 | `DEVELOPER_TOKEN` | tier-quota | JWT for Developer tier user |
-| `TEAM_TOKEN` | tier-quota | JWT for Team tier user |
+| `STARTER_TOKEN` | tier-quota | JWT for Starter tier user |
 | `GROWTH_TOKEN` | tier-quota | JWT for Growth tier user |
 | `SUPABASE_URL` | auth | Supabase project URL |
 | `SUPABASE_KEY` | auth | Supabase anon key |
