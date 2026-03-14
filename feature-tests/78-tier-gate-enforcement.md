@@ -109,6 +109,17 @@ All 36 endpoint/tier combinations verified:
 - [ ] Production scanner overlay test: replaced with `test_production_overlay_sets_registry`
 - [ ] Full suite: 1032 passed, 0 failed, 24 skipped
 
+## Additional Pytest Tests (v0.29.91)
+
+The following pytest tests were added as part of the tier test consolidation (replacing shell scripts):
+
+- `tests/test_feature_gates.py` — Feature gate enforcement tests for tier-based access control
+- `tests/test_tier_config_validation.py` — Validates tiers.json structure and values against code expectations
+- `tests/test_billing_api.py` — Billing API endpoint tests (billing/plans now reads dynamically from blocksecops_tier_config)
+- `tests/test_billing_plans_match_tiers_json.py` — Ensures billing.py plan data matches tiers.json (no hardcoded drift)
+
+These replace the deleted shell test scripts (`01-tier-quota-tests.sh`, `test-billing-v042.sh`).
+
 ## Version History
 
 | Version | PR | Changes |
@@ -118,3 +129,4 @@ All 36 endpoint/tier combinations verified:
 | 0.29.25 | #260 | Added 20 structural unit tests for tier gate enforcement |
 | 0.29.26 | #261 | Fixed 5 stale unit tests; full suite clean (1032/0/24) |
 | 0.29.42 | — | Integrations tier gate changed from growth to starter; IDE tokens changed from starter to growth |
+| 0.29.91 | — | Tier test consolidation: shell scripts deleted, pytest tests added; billing.py/system.py/support.py now read from blocksecops_tier_config dynamically |

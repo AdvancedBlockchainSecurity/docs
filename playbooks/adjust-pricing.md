@@ -528,13 +528,20 @@ print(f'Contracts: {t.quotas.monthly_contract_limit}')
 
 ---
 
-## Important: billing.py Hardcoded Plan Data
+## Important: billing.py Now Reads from tiers.json
 
-**`blocksecops-api-service/src/application/services/billing.py`** contains hardcoded plan data (prices, plan names, Stripe price IDs) that is **not** sourced from `tiers.json`. When subscription prices or tier quotas change, `billing.py` must be manually updated to match.
+As of v0.29.91, `billing.py` reads plan data dynamically from `blocksecops_tier_config` (source of truth: `tiers.json`). Previously, plan data was hardcoded and drifted — the v4.0 pricing audit found v3.2 prices still in `billing.py`.
 
-This was discovered during the v4.0 competitive pricing adjustment (March 13, 2026): the tier audit found that `billing.py` still had v3.2 prices after all other files had been updated. The fix required updating the hardcoded values in `billing.py` and rebuilding the API service to v0.29.88. After the fix, the full tier audit passed 133/133 checks.
+**After any pricing change, run the regression test to verify the API returns updated values:**
 
-**When changing prices, always verify `billing.py` is in sync with `tiers.json`.**
+```bash
+cd blocksecops-api-service
+.venv/bin/pytest tests/regression/test_billing_plans_match_tiers_json.py -v
+```
+
+This test compares GET `/billing/plans` response against `blocksecops_tier_config` and will catch any drift.
+
+**Note:** The tier-config Python wheel must be rebuilt and included in the Docker image when `tiers.json` changes. See the Dockerfile `COPY blocksecops_tier_config-*.whl` step.
 
 ---
 
