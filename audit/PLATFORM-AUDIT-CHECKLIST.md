@@ -4,7 +4,7 @@
 **Created:** March 13, 2026
 **Last Updated:** March 14, 2026
 **Audit Date:** March 14, 2026
-**Status:** PASS (with findings) — Platform operational. 2 findings requiring remediation, 2 advisories.
+**Status:** PASS (with advisories) — Platform operational. All findings remediated. 2 non-blocking advisories remain.
 **Scope:** Full live platform audit — all components, services, infrastructure, external dependencies, scanners, security, and operations
 **Environment:** GCP Production (gke_project-8a2657b9-d96c-4c0a-a69_us-west1_apogee-production-gke)
 
@@ -274,7 +274,7 @@ External SaaS:
 | 3.1.7 | Notification | `:8003/health` (internal) | `{"status":"healthy"}` | healthy | [x] |
 | 3.1.8 | Intelligence Engine | `:8000/health` (internal) | `{"status":"healthy"}` | healthy | [x] |
 | 3.1.9 | Data Service | `:80/health` (internal) | `{"status":"healthy"}` | healthy | [x] |
-| 3.1.10 | Contract Parser | `:8007/health` (internal, direct) | `{"status":"OK"}` | OK (responds on localhost:8007, cross-ns timeout — see Finding F1) | [~] |
+| 3.1.10 | Contract Parser | `:8007/health` (internal) | `{"status":"OK"}` | OK — connectivity restored (F1 resolved, PR #33) | [x] |
 
 ### 3.2 Deployment Status
 
@@ -317,7 +317,7 @@ External SaaS:
 | 4.1.3 | All images use immutable semantic version tags | No `:latest` tags | 0 `:latest` tags across entire cluster | [x] |
 | 4.1.4 | KJM fallback defaults match ConfigMap | All 16 match | Verified via tool-integration health | [x] |
 | 4.1.5 | Deprecated scanners excluded (4naly3er removed Dec 2025) | Not in scanner list | Not present | [x] |
-| 4.1.6 | `SCANNER_REGISTRY` ConfigMap value | Non-empty registry prefix | **EMPTY** — see Finding F2 | [!] |
+| 4.1.6 | `SCANNER_REGISTRY` ConfigMap value | Non-empty registry prefix | Set to GCP AR path (F2 resolved, PR #139) | [x] |
 
 ### 4.2 Scanner Execution
 
@@ -688,8 +688,8 @@ External SaaS:
 | 15.4 | No sensitive data in logs (passwords, tokens, PII) | Sanitized | [ ] |
 | 15.5 | GCP Cloud Monitoring: GKE metrics (CPU, memory, restarts) | Dashboards render | [ ] |
 | 15.6 | Uptime checks: external HTTPS probes on `app.0xapogee.com` | Configured | [ ] |
-| 15.7 | Alerting policies: service down, error rate, scan backlog | Alerts configured | [~] |
-| 15.8 | Alertmanager running | Scaled to 0 (advisory) | [~] |
+| 15.7 | Alerting rules: 9 ClusterRules (pods, resources, DB, certs) | Configured | ClusterRules `apogee-platform-alerts` active | [x] |
+| 15.8 | Alertmanager running with Discord integration | 1/1 Running, alerts delivered | Alertmanager 2/2, discord bridge 1/1, test alert delivered | [x] |
 
 ---
 
@@ -835,34 +835,31 @@ External SaaS:
 
 ## Findings
 
-### F1: Contract Parser cross-namespace connectivity timeout (MEDIUM)
+### F1: Contract Parser cross-namespace connectivity timeout (CRITICAL) — RESOLVED
 
 **Discovered:** March 14, 2026 during Section 3.1.10 audit
+**Resolved:** March 14, 2026
+**PR:** https://github.com/AdvancedBlockchainSecurity/blocksecops-contract-parser/pull/33
 
-**Symptom:** `curl` from api-service-prod pod to `contract-parser.contract-parser-prod.svc.cluster.local:8007` times out after 5s. However, contract-parser responds correctly on `localhost:8007` within its own pod.
+**Symptom:** All cross-namespace traffic to contract-parser timed out. Pod responded on localhost:8007 but was unreachable from api-service, tool-integration, and orchestration. EndpointSlice pointed to stale IP `10.1.3.236` while pod was at `10.1.0.6`.
 
-**NetworkPolicy analysis:**
-- `api-service-to-contract-parser` egress policy exists in api-service-prod (port 8007, podSelector `app: contract-parser`, namespaceSelector `contract-parser-prod`) — correct
-- `contract-parser-ingress` ingress policy exists in contract-parser-prod (port 8007, from api-service-prod, tool-integration-prod, orchestration-prod) — correct
-- Pod labels match selectors: api-service pod has `app: api-service`, contract-parser pod has `app: contract-parser`
+**Root cause:** The GCP `service-patch.yaml` used `$patch: replace` on the entire `spec` block to override the port from 9000 to 8007. This removed the `selector: app: contract-parser` field. Without a selector, Kubernetes stopped auto-managing endpoints. The EndpointSlice remained pointed at a pod IP from a previous node that no longer existed.
 
-**Possible cause:** The contract-parser Service is on port 8007 and endpoints are populated (`10.1.3.236:8007`). The NetworkPolicy selectors and ports appear correct. This could be a Calico/GKE networking issue or a DNS resolution timing issue. Requires deeper investigation (tcpdump, Calico logs, or direct IP test).
-
-**Impact:** If api-service cannot reach contract-parser, AST parsing for scans may fail. However, tool-integration (which manages scanner jobs) may be the primary consumer. Functional impact needs confirmation.
-
-**Action required:** Investigate cross-namespace connectivity. Test from tool-integration and orchestration pods. Check if Calico is blocking despite correct policies.
+**Fix:** Added `selector: app: contract-parser` and `type: ClusterIP` to the `$patch: replace` block so the full spec is correct after replacement. Applied to cluster, endpoints updated, connectivity restored from all services.
 
 ---
 
-### F2: Scanner ConfigMap `SCANNER_REGISTRY` is empty (MEDIUM)
+### F2: Scanner ConfigMap `SCANNER_REGISTRY` is empty (MEDIUM) — RESOLVED
 
 **Discovered:** March 14, 2026 during Section 4.1 audit
+**Resolved:** March 14, 2026
+**PR:** https://github.com/AdvancedBlockchainSecurity/blocksecops-tool-integration/pull/139
 
-**Symptom:** `SCANNER_REGISTRY` key in the `scanner-versions` ConfigMap (tool-integration-prod) is an empty string `""`. The GCP overlay for tool-integration is expected to patch this with the Artifact Registry prefix (`us-west1-docker.pkg.dev/project-8a2657b9-d96c-4c0a-a69/apogee`).
+**Symptom:** `SCANNER_REGISTRY` key in the `scanner-versions` ConfigMap (tool-integration-prod) was empty `""`. Per `docker-image-versioning.md`, this ConfigMap is the single source of truth for scanner image versions.
 
-**Impact:** Scanner Jobs may not be able to pull images if the registry prefix is empty. The KJM (Kubernetes Job Manager) may fall back to `default_images` dict which includes the registry, or it may construct image references without a registry prefix, causing `ImagePullBackOff`. Functional scanner execution testing needed to confirm impact.
+**Root cause:** The GCP overlay was missing `scanner-versions-patch.yaml`. A fix existed in the `production/` overlay but that overlay is not used — the `gcp/` overlay is what's applied. The deployment env var was set correctly via `deployment-patch.yaml`, so scanners functioned at runtime, but the ConfigMap was inconsistent.
 
-**Action required:** Verify the GCP kustomize overlay patches `SCANNER_REGISTRY`. If it relies on a different mechanism (e.g., `SCANNER_IMAGE_*` values being full URIs in production overlay), document that. Otherwise, patch the ConfigMap with the correct registry prefix.
+**Fix:** Added `scanner-versions-patch.yaml` to the GCP overlay and registered it in `kustomization.yaml`. Applied to cluster, ConfigMap now shows correct registry prefix.
 
 ---
 
@@ -876,13 +873,22 @@ External SaaS:
 
 ---
 
-### ADV-2: Alertmanager scaled to 0 (INFO)
+### ADV-2: Alertmanager scaled to 0 (INFO) — RESOLVED
 
-**Discovered:** March 14, 2026 during Section 15 audit (carried forward from previous audits)
+**Discovered:** March 14, 2026 during Section 15 audit
+**Resolved:** March 14, 2026
+**PR:** https://github.com/AdvancedBlockchainSecurity/blocksecops-gcp-infrastructure/pull/49
 
-**Symptom:** Alertmanager StatefulSet in gmp-system is at 0/0 replicas.
+**Symptom:** Alertmanager StatefulSet in gmp-system was at 0/0 replicas with noop config.
 
-**Impact:** Custom alerting rules are not active. GCP Cloud Monitoring alerts can be used as alternative.
+**Resolution:** Implemented full alerting stack:
+- 9 ClusterRules (service availability, resources, database, certificates)
+- Alertmanager config in gmp-public (GKE operator syncs to gmp-system)
+- alertmanager-discord bridge for Discord delivery
+- Discord webhook URL stored in GCP Secret Manager via ESO
+- Test alert delivered successfully to Discord
+
+**Playbook:** [alertmanager-discord-alerting.md](../playbooks/alertmanager-discord-alerting.md)
 
 ---
 
@@ -893,8 +899,8 @@ External SaaS:
 | Section | Total | Passed | Failed | Advisory | Not Tested |
 |---------|-------|--------|--------|----------|------------|
 | 2. Edge & Traffic | 17 | 17 | 0 | 0 | 0 |
-| 3. Application Services | 22 | 21 | 0 | 1 (F1) | 0 |
-| 4. Scanner Fleet | 16 | 15 | 1 (F2) | 0 | 0 |
+| 3. Application Services | 22 | 22 | 0 | 0 | 0 |
+| 4. Scanner Fleet | 16 | 16 | 0 | 0 | 0 |
 | 5. Data Layer | 22 | 22 | 0 | 0 | 0 |
 | 6. Secrets & Encryption | 13 | 13 | 0 | 0 | 0 |
 | 7. Authentication & Identity | 16 | — | — | — | 16 |
@@ -905,7 +911,7 @@ External SaaS:
 | 12. Kubernetes Infrastructure | 12 | 11 | 0 | 1 | 0 |
 | 13. Network Security | 7 | 7 | 0 | 0 | 0 |
 | 14. TLS & Certificates | 8 | 8 | 0 | 0 | 0 |
-| 15. Monitoring & Observability | 8 | 1 | 0 | 2 | 5 |
+| 15. Monitoring & Observability | 8 | 3 | 0 | 0 | 5 |
 | 16. CI/CD & Image Pipeline | 9 | 5 | 0 | 0 | 4 |
 | 17. Backup & DR | 7 | — | — | 1 | 6 |
 | 18. Application Security | 14 | — | — | — | 14 |
@@ -913,7 +919,7 @@ External SaaS:
 | 20. Compliance & Privacy | 6 | — | — | — | 6 |
 | 21. End-to-End Workflows | 10 | — | — | — | 10 |
 | 22. Smoke Test | 13 | 13 | 0 | 0 | 0 |
-| **TOTAL** | **257** | **133** | **1** | **5** | **124** |
+| **TOTAL** | **257** | **137** | **0** | **2** | **124** |
 
 **Note:** Sections marked "Not Tested" (7-11, 17-21) require authenticated user testing, Stripe test mode, or load testing tooling that cannot be performed via cluster inspection alone. Infrastructure sections (2-6, 12-16, 22) are fully audited.
 
