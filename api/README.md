@@ -152,11 +152,11 @@ curl -X GET https://api.0xapogee.com/api/v1/scans/{scan_id}/results \
 - Formal verification (3 tools)
 - SBOM generation
 
-### Tier-Based Access (source: `tiers.json` v3.2)
+### Tier-Based Access (source: `tiers.json` v4.0)
 - **Developer** (free): 3 contracts/month, 5 files/scan
-- **Team** ($299/mo): 15 contracts/month, 50 files/scan, export reports
-- **Growth** ($699/mo): 50 contracts/month, 100 files/scan, API access, multi-chain
-- **Enterprise** ($1,999+/mo): Unlimited contracts, SSO/SAML, dedicated support
+- **Starter** ($199/mo): 25 contracts/month, 50 files/scan, export reports
+- **Growth** ($499/mo): 75 contracts/month, 100 files/scan, API access, multi-chain
+- **Enterprise** ($1,499+/mo): Unlimited contracts, SSO/SAML, dedicated support
 
 ### Pay-Per-Scan (x402)
 - **Alternative to subscriptions** - Pay per scan when quota exceeded

@@ -1,6 +1,6 @@
 # Stripe Test Subscriptions Playbook
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Last Updated:** March 13, 2026
 **Status:** Active
 
@@ -160,15 +160,15 @@ INSERT INTO subscriptions (
 -- Also update the user's tier in user_quotas
 UPDATE user_quotas
 SET tier = 'growth',
-    monthly_contract_limit = 50,
+    monthly_contract_limit = 75,
     max_projects = -1,
-    max_team_members = 15,
+    max_team_members = 25,
     api_access_enabled = true,
     multi_chain_enabled = true,
     continuous_monitoring_enabled = true,
     fp_reduction_enabled = true,
     webhooks_enabled = true,
-    result_retention_days = 180,
+    result_retention_days = 365,
     scan_priority = 25
 WHERE user_id = 'YOUR_USER_UUID';
 ```
@@ -422,7 +422,7 @@ PGPASSWORD=postgres psql -h 127.0.0.1 -p 5432 -U postgres -d solidity_security <
 INSERT INTO subscriptions (id, user_id, tier, status, stripe_subscription_id, stripe_customer_id, started_at, current_period_start, current_period_end, created_at, updated_at)
 VALUES (gen_random_uuid(), '$USER_UUID', 'growth', 'active', 'sub_test_mock_growth', 'cus_test_mock_growth', NOW(), NOW(), NOW() + INTERVAL '30 days', NOW(), NOW());
 
-UPDATE user_quotas SET tier='growth', monthly_contract_limit=50, max_projects=-1, max_team_members=15, api_access_enabled=true, multi_chain_enabled=true, continuous_monitoring_enabled=true, fp_reduction_enabled=true, webhooks_enabled=true, result_retention_days=180, scan_priority=25 WHERE user_id='$USER_UUID';
+UPDATE user_quotas SET tier='growth', monthly_contract_limit=75, max_projects=-1, max_team_members=25, api_access_enabled=true, multi_chain_enabled=true, continuous_monitoring_enabled=true, fp_reduction_enabled=true, webhooks_enabled=true, result_retention_days=365, scan_priority=25 WHERE user_id='$USER_UUID';
 EOF
 
 # 4. Verify
@@ -447,3 +447,4 @@ PGPASSWORD=postgres psql -h 127.0.0.1 -p 5432 -U postgres -d solidity_security \
 |---------|------|---------|--------|
 | 1.0.0 | 2026-02-03 | Initial playbook for test subscriptions | Apogee Team |
 | 1.1.0 | 2026-03-13 | Added GCP production test results, documented bugs found during checkout testing | Apogee Team |
+| 1.2.0 | 2026-03-13 | Updated Growth tier quotas for competitive pricing adjustment (tiers.json v4.0): scans 50→75, team members 15→25, retention 180→365 days | Apogee Team |

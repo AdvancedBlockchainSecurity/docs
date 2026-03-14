@@ -1,6 +1,6 @@
 # Stripe Payment Setup Playbook
 
-**Version:** 1.2.0
+**Version:** 1.3.0
 **Last Updated:** March 13, 2026
 **Status:** Active
 
@@ -72,19 +72,19 @@ Create the following products in Stripe Dashboard (**Products → Add product**)
 
 | Product Name | Credits | Price | Type | Config Key |
 |--------------|---------|-------|------|------------|
-| Credits - Starter | 10 | $30.00 | One-time | `creditPackages.starter.stripePriceId` |
-| Credits - Builder | 50 | $125.00 | One-time | `creditPackages.builder.stripePriceId` |
-| Credits - Pro | 200 | $400.00 | One-time | `creditPackages.pro.stripePriceId` |
-| Credits - Bulk | 1000 | $1500.00 | One-time | `creditPackages.bulk.stripePriceId` |
+| Credits - Starter | 10 | $25.00 | One-time | `creditPackages.starter.stripePriceId` |
+| Credits - Builder | 50 | $99.00 | One-time | `creditPackages.builder.stripePriceId` |
+| Credits - Pro | 250 | $399.00 | One-time | `creditPackages.pro.stripePriceId` |
+| Credits - Bulk | 1000 | $1,250.00 | One-time | `creditPackages.bulk.stripePriceId` |
 
 #### Subscription Tiers (Recurring Payments)
 
 | Product Name | Monthly Price | Annual Price | Features |
 |--------------|---------------|--------------|----------|
 | Developer (Free) | $0 | $0 | No Stripe product needed |
-| Starter | $299/month | $2,988/year ($249/mo) | 50 scans/mo, 5 team members, API access |
-| Growth | $699/month | $7,188/year ($599/mo) | 200 scans/mo, 20 team members, priority support |
-| Enterprise | $1,999/month | Contact Sales | Unlimited scans, SSO, dedicated support |
+| Starter | $199/month | $2,028/year ($169/mo) | 25 scans/mo, 15 projects, API access |
+| Growth | $499/month | $5,028/year ($419/mo) | 75 scans/mo, 25 team members, priority support |
+| Enterprise | $1,499/month | Contact Sales | Unlimited scans, SSO, dedicated support |
 
 ### 3.2 Create Credit Package Products
 
@@ -97,28 +97,28 @@ For each credit package:
 ```
 Name:        Credits - Starter (10 credits)
 Description: 10 scan credits for Apogee smart contract security scanning
-Pricing:     $30.00 USD - One time
+Pricing:     $25.00 USD - One time
 ```
 
 **Credits - Builder**
 ```
 Name:        Credits - Builder (50 credits)
-Description: 50 scan credits for Apogee - Save 17% ($2.50/credit)
-Pricing:     $125.00 USD - One time
+Description: 50 scan credits for Apogee - Save 21% ($1.98/credit)
+Pricing:     $99.00 USD - One time
 ```
 
 **Credits - Pro**
 ```
-Name:        Credits - Pro (200 credits)
-Description: 200 scan credits for Apogee - Save 33% ($2.00/credit)
-Pricing:     $400.00 USD - One time
+Name:        Credits - Pro (250 credits)
+Description: 250 scan credits for Apogee - Save 36% ($1.60/credit)
+Pricing:     $399.00 USD - One time
 ```
 
 **Credits - Bulk**
 ```
 Name:        Credits - Bulk (1000 credits)
-Description: 1000 scan credits for Apogee - Save 50% ($1.50/credit)
-Pricing:     $1500.00 USD - One time
+Description: 1000 scan credits for Apogee - Save 50% ($1.25/credit)
+Pricing:     $1,250.00 USD - One time
 ```
 
 3. After saving each product, copy the **Price ID** from the product page
@@ -130,21 +130,21 @@ For subscription tiers, each product needs TWO prices (monthly and annual):
 **Starter Tier**
 ```
 Name:        Apogee Starter
-Description: Starter plan - 50 scans/month, 5 team members, API access, email support
+Description: Starter plan - 25 scans/month, 15 projects, API access, email support
 
 Add two prices:
-  - $299.00 USD - Recurring monthly
-  - $2,988.00 USD - Recurring yearly (saves $600/year)
+  - $199.00 USD - Recurring monthly
+  - $2,028.00 USD - Recurring yearly (saves $360/year)
 ```
 
 **Growth Tier**
 ```
 Name:        Apogee Growth
-Description: Growth plan - 200 scans/month, 20 team members, priority support, webhooks
+Description: Growth plan - 75 scans/month, 25 team members, priority support, webhooks
 
 Add two prices:
-  - $699.00 USD - Recurring monthly
-  - $7,188.00 USD - Recurring yearly (saves $1,200/year)
+  - $499.00 USD - Recurring monthly
+  - $5,028.00 USD - Recurring yearly (saves $960/year)
 ```
 
 **Enterprise Tier**
@@ -153,7 +153,7 @@ Name:        Apogee Enterprise
 Description: Enterprise plan - Unlimited scans, SSO, dedicated support, custom integrations
 
 Add one price:
-  - $1,999.00 USD - Recurring monthly
+  - $1,499.00 USD - Recurring monthly
   (Annual pricing handled via sales contracts)
 ```
 
@@ -163,21 +163,21 @@ After creating all products, record the Price IDs:
 
 ```
 # Credit Packages (One-time)
-credits_starter:      price_1Nxxxxxxxxxxxxx
-credits_builder:      price_1Nxxxxxxxxxxxxx
-credits_pro:          price_1Nxxxxxxxxxxxxx
-credits_bulk:         price_1Nxxxxxxxxxxxxx
+credits_starter:      price_1TAfcV3ZtjkVcNXVM6qpmvA1
+credits_builder:      price_1TAfcW3ZtjkVcNXVX6QaB1Sm
+credits_pro:          price_1TAfcX3ZtjkVcNXVvKAhWeXY
+credits_bulk:         price_1TAfcZ3ZtjkVcNXVLfhIA2K3
 
 # Starter Tier (Subscription)
-starter_monthly:      price_1Nxxxxxxxxxxxxx
-starter_annual:       price_1Nxxxxxxxxxxxxx
+starter_monthly:      price_1TAfcL3ZtjkVcNXVjTSRsgYs
+starter_annual:       price_1TAfcM3ZtjkVcNXVg9ll3Pqm
 
 # Growth Tier (Subscription)
-growth_monthly:       price_1Nxxxxxxxxxxxxx
-growth_annual:        price_1Nxxxxxxxxxxxxx
+growth_monthly:       price_1TAfcN3ZtjkVcNXVZQUALruH
+growth_annual:        price_1TAfcO3ZtjkVcNXVVhAFfSwW
 
 # Enterprise Tier (Subscription)
-enterprise_monthly:   price_1Nxxxxxxxxxxxxx
+enterprise_monthly:   price_1TAfcP3ZtjkVcNXVgFFrvw9i
 ```
 
 ---
@@ -200,31 +200,31 @@ Find the `creditPackages` section and update the `stripePriceId` values:
 "creditPackages": {
   "starter": {
     "credits": 10,
-    "price": 30.00,
-    "perCredit": 3.00,
+    "price": 25.00,
+    "perCredit": 2.50,
     "savings": null,
-    "stripePriceId": "price_1Nxxxxxxxxxxxxx"
+    "stripePriceId": "price_1TAfcV3ZtjkVcNXVM6qpmvA1"
   },
   "builder": {
     "credits": 50,
-    "price": 125.00,
-    "perCredit": 2.50,
-    "savings": "17%",
-    "stripePriceId": "price_1Nxxxxxxxxxxxxx"
+    "price": 99.00,
+    "perCredit": 1.98,
+    "savings": "21%",
+    "stripePriceId": "price_1TAfcW3ZtjkVcNXVX6QaB1Sm"
   },
   "pro": {
-    "credits": 200,
-    "price": 400.00,
-    "perCredit": 2.00,
-    "savings": "33%",
-    "stripePriceId": "price_1Nxxxxxxxxxxxxx"
+    "credits": 250,
+    "price": 399.00,
+    "perCredit": 1.60,
+    "savings": "36%",
+    "stripePriceId": "price_1TAfcX3ZtjkVcNXVvKAhWeXY"
   },
   "bulk": {
     "credits": 1000,
-    "price": 1500.00,
-    "perCredit": 1.50,
+    "price": 1250.00,
+    "perCredit": 1.25,
     "savings": "50%",
-    "stripePriceId": "price_1Nxxxxxxxxxxxxx"
+    "stripePriceId": "price_1TAfcZ3ZtjkVcNXVLfhIA2K3"
   }
 }
 ```
@@ -238,11 +238,11 @@ Find each tier in the `tiers` section and update the Stripe Price IDs:
 "starter": {
   "name": "Starter",
   "pricing": {
-    "monthly": 299,
-    "annual": 2988
+    "monthly": 199,
+    "annual": 2028
   },
-  "stripePriceIdMonthly": "price_1Nxxxxxxxxxxxxx",
-  "stripePriceIdAnnual": "price_1Nxxxxxxxxxxxxx",
+  "stripePriceIdMonthly": "price_1TAfcL3ZtjkVcNXVjTSRsgYs",
+  "stripePriceIdAnnual": "price_1TAfcM3ZtjkVcNXVg9ll3Pqm",
   ...
 }
 ```
@@ -252,11 +252,11 @@ Find each tier in the `tiers` section and update the Stripe Price IDs:
 "growth": {
   "name": "Growth",
   "pricing": {
-    "monthly": 699,
-    "annual": 7188
+    "monthly": 499,
+    "annual": 5028
   },
-  "stripePriceIdMonthly": "price_1Nxxxxxxxxxxxxx",
-  "stripePriceIdAnnual": "price_1Nxxxxxxxxxxxxx",
+  "stripePriceIdMonthly": "price_1TAfcN3ZtjkVcNXVZQUALruH",
+  "stripePriceIdAnnual": "price_1TAfcO3ZtjkVcNXVVhAFfSwW",
   ...
 }
 ```
@@ -266,10 +266,10 @@ Find each tier in the `tiers` section and update the Stripe Price IDs:
 "enterprise": {
   "name": "Enterprise",
   "pricing": {
-    "monthly": 1999,
+    "monthly": 1499,
     "annual": null
   },
-  "stripePriceIdMonthly": "price_1Nxxxxxxxxxxxxx",
+  "stripePriceIdMonthly": "price_1TAfcP3ZtjkVcNXVgFFrvw9i",
   "stripePriceIdAnnual": null,
   ...
 }
@@ -554,7 +554,7 @@ Stripe provides test card numbers for testing:
 2. Select a credit package (e.g., "Builder")
 3. Click "Purchase Credits"
 4. Select "Card" payment method
-5. Click "Pay $125.00 with Card"
+5. Click "Pay $99.00 with Card"
 6. In Stripe Checkout, enter test card: `4242 4242 4242 4242`
 7. Complete the purchase
 8. Verify redirect to success page
@@ -644,3 +644,4 @@ Before going live:
 | 1.0.0 | 2026-02-02 | Initial playbook | Apogee Team |
 | 1.1.0 | 2026-02-03 | Updated secrets to use Vault (not ConfigMap), updated webhook forwarding for kubeadm NodePort | Apogee Team |
 | 1.2.0 | 2026-03-13 | Added API-based webhook creation, GCP Secret Manager update steps, updated event list for subscriptions | Apogee Team |
+| 1.3.0 | 2026-03-13 | Competitive pricing adjustment per tiers.json v4.0: updated subscription prices, credit packages, quotas, and Stripe price IDs | Apogee Team |

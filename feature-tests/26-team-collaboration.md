@@ -136,9 +136,9 @@ curl -s -X POST -H "Authorization: Bearer ${TOKEN}" \
 | Tier | Price | Max Team Members |
 |------|-------|------------------|
 | Developer | $0 | 1 (solo) |
-| Starter | $299/mo | 5 |
-| Growth | $699/mo | 15 |
-| Enterprise | $1,999+/mo | Unlimited |
+| Starter | $199/mo | 5 |
+| Growth | $499/mo | 25 |
+| Enterprise | $1,499+/mo | Unlimited |
 
 **Test: Quota Exceeded**:
 ```bash
@@ -167,8 +167,8 @@ curl -s -X POST -H "Authorization: Bearer ${TOKEN}" \
 - [ ] Developer tier: Cannot add team members (solo only)
 - [ ] Starter tier: Can add up to 5 members
 - [ ] Starter tier: 6th member returns 403 with upgrade prompt
-- [ ] Growth tier: Can add up to 15 members
-- [ ] Growth tier: 16th member returns 403 with upgrade prompt
+- [ ] Growth tier: Can add up to 25 members
+- [ ] Growth tier: 26th member returns 403 with upgrade prompt
 - [ ] Enterprise tier: No member limit (max_team_members = -1)
 
 **Status**: [ ] NOT YET TESTED

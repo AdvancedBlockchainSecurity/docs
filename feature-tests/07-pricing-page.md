@@ -1,7 +1,7 @@
 # Pricing Page Tests
 
 **Priority**: P2 - Medium
-**Last Updated**: March 7, 2026
+**Last Updated**: March 13, 2026
 **Related**: Phase 3.1b Frontend, Migration 024, Migration 030
 
 ---
@@ -11,7 +11,7 @@
 ### 1.1 Page Load
 - [ ] Pricing page accessible at /pricing
 - [ ] Page loads without errors
-- [ ] All four tiers displayed (Developer, Team, Growth, Enterprise)
+- [ ] All four tiers displayed (Developer, Starter, Growth, Enterprise)
 - [ ] Responsive on mobile/tablet/desktop
 
 ### 1.2 Developer Tier Card (Free)
@@ -33,15 +33,15 @@
 - [ ] "Current Plan" indicator (if user is Developer)
 - [ ] "Get Started" button (if not logged in)
 
-### 1.3 Starter Tier Card ($299/mo)
+### 1.3 Starter Tier Card ($199/mo)
 - [ ] "Starter" label displayed with blue styling
-- [ ] Price shown ($299/month)
+- [ ] Price shown ($199/month)
 - [ ] Feature list:
-  - [ ] 15 scans/month
+  - [ ] 25 scans/month
   - [ ] Unlimited files per scan
   - [ ] Unlimited LoC per scan
-  - [ ] 10 projects
-  - [ ] All 17+ scanners
+  - [ ] 15 projects
+  - [ ] All 25+ scanners
   - [ ] No API access
   - [ ] Export enabled (PDF, JSON, SARIF)
   - [ ] 90-day retention
@@ -51,12 +51,12 @@
 - [ ] "Upgrade to Starter" button (if user is Developer)
 - [ ] "Current Plan" indicator (if user is Starter)
 
-### 1.4 Growth Tier Card ($699/mo)
+### 1.4 Growth Tier Card ($499/mo)
 - [ ] "Growth" label displayed with purple styling
 - [ ] "Popular" badge shown
-- [ ] Price shown ($699/month)
+- [ ] Price shown ($499/month)
 - [ ] Feature list:
-  - [ ] 50 scans/month
+  - [ ] 75 scans/month
   - [ ] Unlimited files per scan
   - [ ] Unlimited LoC per scan
   - [ ] Unlimited projects
@@ -66,15 +66,15 @@
   - [ ] Webhooks enabled
   - [ ] CI/CD Integration (CLI)
   - [ ] Integrations Hub
-  - [ ] Up to 15 team members
-  - [ ] 180-day retention
+  - [ ] Up to 25 team members
+  - [ ] 365-day retention
   - [ ] Continuous monitoring
 - [ ] "Upgrade to Growth" button (if user is Developer/Starter)
 - [ ] "Current Plan" indicator (if user is Growth)
 
-### 1.5 Enterprise Tier Card ($1,999+/mo)
+### 1.5 Enterprise Tier Card ($1,499+/mo)
 - [ ] "Enterprise" label displayed with purple styling
-- [ ] Price shown ($1,999+/month or "Contact Sales")
+- [ ] Price shown ($1,499+/month or "Contact Sales")
 - [ ] Feature list:
   - [ ] Unlimited scans
   - [ ] Unlimited files per scan
@@ -113,10 +113,10 @@
 ### 3.1 Feature Matrix Display
 - [ ] "Detailed Feature Comparison" section visible
 - [ ] All features listed in rows
-- [ ] Five columns: Developer, Team, Growth, Enterprise, x402 Pay-Per-Scan
+- [ ] Five columns: Developer, Starter, Growth, Enterprise, x402 Pay-Per-Scan
 - [ ] Correct styling for each tier column:
   - [ ] Developer: Gray
-  - [ ] Team: Green
+  - [ ] Starter: Green
   - [ ] Growth: Blue
   - [ ] Enterprise: Purple
   - [ ] x402: Emerald
@@ -124,13 +124,13 @@
 
 ### 3.2 Limit Comparison
 Features to verify in matrix:
-- [ ] Monthly Scans: 3 / 15 / 50 / Unlimited / Pay per scan
-- [ ] Team Members: 2 / 5 / 15 / Unlimited / 1
-- [ ] Projects: 3 / 10 / Unlimited / Unlimited / 5
+- [ ] Monthly Scans: 3 / 25 / 75 / Unlimited / Pay per scan
+- [ ] Team Members: 2 / 5 / 25 / Unlimited / 1
+- [ ] Projects: 3 / 15 / Unlimited / Unlimited / 5
 - [ ] API Calls/Month: None / None / Unlimited / Unlimited / Per tier
 - [ ] Files/Scan: Unlimited / Unlimited / Unlimited / Unlimited / Per tier
 - [ ] LoC/Scan: Unlimited / Unlimited / Unlimited / Unlimited / Per tier
-- [ ] Result Retention: 7 days / 90 days / 180 days / 365 days / 90 days
+- [ ] Result Retention: 7 days / 90 days / 365 days / 730 days / 90 days
 - [ ] All Scanners: Yes / Yes / Yes / Yes / Yes
 - [ ] API Access: No / No / Yes (Full) / Yes / Yes
 - [ ] Webhooks: No / Yes / Yes / Yes / Yes

@@ -781,9 +781,9 @@ When a user exceeds their tier-based scan quota, the API returns HTTP 402 with d
 
 **Tier Limits**:
 - **Developer** (free): 3 contracts/month (enforced)
-- **Team** ($299/mo): 15 contracts/month
-- **Growth** ($699/mo): 50 contracts/month
-- **Enterprise** ($1,999+/mo): Unlimited contracts
+- **Starter** ($199/mo): 25 contracts/month
+- **Growth** ($499/mo): 75 contracts/month
+- **Enterprise** ($1,499+/mo): Unlimited contracts
 
 **Payment Options** (Phase 3.4 - December 2025):
 The 402 response includes `payment_options` for x402 pay-per-scan integration:
@@ -2635,14 +2635,14 @@ Get enhanced user profile with tier and quota information.
 - `quota.scan_priority`: Scan queue priority (5=highest/enterprise, 50=lowest/developer)
 - `quota.quota_reset_at`: Next quota reset date
 
-**Tier Limits** (source of truth: `tiers.json` v3.2):
+**Tier Limits** (source of truth: `tiers.json` v4.0):
 
 | Tier | Contracts/Month | Files/Scan | Priority | Export | Webhooks | API Access |
 |------|----------------|------------|----------|--------|----------|------------|
 | Developer (free) | 3 | 5 | 50 (lowest) | No | No | No |
-| Starter ($299/mo) | 15 | 50 | 30 | Yes | No | No |
-| Growth ($699/mo) | 50 | 100 | 15 | Yes | Yes | Yes |
-| Enterprise ($1,999+/mo) | Unlimited | Unlimited | 5 (highest) | Yes | Yes | Yes |
+| Starter ($199/mo) | 25 | 50 | 30 | Yes | No | No |
+| Growth ($499/mo) | 75 | 100 | 15 | Yes | Yes | Yes |
+| Enterprise ($1,499+/mo) | Unlimited | Unlimited | 5 (highest) | Yes | Yes | Yes |
 
 **Status Codes**:
 - `200` OK - Enhanced profile retrieved

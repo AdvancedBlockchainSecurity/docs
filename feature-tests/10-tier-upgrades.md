@@ -1,7 +1,7 @@
 # Tier Upgrade Tests
 
 **Priority**: P1 - High
-**Last Updated**: March 7, 2026
+**Last Updated**: March 13, 2026
 **Related**: Freemium Model, Pricing Tiers, Migration 024, Migration 030, UpgradeBanner (v0.30.1)
 
 ---
@@ -11,9 +11,9 @@
 | Tier | Price | Scans/Mo | Files/Scan | Team Members | Projects | API Calls |
 |------|-------|----------|------------|--------------|----------|-----------|
 | Developer | $0 | 3 | Unlimited | 2 | 3 | 0 (no API) |
-| Starter | $299/mo | 15 | Unlimited | 5 | 10 | 0 (no API) |
-| Growth | $699/mo | 50 | Unlimited | 15 | Unlimited | Unlimited |
-| Enterprise | $1,999+/mo | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
+| Starter | $199/mo | 25 | Unlimited | 5 | 15 | 0 (no API) |
+| Growth | $499/mo | 75 | Unlimited | 25 | Unlimited | Unlimited |
+| Enterprise | $1,499+/mo | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
 
 ---
 
@@ -27,21 +27,21 @@
 
 ### 1.2 Payment Processing
 - [ ] Payment form loads correctly
-- [ ] Valid payment method accepted ($299/month)
+- [ ] Valid payment method accepted ($199/month)
 - [ ] Invalid payment method shows error
 - [ ] Payment confirmation displayed
 
 ### 1.3 Post-Upgrade Verification
 - [ ] User tier updated to "starter" in database
 - [ ] Quota widget shows "Starter" tier label
-- [ ] Scan limit increased to 15/month
+- [ ] Scan limit increased to 25/month
 - [ ] Files per scan now unlimited (-1)
 - [ ] LoC per scan now unlimited (-1)
 - [ ] Export enabled (PDF, JSON, SARIF)
-- [ ] Projects limit increased to 10
+- [ ] Projects limit increased to 15
 - [ ] API access NOT enabled (Starter has no API access)
 - [ ] Priority queue level updated (40)
-- [ ] All 17+ scanners now accessible
+- [ ] All 25+ scanners now accessible
 - [ ] Team members limit increased to 5
 
 ### 1.4 Quota Preservation
@@ -56,7 +56,7 @@
 ### 2.1 Upgrade Initiation
 - [ ] "Upgrade to Growth" button visible for Starter users
 - [ ] Upgrade benefits clearly shown (more users, full API access, webhooks, CI/CD)
-- [ ] Price shown ($699/month)
+- [ ] Price shown ($499/month)
 - [ ] Clicking upgrade navigates to payment flow
 
 ### 2.2 Payment Processing
@@ -67,20 +67,20 @@
 ### 2.3 Post-Upgrade Verification
 - [ ] User tier updated to "growth" in database
 - [ ] Quota widget shows "Growth" tier label
-- [ ] Scan limit increased to 50/month
+- [ ] Scan limit increased to 75/month
 - [ ] Files per scan remains unlimited (-1)
 - [ ] Projects limit becomes unlimited (-1)
 - [ ] API calls become unlimited (-1)
 - [ ] Full API access enabled
 - [ ] Priority queue level updated (25)
-- [ ] Team management enabled (up to 15 members)
+- [ ] Team management enabled (up to 25 members)
 - [ ] Webhooks enabled
-- [ ] Result retention increased to 180 days
+- [ ] Result retention increased to 365 days
 - [ ] Continuous monitoring enabled
 
 ### 2.4 Team Features Expanded
 - [ ] Team invite functionality expanded
-- [ ] Can invite up to 14 additional members
+- [ ] Can invite up to 24 additional members
 - [ ] Full API access now available
 
 ---
@@ -90,7 +90,7 @@
 ### 3.1 Upgrade Initiation
 - [ ] "Upgrade to Enterprise" or "Contact Sales" button visible for Growth users
 - [ ] Upgrade benefits clearly shown (unlimited, organizations, audit, SSO)
-- [ ] Price shown ($1,999+/month or "Contact Sales")
+- [ ] Price shown ($1,499+/month or "Contact Sales")
 - [ ] Clicking upgrade navigates to payment flow or contact form
 
 ### 3.2 Payment Processing
@@ -144,7 +144,7 @@
 
 ### 5.1 Developer to Growth
 - [ ] Direct upgrade path available
-- [ ] No requirement to go through Team first
+- [ ] No requirement to go through Starter first
 - [ ] Full API access enabled immediately
 - [ ] All Growth limits applied
 
@@ -165,14 +165,14 @@
 
 ### 6.2 At Quota Limit Upgrade
 - [ ] User at 3/3 scans (Developer tier) can initiate upgrade
-- [ ] After upgrade to Starter, user shows 3/15
+- [ ] After upgrade to Starter, user shows 3/25
 - [ ] After upgrade to Enterprise, user shows 3/Unlimited
 - [ ] User can scan immediately after upgrade
 - [ ] No scan loss during upgrade
 
 ### 6.3 At Team Limit Upgrade
 - [ ] Team user with 5/5 team members can upgrade
-- [ ] After upgrade to Growth, shows 5/15
+- [ ] After upgrade to Growth, shows 5/25
 - [ ] Can immediately invite more members
 
 ### 6.4 Failed Payment Recovery
@@ -232,7 +232,7 @@
 - [ ] Shows sparkles icon on left
 - [ ] Message shows "Upgrade to {next tier} to unlock more features"
 - [ ] Shows up to 3 feature highlights for next tier (desktop only)
-- [ ] Price badge visible (e.g., "$299/mo")
+- [ ] Price badge visible (e.g., "$199/mo")
 - [ ] "View Plans" button links to /pricing
 
 ### 8.2 Tier-Based Messaging
@@ -251,7 +251,7 @@
 **Growth tier highlights shown to Starter users:**
 - [ ] Full API Access
 - [ ] 100 AI Explanations/month
-- [ ] Up to 15 team members
+- [ ] Up to 25 team members
 
 **Enterprise tier highlights shown to Growth users:**
 - [ ] Unlimited AI
@@ -346,7 +346,7 @@ localStorage.removeItem('upgrade-banner-dismissed:{userId}')
 **Team Seat Limit (403)**:
 ```json
 {
-  "detail": "Team seat limit reached (5/5). Upgrade to Growth for 15 seats.",
+  "detail": "Team seat limit reached (5/5). Upgrade to Growth for 25 seats.",
   "current_tier": "starter",
   "required_tier": "growth"
 }

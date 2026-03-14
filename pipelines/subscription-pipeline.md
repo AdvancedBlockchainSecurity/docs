@@ -400,9 +400,9 @@ Invalid billing_interval: defaults to "monthly"
 | Tier | Monthly | Annual (17% savings) | Contracts/Month |
 |------|---------|----------------------|-----------------|
 | Developer | $0 | $0 | 3 |
-| Starter | $299 | ~$2,988/yr | 15 |
-| Growth | $699 | ~$7,188/yr | 50 |
-| Enterprise | $1,999+ | Custom | Unlimited |
+| Starter | $199 | ~$1,990/yr | 25 |
+| Growth | $499 | ~$4,990/yr | 75 |
+| Enterprise | $1,499+ | Custom | Unlimited |
 
 Source of truth: `blocksecops-shared/tier-config/tiers.json`
 

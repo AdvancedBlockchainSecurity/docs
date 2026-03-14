@@ -306,7 +306,7 @@
 
 ### 5.6 Retention Policy
 - [ ] Developer tier: 7 days retention
-- [ ] Team tier: 30 days retention
+- [ ] Starter tier: 30 days retention
 - [ ] Growth tier: 90 days retention
 - [ ] Enterprise tier: 1 year retention
 - [ ] Old logs automatically purged
@@ -400,8 +400,8 @@
 - [ ] Shows price badge and "View Plans" button
 
 **Tier-Based Display:**
-- [ ] Developer user sees Team promotion
-- [ ] Team user sees Growth promotion
+- [ ] Developer user sees Starter promotion
+- [ ] Starter user sees Growth promotion
 - [ ] Growth user sees Enterprise promotion
 - [ ] Enterprise user: Banner NOT displayed
 
@@ -703,7 +703,7 @@
 - [ ] 7 days audit logs
 - [ ] No audit export
 
-### 8.2 Starter Tier ($299/mo)
+### 8.2 Starter Tier ($199/mo)
 - [ ] 5 webhooks
 - [ ] 1 organization
 - [ ] 5 team members
@@ -711,15 +711,15 @@
 - [ ] 30 days audit logs
 - [ ] No audit export
 
-### 8.3 Growth Tier ($699/mo)
+### 8.3 Growth Tier ($499/mo)
 - [ ] 10 webhooks
 - [ ] 1 organization
-- [ ] 15 team members
+- [ ] 25 team members
 - [ ] 10 API keys
 - [ ] 90 days audit logs
 - [ ] Full API access
 
-### 8.4 Enterprise Tier ($1,999+/mo)
+### 8.4 Enterprise Tier ($1,499+/mo)
 - [ ] Unlimited webhooks
 - [ ] Unlimited organizations
 - [ ] Unlimited team members
@@ -803,7 +803,7 @@ analytics:read, webhooks:read, webhooks:write
 - [ ] `scans_used_this_month` should reset to 0
 - [ ] User session reflects new tier immediately (or after re-login)
 
-#### Upgrade from Developer to Team
+#### Upgrade from Developer to Starter
 - [ ] `monthly_scan_limit` increases from 10 to 100
 - [ ] `max_files_per_scan` increases from 5 to unlimited
 - [ ] `scan_priority` increases from 50 to 30
@@ -812,11 +812,11 @@ analytics:read, webhooks:read, webhooks:write
 - [ ] `result_retention_days` increases from 7 to 90
 - [ ] `max_team_members` increases from 1 to 5
 
-#### Upgrade from Team to Growth
+#### Upgrade from Starter to Growth
 - [ ] `monthly_scan_limit` increases from 100 to 500
 - [ ] `scan_priority` increases from 30 to 15
-- [ ] `result_retention_days` increases from 90 to 180
-- [ ] `max_team_members` increases from 5 to 15
+- [ ] `result_retention_days` increases from 90 to 365
+- [ ] `max_team_members` increases from 5 to 25
 - [ ] Full API access enabled
 
 #### Upgrade from Growth to Enterprise
@@ -872,8 +872,8 @@ WHERE user_id = '<user_uuid>';
 - [ ] `TierGate` component blocks access for insufficient tier
 - [ ] Upgrade prompt shown with link to pricing
 - [ ] ADMIN section in sidebar respects tier
-- [ ] API Keys visible to team+ only
-- [ ] Webhooks visible to team+ only
+- [ ] API Keys visible to starter+ only
+- [ ] Webhooks visible to starter+ only
 - [ ] Audit Logs visible to enterprise only
 - [ ] Organizations visible to enterprise only
 
@@ -881,13 +881,13 @@ WHERE user_id = '<user_uuid>';
 
 | Feature | Developer | Starter | Growth | Enterprise |
 |---------|-----------|---------|--------|------------|
-| Monthly Scan Limit | 3 | 15 | 50 | Unlimited |
+| Monthly Scan Limit | 3 | 25 | 75 | Unlimited |
 | Max Files Per Scan | Unlimited | Unlimited | Unlimited | Unlimited |
 | Scan Priority | 50 | 40 | 25 | 5 |
 | Webhooks | ❌ | ✅ | ✅ | ✅ |
 | API Access | ❌ | ❌ | ✅ (Full) | ✅ |
-| Result Retention | 7 days | 90 days | 180 days | 365 days |
-| Max Team Members | 2 | 5 | 15 | Unlimited |
+| Result Retention | 7 days | 90 days | 365 days | 365 days |
+| Max Team Members | 2 | 5 | 25 | Unlimited |
 | Organizations | ❌ | ❌ | ❌ | ✅ |
 | Audit Logs | ❌ | ❌ | ❌ | ✅ |
 | Custom Roles | ❌ | ❌ | ❌ | ✅ |

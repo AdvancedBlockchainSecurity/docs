@@ -1,7 +1,7 @@
 # Tier Upsell & CTA Tests
 
 **Priority**: P1 - High
-**Last Updated**: March 12, 2026
+**Last Updated**: March 13, 2026
 **Related**: TierGate, Sidebar, Dashboard, Pricing, Quota Pre-Checks, v0.46.28+
 
 ---
@@ -52,13 +52,13 @@ Tests for the tier upsell and conversion-optimized CTA system implemented in das
 - [ ] Shows 3 feature cards: AI Security Copilot, Automated Code Review, Integrations Hub
 - [ ] Each card has icon, title, description, and tier badge
 - [ ] Cards are clickable (navigate to gated page)
-- [ ] Clicking card shows TierGate upgrade prompt with Starter pricing ($299/mo)
+- [ ] Clicking card shows TierGate upgrade prompt with Starter pricing ($199/mo)
 
 ### 2.2 Starter Tier User
 - [ ] Feature discovery section still shown (for Growth features)
 - [ ] Shows different cards: Runtime Monitoring, API Access, Team Management
 - [ ] Cards navigate to Growth-gated pages
-- [ ] TierGate shows Growth pricing ($699/mo)
+- [ ] TierGate shows Growth pricing ($499/mo)
 
 ### 2.3 Growth+ Tier User
 - [ ] Feature discovery section NOT shown
@@ -106,10 +106,10 @@ Tests for the tier upsell and conversion-optimized CTA system implemented in das
 ## 5. TierGate Pricing Accuracy
 
 ### 5.1 Next-Tier Pricing (Not Required-Tier Pricing)
-- [ ] Developer user sees Starter pricing ($299/mo) for Starter-gated features
-- [ ] Developer user sees Starter pricing ($299/mo) for Growth-gated features (next step up)
-- [ ] Starter user sees Growth pricing ($699/mo) for Growth-gated features
-- [ ] Growth user sees Enterprise pricing ($1,999+/mo) for Enterprise-gated features
+- [ ] Developer user sees Starter pricing ($199/mo) for Starter-gated features
+- [ ] Developer user sees Starter pricing ($199/mo) for Growth-gated features (next step up)
+- [ ] Starter user sees Growth pricing ($499/mo) for Growth-gated features
+- [ ] Growth user sees Enterprise pricing ($1,499+/mo) for Enterprise-gated features
 
 ### 5.2 Full-Page Block Mode
 - [ ] Gated page shows upgrade prompt with plan name, price, and feature list
@@ -145,7 +145,7 @@ Tests for the tier upsell and conversion-optimized CTA system implemented in das
 1. [ ] Log in as developer user
 2. [ ] Sidebar shows lock icons on 13 gated items
 3. [ ] Dashboard shows feature discovery cards
-4. [ ] Click locked nav item → see upgrade prompt (Starter $299/mo)
+4. [ ] Click locked nav item → see upgrade prompt (Starter $199/mo)
 5. [ ] Try scan at quota limit → toast error with upgrade link
 6. [ ] Visit vulnerability detail → AI buttons show preview gates
 7. [ ] Pricing page → CI/CD rows correct (CLI for all, Hub for starter+)

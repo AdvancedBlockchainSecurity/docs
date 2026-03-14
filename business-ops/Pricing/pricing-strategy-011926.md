@@ -55,9 +55,9 @@ Based on competitive analysis and pricing strategy research, Apogee should imple
 
 **Rationale:** Developer tools convert at only **3-5%** freemium-to-paid. A generous free tier builds community, generates word-of-mouth, and creates switching costs. Limiting contracts/month (not features) follows Snyk's successful model.
 
-### Tier 2: Team ($299/month)
-**Price:** $299/month ($249 annual billing)  
-**Limits:** 15 contracts/month, 5 users, 3 repos
+### Tier 2: Starter ($199/month)
+**Price:** $199/month ($166 annual billing)
+**Limits:** 25 contracts/month, 5 users, 3 repos
 
 - Everything in Developer plus:
 - **Full 509-detector coverage** across all vulnerability categories
@@ -68,13 +68,13 @@ Based on competitive analysis and pricing strategy research, Apogee should imple
 - Email support (24-hour response)
 - ML-powered false positive filtering (95% reduction)
 
-**Rationale:** Priced below MetaTrust ($599) and competitive with Aikido Basic ($300) while offering Web3-specific value. The $299 price point creates psychological advantage vs. $300+ competitors.
+**Rationale:** Priced significantly below MetaTrust ($599) and below Aikido Basic ($300) while offering Web3-specific value. The $199 price point creates strong competitive advantage vs. $300+ competitors.
 
-### Tier 3: Growth ($699/month)
-**Price:** $699/month ($599 annual billing)  
-**Limits:** 50 contracts/month, 15 users, unlimited repos
+### Tier 3: Growth ($499/month)
+**Price:** $499/month ($416 annual billing)
+**Limits:** 75 contracts/month, 25 users, unlimited repos
 
-- Everything in Team plus:
+- Everything in Starter plus:
 - **Multi-chain support** (Solidity, Vyper, Rust/Solana, Cairo, Move)
 - Real-time security dashboards
 - Custom rule configuration
@@ -84,10 +84,10 @@ Based on competitive analysis and pricing strategy research, Apogee should imple
 - Priority support (4-hour response)
 - Compliance certifications (SOC 2, ISO 27001, NIST mapping)
 
-**Rationale:** The 2.3x price jump from Team to Growth is justified by multi-chain support and continuous monitoring—features with high perceived value. Positioned as the "sweet spot" tier for serious DeFi projects.
+**Rationale:** The 2.5x price jump from Starter to Growth is justified by multi-chain support and continuous monitoring—features with high perceived value. Positioned as the "sweet spot" tier for serious DeFi projects.
 
 ### Tier 4: Enterprise (Custom)
-**Price:** Starting at $1,999/month, custom quotes for large deployments  
+**Price:** Starting at $1,499/month, custom quotes for large deployments
 **Limits:** Unlimited contracts, users, and repos
 
 - Everything in Growth plus:
@@ -101,7 +101,7 @@ Based on competitive analysis and pricing strategy research, Apogee should imple
 - Executive reporting and board-ready dashboards
 - Annual security review sessions
 
-**Rationale:** Enterprise pricing starts at ~$24K/year, positioning below traditional audit costs ($30K+ for a single engagement) while delivering continuous coverage. The "pay once, scan always" value proposition makes Enterprise compelling vs. repeated audit engagements.
+**Rationale:** Enterprise pricing starts at ~$18K/year, positioning below traditional audit costs ($30K+ for a single engagement) while delivering continuous coverage. The "pay once, scan always" value proposition makes Enterprise compelling vs. repeated audit engagements.
 
 ## Usage-based expansion revenue accelerates growth
 
@@ -181,7 +181,7 @@ Enterprise security purchases follow distinct patterns that Apogee pricing shoul
 Apogee can differentiate on **how** it prices, not just **what** it charges:
 
 **1. "Unified Scanner Credit" model**
-Position as replacement for multiple tools. Offer calculation: "Apogee Growth at $699/month replaces $2,400+/month in point solutions (Slither + Mythril + Echidna + Semgrep + manual review time)." Create an ROI calculator on the pricing page.
+Position as replacement for multiple tools. Offer calculation: "Apogee Growth at $499/month replaces $2,400+/month in point solutions (Slither + Mythril + Echidna + Semgrep + manual review time)." Create an ROI calculator on the pricing page.
 
 **2. "Security-as-insurance" packaging**
 Offer optional **coverage guarantee**: "If a vulnerability scanned by Apogee leads to an exploit, receive $X credit toward incident response services." This mirrors Sherlock's coverage model and creates unique differentiation.
@@ -190,7 +190,7 @@ Offer optional **coverage guarantee**: "If a vulnerability scanned by Apogee lea
 For large protocols, offer pricing based on **Total Value Locked**: 0.1-0.3% of TVL annually for unlimited scanning. Aligns vendor revenue with customer success and creates powerful incentive alignment.
 
 **4. "Audit-ready" packaging**
-Bundle scanning + report generation + remediation tracking as a package specifically designed to prepare for formal audits. Price at $1,999 one-time + $499/month ongoing. Positions Apogee as complement to (not replacement for) formal audits.
+Bundle scanning + report generation + remediation tracking as a package specifically designed to prepare for formal audits. Price at $1,499 one-time + $499/month ongoing. Positions Apogee as complement to (not replacement for) formal audits.
 
 ## Competitive response scenarios
 
@@ -248,6 +248,6 @@ Anticipate competitive moves and prepare responses:
 
 The Web3 security market's fragmentation creates a significant opportunity for Apogee to establish category leadership through strategic pricing. By combining **transparent published pricing** (unlike competitors requiring sales contact), **generous free tier** (driving developer adoption), **flat-rate team tiers** (avoiding per-developer cost anxiety), and **value-aligned enterprise options** (TVL-based and outcome-based pricing), Apogee can differentiate on pricing structure itself—not just price points.
 
-The recommended architecture—Developer (Free), Team ($299), Growth ($699), Enterprise (Custom from $1,999)—positions Apogee below MetaTrust while offering more comprehensive Web3 coverage than general DevSecOps platforms like Aikido or Jit. The usage-based expansion components (per-contract overages, express scans, audit reports) create natural growth paths that don't require friction-heavy tier upgrades.
+The recommended architecture—Developer (Free), Starter ($199), Growth ($499), Enterprise (Custom from $1,499)—positions Apogee well below MetaTrust while offering more comprehensive Web3 coverage than general DevSecOps platforms like Aikido or Jit. The usage-based expansion components (per-contract overages, express scans, audit reports) create natural growth paths that don't require friction-heavy tier upgrades.
 
-Most critically, Apogee should emphasize the **consolidation value proposition** in all pricing communications: replacing 10+ point solutions with a single platform isn't just convenient—it's economically superior. With 25+ integrated scanners, Apogee can credibly claim **$2,400+/month in tool replacement value** against the $699 Growth tier—a 3.4x value multiplier that competitors cannot match.
+Most critically, Apogee should emphasize the **consolidation value proposition** in all pricing communications: replacing 10+ point solutions with a single platform isn't just convenient—it's economically superior. With 25+ integrated scanners, Apogee can credibly claim **$2,400+/month in tool replacement value** against the $499 Growth tier—a 4.8x value multiplier that competitors cannot match.

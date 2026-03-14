@@ -79,7 +79,7 @@ kubectl rollout restart deployment/dashboard -n dashboard-local
 
 **Expected Result**:
 - Redirects to Stripe Checkout page
-- Shows correct plan and price ($699/month)
+- Shows correct plan and price ($499/month)
 - Can complete payment with test card
 
 **Actual Result** (2026-03-13):
@@ -294,7 +294,7 @@ WHERE user_id = 'user-uuid';
 **Status**: ⏳ Pending
 
 **Steps**:
-1. Login with Team plan
+1. Login with Starter plan
 2. Navigate to Billing → View Plans
 3. Select "Growth" plan
 4. Complete checkout
@@ -313,11 +313,11 @@ WHERE user_id = 'user-uuid';
 
 **Steps**:
 1. Select Growth plan (annual)
-2. Verify pricing shows annual rate
+2. Verify pricing shows annual rate ($5,028/yr — $419/mo)
 3. Complete checkout
 
 **Expected Result**:
-- Checkout shows annual price
+- Checkout shows annual price ($5,028/yr)
 - `billing_interval = 'annual'`
 - `current_period_end` is 1 year out
 - Correct savings displayed
@@ -329,7 +329,7 @@ WHERE user_id = 'user-uuid';
 **Status**: ⏳ Pending
 
 **Steps**:
-1. Login with active subscription (e.g., Team plan)
+1. Login with active subscription (e.g., Starter plan)
 2. Navigate to Billing
 3. Click "Change Plan" button on SubscriptionCard
 4. TierChangeModal opens showing available tiers

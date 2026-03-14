@@ -248,18 +248,18 @@ case "$QUOTA_TIER" in
             fail "Developer tier limit should be 3, got ${MONTHLY_LIMIT}"
         fi
         ;;
-    team)
-        if [ "$MONTHLY_LIMIT" == "15" ]; then
-            pass "Team tier limit matches tiers.json (15)"
+    starter)
+        if [ "$MONTHLY_LIMIT" == "25" ]; then
+            pass "Starter tier limit matches tiers.json (25)"
         else
-            fail "Team tier limit should be 15, got ${MONTHLY_LIMIT}"
+            fail "Starter tier limit should be 25, got ${MONTHLY_LIMIT}"
         fi
         ;;
     growth)
-        if [ "$MONTHLY_LIMIT" == "50" ]; then
-            pass "Growth tier limit matches tiers.json (50)"
+        if [ "$MONTHLY_LIMIT" == "75" ]; then
+            pass "Growth tier limit matches tiers.json (75)"
         else
-            fail "Growth tier limit should be 50, got ${MONTHLY_LIMIT}"
+            fail "Growth tier limit should be 75, got ${MONTHLY_LIMIT}"
         fi
         ;;
     enterprise)
@@ -292,9 +292,9 @@ fi
 
 # Verify tier names
 PLAN_TIERS=$(echo "$PLANS" | jq -r '.plans[].tier' | sort | tr '\n' ',')
-EXPECTED="developer,enterprise,growth,team,"
+EXPECTED="developer,enterprise,growth,starter,"
 if [ "$PLAN_TIERS" == "$EXPECTED" ]; then
-    pass "Plan tiers correct: developer, team, growth, enterprise"
+    pass "Plan tiers correct: developer, starter, growth, enterprise"
 else
     fail "Plan tiers unexpected: ${PLAN_TIERS}"
 fi
@@ -308,19 +308,19 @@ else
 fi
 
 # Verify team tier pricing (API returns dollars, not cents)
-TEAM_PRICE=$(echo "$PLANS" | jq -r '.plans[] | select(.tier == "team") | .price_monthly')
-if [ "$TEAM_PRICE" == "299" ] || [ "$TEAM_PRICE" == "29900" ]; then
-    pass "Team tier price: \$299/mo (${TEAM_PRICE})"
+STARTER_PRICE=$(echo "$PLANS" | jq -r '.plans[] | select(.tier == "starter") | .price_monthly')
+if [ "$STARTER_PRICE" == "199" ] || [ "$STARTER_PRICE" == "19900" ]; then
+    pass "Starter tier price: \$199/mo (${STARTER_PRICE})"
 else
-    fail "Team tier price should be 299 (or 29900 cents), got ${TEAM_PRICE}"
+    fail "Starter tier price should be 199 (or 19900 cents), got ${STARTER_PRICE}"
 fi
 
 # Verify growth tier pricing
 GROWTH_PRICE=$(echo "$PLANS" | jq -r '.plans[] | select(.tier == "growth") | .price_monthly')
-if [ "$GROWTH_PRICE" == "699" ] || [ "$GROWTH_PRICE" == "69900" ]; then
-    pass "Growth tier price: \$699/mo (${GROWTH_PRICE})"
+if [ "$GROWTH_PRICE" == "499" ] || [ "$GROWTH_PRICE" == "49900" ]; then
+    pass "Growth tier price: \$499/mo (${GROWTH_PRICE})"
 else
-    fail "Growth tier price should be 699 (or 69900 cents), got ${GROWTH_PRICE}"
+    fail "Growth tier price should be 499 (or 49900 cents), got ${GROWTH_PRICE}"
 fi
 
 # Verify developer scan limit

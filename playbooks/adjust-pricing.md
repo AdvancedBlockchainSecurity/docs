@@ -1,7 +1,7 @@
 # Playbook: Adjust Pricing
 
-**Version:** 1.0.0
-**Last Updated:** February 2, 2026
+**Version:** 1.1.0
+**Last Updated:** March 13, 2026
 
 ## Overview
 
@@ -70,12 +70,12 @@ Edit `blocksecops-shared/tier-config/tiers.json` with your changes.
   "tiers": {
     "starter": {
       "pricing": {
-        "monthly": 349,        // Was 299
-        "annual": 3490,        // Was 2988
-        "perContract": 23.27   // Recalculate: monthly / contracts
+        "monthly": 199,        // Was 299
+        "annual": 2028,        // Was 2988
+        "perContract": 7.96    // Recalculate: monthly / contracts
       },
       "display": {
-        "badge": "$349/mo"     // Update display badge
+        "badge": "$199/mo"     // Update display badge
       }
     }
   }
@@ -90,7 +90,7 @@ Edit `blocksecops-shared/tier-config/tiers.json` with your changes.
     "growth": {
       "quotas": {
         "monthlyContractLimit": 75,    // Was 50
-        "maxTeamMembers": 20,          // Was 15
+        "maxTeamMembers": 25,          // Was 15
         "monthlyAiExplanationsLimit": 300  // Was 200
       }
     }
@@ -119,9 +119,9 @@ Edit `blocksecops-shared/tier-config/tiers.json` with your changes.
 {
   "creditPackages": {
     "starter": {
-      "credits": 15,          // Was 10
-      "price": 40.00,         // Was 30
-      "perCredit": 2.67,      // Recalculate
+      "credits": 10,          // 10 credits
+      "price": 25.00,         // Was 30
+      "perCredit": 2.50,      // Recalculate
       "savings": null
     }
   }
@@ -147,8 +147,8 @@ Always update the metadata when making changes:
 
 ```json
 {
-  "version": "3.2",           // Increment version
-  "lastUpdated": "2026-02-02" // Update date
+  "version": "4.0",           // Increment version
+  "lastUpdated": "2026-03-13" // Update date
 }
 ```
 
@@ -196,7 +196,7 @@ If subscription prices changed, update Stripe:
 ### Create New Stripe Price
 
 1. Go to [Stripe Dashboard](https://dashboard.stripe.com/products)
-2. Find the relevant product (e.g., "Apogee Team")
+2. Find the relevant product (e.g., "Apogee Starter")
 3. Click "Add another price"
 4. Configure:
    - Pricing model: Standard pricing
@@ -210,8 +210,8 @@ If subscription prices changed, update Stripe:
 {
   "tiers": {
     "starter": {
-      "stripePriceIdMonthly": "price_new_starter_monthly",
-      "stripePriceIdAnnual": "price_new_starter_annual"
+      "stripePriceIdMonthly": "price_1TAfcL3ZtjkVcNXVjTSRsgYs",
+      "stripePriceIdAnnual": "price_1TAfcM3ZtjkVcNXVg9ll3Pqm"
     }
   }
 }
@@ -259,13 +259,13 @@ export const PRICING_TIERS: PricingTier[] = [
   {
     id: 'starter',
     name: 'Starter',
-    price: 349,           // Match tiers.json
-    priceDisplay: '$349',
-    scansPerMonth: 15,    // Match quotas.monthlyContractLimit
-    users: 5,             // Match quotas.maxTeamMembers
+    price: 199,           // Match tiers.json
+    priceDisplay: '$199',
+    scansPerMonth: 25,    // Match quotas.monthlyContractLimit
+    users: 15,            // Match quotas.maxProjects
     features: [
-      '15 contract scans/month',
-      '5 team members',
+      '25 contract scans/month',
+      '15 projects',
       // ...
     ],
   },
@@ -277,7 +277,7 @@ export const PRICING_TIERS: PricingTier[] = [
 
 ```typescript
 export const CREDIT_PACKAGES: CreditPackage[] = [
-  { name: 'Starter', credits: 15, price: 40, perScan: '2.67' },
+  { name: 'Starter', credits: 10, price: 25, perScan: '2.50' },
   // ... match creditPackages in tiers.json
 ];
 ```
@@ -302,7 +302,7 @@ Edit `docs/standards/tier-standards.md` to reflect any changes:
 
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-02 | **v3.2**: Updated Starter tier pricing to $349/mo. Increased Growth AI quotas. | Your Name |
+| 2026-03-13 | **v4.0**: Competitive pricing adjustment. Starter $199/mo, Growth $499/mo, Enterprise $1,499/mo. Updated credit packages and quotas. | Apogee Team |
 ```
 
 ---
@@ -369,7 +369,7 @@ npm run build
 
 # Deploy (triggers on push to main)
 git add lib/pricing-data.ts
-git commit -m "chore(pricing): sync pricing with tiers.json v3.2"
+git commit -m "chore(pricing): sync pricing with tiers.json v4.0"
 git push origin main
 ```
 
@@ -525,6 +525,16 @@ print(f'Price: {t.pricing.monthly}')
 print(f'Contracts: {t.quotas.monthly_contract_limit}')
 "
 ```
+
+---
+
+## Important: billing.py Hardcoded Plan Data
+
+**`blocksecops-api-service/src/application/services/billing.py`** contains hardcoded plan data (prices, plan names, Stripe price IDs) that is **not** sourced from `tiers.json`. When subscription prices or tier quotas change, `billing.py` must be manually updated to match.
+
+This was discovered during the v4.0 competitive pricing adjustment (March 13, 2026): the tier audit found that `billing.py` still had v3.2 prices after all other files had been updated. The fix required updating the hardcoded values in `billing.py` and rebuilding the API service to v0.29.88. After the fix, the full tier audit passed 133/133 checks.
+
+**When changing prices, always verify `billing.py` is in sync with `tiers.json`.**
 
 ---
 

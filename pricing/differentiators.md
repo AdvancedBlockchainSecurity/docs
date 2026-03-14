@@ -1,6 +1,6 @@
 # Apogee Differentiators
 
-**Last Updated**: January 19, 2026
+**Last Updated**: March 13, 2026
 
 ## Executive Summary
 
@@ -209,10 +209,10 @@ Apogee is the only well-rounded platform in the web3 smart contract security mar
 **Credit Packages**:
 | Package | Credits | Price | Per-Scan |
 |---------|---------|-------|----------|
-| Starter | 10 | $30 USDC | $3.00 |
-| Builder | 50 | $125 USDC | $2.50 |
-| Pro | 200 | $400 USDC | $2.00 |
-| Bulk | 1,000 | $1,500 USDC | $1.50 |
+| Starter | 10 | $25 USDC | $2.50 |
+| Builder | 50 | $99 USDC | $1.98 |
+| Pro | 250 | $399 USDC | $1.60 |
+| Bulk | 1,000 | $1,250 USDC | $1.25 |
 
 **Why It Matters**:
 - No subscription lock-in
@@ -235,10 +235,10 @@ Apogee is the only well-rounded platform in the web3 smart contract security mar
 > "Stop running 5 different tools manually. Get unified results in one dashboard with 95% less noise."
 
 ### For Small Teams
-> "The only platform that combines 25+ scanners, 95% false positive reduction, and vulnerability management at $299/month."
+> "The only platform that combines 25+ scanners, 95% false positive reduction, and vulnerability management at $199/month."
 
 ### For Growing Protocols
-> "Multi-chain support and continuous monitoring for serious DeFi projects at $699/month."
+> "Multi-chain support and continuous monitoring for serious DeFi projects at $499/month."
 
 ### For Protocols Preparing for Audit
 > "Reduce audit findings and costs by catching issues before auditors do. Our 95% FP reduction means you focus on real issues."
@@ -284,7 +284,7 @@ Legend: ✅ Full support | ⚠️ Limited | ❌ Not available
 
 **Apogee Consolidation Value**:
 - Replaces 10+ point solutions with single platform
-- Growth tier at $699/month replaces $2,400+/month in point solutions
+- Growth tier at $499/month replaces $2,400+/month in point solutions
 - 3.4x value multiplier that competitors cannot match
 
 **ROI Calculator**:
@@ -295,4 +295,4 @@ Legend: ✅ Full support | ⚠️ Limited | ❌ Not available
 | Echidna (manual) | $0 + engineer time | Included |
 | SolidityScan | $200-500 | Included |
 | Manual review time | ~$2,000/month | 95% reduced |
-| **Total** | **$2,400+/month** | **$699/month** |
+| **Total** | **$2,400+/month** | **$499/month** |

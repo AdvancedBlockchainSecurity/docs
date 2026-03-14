@@ -1,7 +1,7 @@
 # Playbook: CI/CD Integration for Developer Tier (Free)
 
 **Version:** 1.0.0
-**Last Updated:** March 12, 2026
+**Last Updated:** March 13, 2026
 **Audience:** Developer (free tier users)
 **Tier:** Developer (Free — $0/mo)
 
@@ -9,7 +9,7 @@
 
 This playbook walks you through setting up automated smart contract security scanning in your CI/CD pipeline using the Apogee CLI on the **Developer (free) tier**. The free tier supports CLI-based CI/CD integration with a 3-scan/month quota.
 
-> **Free tier users:** The Integrations Hub dashboard, direct REST API access, and webhook notifications are not available. All CI/CD integration uses the CLI. Upgrade to [Starter ($299/mo)](https://app.0xapogee.com/pricing) for dashboard-based CI/CD configuration and 15 contracts/month.
+> **Free tier users:** The Integrations Hub dashboard, direct REST API access, and webhook notifications are not available. All CI/CD integration uses the CLI. Upgrade to [Starter ($199/mo)](https://app.0xapogee.com/pricing) for dashboard-based CI/CD configuration and 25 contracts/month.
 
 ---
 
@@ -326,9 +326,9 @@ apogee scan --path ./contracts --severity-threshold high --wait --dry-run
 
 ## Free Tier Limitations Summary
 
-| Feature | Developer (Free) | Starter ($299/mo) |
+| Feature | Developer (Free) | Starter ($199/mo) |
 |---------|-----------------|-------------------|
-| Monthly contracts | 3 | 15 |
+| Monthly contracts | 3 | 25 |
 | CI/CD method | CLI only | CLI + Integrations Hub |
 | Concurrent scans | 1 | 2 |
 | Result retention | 7 days | 90 days |

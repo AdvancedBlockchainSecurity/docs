@@ -1,7 +1,7 @@
 # Tier Standards - Source of Truth
 
-**Last Updated**: March 12, 2026
-**Version**: 3.6 (Add monthly_ai_exploits_limit to TierQuotas model)
+**Last Updated**: March 13, 2026
+**Version**: 4.0 (Competitive pricing adjustment)
 **Status**: Official
 **Owner**: Product Team
 
@@ -77,30 +77,30 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 
 | Attribute | Value |
 |-----------|-------|
-| **Price** | $299/month (~$2,988/year with 17% discount) |
-| **Monthly Contracts** | 15 |
+| **Price** | $199/month (~$2,028/year with 15% discount) |
+| **Monthly Contracts** | 25 |
 | **Max LoC per Scan** | Unlimited |
 | **Max Files per Scan** | Unlimited |
-| **Projects** | 10 |
+| **Projects** | 15 |
 | **Team Members** | 5 |
 | **API Calls/Month** | 0 (no API access) |
 | **Result Retention** | 90 days |
 | **Scan Priority** | 40 |
 | **API Access** | No |
-| **Private Repos** | 3 |
+| **Private Repos** | 5 |
 | **Multi-Chain** | No (Solidity only) |
 | **Continuous Monitoring** | No |
 | **95% FP Reduction** | Yes |
 | **Webhooks** | Yes |
 | **CI/CD Integration** | Yes (CLI + Integrations Hub) |
 | **Export Reports** | Yes (PDF, JSON, SARIF) |
-| **AI Explanations/Month** | 50 |
-| **AI Invariant Generations/Month** | 10 |
+| **AI Explanations/Month** | 75 |
+| **AI Invariant Generations/Month** | 15 |
 | **Scanners** | All 25+ |
 | **Support** | Email (24h response) |
 
 **Best For**: Small development teams, freelance auditors, early-stage startups
-**Per-Contract Cost**: $19.93
+**Per-Contract Cost**: $7.96
 
 ---
 
@@ -108,14 +108,14 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 
 | Attribute | Value |
 |-----------|-------|
-| **Price** | $699/month (~$7,188/year with 17% discount) |
-| **Monthly Contracts** | 50 |
+| **Price** | $499/month (~$5,028/year with 16% discount) |
+| **Monthly Contracts** | 75 |
 | **Max LoC per Scan** | Unlimited |
 | **Max Files per Scan** | Unlimited |
 | **Projects** | Unlimited (-1) |
-| **Team Members** | 15 |
+| **Team Members** | 25 |
 | **API Calls/Month** | Unlimited (-1) |
-| **Result Retention** | 180 days |
+| **Result Retention** | 365 days |
 | **Scan Priority** | 25 |
 | **API Access** | Yes |
 | **Private Repos** | Unlimited |
@@ -125,13 +125,13 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | **Webhooks** | Yes |
 | **CI/CD Integration** | Yes (CLI + Integrations Hub) |
 | **Export Reports** | Yes (PDF, JSON, SARIF) |
-| **AI Explanations/Month** | 200 |
-| **AI Invariant Generations/Month** | 50 |
+| **AI Explanations/Month** | 300 |
+| **AI Invariant Generations/Month** | 75 |
 | **Scanners** | All 25+ |
 | **Support** | Priority (4h response) |
 
 **Best For**: Growing protocols, multi-chain projects, companies preparing for audits
-**Per-Contract Cost**: $13.98
+**Per-Contract Cost**: $6.65
 
 ---
 
@@ -139,7 +139,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 
 | Attribute | Value |
 |-----------|-------|
-| **Price** | $1,999+/month (custom pricing) |
+| **Price** | $1,499+/month (custom pricing) |
 | **Monthly Contracts** | Unlimited (-1) |
 | **Max LoC per Scan** | Unlimited (-1) |
 | **Max Files per Scan** | Unlimited (-1) |
@@ -177,17 +177,17 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 
 | Metric | Developer | Starter | Growth | Enterprise |
 |--------|-----------|------|--------|------------|
-| Monthly Contracts | 3 | 15 | 50 | -1 |
+| Monthly Contracts | 3 | 25 | 75 | -1 |
 | Max LoC per Scan | -1 | -1 | -1 | -1 |
 | Max Files per Scan | -1 | -1 | -1 | -1 |
-| Projects | 3 | 10 | -1 | -1 |
-| Team Members | 2 | 5 | 15 | -1 |
+| Projects | 3 | 15 | -1 | -1 |
+| Team Members | 2 | 5 | 25 | -1 |
 | API Calls/Month | 0 | 0 | -1 | -1 |
-| Private Repos | 0 | 3 | -1 | -1 |
-| AI Explanations/Month | 0 | 50 | 200 | -1 |
-| AI Invariant Gens/Month | 0 | 10 | 50 | -1 |
+| Private Repos | 0 | 5 | -1 | -1 |
+| AI Explanations/Month | 0 | 75 | 300 | -1 |
+| AI Invariant Gens/Month | 0 | 15 | 75 | -1 |
 | AI Exploit Gens/Month | 0 | 0 | 5 | 50 |
-| Result Retention (days) | 7 | 90 | 180 | 365 |
+| Result Retention (days) | 7 | 90 | 365 | 365 |
 | Scan Priority | 50 | 40 | 25 | 5 |
 
 **Note**: `-1` means unlimited
@@ -199,7 +199,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | All 25+ Scanners | Yes | Yes | Yes | Yes |
 | Export Reports | No | Yes | Yes | Yes |
 | 95% FP Reduction | No | Yes | Yes | Yes |
-| Private Repos | No | 3 | Unlimited | Unlimited |
+| Private Repos | No | 5 | Unlimited | Unlimited |
 | API Access | No | No | Yes | Yes |
 | Webhooks | No | Yes | Yes | Yes |
 | CI/CD Integration (CLI) | Yes | Yes | Yes | Yes |
@@ -219,16 +219,16 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | Tier | Monthly | Annual | Savings | Per-Contract |
 |------|---------|--------|---------|--------------|
 | Developer | $0 | $0 | - | - |
-| Starter | $299 | ~$2,988 | 17% | $19.93 |
-| Growth | $699 | ~$7,188 | 17% | $13.98 |
-| Enterprise | $1,999+ | Custom | - | ~$0 |
+| Starter | $199 | ~$2,028 | 15% | $7.96 |
+| Growth | $499 | ~$5,028 | 16% | $6.65 |
+| Enterprise | $1,499+ | Custom | - | ~$0 |
 
 ### Price Multipliers
 
 | Tier Jump | Multiplier |
 |-----------|------------|
-| Starter → Growth | 2.3x |
-| Growth → Enterprise | 2.9x |
+| Starter → Growth | 2.5x |
+| Growth → Enterprise | 3.0x |
 
 ### Support Levels
 
@@ -311,9 +311,9 @@ AI-powered features use the Anthropic Claude API and are tier-gated with monthly
 | AI Copilot queries | 0 | 25 | 100 | -1 |
 | Code Review requests | 0 | 25 | 100 | -1 |
 | Code Repair requests | 0 | 10 | 50 | -1 |
-| Invariant Generations | 0 | 10 | 50 | -1 |
+| Invariant Generations | 0 | 15 | 75 | -1 |
 | PoC Exploit Generations | 0 | 0 | 5 | 50 |
-| AI Explanations | 0 | 50 | 200 | -1 |
+| AI Explanations | 0 | 75 | 300 | -1 |
 | NL Conversions | 0 | 25 | 100 | -1 |
 | Priority Queue | No | No | No | Yes |
 
@@ -415,10 +415,10 @@ Pay-per-scan credit packages via x402 (USDC on Base) for users who prefer flexib
 
 | Package | Credits | Price (USDC) | Per-Credit | Savings |
 |---------|---------|--------------|------------|---------|
-| **Starter** | 10 | $30 | $3.00 | - |
-| **Builder** | 50 | $125 | $2.50 | 17% |
-| **Pro** | 200 | $400 | $2.00 | 33% |
-| **Bulk** | 1,000 | $1,500 | $1.50 | 50% |
+| **Starter** | 10 | $25 | $2.50 | - |
+| **Builder** | 50 | $99 | $1.98 | 21% |
+| **Pro** | 250 | $399 | $1.60 | 36% |
+| **Bulk** | 1,000 | $1,250 | $1.25 | 50% |
 
 **Note**: 1 credit = 1 scan. Credits never expire.
 
@@ -436,7 +436,7 @@ Pay-per-scan credit packages via x402 (USDC on Base) for users who prefer flexib
 
 | Platform | Model | Per-Scan Cost | Scanners |
 |----------|-------|---------------|----------|
-| Apogee x402 | Credit packages | $1.50-$3.00 | 25+ |
+| Apogee x402 | Credit packages | $1.25-$2.50 | 25+ |
 | MythX On-Demand | Per-scan | $3.33 | 1 |
 | SolidityScan On-Demand | LoC-based | $15-30 | 1 |
 
@@ -448,19 +448,19 @@ Pay-per-scan credit packages via x402 (USDC on Base) for users who prefer flexib
 |----------------------|-----------|---------------|
 | 5 scans/month | $15 | x402 (Starter) |
 | 10 scans/month | $30 | x402 (Starter) |
-| 15+ scans/month | $45+ | Starter ($299) |
+| 15+ scans/month | $45+ | Starter ($199) |
 
 ### Environment Variables
 
 ```bash
 # x402 credit packages (USDC)
-CREDIT_PACKAGE_STARTER_PRICE=30.00
+CREDIT_PACKAGE_STARTER_PRICE=25.00
 CREDIT_PACKAGE_STARTER_CREDITS=10
-CREDIT_PACKAGE_BUILDER_PRICE=125.00
+CREDIT_PACKAGE_BUILDER_PRICE=99.00
 CREDIT_PACKAGE_BUILDER_CREDITS=50
-CREDIT_PACKAGE_PRO_PRICE=400.00
-CREDIT_PACKAGE_PRO_CREDITS=200
-CREDIT_PACKAGE_BULK_PRICE=1500.00
+CREDIT_PACKAGE_PRO_PRICE=399.00
+CREDIT_PACKAGE_PRO_CREDITS=250
+CREDIT_PACKAGE_BULK_PRICE=1250.00
 CREDIT_PACKAGE_BULK_CREDITS=1000
 ```
 
@@ -558,33 +558,33 @@ monthly_nl_conversions_limit = 0,
 monthly_ai_exploits_limit = 0
 
 -- Starter tier
-monthly_contract_limit = 15,
+monthly_contract_limit = 25,
 max_loc_per_scan = -1,
 max_files_per_scan = -1,
 scan_priority = 40,
-max_projects = 10,
+max_projects = 15,
 max_team_members = 5,
 monthly_api_calls_limit = 0,
 api_access_enabled = false,
-private_repos_limit = 3,
+private_repos_limit = 5,
 multi_chain_enabled = false,
 continuous_monitoring_enabled = false,
 fp_reduction_enabled = true,
 webhooks_enabled = true,
 export_enabled = true,
 result_retention_days = 90,
-monthly_ai_explanations_limit = 50,
-monthly_invariant_generations_limit = 10,
+monthly_ai_explanations_limit = 75,
+monthly_invariant_generations_limit = 15,
 monthly_nl_conversions_limit = 25,
 monthly_ai_exploits_limit = 0
 
 -- Growth tier
-monthly_contract_limit = 50,
+monthly_contract_limit = 75,
 max_loc_per_scan = -1,
 max_files_per_scan = -1,
 scan_priority = 25,
 max_projects = -1,
-max_team_members = 15,
+max_team_members = 25,
 monthly_api_calls_limit = -1,
 api_access_enabled = true,
 private_repos_limit = -1,
@@ -593,9 +593,9 @@ continuous_monitoring_enabled = true,
 fp_reduction_enabled = true,
 webhooks_enabled = true,
 export_enabled = true,
-result_retention_days = 180,
-monthly_ai_explanations_limit = 200,
-monthly_invariant_generations_limit = 50,
+result_retention_days = 365,
+monthly_ai_explanations_limit = 300,
+monthly_invariant_generations_limit = 75,
 monthly_nl_conversions_limit = 100,
 monthly_ai_exploits_limit = 5
 

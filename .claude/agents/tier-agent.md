@@ -47,12 +47,12 @@ The tier system follows a **single source of truth** pattern:
 ## Tier Hierarchy
 
 ```
-developer (0) < team (1) < growth (2) < enterprise (3)
+developer (0) < starter (1) < growth (2) < enterprise (3)
 ```
 
 **Official tier names** (use exact strings in API/database):
 - `developer` (Free tier)
-- `team`
+- `starter`
 - `growth`
 - `enterprise`
 
@@ -62,14 +62,14 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 
 ### Quotas
 
-| Quota | Developer | Team | Growth | Enterprise |
-|-------|-----------|------|--------|------------|
-| Monthly Contracts | 3 | 15 | 50 | -1 (unlimited) |
+| Quota | Developer | Starter | Growth | Enterprise |
+|-------|-----------|---------|--------|------------|
+| Monthly Contracts | 3 | 25 | 75 | -1 (unlimited) |
 | Max LoC/Scan | -1 | -1 | -1 | -1 |
-| Projects | 3 | 10 | -1 | -1 |
-| Team Members | 2 | 5 | 15 | -1 |
+| Projects | 3 | 15 | -1 | -1 |
+| Team Members | 2 | 5 | 25 | -1 |
 | Private Repos | 0 | 3 | -1 | -1 |
-| Result Retention | 7 days | 90 days | 180 days | 365 days |
+| Result Retention | 7 days | 90 days | 365 days | 365 days |
 | Concurrent Scans | 1 | 2 | 5 | -1 |
 | Scan Priority | 50 | 40 | 25 | 5 (highest) |
 | API Calls/Month | 0 | 0 | -1 | -1 |
@@ -78,8 +78,8 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 
 ### Features
 
-| Feature | Developer | Team | Growth | Enterprise |
-|---------|-----------|------|--------|------------|
+| Feature | Developer | Starter | Growth | Enterprise |
+|---------|-----------|---------|--------|------------|
 | All 25+ Scanners | Yes | Yes | Yes | Yes |
 | Export Reports | Yes | Yes | Yes | Yes |
 | CI/CD Integration | Yes | Yes | Yes | Yes |
@@ -100,9 +100,9 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 | Tier | Monthly | Annual | Per Contract |
 |------|---------|--------|--------------|
 | Developer | $0 | $0 | - |
-| Team | $299 | $2,988 | $19.93 |
-| Growth | $699 | $7,188 | $13.98 |
-| Enterprise | $1,999+ | Custom | ~$0 |
+| Starter | $199 | $2,028 | $8.11 |
+| Growth | $499 | $5,028 | $6.70 |
+| Enterprise | $1,499+ | Custom | ~$0 |
 
 ---
 
@@ -113,7 +113,7 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 | Tier | Per Minute | Per Hour | Per Day |
 |------|------------|----------|---------|
 | Developer | N/A | N/A | N/A |
-| Team | N/A | N/A | N/A |
+| Starter | N/A | N/A | N/A |
 | Growth | 300 | 10,000 | Unlimited |
 | Enterprise | Custom | Custom | Custom |
 
@@ -122,7 +122,7 @@ developer (0) < team (1) < growth (2) < enterprise (3)
 | Tier | Requests/Min |
 |------|--------------|
 | Developer | 60 |
-| Team | 120 |
+| Starter | 120 |
 | Growth | 300 |
 | Enterprise | Custom |
 
@@ -134,10 +134,10 @@ Credit packages for flexible billing:
 
 | Package | Credits | Price | Per Credit | Savings |
 |---------|---------|-------|------------|---------|
-| Starter | 10 | $30 | $3.00 | - |
-| Builder | 50 | $125 | $2.50 | 17% |
-| Pro | 200 | $400 | $2.00 | 33% |
-| Bulk | 1,000 | $1,500 | $1.50 | 50% |
+| Starter | 10 | $25 | $2.50 | - |
+| Builder | 50 | $99 | $1.98 | 21% |
+| Pro | 250 | $399 | $1.60 | 36% |
+| Bulk | 1,000 | $1,250 | $1.25 | 50% |
 
 ---
 
@@ -256,7 +256,7 @@ from blocksecops_tier_config import (
 
 # Get tier configuration
 growth_tier = get_tier('growth')
-print(growth_tier['pricing']['monthly'])  # 699
+print(growth_tier['pricing']['monthly'])  # 499
 
 # Get database-ready quota values
 quotas = get_tier_quotas_for_db('growth')
@@ -273,7 +273,7 @@ import {
 } from '@blocksecops/tier-config';
 
 const tier = getTier('growth');
-console.log(tier.pricing.monthly);  // 699
+console.log(tier.pricing.monthly);  // 499
 console.log(tier.features.apiAccessEnabled);  // true
 ```
 
@@ -327,7 +327,7 @@ Returns:
 3. **Upgrades take effect immediately** - Prorated charge applied, access granted now
 4. **Downgrades take effect at period end** - Users keep access until current period expires
 5. **Enterprise is custom** - No self-service, requires sales contact
-6. **API access requires Growth+** - Developer and Team cannot use API keys
+6. **API access requires Growth+** - Developer and Starter cannot use API keys
 
 ---
 

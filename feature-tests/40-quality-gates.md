@@ -51,7 +51,7 @@ Quality Gates enable CI/CD pipeline integration for automated security scanning 
 **Expected Results**:
 - [ ] Quality Gate tab/option not visible or disabled
 - [ ] Upgrade prompt displayed
-- [ ] Message: "Quality Gates are available on Team tier and above"
+- [ ] Message: "Quality Gates are available on Starter tier and above"
 - [ ] API returns 403 for direct endpoint access
 
 ---
@@ -356,7 +356,7 @@ curl -s "http://localhost:8000/api/v1/quality-gates/projects/$PROJECT_ID/history
 **Objective**: Verify dashboard quality gate configuration UI
 
 **Prerequisites**:
-- User on Team tier or higher
+- User on Starter tier or higher
 - Project exists
 
 **Steps**:
@@ -497,9 +497,9 @@ Returns evaluation history with pagination.
 | Tier | Price | Quality Gates Access |
 |------|-------|---------------------|
 | Developer | $0 | Not available |
-| Team | $299/mo | Full access |
-| Growth | $699/mo | Full access |
-| Enterprise | $1,999+/mo | Full access |
+| Starter | $199/mo | Full access |
+| Growth | $499/mo | Full access |
+| Enterprise | $1,499+/mo | Full access |
 
 ---
 

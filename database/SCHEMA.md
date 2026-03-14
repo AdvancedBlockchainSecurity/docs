@@ -358,14 +358,14 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 **Relationships:**
 - One-to-one with `users` (user_id, CASCADE DELETE)
 
-**Tier Limits (Updated March 7, 2026 — aligned to `blocksecops-shared/tier-config/tiers.json` v3.3)**:
+**Tier Limits (Updated March 13, 2026 — aligned to `blocksecops-shared/tier-config/tiers.json` v4.0, migration 081)**:
 
 | Tier | Price | Scans/Mo | Files/Scan | LoC/Scan | Projects | API Calls/Mo | Team | AI Explain/Mo | Export | Retention | Priority |
 |------|-------|----------|------------|----------|----------|--------------|------|---------------|--------|-----------|----------|
 | **Developer** | $0 | 3 | Unlimited | Unlimited | 3 | 0 (no API) | 2 | 0 | No | 7 days | 50 |
-| **Starter** | $299/mo | 15 | Unlimited | Unlimited | 10 | 0 (no API) | 5 | 50 | Yes | 90 days | 40 |
-| **Growth** | $699/mo | 50 | Unlimited | Unlimited | Unlimited | Unlimited | 15 | 200 | Yes | 180 days | 25 |
-| **Enterprise** | $1,999+/mo | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Yes | 365 days | 5 |
+| **Starter** | $199/mo | 25 | Unlimited | Unlimited | 15 | 0 (no API) | 5 | 75 | Yes | 90 days | 40 |
+| **Growth** | $499/mo | 75 | Unlimited | Unlimited | Unlimited | Unlimited | 25 | 300 | Yes | 365 days | 25 |
+| **Enterprise** | $1,499+/mo | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Yes | 365 days | 5 |
 
 **Rate Limits (per tiers.json)**:
 
@@ -378,18 +378,18 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
 
 **Feature Access by Tier**:
 - Export: starter+ (developer=no)
-- API Access: growth+ ($699/mo)
-- Webhooks: starter+ ($299/mo)
-- AI Explanations: starter+ (quota-limited: 50/200/unlimited)
-- Organizations: enterprise ($1,999+/mo)
+- API Access: growth+ ($499/mo)
+- Webhooks: starter+ ($199/mo)
+- AI Explanations: starter+ (quota-limited: 75/300/unlimited)
+- Organizations: enterprise ($1,499+/mo)
 - Audit Logging: enterprise
 - SSO/SAML: enterprise
 
-**Trigger:** `create_user_quota()` — auto-creates quota row on user INSERT, values sourced from tiers.json (migration 080)
+**Trigger:** `create_user_quota()` — auto-creates quota row on user INSERT, values sourced from tiers.json (migration 080, revised by 081)
 
 **Auto-Creation Trigger:**
 - Trigger function `create_user_quota()` automatically creates quota record on user insert
-- Quota limits set based on user's initial tier (Migration 080 values, aligned to tiers.json v3.3)
+- Quota limits set based on user's initial tier (Migration 081 values, aligned to tiers.json v4.0)
 - Monthly/annual reset handled by background task (`src/infrastructure/tasks/quota_reset.py`)
 
 **Quota Reset Background Task (Added January 11, 2026):**
@@ -424,7 +424,7 @@ User quota tracking for tier-based limits (Phase 3.1a - Freemium Model). Auto-cr
     "reset_date": "2026-02-01T00:00:00+00:00",
     "days_until_reset": 17,
     "upgrade_url": "/pricing",
-    "upgrade_message": "Upgrade to Starter for 100 scans/month or wait until your quota resets"
+    "upgrade_message": "Upgrade to Starter for 25 scans/month or wait until your quota resets"
   }
 }
 ```
@@ -440,16 +440,16 @@ Enforced at upload endpoint (`POST /api/v1/upload`):
 
 1. **File Size Limits** (tier-based):
    - Developer: 1 MB per file, 5 MB archives ($0)
-   - Starter: 5 MB per file, 25 MB archives ($299/mo)
-   - Growth: 10 MB per file, 50 MB archives ($699/mo)
-   - Enterprise: 20 MB per file, 100 MB archives ($1,999+/mo)
+   - Starter: 5 MB per file, 25 MB archives ($199/mo)
+   - Growth: 10 MB per file, 50 MB archives ($499/mo)
+   - Enterprise: 20 MB per file, 100 MB archives ($1,499+/mo)
    - Returns HTTP 413 if file size exceeds tier limit
 
 2. **Files-per-Scan Limits** (from `max_files_per_scan` column):
    - Developer: 25 files max per archive ($0)
-   - Starter: 50 files max per archive ($299/mo)
-   - Growth: 100 files max per archive ($699/mo)
-   - Enterprise: Unlimited (-1) ($1,999+/mo)
+   - Starter: 50 files max per archive ($199/mo)
+   - Growth: 100 files max per archive ($499/mo)
+   - Enterprise: Unlimited (-1) ($1,499+/mo)
    - Returns HTTP 402 if archive exceeds file count limit
 
 3. **Language Validation**:
@@ -1964,12 +1964,13 @@ Credit packages available for purchase (Phase 3.4 - x402 Pay-Per-Scan).
 **Relationships:**
 - One-to-many with `payment_transactions`
 
-**Seed Data:**
-| Name | Credits | Price USD | Discount |
-|------|---------|-----------|----------|
-| Starter | 10 | $8.00 | 20% |
-| Pro | 50 | $35.00 | 30% |
-| Enterprise | 200 | $120.00 | 40% |
+**Seed Data (Updated March 13, 2026 — migration 081):**
+| Name | Credits | Price USD | Per Credit |
+|------|---------|-----------|------------|
+| Starter | 10 | $25.00 | $2.50 |
+| Builder | 50 | $99.00 | $1.98 |
+| Pro | 250 | $399.00 | $1.60 |
+| Bulk | 1,000 | $1,250.00 | $1.25 |
 
 ---
 
@@ -2895,13 +2896,20 @@ See [Platform Development Standards](/Users/pwner/Git/ABS/docs/PLATFORM-DEVELOPM
 
 ---
 
-**Document Version:** 1.8.0
-**Last Updated:** February 4, 2026 (Added deduplication audit fixes - Migration 066)
+**Document Version:** 1.9.0
+**Last Updated:** March 13, 2026 (Competitive pricing/quota adjustment - Migration 081)
 **Maintained By:** Apogee Team
 
 ---
 
 ## Recent Schema Changes
+
+### Migration 081: Competitive Pricing and Quota Adjustment (March 13, 2026)
+- Revises migration 080 quota defaults to align with tiers.json v4.0
+- **Price changes:** Starter $299→$199/mo, Growth $699→$499/mo, Enterprise $1,999→$1,499/mo
+- **Quota changes:** Starter scans 15→25, projects 10→15, AI explanations 50→75; Growth scans 50→75, team members 15→25, retention 180→365 days, AI explanations 200→300
+- **Credit packages:** Replaced old 3-package structure with 4 packages (Starter 10cr/$25, Builder 50cr/$99, Pro 250cr/$399, Bulk 1000cr/$1,250)
+- Updates `create_user_quota()` trigger function with new default values
 
 ### Migration 066: Deduplication Audit Fixes (February 4, 2026)
 - Added indexes for improved query performance on classification/deduplication columns:

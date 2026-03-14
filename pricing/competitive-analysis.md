@@ -1,6 +1,6 @@
 # Web3 Smart Contract Security Market Analysis
 
-**Last Updated**: January 19, 2026
+**Last Updated**: March 13, 2026
 
 ## Executive Summary
 
@@ -51,7 +51,7 @@ Apogee operates in the web3 smart contract security market, a smaller and less m
 - No cross-scanner deduplication
 - No 95% false positive reduction
 - No vulnerability management dashboard
-- **Cost per scanner: $200-500** vs Apogee $12-28
+- **Cost per scanner: $200-500** vs Apogee $7.96-19.96
 
 ---
 
@@ -75,7 +75,7 @@ Apogee operates in the web3 smart contract security market, a smaller and less m
 - No cross-scanner deduplication
 - No 95% false positive reduction
 - Per-LOC pricing can become expensive at scale
-- **Cost per scanner: $599** vs Apogee $12-28
+- **Cost per scanner: $599** vs Apogee $7.96-19.96
 
 ---
 
@@ -100,7 +100,7 @@ Apogee operates in the web3 smart contract security market, a smaller and less m
 - No unified scanning (single tool)
 - No vulnerability management
 - Opaque pricing
-- **Cost per scanner: ~$1,000** vs Apogee $12-28
+- **Cost per scanner: ~$1,000** vs Apogee $7.96-19.96
 
 ---
 
@@ -210,7 +210,7 @@ Price Scale (Monthly):
 $0 ──────────────────────────────────────────────────────────────── $2K+
 │                                                                     │
 Free Tools    Apogee    MetaTrust      Olympix      Enterprise
-(Slither,     ($0-$699)      ($599)         (~$1K)       Solutions
+(Slither,     ($0-$499)      ($599)         (~$1K)       Solutions
  Aderyn)      25+ scanners   1 scanner      1 scanner
               95% FP reduce
 ```
@@ -218,7 +218,7 @@ Free Tools    Apogee    MetaTrust      Olympix      Enterprise
 ### Apogee Position
 
 - **Above** free tools: Dashboard, intelligence, 95% FP reduction, support
-- **Entry below** MetaTrust ($599): Team tier at $299 with 25x more scanners
+- **Entry below** MetaTrust ($599): Starter tier at $199 with 25x more scanners
 - **Premium tiers** competitive with Olympix: Full platform vs IDE plugin
 - **Unique**: x402 pay-per-scan, unified scanning, continuous monitoring
 
@@ -230,8 +230,8 @@ Free Tools    Apogee    MetaTrust      Olympix      Enterprise
 | SolidityScan Pro | $500 | 1 | $500 |
 | MetaTrust | $599 | 1 | $599 |
 | Olympix | ~$1,000 | 1 | $1,000 |
-| **Apogee Team** | $299 | 25+ | **$12** |
-| **Apogee Growth** | $699 | 25+ | **$28** |
+| **Apogee Starter** | $199 | 25+ | **$7.96** |
+| **Apogee Growth** | $499 | 25+ | **$19.96** |
 
 ---
 
