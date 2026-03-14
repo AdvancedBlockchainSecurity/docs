@@ -35,9 +35,9 @@ USERS = {
         "sub": "11111111-1111-1111-1111-111111111111",
         "email": "test-developer@blocksecops.local",
     },
-    "team": {
+    "starter": {
         "sub": "22222222-2222-2222-2222-222222222222",
-        "email": "test-team@blocksecops.local",
+        "email": "test-starter@blocksecops.local",
     },
     "growth": {
         "sub": "33333333-3333-3333-3333-333333333333",
@@ -58,11 +58,11 @@ ENDPOINTS = [
     ("/contracts", True, None, "Contracts list"),
     ("/scans", True, None, "Scans list"),
     ("/vulnerabilities", True, None, "Vulnerabilities list"),
-    ("/search", True, "team", "Search"),
-    ("/api-keys", True, "team", "API Keys list"),
-    ("/webhooks", True, "team", "Webhooks list"),
-    ("/notification-channels", True, "team", "Notification channels"),
-    ("/economic-analysis/quota", True, "team", "Economic analysis quota"),
+    ("/search", True, "starter", "Search"),
+    ("/api-keys", True, "starter", "API Keys list"),
+    ("/webhooks", True, "starter", "Webhooks list"),
+    ("/notification-channels", True, "starter", "Notification channels"),
+    ("/economic-analysis/quota", True, "starter", "Economic analysis quota"),
     ("/audit-logs", True, "enterprise", "Audit logs"),
 ]
 
@@ -74,8 +74,8 @@ CONCURRENCY_LEVELS = [
     ("stress", 50, 200),
 ]
 
-TIER_ORDER = {"developer": 0, "team": 1, "growth": 2, "enterprise": 3}
-RATE_LIMITED_TIERS = {"developer", "team"}  # monthly_api_calls_limit=0
+TIER_ORDER = {"developer": 0, "starter": 1, "growth": 2, "enterprise": 3}
+RATE_LIMITED_TIERS = {"developer", "starter"}  # monthly_api_calls_limit=0
 
 
 # ============================================================================
@@ -341,7 +341,7 @@ def generate_markdown(
     lines.append(f"- **Connection errors:** {total_errors}")
 
     # Per-tier summary
-    for tier in ["developer", "team", "growth", "enterprise"]:
+    for tier in ["developer", "starter", "growth", "enterprise"]:
         tr = tier_results.get(tier)
         if not tr:
             continue
@@ -400,7 +400,7 @@ def generate_markdown(
     lines.append("")
 
     # Results by tier
-    for tier in ["developer", "team", "growth", "enterprise"]:
+    for tier in ["developer", "starter", "growth", "enterprise"]:
         tr = tier_results.get(tier)
         if not tr:
             continue
@@ -557,7 +557,7 @@ async def main():
 
     print_header("Apogee Platform Load Test")
     print(f"  API: {API_BASE}")
-    print(f"  Tiers: developer, team, growth, enterprise")
+    print(f"  Tiers: developer, starter, growth, enterprise")
     print(f"  Endpoints: {len(ENDPOINTS)}")
     print(f"  Concurrency levels: {len(CONCURRENCY_LEVELS)}")
     print()
@@ -599,20 +599,20 @@ async def main():
                 f"Developer tier: {non_429} non-429 responses on {er.endpoint}"
             )
 
-    # ---- Phase 3: Team tier ----
-    print_header("Phase 3: Team Tier (expect all 429)")
-    tr = await run_tier_test("team", tokens["team"])
-    tier_results["team"] = tr
+    # ---- Phase 3: Starter tier ----
+    print_header("Phase 3: Starter Tier (expect all 429)")
+    tr = await run_tier_test("starter", tokens["starter"])
+    tier_results["starter"] = tr
     for er in tr.endpoint_results:
         if er.endpoint in ("/health/live", "/health/ready"):
             continue
         print_endpoint_result(er)
         non_429 = sum(c for s, c in er.status_counts.items() if s != 429)
         if non_429 > 0:
-            issues.append(f"Team tier: {non_429} non-429 responses on {er.endpoint}")
+            issues.append(f"Starter tier: {non_429} non-429 responses on {er.endpoint}")
 
     # ---- Phase 4: Growth tier ----
-    print_header("Phase 4: Growth Tier (expect 200 on team+, 403 on enterprise)")
+    print_header("Phase 4: Growth Tier (expect 200 on starter+, 403 on enterprise)")
     tr = await run_tier_test("growth", tokens["growth"])
     tier_results["growth"] = tr
     for er in tr.endpoint_results:

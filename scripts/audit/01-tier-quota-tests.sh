@@ -55,7 +55,7 @@ else
 
   # Verify tier names (tiers is an object with tier names as keys)
   TIER_NAMES=$(jq -r '.tiers | keys[]' "$TIERS_JSON" | sort | tr '\n' ',')
-  check "Tier names" "developer,enterprise,growth,team," "$TIER_NAMES"
+  check "Tier names" "developer,enterprise,growth,starter," "$TIER_NAMES"
 
   # Verify quota limits per tier
   echo ""
@@ -66,9 +66,9 @@ else
   DEV_SCANS=$(jq -r '.tiers.developer.quotas.monthlyContractLimit' "$TIERS_JSON")
   check "Developer scans/month = 3" "3" "$DEV_SCANS"
 
-  # Verify Team tier limits
-  TEAM_SCANS=$(jq -r '.tiers.team.quotas.monthlyContractLimit' "$TIERS_JSON")
-  check "Team scans/month = 15" "15" "$TEAM_SCANS"
+  # Verify Starter tier limits
+  STARTER_SCANS=$(jq -r '.tiers.starter.quotas.monthlyContractLimit' "$TIERS_JSON")
+  check "Starter scans/month = 25" "25" "$STARTER_SCANS"
 
   # Verify Growth tier limits
   GROWTH_SCANS=$(jq -r '.tiers.growth.quotas.monthlyContractLimit' "$TIERS_JSON")
@@ -81,7 +81,7 @@ else
 
   # Verify Stripe product IDs are populated
   echo ""
-  for tier in team growth enterprise; do
+  for tier in starter growth enterprise; do
     PRODUCT_ID=$(jq -r ".tiers.${tier}.stripe.productId // \"\"" "$TIERS_JSON")
     if [ -n "$PRODUCT_ID" ] && [ "$PRODUCT_ID" != "null" ] && [ "$PRODUCT_ID" != "" ]; then
       echo "  PASS: $tier has Stripe productId"
@@ -170,16 +170,16 @@ else
   echo "  SKIP: DEVELOPER_TOKEN not set (set to test feature gates)"
 fi
 
-if [ -n "${TEAM_TOKEN:-}" ]; then
-  # 1.5: Team tier can't create API keys
+if [ -n "${STARTER_TOKEN:-}" ]; then
+  # 1.5: Starter tier can't create API keys
   API_KEY_RESP=$(curl $CURL_FLAGS -o /dev/null -w "%{http_code}" \
     -X POST "$BASE_URL/api/v1/api-keys" \
-    -H "Authorization: Bearer $TEAM_TOKEN" \
+    -H "Authorization: Bearer $STARTER_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{"name":"audit-test","scopes":["scans:read"]}' 2>/dev/null)
-  check "1.5 Team can't create API keys" "403" "$API_KEY_RESP"
+  check "1.5 Starter can't create API keys" "403" "$API_KEY_RESP"
 else
-  echo "  SKIP: TEAM_TOKEN not set"
+  echo "  SKIP: STARTER_TOKEN not set"
 fi
 
 if [ -n "${GROWTH_TOKEN:-}" ]; then

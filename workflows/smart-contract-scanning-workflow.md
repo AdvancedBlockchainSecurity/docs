@@ -105,7 +105,7 @@ User uploads file/archive
 | Tier | Single File | Archive |
 |------|-------------|---------|
 | Developer | 5 MB | 25 MB |
-| Team | 10 MB | 50 MB |
+| Starter | 10 MB | 50 MB |
 | Growth | 10 MB | 50 MB |
 | Enterprise | 20 MB | 100 MB |
 
@@ -361,7 +361,7 @@ spec:
 |------|----------------|-------------|
 | Enterprise | 5 | Highest priority |
 | Growth | 25 | High priority |
-| Team | 40 | Normal priority |
+| Starter | 40 | Normal priority |
 | Developer | 50 | Base priority |
 
 *Lower value = Higher priority*
@@ -805,7 +805,7 @@ data:
 | Tier | Monthly Scans | Notes |
 |------|---------------|-------|
 | Developer | 3 | Free tier |
-| Team | Configurable | Team plan |
+| Starter | Configurable | Starter plan |
 | Growth | Configurable | Growth plan |
 | Enterprise | Unlimited | Enterprise plan |
 

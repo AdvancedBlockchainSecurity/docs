@@ -23,11 +23,11 @@ Three categories of improvements:
 
 | Component | Error Type | CTA Destination |
 |-----------|-----------|-----------------|
-| `VulnerabilityDetail.tsx` | AI Review (403) | `/pricing` — "Requires Team tier" |
-| `VulnerabilityDetail.tsx` | Code Repair (403) | `/pricing` — "Requires Team tier" |
+| `VulnerabilityDetail.tsx` | AI Review (403) | `/pricing` — "Requires Starter tier" |
+| `VulnerabilityDetail.tsx` | Code Repair (403) | `/pricing` — "Requires Starter tier" |
 | `VulnerabilityDetail.tsx` | PoC Exploit (403) | `/pricing` — "Requires Growth tier" |
-| `VulnerabilityDetail.tsx` | Invariant Gen (403) | `/pricing` — "Requires Team tier" |
-| `CopilotPage.tsx` | Chat (403) | `/pricing` — "Upgrade to Team" banner |
+| `VulnerabilityDetail.tsx` | Invariant Gen (403) | `/pricing` — "Requires Starter tier" |
+| `CopilotPage.tsx` | Chat (403) | `/pricing` — "Upgrade to Starter" banner |
 | `EconomicSecurityPanel.tsx` | Panel (403) | `/pricing` — Upgrade prompt |
 | `GenerateExploitModal.tsx` | Quota exceeded | `/pricing` — "Upgrade Plan" button |
 | `GenerateInvariantsModal.tsx` | Quota exceeded | `/pricing` — "Upgrade Plan" button |
@@ -39,12 +39,12 @@ Error states use sentinel values that are caught by conditional rendering:
 
 ```typescript
 // Set sentinel (never displayed as raw text)
-setReviewError('upgrade_team');
+setReviewError('upgrade_starter');
 
 // Render upgrade CTA or error message
 {reviewError && (reviewError.startsWith('upgrade_') ? (
   <p className="text-xs text-purple-400">
-    Requires Team tier. <a href="/pricing" className="underline">Upgrade</a>
+    Requires Starter tier. <a href="/pricing" className="underline">Upgrade</a>
   </p>
 ) : (
   <p className="text-xs text-red-600">{reviewError}</p>
@@ -130,10 +130,10 @@ className="bg-[#00D4FF] text-gray-900 hover:shadow-[0_0_15px_rgba(0,212,255,0.3)
 
 1. Upload button visible on contract upload modal (electric cyan on dark background)
 2. Tier-gated features show purple "Upgrade" links instead of red error text
-3. QuotaWidget shows upgrade button for free/team/growth tier users
-4. Copilot chat shows "Upgrade to Team" banner for developer-tier users
+3. QuotaWidget shows upgrade button for free/starter/growth tier users
+4. Copilot chat shows "Upgrade to Starter" banner for Developer-tier users
 5. Economic Security panel shows upgrade prompt for developer-tier users
-6. No raw sentinel values (`upgrade_team`, `upgrade_required`) visible in UI
+6. No raw sentinel values (`upgrade_starter`, `upgrade_required`) visible in UI
 
 ---
 

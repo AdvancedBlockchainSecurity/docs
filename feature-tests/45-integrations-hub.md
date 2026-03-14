@@ -70,7 +70,7 @@ The Unified Integrations Hub consolidates all platform integrations into a singl
 **Goal:** Verify VCS integration management (existing functionality)
 
 **Prerequisites:**
-- Team+ tier account
+- Starter+ tier account
 
 **Test Steps:**
 
@@ -90,7 +90,7 @@ The Unified Integrations Hub consolidates all platform integrations into a singl
 **Goal:** Verify all 4 CI/CD provider integrations
 
 **Prerequisites:**
-- Team+ tier account
+- Starter+ tier account
 
 **Test Steps (Provider Cards):**
 
@@ -150,7 +150,7 @@ The Unified Integrations Hub consolidates all platform integrations into a singl
 | Step | Action | Expected Result |
 |------|--------|-----------------|
 | 1 | View Issue Tracking tab | Shows JIRA card |
-| 2 | Team tier user views tab | Shows "Enterprise" badge, upgrade button |
+| 2 | Starter tier user views tab | Shows "Enterprise" badge, upgrade button |
 | 3 | Enterprise user clicks Connect | OAuth flow to auth.atlassian.com |
 | 4 | Authorize application | Returns with success |
 | 5 | Configure project mapping | Can map Apogee project to JIRA project |
@@ -162,7 +162,7 @@ The Unified Integrations Hub consolidates all platform integrations into a singl
 **Goal:** Verify notification channels management (migrated from /notification-channels)
 
 **Prerequisites:**
-- Team+ tier account
+- Starter+ tier account
 
 **Test Steps:**
 
@@ -186,7 +186,7 @@ The Unified Integrations Hub consolidates all platform integrations into a singl
 **Goal:** Verify IDE token management
 
 **Prerequisites:**
-- Team+ tier account
+- Starter+ tier account
 
 **Test Steps:**
 
@@ -229,11 +229,11 @@ The Unified Integrations Hub consolidates all platform integrations into a singl
 | 3 | Check tab navigation | Service Accounts tab is NOT visible |
 | 4 | Navigate to `/integrations?tab=service-accounts` | Defaults to Overview tab (invalid tab ignored) |
 
-**Test Steps (Admin, Developer/Team Tier):**
+**Test Steps (Admin, Developer/Starter Tier):**
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 1 | Login as admin with Developer/Team tier | Login successful |
+| 1 | Login as admin with Developer/Starter tier | Login successful |
 | 2 | Navigate to `/integrations` | Service Accounts tab IS visible |
 | 3 | Click Service Accounts tab | Shows TierGate overlay with upsell |
 | 4 | Click "Upgrade" in overlay | Navigates to `/pricing` |
