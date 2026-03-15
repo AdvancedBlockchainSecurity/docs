@@ -38,9 +38,9 @@ ConfigMap had `intelligence_engine_url` pointing to port 80. IE service exposes 
 
 Fixed in: base configmap, local overlay, GCP overlay. Applied and verified.
 
-### F2 — MEDIUM: Pattern naming inconsistency
+### F2 — MEDIUM: Pattern naming inconsistency — FIXED
 
-20 patterns use long category names instead of 3-letter abbreviations. 13 patterns use `BVD-SOL-` instead of `BVD-SOLANA-`. 4 patterns use non-standard language prefixes (ERC, COL, COD, LOC). Requires database migration — tracked as follow-up.
+52 patterns used non-standard naming. Alembic migration 082 renamed all to BVD-{LANGUAGE}-{3-LETTER}-{NUMBER}. Fixed scanner_upgrade_service.py. Database backup taken. v0.29.93.
 
 ### F3 — LOW: Low semantic fingerprint coverage (47%)
 
