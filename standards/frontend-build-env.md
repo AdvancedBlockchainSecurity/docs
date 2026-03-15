@@ -1,8 +1,8 @@
 # Frontend Build-Time Environment Variables
 
 **Part of:** [Platform Development Standards](./INDEX.md)
-**Version:** 2.0.0
-**Last Updated:** March 10, 2026
+**Version:** 3.0.0
+**Last Updated:** March 14, 2026
 **Status:** Active
 
 ## Overview
@@ -45,9 +45,7 @@ These values are intentionally public and designed to be visible in browser code
 | `VITE_API_BASE_URL` | Admin Portal | `/api/v1` | Relative API path routed via Traefik |
 | `VITE_ENVIRONMENT` | Admin Portal | `local` | Environment identifier, no security impact |
 | `VITE_WS_URL` | Dashboard | `wss://app.0xapogee.com/ws` | WebSocket endpoint, auth required (use wss:// for server/staging/production) |
-| `VITE_WALLETCONNECT_PROJECT_ID` | Dashboard | `abc123...` | Public project identifier |
-| `VITE_USE_TESTNET` | Dashboard | `true` | Feature flag, no security impact |
-| `VITE_API_URL` | Dashboard | `https://api.example.com` | Public API endpoint |
+| `VITE_STRIPE_PUBLISHABLE_KEY` | Dashboard | `pk_test_...` | Stripe publishable key, safe for frontend (secret key stays backend-only) |
 
 ### Private Variables (Never in Frontend)
 
@@ -118,8 +116,7 @@ VITE_SUPABASE_URL=https://huzjlpypdlelqnbjvxad.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 VITE_WS_ENABLED=true
 VITE_WS_URL=wss://app.0xapogee.com/ws
-VITE_WALLETCONNECT_PROJECT_ID=your_project_id
-VITE_USE_TESTNET=true
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...
 ```
 
 ### `.env.example` (Template)
@@ -132,8 +129,7 @@ VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
 VITE_WS_ENABLED=true
 VITE_WS_URL=wss://app.0xapogee.com/ws
-VITE_WALLETCONNECT_PROJECT_ID=
-VITE_USE_TESTNET=true
+VITE_STRIPE_PUBLISHABLE_KEY=
 ```
 
 ---
@@ -154,12 +150,16 @@ cd /path/to/workspace
 source blocksecops-dashboard/.env.local
 
 docker build \
+  -f blocksecops-dashboard/Dockerfile \
   --build-arg VITE_SUPABASE_URL=$VITE_SUPABASE_URL \
   --build-arg VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY \
   --build-arg VITE_WS_URL=$VITE_WS_URL \
   --build-arg VITE_WS_ENABLED=$VITE_WS_ENABLED \
-  -t ${REGISTRY}/blocksecops/dashboard:0.19.0 \
-  -f blocksecops-dashboard/Dockerfile .
+  --build-arg VITE_STRIPE_PUBLISHABLE_KEY=$VITE_STRIPE_PUBLISHABLE_KEY \
+  --build-arg SERVICE_VERSION=${VERSION} \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(cd blocksecops-dashboard && git rev-parse --short HEAD) \
+  -t ${REGISTRY}/blocksecops/dashboard:${VERSION} .
 
 # 4. Push to container registry
 docker push ${REGISTRY}/blocksecops/dashboard:0.19.0
@@ -203,8 +203,11 @@ For staging/production, values come from CI/CD secrets:
 - name: Build Dashboard
   run: |
     docker build \
+      -f blocksecops-dashboard/Dockerfile \
       --build-arg VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }} \
       --build-arg VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }} \
+      --build-arg VITE_STRIPE_PUBLISHABLE_KEY=${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }} \
+      --build-arg SERVICE_VERSION=${{ github.sha }} \
       -t blocksecops-dashboard:${{ github.sha }} .
 ```
 
