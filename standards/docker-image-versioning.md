@@ -130,17 +130,15 @@ cd /home/pwner/Git  # Parent directory containing both repos
 VERSION=$(grep '"version"' blocksecops-dashboard/package.json | head -1 | cut -d'"' -f4)
 REGISTRY="${REGISTRY:?REGISTRY not set}"
 
-# Get Supabase credentials from existing ConfigMap
-SUPABASE_URL=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_url}')
-SUPABASE_KEY=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.supabase_anon_key}')
-WALLETCONNECT_ID=$(kubectl get configmap -n dashboard-local dashboard-config -o jsonpath='{.data.VITE_WALLETCONNECT_PROJECT_ID}')
+# Source build-time env vars from .env.local
+source blocksecops-dashboard/.env.local
 
 # Build with required build args
 docker build \
   -f blocksecops-dashboard/Dockerfile \
-  --build-arg VITE_SUPABASE_URL=${SUPABASE_URL} \
-  --build-arg VITE_SUPABASE_ANON_KEY=${SUPABASE_KEY} \
-  --build-arg VITE_WALLETCONNECT_PROJECT_ID=${WALLETCONNECT_ID} \
+  --build-arg VITE_SUPABASE_URL=${VITE_SUPABASE_URL} \
+  --build-arg VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY} \
+  --build-arg VITE_STRIPE_PUBLISHABLE_KEY=${VITE_STRIPE_PUBLISHABLE_KEY} \
   --build-arg SERVICE_VERSION=${VERSION} \
   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --build-arg VCS_REF=$(cd blocksecops-dashboard && git rev-parse --short HEAD) \
@@ -230,7 +228,7 @@ Most services follow the standard pattern (build from service directory):
 |---------|---------------|---------------------|
 | api-service | Service directory | None |
 | admin-portal | Service directory | Supabase build args (`VITE_ADMIN_SUPABASE_*`) |
-| dashboard | **Parent directory** | Supabase build args, shared lib, tier-config build |
+| dashboard | **Parent directory** | Supabase + Stripe build args, shared lib, tier-config build |
 | data-service | Service directory | None |
 | intelligence-engine | Service directory | None |
 | notification | Service directory | None |
