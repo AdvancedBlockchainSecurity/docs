@@ -280,34 +280,17 @@ slither:
 
 ## Lockfile Management
 
-**MANDATORY:** Always commit dependency lockfiles to version control.
+**MANDATORY:** Commit lockfiles. Use `npm ci` in Dockerfiles.
 
-### Python Projects
+### Rules
 
-```bash
-# Generate/update requirements
-pip freeze > requirements.txt
-
-# Or use pip-tools for better control
-pip-compile requirements.in > requirements.txt
-
-# Commit lockfile
-git add requirements.txt
-git commit -m "chore: Update Python dependencies"
-```
-
-### Node.js Projects
-
-```bash
-# package-lock.json is auto-generated
-npm install
-
-# Always commit package-lock.json
-git add package-lock.json package.json
-git commit -m "chore: Update Node.js dependencies"
-
-# NEVER use --no-save or --no-lock
-```
+- Always commit `package-lock.json`, `Cargo.lock`, `requirements.txt` to version control
+- Use `npm install <package>@<version>` to add/update deps — never edit `package.json` by hand
+- Commit `package.json` + `package-lock.json` together in the same commit
+- Dockerfiles: `npm ci` (not `npm install`) — fails fast on lockfile drift
+- Exception: repos with `file:` workspace deps (e.g., dashboard) must use `npm install` — lockfile is non-portable across directory layouts
+- If `npm ci` fails: run `npm install` locally, commit updated lockfile, rebuild
+- Rust: commit `Cargo.lock` for binaries/services; optional for libraries
 
 ### Docker Images
 
