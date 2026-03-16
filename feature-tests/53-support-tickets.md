@@ -55,7 +55,7 @@ The support ticket system allows authenticated users to submit support requests 
 
 **Expected Results:**
 - Success message displayed
-- Ticket reference number shown (format: BSO-XXXXXXXX)
+- Ticket reference number shown (format: APG-XXXX)
 - Modal shows confirmation view
 - If JIRA enabled: JIRA issue link displayed
 
@@ -225,7 +225,7 @@ curl -X POST http://app.0xapogee.com/api/v1/support-tickets \
 {
   "success": true,
   "ticket_id": "550e8400-e29b-41d4-a716-446655440000",
-  "ticket_reference": "BSO-A1B2C3D4",
+  "ticket_reference": "APG-0001",
   "jira_issue_key": null,
   "jira_issue_url": null,
   "message": "Support ticket submitted successfully"
@@ -371,7 +371,7 @@ GROUP BY jira_sync_status;
 
 **Expected Results:**
 - Columns: Reference, Subject, Category, Priority, Status, JIRA, Created
-- Reference format: BSO-XXXXXXXX
+- Reference format: APG-XXXX
 - Priority shows colored badge (urgent=red, high=orange, medium=yellow, low=gray)
 - Status shows colored badge (open=blue, in_progress=yellow, resolved=green, closed=gray)
 - JIRA column shows link to JIRA issue (or "-" if not synced)
@@ -454,7 +454,7 @@ curl -X GET "http://app.0xapogee.com/api/v1/support-tickets?page=1&page_size=20"
   "tickets": [
     {
       "id": "550e8400-e29b-41d4-a716-446655440000",
-      "ticket_reference": "BSO-550E8400",
+      "ticket_reference": "APG-0002",
       "category": "bug",
       "priority": "high",
       "subject": "Test support ticket",
