@@ -15,6 +15,7 @@ Requirements: httpx, PyJWT (both in api-service venv)
 
 import asyncio
 import json
+import os
 import statistics
 import sys
 import time
@@ -27,8 +28,11 @@ import jwt
 # Configuration
 # ============================================================================
 
-API_BASE = "https://app.0xapogee.com/api/v1"
-JWT_SECRET = "local-dev-jwt-secret-key-change-in-production"
+API_BASE = os.environ.get("AUDIT_API_BASE", "https://app.0xapogee.com/api/v1")
+JWT_SECRET = os.environ.get("SUPABASE_JWT_SECRET")
+if not JWT_SECRET:
+    sys.exit("ERROR: SUPABASE_JWT_SECRET environment variable is required. "
+             "See docs/standards/secrets-management.md")
 
 USERS = {
     "developer": {
