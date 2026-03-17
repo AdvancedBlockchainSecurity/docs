@@ -1,7 +1,7 @@
 # Scanner Upgrade Pipeline
 
-**Last Updated:** February 18, 2026
-**API Version:** 0.28.44
+**Last Updated:** March 17, 2026
+**API Version:** 0.33.3
 
 Full pipeline that runs when an admin clicks "Upgrade" on a scanner in the Admin Portal.
 
@@ -17,7 +17,8 @@ Click "Upgrade" →          POST /admin/system/             POST /scanners/{nam
                               a. Detector comparison         3. Return result
                               b. Pattern seeding
                               c. Audit validation
-                           3. Return combined result
+                           3. Update scanner_versions DB table
+                           4. Return combined result
                     ←      (includes pipeline results)
 ```
 
