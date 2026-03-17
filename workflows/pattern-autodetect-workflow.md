@@ -43,6 +43,19 @@ This ensures the intelligence platform's pattern knowledge base is always popula
 
 **Manual re-seed**: `POST /api/v1/internal/patterns/seed` (requires `X-Internal-Service-Key`)
 
+## Startup Seeding (Exploits & CVEs)
+
+On every API service startup, `seed_if_needed()` from `exploit_cve_seed_service.py` runs after pattern seeding. It:
+
+1. Reads `seeds/exploits_and_cves.json` (bundled in the Docker image)
+2. Compares the file version with the DB version in `ml_model_metadata` (model_name = `exploit_cve_seed`)
+3. If behind or empty: inserts 10 curated exploit incidents + 10 smart contract CVEs
+4. If up to date: skips (no-op on pod restarts)
+
+This populates the intelligence pages (`/intelligence/exploits`, `/intelligence/cves`) automatically.
+
+**Manual re-seed**: `POST /api/v1/internal/intelligence/seed` (requires `X-Internal-Service-Key`)
+
 ---
 
 ## Trigger Points
