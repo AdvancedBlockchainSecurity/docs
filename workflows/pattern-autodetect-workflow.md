@@ -30,6 +30,21 @@ The pattern auto-detection workflow automatically creates patterns and mappings 
 
 ---
 
+## Startup Seeding (Curated Patterns)
+
+On every API service startup, the `seed_patterns_if_needed()` function runs automatically via the FastAPI lifespan hook. It:
+
+1. Reads `seeds/vulnerability_patterns.json` (bundled in the Docker image)
+2. Compares the file version with the DB version stored in `ml_model_metadata` (model_name = `pattern_seed`)
+3. If behind or empty: upserts 397 curated patterns + 678 scanner mappings
+4. If up to date: skips (no-op on pod restarts)
+
+This ensures the intelligence platform's pattern knowledge base is always populated — no manual `seed_vulnerability_patterns.py` execution needed.
+
+**Manual re-seed**: `POST /api/v1/internal/patterns/seed` (requires `X-Internal-Service-Key`)
+
+---
+
 ## Trigger Points
 
 ### 1. Post-Scan Hook
