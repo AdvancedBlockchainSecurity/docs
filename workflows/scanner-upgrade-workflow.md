@@ -1,8 +1,8 @@
 # Scanner Upgrade Workflow
 
-**Last Updated:** February 18, 2026
+**Last Updated:** March 17, 2026
 **Status:** Active
-**API Version:** 0.28.44
+**API Version:** 0.33.3
 
 ---
 
@@ -94,7 +94,8 @@ The Admin Dashboard provides an "Upgrade" button for scanners that show a newer 
    - **Detector comparison** — compares detector list against existing mappings
    - **Pattern seeding** — creates patterns for unmapped vulnerabilities
    - **Audit validation** — calculates coverage and health score
-7. Returns combined result with pipeline data
+7. Updates `scanner_versions` database table with new version (immediate, not waiting for pod restart)
+8. Returns combined result with pipeline data
 
 **What it does NOT do:**
 - Rebuild Docker images (requires host-side Docker access)
