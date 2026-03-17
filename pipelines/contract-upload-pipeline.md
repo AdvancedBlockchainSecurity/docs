@@ -32,7 +32,7 @@ POST /scans         →       Trigger scan on uploaded contract          scans
 |---|------|-------------|
 | 1 | Authentication | Dual-auth: JWT (`Authorization: Bearer`) or API key (`X-API-Key`) with `contracts:write` scope |
 | 2 | Name check | Verify no existing contract with same name for user (`409 Conflict` if duplicate) |
-| 3 | Language detection | Auto-detect from source code content or file extension. Supported: `solidity`, `vyper`, `rust`, `move`, `cairo` |
+| 3 | Language detection | Auto-detect from source code content or file extension. Supported: `solidity`, `vyper`, `rust`, `move` |
 | 4 | Validation | Validate `ContractCreate` schema: name, source_code/files, optional network/address |
 | 5 | Line counting | Count lines of code from source for metrics |
 | 6 | Store contract | Insert into `contracts` table with metadata (language, framework, compiler_version) |
@@ -92,7 +92,6 @@ ContractResponse (id, vulnerabilities: {0,0,0,0}, projects, tags)
 | Vyper | `vyper` | `.vy` extension |
 | Rust (Solana) | `rust` | `.rs` extension, `use anchor_lang` |
 | Move | `move` | `.move` extension |
-| Cairo | `cairo` | `.cairo` extension |
 
 ## Input Validation (v0.29.43)
 

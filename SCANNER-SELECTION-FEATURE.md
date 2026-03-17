@@ -40,7 +40,6 @@ The Scanner Selection feature allows users to customize which security scanners 
 - **Vyper** - Alternative Ethereum language
 - **Rust** - Solana/Substrate programs
 - **Move** - Aptos/Sui smart contracts
-- **Cairo** - StarkNet contracts
 
 ---
 
@@ -506,8 +505,7 @@ type ScannerLanguage =
   | 'solidity'
   | 'vyper'
   | 'rust'
-  | 'move'
-  | 'cairo';
+  | 'move';
 ```
 
 ---
