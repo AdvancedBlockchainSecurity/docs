@@ -59,6 +59,7 @@ POST /scans         →      Queue scan task      execute_scanners()          Sc
 | Store findings | Insert enriched vulnerabilities into database |
 | Update scan | Set scan status to `completed` with summary statistics |
 | Persist duration | Calculate `duration_seconds = completed_at - started_at` and store on scan record |
+| Pattern auto-detect | Post-scan hook fires `pattern.autodetect` task to create patterns for any unmapped detectors (non-blocking, see [Pattern Auto-Detection Workflow](../workflows/pattern-autodetect-workflow.md)) |
 
 ### Scan Duration Tracking
 

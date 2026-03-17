@@ -17,8 +17,10 @@ Inline labels      →         3. Deduplicate by vuln_id     6. Train RandomFore
 
 ## Trigger
 
+- **Celery Beat (daily)**: `ml.check_model_freshness` at 02:00 UTC detects never-trained or stale models and triggers retrain via `POST /internal/ml/execute-training`
+- **Label threshold**: When 100 new labels accumulate since last training, `schedule_model_retrain()` fires immediately
 - **Admin Portal**: Platform admin clicks "Retrain Model" at `POST /admin/system/ml/retrain`
-- **Auto-trigger**: When new labels push count over training threshold (50 min, 200 recommended)
+- **Dashboard**: "Train Now" button on ModelStatusWidget (when 50+ samples available)
 - **Legacy endpoint**: `POST /ml/retrain` (deprecated, requires platform_admin role)
 
 ## Pipeline Phases
