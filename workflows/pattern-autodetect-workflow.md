@@ -56,6 +56,19 @@ This populates the intelligence pages (`/intelligence/exploits`, `/intelligence/
 
 **Manual re-seed**: `POST /api/v1/internal/intelligence/seed` (requires `X-Internal-Service-Key`)
 
+## Startup Seeding (Scanner Versions)
+
+On every API service startup, `seed_if_needed()` from `scanner_version_seed_service.py` runs after exploit/CVE seeding. It:
+
+1. Reads the `SCANNER_METADATA` environment variable (populated from the `scanner-versions` ConfigMap)
+2. Computes a content hash and compares with the DB version in `ml_model_metadata` (model_name = `scanner_version_seed`)
+3. If ConfigMap changed or table empty: upserts 16 scanner records into the `scanner_versions` table
+4. If unchanged: skips (no-op on pod restarts)
+
+This persists scanner metadata (version, developer, ecosystem, type) from the ConfigMap into the database, enabling queries and tracking without manual SQL.
+
+**Manual re-seed**: `POST /api/v1/internal/scanners/seed` (requires `X-Internal-Service-Key`)
+
 ---
 
 ## Trigger Points
