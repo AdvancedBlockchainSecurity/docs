@@ -3,9 +3,10 @@
 # Scanner Version Tracking Database
 
 **Created**: 2025-10-30
+**Last Updated**: 2026-03-17
 **Purpose**: Database-driven scanner version tracking to replace manual markdown documentation
 **Database**: `solidity_security` (existing PostgreSQL database)
-**Location**: `/Users/pwner/Git/ABS/database/scanner-version-tracking/`
+**Status**: Active — `scanner_versions` table created via Alembic migration 085, auto-seeded from ConfigMap on API service startup
 
 ---
 
