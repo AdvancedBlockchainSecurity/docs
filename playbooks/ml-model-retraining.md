@@ -1,11 +1,20 @@
 # Playbook: ML Model Retraining
 
-**Version:** 1.0.0
-**Last Updated:** February 5, 2026
+**Version:** 1.1.0
+**Last Updated:** March 16, 2026
 
 ## Overview
 
-This playbook covers retraining the **False Positive Classifier** — a Random Forest model that predicts the probability (0.0-1.0) that a vulnerability finding is a false positive. Retraining is an admin-only operation performed via the Admin Portal or API.
+This playbook covers retraining the **False Positive Classifier** — a Random Forest model that predicts the probability (0.0-1.0) that a vulnerability finding is a false positive. Retraining happens **automatically** via Celery Beat scheduling, or **manually** via the Admin Portal or API.
+
+### Automatic Training (Default)
+
+The model is automatically trained in two scenarios:
+
+1. **Daily freshness check** (Celery Beat at 02:00 UTC): The `ml.check_model_freshness` task checks if the model has never been trained or is older than 7 days. If retraining is needed and sufficient data exists (50+ samples), it triggers training via the orchestration service calling `POST /api/v1/internal/ml/execute-training`.
+2. **Label threshold** (100 new labels): When users label vulnerabilities and the count since last training reaches `ML_RETRAIN_THRESHOLD` (default: 100), training is triggered immediately.
+
+In most cases, no manual intervention is needed. The steps below are for manual retraining or troubleshooting.
 
 ---
 
