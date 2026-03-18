@@ -51,7 +51,7 @@ Finds vulnerabilities in the database that lack a `pattern_code` and creates pat
 | Find unmapped | Query vulnerabilities where `pattern_code IS NULL` |
 | Infer category | Score-based keyword matching on detector name |
 | Infer severity | Category-based severity + keyword overrides |
-| Generate pattern code | `BVD-SOL-{CATEGORY}-{SCANNER}-{DETECTOR}` format |
+| Generate pattern code | `BVD-{ECOSYSTEM}-{CATEGORY_CODE}-{NNN}` format (sequential) |
 | Seed to database | Insert `vulnerability_patterns` + `pattern_tool_mappings` |
 
 Pattern seeding is **additive only** — existing patterns and mappings are never deleted or overwritten. If a pattern or mapping already exists, it is skipped.

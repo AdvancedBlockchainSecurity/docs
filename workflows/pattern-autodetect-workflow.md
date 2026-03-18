@@ -140,9 +140,15 @@ Maps category to default severity, with keyword overrides:
 
 ### Step 4: Generate BVD Code
 
-Format: `BVD-SOL-{CATEGORY_PREFIX}-{SCANNER_SLUG}-{DETECTOR_SLUG}`
+Format: `BVD-{ECOSYSTEM}-{CATEGORY_CODE}-{SEQUENTIAL_NUMBER}`
 
-Example: `BVD-SOL-REE-SLI-REENTRANCY_ET`
+Examples: `BVD-SOLIDITY-REE-015`, `BVD-SOLANA-ACC-004`, `BVD-VYPER-UNC-003`
+
+Canonical pattern ID generation is centralized in `src/domain/services/pattern_id.py`:
+- Ecosystem determined from scanner ID or affected languages
+- Category mapped to 3-letter code (ACC, REE, ARI, etc.)
+- Sequential number queries max existing number for that prefix
+- Validated against regex before insertion — invalid IDs are auto-corrected
 
 ### Step 5: Create Records
 
