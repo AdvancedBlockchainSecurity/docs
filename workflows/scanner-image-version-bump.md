@@ -390,6 +390,9 @@ After completing the version bump:
 - [ ] tool-integration pod healthy (1/1 Ready)
 - [ ] Tool-integration logs show scanner registered with new version
 - [ ] Test scan job uses new scanner image
+- [ ] Solc pre-installed (solc-select + .svm for Foundry scanners)
+- [ ] forge-std pre-installed (Foundry-based scanners only)
+- [ ] No external downloads at runtime (verify with `offline = true`)
 - [ ] All changes committed to Git
 - [ ] OCI labels verified on image
 

@@ -302,6 +302,10 @@ scanner-images/
 - Entrypoint script handles: env validation, tool setup, execution, JSON output, HTTP callback
 - Foundry (forge) included in Solidity images for project compilation
 - Node.js 20 included for Hardhat project support
+- Solc pre-installed to `/opt/solc-select/` (solc-select) and `/opt/svm/` (Foundry) at build time
+- forge-std v1.9.6 pre-installed to `/opt/forge-std/` for Foundry project compilation
+- No external downloads at runtime — NetworkPolicy blocks outbound HTTPS by design
+- Foundry-based run scripts set `offline = true` in foundry.toml
 
 ## Observability
 
