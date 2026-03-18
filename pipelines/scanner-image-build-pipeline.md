@@ -497,6 +497,48 @@ docker build \
 
 ---
 
+## Runtime Dependency Pre-Installation
+
+Scanner images MUST pre-install all runtime dependencies at Docker build time. NetworkPolicy blocks external downloads at runtime — this is by design (security-first).
+
+### Solc Compiler Binaries
+
+Scanners that compile Solidity need `solc`. Two cache locations depending on the compilation tool:
+
+| Tool | Cache Location | Scanners |
+|------|---------------|----------|
+| solc-select | `~/.solc-select/artifacts/solc-{VERSION}/solc-{VERSION}` | slither, echidna, medusa |
+| Foundry (forge) | `~/.svm/{VERSION}/solc-{VERSION}` | aderyn, soliditydefend, halmos, wake |
+
+Pre-install to `/opt/solc-select/` and `/opt/svm/` (survives KJM emptyDir mount at `/home/scanner`), then seed to `$HOME` via Dockerfile `RUN` after `USER scanner`.
+
+**Versions to pre-install (2022+ contracts):**
+```
+0.8.13  0.8.17  0.8.19  0.8.20  0.8.21  0.8.24  0.8.26  0.8.28
+```
+
+### Foundry forge-std Library
+
+Foundry projects require `forge-std` for compilation. Pre-install from GitHub release tarball at build time:
+```dockerfile
+RUN mkdir -p /opt/forge-std/lib/forge-std && \
+    curl -sL https://github.com/foundry-rs/forge-std/archive/refs/tags/v1.9.6.tar.gz | \
+    tar xz --strip-components=1 -C /opt/forge-std/lib/forge-std
+```
+
+Run scripts copy from `/opt/forge-std/lib/forge-std` to project `lib/` at container startup.
+
+### Offline Mode
+
+Foundry-based scanner run scripts add `offline = true` to `foundry.toml` at runtime to prevent any download attempts:
+```bash
+if ! grep -q 'offline' foundry.toml 2>/dev/null; then
+    sed -i '/\[profile\.default\]/a offline = true' foundry.toml
+fi
+```
+
+---
+
 ## Related Documentation
 
 - [Docker Image Versioning Standards](../standards/docker-image-versioning.md) - General Docker versioning + scanner section

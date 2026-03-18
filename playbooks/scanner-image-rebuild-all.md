@@ -13,6 +13,7 @@ This playbook documents the complete procedure for rebuilding all 16 scanner ima
 3. **Wrapper script improvements** - Updating error handling, logging, or output format across all scanners
 4. **Security patches** - Rebuilding all images with patched dependencies
 5. **Routine maintenance** - Periodic full rebuild cycle
+6. **Solc/forge-std updates** - Pre-installing new compiler versions or forge-std updates
 
 This is the process completed on **March 4, 2026** to ensure all 16 scanners had proper OCI labels (SCANNER_IMAGE_VERSION, UPSTREAM_TOOL_VERSION, BUILD_DATE, VCS_REF).
 

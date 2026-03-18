@@ -140,6 +140,9 @@ RUN git clone --branch v1.10.3 --depth 1 https://github.com/AdvancedBlockchainSe
 - Check if Rust/Node/Python version needs updating for new tool version
 - Review upstream release notes for dependency changes
 - Update base images if required
+- Verify solc pre-installation covers required versions (currently: 0.8.13-0.8.28)
+- Foundry-based scanners: verify forge-std version in Dockerfile is current
+- Confirm no new external runtime dependencies (NetworkPolicy blocks downloads)
 
 ---
 

@@ -16,6 +16,11 @@ Operational checklist for verifying any scanner (new or existing) is production-
 - [ ] Wrapper script filters hidden directory paths (`-not -path '*/\.*'`)
 - [ ] Wrapper script includes curl retry logic for callback POST
 - [ ] OCI-compliant labels (`org.opencontainers.image.*`)
+- [ ] Solc pre-installed to `/opt/solc-select/` (for solc-select scanners) and `/opt/svm/` (for Foundry scanners)
+- [ ] Foundry-based scanners: forge-std pre-installed to `/opt/forge-std/lib/forge-std`
+- [ ] Seed step after `USER scanner`: copies from `/opt/` to `$HOME/.solc-select/` and `$HOME/.svm/`
+- [ ] No external downloads at runtime (NetworkPolicy blocks outbound HTTPS)
+- [ ] Foundry-based run scripts set `offline = true` in foundry.toml
 
 ### 2. ConfigMap Registration (4 files)
 

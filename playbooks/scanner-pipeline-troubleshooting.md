@@ -150,7 +150,33 @@ jq '[.[] | select(.ruleId != null) | ...]'
 2. Pre-install solc versions to `/opt/solc-select/artifacts` (survives emptyDir mount)
 3. Add runtime seed step in `run-slither.sh` to copy from `/opt` to `$HOME/.solc-select/`
 
-**Current state:** 18 solc versions (0.5.16–0.8.28) pre-installed in scanner-slither:0.3.8. Runtime seed completes in <1s.
+**Current state:** 8 solc versions (0.8.13–0.8.28) pre-installed in all Solidity scanner images. Runtime seed completes in <1s.
+
+**Applies to ALL Solidity scanners**, not just slither:
+- **solc-select scanners** (slither, echidna, medusa): Pre-install to `/opt/solc-select/artifacts/`
+- **Foundry scanners** (aderyn, soliditydefend, halmos, wake): Pre-install to `/opt/svm/` (Foundry uses `~/.svm/`, NOT `~/.solc-select/`)
+
+---
+
+### Issue 4b: Foundry Scanner Can't Compile (forge-std missing)
+
+**Symptoms:**
+- Scan completes with 0 vulnerabilities on Foundry projects
+- Logs show `forge install foundry-rs/forge-std` failed
+- `Warning: Could not install forge-std, continuing anyway...`
+
+**Root Cause:** Foundry projects require forge-std library for compilation. Run scripts tried to clone from GitHub at runtime, which is blocked by NetworkPolicy.
+
+**Fix:** Pre-install forge-std v1.9.6 at build time:
+```dockerfile
+RUN mkdir -p /opt/forge-std/lib/forge-std && \
+    curl -sL https://github.com/foundry-rs/forge-std/archive/refs/tags/v1.9.6.tar.gz | \
+    tar xz --strip-components=1 -C /opt/forge-std/lib/forge-std
+```
+
+Run scripts copy from `/opt/forge-std/lib/forge-std` to project `lib/` at container startup. Also set `offline = true` in foundry.toml to prevent any download attempts.
+
+**Current state:** forge-std pre-installed in aderyn, slither, soliditydefend, halmos, wake images.
 
 ---
 
