@@ -1,9 +1,9 @@
 # Deduplication Maintenance Pipeline
 
-**Last Updated:** March 13, 2026
-**API Version:** 0.29.82
+**Last Updated:** March 19, 2026
+**API Version:** 0.35.0
 
-Hybrid deduplication system with three execution paths: Celery worker dedup (3 phases dispatched from API pod), post-scan maintenance (4 scoped tasks in worker), and weekly housekeeping (full 18-task sweep via CronJob).
+Hybrid deduplication system with three execution paths: Celery worker dedup (3 phases dispatched from API pod), post-scan maintenance (5 scoped tasks in worker), and daily housekeeping (full 20-task sweep via Celery Beat at 04:00 UTC — replaced weekly K8s CronJob in v0.35.0).
 
 ## Overview
 

@@ -23,6 +23,8 @@ Inline labels      →         3. Deduplicate by vuln_id     6. Train RandomFore
 - **Dashboard**: "Train Now" button on ModelStatusWidget (when 50+ samples available)
 - **Legacy endpoint**: `POST /ml/retrain` (deprecated, requires platform_admin role)
 
+**Label integrity**: Training labels MUST come from end-user actions on the vulnerability detail page only (`POST /ml/label-vulnerability` with JWT auth + ownership check). Auto-labeling scripts are prohibited — they were removed in v0.35.0 after contaminating training data with heuristic labels.
+
 ## Pipeline Phases
 
 ### Phase 1: Data Collection

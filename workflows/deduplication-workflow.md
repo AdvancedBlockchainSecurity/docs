@@ -1,8 +1,8 @@
 # Deduplication Workflow
 
-**Last Updated:** March 13, 2026
+**Last Updated:** March 19, 2026
 **Status:** Active
-**API Version:** 0.29.82+
+**API Version:** 0.35.0+
 
 ---
 
@@ -11,8 +11,8 @@
 The deduplication system uses a hybrid architecture with three execution paths:
 
 1. **Celery worker dedup** — All 3 dedup phases dispatched to an isolated worker pod via Redis (v0.29.13+)
-2. **Post-scan maintenance** — 4 scoped tasks run in the Celery worker after dedup phases complete
-3. **Weekly housekeeping** — Full 18-task sweep via CronJob (Sunday 2 AM UTC)
+2. **Post-scan maintenance** — 5 scoped tasks run in the Celery worker after dedup phases complete
+3. **Daily housekeeping** — Full 20-task sweep via Celery Beat at 04:00 UTC daily (replaced weekly K8s CronJob in v0.35.0)
 
 Dedup processing is fully isolated from the API event loop, preventing health check starvation and pod restarts under heavy scan load.
 

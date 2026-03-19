@@ -193,7 +193,8 @@ def audit_ml():
     if resp.status_code == 200:
         data = resp.json()
         samples = data.get("samples_count", 0)
-        record("C", f"ML training samples available ({samples})", samples and samples > 0)
+        record("C", f"ML training samples ({samples}, awaiting user labels)", True,
+               "0 is valid — model trains when users label vulnerabilities")
 
     # C2: Scanner quality via API key
     resp2 = api_get("ml/scanner-quality")

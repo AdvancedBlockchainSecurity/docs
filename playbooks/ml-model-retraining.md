@@ -1,7 +1,7 @@
 # Playbook: ML Model Retraining
 
-**Version:** 1.1.0
-**Last Updated:** March 16, 2026
+**Version:** 1.2.0
+**Last Updated:** March 19, 2026
 
 ## Overview
 
@@ -15,6 +15,20 @@ The model is automatically trained in two scenarios:
 2. **Label threshold** (100 new labels): When users label vulnerabilities and the count since last training reaches `ML_RETRAIN_THRESHOLD` (default: 100), training is triggered immediately.
 
 In most cases, no manual intervention is needed. The steps below are for manual retraining or troubleshooting.
+
+### Label Integrity
+
+Training labels MUST come from end-user actions on the vulnerability detail page only. The labeling endpoint (`POST /ml/label-vulnerability`) requires JWT auth and contract ownership verification.
+
+Auto-labeling scripts (`auto_label_vulnerabilities.py`, `label_vulnerabilities.py`, `import_labels.py`) were removed in v0.35.0 after they were found to have contaminated training data with heuristic labels. If the model appears trained but no users have labeled vulnerabilities, the training data is likely corrupt — reset via:
+```sql
+UPDATE ml_model_metadata SET accuracy = NULL, auc = NULL,
+    labels_since_train = 0, last_trained_at = NULL, current_version = '0.0.0'
+WHERE model_name = 'fp_classifier';
+UPDATE vulnerabilities SET user_classification = NULL WHERE user_classification IS NOT NULL;
+UPDATE vulnerability_patterns SET fp_feedback_count = 0, confirmed_feedback_count = 0,
+    needs_review = false, review_reason = NULL;
+```
 
 ---
 
