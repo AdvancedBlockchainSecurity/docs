@@ -23,8 +23,8 @@ store_scan_results()     run_dedup_task() [from Redis queue]        vulnerabilit
                              • tool consensus (contract-scoped)
                              • orphan grouping (contract-scoped)
 
-PATH 2: WEEKLY HOUSEKEEPING (CronJob, separate pod)
-CronJob (Sun 2 AM UTC) → run_weekly_housekeeping()                 vulnerabilities
+PATH 2: DAILY HOUSEKEEPING (Celery Beat, 04:00 UTC)
+dedup.daily_maintenance → run_weekly_housekeeping()                 vulnerabilities
                            Phase 1: Cleanup & Fingerprints          deduplication_groups
                            Phase 2: Grouping & Mapping              pattern_tool_mappings
                            Phase 3: Analytics & Quality             scanner_quality_metrics
@@ -58,15 +58,16 @@ The worker runs all 3 dedup phases (intra-scan, cross-scan, post-scan maintenanc
 - Retry: 2x with 30s backoff
 - Soft time limit: 5 min, hard kill: 10 min
 
-### Weekly Housekeeping (CronJob)
+### Daily Housekeeping (Celery Beat)
 
-- **Kubernetes CronJob**: Runs weekly Sunday at 2 AM UTC (`k8s/base/api-service/cronjob-deduplication.yaml`)
-- **Manual**: `kubectl create job --from=cronjob/deduplication-maintenance deduplication-maintenance-manual -n api-service-local`
+- **Celery Beat**: `dedup.daily_maintenance` runs at 04:00 UTC daily (orchestration service)
+- **Internal endpoint**: `POST /api/v1/internal/dedup/maintenance` (requires `X-Internal-Service-Key`)
+- **CLI**: `python -m src.infrastructure.tasks.deduplication_maintenance --weekly`
 
 ### CLI
 
 ```bash
-# Weekly housekeeping (used by CronJob)
+# Full 20-task sweep (what the daily Celery Beat task runs)
 python -m src.infrastructure.tasks.deduplication_maintenance --weekly
 
 # Post-scan for specific scan (manual testing)
@@ -91,7 +92,7 @@ python -m src.infrastructure.tasks.deduplication_maintenance
 
 ## Weekly Housekeeping Tasks (18 Total)
 
-The weekly CronJob runs all 18 tasks as a full sweep across the entire database.
+The daily Celery Beat task runs all 20 tasks as a full sweep across the entire database.
 
 ### Phase 1: Cleanup & Fingerprint Generation (Tasks 1-6)
 

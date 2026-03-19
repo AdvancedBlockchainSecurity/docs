@@ -41,11 +41,11 @@ Dedup processing is fully isolated from the API event loop, preventing health ch
 
 ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
 
-  Weekly CronJob (Sunday 2 AM UTC)
+  Celery Beat (Daily 04:00 UTC)
        │
        ▼
-  WEEKLY HOUSEKEEPING (separate pod, same image)
-    Full 18-task sweep: cleanup, fingerprints, grouping, analytics,
+  DAILY HOUSEKEEPING (via orchestration → internal endpoint)
+    Full 20-task sweep: cleanup, fingerprints, grouping, analytics,
     scanner quality, ML feedback, active learning
 ```
 

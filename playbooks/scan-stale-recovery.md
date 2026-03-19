@@ -1,7 +1,7 @@
 # Playbook: Scan Stale Recovery & Monitoring
 
-**Version**: 2.1.0
-**Last Updated**: 2026-02-28
+**Version**: 3.0.0
+**Last Updated**: 2026-03-19
 
 ## Overview
 
@@ -142,11 +142,9 @@ After taking action:
 - [ ] Auto-refresh updates every 30 seconds
 - [ ] All actions appear in audit logs
 
-## Two Recovery Mechanisms
+## Recovery Mechanisms
 
-The platform has two independent stale scan recovery mechanisms:
-
-### 1. Orchestration Celery Beat (Primary — v0.10.6+)
+### Orchestration Celery Beat (Primary — v0.10.6+)
 
 Runs every 30 seconds via `check_stale_scans` task. Directly queries the database.
 
@@ -156,38 +154,28 @@ Runs every 30 seconds via `check_stale_scans` task. Directly queries the databas
 
 The outer exception handler in `execute_scan_analysis` also records `error_message` on unexpected failures, preventing NULL error messages on failed scans.
 
-### 2. API Service Maintenance Endpoint + CronJob (Secondary — v0.28.38+, Phase 2 in v0.29.43+)
+### API Service Maintenance CLI (Manual — v0.28.38+)
 
-HTTP endpoint for recovery of scans that the orchestration beat may miss (e.g., scans where the callback never arrived):
-
-```bash
-# Recover scans stuck in queued/running for >1 hour
-# Records error_message with recovery context and original status
-curl -sk -X POST https://app.0xapogee.com/api/v1/scans/maintenance/recover-stale-scans \
-  -H "X-Internal-Service: true"
-```
-
-This endpoint records `error_message: "Recovered by maintenance: scan was stuck in '{status}' status for over 1 hour (created {timestamp})"` and resets associated contract status from `scanning` to `scanned`.
-
-**Phase 2 (v0.29.43+):** The endpoint now includes a second recovery pass that finds contracts stuck in `"scanning"` status with no active (`queued`/`running`) scans and resets them to `"scanned"` or `"uploaded"`. This closes the gap where a contract could remain in `"scanning"` even after all associated scans had completed or failed.
-
-**Automated CronJob (v0.29.43+):** A Kubernetes CronJob (`cronjob-stale-scan-recovery.yaml`) runs `stale_scan_recovery.py` every 15 minutes with `concurrencyPolicy: Forbid`. No manual invocation is required for routine recovery.
+Standalone CLI tool for manual recovery of scans that the orchestration beat may miss (e.g., scans where the callback never arrived). Includes additional phases for stuck contracts and batch reconciliation:
 
 ```bash
-# Check CronJob status
-kubectl get cronjob stale-scan-recovery -n api-service-local
-
-# Manually trigger a recovery job
-kubectl create job --from=cronjob/stale-scan-recovery stale-scan-recovery-manual -n api-service-local
-kubectl logs -n api-service-local job/stale-scan-recovery-manual -f
+# Run manually from inside the pod or with correct DATABASE_URL
+python -m src.infrastructure.tasks.stale_scan_recovery
 ```
 
-### Key Difference
+Three recovery phases:
+1. **Stale scans**: Marks scans stuck in queued/running for >1 hour as failed
+2. **Stuck contracts**: Resets contracts in `"scanning"` with no active scans to `"scanned"` or `"uploaded"`
+3. **Batch reconciliation**: Finalizes batch scans where all children are complete but batch status is still running
 
-| Mechanism | Interval | Timeout | Handles Queued | Retries Running | Fixes Contract Status | Records error_message |
+**Note (v0.35.1):** The K8s CronJob (`cronjob-stale-scan-recovery.yaml`) was removed in favor of the Celery Beat task which runs every 30 seconds. The CLI tool remains available for manual intervention.
+
+### Comparison
+
+| Mechanism | Interval | Timeout | Handles Queued | Retries Running | Fixes Contract Status | Batch Reconciliation |
 |---|---|---|---|---|---|---|
-| Orchestration beat | 30s | 600s (10m) | Yes (v0.10.6+) | Yes (up to 3) | Yes | Yes |
-| API maintenance endpoint | On-demand / CronJob (15 min) | 3600s (1h) | Yes | No (fails immediately) | Yes — Phase 2 (v0.29.43+) | Yes (v0.29.37+) |
+| Orchestration beat | 30s | 600s (10m) | Yes (v0.10.6+) | Yes (up to 3) | No | No |
+| CLI tool | Manual | 3600s (1h) | Yes | No (fails immediately) | Yes | Yes |
 
 **See also:** [Database manual fix for existing stuck contracts](../database/MANUAL-FIXES-2026-02-17-STALE-SCANS.md)
 
