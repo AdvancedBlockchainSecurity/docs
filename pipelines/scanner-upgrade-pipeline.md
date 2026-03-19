@@ -1,7 +1,7 @@
 # Scanner Upgrade Pipeline
 
-**Last Updated:** March 17, 2026
-**API Version:** 0.33.3
+**Last Updated:** March 19, 2026
+**API Version:** 0.35.2
 
 Full pipeline that runs when an admin clicks "Upgrade" on a scanner in the Admin Portal.
 
@@ -80,7 +80,7 @@ Validates data integrity after the upgrade. This is a **read-only** operation.
 | Operation | Handled By |
 |-----------|-----------|
 | Docker image rebuild | Host-side operation (see [Upgrade Scanner Image Playbook](../playbooks/upgrade-scanner-image.md)) |
-| Deduplication maintenance | Daily CronJob at 2AM UTC (or manual trigger) |
+| Deduplication maintenance | Daily Celery Beat at 04:00 UTC (or manual trigger via internal endpoint) |
 | ML model retraining | Admin Portal → ML Models → Retrain Model |
 | Delete old vulnerabilities | Manual clean-slate procedure (see below) |
 | Delete old scans | Manual clean-slate procedure (see below) |
@@ -93,7 +93,7 @@ Validates data integrity after the upgrade. This is a **read-only** operation.
 |-----------|-------------------|
 | Vulnerability records | Preserved (never deleted) |
 | User labels (`user_classification`) | Preserved (never touched) |
-| Deduplication groups | Preserved (cleaned by daily CronJob) |
+| Deduplication groups | Preserved (cleaned by daily Celery Beat task) |
 | ML model weights | Not touched (separate from upgrade pipeline) |
 | Patterns (`vulnerability_patterns`) | Additive only (new patterns created, never deleted) |
 | Mappings (`pattern_tool_mappings`) | Additive + soft-deactivate (removed detectors set `is_active = False`) |
@@ -453,6 +453,12 @@ kubectl exec -n postgresql-local postgresql-0 -- psql -U blocksecops -d solidity
 - [ ] Audit health score >= 90% (healthy)
 
 ---
+
+## Authentication
+
+The API service proxies upgrade requests to tool-integration using the `X-Internal-Service-Token` header (BSO-SEC-004). The tool-integration service validates this token before allowing ConfigMap modifications.
+
+**Fixed in v0.35.2:** The `X-Internal-Service-Token` header was missing from the proxy call, causing all upgrade attempts to receive 403 from tool-integration. The RBAC Role for the tool-integration service account was also missing the `update` verb for ConfigMaps (had `patch` only), causing K8s API 403 when replacing the ConfigMap.
 
 ## Related Documentation
 
