@@ -1,7 +1,7 @@
 # Playbook: Deduplication Maintenance
 
-**Version:** 2.2.0
-**Last Updated:** March 13, 2026
+**Version:** 3.0.0
+**Last Updated:** March 19, 2026
 **Audience:** Platform Operator | Developer
 
 ## Overview
@@ -9,8 +9,10 @@
 Monitor and troubleshoot the hybrid deduplication maintenance system. Deduplication runs via three paths:
 
 1. **Celery worker dedup** — All 3 dedup phases dispatched to isolated worker pod via Redis (v0.29.13+)
-2. **Post-scan maintenance** — 4 scoped tasks run in the Celery worker after dedup phases
-3. **Weekly CronJob** — Full 18-task sweep runs Sunday 2 AM UTC
+2. **Post-scan maintenance** — 5 scoped tasks run in the Celery worker after dedup phases (includes fingerprint backfill)
+3. **Daily Celery Beat** — Full 20-task sweep runs at 04:00 UTC daily via `dedup.daily_maintenance` (replaced weekly K8s CronJob in v0.35.0)
+
+**Manual re-trigger**: `POST /api/v1/internal/dedup/maintenance` (requires `X-Internal-Service-Key`)
 
 ---
 

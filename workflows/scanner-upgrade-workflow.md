@@ -55,7 +55,7 @@ The scanner upgrade workflow updates scanner version metadata, validates detecto
 │   ┌─────────────────────────────────────────────────────────────────────┐  │
 │   │ Phase 6: DEDUPLICATION MAINTENANCE                                  │  │
 │   │ Re-run deduplication for affected contracts                         │  │
-│   │ Daily CronJob handles this automatically (2AM UTC)                  │  │
+│   │ Daily Celery Beat handles this automatically (04:00 UTC)             │  │
 │   └─────────────────────────────────────────────────────────────────────┘  │
 │        │                                                                    │
 │        ▼                                                                    │
@@ -99,7 +99,7 @@ The Admin Dashboard provides an "Upgrade" button for scanners that show a newer 
 
 **What it does NOT do:**
 - Rebuild Docker images (requires host-side Docker access)
-- Trigger deduplication (handled by daily CronJob)
+- Trigger deduplication (handled by daily Celery Beat at 04:00 UTC)
 
 **API Flow:**
 ```
@@ -226,9 +226,9 @@ Removed: (none)
 
 ### Phase 6: Deduplication Maintenance
 
-**Automated:** Daily CronJob at 2AM UTC (`deduplication-maintenance` in `api-service-local` namespace).
+**Automated:** Daily Celery Beat at 04:00 UTC (`dedup.daily_maintenance` via orchestration service).
 
-**18 maintenance tasks** including:
+**20 maintenance tasks** including:
 - Re-fingerprint findings with empty fingerprints
 - Merge overlapping deduplication groups
 - Update canonical selections

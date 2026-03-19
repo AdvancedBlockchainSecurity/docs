@@ -133,7 +133,9 @@ Training is triggered automatically in three ways:
 2. **Daily freshness check**: Celery Beat task `ml.check_model_freshness` runs at **02:00 UTC daily**. If the model has never been trained (and sufficient data exists) or is older than 7 days, it triggers retraining via the orchestration service.
 3. **Post-label counting**: The `LabelCounter` in `ml_model_metadata` tracks labels since last training and triggers retrain when `ML_RETRAIN_THRESHOLD` (default: 100) is reached.
 
-The daily freshness check is critical for **initial training** — when the model has never been trained but labeled data exists (e.g., 385 samples from historical labeling), the freshness check detects this and triggers the first training automatically.
+The daily freshness check is critical for **initial training** — when the model has never been trained but sufficient labeled data exists (50+ samples), the freshness check detects this and triggers the first training automatically.
+
+**Label sources**: Labels MUST come from end-user actions on the vulnerability detail page only. The `/ml/label-vulnerability` endpoint requires JWT auth and contract ownership verification. Auto-labeling scripts are prohibited — they create fake training data that corrupts the model.
 
 ### Manual Training (Admin Only)
 
