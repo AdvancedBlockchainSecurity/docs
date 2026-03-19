@@ -1,8 +1,8 @@
 # Scanner Upgrade Workflow
 
-**Last Updated:** March 17, 2026
+**Last Updated:** March 19, 2026
 **Status:** Active
-**API Version:** 0.33.3
+**API Version:** 0.35.2
 
 ---
 
