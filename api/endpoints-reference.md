@@ -805,6 +805,34 @@ The 402 response includes `payment_options` for x402 pay-per-scan integration:
 
 ---
 
+### POST /scans/{scan_id}/cancel
+
+**NEW** (March 23, 2026) - Cancel a running or queued scan.
+
+Cancels a scan that is currently in `running` or `queued` status. Any partial results from scanners that completed before cancellation are preserved. The scan status is set to `cancelled`.
+
+**Authentication**: Required (scope: `scans:create`)
+
+**Path Parameters**:
+- `scan_id` (UUID) - The scan to cancel
+
+**Response** (200 OK):
+```json
+{
+  "success": true,
+  "scan_id": "uuid",
+  "status": "cancelled",
+  "message": "Scan cancelled successfully"
+}
+```
+
+**Error Responses**:
+- `400` - Scan is not in a cancellable state (already completed/failed/cancelled)
+- `404` - Scan not found
+- `403` - Scan does not belong to authenticated user/org
+
+---
+
 ### DELETE /scans/{scan_id}
 
 **NEW** (December 9, 2025) - Delete a scan and all related records.
