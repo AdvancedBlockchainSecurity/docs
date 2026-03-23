@@ -379,7 +379,7 @@ Scan execution tracking with priority queue support.
 | user_id | UUID | FK users(id), NOT NULL, indexed | |
 | organization_id | UUID | FK organizations(id) ON DELETE SET NULL, nullable, indexed | |
 | scan_type | VARCHAR(50) | NOT NULL, default 'full' | |
-| status | ENUM(scan_status) | NOT NULL, default 'queued' | queued/running/completed/failed |
+| status | ENUM(scan_status) | NOT NULL, default 'queued' | queued/running/completed/failed/cancelled |
 | started_at | TIMESTAMPTZ | nullable | |
 | completed_at | TIMESTAMPTZ | nullable | |
 | error_message | TEXT | nullable | |
@@ -1985,7 +1985,7 @@ Support ticket submissions with JIRA integration.
 |------|--------|---------|
 | `contract_language` | solidity, vyper, rust, move, cairo, tact, clarity, yul, huff, fe, simplicity, michelson, plutus, sway, cadence, motoko, ink, zinc, leo, near, cosmos | contracts.language |
 | `contract_status` | uploaded, pending, scanning, scanned, failed | contracts.status |
-| `scan_status` | queued, running, completed, failed | scans.status |
+| `scan_status` | queued, running, completed, failed, cancelled | scans.status |
 | `vulnerability_severity` | critical, high, medium, low | vulnerabilities.severity |
 | `vulnerability_status` | open, acknowledged, fixed, false_positive | vulnerabilities.status |
 

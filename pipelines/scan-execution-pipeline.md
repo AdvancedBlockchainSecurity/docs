@@ -112,6 +112,7 @@ The `ScannerContext` dataclass contains everything a scanner needs:
 | Echidna | Solidity | Fuzzer | via K8s Job |
 | Medusa | Solidity | Fuzzer | via K8s Job |
 | Wake | Solidity | Static Analysis | via K8s Job |
+| Mythril | Solidity | Symbolic Execution | via K8s Job |
 | Moccasin | Vyper | Fuzzer | via K8s Job |
 | Sol-Azy | Solana/Rust | Static Analysis | via K8s Job |
 | Sec3 X-Ray | Solana/Rust | Static Analysis | via K8s Job |
