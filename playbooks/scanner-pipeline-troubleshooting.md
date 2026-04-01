@@ -180,6 +180,53 @@ Run scripts copy from `/opt/forge-std/lib/forge-std` to project `lib/` at contai
 
 ---
 
+### Issue 4c: Scanner Callback Returns 403 Forbidden
+
+**Symptoms:**
+- Scanner pod completes successfully with findings
+- Pod logs show `Failed to post results (HTTP 403): {"detail":"Invalid service token"}`
+- Scan marked as completed with 0 vulnerabilities
+
+**Root Cause:** Security audit (March 2026) added `X-Internal-Service-Token` authentication to the `/api/v1/scans/{scan_id}/results` callback endpoint. Scanner entrypoint scripts didn't include the token header.
+
+**Fix (v0.5.36):**
+1. KJM passes `INTERNAL_SERVICE_TOKEN` env var to scanner K8s Job pods
+2. All 11 scanner entrypoint scripts include `-H "X-Internal-Service-Token: ${INTERNAL_SERVICE_TOKEN:-}"` in callback curl POST
+
+**Diagnosis:**
+```bash
+# Check if callback is getting 403
+kubectl logs -n tool-integration-prod deployment/tool-integration --since=10m | grep "403"
+# If you see: POST /api/v1/scans/{id}/results HTTP/1.1 403 Forbidden
+# → Scanner images need the auth header update
+```
+
+---
+
+### Issue 4d: Multi-File Project Returns 0 Findings
+
+**Symptoms:**
+- Single-file contracts produce findings but multi-file projects produce 0
+- Scanner entrypoint logs show files at `/contracts/src_Token.sol` instead of `/contracts/src/Token.sol`
+
+**Root Cause:** ConfigMap keys flatten directory paths (slashes replaced with underscores). Scanner entrypoint scripts must reconstruct the directory structure before running analysis.
+
+**Fix:** Scanner entrypoint scripts detect multi-file projects (presence of `foundry.toml`, `hardhat.config.js`, or `manifest.json`), copy to writable `/tmp/project`, and reconstruct directory structure:
+```bash
+for file in *.sol; do
+    if [ -f "$file" ] && [[ "$file" == *_* ]]; then
+        dir_part="${file%%_*}"
+        file_part="${file#*_}"
+        mkdir -p "$dir_part"
+        mv "$file" "$dir_part/$file_part"
+    fi
+done
+```
+
+**Current state:** Multi-file support added to soliditydefend, semgrep, solhint, halmos, medusa, rustdefend, moccasin, vyper, wake. Slither and aderyn already had it.
+
+---
+
 ### Issue 5: Scanner Reads Wrong Directory
 
 **Symptoms:**

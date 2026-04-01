@@ -274,6 +274,17 @@ Failed API forwards are stored in `/tmp/dead-letters/` for manual retry:
 | Curl retry + timeout | aderyn, semgrep | Added --retry 3 --retry-all-errors to callback POST |
 | Offline rule bundling | semgrep | Download rules during Docker build for air-gapped operation |
 
+## April 2026 Fixes
+
+| Fix | Scanner | Description |
+|-----|---------|-------------|
+| Callback auth header | all (11 scanners) | Add X-Internal-Service-Token to callback POST — required after security audit added auth to results endpoint |
+| KJM token passthrough | tool-integration | Pass INTERNAL_SERVICE_TOKEN env var to scanner K8s Job pods |
+| Multi-file project support | soliditydefend, semgrep, solhint, halmos, medusa, rustdefend, moccasin, vyper, wake | Detect Foundry/Hardhat projects, copy to writable dir, reconstruct directory structure from flattened ConfigMap keys |
+| Slither .svm cache | slither | Pre-install Foundry .svm solc cache in Dockerfile for offline `forge build` |
+| Slither offline mode | slither | Add `offline = true` to foundry.toml in entrypoint to prevent runtime solc downloads |
+| Wake git init fix | wake | Set global git config before `git init` to prevent failure in container |
+
 ## Files
 
 | File | Role |

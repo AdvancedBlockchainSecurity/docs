@@ -147,6 +147,8 @@ Without these rules, scanner pods in namespaces with `default-deny-all` cannot P
 
 **Callback endpoint**: `POST /api/v1/scans/{scan_id}/results`
 
+**Authentication (v0.5.36+)**: Scanner callbacks require `X-Internal-Service-Token` header. The token is passed to scanner pods as the `INTERNAL_SERVICE_TOKEN` environment variable by the Kubernetes Job Manager. Scanner entrypoint scripts include this header in their curl POST.
+
 **Parser routing by scanner type**:
 
 | Scanner | Parser | Key Input Field | Notes |
