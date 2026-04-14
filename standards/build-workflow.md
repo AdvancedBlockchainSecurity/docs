@@ -59,6 +59,18 @@ docker push ${REGISTRY}/blocksecops/<service>:${VERSION}
 kubectl apply -k k8s/overlays/local/<service>/
 ```
 
+> **MANDATORY:** All three `--build-arg` flags above are required, not optional.
+>
+> Without `SERVICE_VERSION`, `BUILD_DATE`, and `VCS_REF`, the resulting image's OCI labels (`org.opencontainers.image.version`, `.created`, `.revision`) will fall back to Dockerfile ARG defaults — typically a stale or generic value. This breaks **provenance tracing**: you cannot determine which Git commit produced a deployed image, when it was built, or whether the running version matches the source-of-truth `pyproject.toml`/`package.json`.
+>
+> **A build that omits any of these args is non-compliant** and must be re-built before pushing. Per the immutable tag policy, this means bumping the version (since the existing tag cannot be overwritten).
+>
+> **Single quick verification after build:**
+> ```bash
+> docker inspect --format='{{json .Config.Labels}}' ${REGISTRY}/blocksecops/<service>:${VERSION} | jq '."org.opencontainers.image.created", ."org.opencontainers.image.revision"'
+> ```
+> If either is empty/null, the build args were missed.
+
 ### Version Drift Checker
 
 Run the platform-wide drift checker to detect version mismatches across all services:

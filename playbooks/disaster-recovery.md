@@ -29,7 +29,7 @@ Procedures for recovering the Apogee platform from catastrophic failures includi
 
 | Component | Method | Frequency | Retention | Location |
 |-----------|--------|-----------|-----------|----------|
-| PostgreSQL (GCP) | In-cluster StatefulSet (GCE PD) | On-demand (GCS CronJob pending) | 30 days | GCS bucket |
+| PostgreSQL (GCP) | `postgresql-backup` CronJob (pg_dump → GCS upload) | Daily at 02:00 UTC | 7 days local PVC + GCS lifecycle | `gs://apogee-production-db-backups/postgresql/` |
 | PostgreSQL (GCP) | PVC snapshot | On-demand | 7 days | Same region |
 | PostgreSQL (local) | Manual `pg_dump` | On-demand | 7 days | `docs/database/backups/` |
 | Vault secrets | `init-vault-local.sh` | On cluster init | N/A | Git (script only) |
@@ -37,6 +37,10 @@ Procedures for recovering the Apogee platform from catastrophic failures includi
 | Application code | Git | Every commit | Permanent | GitHub |
 | Kubernetes manifests | Git (kustomize) | Every commit | Permanent | GitHub |
 | Docker images | Harbor (local) / Artifact Registry (GCP) | Every build | Immutable tags | Registry |
+
+> **Operational runbook:** See `docs/playbooks/postgresql-backup-operations.md` for daily ops, manual triggers, troubleshooting, and the active alerts (`CronJobJobFailed`, `PostgreSQLBackupStale`, `CronJobPodConfigError`).
+>
+> **Incident reference:** The GCP CronJob was silently broken from 2026-04-13 to 2026-04-15. Postmortem and lessons learned: `docs/audit/2026-04-15-postgresql-backup-recovery-summary.md`.
 
 ### What Is NOT Backed Up
 

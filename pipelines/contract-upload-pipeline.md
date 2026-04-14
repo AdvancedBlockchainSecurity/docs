@@ -2,6 +2,10 @@
 
 Handles smart contract upload, validation, storage, and optional scan triggering.
 
+**Sibling pipelines:**
+- [GitHub URL Ingest Pipeline](./github-url-ingest-pipeline.md) — `POST /api/v1/contracts/from-github` (added api-service 0.37.x)
+- [Contract Ingest Workflow](../workflows/contract-ingest-workflow.md) — comparison of all four ingest methods
+
 ## Overview
 
 ```

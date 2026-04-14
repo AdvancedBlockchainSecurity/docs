@@ -59,7 +59,7 @@ In production, PostgreSQL runs as a self-hosted StatefulSet on GKE (not Cloud SQ
 | Storage | GCE Persistent Disk (10Gi, `standard-rwo`) |
 | SSL | Enabled via cert-manager (self-signed CA) |
 | Credentials | GCP Secret Manager → ExternalSecret |
-| Backup | Pending: GCS-based backup CronJob |
+| Backup | `postgresql-backup` CronJob daily at 02:00 UTC → `gs://apogee-production-db-backups/postgresql/` (operational since 2026-04-15). See `docs/playbooks/postgresql-backup-operations.md`. |
 
 Connection string format (asyncpg):
 ```
