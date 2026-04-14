@@ -214,9 +214,9 @@ Smart contract source code and metadata.
 | structure_analyzed_at | TIMESTAMPTZ | nullable | |
 | structure_parse_errors | JSONB | nullable | |
 | source_hash | VARCHAR(64) | nullable, indexed | SHA-256 content hash |
-| source_repo_url | VARCHAR(500) | nullable | |
-| source_commit_hash | VARCHAR(40) | nullable | |
-| source_file_path | VARCHAR(500) | nullable | |
+| source_repo_url | VARCHAR(500) | nullable | Provenance: original GitHub URL (populated by `/api/v1/contracts/from-github` since api-service 0.37.x; OAuth-linked sync also populates) |
+| source_commit_hash | VARCHAR(40) | nullable | Provenance: branch HEAD SHA at fetch time |
+| source_file_path | VARCHAR(500) | nullable | Provenance: repo-relative path |
 | is_archived | BOOLEAN | NOT NULL, default false | ML data preservation |
 | archived_at | TIMESTAMPTZ | nullable | |
 | created_at | TIMESTAMPTZ | NOT NULL, default now() | |
