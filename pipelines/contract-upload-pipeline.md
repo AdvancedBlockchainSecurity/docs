@@ -86,12 +86,27 @@ ContractResponse (id, vulnerabilities: {0,0,0,0}, projects, tags)
 
 ## Supported Languages
 
-| Language | Enum Value | Detection |
-|----------|------------|-----------|
-| Solidity | `solidity` | `.sol` extension, `pragma solidity` |
-| Vyper | `vyper` | `.vy` extension |
-| Rust (Solana) | `rust` | `.rs` extension, `use anchor_lang` |
-| Move | `move` | `.move` extension |
+| Language | Enum Value | Detection | Single File | Project Archive |
+|----------|------------|-----------|-------------|-----------------|
+| Solidity | `solidity` | `.sol` extension, `pragma solidity` | yes | yes (Foundry, Hardhat) |
+| Vyper | `vyper` | `.vy` extension | yes | yes |
+| Rust (Solana) | `rust` | `.rs` extension, `use anchor_lang` | yes | yes (Anchor) — added 2026-04-13 in api-service 0.36.2 |
+| Move | `move` | `.move` extension | yes | no |
+
+### Framework Detection (`framework_detector.py`)
+
+| Framework | Trigger File | Source Directory | Dependency Dir |
+|-----------|-------------|------------------|----------------|
+| `anchor` | `Anchor.toml` | `programs/` | none (crates pre-vendored in scanner images) |
+| `foundry` | `foundry.toml` | `src/` | `lib/` |
+| `hardhat` | `hardhat.config.{js,ts}` | `contracts/` | `node_modules/` |
+| `plain` | none of the above | `src/`, `contracts/`, `programs/`, `source/` | none |
+
+Anchor has highest detection priority (`Anchor.toml` is unambiguous). Then Foundry, Hardhat, Plain.
+
+### Multi-Language Archive Extraction (`archive_extractor.py`)
+
+The archive extractor walks all `*.sol`, `*.rs`, `*.vy` files and classifies each by language. Config files (`Anchor.toml`, `Cargo.toml`, `foundry.toml`, `hardhat.config.*`, `package.json`, `remappings.txt`) are extracted alongside contract files. Solidity-only dependency resolution (import remapping) is skipped for Rust/Vyper projects.
 
 ## Input Validation (v0.29.43)
 

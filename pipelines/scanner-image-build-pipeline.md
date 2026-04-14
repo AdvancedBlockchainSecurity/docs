@@ -323,6 +323,87 @@ ENTRYPOINT ["/app/wrapper.sh"]
 - OCI labels record both image version and tool version
 - Entrypoint is typically a wrapper script that runs the upstream tool
 
+### Wrapper Script Standard
+
+**MANDATORY:** All scanner wrapper scripts MUST be **external files** copied into the image, NOT inline `RUN cat > /usr/local/bin/wrapper << 'EOF' ... EOF` heredocs. Inline heredocs (legacy pattern, removed 2026-04-13) are harder to lint, can't be unit-tested independently, and are vulnerable to shell injection via variable interpolation inside the heredoc.
+
+**Required wrapper script structure** (matches `rustdefend-scan`, `soliditydefend-scan`):
+
+```bash
+#!/bin/bash
+set -euo pipefail  # medusa intentionally omits -e for exit-code handling
+
+CONTRACTS_DIR="${CONTRACTS_DIR:-/contracts}"
+OUTPUT_FILE="${OUTPUT_FILE:-/output/results.json}"
+CALLBACK_URL="${CALLBACK_URL:-}"
+SCAN_ID="${SCAN_ID:-}"
+
+# 1. Validate required env vars
+if [ -z "$CALLBACK_URL" ] || [ -z "$SCAN_ID" ]; then
+    echo "ERROR: CALLBACK_URL and SCAN_ID environment variables are required"
+    exit 1
+fi
+
+# 2. EXIT trap for guaranteed callback delivery
+post_callback() { ... }
+cleanup() { post_callback; rm -f "$TMP_FILES"; }
+trap cleanup EXIT
+
+# 3. Set up writable workspace (ConfigMap mounts are read-only)
+WORK_DIR="/tmp/project"
+rm -rf "$WORK_DIR"
+cp -rL "$CONTRACTS_DIR" "$WORK_DIR"
+
+# 4. Reconstruct flattened ConfigMap directory structure
+# (slash → underscore convention from KJM)
+
+# 5. Run scanner, write platform-standard JSON output:
+#    {scanner, version, status, vulnerabilities[], summary, metadata}
+```
+
+**Dockerfile pattern:**
+```dockerfile
+COPY scanner-name-scan /usr/local/bin/scanner-name-scan
+RUN chmod +x /usr/local/bin/scanner-name-scan
+USER scanner  # UID 1000 to match KJM runAsUser
+ENTRYPOINT ["scanner-name-scan"]
+```
+
+### Offline Build Pattern (Rust Scanners)
+
+For scanners that compile user code (trident, cargo-fuzz-solana), runtime crate downloads are blocked by NetworkPolicy. Pre-vendor crates at Docker build time:
+
+```dockerfile
+# Create skeleton project with common dependencies
+RUN mkdir -p /opt/skeleton/programs/skeleton/src && \
+    cat > /opt/skeleton/programs/skeleton/Cargo.toml << 'EOF'
+[package]
+name = "skeleton"
+version = "0.1.0"
+edition = "2021"
+[dependencies]
+anchor-lang = "0.30.1"
+solana-program = "1.18"
+EOF
+
+# Vendor all crate sources for offline resolution
+WORKDIR /opt/skeleton
+RUN cargo vendor /opt/cargo-vendor 2>&1 && \
+    mkdir -p /opt/cargo-vendor/.cargo && \
+    cat > /opt/cargo-vendor/.cargo/config.toml << 'EOF'
+[source.crates-io]
+replace-with = "vendored-sources"
+[source.vendored-sources]
+directory = "/opt/cargo-vendor"
+[net]
+offline = true
+EOF
+```
+
+At runtime, the wrapper seeds `/opt/cargo-vendor/.cargo/config.toml` into the user's workspace `.cargo/` so `cargo build` resolves all deps offline.
+
+This pattern mirrors Slither's pre-installed solc strategy. Storage location is `/opt/` (immune to KJM emptyDir mount at `/home/scanner` that shadows baked-in files).
+
 ### KJM Fallback (Kubernetes Job Manager)
 
 **File:** `blocksecops-tool-integration/src/scanners/kubernetes_job_manager.py`

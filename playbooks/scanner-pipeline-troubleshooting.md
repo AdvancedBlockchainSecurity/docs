@@ -335,16 +335,62 @@ pytest tests/regression/test_scanner_network_policy.py -v
 
 ---
 
+### Issue 11: Rust Scanner Fails with "failed to select a version" or "no matching package" (Vendored Crates)
+
+**Symptoms:**
+- trident or cargo-fuzz-solana scan completes (status=completed) but reports 0 findings or build errors in logs
+- Logs show:
+  ```
+  error: failed to select a version for the requirement `anchor-lang = "^0.29.0"`
+  location searched: directory source `/opt/cargo-fuzz-vendor` (which is replacing registry `crates-io`)
+  note: perhaps a crate was updated and forgotten to be re-vendored?
+  ```
+  Or: `error: no matching package named 'XYZ' found`
+
+**Root Cause:** Scanner pods cannot reach crates.io (NetworkPolicy egress allows only DNS + tool-integration callback). All required crates are pre-vendored at Docker build time into `/opt/cargo-vendor/` (trident) or `/opt/cargo-fuzz-vendor/` (cargo-fuzz-solana). If the user's `Cargo.toml` requires a crate version not in the vendored set, the offline build fails.
+
+**Currently vendored:**
+- **trident**: anchor-lang 0.30.1, anchor-spl 0.30.1, solana-program 1.18, solana-sdk 1.18, spl-token 4, spl-associated-token-account 3, borsh 1, thiserror 1
+- **cargo-fuzz-solana**: same as trident **plus** anchor-lang 0.29.0, anchor-spl 0.29.0, solana-program 1.17, libfuzzer-sys 0.4, arbitrary 1
+
+**Resolution:**
+1. Verify the user's required crate is missing from the vendor: check the scanner image's `/opt/cargo-vendor/` (or `cargo-fuzz-vendor/`) directory listing
+2. To add a crate to the vendored set: edit the skeleton `Cargo.toml` in the scanner's Dockerfile (`scanner-images/trident/Dockerfile` or `scanner-images/cargo-fuzz-solana/Dockerfile`), bump scanner image version, rebuild + push + redeploy
+3. The wrapper handles the failure gracefully — returns `status=completed` with `vulnerabilities=[]` rather than crashing
+
+**Diagnostic:**
+```bash
+# Inspect what's vendored in the scanner image
+docker run --rm --entrypoint /bin/sh scanner-trident:0.4.0 \
+  -c "ls /opt/cargo-vendor/ | head -30"
+
+# Check scanner job logs for offline build errors
+kubectl logs -n tool-integration-prod job/scan-trident-<scan_id> | grep -E "failed to select|no matching package|offline"
+```
+
+---
+
 ## Scanner Image Version Reference
 
 | Scanner | Image | Version | Base | UID |
 |---------|-------|---------|------|-----|
-| slither | scanner-slither | 0.3.8 | python:3.11-slim | 1000 |
-| aderyn | scanner-aderyn | 0.7.3 | debian:bookworm-slim | 1000 |
-| semgrep | scanner-semgrep | 0.3.8 | python:3.11-slim | 1000 |
-| solhint | scanner-solhint | 0.1.8 | node:20-alpine | 1000 (node) |
-| wake | scanner-wake | 0.3.8 | python:3.11-slim | 1000 |
-| soliditydefend | scanner-soliditydefend | 0.9.1 | debian:bookworm-slim | 1000 |
+| slither | scanner-slither | 0.3.11 | python:3.11-slim | 1000 |
+| aderyn | scanner-aderyn | 0.7.10 | debian:bookworm-slim | 1000 |
+| semgrep | scanner-semgrep | 0.3.11 | python:3.11-slim | 1000 |
+| solhint | scanner-solhint | 0.1.13 | node:20-alpine | 1000 (node) |
+| wake | scanner-wake | 0.4.6 | python:3.11-slim | 1000 |
+| soliditydefend | scanner-soliditydefend | 0.9.7 | debian:bookworm-slim | 1000 |
+| echidna | scanner-echidna | 0.4.0 | python:3.11-slim | 1000 |
+| halmos | scanner-halmos | 0.3.10 | python:3.11-slim | 1000 |
+| medusa | scanner-medusa | 0.3.8 | alpine + gcompat | 1000 |
+| mythril | scanner-mythril | 0.1.7 | python:3.11-slim | 1000 |
+| vyper | scanner-vyper | 0.3.5 | python:3.11-slim | 1000 |
+| moccasin | scanner-moccasin | 0.3.4 | python:3.11-slim | 1000 |
+| sol-azy | scanner-sol-azy | 0.5.0 | rust:1.88-bookworm | 1000 |
+| sec3-xray | scanner-sec3-xray | 0.4.0 | ghcr.io/sec3-product/x-ray:v0.0.6 | 1000 |
+| trident | scanner-trident | 0.4.0 | rust:1.88-bookworm | 1000 |
+| cargo-fuzz-solana | scanner-cargo-fuzz-solana | 0.4.0 | rust:1.85-bookworm + nightly | 1000 |
+| rustdefend | scanner-rustdefend | 0.4.5 | debian:bookworm-slim | 1000 |
 
 ---
 

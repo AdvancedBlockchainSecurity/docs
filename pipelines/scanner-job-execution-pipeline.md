@@ -219,13 +219,15 @@ Without these rules, scanner pods in namespaces with `default-deny-all` cannot P
 
 ### Solana/Rust (5)
 
-| Scanner | Tool Version | Image Tag | Memory Limit | Developer |
-|---------|-------------|-----------|--------------|-----------|
-| sol-azy | 0.4.1 | scanner-sol-azy:0.4.4 | 1Gi | FuzzingLabs |
-| sec3-xray | 0.3.0 | scanner-sec3-xray:0.3.3 | 2Gi | Sec3 |
-| trident | 0.12.0 | scanner-trident:0.3.5 | 1Gi | Ackee Blockchain |
-| cargo-fuzz-solana | 0.13.1 | scanner-cargo-fuzz-solana:0.3.4 | 1Gi | rust-fuzz |
-| rustdefend | 0.5.1 | scanner-rustdefend:0.4.5 | 1Gi | Apogee |
+| Scanner | Tool Version | Image Tag | Memory Limit | Developer | Pipeline Notes |
+|---------|-------------|-----------|--------------|-----------|----------------|
+| sol-azy | 0.4.1 | scanner-sol-azy:0.5.0 | 1Gi | FuzzingLabs | SAST on raw `.rs`; works on single files and Anchor projects |
+| sec3-xray | 0.0.6 | scanner-sec3-xray:0.4.0 | 2Gi | Sec3 | LLVM-based SAST; requires Cargo project structure |
+| trident | 0.12.0 | scanner-trident:0.4.0 | 4Gi | Ackee Blockchain | Anchor fuzzer; requires `Anchor.toml` + `programs/`. Crates pre-vendored in `/opt/cargo-vendor/` for offline `anchor build` |
+| cargo-fuzz-solana | 0.13.1 | scanner-cargo-fuzz-solana:0.4.0 | 4Gi | rust-fuzz | LibFuzzer + nightly Rust. Pre-vendors Anchor 0.29 + 0.30 + libfuzzer-sys for offline `cargo fuzz build` |
+| rustdefend | 0.5.1 | scanner-rustdefend:0.4.5 | 1Gi | Apogee | AST-only via `syn`; works on flat `.rs` and Anchor projects |
+
+**Offline build pattern (trident, cargo-fuzz-solana):** Mirrors Slither's pre-installed solc strategy. At Docker build time, a skeleton project is created and `cargo vendor` downloads all common Solana SDK + Anchor crates. At runtime, the wrapper seeds `.cargo/config.toml` (with `[net] offline = true`) into the user's workspace so `cargo build` resolves all dependencies from `/opt/cargo-vendor/` without internet access. NetworkPolicy on scanner pods only allows DNS + callback to tool-integration:8005.
 
 ## Standardized Vulnerability Schema
 
