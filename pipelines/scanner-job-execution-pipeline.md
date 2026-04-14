@@ -223,8 +223,8 @@ Without these rules, scanner pods in namespaces with `default-deny-all` cannot P
 |---------|-------------|-----------|--------------|-----------|----------------|
 | sol-azy | 0.4.1 | scanner-sol-azy:0.5.0 | 1Gi | FuzzingLabs | SAST on raw `.rs`; works on single files and Anchor projects |
 | sec3-xray | 0.0.6 | scanner-sec3-xray:0.4.0 | 2Gi | Sec3 | LLVM-based SAST; requires Cargo project structure |
-| trident | 0.12.0 | scanner-trident:0.4.0 | 4Gi | Ackee Blockchain | Anchor fuzzer; requires `Anchor.toml` + `programs/`. Crates pre-vendored in `/opt/cargo-vendor/` for offline `anchor build` |
-| cargo-fuzz-solana | 0.13.1 | scanner-cargo-fuzz-solana:0.4.0 | 4Gi | rust-fuzz | LibFuzzer + nightly Rust. Pre-vendors Anchor 0.29 + 0.30 + libfuzzer-sys for offline `cargo fuzz build` |
+| trident | 0.12.0 | scanner-trident:0.4.1 | 2Gi | Ackee Blockchain | Anchor fuzzer; requires `Anchor.toml` + `programs/`. Crates pre-vendored in `/opt/cargo-vendor/`; wrapper exports `CARGO_BUILD_JOBS=1` to keep LLVM link memory inside the pod cap |
+| cargo-fuzz-solana | 0.13.1 | scanner-cargo-fuzz-solana:0.4.1 | 2Gi | rust-fuzz | LibFuzzer + nightly Rust. Wrapper runs `cargo +nightly fuzz run --jobs 1 -- -rss_limit_mb=1800` so LibFuzzer self-aborts before the pod OOM-kills |
 | rustdefend | 0.5.1 | scanner-rustdefend:0.4.5 | 1Gi | Apogee | AST-only via `syn`; works on flat `.rs` and Anchor projects |
 
 **Offline build pattern (trident, cargo-fuzz-solana):** Mirrors Slither's pre-installed solc strategy. At Docker build time, a skeleton project is created and `cargo vendor` downloads all common Solana SDK + Anchor crates. At runtime, the wrapper seeds `.cargo/config.toml` (with `[net] offline = true`) into the user's workspace so `cargo build` resolves all dependencies from `/opt/cargo-vendor/` without internet access. NetworkPolicy on scanner pods only allows DNS + callback to tool-integration:8005.
