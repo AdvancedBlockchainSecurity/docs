@@ -65,10 +65,11 @@ For the complete operational pipeline (trigger, execution, result collection, fo
 
 | Scanner | Tool Version | Image Tag | Memory Limit | Developer |
 |---------|-------------|-----------|--------------|-----------|
-| sol-azy | 0.4.0 | scanner-sol-azy:0.4.0 | 1Gi | FuzzingLabs |
-| sec3-xray | 0.3.0 | scanner-sec3-xray:0.3.1 | 2Gi | Sec3 |
-| trident | 0.12.0 | scanner-trident:0.3.0 | 1Gi | Ackee Blockchain |
-| cargo-fuzz-solana | 0.13.1 | scanner-cargo-fuzz-solana:0.3.0 | 1Gi | rust-fuzz |
+| sol-azy | 0.4.1 | scanner-sol-azy:0.5.0 | 1Gi | FuzzingLabs |
+| sec3-xray | 0.0.6 | scanner-sec3-xray:0.4.0 | 2Gi | Sec3 |
+| trident | 0.12.0 | scanner-trident:0.4.1 | 2Gi | Ackee Blockchain |
+| cargo-fuzz-solana | 0.13.1 | scanner-cargo-fuzz-solana:0.4.1 | 2Gi | rust-fuzz |
+| rustdefend | 0.5.1 | scanner-rustdefend:0.4.5 | 1Gi | Apogee |
 
 ## Execution Flow
 

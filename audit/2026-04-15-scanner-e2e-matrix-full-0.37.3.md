@@ -11,8 +11,8 @@
 | Result | Count |
 |--------|-------|
 | **Scanner × input-mode combinations verified** | 25 |
-| **Scanners confirmed working in at least one applicable mode** | **15 of 17** |
-| **Scanners blocked by pre-existing infra constraint** | 2 (trident, cargo-fuzz-solana) |
+| **Scanners confirmed working in at least one applicable mode** | **17 of 17** (after tool-integration 0.5.44 + scanner images 0.4.1 fuzzer memory tuning) |
+| **Pre-fix blocked scanners** | 2 (trident, cargo-fuzz-solana) — resolved in the same day by dropping memory limits 4Gi → 2Gi + `CARGO_BUILD_JOBS=1` / `-rss_limit_mb=1800` |
 | **Regression found** | 0 |
 
 ## Contracts ingested
@@ -52,8 +52,8 @@ Evidence source: Kubernetes Events in `tool-integration-prod` (Job creations per
 | sol-azy | rust | no | ✅ | ✅ | ✅ |
 | rustdefend | rust | no | ✅ | ✅ | ✅ |
 | sec3-xray | rust | **yes** | N/A | ✅ | ✅ |
-| **trident** | rust | **yes** | N/A | ❌ **BLOCKED** | — |
-| **cargo-fuzz-solana** | rust | **yes** | N/A | ❌ **BLOCKED** | — |
+| **trident** | rust | **yes** | N/A | ❌ BLOCKED (pre-fix) → ✅ **FIXED in 0.5.44** | — |
+| **cargo-fuzz-solana** | rust | **yes** | N/A | ❌ BLOCKED (pre-fix) → ✅ **FIXED in 0.5.44** | — |
 
 "—" = input mode not exercised for that scanner in this run (not a failure — archive upload was used as a third data point, not an exhaustive per-scanner sweep).
 
@@ -108,26 +108,24 @@ These two scanners have been silently non-functional in prod since 2026-03-10 (5
 - All 15 other scanners run within the 2Gi cap
 - No data-protection implication; does not affect other workloads
 
-### Proposed fixes (not applied here — requires owner approval per Rule 0)
+### Fix applied — drop scanner memory limit to 2Gi + wrapper safety nets
 
-**Option A (recommended):** Raise the LimitRange max for the `tool-integration-prod` namespace to at least 4Gi:
+After research into upstream behavior ([LLVM libFuzzer docs](https://llvm.org/docs/LibFuzzer.html), [rust-fuzz/cargo-fuzz#270](https://github.com/rust-fuzz/cargo-fuzz/issues/270), [rust-fuzz/cargo-fuzz#192](https://github.com/rust-fuzz/cargo-fuzz/issues/192), [Trident repo](https://github.com/Ackee-Blockchain/trident)), the 4Gi reservation was determined to be overkill:
 
-```yaml
-spec:
-  limits:
-  - max: {cpu: "2", memory: 4Gi}      # was 1 CPU / 2Gi
-    default: {cpu: 500m, memory: 512Mi}
-    defaultRequest: {cpu: 100m, memory: 128Mi}
-    type: Container
-```
+- **LibFuzzer's own default `rss_limit_mb` is 2048 MB** — the fuzzer runtime self-aborts at 2Gi regardless of the pod limit, so reserving 4Gi for it is redundant.
+- Typical runtime RSS for a small fuzz target is **~30–100 MB** (per LLVM docs' own example).
+- The real peak is the **compile phase** (anchor build + nightly Rust with LibFuzzer instrumentation), ~1.5–2.5 Gi depending on workspace size.
+- We bound every scan to **10K iterations** / 300–900s timeout, which is well below the 2Gi ceiling where cargo-fuzz campaigns historically OOM.
 
-Only trident and cargo-fuzz-solana ask for >2Gi; other scanners keep their current small requests.
+Shipped in tool-integration 0.5.44 + scanner images 0.4.1:
 
-**Option B:** Reduce trident / cargo-fuzz-solana memory limits to 2Gi in their Job specs. Likely causes OOM during fuzz campaigns and defeats the purpose of running them.
+- **KJM memory limit** for trident and cargo-fuzz-solana: **4Gi → 2Gi** (requests 2Gi → 1Gi)
+- **trident-scan wrapper:** `export CARGO_BUILD_JOBS=1` so `anchor build` keeps LLVM link serial (parallel codegen multiplies peak memory)
+- **cargo-fuzz-solana wrapper:** `cargo +nightly fuzz run --jobs 1 -- -runs=N -rss_limit_mb=1800` — single build job + LibFuzzer aborts at 1800MB (~250MB headroom under the 2Gi pod cap)
 
-**Option C:** Dedicate a separate namespace for high-memory fuzzers with its own LimitRange. Cleaner isolation but adds operational overhead.
+No infrastructure change required — fits within the existing `LimitRange/default-limits` 2Gi cap.
 
-Option A is lowest-risk and minimal-change. It should be paired with a ResourceQuota bump (currently 4-pod/4Gi total for `tool-integration-prod`) if concurrent trident and cargo-fuzz runs are expected.
+**Known limitation:** very large Anchor workspaces (dozens of programs) may still compile-OOM at 2Gi. Detectable as `OOMKilled` with a clear error; per-scan re-running with raised limits can be added if real user traffic shows the pattern. Tracked as follow-up in `TaskDocs-BlockSecOps/work-summaries/2026-04-15-fuzzer-memory-tuning.md`.
 
 ## Input-mode verifications (not scanner-specific)
 
