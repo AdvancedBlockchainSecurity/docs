@@ -281,9 +281,13 @@ GITHUB_REPOS = {
 - "Upgrade" button appears when versions differ
 - Scanners without a `GITHUB_REPOS` entry show no latest-version indicator and no upgrade button
 
-## target_version validation (api-service 0.37.4)
+## Validation layers (in order)
 
-Since 2026-04-15, the upgrade endpoint enforces strict-semver input validation on `ScannerUpgradeRequest.target_version`:
+An upgrade request passes through four independent validation layers before the ConfigMap is mutated. Each layer catches a different class of mistake; together they close the admin-facing gaps surfaced in the 2026-04-15 pipeline review.
+
+### Layer 1 — `target_version` semver shape (api-service 0.37.4)
+
+Strict regex on `ScannerUpgradeRequest.target_version`:
 
 ```python
 _SCANNER_VERSION_RE = re.compile(r"^\d+\.\d+\.\d+([.+\-][A-Za-z0-9.+\-]+)?$")
@@ -291,9 +295,31 @@ _SCANNER_VERSION_RE = re.compile(r"^\d+\.\d+\.\d+([.+\-][A-Za-z0-9.+\-]+)?$")
 
 Accepts `MAJOR.MINOR.PATCH` with optional PEP440-style suffix (`-rc1`, `.post1`, `+build5`). Rejects empty, letters-only, shell metachars, XSS payloads, path-traversal chars, whitespace.
 
-A pre-flight check also hits tool-integration `/scanners/health` and returns 404 if `scanner_name` is not in the current registry. Soft-fails if the health endpoint is unreachable — tool-integration's own allowlist remains the last line of defence.
+### Layer 2 — scanner-name existence (api-service 0.37.4)
 
-See `docs/audit/2026-04-15-admin-scanner-upgrade-pipeline-review.md` for the full OWASP A03 analysis.
+Pre-flight call to tool-integration `/scanners/health` — returns 404 if `scanner_name` is not in the current registry. Soft-fails if the health endpoint is unreachable; tool-integration's own allowlist is the last line of defence.
+
+### Layer 3 — upstream GitHub release list (tool-integration 0.5.46)
+
+Before mutating the ConfigMap, tool-integration fetches (with 1-hour cache) the list of published GitHub releases for the scanner. If `target_version` is not in that list, returns **400** with "not a published upstream release".
+
+```python
+known = await get_known_github_versions(scanner_name)
+if known is not None and body.target_version not in known:
+    raise HTTPException(400, "target_version ... is not a published upstream release")
+```
+
+Exceptions:
+- Scanners without a `GITHUB_REPOS` entry (sol-azy, rustdefend) bypass the check (legacy behaviour)
+- Compensating reverts from api-service fix #5 (target_version equals current_version) bypass the check — always targets a previously-valid version
+
+Residual gap: "upstream cut release X but we haven't built + pushed our scanner image for X yet". Narrow window (minutes to hours given the build pipeline). Future closure: Artifact Registry HEAD probe behind Workload Identity — tracked, not scheduled.
+
+### Layer 4 — Kubernetes admission (existing, always on)
+
+If layers 1–3 are bypassed or wrong, the Deployment rollout still fails cleanly: kubelet gets `ImagePullBackOff`, the `CronJobPodConfigError` alert fires within 5 min, and manual remediation is well-documented in `docs/playbooks/upgrade-scanner-image.md`.
+
+See `docs/audit/2026-04-15-admin-scanner-upgrade-pipeline-review.md` for the full pipeline audit (5 of 6 fixes shipped; #3 rollback endpoint queued).
 
 ---
 

@@ -1,8 +1,8 @@
 # Scanner Upgrade Pipeline
 
 **Last Updated:** 2026-04-15
-**API Version:** 0.37.5 (target_version validation + unit-of-work compensating revert)
-**Tool-Integration Version:** 0.5.45 (GITHUB_REPOS expanded to 15 scanners)
+**API Version:** 0.37.6 (target_version validation + unit-of-work compensating revert + scanner.upgraded notification)
+**Tool-Integration Version:** 0.5.46 (GITHUB_REPOS expanded to 15 scanners + upstream release-list validation)
 
 Full pipeline that runs when an admin clicks "Upgrade" on a scanner in the Admin Portal.
 
@@ -58,6 +58,43 @@ Response includes a `state` field that tells the caller the post-mutation outcom
 | `rejected` | prev | prev | tool-integration refused the request (invalid version, conflict) |
 
 The `state` field is the authoritative signal when `success=false`; legacy consumers that ignore it continue to work because it defaults to `"applied"`.
+
+## Phase 0.5: Upstream Release Validation (tool-integration 0.5.46)
+
+Between api-service's Phase 0 pre-flight and tool-integration's ConfigMap mutation, tool-integration checks the `target_version` against the published GitHub release list for the scanner:
+
+```
+api-service 0.37.4+        tool-integration 0.5.46+
+─────────────────         ─────────────────────────
+Layer 1: semver regex  →  Layer 3: GitHub release list
+Layer 2: registry name →                           →  ConfigMap mutation
+```
+
+| Outcome | Behaviour |
+|---------|-----------|
+| `target_version` is in the published upstream release list | Proceed to ConfigMap mutation |
+| `target_version` is not in the list | **HTTP 400** — "not a published upstream release" |
+| Scanner has no `GITHUB_REPOS` mapping (sol-azy, rustdefend) | Skip the check — legacy behaviour |
+| GitHub API unreachable | Soft-fail, log warning, skip the check |
+| Compensating revert (target_version == current_version) | Bypass the check — previous version was always valid |
+
+Fetch results are cached for 1 hour in the existing `_github_cache` (asyncio-locked). Residual gap: upstream cuts release X before we build + push `scanner-<name>:X` to Artifact Registry — narrow window; tracked as a future AR HEAD probe behind Workload Identity.
+
+## Phase 5: Notification Emission (api-service 0.37.6)
+
+After the commit / compensating-revert block, api-service emits a `scanner.upgraded` notification through the admin's configured channels (webhook, email, Slack). Severity scales with state:
+
+| state | severity |
+|-------|----------|
+| `applied` | info |
+| `reverted` | medium |
+| `applied_db_stale` | **high** (drift — attention required) |
+| `tool_integration_failed` | low |
+| `rejected` | low |
+
+Payload metadata includes `scanner_name`, `previous_version`, `new_version`, `state`, `reason`. Notification failure is best-effort — a warning is logged but the upgrade response is never blocked.
+
+`WebhookEventType.SCANNER_UPGRADED` is stored as a JSON string in the `webhooks.events` JSONB column, so admins can subscribe per-webhook without any schema migration.
 
 ## Pipeline Phases
 

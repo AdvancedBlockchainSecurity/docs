@@ -8,8 +8,10 @@
 - api-service 0.37.4 (PR #347) — strict-semver validation on `target_version` + scanner-name existence check (OWASP A03 closure)
 - tool-integration 0.5.45 (PR #155) — `GITHUB_REPOS` expanded from 9 → 15 scanners; mythril repo corrected `ConsenSys` → `ConsenSysDiligence`
 - api-service 0.37.5 (PR #348) — unit-of-work with compensating revert; new `state` field on upgrade response
+- api-service 0.37.6 (PR #349) — `scanner.upgraded` notification event emitted on every post-mutation outcome
+- tool-integration 0.5.46 (PR #156) — upstream GitHub-release-list validation; rejects `target_version` that was never published
 
-Full audit + 6-PR remediation plan: `audit/2026-04-15-admin-scanner-upgrade-pipeline-review.md`.
+Full audit + 6-PR remediation plan: `audit/2026-04-15-admin-scanner-upgrade-pipeline-review.md`. 5 of 6 fixes shipped; only #3 (rollback endpoint + `scanner_version_history` table) remains queued.
 
 ---
 
@@ -109,6 +111,27 @@ Full audit + 6-PR remediation plan: `audit/2026-04-15-admin-scanner-upgrade-pipe
 - [ ] tool-integration network error: `state="tool_integration_failed"`, ConfigMap never mutated, `success=false`, safe to retry
 - [ ] tool-integration rejection (bad version, conflict): `state="rejected"`, `success=false`
 - [ ] `state` defaults to `"applied"` for backwards compatibility when the field isn't populated
+
+### 3.6 Upstream GitHub-release validation (added 2026-04-15, tool-integration 0.5.46)
+- [ ] Valid upstream version accepted: `target_version="0.11.5"` on slither (most recent upstream tag) → 200
+- [ ] Unpublished version rejected: `target_version="0.99.99"` on slither → **400** with "not a published upstream release"
+- [ ] Unmapped scanner bypasses check: `target_version="0.4.0"` on sol-azy → processed (sol-azy has no `GITHUB_REPOS` entry); tool-integration's own allowlist is still authoritative
+- [ ] Unmapped scanner bypasses check: rustdefend accepts any valid semver (internal scanner)
+- [ ] Cache honoured: two consecutive upgrades within 1 hour make only one GitHub API call
+- [ ] GitHub API failure falls through: if `api.github.com` is unreachable, the check soft-fails (legacy behaviour), logged with a warning
+- [ ] **Compensating revert bypass:** when api-service fix #5 issues a revert (target_version == current_version), the upstream-release check is skipped — the previous version was always valid
+
+### 3.7 `scanner.upgraded` notification (added 2026-04-15, api-service 0.37.6)
+- [ ] `WebhookEventType.SCANNER_UPGRADED` value is `"scanner.upgraded"`
+- [ ] Admin with a configured webhook / email / Slack channel subscribed to `scanner.upgraded` receives a notification after every upgrade call
+- [ ] Severity matrix:
+  - `state="applied"` → `info`
+  - `state="reverted"` → `medium`
+  - `state="applied_db_stale"` → `high` (drift — needs manual remediation)
+  - `state="tool_integration_failed"` → `low`
+  - `state="rejected"` → `low`
+- [ ] Payload `metadata` includes: scanner_name, previous_version, new_version, state, reason
+- [ ] Notification failure never blocks the upgrade response (best-effort; warning logged, upgrade result unchanged)
 
 ---
 
