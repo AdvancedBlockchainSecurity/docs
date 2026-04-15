@@ -7,6 +7,7 @@
 **Recent changes (2026-04-15):**
 - api-service 0.37.4 (PR #347) — strict-semver validation on `target_version` + scanner-name existence check (OWASP A03 closure)
 - tool-integration 0.5.45 (PR #155) — `GITHUB_REPOS` expanded from 9 → 15 scanners; mythril repo corrected `ConsenSys` → `ConsenSysDiligence`
+- api-service 0.37.5 (PR #348) — unit-of-work with compensating revert; new `state` field on upgrade response
 
 Full audit + 6-PR remediation plan: `audit/2026-04-15-admin-scanner-upgrade-pipeline-review.md`.
 
@@ -93,12 +94,21 @@ Full audit + 6-PR remediation plan: `audit/2026-04-15-admin-scanner-upgrade-pipe
 - [ ] List of completed steps returned
 - [ ] Message includes note about Docker image rebuild
 - [ ] Steps list displayed in UI
+- [ ] Response includes `state: "applied"` (api-service 0.37.5+)
 
 ### 3.4 Error Handling
 - [ ] Non-existent scanner returns 404
 - [ ] K8s API errors caught and returned as `success: false`
 - [ ] Error message displayed in UI
 - [ ] Partial step list shows what completed before failure
+
+### 3.5 `state` field contract (added 2026-04-15, api-service 0.37.5)
+- [ ] Happy path: `state="applied"` when ConfigMap + DB both updated
+- [ ] DB-failure + revert-success: `state="reverted"`, `previous_version == new_version` (both pre-upgrade), `success=false`
+- [ ] DB-failure + revert-failure: `state="applied_db_stale"`, `new_version` holds the ConfigMap value, `success=false`, message instructs manual remediation
+- [ ] tool-integration network error: `state="tool_integration_failed"`, ConfigMap never mutated, `success=false`, safe to retry
+- [ ] tool-integration rejection (bad version, conflict): `state="rejected"`, `success=false`
+- [ ] `state` defaults to `"applied"` for backwards compatibility when the field isn't populated
 
 ---
 

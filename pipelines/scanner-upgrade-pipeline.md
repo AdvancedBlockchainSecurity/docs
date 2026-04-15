@@ -1,7 +1,7 @@
 # Scanner Upgrade Pipeline
 
 **Last Updated:** 2026-04-15
-**API Version:** 0.37.4 (target_version validation)
+**API Version:** 0.37.5 (target_version validation + unit-of-work compensating revert)
 **Tool-Integration Version:** 0.5.45 (GITHUB_REPOS expanded to 15 scanners)
 
 Full pipeline that runs when an admin clicks "Upgrade" on a scanner in the Admin Portal.
@@ -42,6 +42,22 @@ Before any upgrade is proxied to tool-integration:
 Pre-flight soft-fails if the tool-integration `/scanners/health` endpoint is unreachable; tool-integration's own `valid_scanners` allowlist in `main.py` catches any unknown scanner as the last line of defence.
 
 Covered by OWASP A03 analysis and a 15-case unit-test suite in `tests/unit/test_admin_scanner_upgrade_validation.py`. See `docs/audit/2026-04-15-admin-scanner-upgrade-pipeline-review.md` for the full rationale.
+
+## Phase 4: Unit-of-Work (api-service 0.37.5)
+
+Before calling tool-integration, the endpoint snapshots the pre-upgrade version from the `scanner_versions` table. After ConfigMap mutation succeeds, if the DB upsert fails, the endpoint **auto-reverts the ConfigMap** to the snapshotted version so cluster and DB stay consistent.
+
+Response includes a `state` field that tells the caller the post-mutation outcome:
+
+| `state` | ConfigMap | DB | Meaning |
+|---------|-----------|----|---------|
+| `applied` | new | new | Upgrade succeeded |
+| `reverted` | prev | prev | DB upsert failed; compensating ConfigMap revert succeeded; no drift |
+| `applied_db_stale` | new | prev | DB upsert failed; revert also failed; manual remediation required |
+| `tool_integration_failed` | prev | prev | Network/timeout reaching tool-integration; ConfigMap never mutated |
+| `rejected` | prev | prev | tool-integration refused the request (invalid version, conflict) |
+
+The `state` field is the authoritative signal when `success=false`; legacy consumers that ignore it continue to work because it defaults to `"applied"`.
 
 ## Pipeline Phases
 
