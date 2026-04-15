@@ -1,8 +1,14 @@
 # Scanner Upgrade via Admin Dashboard
 
 **Priority**: P1 - Important
-**Last Tested**: February 5, 2026
+**Last Tested**: 2026-04-15 (api-service 0.37.4 + tool-integration 0.5.45)
 **Endpoint**: `POST /api/v1/admin/system/scanners/{name}/upgrade`
+
+**Recent changes (2026-04-15):**
+- api-service 0.37.4 (PR #347) — strict-semver validation on `target_version` + scanner-name existence check (OWASP A03 closure)
+- tool-integration 0.5.45 (PR #155) — `GITHUB_REPOS` expanded from 9 → 15 scanners; mythril repo corrected `ConsenSys` → `ConsenSysDiligence`
+
+Full audit + 6-PR remediation plan: `audit/2026-04-15-admin-scanner-upgrade-pipeline-review.md`.
 
 ---
 
@@ -15,7 +21,12 @@
 - [ ] Scanners without GitHub mapping show no latest version
 - [ ] Cache refreshes after 1 hour
 
-### 1.2 Scanner Health Table
+### 1.2 GITHUB_REPOS coverage (updated 2026-04-15)
+- [ ] 15 of 17 scanners show `latest_version` populated: slither, aderyn, soliditydefend, solhint, semgrep, echidna, halmos, wake, medusa, **mythril**, **vyper**, **moccasin**, **sec3-xray**, **trident**, **cargo-fuzz-solana** (bold = added 2026-04-15)
+- [ ] sol-azy and rustdefend intentionally show no `latest_version` (sol-azy has no upstream GitHub releases; rustdefend is internal-only)
+- [ ] mythril resolves via `ConsenSysDiligence/mythril` (the ConsenSys org was renamed)
+
+### 1.3 Scanner Health Table
 - [ ] All registered scanners appear in table
 - [ ] Health status (Healthy/Degraded) displayed correctly
 - [ ] Job counts (Total/Failed/Running) accurate
@@ -50,6 +61,23 @@
 - [ ] Request proxied to tool-integration service
 - [ ] Timeout set to 60 seconds
 - [ ] Admin action logged in audit trail
+
+### 3.1.1 target_version input validation (added 2026-04-15, api-service 0.37.4)
+- [ ] `target_version="1.2.3"` accepted (valid semver)
+- [ ] `target_version="1.2.3-rc1"` accepted (pre-release suffix)
+- [ ] `target_version="1.2.3.post1"` accepted (PEP440 post-release)
+- [ ] `target_version="1.2.3+build5"` accepted (build metadata)
+- [ ] `target_version="1.2.3-beta+exp.sha.5114f85"` accepted
+- [ ] `target_version=""` rejected (422)
+- [ ] `target_version="latest"` rejected (422)
+- [ ] `target_version="v1.2.3"` rejected (leading `v` — 422)
+- [ ] `target_version="1.2"` rejected (missing PATCH — 422)
+- [ ] `target_version="1.2.3;rm -rf /"` rejected (shell metachar — 422)
+- [ ] `target_version="<script>alert(1)</script>"` rejected (XSS — 422)
+- [ ] `target_version="../../etc/passwd"` rejected (path traversal — 422)
+- [ ] `target_version` > 50 chars rejected (422)
+- [ ] `reason` > 500 chars rejected (422)
+- [ ] Unknown `scanner_name` rejected (404 "Scanner not registered") via pre-flight to tool-integration `/scanners/health`
 
 ### 3.2 ConfigMap Update (Tool Integration)
 - [ ] ConfigMap `scanner-versions` read from K8s API

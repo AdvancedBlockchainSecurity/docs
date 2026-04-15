@@ -1,7 +1,8 @@
 # Scanner Upgrade Pipeline
 
-**Last Updated:** March 19, 2026
-**API Version:** 0.35.2
+**Last Updated:** 2026-04-15
+**API Version:** 0.37.4 (target_version validation)
+**Tool-Integration Version:** 0.5.45 (GITHUB_REPOS expanded to 15 scanners)
 
 Full pipeline that runs when an admin clicks "Upgrade" on a scanner in the Admin Portal.
 
@@ -11,16 +12,36 @@ Full pipeline that runs when an admin clicks "Upgrade" on a scanner in the Admin
 Admin Portal                API Service                     Tool Integration
 ────────────               ─────────────                   ──────────────────
 Click "Upgrade" →          POST /admin/system/             POST /scanners/{name}/upgrade
-                           scanners/{name}/upgrade
-                           1. Proxy to tool-integration     1. Update ConfigMap
-                           2. On success, run pipeline:     2. Restart deployment
-                              a. Detector comparison         3. Return result
+                           scanners/{name}/upgrade          (internal-token authed)
+                           0. Validate target_version       1. Update ConfigMap
+                              (semver regex, 0.37.4)        2. Restart deployment
+                           0. Pre-flight scanner-name       3. Return result
+                              existence (0.37.4)
+                           1. Proxy to tool-integration
+                           2. On success, run pipeline:
+                              a. Detector comparison
                               b. Pattern seeding
                               c. Audit validation
                            3. Update scanner_versions DB table
                            4. Return combined result
                     ←      (includes pipeline results)
 ```
+
+## Phase 0: Pre-flight Validation (api-service 0.37.4)
+
+Before any upgrade is proxied to tool-integration:
+
+| Check | Behavior on fail |
+|-------|------------------|
+| `target_version` matches `^\d+\.\d+\.\d+([.+\-][A-Za-z0-9.+\-]+)?$` | 422 Unprocessable Entity (pydantic `field_validator`) |
+| `target_version` length ≤ 50 | 422 |
+| `reason` length ≤ 500 | 422 |
+| `scanner_name` exists in tool-integration `/scanners/health` registry | 404 "Scanner not registered" |
+| `scanner_name` matches `^[A-Za-z0-9_-]+$` | 400 "Invalid scanner name" |
+
+Pre-flight soft-fails if the tool-integration `/scanners/health` endpoint is unreachable; tool-integration's own `valid_scanners` allowlist in `main.py` catches any unknown scanner as the last line of defence.
+
+Covered by OWASP A03 analysis and a 15-case unit-test suite in `tests/unit/test_admin_scanner_upgrade_validation.py`. See `docs/audit/2026-04-15-admin-scanner-upgrade-pipeline-review.md` for the full rationale.
 
 ## Pipeline Phases
 

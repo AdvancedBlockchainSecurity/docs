@@ -242,23 +242,58 @@ After a scanner upgrade, the next daily maintenance run will automatically proce
 
 The tool-integration service checks for newer versions using the GitHub API:
 
-**Mapping:** `GITHUB_REPOS` dict in `blocksecops-tool-integration/src/main.py`
+**Mapping:** `GITHUB_REPOS` dict in `blocksecops-tool-integration/src/main.py` (tool-integration 0.5.45).
+
+Format: `scanner_id -> (owner/repo, tag_prefix)`. `tag_prefix` is stripped from the GitHub release `tag_name` to yield a plain semver; empty string means the upstream tags without a prefix.
 
 ```python
 GITHUB_REPOS = {
-    "slither": "crytic/slither",
-    "mythril": "ConsenSys/mythril",
-    "soliditydefend": "AquaBlueSec/SolidityDefend",
-    # ... etc
+    # Solidity (10 of 10)
+    "slither":         ("crytic/slither", "v"),
+    "aderyn":          ("Cyfrin/aderyn", "aderyn-v"),
+    "soliditydefend":  ("AdvancedBlockchainSecurity/SolidityDefend", "v"),
+    "solhint":         ("protofire/solhint", "v"),
+    "semgrep":         ("semgrep/semgrep", "v"),
+    "echidna":         ("crytic/echidna", "v"),
+    "halmos":          ("a16z/halmos", "v"),
+    "wake":            ("Ackee-Blockchain/wake", "v"),
+    "medusa":          ("crytic/medusa", "v"),
+    "mythril":         ("ConsenSysDiligence/mythril", "v"),
+    # Vyper (2 of 2)
+    "vyper":           ("vyperlang/vyper", "v"),
+    "moccasin":        ("Cyfrin/moccasin", ""),
+    # Solana/Rust (3 of 5)
+    "sec3-xray":       ("sec3-product/x-ray", "v"),
+    "trident":         ("Ackee-Blockchain/trident", ""),
+    "cargo-fuzz-solana": ("rust-fuzz/cargo-fuzz", ""),
 }
 ```
 
-**Cache:** 1-hour TTL (`_github_version_cache` with timestamp check).
+**Coverage:** 15 of 17 registered scanners. The remaining two are deliberate exclusions:
+- `sol-azy` (FuzzingLabs/sol-azy) — upstream has no releases or tags
+- `rustdefend` — internal-only scanner, no public upstream
+
+**Cache:** 1-hour TTL (`_github_cache` with timestamp check, `_github_cache_lock` mutex for thread safety).
 
 **Display:** Admin System → Security Scanners table shows:
 - Current version (from ConfigMap `SCANNER_METADATA`)
 - Latest version (from GitHub API, shown as yellow `→ x.y.z` when different)
 - "Upgrade" button appears when versions differ
+- Scanners without a `GITHUB_REPOS` entry show no latest-version indicator and no upgrade button
+
+## target_version validation (api-service 0.37.4)
+
+Since 2026-04-15, the upgrade endpoint enforces strict-semver input validation on `ScannerUpgradeRequest.target_version`:
+
+```python
+_SCANNER_VERSION_RE = re.compile(r"^\d+\.\d+\.\d+([.+\-][A-Za-z0-9.+\-]+)?$")
+```
+
+Accepts `MAJOR.MINOR.PATCH` with optional PEP440-style suffix (`-rc1`, `.post1`, `+build5`). Rejects empty, letters-only, shell metachars, XSS payloads, path-traversal chars, whitespace.
+
+A pre-flight check also hits tool-integration `/scanners/health` and returns 404 if `scanner_name` is not in the current registry. Soft-fails if the health endpoint is unreachable — tool-integration's own allowlist remains the last line of defence.
+
+See `docs/audit/2026-04-15-admin-scanner-upgrade-pipeline-review.md` for the full OWASP A03 analysis.
 
 ---
 
