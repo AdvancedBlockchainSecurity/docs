@@ -1,6 +1,8 @@
 # Drift Audit Cron — Design + Playbook
 
-**Status:** Proposed
+**Status:** Active — deployed 2026-04-15
+**Namespace:** `platform-audit-prod`
+**Design note:** uses CLIENT-SIDE diff (`kustomize build` + `kubectl get -o yaml` + normalized-YAML compare). The original design proposed `kubectl diff -k`, but that would require server-side dry-run permissions (`patch`/`create`/`update` on all target resources) — unacceptable for a read-only audit CronJob. The implemented CronJob spec in `blocksecops-gcp-infrastructure/k8s/overlays/gcp/drift-audit/cronjob.yaml` is the authoritative reference; the YAML block in this doc is the historical design.
 **Last Updated:** 2026-04-15
 **Cadence:** Weekly (Sunday 04:00 UTC)
 **Owner:** Platform Operator
