@@ -1,8 +1,56 @@
 # Drift Audit Cron — Design + Playbook
 
-**Status:** Active — deployed 2026-04-15
-**Namespace:** `platform-audit-prod`
+**Status:** Suspended 2026-04-16 — blocked on repo-clone auth (Option A chosen)
+**Namespace:** `platform-audit-prod` (manifests deployed, CronJob `spec.suspend: true`)
 **Design note:** uses CLIENT-SIDE diff (`kustomize build` + `kubectl get -o yaml` + normalized-YAML compare). The original design proposed `kubectl diff -k`, but that would require server-side dry-run permissions (`patch`/`create`/`update` on all target resources) — unacceptable for a read-only audit CronJob. The implemented CronJob spec in `blocksecops-gcp-infrastructure/k8s/overlays/gcp/drift-audit/cronjob.yaml` is the authoritative reference; the YAML block in this doc is the historical design.
+
+## Why suspended (2026-04-16)
+
+First verification run failed on `git clone`:
+
+```
+fatal: could not read Username for 'https://github.com': No such device or address
+```
+
+`github.com/AdvancedBlockchainSecurity/blocksecops-gcp-infrastructure` returns 404 anonymously — it's private. The CronJob can't clone without credentials, and the design doc assumed anonymous access.
+
+## Three options considered
+
+| Option | Description | Cost | Security |
+|--------|-------------|------|----------|
+| **A — Suspend + defer (chosen)** | `spec.suspend: true` in Git + cluster. Cron doesn't run. Scaffolding (RBAC, namespace, NetworkPolicy, alert) stays in place for future un-blocking. | Zero ongoing cost | No new credential, no new failure mode |
+| B — Wire a fine-grained read-only PAT | New K8s Secret synced from GCP Secret Manager; `git clone https://$TOKEN@github.com/...`. | ~1h implementation; credential rotation burden | New long-lived credential |
+| C — Drop entirely | Revert all drift-audit manifests + alert + namespace. | Cleanup PR | Smallest surface, no resurrection path |
+
+## Why A was chosen
+
+1. **Existing alerts cover the actual-outage failure modes.** `CronJobJobFailed` (5 min), `PostgreSQLBackupStale` (25h), `GCPSecretDrift` (10m) catch the same class of problems that the 2026-04-15 outage surfaced. Drift-audit's unique value is catching drift *before* it becomes a symptom — real, but not load-bearing with current alerting.
+2. **Worst-case-without-drift-audit is a 24h outage window.** Acceptable for a pre-customer platform.
+3. **Option B adds a long-lived credential to own.** Every new secret is another thing to rotate, leak-check, and sync. Not worth it for marginal value over manual `kubectl diff -k` on demand.
+4. **Scaffolding stays useful.** When we *do* want drift-audit (post-customer, more services, compliance driver, or an alternative auth path like GKE Config Sync), the manifests are already in Git — just flip `suspend: false` and wire auth.
+
+## How to un-block (when we need drift-audit)
+
+1. Pick an auth path (Option B PAT, Config Sync, GitHub App, self-hosted git mirror)
+2. Update the CronJob spec to consume the credential (env var, volume mount, or different auth method)
+3. Set `spec.suspend: false` in Git
+4. `kubectl apply -k` + manual-trigger verification run
+5. Update this playbook's status back to Active with the deployment date
+
+## Manual drift check in the meantime
+
+```bash
+# Single overlay
+kubectl diff -k /home/pwner/Git/blocksecops-gcp-infrastructure/k8s/overlays/gcp
+
+# All production overlays
+for OVERLAY in k8s/overlays/production/postgresql k8s/overlays/gcp; do
+  echo "=== $OVERLAY ==="
+  (cd /home/pwner/Git/blocksecops-gcp-infrastructure && kubectl diff -k "$OVERLAY")
+done
+```
+
+The `kubectl diff -k` approach works from a workstation because the operator has cluster-admin; it doesn't generalize to an in-cluster read-only SA — which is why automation needed the client-side-diff design in the first place.
 **Last Updated:** 2026-04-15
 **Cadence:** Weekly (Sunday 04:00 UTC)
 **Owner:** Platform Operator
