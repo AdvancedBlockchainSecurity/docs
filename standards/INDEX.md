@@ -194,6 +194,16 @@ These standards ensure proper versioning and configuration management:
     - Common patterns and anti-patterns
     - Validation and troubleshooting
 
+23. **[NetworkPolicy Templates](./networkpolicy-templates.md)**
+    - Four workload archetypes: internal HTTP service, CronJob with GCP egress, scanner Job, stateful database
+    - Anti-patterns (empty `to: []` on arbitrary TCP, missing `protocol:`, etc.)
+    - Pre-ship checklist
+    - Cross-links to `new-cronjob-deployment.md` workflow
+
+### 🛠️ Operational Workflows (cross-link)
+
+- **[New CronJob Deployment](../workflows/new-cronjob-deployment.md)** — canonical pattern for adding a new production CronJob to GCP (kustomize layout, Workload Identity binding, RBAC scope, NetworkPolicy archetype, Prometheus alerting, deploy+verify). Followed by `postgresql-backup`, `gcp-secret-drift-check`, and `drift-audit`.
+
 ### ✅ Compliance & Verification
 
 23. **[Compliance Checklist](./compliance-checklist.md)**
@@ -256,6 +266,7 @@ docs/standards/
 ├── kubernetes-pod-lifecycle.md
 ├── kustomize-standards.md
 ├── ml-development.md
+├── networkpolicy-templates.md
 ├── organization-team-user-hierarchy.md
 ├── secrets-management.md
 ├── secure-coding.md

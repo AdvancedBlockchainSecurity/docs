@@ -4,12 +4,23 @@
 **Database Name:** `solidity_security`
 **Schema:** `public`
 **Timezone:** UTC
-**Verified:** March 15, 2026
-**Latest Migration:** 082 (rename_patterns_to_convention)
+**Verified:** 2026-04-16 (partial — only the tables added since 082 are covered below; older tables in this doc reflect the 2026-03-15 snapshot)
+**Latest Migration:** 086 (add_scanner_version_history_table)
 
 > **Naming Note:** The database is named `solidity_security`, not `blocksecops`. This name was established during initial development when the focus was solely on Solidity. Retained for backward compatibility.
 
-**Total Tables:** 82 ORM-managed tables (excluding `alembic_version`)
+**Total Tables:** 84 ORM-managed tables (excluding `alembic_version`)
+
+### Migration history delta since last full verification
+
+| Migration | Date | Change | SCHEMA.md status |
+|-----------|------|--------|------------------|
+| 083 | 2026-03-16 | `support_tickets.ticket_number` column added | Pending — column not yet reflected below |
+| 084 | 2026-03-16 | `support_tickets.organization_id` column added | Pending — column not yet reflected below |
+| 085 | 2026-03-17 | **NEW** `scanner_versions` table | Pending — table not yet documented below |
+| 086 | 2026-04-15 | **NEW** `scanner_version_history` table | **Documented** — see Domain 12 |
+
+Migrations 083–085 predate this session and remain as documentation follow-up for the next full verification sweep.
 
 ---
 
@@ -1825,6 +1836,30 @@ Fuzzing test results.
 | failure_trace | TEXT | nullable | |
 | seed | INTEGER | nullable | |
 | created_at | TIMESTAMPTZ | NOT NULL | |
+
+### `scanner_version_history`
+
+Audit trail of every admin scanner upgrade + rollback + auto-revert. Added 2026-04-15 in migration 086 as fix #3 of the admin scanner upgrade pipeline review. Used by `POST /api/v1/admin/system/scanners/{name}/rollback` to resolve the immediately-prior version.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | SERIAL | PRIMARY KEY | |
+| scanner_name | VARCHAR(100) | NOT NULL | Matches `scanner_versions.scanner_name` but no FK (history must survive scanner deletion) |
+| previous_version | VARCHAR(50) | NOT NULL | Version the ConfigMap held before this operation |
+| new_version | VARCHAR(50) | NOT NULL | Version the operation applied (or rolled back to) |
+| state | VARCHAR(40) | NOT NULL, CHECK | One of `applied` / `reverted` / `applied_db_stale` / `tool_integration_failed` / `rejected` (fix #5 outcome vocabulary) |
+| reason | TEXT | nullable | Admin-supplied rationale; sanitized via `sanitize_user_text` at the API boundary |
+| admin_user_id | UUID | FK users(id) ON DELETE SET NULL, nullable | Admin who triggered the operation |
+| upgrade_source | VARCHAR(20) | NOT NULL, default `admin_portal`, CHECK | One of `admin_portal` / `rollback` / `auto_revert` (routing hint for the rollback query) |
+| created_at | TIMESTAMPTZ | NOT NULL, default now() | |
+
+**Indexes:**
+- `idx_scanner_version_history_scanner_time` — `(scanner_name, created_at DESC)` — rollback target lookup
+- `idx_scanner_version_history_admin` — `(admin_user_id, created_at DESC)` — per-admin audit queries
+
+**Check constraints:**
+- `valid_upgrade_state` — closed-set CHECK on `state`
+- `valid_upgrade_source` — closed-set CHECK on `upgrade_source`
 
 ---
 
