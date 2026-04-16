@@ -6,6 +6,8 @@ Operational runbook for the production PostgreSQL backup CronJob. Covers daily o
 - `docs/playbooks/disaster-recovery.md` — full disaster recovery scenarios
 - `docs/audit/2026-04-15-postgresql-backup-recovery-summary.md` — incident postmortem
 - `docs/standards/database-management.md` — backup standards
+- `docs/playbooks/gcp-secret-drift-validation-cron.md` — sibling CronJob `gcp-secret-drift-check` (deployed 2026-04-15) co-located in `postgresql-prod`. Weekly read-only comparison of the two GCP Secret Manager entries that feed this backup's authentication. Fires `GCPSecretDrift` (critical) ~24h before the next backup would fail auth — the specific pre-failure signal for the 2026-04-15 outage class.
+- `docs/workflows/new-cronjob-deployment.md` — pattern followed by the sibling cron above
 
 ## Backup Architecture
 
