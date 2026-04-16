@@ -121,6 +121,11 @@ Full audit + 6-PR remediation plan: `audit/2026-04-15-admin-scanner-upgrade-pipe
 - [ ] GitHub API failure falls through: if `api.github.com` is unreachable, the check soft-fails (legacy behaviour), logged with a warning
 - [ ] **Compensating revert bypass:** when api-service fix #5 issues a revert (target_version == current_version), the upstream-release check is skipped — the previous version was always valid
 
+### 3.7 Automated regression coverage (added 2026-04-16)
+- [ ] `blocksecops-api-service/tests/contract/test_scanner_upgrade_request_contract.py` — schema-level contract between api-service `ScannerUpgradeRequest` and tool-integration `UpgradeRequest` (target_version + reason shape, both str, matching response-superset). Catches renames / type drift at CI import time. 8 tests pass.
+- [ ] `blocksecops-api-service/tests/integration/test_alembic_migration_086_roundtrip.py` — migration 086 apply/downgrade/idempotency roundtrip for the `scanner_version_history` table (backing store for fix #3 rollback). Shells out to `alembic` CLI; skips cleanly when no Postgres is reachable. 5 tests (Postgres-dependent).
+- [ ] `blocksecops-tool-integration/tests/integration/test_preflight_roundtrip.py` — real `TestClient` against `/scanners/health` (shape api-service pre-flight depends on) and `/scanners/slither/upgrade` with `target_version="0.99.99"` (fix #2 400 path) and with an unknown scanner name (404). 6 tests pass.
+
 ### 3.7 `scanner.upgraded` notification (added 2026-04-15, api-service 0.37.6)
 - [ ] `WebhookEventType.SCANNER_UPGRADED` value is `"scanner.upgraded"`
 - [ ] Admin with a configured webhook / email / Slack channel subscribed to `scanner.upgraded` receives a notification after every upgrade call

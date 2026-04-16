@@ -168,3 +168,15 @@ See `docs/audit/2026-04-14-scanner-e2e-test-matrix.md` for the full matrix.
 ### New follow-up identified during fix verification
 
 - **Trident on flat-tarball Anchor projects** — pre-existing trident-scan wrapper bug (path-reconstruction loop only handles top-level `*.rs` files, not nested ones). Affects projects uploaded via `/upload` as a single archive but not those ingested via `/from-github` (which preserves directory structure as ContractFileModel rows). Tracked separately.
+
+---
+
+## Update 2026-04-16: Dashboard wiring + hook test
+
+The api-service endpoint shipped in 0.37.2/0.37.3 but the dashboard side was never wired, so customer-facing ingest via GitHub URL was unreachable through the UI. Closed in this pass:
+
+- `blocksecops-dashboard/src/lib/api/contracts.ts` — added `createContractFromGitHub()` client method, `ContractFromGitHubRequest` type, and `isGitHubIngestError()` type guard. The guard unpacks the server's `{error, message}` detail so components can surface the rate-limit/PAT hint verbatim per the 0.37.3 wording fix.
+- `blocksecops-dashboard/src/hooks/useGitHubIngest.ts` — new `useCreateFromGithub` React Query mutation. On success it invalidates the `['contracts']` query so ContractsList picks up the new contract without a manual refresh.
+- `blocksecops-dashboard/tests/hooks/useGitHubIngest.test.ts` — locks down three response branches: 201 success, 400 `invalid_github_url`, and 429 `github_rate_limited` with the exact "GitHub PAT via the integrations endpoint" wording. 4 test cases, all pass.
+
+**Still out-of-scope:** wiring the hook into `ContractUploadModal.tsx` as a third ingest tab. The hook is callable from any component; the modal UI surface remains single-file-paste + archive-upload + address until a customer asks for it.
