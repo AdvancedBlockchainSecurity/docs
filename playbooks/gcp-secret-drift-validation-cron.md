@@ -1,6 +1,7 @@
 # GCP Secret Manager Drift Validation Cron — Design Proposal
 
-**Status:** Proposed (design only — not deployed)
+**Status:** Active — deployed 2026-04-15
+**Namespace:** `postgresql-prod` (co-located with `postgresql-backup` that it guards)
 **Cadence:** Weekly (Sunday 05:00 UTC — offset from drift-audit-cron at 04:00)
 **Owner:** Platform Operator
 **Last Updated:** 2026-04-15
