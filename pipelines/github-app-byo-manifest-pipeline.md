@@ -1,12 +1,15 @@
 # GitHub App BYO Manifest Pipeline
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Last Updated:** 2026-04-17
 **Related migration:** 087
+**Code versions:** api-service `0.39.1`, dashboard `0.50.3`
 **Related code:**
 - Service: `blocksecops-api-service/src/application/services/github_app_service.py`
 - Endpoints: `blocksecops-api-service/src/presentation/api/v1/endpoints/github_app.py`
 - Tests: `tests/unit/services/test_github_app_service.py`, `tests/integration/test_github_app_manifest_flow.py`
+- Dashboard wizard: `blocksecops-dashboard/src/components/integrations/hub/GitHubAppSetupWizard.tsx`
+- Dashboard CSP: `blocksecops-dashboard/serve.json` + `k8s/overlays/production/middleware-security-headers.yaml` (both must carry `form-action 'self' https://github.com`)
 
 ## Overview
 
@@ -169,6 +172,32 @@ Methods on `GitHubAppService` all take per-integration `(app_id, private_key_pem
 - `list_installation_repositories` — `GET /installation/repositories` with installation token, paginated via Link header
 - `fetch_file_content` — `GET /repos/{owner}/{repo}/contents/{path}?ref=<sha>` with installation token
 - `get_installation_info` — `GET /app/installations/{id}` with app JWT (not installation token — the JWT is what GitHub uses to prove we own the App)
+
+### Stage 8.5 — Import installed repositories (authenticated, 0.39.1+)
+
+**Endpoint:** `POST /api/v1/organizations/{org_id}/integrations/github-app/{integration_id}/import-installed-repos`
+**Auth:** Bearer JWT + org admin check
+**Rate limit:** general/default tier
+
+**Inputs:** `org_id`, `integration_id` (path)
+
+**Process:**
+1. Verify org membership with `require_admin=True`
+2. Load `(IntegrationModel, IntegrationCredentialModel)` for this org+integration; 404 if missing
+3. Reject if `integration.status != "connected"` (400) or credential is missing `github_app_installation_id` / `github_app_id` / `github_app_private_key_encrypted` (400/500 as appropriate)
+4. Decrypt PEM via `decrypt_private_key(credential.github_app_private_key_encrypted)`
+5. Call `list_installation_repositories(app_id, pem, installation_id)` — paginates via Link headers until all pages consumed
+6. Fetch existing `IntegrationRepositoryModel` rows for the integration, keyed on `external_repo_id`
+7. For each GitHub repo not already in the set, insert a new row (`sync_status='pending'`, `is_private` mirrored from GitHub, `external_repo_id=str(gh["id"])`)
+8. If any new rows inserted, bump `integration.repos_synced`
+9. Commit, re-query the full ordered list, return `RepositoryListResponse`
+
+**Idempotency:** The dedupe check on `(integration_id, external_repo_id)` means the endpoint is safe to call repeatedly (customers re-click Import after re-Configuring the installation on GitHub).
+
+**Failure modes:**
+- GitHub `401` while listing → installation token evicted, `GitHubAppAuthError` → 502 response
+- GitHub `5xx` or timeout → `GitHubAppError` → 502 response
+- No network egress to `api.github.com` → surfaces as a 502 with an httpx exception string
 
 ### Stage 9 — Webhook receiver (stub)
 

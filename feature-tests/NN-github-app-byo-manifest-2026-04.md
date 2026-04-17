@@ -2,10 +2,10 @@
 
 **Priority:** P1
 **Date:** 2026-04-17
-**Versions:** api-service `0.38.1 → 0.39.0`, dashboard (Phase 2 pending)
+**Versions:** api-service `0.38.1 → 0.39.0 → 0.39.1`, dashboard `0.49.1 → 0.50.0 → 0.50.3`
 **Migration:** 087 (`add_github_app_fields_to_integration_credentials`)
-**Related PR:** blocksecops-api-service#355
-**Status:** **Phase 1 (backend) live.** Phase 2 (dashboard UI) pending follow-up PR.
+**Related PRs:** blocksecops-api-service#355, blocksecops-dashboard#214 (Phase 2), plus follow-up PATCHes for the flow-complete pass
+**Status:** **Phase 1 (backend) + Phase 2 (dashboard) live.** Repo sync/scan pipeline deferred — see *Deferred* section below.
 
 ## Overview
 
@@ -71,6 +71,24 @@ This is distinct from the **URL-based GitHub ingest** path (`POST /api/v1/contra
 - [ ] Delivery ID + event name logged server-side for traceability
 - [ ] **Not** dispatching scans yet — this is a documented no-op until the follow-up receiver ships
 
+### 6. Import installed repositories (0.39.1)
+- [ ] `POST /api/v1/organizations/{org_id}/integrations/github-app/{integration_id}/import-installed-repos` with Bearer JWT (admin) returns 200 + the connected-repo list
+- [ ] Same request without auth → 401
+- [ ] Non-admin org member → 403
+- [ ] Integration in `pending` status (install not completed) → 400 `Integration is not connected yet`
+- [ ] Integration missing `github_app_installation_id` → 400 `Installation ID is missing`
+- [ ] First call creates `IntegrationRepository` rows mirroring GitHub's installation repo selection; `repos_synced` incremented
+- [ ] Re-calling is idempotent — no duplicate rows; dedupe keys on `(integration_id, external_repo_id)`
+- [ ] Pagination works — repos past the 100-per-page GitHub API boundary are included
+- [ ] GitHub API `401` from installation token surfaces as 502 `GitHub API error…` (token is invalidated server-side)
+
+### 7. Dashboard wizard + repo management (Phase 2)
+- [ ] CSP `form-action 'self' https://github.com` — clicking **Create GitHub App** navigates to `github.com/settings/apps/new` with the manifest pre-filled (no CSP form-action violation)
+- [ ] After GitHub redirects back with `?success=true&provider=github`, **exactly one** success toast is shown (not 5) — `setSearchParams` clears the param so the effect does not re-fire on auth re-renders
+- [ ] Wizard renders the correct step for integration state: no integration → Create; `status!=connected` → Install; `status=connected` → Manage Repositories
+- [ ] In Manage step, **Import from GitHub** button calls the import endpoint and populates the `Connected repositories` modal
+- [ ] "From repo" indicator on contracts — **deferred**: `ContractModel.source_repo_url` is not yet surfaced in any API response schema or dashboard view
+
 ## Security posture
 
 - [ ] Each customer's App private key encrypted at rest via Fernet (`INTEGRATION_ENCRYPTION_KEY`)
@@ -84,17 +102,18 @@ This is distinct from the **URL-based GitHub ingest** path (`POST /api/v1/contra
 
 | Item | Deferred because |
 |------|-----------------|
+| Repo-to-contract sync pipeline — walk GitHub tree for `.sol` files, create `ContractModel` rows with `source_repo_url`/`source_commit_hash`/`source_file_path`, queue scans in Celery | The existing `/repositories/{repo_id}/sync` endpoint sets `sync_status='syncing'` but has a `TODO: Trigger background sync job` and never queues work. The entire repo → contract → scan pipeline is unbuilt. **This is the top priority follow-up (Option A)** — customer flow is non-functional without it. |
 | Webhook event dispatch (scan-on-push / scan-on-PR) | Explicit scope decision on 2026-04-17 — ship install-and-sync first |
-| Dashboard `GitHubAppSetupWizard` + repo management UI | Phase 2 PR, queued behind backend verification |
+| "From repo" indicator on contracts list + detail | `ContractModel.source_repo_url` exists in DB (since migration 063) but is not on any response schema; dashboard never renders it. Cheap add once the sync pipeline starts populating it. |
 | Retire legacy `oauth_service.py` GitHub path | Kept as dead code until dashboard confirms no callers |
 | GitHub Enterprise Server support via Broker | Multi-week separate initiative |
 
 ## Verification (live in prod)
 
 ```bash
-# 1. Backend version reflects 0.39.0
+# 1. Backend version reflects 0.39.1
 curl -s https://app.0xapogee.com/api/v1/health/live | jq .version
-# Expected: "0.39.0"
+# Expected: "0.39.1"
 
 # 2. Migration 087 applied
 kubectl exec -n postgresql-prod postgresql-0 -- psql -U blocksecops -d solidity_security -t \
@@ -122,6 +141,11 @@ curl -s -o /dev/null -w "%{http_code}" \
 curl -s -o /dev/null -w "%{http_code}" -X POST \
   https://app.0xapogee.com/api/v1/github-app/webhook
 # Expected: 204
+
+# 5. Import-installed-repos requires auth
+curl -s -o /dev/null -w "%{http_code}" -X POST \
+  https://app.0xapogee.com/api/v1/organizations/00000000-0000-0000-0000-000000000000/integrations/github-app/00000000-0000-0000-0000-000000000000/import-installed-repos
+# Expected: 401
 ```
 
 ## Related

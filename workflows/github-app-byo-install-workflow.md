@@ -56,17 +56,30 @@ At this point: App exists but is not yet installed on any repos.
 
 ### Step 4 — Back in Apogee
 
-1. Apogee shows a green **Connected** banner.
+1. Apogee shows a green **Connected** banner (single toast — exactly one).
 2. The GitHub card now shows:
    - Your GitHub account name + avatar
    - Number of connected repos
-   - **Manage Repositories** button (Phase 2 — coming in the dashboard UI follow-up)
+   - **Manage Repositories** button
+
+### Step 5 — Import your installed repositories
+
+1. Click **Manage Repositories**. A modal lists the repos already imported (empty on first open).
+2. Click **Import from GitHub**. Apogee calls `/integrations/github-app/{integration_id}/import-installed-repos`, which lists the repos your App installation has access to on GitHub and upserts them as `IntegrationRepository` rows.
+3. Close the modal — the **Connected repositories** section on the card now shows the imported repos, each with `sync_status=pending`.
+
+Re-running Import is idempotent. Whenever you add/remove repos via GitHub's *Configure* page for the App, come back and click Import again to pull the updated selection into Apogee.
 
 ## Post-install behaviour
 
 - Apogee stores your App's private key and webhook secret **encrypted at rest** (Fernet) in the `integration_credentials` table. The raw values are never logged or exported.
 - When you trigger a scan on a repo, Apogee signs a short-lived RS256 JWT with your App's private key, exchanges it for a 1-hour installation token, and uses that token to call `api.github.com`.
 - Webhooks hit Apogee's `/github-app/webhook` endpoint. The receiver is currently a 204 stub — push/PR auto-scan is a deferred feature (follow-up pass).
+
+## Known limitations
+
+- **Sync now on a repo is a stub.** The per-repo `Sync now` button flips `sync_status` to `syncing` but **does not** enumerate `.sol` files or create `ContractModel` rows yet. The repo → contract → scan pipeline is the top-priority follow-up. Track the status on the feature-test doc.
+- **No "From repo" indicator on contracts.** The `ContractModel.source_repo_url` column exists but is not surfaced in API responses or the dashboard today. This will be added alongside the sync pipeline.
 
 ## Reconfiguring
 
