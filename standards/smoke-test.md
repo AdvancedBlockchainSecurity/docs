@@ -151,6 +151,59 @@ curl $AUTH -X POST -H "Content-Type: application/json" \
   "https://${PLATFORM_URL}/api/v1/search"
 ```
 
+### GitHub URL Ingest (POST /contracts/from-github)
+
+Added 2026-04-16. Verifies the customer-facing "Import from GitHub" path end-to-end: URL parsing → GitHub fetch → language detection → contract persist. Use a small, stable public file so the smoke test doesn't burn the 60/hr anonymous GitHub rate limit.
+
+```bash
+PLATFORM_URL="${PLATFORM_URL:-app.0xapogee.com}"
+SMOKE_CONTRACT_NAME="smoke-test-$(date +%s)"
+
+# Happy path — expect 201 with contract.id, source_repo_url, source_commit_hash populated
+curl -s -X POST \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"name\":\"${SMOKE_CONTRACT_NAME}\",\"github_url\":\"https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol\"}" \
+  "https://${PLATFORM_URL}/api/v1/contracts/from-github" | \
+  python3 -c "
+import sys,json
+d=json.load(sys.stdin)
+ok = d.get('id') and d.get('source_repo_url') and d.get('language')=='solidity'
+print('PASS' if ok else f'FAIL: {d}')"
+
+# Invalid URL — expect 400 with detail.error == 'invalid_github_url'
+curl -s -o /dev/null -w "%{http_code}" -X POST \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"bad-url-smoke","github_url":"https://example.com/not-github"}' \
+  "https://${PLATFORM_URL}/api/v1/contracts/from-github"
+# Expected: 400
+
+# Cleanup the smoke-test contract so it doesn't accumulate
+CONTRACT_ID=$(curl -s -H "Authorization: Bearer $TOKEN" \
+  "https://${PLATFORM_URL}/api/v1/contracts?limit=1" | python3 -c "
+import sys,json
+d=json.load(sys.stdin)
+for c in d.get('contracts', []):
+    if c.get('name','').startswith('smoke-test-'): print(c['id']); break")
+[ -n "$CONTRACT_ID" ] && curl -s -X DELETE \
+  -H "Authorization: Bearer $TOKEN" \
+  "https://${PLATFORM_URL}/api/v1/contracts/$CONTRACT_ID" > /dev/null
+```
+
+**Dashboard-side smoke (manual, after any dashboard deploy):**
+
+1. Open `https://${PLATFORM_URL}/contracts` and click **Upload Contract**
+2. Click the **GitHub URL** tab
+3. Paste a blob URL (e.g. the OpenZeppelin ERC20.sol URL above)
+4. Give it a name and click **Import from GitHub**
+5. Confirm the modal closes and the contract appears in the list with language auto-detected
+
+Expected failure modes to spot-check:
+- Non-GitHub URL (e.g. `https://example.com/foo`) → "Enter a valid GitHub URL" client-side error
+- Malformed GitHub URL (missing blob/tree segment) → same client-side error
+- Valid URL but private repo → server returns 403 with "Use the GitHub OAuth integration" — message renders verbatim in the red banner
+
 ## Database Checks
 
 ```bash
@@ -358,6 +411,19 @@ check "No stale scans" "0" "$STALE"
 
 MISSING_ERR=$(kubectl exec -n postgresql-${ENV} postgresql-0 -- psql -U blocksecops -d solidity_security -t -c "SELECT COUNT(*) FROM scans WHERE status='failed' AND error_message IS NULL;" 2>/dev/null | tr -d ' ')
 check "Failed scans have error_message" "0" "$MISSING_ERR"
+
+echo ""
+echo "=== GitHub URL Ingest ==="
+# Requires $TOKEN set — skip if unset
+if [ -n "${TOKEN:-}" ]; then
+  GH_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+    -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+    -d '{"name":"bad-url-smoke","github_url":"https://example.com/not-github"}' \
+    "https://${PLATFORM_URL}/api/v1/contracts/from-github" 2>/dev/null)
+  check "Invalid GitHub URL rejected" "400" "$GH_CODE"
+else
+  echo "  SKIP: GitHub URL ingest (TOKEN not set)"
+fi
 
 echo ""
 echo "=== Summary ==="

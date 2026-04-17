@@ -2,6 +2,10 @@
 
 Common errors from `POST /api/v1/contracts/from-github` and how to fix them.
 
+## UI entry point (dashboard)
+
+As of 2026-04-16, customers reach this endpoint via the **GitHub URL** tab in `ContractUploadModal` (Contracts page → **Upload Contract** button → **GitHub URL** tab). The UI validates the URL shape client-side before submitting and renders the server's `detail.message` verbatim on error — so the guidance below (rate-limit hint, private-repo redirect, etc.) surfaces directly to the end user with no translation. If a customer reports an ingest error, ask them to copy the exact red-banner text; that's the server message string, not a paraphrase.
+
 ## Quick Reference: Error Codes
 
 | HTTP | `error` field | Common cause |
