@@ -1,15 +1,16 @@
 # Contract Ingest Workflow
 
-User-facing workflow comparing the four ways to get a contract into the BlockSecOps platform for scanning.
+User-facing workflow comparing the five ways to get a contract into the BlockSecOps platform for scanning.
 
-## The Four Ingest Paths
+## The Five Ingest Paths
 
 | Path | Endpoint | When to use |
 |------|----------|-------------|
 | **Source paste** | `POST /api/v1/contracts` (with `source_code`) | Quick scan of a single file you have locally; when GitHub is unreachable from your network |
 | **Archive upload** | `POST /api/v1/upload` (multipart `file=`) | Multi-file project you already have packaged (zip/tar.gz); Hardhat/Foundry/Anchor projects with `node_modules` or `lib/` excluded |
 | **GitHub URL** | `POST /api/v1/contracts/from-github` | Public GitHub blob or tree URL; provenance auto-tracked (commit SHA stored) |
-| **OAuth GitHub sync** | `POST /api/v1/organizations/.../integrations/.../sync` | Private repos, or org-scoped repos you've already connected via OAuth; recurring scans on a branch |
+| **GitHub App (BYO manifest)** | `/api/v1/github-app/*` + `/organizations/.../github-app/*` | Private repos; recurring syncs; per-repo permissions. Each org registers their own GitHub App via GitHub's manifest flow. See `github-app-byo-install-workflow.md`. |
+| **OAuth GitHub sync** (legacy) | `POST /api/v1/organizations/.../integrations/.../sync` | Pre-existing OAuth-based integrations. For new GitHub integrations, prefer the GitHub App BYO path above. |
 
 ## Decision Flow
 
@@ -25,8 +26,9 @@ Got a contract to scan?
 │    ├─ Directory (tree URL) → POST /api/v1/contracts/from-github
 │    └─ Whole repo / private → continue
 │
-├─ Is it private GitHub?
-│    └─ Yes → OAuth integration (linked repository sync)
+├─ Is it private GitHub or recurring?
+│    └─ Yes → GitHub App BYO (register your own App via manifest flow)
+│             See docs/workflows/github-app-byo-install-workflow.md
 │
 └─ Have a tarball / zip locally?
      └─ POST /api/v1/upload

@@ -1,8 +1,10 @@
 # OAuth Integration Workflow
 
-**Last Updated:** February 24, 2026
-**Status:** Active
+**Last Updated:** 2026-04-17
+**Status:** Active for GitLab / Bitbucket / JIRA / Jenkins
 **API Version:** 0.29.22+
+
+> **GitHub note (2026-04-17):** New GitHub integrations should use the **BYO GitHub App manifest flow** (`docs/workflows/github-app-byo-install-workflow.md`), not OAuth. The OAuth path described below is retained for GitLab / Bitbucket / JIRA / Jenkins and for pre-existing GitHub OAuth integrations. Retirement of the GitHub OAuth path is a separate follow-up once no customers depend on it.
 
 ---
 
