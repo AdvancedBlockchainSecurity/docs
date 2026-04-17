@@ -4,8 +4,8 @@
 **Database Name:** `solidity_security`
 **Schema:** `public`
 **Timezone:** UTC
-**Verified:** 2026-04-16 (partial — only the tables added since 082 are covered below; older tables in this doc reflect the 2026-03-15 snapshot)
-**Latest Migration:** 086 (add_scanner_version_history_table)
+**Verified:** 2026-04-17 (partial — only the tables added since 082 are covered below; older tables in this doc reflect the 2026-03-15 snapshot)
+**Latest Migration:** 087 (add_github_app_fields_to_integration_credentials)
 
 > **Naming Note:** The database is named `solidity_security`, not `blocksecops`. This name was established during initial development when the focus was solely on Solidity. Retained for backward compatibility.
 
@@ -1378,17 +1378,27 @@ Third-party integration connections (OAuth).
 
 ### `integration_credentials`
 
-Encrypted OAuth credentials (Fernet symmetric encryption).
+Encrypted credentials for integrations (OAuth + GitHub App BYO). Stores either
+OAuth tokens (GitLab/Bitbucket/JIRA) or GitHub App fields (migration 087),
+never both on the same row.
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | id | UUID | PK | |
 | integration_id | UUID | FK integrations(id) ON DELETE CASCADE, UNIQUE, NOT NULL, indexed | |
-| access_token_encrypted | TEXT | NOT NULL | |
+| access_token_encrypted | TEXT | nullable (since 087) | OAuth access token; NULL for GitHub App BYO rows |
 | refresh_token_encrypted | TEXT | nullable | |
 | token_type | VARCHAR(50) | NOT NULL, default 'Bearer' | |
 | scopes | JSONB | nullable | |
 | expires_at | TIMESTAMPTZ | nullable | |
+| github_app_id | VARCHAR(20) | nullable (087) | GitHub-assigned numeric App ID |
+| github_app_slug | VARCHAR(255) | nullable (087) | URL slug `github.com/apps/{slug}` |
+| github_app_client_id | VARCHAR(255) | nullable (087) | OAuth client ID for the App |
+| github_app_private_key_encrypted | TEXT | nullable (087) | Fernet-encrypted PEM; signs RS256 app JWTs |
+| github_app_webhook_secret_encrypted | TEXT | nullable (087) | Fernet-encrypted HMAC secret |
+| github_app_installation_id | BIGINT | nullable (087) | Set after customer completes install step |
+| github_app_created_at | TIMESTAMPTZ | nullable (087) | When manifest exchange finished |
+| github_app_installed_at | TIMESTAMPTZ | nullable (087) | When installation_id was recorded |
 | created_at | TIMESTAMPTZ | NOT NULL, default now() | |
 | updated_at | TIMESTAMPTZ | NOT NULL, default now() | |
 

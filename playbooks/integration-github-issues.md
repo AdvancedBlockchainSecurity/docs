@@ -1,12 +1,14 @@
 # Playbook: GitHub Issues Integration
 
-**Version:** 1.0.0
-**Last Updated:** February 1, 2026
+**Version:** 1.1.0
+**Last Updated:** 2026-04-17
 **Audience:** Developer | Team Lead
 
 ## Overview
 
 This playbook guides you through integrating Apogee with GitHub Issues to automatically create issues from security vulnerabilities. Track remediation in your existing GitHub workflow and keep findings synchronized.
+
+> **2026-04-17 update:** The GitHub App BYO manifest flow (`docs/workflows/github-app-byo-install-workflow.md`) is the preferred way to connect GitHub to Apogee. It uses per-org GitHub Apps (customer-owned) with read-only repo access — see `docs/playbooks/github-app-byo-troubleshooting.md` for App-specific issues. This playbook covers the broader GitHub integration use case (Issues sync, etc.); repo access is a prerequisite and can come from either the URL-ingest path (one-shot, public repos) or the BYO App path (recurring, private repos).
 
 ---
 

@@ -1,9 +1,11 @@
 # OAuth Integration Pipeline
 
-**Last Updated:** February 24, 2026
+**Last Updated:** 2026-04-17
 **API Version:** 0.29.22+
 
-Pipeline for setting up OAuth third-party integrations (GitHub, GitLab, Bitbucket, JIRA, Jenkins) in a new environment. Primarily for GCP deployment but applicable to any environment.
+> **GitHub note (2026-04-17):** New GitHub integrations use the **BYO GitHub App manifest pipeline** (`docs/pipelines/github-app-byo-manifest-pipeline.md`) — no platform-level OAuth App to register. The OAuth pipeline below applies to GitLab / Bitbucket / JIRA / Jenkins (and pre-existing GitHub OAuth deployments until those are retired).
+
+Pipeline for setting up OAuth third-party integrations (GitLab, Bitbucket, JIRA, Jenkins) in a new environment. Primarily for GCP deployment but applicable to any environment.
 
 ## Overview
 

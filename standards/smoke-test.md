@@ -204,6 +204,40 @@ Expected failure modes to spot-check:
 - Malformed GitHub URL (missing blob/tree segment) → same client-side error
 - Valid URL but private repo → server returns 403 with "Use the GitHub OAuth integration" — message renders verbatim in the red banner
 
+### GitHub App BYO manifest flow (2026-04-17 — backend checks)
+
+These are unauthenticated reachability checks. The authenticated end-to-end customer flow (create App via manifest → install → sync repos) requires a browser and a real `$TOKEN`; script it separately when the dashboard wizard ships.
+
+```bash
+PLATFORM_URL="${PLATFORM_URL:-app.0xapogee.com}"
+
+# manifest-init requires auth — unauth must 401, not 500
+echo -n "manifest-init (no auth): "
+curl -s -o /dev/null -w "%{http_code}\n" -X POST \
+  "https://${PLATFORM_URL}/api/v1/organizations/00000000-0000-0000-0000-000000000000/integrations/github-app/manifest-init"
+# Expected: 401
+
+# manifest-callback must reject invalid state with 302 redirect (not 500)
+echo -n "manifest-callback (invalid state): "
+curl -s -o /dev/null -w "%{http_code}\n" \
+  "https://${PLATFORM_URL}/api/v1/github-app/manifest-callback?code=x&state=invalid"
+# Expected: 302
+
+# setup with invalid setup_action → 302 redirect
+echo -n "setup (invalid action): "
+curl -s -o /dev/null -w "%{http_code}\n" \
+  "https://${PLATFORM_URL}/api/v1/github-app/setup?installation_id=1&setup_action=nope"
+# Expected: 302
+
+# webhook stub → 204 for any payload
+echo -n "webhook stub: "
+curl -s -o /dev/null -w "%{http_code}\n" -X POST -H "Content-Type: application/json" -d '{"zen":"smoke"}' \
+  "https://${PLATFORM_URL}/api/v1/github-app/webhook"
+# Expected: 204
+```
+
+**Dashboard-side smoke (Phase 2, not yet shipped):** wizard + repo management tests will be added once the dashboard UI PR ships. Currently manifest-init returns the correct JSON shape but nothing in the dashboard consumes it yet.
+
 ## Database Checks
 
 ```bash
