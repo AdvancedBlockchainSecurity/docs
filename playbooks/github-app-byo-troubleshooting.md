@@ -1,6 +1,6 @@
 # GitHub App BYO Troubleshooting
 
-Operator-facing playbook for issues with the bring-your-own GitHub App flow (migration 087, api-service 0.39.0+).
+Operator-facing playbook for issues with the bring-your-own GitHub App flow (migration 087, api-service 0.39.1+, dashboard 0.50.3+).
 
 ## Distinguishing from URL-ingest issues
 
@@ -20,6 +20,11 @@ If a customer reports a GitHub-related error, first identify which path they're 
 | `/setup` returns 302 with `?error=installation_lookup_failed` | Private key decryption failed OR installation revoked | Issue 5 |
 | Sync fails with 401 | Installation token rejected | Issue 6 |
 | Webhook delivery fails on GitHub's side | URL unreachable or signature mismatch | Issue 7 |
+| `Create GitHub App` button blocked by CSP `form-action` | Dashboard CSP missing `https://github.com` in `form-action` | Issue 8 |
+| 5 duplicate "Successfully connected GitHub!" toasts after install | Dashboard <0.50.3 used `window.history.replaceState` which did not update React Router's `useSearchParams` | Issue 9 |
+| List-integrations 422 "undefined" on page load after GitHub redirect | Dashboard called `refetch()` before `currentOrganization?.id` resolved | Issue 10 |
+| Modal empty; "Import from GitHub" button missing or does nothing | api-service <0.39.1 lacks `/import-installed-repos` endpoint, or button not clicked after install | Issue 11 |
+| Repo shows `Syncing` forever, 0 contracts | Per-repo sync endpoint is a stub — no background job implemented | Issue 12 |
 
 ## Issue 1: `/manifest-init` returns 503
 
@@ -177,6 +182,98 @@ kubectl exec -n postgresql-prod postgresql-0 -- psql -U blocksecops -d solidity_
 1. Customer regenerates private key in GitHub App settings
 2. Customer re-runs manifest-init in Apogee — a new App (different App ID) gets created
 3. OR: customer manually uploads new PEM via a future support endpoint (not built yet)
+
+## Issue 8: CSP `form-action` blocks the manifest POST to github.com
+
+**Symptom (browser console):**
+```
+Content-Security-Policy: The page's settings blocked the loading of a resource
+(form-action) at https://github.com/settings/apps/new?state=...
+because it violates the following directive: "form-action 'self'"
+```
+
+**Cause:** Before dashboard 0.50.1 the CSP declared `form-action 'self'`, which blocks the auto-submitted manifest form that POSTs to `github.com/settings/apps/new` (or `github.com/organizations/<org>/settings/apps/new`).
+
+**Fix:** `form-action 'self' https://github.com` in both CSP sources:
+
+- `blocksecops-dashboard/serve.json` (baked into the static `serve` config)
+- `blocksecops-dashboard/k8s/overlays/production/middleware-security-headers.yaml` (Traefik middleware for the production GCP path)
+
+Both must stay in sync; changing only one silently drifts depending on which ingress path a cluster uses.
+
+**Verify after deploy:**
+```bash
+docker run --rm --entrypoint cat \
+  us-west1-docker.pkg.dev/<project>/apogee/dashboard:<new-version> \
+  /app/dist/serve.json | grep -o "form-action[^;]*"
+# Expected: form-action 'self' https://github.com
+```
+
+## Issue 9: 5 duplicate "Successfully connected GitHub!" toasts
+
+**Symptom:** After GitHub redirects to `/integrations?success=true&provider=github`, the user sees multiple identical success toasts (often 5) stacked up.
+
+**Cause (dashboard <0.50.3):** `SourceControlTab` used `window.history.replaceState({}, '', '/integrations?tab=source-control')` to clear the `success=true` query param. `replaceState` does **not** notify React Router's `useSearchParams`, so subsequent re-renders (auth state flickers, `addToast` reference changes, etc.) still see `success=true` and re-run the effect.
+
+**Fix (dashboard 0.50.3+):** use `setSearchParams({ tab: 'source-control' }, { replace: true })` so React Router actually observes the cleared query, and guard the effect with a `useRef` so even if it did re-fire, the toast wouldn't double-up.
+
+## Issue 10: `GET /organizations/undefined/integrations` → 422 after GitHub redirect
+
+**Symptom:** Browser network tab shows `XHR GET /api/v1/organizations/undefined/integrations 422` immediately after returning from GitHub, and the integration does not appear in the UI even though it exists in the DB.
+
+**Cause:** After a GitHub round-trip the entire dashboard re-mounts; `currentOrganization` is null until `/users/me` resolves and the org list loads. `SourceControlTab`'s callback-handler effect called `refetch()` on the integrations query, which **bypasses React Query's `enabled: !!orgId` gate** and fires with `orgId=undefined`.
+
+**Fix (dashboard 0.50.3+):** the effect now early-returns unless `currentOrganization?.id` is truthy, and re-runs once it resolves. The `enabled` gate handles all other call sites automatically.
+
+**Verify the integration really is in the DB despite the UI not showing it:**
+```bash
+kubectl exec -n postgresql-prod postgresql-0 -- psql -U blocksecops -d solidity_security -c \
+  "SELECT id, status, external_username, settings->>'auth_model' as auth_model
+   FROM integrations WHERE provider='github' AND organization_id='<ORG_ID>';"
+```
+
+## Issue 11: "Import from GitHub" button missing or no-op
+
+**Symptom:** In the Manage Repositories modal the empty state reads *"No repositories imported yet. Click Import from GitHub above…"* but either the button is missing (older dashboard), or clicking it fails with `404` / `501`.
+
+**Cause:** The import endpoint lives in api-service 0.39.1+ — earlier versions don't have it. Dashboard 0.50.3+ expects the endpoint.
+
+**Diagnostic:**
+```bash
+# Confirm backend is 0.39.1+ and endpoint is registered
+kubectl -n api-service-prod get deployment api-service \
+  -o jsonpath='{.spec.template.spec.containers[0].image}'
+
+curl -s -o /dev/null -w "%{http_code}" -X POST \
+  https://app.0xapogee.com/api/v1/organizations/00000000-0000-0000-0000-000000000000/integrations/github-app/00000000-0000-0000-0000-000000000000/import-installed-repos
+# Expected: 401 (unauth). If 404, api-service is pre-0.39.1.
+```
+
+**Fix:** bump api-service to 0.39.1 (or later), redeploy.
+
+**If both versions are current and it's still failing,** check the api-service logs:
+```bash
+kubectl logs -n api-service-prod deployment/api-service --tail=100 | grep -iE "import|github"
+```
+A 502 with *"GitHub API error while listing installation repositories"* means the stored App credentials can't authenticate — go to Issue 6.
+
+## Issue 12: Repo stuck on `Syncing`, 0 contracts
+
+**Symptom:** Customer clicks `Sync now` on a connected repo. Status flips to `Syncing`, but after minutes/hours no contracts appear and the status stays stuck.
+
+**Cause:** `POST /integrations/{integration_id}/repositories/{repo_id}/sync` (`src/presentation/api/v1/endpoints/integrations.py:765`) is an unfinished stub. The endpoint sets `sync_status='syncing'` and returns 200 — but the `# TODO: Trigger background sync job` comment immediately below is unimplemented. No worker enumerates `.sol` files, no `ContractModel` rows are created, no scans are queued.
+
+**Current state: this is known.** The repo-to-contract-to-scan pipeline is the top-priority follow-up (Option A) and will land in a subsequent PR. Track the status on `docs/feature-tests/NN-github-app-byo-manifest-2026-04.md` → *Deferred* section.
+
+**Short-term workaround for affected customers:** use the URL-ingest path (`POST /api/v1/contracts/from-github`) per-file to scan specific contracts from the same repo. Public repos only; the App-backed private-repo flow requires the pipeline work to land.
+
+**Operator recovery — clear stuck `syncing` rows:**
+```bash
+kubectl exec -n postgresql-prod postgresql-0 -- psql -U blocksecops -d solidity_security -c \
+  "UPDATE integration_repositories
+   SET sync_status='pending'
+   WHERE sync_status='syncing' AND integration_id='<INTEGRATION_ID>';"
+```
 
 ## Related
 
