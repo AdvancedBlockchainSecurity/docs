@@ -180,3 +180,19 @@ The api-service endpoint shipped in 0.37.2/0.37.3 but the dashboard side was nev
 - `blocksecops-dashboard/tests/hooks/useGitHubIngest.test.ts` — locks down three response branches: 201 success, 400 `invalid_github_url`, and 429 `github_rate_limited` with the exact "GitHub PAT via the integrations endpoint" wording. 4 test cases, all pass.
 
 **Still out-of-scope:** wiring the hook into `ContractUploadModal.tsx` as a third ingest tab. The hook is callable from any component; the modal UI surface remains single-file-paste + archive-upload + address until a customer asks for it.
+
+---
+
+## Update 2026-04-16 (part 2): Modal UI wiring + smoke test
+
+The hook shipped earlier in the day was still not reachable from the customer UI. This pass closes that gap and adds end-to-end smoke coverage.
+
+- `blocksecops-dashboard/src/components/contracts/ContractUploadModal.tsx` — added a three-tab input-mode selector at the top of the Source section: **Paste Code** / **Upload File** / **GitHub URL**. Only the active tab's input renders; switching tabs clears cross-mode state and validation errors so the user can't accidentally submit stale data.
+- **Client-side URL validation** — strict regex anchored to `https://github.com/{owner}/{repo}/(blob|tree)/{branch}/{path}`. Rejects non-GitHub hosts, missing blob/tree segment, and empty input before any network call.
+- **Server error rendering** — the API's structured `detail.message` renders verbatim in a red banner (rate-limit PAT hint, invalid URL, private repo redirect, content-too-large). React auto-escapes, no `dangerouslySetInnerHTML`, no XSS risk.
+- **409 conflict reuse** — contract-name-exists from `/from-github` routes into the same `DuplicateContractModal` rename/overwrite flow that the paste and upload paths already use.
+- **Submit button label** switches to "Import from GitHub" in GitHub mode so the action is unambiguous.
+- `blocksecops-dashboard/tests/components/ContractUploadModal.github.test.tsx` — 8 component-level tests covering tab rendering, tab switching, empty-URL rejection, non-GitHub URL rejection, missing blob/tree path rejection, successful submission via `createContractFromGitHub`, rate-limit error rendering (asserts the exact 0.37.3 "GitHub PAT via the integrations endpoint" wording appears in the DOM).
+- `docs/standards/smoke-test.md` — added a "GitHub URL Ingest" block under Authenticated Endpoint Tests: happy-path curl against `/api/v1/contracts/from-github`, invalid-URL 400 check, and a manual browser-side checklist for the modal's three-tab flow. The quick full smoke script now also exits non-zero if the invalid-URL path doesn't return 400.
+
+**Dashboard PR:** AdvancedBlockchainSecurity/blocksecops-dashboard#211 (merged 2026-04-16).
