@@ -196,3 +196,25 @@ The hook shipped earlier in the day was still not reachable from the customer UI
 - `docs/standards/smoke-test.md` — added a "GitHub URL Ingest" block under Authenticated Endpoint Tests: happy-path curl against `/api/v1/contracts/from-github`, invalid-URL 400 check, and a manual browser-side checklist for the modal's three-tab flow. The quick full smoke script now also exits non-zero if the invalid-URL path doesn't return 400.
 
 **Dashboard PR:** AdvancedBlockchainSecurity/blocksecops-dashboard#211 (merged 2026-04-16).
+
+---
+
+## Update 2026-04-17 (part 2): contract name auto-fill from URL
+
+End-user feedback surfaced that the GitHub URL tab required users to type a contract name manually, even though the URL already contains a natural name. The file-upload tab has always auto-derived the name from the filename; this pass brings parity.
+
+**Behaviour added in dashboard 0.49.1:**
+
+| Input URL | Auto-filled name |
+|-----------|------------------|
+| `https://github.com/.../blob/master/contracts/token/ERC20/ERC20.sol` | `ERC20` (extension stripped) |
+| `https://github.com/.../tree/master/contracts/token/ERC20` | `ERC20` (final directory segment) |
+| Any URL pasted while the name field already has a value | No change — user input is never overwritten |
+
+**Implementation notes:**
+
+- `deriveNameFromGitHubUrl()` helper lives alongside `isValidGitHubUrl()` in `ContractUploadModal.tsx`; both share the same anchored regex as the backend's URL parser.
+- Derivation runs on **`onBlur`**, not `onChange`. A URL like `https://github.com/a/b/blob/c/d` briefly matches the valid-URL regex during typing — deriving on every keystroke would set the name to `d` prematurely. Auto-fill firing only on tab/click-away eliminates that, handles paste correctly (the paste is a single value change followed by blur), and leaves manual typers with a populated name the moment they move to the next field.
+- Three new test cases in `ContractUploadModal.github.test.tsx` cover blob auto-fill, tree auto-fill, and the no-overwrite guarantee.
+
+**Dashboard PR:** AdvancedBlockchainSecurity/blocksecops-dashboard#213 (merged 2026-04-17, deployed as 0.49.1).
