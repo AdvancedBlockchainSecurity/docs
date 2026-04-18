@@ -1,6 +1,6 @@
 # GitHub App BYO Troubleshooting
 
-Operator-facing playbook for issues with the bring-your-own GitHub App flow (migration 087, api-service 0.39.1+, dashboard 0.50.3+).
+Operator-facing playbook for issues with the bring-your-own GitHub App flow (migration 087, api-service 0.40.3+, dashboard 0.51.0+).
 
 ## Distinguishing from URL-ingest issues
 
@@ -24,7 +24,10 @@ If a customer reports a GitHub-related error, first identify which path they're 
 | 5 duplicate "Successfully connected GitHub!" toasts after install | Dashboard <0.50.3 used `window.history.replaceState` which did not update React Router's `useSearchParams` | Issue 9 |
 | List-integrations 422 "undefined" on page load after GitHub redirect | Dashboard called `refetch()` before `currentOrganization?.id` resolved | Issue 10 |
 | Modal empty; "Import from GitHub" button missing or does nothing | api-service <0.39.1 lacks `/import-installed-repos` endpoint, or button not clicked after install | Issue 11 |
-| Repo shows `Syncing` forever, 0 contracts | Per-repo sync endpoint is a stub — no background job implemented | Issue 12 |
+| Repo shows `Syncing` forever, 0 contracts | celery-worker egress or mapper-load issue; was the 0.39.1 stub | Issue 12 |
+| Sync hits `error`, `sync_error` says "private key decryption failed" | Fernet key rotated without re-encrypt | Issue 13 |
+| Sync `synced` but no contracts on `/contracts` page | API response schema not returning `source_repo_url`; browser cache | Issue 14 |
+| Disconnect → re-create fails with "name already taken" | GitHub App names are globally unique; Apogee's disconnect keeps the App on GitHub | Issue 15 |
 
 ## Issue 1: `/manifest-init` returns 503
 
@@ -259,21 +262,91 @@ A 502 with *"GitHub API error while listing installation repositories"* means th
 
 ## Issue 12: Repo stuck on `Syncing`, 0 contracts
 
-**Symptom:** Customer clicks `Sync now` on a connected repo. Status flips to `Syncing`, but after minutes/hours no contracts appear and the status stays stuck.
+**Symptom:** Customer clicks `Sync now` on a connected repo. Status flips to `Syncing`, but after minutes/hours no contracts appear.
 
-**Cause:** `POST /integrations/{integration_id}/repositories/{repo_id}/sync` (`src/presentation/api/v1/endpoints/integrations.py:765`) is an unfinished stub. The endpoint sets `sync_status='syncing'` and returns 200 — but the `# TODO: Trigger background sync job` comment immediately below is unimplemented. No worker enumerates `.sol` files, no `ContractModel` rows are created, no scans are queued.
+Three possible causes in order of likelihood for api-service 0.40.3+:
 
-**Current state: this is known.** The repo-to-contract-to-scan pipeline is the top-priority follow-up (Option A) and will land in a subsequent PR. Track the status on `docs/feature-tests/NN-github-app-byo-manifest-2026-04.md` → *Deferred* section.
+### 12a. celery-worker cannot reach api.github.com
 
-**Short-term workaround for affected customers:** use the URL-ingest path (`POST /api/v1/contracts/from-github`) per-file to scan specific contracts from the same repo. Public repos only; the App-backed private-repo flow requires the pipeline work to land.
+The worker needs TCP 443 egress to the public internet. The dedicated policy `celery-worker-egress-external-apis` (api-service 0.40.1+) permits this; if missing, sync tasks fail with `ConnectTimeout`.
 
-**Operator recovery — clear stuck `syncing` rows:**
+**Diagnostic:**
 ```bash
-kubectl exec -n postgresql-prod postgresql-0 -- psql -U blocksecops -d solidity_security -c \
+kubectl -n api-service-prod logs deployment/celery-worker --tail=100 | grep -iE "ConnectTimeout|github-sync"
+kubectl -n api-service-prod get networkpolicy celery-worker-egress-external-apis
+```
+
+**Fix:** `kubectl apply -k k8s/overlays/gcp/` to re-apply the base policies.
+
+### 12b. SQLAlchemy mapper resolution fails on task start
+
+The Celery task imports `ContractModel` which triggers `VulnerabilityModel`'s string-relationship to `DeduplicationGroupModel` — a class living in `src/infrastructure/database/specialized_models/intelligence.py`. If that module isn't imported before first mapper resolution, the task raises `InvalidRequestError: failed to locate a name ('DeduplicationGroupModel')`.
+
+**Fix (already in 0.40.1):** `github_sync_task.py` explicitly imports every submodule of `specialized_models` for side effects. If a new model file is added to that package later, add it to the import list.
+
+### 12c. Stuck row left over from the 0.39.1 stub era
+
+Before api-service 0.40.0, the endpoint set `sync_status='syncing'` and returned without enqueuing any task. Integrations that were clicked in that window have DB rows stuck in `syncing` indefinitely — the dashboard disables the Sync button for rows in that state.
+
+**Cleanest recovery (no direct DB write):** ask the customer to click **Disconnect** on the repo row in the Manage Repositories modal, then **Import from GitHub** again. That re-creates the row with `sync_status='pending'` and the Sync button is re-enabled on 0.40.1+.
+
+**Operator override (direct UPDATE, requires owner approval):**
+```bash
+kubectl -n postgresql-prod exec postgresql-0 -- psql -U blocksecops -d solidity_security -c \
   "UPDATE integration_repositories
-   SET sync_status='pending'
+   SET sync_status='pending', sync_error=NULL
    WHERE sync_status='syncing' AND integration_id='<INTEGRATION_ID>';"
 ```
+
+**Verify the worker actually processed a task:**
+```bash
+kubectl -n api-service-prod logs deployment/celery-worker --tail=200 \
+  | grep -E "Task github_sync.sync_repo_contracts"
+# Expect: received → start → done lines for the customer's repo_id
+```
+
+## Issue 13: `sync_error: private key decryption failed`
+
+**Symptom:** Sync row shows *Error*, `sync_error` starts with "private key decryption failed".
+
+**Cause:** `INTEGRATION_ENCRYPTION_KEY` has been rotated in the running api-service pods without re-encrypting existing `github_app_private_key_encrypted` ciphertexts. Fernet decrypt fails because the ciphertext was written with the old key.
+
+**Fix (operator):** revert `INTEGRATION_ENCRYPTION_KEY` to the previous value *or* re-encrypt all affected rows with a small migration helper. The customer-visible recovery is a full re-create of the integration (disconnect → manifest flow → install → sync), which generates fresh credentials under the current key.
+
+## Issue 14: Sync reports `synced` but contracts don't appear on the Contracts page
+
+**Symptom:** DB shows `contracts_found > 0` and the `contracts` table has matching rows with `source_repo_url` populated, but the dashboard `/contracts` page doesn't list them.
+
+Two causes to check in order:
+
+### 14a. Browser cache — old dashboard bundle
+
+The contract list uses a 30 s React Query `staleTime`, but if the dashboard bundle is older than 0.51.0 the `source_repo_url`, `source_commit_hash`, and `source_file_path` fields are never rendered (the TS type doesn't include them).
+
+**Fix:** customer hard-refreshes (Ctrl-Shift-R). Check the bundle filename changes from `index-Dr11r53i.js` (0.50.3) to whatever 0.51.0 baked.
+
+### 14b. Backend response schema missing the fields
+
+If a new endpoint that returns `ContractResponse` is added without passing the three source fields to the constructor, the dashboard won't render the badge for contracts surfaced via that endpoint. Every `ContractResponse(...)` and `ContractDetailResponse(...)` call site in the codebase MUST include `source_repo_url`, `source_commit_hash`, `source_file_path`.
+
+**Diagnostic:**
+```bash
+kubectl -n api-service-prod exec deployment/api-service -- grep -rnE "ContractResponse\(|ContractDetailResponse\(" /app/src/ | xargs -I{} sh -c 'echo {} && ...' # or check locally
+```
+
+**Fix:** add the three fields to any constructor that's missing them; rebuild + bump PATCH.
+
+## Issue 15: Disconnect + re-create fails with "name already taken"
+
+**Symptom:** Customer disconnects a GitHub integration in Apogee, goes through the Create GitHub App flow again, and GitHub rejects with *"Name is already taken"* on the Create page.
+
+**Cause:** GitHub App names are **globally unique across github.com**. Apogee's disconnect removes the `integrations` + `integration_credentials` + `integration_repositories` rows from our DB but **does not** delete the underlying GitHub App — it still lives on the customer's GitHub account under *Settings → Developer settings → GitHub Apps*.
+
+**Three recovery options, fastest first:**
+
+1. **Rename on the GitHub Create page.** The manifest pre-fills the `GitHub App name` field but GitHub lets you edit it. Add a suffix like "Apogee for AcmeCorp 2" and click Create.
+2. **Delete the old App on GitHub first.** Navigate to `https://github.com/settings/apps/<slug>`, *Advanced* tab, *Delete GitHub App*. Then retry the manifest flow with the default name.
+3. **Reuse the existing App.** Not supported by the current manifest flow; an "attach existing App" path is a backlog item.
 
 ## Related
 
