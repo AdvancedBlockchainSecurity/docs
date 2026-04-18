@@ -1,9 +1,9 @@
 # GitHub App BYO Manifest Pipeline
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Last Updated:** 2026-04-17
 **Related migration:** 087
-**Code versions:** api-service `0.39.1`, dashboard `0.50.3`
+**Code versions:** api-service `0.40.3`, dashboard `0.51.0`
 **Related code:**
 - Service: `blocksecops-api-service/src/application/services/github_app_service.py`
 - Endpoints: `blocksecops-api-service/src/presentation/api/v1/endpoints/github_app.py`
@@ -198,6 +198,53 @@ Methods on `GitHubAppService` all take per-integration `(app_id, private_key_pem
 - GitHub `401` while listing → installation token evicted, `GitHubAppAuthError` → 502 response
 - GitHub `5xx` or timeout → `GitHubAppError` → 502 response
 - No network egress to `api.github.com` → surfaces as a 502 with an httpx exception string
+
+### Stage 10 — Repo sync Celery task (0.40.0+)
+
+**Endpoint:** `POST /api/v1/organizations/{org_id}/integrations/{integration_id}/repositories/{repo_id}/sync`
+**Auth (HTTP layer):** Bearer JWT + org admin
+**Worker queue:** `github_sync` (routed via `task_routes` in `celery_app.py`)
+**Task name:** `github_sync.sync_repo_contracts`
+**Timeouts:** 10 min soft, 12 min hard; `max_retries=3` with 60 s delay
+**Rate limit (HTTP):** general/default tier
+
+**HTTP flow:**
+1. `verify_org_membership(require_admin=True)` + 404 if integration/repo missing.
+2. Reject 400 if integration `status != connected` or provider is `github` and `IntegrationCredentialModel.github_app_installation_id` is null.
+3. Set `repo.sync_status='syncing'`, clear `sync_error`, commit.
+4. Import `sync_repo_contracts` from `src.infrastructure.tasks.github_sync_task` (local import — avoids pulling Celery at API-module load in non-worker contexts) and enqueue via `apply_async(args=[org_id, integration_id, repo_id])`.
+5. Return the refreshed `IntegrationRepositoryResponse`.
+
+**Worker flow (`_sync_async`):**
+1. Single joined `SELECT … FOR UPDATE` loads integration + credential + repo row. Bails early with `sync_status='error'` + message for any missing row, non-connected integration, missing installation_id, or incomplete credentials.
+2. `decrypt_private_key(credential.github_app_private_key_encrypted)` via the Fernet wrapper.
+3. Parse `repo.repo_full_name` → `(owner, name)`. Bail early with a typed error if the name is malformed.
+4. `get_default_branch_commit(app_id, pem, installation_id, owner, name)` → `(default_branch, head_sha)`.
+5. `fetch_repo_tree(app_id, pem, installation_id, owner, name, head_sha)` — `GET /repos/{owner}/{name}/git/trees/{sha}?recursive=1` with installation token. Logs a warning if GitHub returns `truncated: true`.
+6. Filter to `type=='blob'`, `path.endswith('.sol')`, `size <= 1_048_576`. Enforce 100-file + 50 MB cumulative caps; skipped-due-to-cap count flows into the eventual `sync_error` summary.
+7. For each kept file: `fetch_file_content(...)` → base64-decode → UTF-8 decode (skip on UnicodeDecodeError).
+8. Upsert on `(organization_id, source_repo_url, source_file_path)`:
+    - New row → INSERT `ContractModel` with `language='solidity'`, `status='uploaded'`, all `source_*` fields populated, `user_id = integration.created_by`.
+    - Existing row + same commit hash → unchanged.
+    - Existing row + different commit → UPDATE `source_code`, `source_commit_hash`, `source_hash`, `lines_of_code`, reset `status='uploaded'`.
+9. Update repo row: `sync_status='synced'`, `last_synced_at=now()`, `last_synced_commit=head_sha`, `contracts_found=<recount>`. If there were partial errors / budget skips / decode skips, write a truncated (≤500 chars) summary to `sync_error`.
+10. On uncaught exception: set `sync_status='error'` + truncated error message, commit, re-raise so Celery's backoff kicks in.
+
+**Dedupe key:** `(organization_id, source_repo_url, source_file_path)` — this allows the same file path in two different repos to land as two contracts, and allows two orgs to independently own copies of the same file.
+
+**Egress:** celery-worker pods have a dedicated NetworkPolicy (`celery-worker-egress-external-apis`) permitting TCP 443 to non-RFC1918 IPs only. Mirrors the existing `api-service-egress-external-apis` policy so both the API pod and the worker can reach `api.github.com`.
+
+**Failure modes:**
+
+| Failure | sync_status | sync_error | Client impact |
+|---|---|---|---|
+| Integration missing / not-connected / installation_id null | `error` | clear message | Dashboard shows Error badge + message |
+| Private key decryption fails | `error` | "private key decryption failed: …" | Customer likely rotated `INTEGRATION_ENCRYPTION_KEY` without re-encrypt — operator follow-up |
+| GitHub 401 on installation token | retry | — | Celery retry × 3 @ 60s; token cache evicted server-side each attempt |
+| GitHub 403 / 5xx on tree walk or blob fetch | retry | populated after final retry | Up to 3 retries, then stuck in `error` |
+| Individual file fails (404 on rename, binary file, partial 403) | `synced` | per-file summary up to 5 entries | Other files still import; row reports `synced` with partial errors |
+| Budget cap hit (file >1 MB, >100 files, >50 MB total) | `synced` | "N file(s) skipped (budget cap)" | Expected; not an error |
+| Worker crash mid-task | requeued | — | `acks_late=True` redelivers; subsequent successful run overwrites error state |
 
 ### Stage 9 — Webhook receiver (stub)
 

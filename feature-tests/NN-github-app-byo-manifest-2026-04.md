@@ -2,10 +2,10 @@
 
 **Priority:** P1
 **Date:** 2026-04-17
-**Versions:** api-service `0.38.1 → 0.39.0 → 0.39.1`, dashboard `0.49.1 → 0.50.0 → 0.50.3`
+**Versions:** api-service `0.38.1 → 0.39.0 → 0.39.1 → 0.40.0 → 0.40.1 → 0.40.2 → 0.40.3`, dashboard `0.49.1 → 0.50.0 → 0.50.3 → 0.51.0`
 **Migration:** 087 (`add_github_app_fields_to_integration_credentials`)
-**Related PRs:** blocksecops-api-service#355, blocksecops-dashboard#214 (Phase 2), plus follow-up PATCHes for the flow-complete pass
-**Status:** **Phase 1 (backend) + Phase 2 (dashboard) live.** Repo sync/scan pipeline deferred — see *Deferred* section below.
+**Related PRs:** blocksecops-api-service#355, blocksecops-dashboard#214 (Phase 2), plus follow-up PATCHes and the Option A repo-sync pipeline
+**Status:** **Backend + Dashboard + Repo-sync pipeline all live.** Customer clicks Sync now → .sol files walk → Contract rows upserted → source indicators render in UI. Webhook auto-scan still deferred — see *Deferred* section below.
 
 ## Overview
 
@@ -87,7 +87,25 @@ This is distinct from the **URL-based GitHub ingest** path (`POST /api/v1/contra
 - [ ] After GitHub redirects back with `?success=true&provider=github`, **exactly one** success toast is shown (not 5) — `setSearchParams` clears the param so the effect does not re-fire on auth re-renders
 - [ ] Wizard renders the correct step for integration state: no integration → Create; `status!=connected` → Install; `status=connected` → Manage Repositories
 - [ ] In Manage step, **Import from GitHub** button calls the import endpoint and populates the `Connected repositories` modal
-- [ ] "From repo" indicator on contracts — **deferred**: `ContractModel.source_repo_url` is not yet surfaced in any API response schema or dashboard view
+
+### 8. Repo sync pipeline (Option A — api-service 0.40.x + dashboard 0.51.0)
+- [ ] Click **Sync now** on a connected repo → endpoint returns in <200ms (task enqueued, not run inline)
+- [ ] `integration_repositories.sync_status` transitions `pending → syncing → synced` (or `error`) without manual intervention
+- [ ] While any repo is syncing, the dashboard polls the repos query every 3 s so the badge + counts update in-place
+- [ ] Celery task walks `/git/trees/{sha}?recursive=1` with the installation token, filters to `.sol` blobs, applies budget caps (1 MB/file, 100 files, 50 MB total)
+- [ ] For each `.sol` file: creates `ContractModel` row with `source_repo_url`, `source_commit_hash`, `source_file_path`, `source_hash` populated; `organization_id` matches the integration's org; `user_id = integration.created_by`
+- [ ] Re-running sync at the same commit is a no-op (dedupe on `(organization_id, source_repo_url, source_file_path)`)
+- [ ] Re-running sync after the branch advances updates `source_code`, `source_commit_hash`, `source_hash`, `lines_of_code`; leaves the contract name intact; resets `status='uploaded'`
+- [ ] Worker egress is locked down to port 443 / non-RFC1918 only (NetworkPolicy `celery-worker-egress-external-apis`)
+- [ ] Task failures truncate the error message to 500 chars and set `sync_error` before re-raising for Celery retry
+- [ ] Files >1 MB or past the 100-file cap are skipped and summarized in `sync_error` — sync still reports `synced`
+
+### 9. "From repo" indicator in the dashboard (0.51.0)
+- [ ] Contracts page — each row imported from GitHub shows a small GitHub-logo pill next to the name, labeled `<owner>/<repo>`
+- [ ] The badge links to the exact blob at the imported commit (`<repo>/blob/<commit>/<file_path>`) in a new tab
+- [ ] The badge refuses to render for any `source_repo_url` not matching `https://github.com/...` (defensive allowlist against bad DB rows)
+- [ ] Contract detail page shows a full **Source** panel with clickable repo URL, short-SHA commit link (→ `<repo>/commit/<sha>`), and file path link (→ blob at commit)
+- [ ] Manually-uploaded contracts (no `source_repo_url`) render with no badge and no Source panel
 
 ## Security posture
 
@@ -102,18 +120,21 @@ This is distinct from the **URL-based GitHub ingest** path (`POST /api/v1/contra
 
 | Item | Deferred because |
 |------|-----------------|
-| Repo-to-contract sync pipeline — walk GitHub tree for `.sol` files, create `ContractModel` rows with `source_repo_url`/`source_commit_hash`/`source_file_path`, queue scans in Celery | The existing `/repositories/{repo_id}/sync` endpoint sets `sync_status='syncing'` but has a `TODO: Trigger background sync job` and never queues work. The entire repo → contract → scan pipeline is unbuilt. **This is the top priority follow-up (Option A)** — customer flow is non-functional without it. |
-| Webhook event dispatch (scan-on-push / scan-on-PR) | Explicit scope decision on 2026-04-17 — ship install-and-sync first |
-| "From repo" indicator on contracts list + detail | `ContractModel.source_repo_url` exists in DB (since migration 063) but is not on any response schema; dashboard never renders it. Cheap add once the sync pipeline starts populating it. |
+| Webhook event dispatch (scan-on-push / scan-on-PR) | Webhook receiver is still a 204 stub; the sync-pipeline worker is now in place, so the webhook pass is a direct extension (dispatch the same Celery task on `push` / `pull_request` events). |
+| Auto-scan-on-sync | Sync imports Contract rows with `status='uploaded'` but does **not** enqueue scans even when `auto_scan_enabled=true`. Wiring the scan-queue call is a narrow follow-up (tier/quota check + POST to tool-integration). |
+| Per-repo toggles in the dashboard (`auto_scan_enabled`, `scan_on_push`, `scan_on_pr`) | Backend flags live on `IntegrationRepositoryModel` but aren't exposed in a UI yet. |
+| Multi-file Foundry/Hardhat project ingest (via `ContractFileModel`) | Each `.sol` is imported as a single-file contract for this pass. Project-level scanning via the multi-file path is a separate effort. |
+| Incremental diff sync via GitHub tree-SHA comparison | Current sync always re-walks the full tree. Diff sync ships with the webhook pass. |
+| `fetch_repo_tree` truncation handling (repos >100k entries) | Only a warning log today; sub-tree recursion is a later enhancement once a customer needs it. |
 | Retire legacy `oauth_service.py` GitHub path | Kept as dead code until dashboard confirms no callers |
 | GitHub Enterprise Server support via Broker | Multi-week separate initiative |
 
 ## Verification (live in prod)
 
 ```bash
-# 1. Backend version reflects 0.39.1
+# 1. Backend version reflects 0.40.3
 curl -s https://app.0xapogee.com/api/v1/health/live | jq .version
-# Expected: "0.39.1"
+# Expected: "0.40.3"
 
 # 2. Migration 087 applied
 kubectl exec -n postgresql-prod postgresql-0 -- psql -U blocksecops -d solidity_security -t \

@@ -70,6 +70,16 @@ At this point: App exists but is not yet installed on any repos.
 
 Re-running Import is idempotent. Whenever you add/remove repos via GitHub's *Configure* page for the App, come back and click Import again to pull the updated selection into Apogee.
 
+### Step 6 — Sync a repository into Apogee
+
+1. On the wizard card's inline `Connected repositories` list, click **Sync now** on the repo you want to import.
+2. The row flips to *Syncing* and the dashboard polls every 3 seconds while any repo is syncing, so you see progress without refreshing.
+3. Behind the scenes a Celery task authenticates with your App's installation token, walks the repo tree at the default branch's head commit, and upserts a `ContractModel` row for every `.sol` file under the 1 MB / 100 files / 50 MB budget.
+4. When the task finishes, the row shows *Synced* with `contracts_found=<n>`. The new contracts appear on the **Contracts** page, each tagged with a small GitHub badge showing `<owner>/<repo>`. Click the badge to jump to the exact blob on GitHub at the imported commit; click the contract to see the full **Source** panel on the detail view (repository, short-SHA commit link, file path).
+5. Re-clicking **Sync now** at the same commit is a no-op (dedupe on `(org_id, repo_url, file_path)`). After a new commit lands, the next sync updates the contract in place — it does not create duplicates.
+
+**Known behavior today:** sync imports contracts but does *not* enqueue scans. Pick contracts manually on the Contracts page and click Scan. Auto-scan-on-sync and push/PR-triggered scans are separate follow-up passes (see the feature-test doc's *Deferred* section).
+
 ## Post-install behaviour
 
 - Apogee stores your App's private key and webhook secret **encrypted at rest** (Fernet) in the `integration_credentials` table. The raw values are never logged or exported.
@@ -78,8 +88,10 @@ Re-running Import is idempotent. Whenever you add/remove repos via GitHub's *Con
 
 ## Known limitations
 
-- **Sync now on a repo is a stub.** The per-repo `Sync now` button flips `sync_status` to `syncing` but **does not** enumerate `.sol` files or create `ContractModel` rows yet. The repo → contract → scan pipeline is the top-priority follow-up. Track the status on the feature-test doc.
-- **No "From repo" indicator on contracts.** The `ContractModel.source_repo_url` column exists but is not surfaced in API responses or the dashboard today. This will be added alongside the sync pipeline.
+- **Sync does not auto-scan.** Contracts are imported with `status='uploaded'`; you pick which ones to scan from the Contracts page. Auto-scan-on-sync is a narrow follow-up.
+- **Sync does not react to GitHub pushes.** The webhook receiver is still a 204 stub — push/PR events don't auto-trigger sync yet. Click **Sync now** to pull the latest commit.
+- **Multi-file projects (Foundry/Hardhat) ingest as individual `.sol` files.** Project-level scanning through `ContractFileModel` will follow in a later pass.
+- **GitHub App disconnect does not delete the App on GitHub.** The App stays on your GitHub account under *Settings → Developer settings → GitHub Apps*. Because GitHub App names are globally unique, if you disconnect and then re-create the Apogee integration with the same default name you'll hit "name already taken" — either rename the App on GitHub's create page (second try), or delete the old App on GitHub first (*App settings → Advanced → Delete GitHub App*).
 
 ## Reconfiguring
 
