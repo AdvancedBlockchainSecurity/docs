@@ -3,7 +3,9 @@
 **Priority**: P1 - High
 **Last Tested**: April 19, 2026
 **Endpoint**: `POST /api/v1/scans` (indirectly — gate runs inside the scanner pod)
-**Applies to**: Every Solidity scanner (wake, slither, aderyn, halmos, mythril, echidna, medusa)
+**Applies to**: Every Solidity scanner consuming `scanner-base-solidity:1.0` — wake, slither, aderyn, halmos, mythril, echidna, medusa.
+
+**Not yet applied to**: `soliditydefend` (tracked under Task #160). It's a Rust-built CLI on its own Dockerfile and does not yet invoke `check-pragma`. A 0.7.6 contract submitted for `soliditydefend` currently returns `status=completed, 0 findings` (silent) rather than the clean "upgrade your pragma" rejection the other scanners emit.
 
 ---
 
