@@ -487,10 +487,23 @@ kubectl get pod -n tool-integration-local <POD_NAME> -o yaml | grep imagePullSec
 
 ---
 
+## Shared Base Image (Solidity scanners)
+
+As of 2026-04-19, seven Solidity scanners (wake, slither, aderyn, halmos, mythril, echidna, medusa) are built `FROM` a shared base image `blocksecops/scanner-base-solidity`. The base owns the solc version list + a `check-pragma` pre-flight gate for unsupported Solidity versions. A base-image change cascades through all seven consumers — the process is documented separately:
+
+- **Add a new solc version** → rebuild base only, PATCH-bump all 7 consumers to pull the new base tag
+- **Change the minimum-supported Solidity cutoff** → MINOR-bump base (logic change), cascade to all 7
+- **Update Foundry / Hardhat / forge-std** → MINOR-bump base, cascade
+
+See the **[Scanner Base Solidity Operations Playbook](../playbooks/scanner-base-solidity-operations.md)** for the full cascade procedure. The per-scanner workflow above still applies when changing a single scanner (e.g., an upstream tool bump that doesn't touch the base).
+
 ## Related Documentation
 
 - [Docker Image Versioning Standards](../standards/docker-image-versioning.md) - General Docker versioning rules + scanner section
+- [Docker Base Images Standard](../standards/docker-base-images.md) - Base-image pattern + SHA-256 verification rules
+- [Scanner Base Solidity Operations](../playbooks/scanner-base-solidity-operations.md) - Shared base-image operations (add solc version, change cutoff, rollback)
 - [Scanner Image Build Pipeline](../pipelines/scanner-image-build-pipeline.md) - Build pipeline architecture
 - [Scanner Image Rebuild Playbook](../playbooks/scanner-image-rebuild-all.md) - Complete guide to rebuilding all 16 scanners
 - [Upgrade Scanner Image Playbook](../playbooks/upgrade-scanner-image.md) - Individual scanner upgrade with pipeline integration
 - [Scanner Upgrade Workflow](./scanner-upgrade-workflow.md) - Full scanner metadata + pattern seeding workflow
+- [Unsupported Solidity Version Gate Tests](../feature-tests/11-pragma-gate.md) - End-user acceptance criteria

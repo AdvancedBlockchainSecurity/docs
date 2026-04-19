@@ -1,7 +1,7 @@
 # Dependency Management Standards
 
-**Version:** 1.8.0
-**Last Updated:** October 20, 2025
+**Version:** 1.9.0
+**Last Updated:** April 18, 2026
 **Status:** Active
 
 ## Overview
@@ -73,6 +73,81 @@ git commit -m "chore: Update <package> to v<version>
 
 # 6. Deploy and monitor
 ```
+
+## Pre-Adoption Audit (MANDATORY)
+
+**MANDATORY:** Before adding any new dependency (pip, npm, cargo, go module, Docker image, downloaded binary), you MUST run these checks and record the results in the PR description. No new dependency ships without this audit.
+
+### Why this matters
+
+Supply-chain attacks account for a growing share of software incidents (typosquatting, maintainer compromise, malicious transitive deps, dependency-confusion). Vulnerability scans catch the published CVEs; supply-chain checks catch the pre-CVE signals (new maintainer, abandonment, suspicious release cadence, unverified artifacts). Both gates are cheap at adoption time and expensive if the dep is already deep in the tree.
+
+### Pre-adoption checklist
+
+| # | Check | Tooling | Accept if… |
+|---|---|---|---|
+| 1 | **Vulnerability scan** — any known CVEs at any severity? | `pip-audit`, `npm audit`, `cargo audit`, `osv-scanner`, `trivy image` | No HIGH/CRITICAL; any MEDIUM documented with justification |
+| 2 | **Transitive vulnerabilities** — dependencies-of-dependencies clean? | Same tools, recursive scan | Same threshold as above |
+| 3 | **Supply-chain signals** — project health, maintainer legitimacy | [OpenSSF Scorecard](https://securityscorecards.dev/), GitHub stars/forks/age, last-commit freshness, issue-response latency | Scorecard ≥ 5.0 OR explicit sign-off; last-release within 12 months; active maintenance |
+| 4 | **Maintainer legitimacy** — no recent takeover, no typosquat | Check PyPI/npm release history, verify GitHub org, cross-check commit signatures where available | Maintainers stable ≥ 6 months; release cadence consistent with past behavior |
+| 5 | **License compliance** — compatible with Apogee's use | GitHub license field, SPDX identifier | MIT/Apache-2.0/BSD/ISC acceptable; GPL/AGPL requires review |
+| 6 | **Artifact integrity** — signed / checksummed / reproducible | GitHub Releases SHA256, Sigstore, npm provenance, PyPI PEP 740 attestations | At minimum: a published SHA-256 we can pin against in our Dockerfiles |
+
+### One-time audit commands
+
+```bash
+# Python (before adding to requirements.txt / pyproject.toml)
+pip-audit --package <name>==<version> --strict              # CVE scan
+pip show <name>                                              # metadata / homepage
+osv-scanner --package <name>@<version>                       # OSV.dev cross-ref
+
+# Node.js (before adding to package.json)
+npm audit --package-lock-only --audit-level=moderate
+npm view <name> maintainers time.created time.modified       # supply-chain signals
+
+# Rust
+cargo audit --package <name>
+
+# Docker base images / Docker binary downloads
+trivy image <image>:<tag>                                    # CVE + secret scan
+
+# OpenSSF Scorecard (requires GITHUB_TOKEN)
+scorecard --repo=github.com/<org>/<repo>
+
+# Any HTTPS-downloaded binary (tarball/zip/single exe)
+# MUST have a published SHA-256 to pin against in Dockerfile.
+# See docs/standards/docker-base-images.md §1 for the canonical pattern.
+```
+
+### Recording the audit in the PR
+
+Every PR that adds or bumps a dependency MUST include this block in the description:
+
+```markdown
+### Dependency audit
+
+| Check | Result |
+|---|---|
+| Vulnerability scan | pip-audit: 0 HIGH/CRITICAL |
+| Transitive vuln scan | osv-scanner: clean |
+| OpenSSF Scorecard | 7.2 (link) |
+| Maintainer legitimacy | Active 3+ yrs, consistent release cadence |
+| License | MIT — compatible |
+| Artifact integrity | SHA-256 pinned in Dockerfile |
+```
+
+### When a dependency fails the audit
+
+1. **HIGH/CRITICAL CVE with no patch** → do not adopt; find alternative or defer
+2. **Scorecard < 5.0** → require explicit written sign-off in PR; document risk
+3. **No SHA-256 available for binary download** → do not adopt a binary without checksum; either (a) use a distribution that publishes checksums, or (b) skip the dependency
+4. **License incompatibility** → legal review required before adoption
+
+### Exception flow
+
+Exceptions require written justification + tech-lead approval, documented inline in the PR description using the [Exception Process](#exception-process) template below.
+
+---
 
 ## Prohibited Dependencies
 
@@ -294,16 +369,44 @@ slither:
 
 ### Docker Images
 
+**MANDATORY:** All `FROM` references in Dockerfiles MUST be digest-pinned with a SHA-256. Tag-only pins are forbidden — a tag can be reassigned by the publisher at any time, silently changing what our builds ingest.
+
 ```dockerfile
-# ❌ WRONG - Using 'latest' tag
+# ❌ WRONG - Using 'latest' tag (unpinned, mutable)
 FROM python:latest
 
-# ✅ CORRECT - Pin to specific version
+# ❌ WRONG - Tag-only pin (still mutable — publisher can re-tag)
 FROM python:3.11.6-slim
 
-# ✅ BETTER - Pin with SHA256
-FROM python:3.11.6-slim@sha256:abc123...
+# ✅ REQUIRED - Pin by digest
+FROM python:3.11.6-slim@sha256:4057d02a202f69bfbfe10f65300519f612eb00fc595b8499f77d3cfe5b1b9fd4
 ```
+
+**Finding the digest:**
+```bash
+docker pull python:3.11.6-slim
+docker images --digests python:3.11.6-slim
+# or: docker inspect python:3.11.6-slim --format '{{index .RepoDigests 0}}'
+```
+
+### Binary Downloads in Dockerfiles
+
+**MANDATORY:** Every HTTPS-downloaded binary (tarball, zip, single executable, precompiled artifact) MUST have its SHA-256 verified at build time with `sha256sum -c`. `curl -sLo ... && chmod +x` without a checksum is prohibited.
+
+See [Docker Base Images §1 Checksum Verification](./docker-base-images.md#1-checksum-verification-for-binaries) for the canonical pattern.
+
+**Minimum acceptable pattern:**
+```dockerfile
+ARG TOOL_VERSION=1.2.3
+ARG TOOL_SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+RUN curl -fsSLo /tmp/tool.tar.gz \
+      "https://github.com/org/tool/releases/download/v${TOOL_VERSION}/tool-linux-amd64.tar.gz" && \
+    echo "${TOOL_SHA256}  /tmp/tool.tar.gz" | sha256sum -c - && \
+    tar -xzf /tmp/tool.tar.gz -C /usr/local/bin && \
+    rm /tmp/tool.tar.gz
+```
+
+**If the upstream project does not publish SHA-256 hashes** for its release artifacts, treat it as a failed [Pre-Adoption Audit](#pre-adoption-audit-mandatory) check #6 and do not adopt.
 
 ## Migration from Deprecated Dependencies
 
