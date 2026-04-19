@@ -1,7 +1,7 @@
 # Secure Coding Standards
 
-**Version:** 1.0.0
-**Last Updated:** February 24, 2026
+**Version:** 1.1.0
+**Last Updated:** April 18, 2026
 **Status:** Active
 
 ## Overview
@@ -99,10 +99,11 @@ subprocess.run(["scanner", scanner_name], shell=False)
 
 ### A06: Vulnerable and Outdated Components
 
+- Every new dependency MUST pass the [Pre-Adoption Audit](./dependency-management.md#pre-adoption-audit-mandatory) **before** it lands in any `requirements.txt` / `package.json` / `Cargo.toml` / Dockerfile — vulnerability scan + supply-chain signals + license + maintainer legitimacy + artifact integrity
 - Use latest stable versions of all dependencies (see [Dependency Management](./dependency-management.md))
 - No deprecated or retired packages
-- Run dependency audit monthly (`pip-audit`, `npm audit`)
-- Pin dependency versions in lockfiles
+- Run dependency audit monthly (`pip-audit`, `npm audit`, `cargo audit`, `osv-scanner`, `trivy`)
+- Pin dependency versions in lockfiles; pin Docker `FROM` by SHA-256 digest; pin every downloaded binary by SHA-256
 
 ### A07: Identification and Authentication Failures
 
@@ -113,10 +114,12 @@ subprocess.run(["scanner", scanner_name], shell=False)
 
 ### A08: Software and Data Integrity Failures
 
-- Verify checksums on downloaded binaries and base images
+- **MANDATORY:** Every HTTPS-downloaded binary in a Dockerfile MUST have its SHA-256 verified with `sha256sum -c` at build time. `curl ... && chmod +x` with no checksum step is prohibited. Canonical pattern: [Docker Base Images §1](./docker-base-images.md#1-checksum-verification-for-binaries)
+- **MANDATORY:** All `FROM` references in Dockerfiles MUST be digest-pinned (`image:tag@sha256:...`), not tag-only — tags are mutable on the publisher side
 - Use immutable Docker image tags (see [Docker Image Versioning](./docker-image-versioning.md))
 - Validate webhook signatures before processing payloads
 - Use signed commits in production branches
+- If upstream does not publish SHA-256 for a release artifact, the dependency fails the pre-adoption audit — do not adopt
 
 ### A09: Security Logging and Monitoring Failures
 

@@ -620,9 +620,33 @@ fi
 
 ---
 
+## Shared Base Image: scanner-base-solidity
+
+As of 2026-04-19, the seven Solidity scanners (wake, slither, aderyn, halmos, mythril, echidna, medusa) build `FROM` a shared base image `blocksecops/scanner-base-solidity`. The pipeline now has an additional upstream step:
+
+```
+Base image build (scanner-base-solidity:{ver}-{hash})
+    │  (pre-installs 17 solc versions 0.8.12→0.8.28, Foundry, Hardhat,
+    │   forge-std, check-pragma gate; all binaries SHA-256 verified)
+    ▼
+Scanner image build (scanner-wake:0.5.0, etc.)
+    │  (FROM scanner-base-solidity:{tag}; adds only the specific tool)
+    ▼
+... rest of pipeline (push, ConfigMap, deploy) ...
+```
+
+**Cascade rules:**
+- A change in `scanner-images/_base/Dockerfile` requires: rebuild base → PATCH-bump all 7 consumers → rebuild all consumers sequentially → push all → ConfigMap + KJM update → deploy.
+- A change in an individual scanner (e.g., new upstream tool version) bumps only that scanner — base image unchanged.
+- Soliditydefend remains on its own image chain (not using the base); its pipeline is unchanged.
+
+See the **[Scanner Base Solidity Operations Playbook](../playbooks/scanner-base-solidity-operations.md)** for base-image-specific build steps (SHA-256 verification, tag hashing, cascade procedure).
+
 ## Related Documentation
 
 - [Docker Image Versioning Standards](../standards/docker-image-versioning.md) - General Docker versioning + scanner section
+- [Docker Base Images Standard](../standards/docker-base-images.md) - Base-image pattern + SHA-256 verification rules
+- [Scanner Base Solidity Operations](../playbooks/scanner-base-solidity-operations.md) - Shared base-image operations (add solc version, change cutoff, rollback)
 - [Scanner Image Version Bump Workflow](../workflows/scanner-image-version-bump.md) - Step-by-step version bump procedure
 - [Scanner Image Rebuild Playbook](../playbooks/scanner-image-rebuild-all.md) - Complete guide for rebuilding all scanners
 - [Upgrade Scanner Image Playbook](../playbooks/upgrade-scanner-image.md) - Individual scanner upgrade

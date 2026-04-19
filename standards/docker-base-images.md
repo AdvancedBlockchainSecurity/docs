@@ -1,7 +1,7 @@
 # Docker Base Image Standards
 
-**Version:** 3.0.0
-**Last Updated:** March 10, 2026
+**Version:** 3.1.0
+**Last Updated:** April 18, 2026
 **Status:** Active
 
 ## Overview
@@ -24,8 +24,11 @@ Create separate base images containing pre-installed heavy dependencies, store t
 |---------|------------|
 | `blocksecops-intelligence-engine` | `${REGISTRY}/blocksecops/blocksecops-intelligence-base-cpu` |
 | `blocksecops-orchestration` | `${REGISTRY}/blocksecops/blocksecops-orchestration-base` |
+| Solidity scanners (wake, slither, aderyn, halmos, mythril, echidna, medusa) | `${REGISTRY}/blocksecops/scanner-base-solidity` |
 
-**Note:** GPU variant available: `blocksecops-intelligence-base-gpu`
+**Notes:**
+- GPU variant available: `blocksecops-intelligence-base-gpu`
+- `scanner-base-solidity` pre-installs 17 solc versions (0.8.12 → 0.8.28, all 2022+), Foundry (forge/cast/anvil), Hardhat, forge-std, and a shared `check-pragma` pre-flight gate that rejects contracts targeting pre-2022 Solidity versions with a clean user-facing error. Pre-2022 support is deliberately dropped — the gate surfaces an "Upgrade your pragma" message on the scan detail page. See `playbooks/scanner-base-solidity-operations.md` for operations (adding solc versions, rebuild, rollback).
 
 ## Build Time Comparison
 
@@ -103,16 +106,45 @@ All base images MUST implement these security measures:
 
 ### 1. Checksum Verification for Binaries
 
+**MANDATORY for every Dockerfile in the platform**, not just base images. Any binary downloaded over HTTPS at build time (tarball, zip, single executable, `.deb`, etc.) MUST have its SHA-256 verified with `sha256sum -c`. `curl ... && chmod +x` with no checksum step is prohibited.
+
+**Why MANDATORY, not best-effort:**
+- A tag like `v1.2.3` on GitHub is mutable — maintainers can force-push or re-tag
+- TLS only verifies the transport, not that the bytes you asked for are the bytes the project ships
+- Without a pinned SHA-256, a compromised release or mirror silently rewrites what our scanners ingest — no deploy boundary detects it
+
+**Canonical pattern (single binary in a tar):**
+
 ```dockerfile
-ARG ADERYN_VERSION=0.5.13
-ARG ADERYN_SHA256=3a85c5067e10c29290907799e6937d93f01dc2dfb82bf980cd61aebd33ffa6ab
-RUN wget -q https://github.com/cyfrin/aderyn/releases/download/aderyn-v${ADERYN_VERSION}/aderyn-x86_64-unknown-linux-gnu.tar.xz && \
-    echo "${ADERYN_SHA256}  aderyn-x86_64-unknown-linux-gnu.tar.xz" | sha256sum -c - && \
-    tar -xf aderyn-x86_64-unknown-linux-gnu.tar.xz && \
-    mv */aderyn /usr/local/bin/aderyn && \
+ARG ADERYN_VERSION=0.6.7
+ARG ADERYN_SHA256=145ff12a7fb266b2cc0b8a3e15cd73ef9b8b9d03b6330dc8f4a8c3c51334a071
+RUN curl -fsSLo /tmp/aderyn.tar.xz \
+      "https://github.com/Cyfrin/aderyn/releases/download/aderyn-v${ADERYN_VERSION}/aderyn-x86_64-unknown-linux-gnu.tar.xz" && \
+    echo "${ADERYN_SHA256}  /tmp/aderyn.tar.xz" | sha256sum -c - && \
+    tar -xJf /tmp/aderyn.tar.xz -C /tmp && \
+    mv /tmp/aderyn-x86_64-unknown-linux-gnu/aderyn /usr/local/bin/aderyn && \
     chmod +x /usr/local/bin/aderyn && \
-    rm -rf aderyn-*
+    rm -rf /tmp/aderyn-*
 ```
+
+**Pattern for bulk binary installs (e.g., a loop of solc versions):** verify each download against the SHA-256 published in the project's authoritative release manifest (e.g., `binaries.soliditylang.org/linux-amd64/list.json` has a `sha256` field per build). Install from the verified copy; never skip the check because "there are too many":
+
+```dockerfile
+RUN SOLC_BASE="https://binaries.soliditylang.org/linux-amd64" && \
+    LIST=$(curl -fsSL "${SOLC_BASE}/list.json") && \
+    for VERSION in 0.8.20 0.8.21 0.8.24; do \
+        BIN=$(jq -r ".releases[\"${VERSION}\"]" <<<"$LIST") && \
+        SHA=$(jq -r ".builds[] | select(.version==\"${VERSION}\") | .sha256" <<<"$LIST" | sed 's/^0x//') && \
+        curl -fsSLo /tmp/solc "${SOLC_BASE}/${BIN}" && \
+        echo "${SHA}  /tmp/solc" | sha256sum -c - && \
+        install -Dm755 /tmp/solc "/opt/solc/${VERSION}/solc" && \
+        rm /tmp/solc; \
+    done
+```
+
+**If the upstream project does not publish SHA-256 hashes** for its release artifacts, the dependency fails the [Pre-Adoption Audit](./dependency-management.md#pre-adoption-audit-mandatory) and MUST NOT be adopted. There are no exceptions — "trust me, the TLS cert is good" is not a substitute for supply-chain integrity.
+
+See also: [Dependency Management — Binary Downloads in Dockerfiles](./dependency-management.md#binary-downloads-in-dockerfiles) for the cross-cutting rule.
 
 ### 2. Base Image Pinned by Digest
 
