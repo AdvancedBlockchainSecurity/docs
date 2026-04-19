@@ -374,16 +374,16 @@ kubectl logs -n tool-integration-prod job/scan-trident-<scan_id> | grep -E "fail
 
 | Scanner | Image | Version | Base | UID |
 |---------|-------|---------|------|-----|
-| slither | scanner-slither | 0.3.11 | python:3.11-slim | 1000 |
-| aderyn | scanner-aderyn | 0.7.10 | debian:bookworm-slim | 1000 |
+| slither | scanner-slither | 0.4.0 | scanner-base-solidity:1.0 | 1000 |
+| aderyn | scanner-aderyn | 0.8.1 | scanner-base-solidity:1.0 | 1000 |
 | semgrep | scanner-semgrep | 0.3.11 | python:3.11-slim | 1000 |
 | solhint | scanner-solhint | 0.1.13 | node:20-alpine | 1000 (node) |
-| wake | scanner-wake | 0.4.6 | python:3.11-slim | 1000 |
-| soliditydefend | scanner-soliditydefend | 0.9.7 | debian:bookworm-slim | 1000 |
-| echidna | scanner-echidna | 0.4.0 | python:3.11-slim | 1000 |
-| halmos | scanner-halmos | 0.3.10 | python:3.11-slim | 1000 |
-| medusa | scanner-medusa | 0.3.8 | alpine + gcompat | 1000 |
-| mythril | scanner-mythril | 0.1.7 | python:3.11-slim | 1000 |
+| wake | scanner-wake | 0.5.0 | scanner-base-solidity:1.0 | 1000 |
+| soliditydefend | scanner-soliditydefend | 0.9.8 | debian:bookworm-slim (Rust builder) | 1000 |
+| echidna | scanner-echidna | 0.5.1 | scanner-base-solidity:1.0 | 1000 |
+| halmos | scanner-halmos | 0.4.1 | scanner-base-solidity:1.0 | 1000 |
+| medusa | scanner-medusa | 0.4.1 | scanner-base-solidity:1.0 | 1000 |
+| mythril | scanner-mythril | 0.2.1 | scanner-base-solidity:1.0 | 1000 |
 | vyper | scanner-vyper | 0.3.5 | python:3.11-slim | 1000 |
 | moccasin | scanner-moccasin | 0.3.4 | python:3.11-slim | 1000 |
 | sol-azy | scanner-sol-azy | 0.5.0 | rust:1.88-bookworm | 1000 |

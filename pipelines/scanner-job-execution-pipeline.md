@@ -194,21 +194,21 @@ Without these rules, scanner pods in namespaces with `default-deny-all` cannot P
 
 | Scanner | Tool Version | Image Tag | Memory Limit | Developer |
 |---------|-------------|-----------|--------------|-----------|
-| slither | 0.11.5 | scanner-slither:0.3.11 | 1Gi | Trail of Bits |
-| aderyn | 0.6.7 | scanner-aderyn:0.7.10 | 512Mi | Cyfrin |
+| slither | 0.11.5 | scanner-slither:0.4.0 | 1Gi | Trail of Bits |
+| aderyn | 0.6.7 | scanner-aderyn:0.8.1 | 512Mi | Cyfrin |
 | semgrep | 1.144.0 | scanner-semgrep:0.3.11 | 1Gi | Semgrep Inc |
 | solhint | 6.0.2 | scanner-solhint:0.1.13 | 512Mi | Protofire |
-| wake | 4.22.0 | scanner-wake:0.4.6 | 1Gi | Ackee Blockchain |
-| soliditydefend | 2.0.8 | scanner-soliditydefend:0.9.7 | 1Gi | Apogee |
-| mythril | 0.24.8 | scanner-mythril:0.1.7 | 2Gi | Consensys |
+| wake | 4.22.0 | scanner-wake:0.5.0 | 1Gi | Ackee Blockchain |
+| soliditydefend | 2.0.9 | scanner-soliditydefend:0.9.8 | 1Gi | Apogee |
+| mythril | 0.24.8 | scanner-mythril:0.2.1 | 2Gi | Consensys |
 
 ### Solidity Fuzzing & Symbolic (3)
 
 | Scanner | Tool Version | Image Tag | Memory Limit | Developer |
 |---------|-------------|-----------|--------------|-----------|
-| echidna | 2.2.7 | scanner-echidna:0.3.10 | 1Gi | Trail of Bits |
-| medusa | 1.5.0 | scanner-medusa:0.3.8 | 2Gi | Trail of Bits |
-| halmos | 0.3.3 | scanner-halmos:0.3.10 | 2Gi | a16z |
+| echidna | 2.2.7 | scanner-echidna:0.5.1 | 1Gi | Trail of Bits |
+| medusa | 1.5.0 | scanner-medusa:0.4.1 | 2Gi | Trail of Bits |
+| halmos | 0.3.3 | scanner-halmos:0.4.1 | 2Gi | a16z |
 
 ### Vyper (2)
 
