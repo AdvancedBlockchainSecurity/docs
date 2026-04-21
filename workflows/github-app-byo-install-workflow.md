@@ -78,18 +78,33 @@ Re-running Import is idempotent. Whenever you add/remove repos via GitHub's *Con
 4. When the task finishes, the row shows *Synced* with `contracts_found=<n>`. The new contracts appear on the **Contracts** page, each tagged with a small GitHub badge showing `<owner>/<repo>`. Click the badge to jump to the exact blob on GitHub at the imported commit; click the contract to see the full **Source** panel on the detail view (repository, short-SHA commit link, file path).
 5. Re-clicking **Sync now** at the same commit is a no-op (dedupe on `(org_id, repo_url, file_path)`). After a new commit lands, the next sync updates the contract in place — it does not create duplicates.
 
-**Known behavior today:** sync imports contracts but does *not* enqueue scans. Pick contracts manually on the Contracts page and click Scan. Auto-scan-on-sync and push/PR-triggered scans are separate follow-up passes (see the feature-test doc's *Deferred* section).
+**Known behavior today:** sync imports contracts but does *not* auto-enqueue scans. Pick contracts manually on the Contracts page and click Scan. Auto-scan-on-sync (dispatching a scan per imported contract after sync completes) is filed as a separate follow-up.
+
+## Auto-sync on push / PR (api-service ≥ 0.43.0)
+
+Per-repo opt-in (default off — BYO policy is manual-scan-only until the customer opts in):
+
+1. Integrations Hub → your GitHub App card → Connected repositories.
+2. On each repo row, three checkboxes:
+   - **Auto-scan** — master switch. Off means the other two have no effect.
+   - **on push** — sync when a commit lands on the default branch.
+   - **on PR** — sync when a PR is opened, reopened, or synchronized (new commits pushed).
+3. Toggles PATCH the repo row immediately. No restart or re-install needed.
+
+Behind the scenes: every GitHub webhook delivery hits `POST /api/v1/github-app/webhook`. The dispatcher verifies the HMAC signature against the per-installation webhook secret, looks up the repo by `(installation.id, repository.id)`, checks the opt-in gates, and enqueues the existing `sync_repo_contracts` Celery task when all gates pass — the same task that runs when you click **Sync now**. Sync runs are content-idempotent (same commit SHA ⇒ `unchanged`), so GitHub delivery retries are safe.
+
+Debugging: see `docs/playbooks/github-app-byo-troubleshooting.md` § "Webhook delivery fails or scans don't auto-trigger" for a decision-tree walkthrough.
 
 ## Post-install behaviour
 
 - Apogee stores your App's private key and webhook secret **encrypted at rest** (Fernet) in the `integration_credentials` table. The raw values are never logged or exported.
 - When you trigger a scan on a repo, Apogee signs a short-lived RS256 JWT with your App's private key, exchanges it for a 1-hour installation token, and uses that token to call `api.github.com`.
-- Webhooks hit Apogee's `/github-app/webhook` endpoint. The receiver is currently a 204 stub — push/PR auto-scan is a deferred feature (follow-up pass).
+- Webhooks hit Apogee's `/github-app/webhook` endpoint and dispatch per the opt-in flags above.
 
 ## Known limitations
 
-- **Sync does not auto-scan.** Contracts are imported with `status='uploaded'`; you pick which ones to scan from the Contracts page. Auto-scan-on-sync is a narrow follow-up.
-- **Sync does not react to GitHub pushes.** The webhook receiver is still a 204 stub — push/PR events don't auto-trigger sync yet. Click **Sync now** to pull the latest commit.
+- **Sync does not auto-scan.** Contracts are imported with `status='uploaded'`; you pick which ones to scan from the Contracts page. Auto-scan-on-sync is a separately-tracked follow-up.
+- **Feature-branch pushes don't trigger auto-sync.** Only pushes to the default branch (`refs/heads/<default_branch>`) fire the dispatcher. This is intentional — feature-branch churn would otherwise re-sync constantly.
 - **Multi-file projects (Foundry/Hardhat) ingest as individual `.sol` files.** Project-level scanning through `ContractFileModel` will follow in a later pass.
 - **GitHub App disconnect does not delete the App on GitHub.** The App stays on your GitHub account under *Settings → Developer settings → GitHub Apps*. Because GitHub App names are globally unique, if you disconnect and then re-create the Apogee integration with the same default name you'll hit "name already taken" — either rename the App on GitHub's create page (second try), or delete the old App on GitHub first (*App settings → Advanced → Delete GitHub App*).
 

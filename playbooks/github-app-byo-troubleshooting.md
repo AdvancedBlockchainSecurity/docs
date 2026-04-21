@@ -146,21 +146,76 @@ kubectl logs -n api-service-prod -l app=api-service --tail=100 | grep "installat
 - If (2) or (3): customer regenerates the private key in GitHub, OR creates a new App via manifest-init
 - If (4): next call will refetch; if persistent, restart api-service pods
 
-## Issue 7: Webhook delivery fails on GitHub's side
+## Issue 7: Webhook delivery fails or scans don't auto-trigger
 
-Customer sees failed deliveries in GitHub App settings → Advanced → Recent Deliveries.
+Customer sees failed deliveries in GitHub App settings → Advanced → Recent Deliveries, or a push/PR doesn't auto-sync the repo in Apogee.
 
-### 7a. Receiver returns 204 but customer expects auto-scans
+**Current state (api-service ≥ 0.43.0):** the webhook receiver dispatches real events. Every push or pull_request goes through this control flow:
 
-**Current state (2026-04-17):** the webhook receiver is a 204 stub. Auto-scan-on-push/PR is **deferred to a follow-up pass**. The manifest declares `default_events: []` so GitHub shouldn't even be sending events yet — if it is, the customer enabled events on the App settings page.
+```
+HMAC signature verify
+  → installation.id → IntegrationCredentialModel
+  → repository.id   → IntegrationRepositoryModel
+  → auto_scan_enabled ∧ scan_on_push (push) ∨ scan_on_pr (PR)
+  → push events: ref == refs/heads/<default_branch>
+  → PR events:   action ∈ {opened, synchronize, reopened}
+  → sync_repo_contracts.apply_async(org_id, integration_id, repo_id)
+```
 
-**Fix:** this is expected; set expectations with the customer.
+Every early-exit returns 204 (so GitHub doesn't retry-storm). The ONLY 5xx path is when the Celery broker is down. 401 fires on invalid signature only.
+
+### 7a. Customer pushed but no sync happened
+
+Walk the decision tree in order:
+
+**Step 1 — GitHub actually delivered?** App settings → Advanced → Recent Deliveries. No green checkmark means GitHub itself never tried.
+
+**Step 2 — Events enabled on the App?** App settings → Webhook. Verify `push` and `pull_request` are checked. Apogee's manifest declares `default_events: ["push", "pull_request"]`, but GitHub lets customers untick them.
+
+**Step 3 — Opt-in flags on?** Query the repo row:
+
+```bash
+kubectl exec -n postgresql-prod postgresql-0 -- psql -U blocksecops -d solidity_security -c \
+  "SELECT id, repo_full_name, auto_scan_enabled, scan_on_push, scan_on_pr, default_branch
+   FROM integration_repositories
+   WHERE external_repo_id = '<GITHUB_REPO_ID>';"
+```
+
+If `auto_scan_enabled=false`, the customer never opted in — direct them to the Integrations Hub → Connected repos → toggle **Auto-scan** ON.
+
+**Step 4 — Push to non-default branch?** The dispatcher restricts `push` events to `refs/heads/<default_branch>`. Feature-branch pushes 204-skip (see api-service logs: `push to non-default branch`).
+
+**Step 5 — PR action?** Only `opened`, `synchronize`, `reopened` dispatch. `closed`/`edited`/`labeled` all skip.
+
+**Step 6 — Celery actually received the task?** Check:
+
+```bash
+kubectl logs -n api-service-prod deployment/celery-worker --tail=200 \
+  | grep -E "Task github_sync.sync_repo_contracts.*(received|succeeded|failed)"
+```
 
 ### 7b. Signature verification failing
 
-When the webhook receiver ships real dispatch, it'll validate `X-Hub-Signature-256` against the per-integration `github_app_webhook_secret_encrypted`. If the customer rotated the webhook secret on GitHub's side, Apogee's stored ciphertext is stale.
+api-service logs show `signature invalid`. HTTP response to GitHub is 401.
 
-**Fix (once real dispatch ships):** re-run manifest-init — GitHub will issue a new webhook secret on App creation.
+Causes:
+- Customer rotated the webhook secret on GitHub's side but Apogee's stored ciphertext is stale
+- An intermediary (CDN, WAF) is mutating the request body before it reaches api-service — the signature is over the raw bytes, any change invalidates it
+- A custom user-agent is replaying the body with a different Content-Length
+
+**Fix for rotated secret:** re-run manifest-init — GitHub issues a new webhook secret on App creation. Alternatively, edit the App's webhook secret on GitHub and ship a new value through the integrations API.
+
+### 7c. Decryption failing on Apogee's side
+
+api-service logs show `webhook secret decryption failed: InvalidToken` or `ValueError`. Response is 204 (we drop rather than retry — a broken credential shouldn't create a retry storm).
+
+Cause: the Fernet key used to encrypt `github_app_webhook_secret_encrypted` has been rotated or lost. Check `INTEGRATION_ENCRYPTION_KEY` in the `api-service-secret`.
+
+**Fix:** re-install the App against the customer's GitHub org. Manifest-callback re-stores the secret under the current key.
+
+### 7d. Sync fires but no contracts appear
+
+The task ran (check Celery logs) but `IntegrationRepositoryModel.contracts_found` didn't change. Either the tree has no `*.sol` files, or they're all over the 1 MB per-file / 100 file / 50 MB cumulative budget cap. `sync_repo_contracts` logs a line per skip reason.
 
 ## Operator utilities
 
