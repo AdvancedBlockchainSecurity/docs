@@ -3,9 +3,9 @@
 **Priority**: P1 - High
 **Last Tested**: April 19, 2026
 **Endpoint**: `POST /api/v1/scans` (indirectly — gate runs inside the scanner pod)
-**Applies to**: Every Solidity scanner consuming `scanner-base-solidity:1.0` — wake, slither, aderyn, halmos, mythril, echidna, medusa.
+**Applies to**: All 8 Solidity scanners — wake, slither, aderyn, halmos, mythril, echidna, medusa, and soliditydefend.
 
-**Not yet applied to**: `soliditydefend` (tracked under Task #160). It's a Rust-built CLI on its own Dockerfile and does not yet invoke `check-pragma`. A 0.7.6 contract submitted for `soliditydefend` currently returns `status=completed, 0 findings` (silent) rather than the clean "upgrade your pragma" rejection the other scanners emit.
+**Implementation note**: 7 of the 8 pick up the gate from `scanner-base-solidity:1.0` (the shared base image). `soliditydefend` is a Rust-built CLI on a bespoke `debian:bookworm-slim` Dockerfile and carries its own copy of the `check-pragma` script at `scanner-images/soliditydefend/check-pragma`. The two copies must be kept in sync — when updating the gate logic, change `scanner-images/_base/check-pragma` AND `scanner-images/soliditydefend/check-pragma` together.
 
 ---
 
@@ -68,6 +68,7 @@ The gate lives in `scanner-base-solidity:1.0.0-30aad7ef` at `/usr/local/bin/chec
 - [ ] Same contract + scanner=`slither` → rejected with same message
 - [ ] Same contract + scanner=`aderyn` → rejected with same message
 - [ ] Same contract + scanner=`mythril` → rejected with same message
+- [ ] Same contract + scanner=`soliditydefend` → rejected with same message
 
 (halmos/echidna/medusa require project archives; reject-behavior is covered by unit tests in `blocksecops-tool-integration/tests/unit/test_check_pragma.py`.)
 
