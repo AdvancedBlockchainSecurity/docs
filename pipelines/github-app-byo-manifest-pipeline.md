@@ -246,17 +246,29 @@ Methods on `GitHubAppService` all take per-integration `(app_id, private_key_pem
 | Budget cap hit (file >1 MB, >100 files, >50 MB total) | `synced` | "N file(s) skipped (budget cap)" | Expected; not an error |
 | Worker crash mid-task | requeued | — | `acks_late=True` redelivers; subsequent successful run overwrites error state |
 
-### Stage 9 — Webhook receiver (stub)
+### Stage 9 — Webhook dispatcher (api-service ≥ 0.43.0)
 
 **Endpoint:** `POST /api/v1/github-app/webhook`
-**Auth:** HMAC-SHA256 signature in `X-Hub-Signature-256` (verified if present, not yet enforced)
-**Rate limit:** 120/minute
+**Auth:** HMAC-SHA256 signature in `X-Hub-Signature-256` (required, enforced).
+**Rate limit:** 120/minute.
 
-Currently a 204 stub that:
-1. Logs delivery ID + event name + installation ID (from payload) for traceability
-2. Returns 204
+**Dispatch pipeline:**
+1. Parse JSON body (malformed → 204-ack + log; GitHub won't retry 2xx).
+2. Extract `installation.id`; no installation → 204 (ping / meta event, benign ack).
+3. Look up `IntegrationCredentialModel` by `github_app_installation_id`; unknown → 204 (non-leak).
+4. Fernet-decrypt `github_app_webhook_secret_encrypted`; `InvalidToken` / `ValueError` / `TypeError` → 204.
+5. Verify `X-Hub-Signature-256` via `hmac.compare_digest` (constant-time); invalid → **401** `Invalid webhook signature`.
+6. Whitelist event to `{push, pull_request}`; other event types → 204.
+7. Extract `repository.id`; missing → 204.
+8. Look up `IntegrationRepositoryModel` by `(integration_id, external_repo_id=str(repository.id))`; unknown → 204.
+9. Gate on `repo.auto_scan_enabled`; for push events additionally require `repo.scan_on_push` AND `ref == refs/heads/<default_branch>`; for PR events additionally require `repo.scan_on_pr` AND `action ∈ {opened, synchronize, reopened}`. Any failed gate → 204 (logged with decision reason for observability).
+10. Enqueue `sync_repo_contracts.apply_async(args=[org_id, integration_id, repo_id])` — same code path as the UI's **Sync now** button. Broker failure → **500** (GitHub retries on 5xx).
 
-**Not yet implemented:** signature enforcement, event routing, scan dispatch. These ship in the follow-up "GitHub App webhook dispatcher" pass.
+**Idempotency:** no dedicated webhook-delivery dedup table. The sync task is content-idempotent: on a retried delivery it walks the same tree at the same commit SHA and returns `unchanged` on every contract. Cost: one no-op Celery task per retry.
+
+**Out of scope (filed as follow-up):** auto-creating scans after the sync completes. Keeping scan creation in the existing `create_scan` path preserves tier + quota + scanner-selection enforcement in one place.
+
+**Security boundary:** every dispatch path is gated on valid HMAC **before** any side effect. Unsigned / mis-signed deliveries never touch Celery or the DB beyond the credential read needed to fetch the secret. Pinned by `tests/unit/presentation/test_github_webhook_dispatcher.py::TestWebhookSignatureVerification::test_handler_verifies_signature_before_dispatching`.
 
 ## Encryption pipeline
 

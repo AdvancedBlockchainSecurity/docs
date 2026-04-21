@@ -66,10 +66,9 @@ This is distinct from the **URL-based GitHub ingest** path (`POST /api/v1/contra
 - [ ] `setup_action=update` or `=request` → 302 redirect without DB change
 - [ ] Missing state → 302 redirect with `?error=missing_state`
 
-### 5. Webhook stub
-- [ ] `POST /api/v1/github-app/webhook` returns 204 for any payload
-- [ ] Delivery ID + event name logged server-side for traceability
-- [ ] **Not** dispatching scans yet — this is a documented no-op until the follow-up receiver ships
+### 5. Webhook dispatcher (api-service ≥ 0.43.0)
+- [ ] `POST /api/v1/github-app/webhook` dispatches real push / pull_request events
+- [ ] Full tests in `docs/feature-tests/14-github-webhook-dispatcher.md`; the stub behavior this section previously described was replaced in 0.43.0
 
 ### 6. Import installed repositories (0.39.1)
 - [ ] `POST /api/v1/organizations/{org_id}/integrations/github-app/{integration_id}/import-installed-repos` with Bearer JWT (admin) returns 200 + the connected-repo list
@@ -120,11 +119,11 @@ This is distinct from the **URL-based GitHub ingest** path (`POST /api/v1/contra
 
 | Item | Deferred because |
 |------|-----------------|
-| Webhook event dispatch (scan-on-push / scan-on-PR) | Webhook receiver is still a 204 stub; the sync-pipeline worker is now in place, so the webhook pass is a direct extension (dispatch the same Celery task on `push` / `pull_request` events). |
+| Webhook event dispatch (sync-on-push / sync-on-PR) | **Shipped in api-service 0.43.0** — the webhook now parses push/PR events, validates HMAC, checks the per-repo opt-in flags, and enqueues the sync Celery task. See `feature-tests/14-github-webhook-dispatcher.md` and `playbooks/github-app-byo-troubleshooting.md § Issue 7`. |
 | Auto-scan-on-sync | Sync imports Contract rows with `status='uploaded'` but does **not** enqueue scans even when `auto_scan_enabled=true`. Wiring the scan-queue call is a narrow follow-up (tier/quota check + POST to tool-integration). |
 | Per-repo toggles in the dashboard (`auto_scan_enabled`, `scan_on_push`, `scan_on_pr`) | Backend flags live on `IntegrationRepositoryModel` but aren't exposed in a UI yet. |
 | Multi-file Foundry/Hardhat project ingest (via `ContractFileModel`) | Each `.sol` is imported as a single-file contract for this pass. Project-level scanning via the multi-file path is a separate effort. |
-| Incremental diff sync via GitHub tree-SHA comparison | Current sync always re-walks the full tree. Diff sync ships with the webhook pass. |
+| Incremental diff sync via GitHub tree-SHA comparison | Current sync always re-walks the full tree. Diff sync is a future optimization separate from the 0.43.0 webhook dispatcher. |
 | `fetch_repo_tree` truncation handling (repos >100k entries) | Only a warning log today; sub-tree recursion is a later enhancement once a customer needs it. |
 | Retire legacy `oauth_service.py` GitHub path | Kept as dead code until dashboard confirms no callers |
 | GitHub Enterprise Server support via Broker | Multi-week separate initiative |
