@@ -132,4 +132,4 @@ A full valid-signature end-to-end test requires a real GitHub App installation +
   - `tests/unit/presentation/test_github_webhook_dispatcher.py` — 28 tests covering stub-replacement, HMAC primitive (positive + 4 negative), signature-before-dispatch ordering, event whitelist, master + sub-flag gates, default-branch restriction, PR action allowlist, installation → credential → repo resolution, fail-safe paths (malformed JSON, missing installation.id / repository.id, unknown event, decrypt failure, orphan integration), enqueue contract, 401 / 500 / 204 status semantics, constant-time compare
 - **Related**:
   - Task #152 feature-test (`13-auto-scan-opt-in.md`) — customers opt in via the flags this dispatcher reads
-  - Follow-up task #162 — auto-scan dispatch after sync completes (scoped out of this task)
+  - **By design, not a follow-up:** the dispatcher never auto-creates scans. Auto-dispatching scans on every push would burn a customer's quota on massive repos (one scan per `.sol` file). The opt-in flags gate sync only; scan-trigger stays a manual customer action via the dashboard Scan button.
