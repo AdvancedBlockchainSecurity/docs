@@ -379,7 +379,7 @@ kubectl logs -n tool-integration-prod job/scan-trident-<scan_id> | grep -E "fail
 | semgrep | scanner-semgrep | 0.3.11 | python:3.11-slim | 1000 |
 | solhint | scanner-solhint | 0.1.13 | node:20-alpine | 1000 (node) |
 | wake | scanner-wake | 0.5.0 | scanner-base-solidity:1.0 | 1000 |
-| soliditydefend | scanner-soliditydefend | 0.9.8 | debian:bookworm-slim (Rust builder) | 1000 |
+| soliditydefend | scanner-soliditydefend | 0.9.9 | debian:bookworm-slim (Rust builder) | 1000 |
 | echidna | scanner-echidna | 0.5.1 | scanner-base-solidity:1.0 | 1000 |
 | halmos | scanner-halmos | 0.4.1 | scanner-base-solidity:1.0 | 1000 |
 | medusa | scanner-medusa | 0.4.1 | scanner-base-solidity:1.0 | 1000 |
