@@ -266,7 +266,7 @@ Methods on `GitHubAppService` all take per-integration `(app_id, private_key_pem
 
 **Idempotency:** no dedicated webhook-delivery dedup table. The sync task is content-idempotent: on a retried delivery it walks the same tree at the same commit SHA and returns `unchanged` on every contract. Cost: one no-op Celery task per retry.
 
-**Out of scope (filed as follow-up):** auto-creating scans after the sync completes. Keeping scan creation in the existing `create_scan` path preserves tier + quota + scanner-selection enforcement in one place.
+**Not a follow-up, by design:** the dispatcher never auto-creates scans — not in a chain after sync, not on a timer. Scans are a quota-consuming customer action; auto-dispatching on every push would burn through a customer's monthly scan allocation on the first push to a large repo (one scan per `.sol` file). The opt-in flags `scan_on_push` / `scan_on_pr` gate sync dispatch only; scan-trigger stays manual via the dashboard's Scan button.
 
 **Security boundary:** every dispatch path is gated on valid HMAC **before** any side effect. Unsigned / mis-signed deliveries never touch Celery or the DB beyond the credential read needed to fetch the secret. Pinned by `tests/unit/presentation/test_github_webhook_dispatcher.py::TestWebhookSignatureVerification::test_handler_verifies_signature_before_dispatching`.
 
