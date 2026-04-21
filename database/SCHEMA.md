@@ -4,8 +4,8 @@
 **Database Name:** `solidity_security`
 **Schema:** `public`
 **Timezone:** UTC
-**Verified:** 2026-04-17 (partial — only the tables added since 082 are covered below; older tables in this doc reflect the 2026-03-15 snapshot)
-**Latest Migration:** 087 (add_github_app_fields_to_integration_credentials)
+**Verified:** 2026-04-21 (contracts baseline columns + all tables from 082+ covered below; older tables reflect the 2026-03-15 snapshot)
+**Latest Migration:** 088 (add_baseline_scan_to_contracts)
 
 > **Naming Note:** The database is named `solidity_security`, not `blocksecops`. This name was established during initial development when the focus was solely on Solidity. Retained for backward compatibility.
 
@@ -19,8 +19,10 @@
 | 084 | 2026-03-16 | `support_tickets.organization_id` column added | Pending — column not yet reflected below |
 | 085 | 2026-03-17 | **NEW** `scanner_versions` table | Pending — table not yet documented below |
 | 086 | 2026-04-15 | **NEW** `scanner_version_history` table | **Documented** — see Domain 12 |
+| 087 | 2026-04-17 | `integration_credentials` + 8 GitHub App BYO fields | Pending — column additions not yet reflected below |
+| 088 | 2026-04-21 | `contracts.baseline_scan_id` + `contracts.baseline_marked_at` + FK + index | **Documented** — see `contracts` in Domain 2 |
 
-Migrations 083–085 predate this session and remain as documentation follow-up for the next full verification sweep.
+Migrations 083–085 and 087 predate this session and remain as documentation follow-up for the next full verification sweep.
 
 ---
 
@@ -230,6 +232,8 @@ Smart contract source code and metadata.
 | source_file_path | VARCHAR(500) | nullable | Provenance: repo-relative path |
 | is_archived | BOOLEAN | NOT NULL, default false | ML data preservation |
 | archived_at | TIMESTAMPTZ | nullable | |
+| baseline_scan_id | UUID | FK scans(id) ON DELETE SET NULL, nullable, indexed | Scan marked as the canonical baseline for this contract. Set via `PUT /api/v1/contracts/{id}/baseline`. Migration 088. |
+| baseline_marked_at | TIMESTAMPTZ | nullable | When the current `baseline_scan_id` was set. Null when no baseline. Migration 088. |
 | created_at | TIMESTAMPTZ | NOT NULL, default now() | |
 | updated_at | TIMESTAMPTZ | NOT NULL, default now() | |
 
