@@ -24,7 +24,10 @@
 
 **Headline finding (original):** the scanner fleet is healthy in steady-state except for a single-scanner regression in **mythril** where its callback payload 422s against the `ScanResults` schema — scans stay queued until stale-recovery fails them. Everything else either completes cleanly, correctly fails-fast on the pragma gate, or cleanly rejects at dispatch with a user-facing error.
 
-**Status update (same-day, post-audit):** the mythril bug was root-caused and fixed same-session in `tool-integration 0.6.5` + `scanner-mythril 0.2.2` (`blocksecops-tool-integration#163`). Verified live post-deploy. See Incident I1 below.
+**Status update (same-day, post-audit):** all 3 bugs filed from the audit were root-caused and fixed same-session.
+- **I1** (mythril 422) — `blocksecops-tool-integration#163` → `tool-integration 0.6.5` + `scanner-mythril 0.2.2`. Live verified.
+- **I2** (wake `Job failed after all retries` race) — api-service 0.43.1 terminal-state guard. Live reproduced on the original contract + guard confirmed firing 2× on the race. 12-scan post-fix matrix across 6 contract shapes passed.
+- **I3** (audit-script stale check) — `_scanner_uses_solidity_base()` helper added; C6 + C7 now skip base-image consumers.
 
 ---
 
@@ -193,31 +196,43 @@ Not a schema-divergence issue (the ScanResults shape is consistent across both s
 
 **Prior-audit correction:** earlier in this doc I noted "Scanner containers POST results DIRECTLY to api-service, bypassing tool-integration's forwarder." That was incorrect — I misread the `result_collector` log. Scanners actually POST to tool-integration's `/api/v1/scans/{id}/results` (CALLBACK_URL is set to the tool-integration service in `kubernetes_job_manager.py:361-363`), tool-integration normalizes + forwards to api-service. The 422 source IPs (10.1.1.105, 10.1.2.77) are tool-integration pod IPs, not scanner pod IPs.
 
-### I2 — wake single-file scan fails "Job failed after all retries" (**NEW, 2026-04-21**)
+### I2 — wake single-file scan fails "Job failed after all retries" (**FIXED, 2026-04-21**)
 
-**Severity:** Intermittent. Wake on the same Solidity shape (foundry archive) succeeded on the same session.
+**Status update (same day, post-audit):** root cause diagnosed + fix shipped in api-service 0.43.1 (terminal-state guard). Live-reproduced in production: re-running wake × `70d006e1` (the same contract that triggered the original failure) now completes cleanly as `status=completed 0/0/0/0` — and api-service logs confirm the race DID fire ("Ignoring failed callback for already-completed scan b127aa27-…: scanner=wake, error='Job failed after all retries'" × 2), but the guard rejected both overwrites.
 
-**Evidence:**
+**Evidence (original):**
 - scan_id `28905574-8629-4a48-ba3b-7dee1f424e9d` (wake × 70d006e1 single-file)
-- api-service logs show **3× POST /results** for this scan from two different source IPs (10.1.1.105 twice + 10.1.2.77 once) — suggests retry logic fired even though the first POST was accepted
-- Pod ran to completion per K8s events; tool-integration log confirms Job completed and was deleted
-- Final state: `status=failed, error_message='Job failed after all retries'`
+- api-service logs showed **3× POST /results** from two tool-integration pod IPs (10.1.1.105 twice + 10.1.2.77 once) — wake scanner's `curl --retry 3 --retry-all-errors` loop fanning across tool-integration replicas
+- Pod ran to completion per K8s events
+- Final state became `status=failed, error_message='Job failed after all retries'` (the race's victim)
 
-**Hypothesis:** race between tool-integration's job-monitor cleanup and api-service's retry / state-transition logic. The tool-integration `Job scan-wake-*.. completed` log correlates with a 200 OK on `/results`, but the scan record never transitioned off `queued` → stale-scan-recovery then flipped it to `failed`.
+**Actual root cause (diagnosed):** tool-integration's `result_collector.py:315` POSTs a `status=failed, error="Job failed after all retries"` callback whenever K8s marks the scan Job as Failed (backoff_limit or activeDeadlineSeconds). This fires even after a prior successful callback has already transitioned the scan to `completed`. api-service's `store_scan_results` unconditionally overwrote `scan.status` — no state-transition guard.
 
-**Task filed:** #170.
+**Fix applied in api-service 0.43.1 (`scans.py` store_scan_results):**
+```python
+# BSO-BUG-170: terminal-state preservation.
+if scan.status == "completed" and results.status == "failed":
+    logger.warning(f"Ignoring failed callback for already-completed scan {scan_id}: ...")
+    return {"success": True, "ignored": True, "prior_status": "completed", ...}
+```
 
-### I3 — Platform audit script emits 2 false-positive failures
+Only `completed → failed` is blocked. All other transitions (`queued → completed`, `queued → failed`, `failed → completed` legitimate recovery, `failed → failed` idempotent) are allowed. Pinned by 6 structural unit tests in `tests/unit/presentation/test_scan_terminal_state_guard.py`.
+
+**Post-fix verification matrix (12 / 12):** wake × single-file (original repro), slither × single + Hardhat, aderyn × Foundry, mythril × single, halmos / medusa / echidna × their respective Foundry projects, vyper × single, moccasin × Vyper project, rustdefend × Rust single, sec3-xray × Anchor project — all completed with the expected finding counts; none flipped to failed; guard confirmed firing twice on the wake repro without corrupting state.
+
+### I3 — Platform audit script emits 2 false-positive failures (**FIXED, 2026-04-21**)
+
+**Status update (same day, post-audit):** fixed in `docs/audits/scripts/audit-scanning-system.py` by adding a `_scanner_uses_solidity_base()` helper that greps the scanner's Dockerfile for `FROM .../scanner-base-solidity:`; the C6 and C7 checks skip any matched scanner with a note like "(skipped ['aderyn', 'slither', 'wake'] — solc from scanner-base-solidity)".
 
 **Severity:** Tooling drift, no runtime impact.
 
-`docs/audits/scripts/audit-scanning-system.py` reports:
+`docs/audits/scripts/audit-scanning-system.py` reported:
 ```
 [C] Foundry scanners pre-install solc: missing: ['aderyn', 'slither']
 [C] Foundry scanners pre-install forge-std: missing: ['aderyn', 'slither']
 ```
 
-These are spurious: `aderyn` and `slither` are now consumers of the **`scanner-base-solidity:1.0`** base image which provides both solc + forge-std at the base layer. The audit script still grep's each scanner's own Dockerfile for install lines and flags the base-image consumers.
+These were spurious: `aderyn` + `slither` (and wake, halmos, mythril, echidna, medusa — 7 total) consume the **`scanner-base-solidity:1.0`** base image which provides solc + forge-std at the base layer. The audit script used to grep each scanner's own Dockerfile for install lines and flagged the base-image consumers.
 
 **Task filed:** #171.
 
@@ -280,6 +295,7 @@ Total: 67/69 PASS   Time: 12s
 ## Follow-ups
 
 - ✅ **#169** — mythril 422 callback — **FIXED same-session** in tool-integration 0.6.5 + scanner-mythril 0.2.2. Live verified.
-- **#170** — Investigate wake intermittent job-failed-after-retries
-- **#171** — Refresh `audit-scanning-system.py` to recognize `scanner-base-solidity:1.0` consumers
-- **Follow-up (informational):** investigate the ⚠️ zero-finding cells on hardhat-project.tar across 3 scanners
+- ✅ **#170** — wake intermittent job-failed-after-retries — **FIXED same-session** in api-service 0.43.1 (terminal-state guard). 12-scan post-fix matrix passed; guard confirmed firing twice on the original wake × 70d006e1 repro.
+- ✅ **#171** — `audit-scanning-system.py` base-image awareness — **FIXED same-session** via `_scanner_uses_solidity_base()` helper on C6 + C7 checks.
+- **Follow-up (informational):** investigate the ⚠️ zero-finding cells on hardhat-project.tar across 3 scanners.
+- **Low-priority follow-up:** tool-integration's forwarder doesn't log the api-service response body on HTTP error — adding `logger.error("...body=%s", e.response.text)` would make future 422-class bugs a minute-long diagnosis instead of a 20-minute log hunt.

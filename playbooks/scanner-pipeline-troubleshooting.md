@@ -464,6 +464,45 @@ pytest tests/regression/test_job_name_collision.py -v
 
 ---
 
+### Issue 12: Scan flipped from `completed` to `failed` after the scanner finished successfully (Job-cleanup race)
+
+**Symptoms (pre-0.43.1):**
+- Scanner pod succeeded per `kubectl get events` and tool-integration logs
+- api-service received a `POST /results` with `status=completed` and persisted findings
+- Later, the scan record shows `status=failed, error_message="Job failed after all retries"`
+- api-service logs show 2–3 POSTs to `/results` from tool-integration pod IPs, some later ones with `status=failed`
+
+**Root cause:** wake's scanner wrapper does `curl --retry 3 --retry-all-errors` on the callback. When the K8s Job cleanup detects the pod as Failed (backoff_limit or activeDeadlineSeconds), `result_collector.py:315` POSTs a `status=failed, error="Job failed after all retries"` callback. Pre-0.43.1, api-service unconditionally overwrote `scan.status`, clobbering the earlier `completed` state.
+
+**Fix (shipped in api-service 0.43.1):** `store_scan_results` has a terminal-state guard at the top — if `scan.status == "completed"` and incoming `results.status == "failed"`, return HTTP 200 with `ignored: true, prior_status: "completed"` and do NOT modify the scan record. The first successful terminal callback wins.
+
+**How to detect the guard firing in logs:**
+```bash
+kubectl logs -n api-service-prod -l app.kubernetes.io/name=api-service --tail=1000 \
+  | grep "Ignoring failed callback for already-completed scan"
+```
+
+Each log line is one prevented overwrite — these are informational, not errors.
+
+**What is allowed (the guard only blocks `completed → failed`):**
+- `queued → completed` / `queued → failed` — first terminal callback wins
+- `completed → completed` — multi-scanner accumulation via `scan.critical_count += ...` is intact
+- `failed → completed` — legitimate recovery (rare)
+- `failed → failed` — idempotent no-op
+
+**Live verification if you suspect a regression:**
+```bash
+INTERNAL_KEY=$(kubectl get secret api-service-secret -n api-service-prod -o jsonpath='{.data.INTERNAL_SERVICE_KEY}' | base64 -d)
+SCAN_ID=<pick-a-completed-scan>
+curl -sS -X POST https://app.0xapogee.com/api/v1/scans/$SCAN_ID/results \
+  -H "X-Internal-Service-Key: $INTERNAL_KEY" -H "Content-Type: application/json" \
+  -d '{"scanner":"wake","status":"failed","error":"test","vulnerabilities":[]}'
+# expect: {"ignored": true, "prior_status": "completed", ...}
+# then re-GET and confirm scan record unchanged
+```
+
+---
+
 ### Issue 9: Failed Callback Results Lost (No Dead-Letter)
 
 **Symptoms:**
