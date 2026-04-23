@@ -22,7 +22,9 @@
 | Platform audit script | **67 / 69 pass** (2 known false-positives — tooling stale post scanner-base-solidity rollout) |
 | Bugs filed from this audit | 3 (tasks #169, #170, #171) |
 
-**Headline finding:** the scanner fleet is healthy in steady-state except for a single-scanner regression in **mythril** where its callback payload now 422s against the current `ScanResults` schema — scans stay queued until stale-recovery fails them. Everything else either completes cleanly, correctly fails-fast on the pragma gate, or cleanly rejects at dispatch with a user-facing error.
+**Headline finding (original):** the scanner fleet is healthy in steady-state except for a single-scanner regression in **mythril** where its callback payload 422s against the `ScanResults` schema — scans stay queued until stale-recovery fails them. Everything else either completes cleanly, correctly fails-fast on the pragma gate, or cleanly rejects at dispatch with a user-facing error.
+
+**Status update (same-day, post-audit):** the mythril bug was root-caused and fixed same-session in `tool-integration 0.6.5` + `scanner-mythril 0.2.2` (`blocksecops-tool-integration#163`). Verified live post-deploy. See Incident I1 below.
 
 ---
 
@@ -172,19 +174,24 @@ No regressions on the platform's pre-shipping endpoints.
 
 ## Incidents
 
-### I1 — mythril callback returns 422 Unprocessable from api-service (**NEW, 2026-04-21**)
+### I1 — mythril callback returns 422 Unprocessable from api-service (**FIXED, 2026-04-21**)
 
-**Severity:** Customer-visible. Every `mythril` scan stays at `status=queued` until the stale-scan-recovery Celery Beat task marks it `failed` (hours later).
+**Status update (same day, post-audit):** root cause diagnosed + fix shipped in `tool-integration 0.6.5` + `scanner-mythril 0.2.2`. See `blocksecops-tool-integration#163`. Live post-deploy verification: scan `e36b3567-daa9-4d65-b963-6f716bce83b9` (mythril × 0.8.20 contract `70d006e1`) completed with `status=completed, 1 high + 2 medium + 2 low findings`. No 422, no stuck queue.
 
-**Evidence:**
+**Original evidence (for audit trail):**
 - scan_id `124d4d70-49ca-44d3-b1f2-4cbad933533b` (single-file) and `8d5d814c-b6bc-4e2f-afa0-d91e2aefc9e2` (foundry archive)
-- api-service logs: `POST /api/v1/scans/124d4d70.../results HTTP/1.1 422 Unprocessable Content` from scanner pod IPs (10.1.2.77, 10.1.2.82)
-- Scanner pod Jobs all complete successfully per `kubectl get events -n tool-integration-prod`
-- tool-integration 0.6.4 architecture: scanner containers POST results DIRECTLY to api-service, bypassing tool-integration's forwarder (log line: "Scanner containers POST results directly, so skipping log parsing to avoid race conditions")
+- api-service logs: `POST /api/v1/scans/124d4d70.../results HTTP/1.1 422 Unprocessable Content` from tool-integration pod IPs (10.1.2.77, 10.1.1.105 — pod IP verification showed both are `tool-integration-*` pods, NOT scanner pods; earlier note in this audit mis-attributed them to scanner pods)
 
-**Root cause (hypothesis):** `scanner-mythril:0.2.1` wrapper emits a payload shape that the current `ScanResults` Pydantic schema (api-service 0.43.0) rejects. Likely a rename/remove of a field between 0.41.0 and 0.43.0 that the mythril wrapper didn't track. Not blocked by any single rollout today — mythril has been quietly broken since the relevant api-service schema change.
+**Actual root cause (diagnosed 2026-04-21 ~19:10 UTC):** `scanner-mythril 0.2.1`'s jq filter built each finding with `id: .swc_id`. Mythril detectors without an SWC mapping emit a null `swc_id`, so the wrapper forwarded `{"id": null, ...}` to tool-integration. Tool-integration's generic fallback at `src/main.py:1883` used `vuln.get("id", "unknown")` — but Python's `dict.get(key, default)` only returns `default` when the **key is missing**. A key present with a null value passes `None` straight through to the forwarded payload. api-service's `VulnerabilityResult.vulnerability_type: str` Pydantic field then rejected the entire batch with `type=string_type, input_value=None`.
 
-**Task filed:** #169. Fix-forward would be either patching `scanner-mythril` wrapper's jq filter or widening `ScanResults` Pydantic model.
+Not a schema-divergence issue (the ScanResults shape is consistent across both services). The bug has likely been silent for every mythril scan whose contract triggered at least one SWC-less detector — which in practice is any non-trivial contract.
+
+**Fix applied:**
+- `tool-integration 0.6.5` (`src/main.py`) — switched generic fallback from `.get(key, default)` to `.get(key) or default` on four required-string fields (`vulnerability_type`, `severity`, `title`, `description`). Defensive against any future scanner that emits null for a required field.
+- `scanner-mythril 0.2.2` (`run-mythril.sh`) — jq filter now uses `(.swc_id // "mythril-unknown")` and analogous null-coalesces on `.title` / `.description`. Handles the null at the source.
+- New regression test `test_generic_branch_coalesces_null_vulnerability_type` in `tests/integration/test_callback_endpoint.py` — 64/64 callback tests pass.
+
+**Prior-audit correction:** earlier in this doc I noted "Scanner containers POST results DIRECTLY to api-service, bypassing tool-integration's forwarder." That was incorrect — I misread the `result_collector` log. Scanners actually POST to tool-integration's `/api/v1/scans/{id}/results` (CALLBACK_URL is set to the tool-integration service in `kubernetes_job_manager.py:361-363`), tool-integration normalizes + forwards to api-service. The 422 source IPs (10.1.1.105, 10.1.2.77) are tool-integration pod IPs, not scanner pod IPs.
 
 ### I2 — wake single-file scan fails "Job failed after all retries" (**NEW, 2026-04-21**)
 
@@ -272,7 +279,7 @@ Total: 67/69 PASS   Time: 12s
 
 ## Follow-ups
 
-- **#169** — Diagnose + fix mythril 422 callback (customer-visible bug, mythril scans effectively broken until resolved)
+- ✅ **#169** — mythril 422 callback — **FIXED same-session** in tool-integration 0.6.5 + scanner-mythril 0.2.2. Live verified.
 - **#170** — Investigate wake intermittent job-failed-after-retries
 - **#171** — Refresh `audit-scanning-system.py` to recognize `scanner-base-solidity:1.0` consumers
 - **Follow-up (informational):** investigate the ⚠️ zero-finding cells on hardhat-project.tar across 3 scanners
