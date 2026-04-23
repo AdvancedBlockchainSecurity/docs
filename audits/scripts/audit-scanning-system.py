@@ -48,6 +48,26 @@ EXPECTED_SCANNERS = [
 
 FOUNDRY_SCANNERS = ["aderyn", "slither", "wake"]
 
+
+def _scanner_uses_solidity_base(scanner: str) -> bool:
+    """True if the scanner's Dockerfile FROMs scanner-base-solidity.
+
+    The shared base image (rolled out 2026-04-19) provides solc + forge-std
+    pre-installed for 7 Solidity scanners: slither, aderyn, wake, halmos,
+    mythril, echidna, medusa. Their own Dockerfiles just do
+    `FROM .../scanner-base-solidity:${BASE_IMAGE_TAG}` — the C6 / C7 per-
+    Dockerfile solc + forge-std checks should skip them to avoid false-
+    positive failures.
+    """
+    dockerfile = REPO_ROOT / f"blocksecops-tool-integration/scanner-images/{scanner}/Dockerfile"
+    if not dockerfile.exists():
+        return False
+    try:
+        content = dockerfile.read_text()
+    except OSError:
+        return False
+    return bool(re.search(r"FROM\s+\S*scanner-base-solidity:", content))
+
 # ============================================================================
 # Helpers
 # ============================================================================
@@ -273,24 +293,37 @@ def audit_scanner_images():
     record("C", f"KJM default_images has all scanners", len(missing_kjm) == 0,
            f"missing: {missing_kjm}" if missing_kjm else "")
 
-    # C6: Solc pre-installed (no runtime download) in Foundry scanners
+    # C6: Solc pre-installed (no runtime download) in Foundry scanners.
+    # Skip scanners consuming scanner-base-solidity:1.0 — the base image
+    # pre-installs solc across solc-select / Foundry SVM / wake-compilers
+    # layouts, so per-Dockerfile inspection gives a false-negative on those.
     foundry_no_preinstall = []
+    skipped_base_c6 = []
     for scanner in FOUNDRY_SCANNERS:
+        if _scanner_uses_solidity_base(scanner):
+            skipped_base_c6.append(scanner)
+            continue
         dockerfile = REPO_ROOT / f"blocksecops-tool-integration/scanner-images/{scanner}/Dockerfile"
         content = file_read(dockerfile)
         if not re.search(r"solc-select|svm|solc.*install", content, re.IGNORECASE):
             foundry_no_preinstall.append(scanner)
-    record("C", f"Foundry scanners pre-install solc", len(foundry_no_preinstall) == 0,
+    c6_note = f" (skipped {skipped_base_c6} — solc from scanner-base-solidity)" if skipped_base_c6 else ""
+    record("C", f"Foundry scanners pre-install solc{c6_note}", len(foundry_no_preinstall) == 0,
            f"missing: {foundry_no_preinstall}" if foundry_no_preinstall else "")
 
-    # C7: forge-std pre-installed for Foundry scanners
+    # C7: forge-std pre-installed for Foundry scanners (same base-image exception)
     no_forgestd = []
+    skipped_base_c7 = []
     for scanner in FOUNDRY_SCANNERS:
+        if _scanner_uses_solidity_base(scanner):
+            skipped_base_c7.append(scanner)
+            continue
         dockerfile = REPO_ROOT / f"blocksecops-tool-integration/scanner-images/{scanner}/Dockerfile"
         content = file_read(dockerfile)
         if "forge-std" not in content:
             no_forgestd.append(scanner)
-    record("C", f"Foundry scanners pre-install forge-std", len(no_forgestd) == 0,
+    c7_note = f" (skipped {skipped_base_c7} — forge-std from scanner-base-solidity)" if skipped_base_c7 else ""
+    record("C", f"Foundry scanners pre-install forge-std{c7_note}", len(no_forgestd) == 0,
            f"missing: {no_forgestd}" if no_forgestd else "")
 
     # C8: Scanner versions in DB match ConfigMap count
