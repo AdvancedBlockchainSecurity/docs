@@ -1,10 +1,26 @@
 # Slither Scanner Integration Documentation
 
-**Version:** 0.3.8
-**Last Updated:** 2026-03-11
+**Version:** 0.4.4
+**Last Updated:** 2026-04-26
 **Scanner Version:** Slither 0.11.5
 **Solc-select Version:** 1.1.0
-**Docker Image:** scanner-slither:0.3.8
+**Docker Image:** scanner-slither:0.4.4
+**Base Image:** scanner-base-solidity:1.1.0-b49e3f10 (OpenZeppelin Contracts 5.0.2 pre-bundled)
+
+## Hardhat Offline Compile (Task #172, 2026-04-26)
+
+Hardhat projects scanned through slither are converted to a Foundry-compatible layout at scan time:
+
+1. Source files reconstructed from flattened ConfigMap keys (`contracts_Lock.sol` → `contracts/Lock.sol`).
+2. `~/.svm` cache seeded from pre-installed solc binaries in the base image.
+3. Minimal `foundry.toml` written at the project root with `offline = true` and an explicit OpenZeppelin remapping (`@openzeppelin/contracts/=/opt/openzeppelin/v5/`).
+4. `hardhat.config.*` renamed to `.disabled` so crytic-compile picks the Foundry framework instead of Hardhat.
+
+This bypasses Hardhat's `npx hardhat compile` step (which fails with HH502 trying to download solc from `binaries.soliditylang.org` — the scanner NetworkPolicy blocks all external egress). `forge build` reads pre-installed solcs from `/opt/svm` and resolves OZ imports against `/opt/openzeppelin/v5/`.
+
+**Coverage:** Hardhat projects without external imports OR with `@openzeppelin/contracts@5.x` imports. Hardhat projects with OZ 4.x, `@openzeppelin/contracts-upgradeable`, `@chainlink/contracts`, or other npm libraries are not yet bundled — these will surface a `forge build` error rather than silently producing 0 findings. Reactive bundling is the planned follow-up.
+
+See `TaskDocs-BlockSecOps/scanners/slither/task-172-hardhat-foundry-conversion-2026-04-26.md` for full root-cause analysis and verification details.
 
 ## Table of Contents
 

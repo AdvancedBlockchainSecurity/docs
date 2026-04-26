@@ -20,7 +20,7 @@ Apogee automatically detects your project framework based on configuration files
 
 | Scanner | Single File | Foundry | Hardhat | Notes |
 |---------|-------------|---------|---------|-------|
-| **Slither** | Full | Full | Full | Native support for all frameworks |
+| **Slither** | Full | Full | Full | Hardhat projects converted to Foundry layout at scan time (offline-compatible). OZ 5.x bundled — see Hardhat Support Details. |
 | **Aderyn** | Full | Full | Partial | Designed primarily for Foundry |
 | **SolidityDefend** | Full | Full | Full | Apogee premier scanner |
 | **Echidna** | Full | Full | Full | Fuzz testing with dependencies |
@@ -84,6 +84,18 @@ invariant_runs = 256     # Invariant runs
 - **npm Dependencies**: Read from `package.json`
 - **Import Resolution**: `node_modules/` paths
 - **Compiler Settings**: Version, optimizer, EVM version
+
+### Offline Compile (Task #172, 2026-04-26)
+
+The scanner namespace is air-gapped — `npx hardhat compile` cannot reach `binaries.soliditylang.org` to download solc (HH502). For slither, Hardhat projects are converted to a Foundry-compatible layout at scan time so `forge build` runs offline using pre-installed solc binaries (`/opt/svm`) and resolves OpenZeppelin imports through an explicit remapping to `/opt/openzeppelin/v5/`. The other 6 Solidity scanners (aderyn, wake, halmos, mythril, echidna, medusa) currently still produce silent 0/0/0/0 on Hardhat — replicating the same conversion across them is filed as platform Task #174.
+
+### Pre-Bundled npm Dependencies
+
+| Package | Version | Path | Bundled In |
+|---------|---------|------|-----------|
+| `@openzeppelin/contracts` | 5.0.2 | `/opt/openzeppelin/v5/` | scanner-base-solidity:1.1.0-b49e3f10 |
+
+OZ 4.x, `@openzeppelin/contracts-upgradeable`, and other libraries (`@chainlink/contracts`, `@uniswap/v3-core`, etc.) are **not** bundled. Projects depending on those will surface `forge build` import errors rather than silently scanning to 0 findings. Reactive bundling on first customer request.
 
 ### Parsed Configuration Fields
 
