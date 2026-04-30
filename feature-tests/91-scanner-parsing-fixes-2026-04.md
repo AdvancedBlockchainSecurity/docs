@@ -148,3 +148,31 @@ All scanners tested locally with `docker run` against purpose-built vulnerable c
 
 1. **Vyper 0.4.x:** Slither's Vyper parser has fundamental AST incompatibilities with 0.4.x. Scanner gracefully returns empty results. Requires upstream slither update.
 2. **Trident:** Requires full Anchor framework project. Platform's ConfigMap-based contract delivery cannot provide full Anchor project structure with crate dependencies.
+
+---
+
+## Mythril Offline OZ Resolution via --solc-json (Task #176, 2026-04-29)
+
+**Scanner version:** scanner-mythril:0.2.7
+**Related task:** Task #176
+
+### Feature
+
+Mythril can now analyze Hardhat projects that import `@openzeppelin/contracts/...` without reaching the network. The fix addresses the root cause: mythril uses solc Standard JSON mode (`--standard-json`) which rejects positional remapping arguments (`--remappings prefix=path`) but correctly honors `settings.remappings` inside a JSON settings file. The wrapper now conditionally writes `/tmp/solc-settings.json` with the OZ remapping and passes `--solc-json /tmp/solc-settings.json` to `myth analyze` when `@openzeppelin/contracts/` imports are detected.
+
+### Verification
+
+| Test type | Contract | Scan ID | Result |
+|-----------|----------|---------|--------|
+| Cluster (production) | Hardhat+OZ ERC20 single-file (`0c7542c6-1c12-4a15-8421-ff959f21c214`) | `c8a40192-4965-4817-999e-78a6e7a1d9f7` | `completed`, ~2m12s, no urllib3 error |
+| Local docker (`--network=none`) | Constructed Hardhat+OZ fixture | n/a | Compiled cleanly, analysis ran to completion |
+
+### Scope
+
+Works for: single-file Hardhat contracts importing `@openzeppelin/contracts/` v5.0.2 (bundled in `scanner-base-solidity:1.1.0-b49e3f10`).
+
+Not yet working: multi-file Hardhat projects (Task #182, filed 2026-04-29).
+
+### Regression tests
+
+7 tests in `tests/regression/test_mythril_solc_json_remappings.py` covering flag wiring, MYTH_EXTRA_ARGS expansion, OZ-import-conditional guard, no-OZ baseline, `--solc-args` dead-end regression check, Dockerfile chown fix, and image version pins.

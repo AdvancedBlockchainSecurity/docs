@@ -383,7 +383,7 @@ kubectl logs -n tool-integration-prod job/scan-trident-<scan_id> | grep -E "fail
 | echidna | scanner-echidna | 0.5.1 | scanner-base-solidity:1.0 | 1000 |
 | halmos | scanner-halmos | 0.4.1 | scanner-base-solidity:1.0 | 1000 |
 | medusa | scanner-medusa | 0.4.1 | scanner-base-solidity:1.0 | 1000 |
-| mythril | scanner-mythril | 0.2.1 | scanner-base-solidity:1.0 | 1000 |
+| mythril | scanner-mythril | 0.2.7 | scanner-base-solidity:1.1.0-b49e3f10 | 1000 |
 | vyper | scanner-vyper | 0.3.5 | python:3.11-slim | 1000 |
 | moccasin | scanner-moccasin | 0.3.4 | python:3.11-slim | 1000 |
 | sol-azy | scanner-sol-azy | 0.5.0 | rust:1.88-bookworm | 1000 |
@@ -500,6 +500,49 @@ curl -sS -X POST https://app.0xapogee.com/api/v1/scans/$SCAN_ID/results \
 # expect: {"ignored": true, "prior_status": "completed", ...}
 # then re-GET and confirm scan record unchanged
 ```
+
+---
+
+### Issue 13: Mythril urllib3 NameResolutionError on solc-bin.ethereum.org
+
+**Symptoms (pre-scanner-mythril:0.2.7):**
+- Mythril Job exits non-zero
+- Wrapper callback POSTs `success=false` with stderr containing a urllib3 traceback:
+  ```
+  urllib3.exceptions.NameResolutionError: ... Failed to resolve 'solc-bin.ethereum.org'
+  ```
+- Scan transitions to `failed` with error indicating compile failure
+- Only affects Hardhat projects importing `@openzeppelin/contracts/...`
+
+**Root cause:** Mythril uses solc Standard JSON mode (`--standard-json`) via py-solc-x. Standard JSON mode rejects positional `prefix=path` remappings on the command line ("Import remappings are not accepted on the command line in Standard JSON mode") and does not read `foundry.toml`. Without a working OZ remapping, solc cannot resolve `@openzeppelin/contracts/...`, causing py-solc-x to fall back to `solcx.install_solc()` — which attempts to fetch the solc binary from `solc-bin.ethereum.org`, blocked by NetworkPolicy.
+
+**This is NOT a NetworkPolicy misconfiguration** — the block is correct. The underlying issue is the missing OZ remapping for mythril's Standard JSON compile path.
+
+**Diagnosis:**
+
+```bash
+# Check pod logs for the urllib3 traceback
+kubectl logs -n tool-integration-prod \
+  -l job-name=scan-mythril-<scan-id-prefix> --tail=100 | grep -A10 "NameResolutionError\|solc-bin"
+
+# If you see the urllib3 traceback, check the scanner image version
+kubectl get pod -n tool-integration-prod \
+  -l job-name=scan-mythril-<scan-id-prefix> \
+  -o jsonpath='{.items[0].spec.containers[0].image}'
+# If version is < 0.2.7, the fix has not been deployed
+```
+
+**Fix:** Upgrade to scanner-mythril:0.2.7 or later. The wrapper conditionally writes a Standard JSON settings file (`/tmp/solc-settings.json`) with the OZ remapping in `settings.remappings` and passes it via `--solc-json` — the correct flag for Standard JSON mode.
+
+**Verify fix is deployed:**
+
+```bash
+kubectl get configmap scanner-versions -n tool-integration-prod \
+  -o jsonpath='{.data.SCANNER_IMAGE_MYTHRIL}'
+# Expected: .../scanner-mythril:0.2.7 (or higher)
+```
+
+**Scope:** Fixed for single-file Hardhat+OZ contracts as of 0.2.7. Multi-file Hardhat projects remain unstable (Task #182).
 
 ---
 
