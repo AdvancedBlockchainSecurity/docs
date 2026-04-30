@@ -21,12 +21,13 @@ Apogee automatically detects your project framework based on configuration files
 | Scanner | Single File | Foundry | Hardhat | Notes |
 |---------|-------------|---------|---------|-------|
 | **Slither** | Full | Full | Full | Hardhat projects converted to Foundry layout at scan time (offline-compatible). OZ 5.x bundled — see Hardhat Support Details. |
-| **Aderyn** | Full | Full | Partial | Designed primarily for Foundry |
+| **Aderyn** | Full | Full | Full | Hardhat → Foundry conversion (Task #172 sweep). OZ 5.x bundled. |
 | **SolidityDefend** | Full | Full | Full | Apogee premier scanner |
-| **Echidna** | Full | Full | Full | Fuzz testing with dependencies |
-| **Halmos** | Full | Full | Full | Symbolic execution |
-| **Wake** | Full | Partial | Partial | Better with single files |
-| **Mythril** | Full | Limited | Limited | Prefers flattened contracts |
+| **Echidna** | Full | Full | Full | Hardhat → Foundry conversion. Note: only finds issues on contracts with `echidna_*` invariant tests. |
+| **Halmos** | Full | Full | Full | Symbolic execution. Hardhat → Foundry conversion. OZ 5.x bundled. |
+| **Wake** | Full | Full | Full | Hardhat → Foundry conversion. OZ 5.x bundled. |
+| **Mythril** | Full | Full | Limited | Symbolic execution. Single-file and Foundry projects work fully. Hardhat projects importing `@openzeppelin/contracts/...` work correctly as of scanner-mythril:0.2.7 (Task #176 — solc Standard JSON remapping via `--solc-json`). Multi-file Hardhat projects (2+ contracts) remain unstable at 2Gi memory (Task #182, filed). |
+| **Medusa** | Full | Full | Full | Hardhat → Foundry conversion. Note: only finds issues on contracts with property-test invariants. |
 | **Securify2** | Full | Limited | Limited | Academic tool, limited project support |
 
 ### Feature Support by Scanner
@@ -87,7 +88,7 @@ invariant_runs = 256     # Invariant runs
 
 ### Offline Compile (Task #172, 2026-04-26)
 
-The scanner namespace is air-gapped — `npx hardhat compile` cannot reach `binaries.soliditylang.org` to download solc (HH502). For slither, Hardhat projects are converted to a Foundry-compatible layout at scan time so `forge build` runs offline using pre-installed solc binaries (`/opt/svm`) and resolves OpenZeppelin imports through an explicit remapping to `/opt/openzeppelin/v5/`. The other 6 Solidity scanners (aderyn, wake, halmos, mythril, echidna, medusa) currently still produce silent 0/0/0/0 on Hardhat — replicating the same conversion across them is filed as platform Task #174.
+The scanner namespace is air-gapped — `npx hardhat compile` cannot reach `binaries.soliditylang.org` to download solc (HH502). All 7 Solidity scanners (slither, aderyn, wake, halmos, mythril, echidna, medusa) convert Hardhat projects to a Foundry-compatible layout at scan time: write a minimal `foundry.toml` with `offline = true` and an explicit OpenZeppelin remapping to `/opt/openzeppelin/v5/`, seed the `.svm` solc cache from pre-installed binaries in the base image, and rename `hardhat.config.*` to `.disabled` so the scanner's compile pipeline (crytic-compile, solcx, forge) picks Foundry framework instead of Hardhat. This is shipped via the slither pass-B fix and the Task #172 sweep PR.
 
 ### Pre-Bundled npm Dependencies
 
@@ -222,8 +223,9 @@ File limits apply **after** smart dependency extraction:
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0.0 | Nov 27, 2025 | Initial framework support (Foundry + Hardhat) |
+| 1.1.0 | Apr 29, 2026 | Mythril Hardhat+OZ single-file fixed (Task #176); multi-file Hardhat limitation noted (Task #182) |
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: November 27, 2025
+**Document Version**: 1.1.0
+**Last Updated**: April 29, 2026
