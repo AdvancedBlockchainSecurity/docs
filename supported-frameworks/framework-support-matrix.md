@@ -20,8 +20,8 @@ Apogee automatically detects your project framework based on configuration files
 
 | Scanner | Single File | Foundry | Hardhat | Notes |
 |---------|-------------|---------|---------|-------|
-| **Slither** | Full | Full | Full | Hardhat projects converted to Foundry layout at scan time (offline-compatible). OZ 5.x bundled — see Hardhat Support Details. |
-| **Aderyn** | Full | Full | Full | Hardhat → Foundry conversion (Task #172 sweep). OZ 5.x bundled. |
+| **Slither** | Full | Full | Full | Hardhat projects converted to Foundry layout at scan time (offline-compatible). OZ 5.x bundled — see Hardhat Support Details. Foundry+OZ projects without a declared remapping now resolved correctly (Task #179, scanner-slither:0.4.6). |
+| **Aderyn** | Full | Full | Full | Hardhat → Foundry conversion (Task #172 sweep). OZ 5.x bundled. Foundry+OZ projects without a declared remapping now resolved correctly (Task #179, scanner-aderyn:0.8.4). |
 | **SolidityDefend** | Full | Full | Full | Apogee premier scanner |
 | **Echidna** | Full | Full | Full | Hardhat → Foundry conversion. Note: only finds issues on contracts with `echidna_*` invariant tests. |
 | **Halmos** | Full | Full | Full | Symbolic execution. Hardhat → Foundry conversion. OZ 5.x bundled. |
@@ -225,8 +225,9 @@ File limits apply **after** smart dependency extraction:
 | 1.0.0 | Nov 27, 2025 | Initial framework support (Foundry + Hardhat) |
 | 1.1.0 | Apr 29, 2026 | Mythril Hardhat+OZ single-file fixed (Task #176); multi-file Hardhat limitation noted (Task #182) |
 | 1.2.0 | May 3, 2026 | Mythril multi-file resilience shipped (Task #182, scanner-mythril:0.2.9 — eliminates 4× backoff retry, definitive terminal status in 1 attempt). Multi-file remains explicitly unsupported pending auto-skip implementation (Task #183, post-launch). |
+| 1.3.0 | May 3, 2026 | Aderyn and slither Foundry+OZ silent-pass resolved (Task #179). Both wrappers now append `@openzeppelin/contracts/=/opt/openzeppelin/v5/` to `remappings.txt` when OZ imports are detected and no remapping is declared in `foundry.toml`. scanner-aderyn:0.8.4, scanner-slither:0.4.6. The same gap in wake/halmos/echidna/medusa Foundry branches is tracked for follow-up. |
 
 ---
 
-**Document Version**: 1.1.0
-**Last Updated**: April 29, 2026
+**Document Version**: 1.3.0
+**Last Updated**: May 3, 2026

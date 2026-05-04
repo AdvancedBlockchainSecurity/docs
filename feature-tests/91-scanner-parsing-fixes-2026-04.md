@@ -224,3 +224,43 @@ This is an accepted pre-customer scope decision. The other six Solidity scanners
 ### Scope boundary
 
 Mythril is **single-file only** in production as of this release. Auto-skip on multi-file contracts (with `skipped` status and operator-visible reason) is Task #183, filed for post-launch.
+
+---
+
+## Aderyn + Slither Foundry+OZ Resolution (Task #179, 2026-05-03)
+
+**Scanner versions:** scanner-aderyn:0.8.4, scanner-slither:0.4.6
+**Tool-integration version:** 0.6.20
+**Related task:** Task #179
+
+### What changed
+
+Both `run-aderyn.sh` and `run-slither.sh` Foundry-project branches were extended to detect and resolve `@openzeppelin/contracts/` imports that lack a project-level remapping. When (a) any `.sol` file in the workspace imports `@openzeppelin/contracts/...` and (b) the project's `foundry.toml` does not already declare a remapping for that prefix, the wrapper appends `@openzeppelin/contracts/=/opt/openzeppelin/v5/` to a `remappings.txt` file in the project workspace root. Foundry reads `remappings.txt` at lower priority than `foundry.toml`, so user-declared remappings (e.g., from `forge install`) are never overridden. The customer's `foundry.toml` is left untouched.
+
+Without the fix, `forge build` resolved imports against an empty search space, produced a partial AST (OZ inheritance chain absent), and both scanners returned 0 findings with `status:"completed"` — a false-pass. The failure produced no `error_message` and was indistinguishable from a genuine clean scan at every API layer.
+
+### Production verification
+
+Fixture contract `eafe2b12-5540-43ca-ab94-00bf5ee6572f`: Foundry project with no remappings, `src/VulnerableToken.sol` importing OZ ERC20 and Ownable, using `tx.origin` and `block.timestamp`.
+
+| Scanner | Scan ID | Pre-fix | Post-fix |
+|---------|---------|---------|---------|
+| aderyn | `2983c210-2dea-47a8-b827-96249df813d3` | 0 findings (false-pass) | **5 medium findings** |
+| slither | `e0dcb464-81a0-4859-aee6-5fa8da6ca617` | 0 findings (false-pass) | **1 medium + 5 low = 6 findings** |
+
+Both scans confirmed `forge build` compiled 7 files (1 user contract + 6 OZ contracts in the inheritance chain) with a complete AST, and detectors ran on the full dependency graph.
+
+### Scope boundary
+
+The Foundry-branch OZ remapping fix applies to aderyn and slither only. The same gap exists in the wake, halmos, echidna, and medusa Foundry branches. Those scanners' symbolic-execution and fuzzing analysis types surface compile failures differently (typically 0 findings without a terminal error). A targeted patch for those four is tracked as a follow-up and can be applied with the same one-line `remappings.txt` approach.
+
+Projects that already vendor OZ via `forge install` (with a `lib/openzeppelin-contracts/` path declared in `foundry.toml`) are unaffected — the guard at step 2 of the wrapper logic detects the existing remapping and skips injection entirely.
+
+### Regression tests
+
+12 new tests in `tests/regression/test_foundry_oz_remappings_txt.py` covering:
+- `remappings.txt` creation when OZ imports are present (both scanners).
+- No-op when OZ imports are absent (both scanners).
+- Skip injection when `foundry.toml` already declares the remapping (both scanners).
+- Idempotency — no double-append on repeated runs (both scanners).
+- `foundry.toml` content unchanged after wrapper execution (both scanners).
