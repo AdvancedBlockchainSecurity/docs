@@ -176,3 +176,51 @@ Not yet working: multi-file Hardhat projects (Task #182, filed 2026-04-29).
 ### Regression tests
 
 7 tests in `tests/regression/test_mythril_solc_json_remappings.py` covering flag wiring, MYTH_EXTRA_ARGS expansion, OZ-import-conditional guard, no-OZ baseline, `--solc-args` dead-end regression check, Dockerfile chown fix, and image version pins.
+
+---
+
+## Mythril Multi-File Resilience (Task #182, 2026-05-03)
+
+**Scanner version:** scanner-mythril:0.2.9
+**Tool-integration version:** 0.6.19
+**API service version:** 0.43.4
+**Related task:** Task #182
+
+### What changed
+
+Three coordinated fixes were deployed to resolve an instability where multi-file Hardhat mythril Jobs retried up to four times (hitting `backoffLimit`) before reaching terminal status, wasting Spot VM compute and producing race-induced state flips in the scan record.
+
+1. **Wrapper hardening (`run-mythril.sh`):** Per-file failure tracking with `SUCCEEDED_FILES` / `FAILED_FILES` arrays. The wrapper emits a definitive `completed` / `partial` / `failed` overall status from a single run and exits 0 unconditionally after writing `OUTPUT_FILE`. This eliminates the 4× backoffLimit retry pattern — pod exit code is no longer the failure signal; the callback payload is. A singular `error` string field is now emitted alongside the `errors` array (the api-service `ScanResults` Pydantic schema declares `error: Optional[str]` and silently drops array fields).
+
+2. **KJM dict completeness (`kubernetes_job_manager.py`):** Mythril added to `_get_timeout_seconds` at 900 seconds (matching halmos's z3 workload; 600s default was insufficient for multi-file Hardhat cold-start + analysis). Mythril added to `_get_scanner_command` as `None` for explicitness (was silently falling through to `[]`).
+
+3. **Symmetric terminal-state guard (`api-service scans.py`):** The original BSO-BUG-170 guard (2026-04-21) protected `completed → failed`. Task #182 exposed the inverse: the result_collector's failure POST can land first and the wrapper's success POST arrives second, silently flipping `failed → completed`. The new symmetric arm rejects any non-`failed` callback when the scan is already in terminal `failed` state. First terminal callback wins in both directions.
+
+### What is tested
+
+| Test type | Contract | Scan ID | Result |
+|-----------|----------|---------|--------|
+| Single-file regression (0.2.7 baseline) | Hardhat+OZ ERC20 single-file (`0c7542c6`) | `c8a40192` | `completed`, no regression |
+| Single-file regression (0.2.9) | Hardhat+OZ ERC20 single-file (`0c7542c6`) | `717ae09f` | `completed` cleanly |
+| Multi-file definitive failure (0.2.9) | 2-contract Hardhat (`f2324aa7`) | `03c96529` | `failed`, 1 attempt (was 4×), OOMKilled |
+
+The multi-file test scan (`03c96529`) confirmed the primary objective: the 4× backoffLimit retry pattern is eliminated. The scan reaches terminal `failed` status in a single pod attempt with no race-induced state flip.
+
+### What is NOT tested (known limitation)
+
+Multi-file mythril completing successfully is not tested and is not expected to pass. Mythril's z3 SMT solver consistently exceeds the 2Gi `tool-integration-prod` LimitRange `max.memory` cap when analyzing 2+ contract files — even on small contracts (~118 LOC). Memory grows exponentially with symbolic branches, not linearly with code size.
+
+This is an accepted pre-customer scope decision. The other six Solidity scanners (slither, aderyn, wake, halmos, echidna, medusa) handle multi-file projects and cover mythril's detector classes. See `docs/scanners/framework-support-matrix.md` for the updated mythril row ("Single-file only").
+
+### Regression tests
+
+**tool-integration (`blocksecops-tool-integration`):**
+- `tests/regression/test_scanner_memory_limits.py` — 4 new tests: mythril timeout pinned at 900s, memory at 2Gi, `scanner_command` is `None`
+- `tests/regression/test_mythril_solc_json_remappings.py` — 5 new tests pinning multi-file resilience: `FAILED_FILES`/`SUCCEEDED_FILES` arrays, three-way `OVERALL_STATUS` decision, `exit 0` on loop completion, `error` summary field emission
+
+**api-service (`blocksecops-api-service`):**
+- `tests/regression/test_terminal_state_symmetric_guard.py` — 5 new tests: both arms of the BSO-BUG-170 symmetric guard, ordering (first terminal wins), "ignored" marker in response, inequality-not-equality assertion
+
+### Scope boundary
+
+Mythril is **single-file only** in production as of this release. Auto-skip on multi-file contracts (with `skipped` status and operator-visible reason) is Task #183, filed for post-launch.

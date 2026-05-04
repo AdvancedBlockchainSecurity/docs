@@ -269,13 +269,13 @@ data:
         "_note": "Updated 2026-03-04, scanner image 0.3.0"
       },
       "mythril": {
-        "version": "0.23.0",
+        "version": "0.23.22",
         "developer": "ConsenSys",
-        "_note": "Updated 2026-02-28, scanner image 0.4.1"
+        "_note": "Updated 2026-05-03, scanner image 0.2.9 — single-file only (Task #182)"
       }
     }
   SCANNER_IMAGE_SLITHER: "harbor.blocksecops.local/blocksecops/scanner-slither:0.3.0"
-  SCANNER_IMAGE_MYTHRIL: "harbor.blocksecops.local/blocksecops/scanner-mythril:0.4.1"
+  SCANNER_IMAGE_MYTHRIL: "harbor.blocksecops.local/blocksecops/scanner-mythril:0.2.9"
   # ... more scanners
 ```
 
@@ -412,7 +412,7 @@ This pattern mirrors Slither's pre-installed solc strategy. Storage location is 
 # Fallback image versions when ConfigMap is unavailable
 default_images = {
     "slither": "harbor.blocksecops.local/blocksecops/scanner-slither:0.3.0",
-    "mythril": "harbor.blocksecops.local/blocksecops/scanner-mythril:0.4.1",
+    "mythril": "harbor.blocksecops.local/blocksecops/scanner-mythril:0.2.9",
     "aderyn": "harbor.blocksecops.local/blocksecops/scanner-aderyn:0.2.1",
     "wake": "harbor.blocksecops.local/blocksecops/scanner-wake:0.1.0",
     # ... more scanners

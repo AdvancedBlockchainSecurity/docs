@@ -645,7 +645,7 @@ GET /api/v1/scans/compare?scan1={id1}&scan2={id2}
 |---------|------|----------------|------------------|-----------|
 | **slither** | Static Analysis | 15s | No | 93 |
 | **aderyn** | Static Analysis | 20s | No | 88 |
-| **mythril** | Symbolic Execution | 180s | No | 4 |
+| **mythril** | Symbolic Execution | 900s | No | 4 |
 | **semgrep** | Pattern Matching | 10s | No | 47 |
 | **solhint** | Linter | 5s | No | 20 |
 | **wake** | Static Analysis | 25s | No | - |
@@ -654,6 +654,8 @@ GET /api/v1/scans/compare?scan1={id1}&scan2={id2}
 | **medusa** | Fuzzer | 180s | Yes | - |
 | **halmos** | Formal Verification | 180s | Yes | - |
 | **foundry-fuzz** | Fuzzer | 120s | Yes | - |
+
+**Note — mythril production constraint (as of 2026-05-03):** Mythril is single-file only in production. Multi-file Hardhat/Foundry projects cause mythril's z3 SMT solver to exceed the 2Gi container memory limit and OOMKill. The other six Solidity scanners (slither, aderyn, wake, halmos, echidna, medusa) handle multi-file projects and cover mythril's detector classes. Auto-skip on multi-file is tracked as Task #183 for post-launch. See `docs/scanners/framework-support-matrix.md` for the current support matrix.
 
 ### Vyper Scanners (2)
 

@@ -1,7 +1,7 @@
 # Playbook: Scanner Pipeline Troubleshooting
 
-**Version:** 1.3.0
-**Last Updated:** March 11, 2026
+**Version:** 1.4.0
+**Last Updated:** 2026-05-03
 
 ## Overview
 
@@ -383,7 +383,7 @@ kubectl logs -n tool-integration-prod job/scan-trident-<scan_id> | grep -E "fail
 | echidna | scanner-echidna | 0.5.1 | scanner-base-solidity:1.0 | 1000 |
 | halmos | scanner-halmos | 0.4.1 | scanner-base-solidity:1.0 | 1000 |
 | medusa | scanner-medusa | 0.4.1 | scanner-base-solidity:1.0 | 1000 |
-| mythril | scanner-mythril | 0.2.7 | scanner-base-solidity:1.1.0-b49e3f10 | 1000 |
+| mythril | scanner-mythril | 0.2.9 | scanner-base-solidity:1.1.0-b49e3f10 | 1000 |
 | vyper | scanner-vyper | 0.3.5 | python:3.11-slim | 1000 |
 | moccasin | scanner-moccasin | 0.3.4 | python:3.11-slim | 1000 |
 | sol-azy | scanner-sol-azy | 0.5.0 | rust:1.88-bookworm | 1000 |
@@ -474,7 +474,7 @@ pytest tests/regression/test_job_name_collision.py -v
 
 **Root cause:** wake's scanner wrapper does `curl --retry 3 --retry-all-errors` on the callback. When the K8s Job cleanup detects the pod as Failed (backoff_limit or activeDeadlineSeconds), `result_collector.py:315` POSTs a `status=failed, error="Job failed after all retries"` callback. Pre-0.43.1, api-service unconditionally overwrote `scan.status`, clobbering the earlier `completed` state.
 
-**Fix (shipped in api-service 0.43.1):** `store_scan_results` has a terminal-state guard at the top — if `scan.status == "completed"` and incoming `results.status == "failed"`, return HTTP 200 with `ignored: true, prior_status: "completed"` and do NOT modify the scan record. The first successful terminal callback wins.
+**Fix (api-service 0.43.1 — original arm; 0.43.4 — symmetric guard):** `store_scan_results` has a terminal-state guard at the top. The original arm (0.43.1) rejects `failed`-after-`completed` callbacks. The symmetric arm (0.43.4, Task #182) also rejects `completed`-after-`failed` callbacks, eliminating the inverse race where the result_collector's failure POST lands first and the wrapper's success POST arrives second and silently flips the state. First terminal callback wins in both directions.
 
 **How to detect the guard firing in logs:**
 ```bash
@@ -484,10 +484,13 @@ kubectl logs -n api-service-prod -l app.kubernetes.io/name=api-service --tail=10
 
 Each log line is one prevented overwrite — these are informational, not errors.
 
-**What is allowed (the guard only blocks `completed → failed`):**
-- `queued → completed` / `queued → failed` — first terminal callback wins
+**What the guard blocks (as of api-service:0.43.4, symmetric guard):**
+- `completed → failed` — rejected; first terminal callback wins (original BSO-BUG-170 arm)
+- `failed → completed` — rejected; first terminal callback wins (symmetric arm added 2026-05-03, Task #182)
+
+**What is allowed:**
+- `queued → completed` / `queued → failed` — first terminal callback accepted
 - `completed → completed` — multi-scanner accumulation via `scan.critical_count += ...` is intact
-- `failed → completed` — legitimate recovery (rare)
 - `failed → failed` — idempotent no-op
 
 **Live verification if you suspect a regression:**
@@ -504,6 +507,8 @@ curl -sS -X POST https://app.0xapogee.com/api/v1/scans/$SCAN_ID/results \
 ---
 
 ### Issue 13: Mythril urllib3 NameResolutionError on solc-bin.ethereum.org
+
+**Status: Resolved at scanner-mythril:0.2.7**
 
 **Symptoms (pre-scanner-mythril:0.2.7):**
 - Mythril Job exits non-zero
@@ -539,10 +544,54 @@ kubectl get pod -n tool-integration-prod \
 ```bash
 kubectl get configmap scanner-versions -n tool-integration-prod \
   -o jsonpath='{.data.SCANNER_IMAGE_MYTHRIL}'
-# Expected: .../scanner-mythril:0.2.7 (or higher)
+# Expected: .../scanner-mythril:0.2.9
 ```
 
-**Scope:** Fixed for single-file Hardhat+OZ contracts as of 0.2.7. Multi-file Hardhat projects remain unstable (Task #182).
+**Scope:** Fixed for single-file Hardhat+OZ contracts as of 0.2.7. Multi-file Hardhat projects OOMKill mythril's z3 solver at the 2Gi container memory limit — see Issue 14.
+
+---
+
+### Issue 14: Mythril OOMKilled on Multi-File Hardhat/Foundry Projects
+
+**Status: Known limitation — single-file use only. Auto-skip on multi-file tracked as Task #183 (post-launch).**
+
+**Symptoms:**
+- Mythril Job fails for multi-file Hardhat or Foundry projects (2+ contract files)
+- Scan record shows `status=failed` with `error_message=null`
+- `kubectl get events` shows OOMKilling:
+  ```
+  OOMKilling  Killed process myth ... total-vm:3012952kB, anon-rss:2088632kB
+  ```
+- Single-file contracts against the same project framework succeed
+
+**Root cause:** Mythril's z3 SMT solver memory grows exponentially with symbolic branches, not linearly with code size. Multi-file analysis runs z3 sequentially per file; the combined resident set exceeds the 2Gi `tool-integration-prod` LimitRange `max.memory` hard cap even on small contracts (~118 LOC). Real customer DeFi contracts would OOM worse.
+
+**This is NOT a misconfiguration.** The 2Gi cap is deliberate. Bumping it further would require a deliberate namespace-wide LimitRange change and would still not guarantee mythril completes on realistic contracts.
+
+**Why `error_message` is null:** The pod is hard-killed by the kernel (SIGKILL via memory cgroup) mid-execution. The wrapper's `exit 0` path — which writes the summary `error` field the api-service schema reads — is never reached. The EXIT trap's fallback fires, but it emits the `errors` array only, which the `ScanResults` Pydantic schema silently drops (it declares `error: Optional[str]`, not an array). This is cosmetic — the scan correctly reaches `failed` status.
+
+**Diagnosis:**
+
+```bash
+# Check OOMKill events for a mythril Job pod
+kubectl get events -n tool-integration-prod \
+  --field-selector involvedObject.kind=Pod \
+  | grep -E "scan-mythril-<scan-id-prefix>|OOMKill"
+
+# Confirm scan status and missing error_message via API
+curl -sk https://app.0xapogee.com/api/v1/scans/<scan_id> \
+  -H "Authorization: Bearer $TOKEN" | jq '{status, error_message}'
+# Expected: {"status": "failed", "error_message": null}
+
+# Confirm the scanner image version is current
+kubectl get configmap scanner-versions -n tool-integration-prod \
+  -o jsonpath='{.data.SCANNER_IMAGE_MYTHRIL}'
+# Expected: .../scanner-mythril:0.2.9
+```
+
+**Resolution for operators:** Instruct the user to scan against a single-file entry-point contract, or to use any of the other six Solidity scanners (slither, aderyn, wake, halmos, echidna, medusa), all of which handle multi-file projects correctly and cover mythril's detector classes.
+
+**Post-launch fix (Task #183):** The KJM will gate on `contract.is_multi_file == True` or `contract.file_count > 1` and mark mythril as `skipped` (not `failed`) with reason "skipped: mythril requires single-file contracts at current memory budget". The dashboard will display `skipped` distinctly from `failed`.
 
 ---
 

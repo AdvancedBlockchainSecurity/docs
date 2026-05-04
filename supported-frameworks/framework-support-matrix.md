@@ -26,7 +26,7 @@ Apogee automatically detects your project framework based on configuration files
 | **Echidna** | Full | Full | Full | Hardhat → Foundry conversion. Note: only finds issues on contracts with `echidna_*` invariant tests. |
 | **Halmos** | Full | Full | Full | Symbolic execution. Hardhat → Foundry conversion. OZ 5.x bundled. |
 | **Wake** | Full | Full | Full | Hardhat → Foundry conversion. OZ 5.x bundled. |
-| **Mythril** | Full | Full | Limited | Symbolic execution. Single-file and Foundry projects work fully. Hardhat projects importing `@openzeppelin/contracts/...` work correctly as of scanner-mythril:0.2.7 (Task #176 — solc Standard JSON remapping via `--solc-json`). Multi-file Hardhat projects (2+ contracts) remain unstable at 2Gi memory (Task #182, filed). |
+| **Mythril** | Full | Single-file only | Single-file only | Symbolic execution. **Multi-file projects are not currently supported** — mythril's z3 SMT solver consistently OOMs at the 2Gi per-container memory limit on multi-file Hardhat/Foundry projects (verified post-Task #182 fix). Single-file and single-entry-point projects work fully, including Hardhat projects importing `@openzeppelin/contracts/...` (Task #176 — solc Standard JSON remapping via `--solc-json`). Multi-file scans terminate cleanly in one attempt (Task #182 eliminated the prior 4× backoff retry pattern) but fail with `status=failed`. The other 6 Solidity scanners (slither, aderyn, wake, halmos, echidna, medusa) handle multi-file projects fine. Auto-skip on multi-file projects is tracked as Task #183 (post-launch). |
 | **Medusa** | Full | Full | Full | Hardhat → Foundry conversion. Note: only finds issues on contracts with property-test invariants. |
 | **Securify2** | Full | Limited | Limited | Academic tool, limited project support |
 
@@ -40,7 +40,7 @@ Apogee automatically detects your project framework based on configuration files
 | Echidna | Yes | Yes | Yes | Yes |
 | Halmos | Yes | Yes | Yes | Yes |
 | Wake | Partial | Partial | Partial | Yes |
-| Mythril | Limited | No | No | Limited |
+| Mythril | Single-file | Single-file | Single-file | Single-file only (Task #182) |
 
 ## Foundry Support Details
 
@@ -224,6 +224,7 @@ File limits apply **after** smart dependency extraction:
 |---------|------|---------|
 | 1.0.0 | Nov 27, 2025 | Initial framework support (Foundry + Hardhat) |
 | 1.1.0 | Apr 29, 2026 | Mythril Hardhat+OZ single-file fixed (Task #176); multi-file Hardhat limitation noted (Task #182) |
+| 1.2.0 | May 3, 2026 | Mythril multi-file resilience shipped (Task #182, scanner-mythril:0.2.9 — eliminates 4× backoff retry, definitive terminal status in 1 attempt). Multi-file remains explicitly unsupported pending auto-skip implementation (Task #183, post-launch). |
 
 ---
 
