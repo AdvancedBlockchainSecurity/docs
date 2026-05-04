@@ -1,6 +1,6 @@
 # Playbook: Scanner Pipeline Troubleshooting
 
-**Version:** 1.4.0
+**Version:** 1.5.0
 **Last Updated:** 2026-05-03
 
 ## Overview
@@ -370,12 +370,66 @@ kubectl logs -n tool-integration-prod job/scan-trident-<scan_id> | grep -E "fail
 
 ---
 
+### Issue 15: Aderyn/Slither Foundry+OZ Silent-Pass (Resolved 2026-05-03)
+
+**Status: Resolved at scanner-aderyn:0.8.4 / scanner-slither:0.4.6**
+
+**Symptoms (pre-fix):**
+- Foundry project with `@openzeppelin/contracts/` imports scans to `vulnerabilities:[]`.
+- `status` is `completed`, `error_message` is `null`.
+- The same contract compiled locally by `forge build` shows issues. Re-scanning does not change the result.
+- Aderyn and slither both affected; mythril, wake, halmos, echidna, medusa Foundry branches are not yet patched (tracked for follow-up).
+
+**Diagnosis — confirm this is the OZ remapping gap:**
+
+```bash
+# 1. Retrieve the scan result and confirm empty findings with no error.
+curl -sk https://app.0xapogee.com/api/v1/scans/<scan_id> \
+  -H "Authorization: Bearer $TOKEN" | jq '{status, error_message, critical_count, high_count, medium_count, low_count}'
+# Expected pattern: status=completed, error_message=null, all counts=0
+
+# 2. Retrieve the contract and confirm it has OZ imports.
+curl -sk https://app.0xapogee.com/api/v1/contracts/<contract_id> \
+  -H "Authorization: Bearer $TOKEN" | jq '.framework'
+# If framework=foundry, check source files for @openzeppelin/contracts/ imports.
+
+# 3. Confirm the scanner image version is pre-fix.
+kubectl get configmap scanner-versions -n tool-integration-prod \
+  -o jsonpath='{.data.SCANNER_IMAGE_ADERYN}'
+# Pre-fix: ...scanner-aderyn:0.8.3 or earlier → fix not deployed
+# Post-fix: ...scanner-aderyn:0.8.4 → fix is deployed
+```
+
+**Root cause:** Both `run-aderyn.sh` and `run-slither.sh` Foundry-project branches detected an existing `foundry.toml` and patched `offline = true` plus optimizer format, but did not add an OpenZeppelin remapping. Real customer Foundry projects that use `@openzeppelin/contracts/` via npm (not `forge install`) ship no remappings in `foundry.toml` because Foundry resolves from `node_modules` locally — a directory not present in the scanner workspace. Without the remapping, `forge build` silently compiled a partial AST (OZ inheritance chain missing), the scanner found 0 issues, and the wrapper POSTed a false-pass.
+
+**Resolution:** Upgrade to scanner-aderyn:0.8.4 and scanner-slither:0.4.6. Both wrappers now append `@openzeppelin/contracts/=/opt/openzeppelin/v5/` to a local `remappings.txt` in the project workspace when (a) `@openzeppelin/contracts/` imports are detected in `.sol` files AND (b) `foundry.toml` does not already declare a remapping for that prefix. The `remappings.txt` approach is non-destructive (the customer's `foundry.toml` is unchanged), respects user-declared remappings (which take precedence over `remappings.txt`), and is idempotent.
+
+**Verify fix is deployed:**
+
+```bash
+# Check aderyn
+kubectl get configmap scanner-versions -n tool-integration-prod \
+  -o jsonpath='{.data.SCANNER_IMAGE_ADERYN}'
+# Expected: .../scanner-aderyn:0.8.4
+
+# Check slither
+kubectl get configmap scanner-versions -n tool-integration-prod \
+  -o jsonpath='{.data.SCANNER_IMAGE_SLITHER}'
+# Expected: .../scanner-slither:0.4.6
+```
+
+**Scope:** Applies to Foundry projects importing `@openzeppelin/contracts/` v5.0.2 (bundled in the base image at `/opt/openzeppelin/v5/`). Projects that already declare `@openzeppelin/contracts/` in `foundry.toml` remappings (e.g., vendored via `forge install` pointing to `lib/openzeppelin-contracts/`) are unaffected — their remapping takes precedence and the injection is skipped. The same gap exists in the wake, halmos, echidna, and medusa Foundry branches; those scanners' fuzzing/symbolic analysis types surface compile failures differently and are tracked separately.
+
+**TaskDoc:** `TaskDocs-BlockSecOps/scanners/task-179-aderyn-slither-foundry-oz-silent-fail-2026-05-03.md`
+
+---
+
 ## Scanner Image Version Reference
 
 | Scanner | Image | Version | Base | UID |
 |---------|-------|---------|------|-----|
-| slither | scanner-slither | 0.4.0 | scanner-base-solidity:1.0 | 1000 |
-| aderyn | scanner-aderyn | 0.8.1 | scanner-base-solidity:1.0 | 1000 |
+| slither | scanner-slither | 0.4.6 | scanner-base-solidity:1.1.0-b49e3f10 | 1000 |
+| aderyn | scanner-aderyn | 0.8.4 | scanner-base-solidity:1.1.0-b49e3f10 | 1000 |
 | semgrep | scanner-semgrep | 0.3.11 | python:3.11-slim | 1000 |
 | solhint | scanner-solhint | 0.1.13 | node:20-alpine | 1000 (node) |
 | wake | scanner-wake | 0.5.0 | scanner-base-solidity:1.0 | 1000 |
