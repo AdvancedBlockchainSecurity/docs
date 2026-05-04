@@ -166,7 +166,7 @@ Update the `default_images` dict. This is a fallback when ConfigMap is unavailab
 ```python
 default_images = {
     "slither": "harbor.blocksecops.local/blocksecops/scanner-slither:0.3.0",
-    "mythril": "harbor.blocksecops.local/blocksecops/scanner-mythril:0.4.1",
+    "mythril": "harbor.blocksecops.local/blocksecops/scanner-mythril:0.2.9",
     # ... more scanners
 }
 ```
