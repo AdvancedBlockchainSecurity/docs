@@ -370,15 +370,15 @@ kubectl logs -n tool-integration-prod job/scan-trident-<scan_id> | grep -E "fail
 
 ---
 
-### Issue 15: Aderyn/Slither Foundry+OZ Silent-Pass (Resolved 2026-05-03)
+### Issue 15: Aderyn/Slither Foundry+OZ Silent-Pass (Resolved 2026-05-03; sweep extended to wake/echidna/medusa/soliditydefend 2026-05-04)
 
-**Status: Resolved at scanner-aderyn:0.8.4 / scanner-slither:0.4.6**
+**Status: Resolved at scanner-aderyn:0.8.5 / scanner-slither:0.4.7 / scanner-wake:0.5.8 / scanner-echidna:0.5.4 / scanner-medusa:0.4.4 / scanner-soliditydefend:0.9.10**
 
 **Symptoms (pre-fix):**
 - Foundry project with `@openzeppelin/contracts/` imports scans to `vulnerabilities:[]`.
 - `status` is `completed`, `error_message` is `null`.
 - The same contract compiled locally by `forge build` shows issues. Re-scanning does not change the result.
-- Aderyn and slither both affected; mythril, wake, halmos, echidna, medusa Foundry branches are not yet patched (tracked for follow-up).
+- Originally surfaced for aderyn and slither. Static re-audit on 2026-05-04 swept the same fix into wake, echidna, medusa, and soliditydefend Foundry branches. The wake sweep introduced regression #192 — see Issue 16 below for the wake-specific follow-up.
 
 **Diagnosis — confirm this is the OZ remapping gap:**
 
@@ -402,25 +402,80 @@ kubectl get configmap scanner-versions -n tool-integration-prod \
 
 **Root cause:** Both `run-aderyn.sh` and `run-slither.sh` Foundry-project branches detected an existing `foundry.toml` and patched `offline = true` plus optimizer format, but did not add an OpenZeppelin remapping. Real customer Foundry projects that use `@openzeppelin/contracts/` via npm (not `forge install`) ship no remappings in `foundry.toml` because Foundry resolves from `node_modules` locally — a directory not present in the scanner workspace. Without the remapping, `forge build` silently compiled a partial AST (OZ inheritance chain missing), the scanner found 0 issues, and the wrapper POSTed a false-pass.
 
-**Resolution:** Upgrade to scanner-aderyn:0.8.4 and scanner-slither:0.4.6. Both wrappers now append `@openzeppelin/contracts/=/opt/openzeppelin/v5/` to a local `remappings.txt` in the project workspace when (a) `@openzeppelin/contracts/` imports are detected in `.sol` files AND (b) `foundry.toml` does not already declare a remapping for that prefix. The `remappings.txt` approach is non-destructive (the customer's `foundry.toml` is unchanged), respects user-declared remappings (which take precedence over `remappings.txt`), and is idempotent.
+**Resolution:** Upgrade to scanner-aderyn:0.8.5 and scanner-slither:0.4.7 (initial fix) and the 2026-05-04 sweep at scanner-echidna:0.5.4, scanner-medusa:0.4.4, and scanner-soliditydefend:0.9.10. Each wrapper now appends `@openzeppelin/contracts/=/opt/openzeppelin/v5/` to a local `remappings.txt` in the project workspace when (a) `@openzeppelin/contracts/` imports are detected in `.sol` files AND (b) `foundry.toml` does not already declare a remapping for that prefix. The `remappings.txt` approach is non-destructive (the customer's `foundry.toml` is unchanged), respects user-declared remappings (which take precedence over `remappings.txt`), and is idempotent.
+
+The wake variant of this fix is implemented differently because wake uses its own `wake compile` rather than `forge build` — see Issue 16.
 
 **Verify fix is deployed:**
 
 ```bash
-# Check aderyn
+# Check aderyn / slither (initial)
 kubectl get configmap scanner-versions -n tool-integration-prod \
   -o jsonpath='{.data.SCANNER_IMAGE_ADERYN}'
-# Expected: .../scanner-aderyn:0.8.4
+# Expected: .../scanner-aderyn:0.8.5
 
-# Check slither
 kubectl get configmap scanner-versions -n tool-integration-prod \
   -o jsonpath='{.data.SCANNER_IMAGE_SLITHER}'
-# Expected: .../scanner-slither:0.4.6
+# Expected: .../scanner-slither:0.4.7
+
+# Check sweep targets (2026-05-04)
+kubectl get configmap scanner-versions -n tool-integration-prod \
+  -o jsonpath='{.data.SCANNER_IMAGE_WAKE}'
+# Expected: .../scanner-wake:0.5.8 (see Issue 16 for wake-specific notes)
+
+kubectl get configmap scanner-versions -n tool-integration-prod \
+  -o jsonpath='{.data.SCANNER_IMAGE_ECHIDNA}'
+# Expected: .../scanner-echidna:0.5.4
+
+kubectl get configmap scanner-versions -n tool-integration-prod \
+  -o jsonpath='{.data.SCANNER_IMAGE_MEDUSA}'
+# Expected: .../scanner-medusa:0.4.4
+
+kubectl get configmap scanner-versions -n tool-integration-prod \
+  -o jsonpath='{.data.SCANNER_IMAGE_SOLIDITYDEFEND}'
+# Expected: .../scanner-soliditydefend:0.9.10
 ```
 
-**Scope:** Applies to Foundry projects importing `@openzeppelin/contracts/` v5.0.2 (bundled in the base image at `/opt/openzeppelin/v5/`). Projects that already declare `@openzeppelin/contracts/` in `foundry.toml` remappings (e.g., vendored via `forge install` pointing to `lib/openzeppelin-contracts/`) are unaffected — their remapping takes precedence and the injection is skipped. The same gap exists in the wake, halmos, echidna, and medusa Foundry branches; those scanners' fuzzing/symbolic analysis types surface compile failures differently and are tracked separately.
+**Scope:** Applies to Foundry projects importing `@openzeppelin/contracts/` v5.0.2 (bundled in the base image at `/opt/openzeppelin/v5/`). Projects that already declare `@openzeppelin/contracts/` in `foundry.toml` remappings (e.g., vendored via `forge install` pointing to `lib/openzeppelin-contracts/`) are unaffected — their remapping takes precedence and the injection is skipped. The same gap was present in the wake, echidna, medusa, and soliditydefend Foundry branches and was closed in the 2026-05-04 sweep (see Issue 16 for the wake-specific regression and target_version follow-up). halmos's scanner architecture is symbolic-execution-only and does not run a compile-then-analyze pipeline; it is not affected.
 
-**TaskDoc:** `TaskDocs-BlockSecOps/scanners/task-179-aderyn-slither-foundry-oz-silent-fail-2026-05-03.md`
+**TaskDoc:** `TaskDocs-BlockSecOps/scanners/task-179-aderyn-slither-foundry-oz-silent-fail-2026-05-03.md` (original); sweep follow-up captured in `TaskDocs-BlockSecOps/audit-2026-05-04-scanner-full-reaudit.md`.
+
+---
+
+### Issue 16: Wake target_version + NetworkPolicy Egress (Resolved 2026-05-05)
+
+**Status: Resolved at scanner-wake:0.5.8**
+
+**Symptoms (pre-fix):**
+
+Two distinct symptom shapes depending on the wake version:
+
+1. wake 0.5.6 (post-Issue-15 sweep, pre-#192 fix): Foundry+OZ projects scanned to `status: failed` with a parser/compile error in `error_message`. This was a regression — the same project on wake 0.5.5 had silently false-passed with `status: completed, vulnerabilities:[]`.
+2. wake 0.5.7 (#192 first attempt, broken): Foundry+OZ projects scanned to `status: failed` with a network resolution error referencing `binaries.soliditylang.org`. The scanner pod attempted an outbound HTTPS call that the namespace's `default-deny-all` NetworkPolicy egress block (correctly) refused.
+
+**Root Cause:**
+
+Wake's compile pipeline differs from forge's. When wake encounters Solidity sources without a wake-native config, it falls back to refreshing its solc-list metadata over the network (via `aiohttp` to `binaries.soliditylang.org`). In the scanner namespace this is blocked by NetworkPolicy egress rules — by design, since scanner pods must not exfiltrate customer source code or pull arbitrary remote artifacts at scan time.
+
+The Issue-15 sweep added `remappings.txt` to wake's Foundry branch under the assumption that wake would benefit from the same `forge build` resolution improvement aderyn/slither got. Wake's compile pipeline is not driven by `forge build`, so the remappings.txt change had no positive effect — it merely surfaced wake's pre-existing parser sensitivity to fully-resolved OZ inheritance chains as a hard failure rather than a silent zero-finding pass.
+
+The 0.5.7 attempted fix wrote a `wake.toml` with the OZ remapping but no `target_version`. Wake interpreted the absent `target_version` as "you haven't told me which solc to use, let me ask binaries.soliditylang.org" — which the NetworkPolicy egress block correctly denied.
+
+**Resolution:**
+
+Wake 0.5.8's `wake-scan` wrapper writes a `wake.toml` with both `target_version` (matching the `SOLC_VERSION` env var, default `0.8.20`) and the OZ remapping when the project imports OZ and no `wake.toml` exists. With `target_version` set, wake's compile pipeline skips the metadata refresh entirely and uses the seeded compilers in `~/.local/share/wake/compilers/`, populated at image build time from `/opt/wake-compilers/`. Compile is fully offline and NetworkPolicy-compliant.
+
+**Verify fix is deployed:**
+
+```bash
+kubectl get configmap scanner-versions -n tool-integration-prod \
+  -o jsonpath='{.data.SCANNER_IMAGE_WAKE}'
+# Expected: .../scanner-wake:0.5.8
+```
+
+**Scope:** Applies to Foundry+OZ projects scanned by wake. Projects shipping their own `wake.toml` are unaffected — the wrapper's write is gated on `wake.toml` not existing. Scanner-namespace NetworkPolicy egress rules remain intact (no allowlist for soliditylang.org); the fix is "don't make the call," not "let the call out."
+
+**TaskDoc:** `TaskDocs-BlockSecOps/audit-2026-05-05-wake-target-version-regression.md`.
 
 ---
 
@@ -428,23 +483,23 @@ kubectl get configmap scanner-versions -n tool-integration-prod \
 
 | Scanner | Image | Version | Base | UID |
 |---------|-------|---------|------|-----|
-| slither | scanner-slither | 0.4.6 | scanner-base-solidity:1.1.0-b49e3f10 | 1000 |
-| aderyn | scanner-aderyn | 0.8.4 | scanner-base-solidity:1.1.0-b49e3f10 | 1000 |
-| semgrep | scanner-semgrep | 0.3.11 | python:3.11-slim | 1000 |
+| slither | scanner-slither | 0.4.7 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
+| aderyn | scanner-aderyn | 0.8.5 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
+| semgrep | scanner-semgrep | 0.3.12 | python:3.11-slim | 1000 |
 | solhint | scanner-solhint | 0.1.13 | node:20-alpine | 1000 (node) |
-| wake | scanner-wake | 0.5.0 | scanner-base-solidity:1.0 | 1000 |
+| wake | scanner-wake | 0.5.8 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
 | soliditydefend | scanner-soliditydefend | 0.9.9 | debian:bookworm-slim (Rust builder) | 1000 |
-| echidna | scanner-echidna | 0.5.1 | scanner-base-solidity:1.0 | 1000 |
-| halmos | scanner-halmos | 0.4.1 | scanner-base-solidity:1.0 | 1000 |
-| medusa | scanner-medusa | 0.4.1 | scanner-base-solidity:1.0 | 1000 |
-| mythril | scanner-mythril | 0.2.9 | scanner-base-solidity:1.1.0-b49e3f10 | 1000 |
+| echidna | scanner-echidna | 0.5.4 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
+| halmos | scanner-halmos | 0.4.3 | scanner-base-solidity:1.1.0-b49e3f10 | 1000 |
+| medusa | scanner-medusa | 0.4.4 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
+| mythril | scanner-mythril | 0.2.9 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
 | vyper | scanner-vyper | 0.3.5 | python:3.11-slim | 1000 |
-| moccasin | scanner-moccasin | 0.3.4 | python:3.11-slim | 1000 |
-| sol-azy | scanner-sol-azy | 0.5.0 | rust:1.88-bookworm | 1000 |
-| sec3-xray | scanner-sec3-xray | 0.4.0 | ghcr.io/sec3-product/x-ray:v0.0.6 | 1000 |
-| trident | scanner-trident | 0.4.0 | rust:1.88-bookworm | 1000 |
-| cargo-fuzz-solana | scanner-cargo-fuzz-solana | 0.4.0 | rust:1.85-bookworm + nightly | 1000 |
-| rustdefend | scanner-rustdefend | 0.4.5 | debian:bookworm-slim | 1000 |
+| moccasin | scanner-moccasin | 0.3.3 | python:3.11-slim | 1000 |
+| sol-azy | scanner-sol-azy | 0.5.1 | rust:1.88-bookworm | 1000 |
+| sec3-xray | scanner-sec3-xray | 0.4.1 | ghcr.io/sec3-product/x-ray:v0.0.6 | 1000 |
+| trident | scanner-trident | 0.4.2 | rust:1.88-bookworm | 1000 |
+| cargo-fuzz-solana | scanner-cargo-fuzz-solana | 0.4.2 | rust:1.85-bookworm + nightly | 1000 |
+| rustdefend | scanner-rustdefend | 0.4.6 | debian:bookworm-slim | 1000 |
 
 ---
 
