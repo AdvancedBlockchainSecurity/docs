@@ -479,6 +479,163 @@ kubectl get configmap scanner-versions -n tool-integration-prod \
 
 ---
 
+### Issue 17: Six cluster-verified scanner failure modes (Resolved 2026-05-06)
+
+**Status:**
+- scanner-trident: **0.4.3**
+- scanner-cargo-fuzz-solana: **0.4.3**
+- scanner-medusa: **0.4.5**
+- scanner-mythril: **0.2.10**
+- tool-integration: **0.6.28** (KJM `_should_skip_scanner` gate; Task #183 implemented)
+- api-service: **0.43.6** (blob-import validation; completed-with-error preservation)
+
+The 2026-05-05 production audit (97 scans across 17 scanners × 11 fixture types) surfaced six cluster-verified failure modes. All six fixed in this round.
+
+#### F1 — trident: opaque "Anchor build failed" message
+
+**Symptoms (pre-fix):** `error_message: "Anchor build failed"` with no diagnostic data on 3 of 4 anchor fixtures.
+
+**Root cause:** `scanner-images/trident/trident-scan` did `anchor build 2>&1` which routed both stdout and stderr to pod stdout. The actual `cargo build` / `anchor` error (toolchain mismatch, missing `provider` in Anchor.toml, `overflow-checks` not enabled, etc.) was lost — only the generic message reached the customer.
+
+**Fix:** Capture build output to a tempfile (`BUILD_LOG=$(mktemp)`), surface the last 250 chars (newline-stripped, length-bounded) in `update_status` error message. `exit 1 → exit 0` so K8s doesn't backoff-retry on a known failure (status is already POSTed).
+
+Pattern mirrors the slither/aderyn forge-build-attribution fix from PR #168.
+
+**Verify:**
+```bash
+kubectl get configmap scanner-versions -n tool-integration-prod \
+  -o jsonpath='{.data.SCANNER_IMAGE_TRIDENT}'
+# Expected: scanner-trident:0.4.3
+```
+
+After fix, customers see actual build errors:
+- `Anchor build failed (exit 1): Error: \`overflow-checks\` is not enabled. To enable, add: [profile.release] overflow-checks = true in workspace root Cargo.toml`
+- `Anchor build failed (exit 1): Error: Unable to deserialize config: TOML parse error at line 1, column 1 | 1 | [features] | ^ missing field \`provider\``
+
+#### F2 — cargo-fuzz-solana: Cargo.toml only checked at root
+
+**Symptoms (pre-fix):** Workspace anchor projects with `Cargo.toml` in `programs/<crate>/` rejected with `Not a Rust project - cargo-fuzz requires Cargo.toml`.
+
+**Root cause:** `scanner-images/cargo-fuzz-solana/cargo-fuzz-solana-scan:146` checked `[ ! -f "$WORK_DIR/Cargo.toml" ]` — root only. Anchor workspace projects ship Cargo.toml inside `programs/<crate>/`.
+
+**Fix:** Tree-walk up to depth 3 with `find -maxdepth 3 -name Cargo.toml -type f`. Accept the project if any nested Cargo.toml is found. Do **not** rebind `$WORK_DIR` — vendor seeding + Rust-file discovery use absolute path, and cargo's own resolver finds nested crates from the root once any Cargo.toml exists.
+
+#### F3 — medusa: bash heredoc emits invalid JSON when fuzz vars are empty
+
+**Symptoms (pre-fix):** `error_message: "Medusa produced no valid output — check scanner logs"` on Foundry projects without property-test invariants.
+
+**Root cause:** `scanner-images/medusa/medusa-scan:402-427` used a bash heredoc with raw shell-variable interpolation to construct the result JSON. When fuzz vars (`TESTS_RUN`, `COVERAGE_PERCENT`, etc.) were empty, the heredoc emitted invalid JSON like `"tests_executed": ,` — the EXIT-trap `jq empty` validator rejected it and the post_callback fallback fired with the opaque error message. **Pre-existing bug since 2025-10-15** (medusa's first import); echidna got the equivalent jq-based rewrite in 2026-04-14, medusa was missed.
+
+**Fix:** Replace the heredoc with `jq -n --arg/--argjson` (matches echidna pattern). Schema is identical field-by-field. `${VAR:-0}` defaults guard against unset vars. If jq fails, OUTPUT_FILE is removed so EXIT-trap fallback fires with a clear error.
+
+#### F4 — mythril: opaque `exit_1` per-file failure code
+
+**Symptoms (pre-fix):** `error_message: "/contracts/contract.sol:exit_1"` on single-file Solidity 0.8.20 scans. Operators couldn't tell whether the cause was timeout, OOMKill, or analysis crash without pulling pod logs.
+
+**Root cause:** `scanner-images/mythril/run-mythril.sh` per-file failure tracking (Task #182) used `FILE_FAIL_REASON="exit_${MYTH_EXIT}"` for any non-timeout failure. This was opaque diagnostic data.
+
+**Fix:** Refine the case statement to surface known exit codes:
+- `124` → `timeout` (existing — preserved)
+- `137` → `oomkill_${MYTHRIL_MEMORY_LIMIT_MB:-2048}MB`
+- `1` → `exit_1_check_pod_logs`
+- other → `exit_${MYTH_EXIT}` (fallback preserved)
+
+#### F5 — mythril multi-file Hardhat: structurally OOMs at 2Gi (Task #183)
+
+**Symptoms (pre-fix):** mythril on multi-file Hardhat projects ran for ~5-15 minutes then OOMKilled with `error_message: "exit_1 on <file>.sol"`. Customer paid for compute that was structurally guaranteed to fail.
+
+**Root cause:** mythril's z3 SMT solver memory grows exponentially with code branches. Multi-file Hardhat fixtures consistently exceed the 2Gi container limit. Verified Task #182 on 2026-05-03; Task #183 filed for the auto-skip implementation.
+
+**Fix (Task #183):** New `_should_skip_scanner()` helper in `tool-integration/src/scanners/kubernetes_job_manager.py` plus a dispatch hook in `src/main.py`. The gate fires when `scanner == "mythril" AND framework == "hardhat" AND file_count > 1`, returns `(True, reason)` to the dispatcher, and the dispatcher fires a synthetic terminal callback with `status: "completed"`, `error: "<gate reason>"`, `vulnerabilities: []`. Detection is canonical config-file based (any `hardhat.config.{js,ts,cjs,mjs}` triggers Hardhat detection) — no api-service coordination required.
+
+**Why `status: "completed"` instead of `"failed"`:** the api-service first-terminal-wins guard at `scans.py:2317` (BSO-BUG-170 symmetric, Task #182) blocks subsequent successful scanner callbacks once any scanner reports failed first. Sending failed for the gate would break multi-scanner scans that include mythril alongside slither/wake/etc — the other scanners would complete fine but the scan would stay stuck at "failed" with 0 findings. Sending completed-with-populated-error preserves both:
+- The customer sees a successful scan with the other scanners' findings aggregated
+- The error_message communicates that mythril was skipped and why
+- Customers can still re-trigger the scan without mythril, or use one of the alternatives suggested
+
+This required a complementary api-service change (see below) to preserve the error from completed-with-warning callbacks.
+
+**Synthetic callback payload (tool-integration → api-service):**
+```json
+{
+  "scanner": "mythril",
+  "status": "completed",
+  "error": "mythril does not support multi-file Hardhat projects (z3 SMT solver memory ceiling at 2Gi). Use slither, aderyn, wake, halmos, echidna, or medusa for multi-file coverage.",
+  "vulnerabilities": []
+}
+```
+
+The synthetic callback is fire-and-forget (`asyncio.create_task`) — the dispatch trigger returns HTTP 200 immediately so the api-service `/api/v1/scans` request doesn't time out at the Cloudflare 100s edge timeout while waiting for tool-integration.
+
+#### F6 — api-service blob URLs with relative imports
+
+**Symptoms (pre-fix):** `POST /api/v1/contracts/from-github` with a blob URL of a `.sol` file containing `import "./IERC20.sol";` succeeded; downstream scanners (especially mythril) then choked with confusing `ParserError: Source IERC20.sol not found` because `fetch_blob()` retrieves only the single file.
+
+**Root cause:** Per `docs/workflows/contract-ingest-workflow.md` §3, the platform's design separates ingest paths: blob = single self-contained file, tree = directory. A blob URL with relative imports violates this boundary. The fetcher had no validation, so the violation cascaded into a confusing scanner error.
+
+**Fix:** Validate at upload time. After `fetch_blob()` returns source code, scan `.sol`/`.vy` files for line-anchored relative-import patterns:
+```python
+re.search(r'^\s*import\s+["\']\.\.?/[^"\']+["\']', source_code, flags=re.MULTILINE)
+```
+
+If matched, return HTTP 400 with error key `blob_has_relative_imports` and a message pointing to the canonical alternative paths (tree URL of parent directory; archive upload via `POST /api/v1/upload`). Absolute imports (`@openzeppelin/contracts/...`, `@uniswap/...`) are unaffected — pattern only matches `./` or `../` prefixes.
+
+#### Companion api-service change: error_message preservation
+
+**File:** `blocksecops-api-service/src/presentation/api/v1/endpoints/scans.py` `store_scan_results()`.
+
+**What changed:** the existing code at line 2335 only set `scan.error_message = results.error` when `results.status == "failed"`. The completed path didn't propagate `error` to the scan record. With the F5 KJM gate now sending `status: "completed"` with `error: <gate-reason>`, that path needed to preserve the error for customer visibility:
+
+```python
+if results.error and not scan.error_message:
+    scan.error_message = results.error
+```
+
+`not scan.error_message` keeps the first-non-empty-error-wins behavior (multiple gated scanners or gate + later scanner-with-warning don't clobber each other; first gate's reason wins).
+
+#### Verify all six fixes deployed
+
+```bash
+# Tool-integration
+kubectl get deployment tool-integration -n tool-integration-prod \
+  -o jsonpath='{.spec.template.spec.containers[0].image}'
+# Expected: ...tool-integration:0.6.28
+
+# api-service
+kubectl get deployment api-service -n api-service-prod \
+  -o jsonpath='{.spec.template.spec.containers[0].image}'
+# Expected: ...api-service:0.43.6
+
+# Scanner image versions
+for s in TRIDENT CARGO_FUZZ_SOLANA MEDUSA MYTHRIL; do
+  echo -n "$s: "
+  kubectl get configmap scanner-versions -n tool-integration-prod \
+    -o jsonpath="{.data.SCANNER_IMAGE_$s}"
+  echo
+done
+# Expected:
+#   TRIDENT: scanner-trident:0.4.3
+#   CARGO_FUZZ_SOLANA: scanner-cargo-fuzz-solana:0.4.3
+#   MEDUSA: scanner-medusa:0.4.5
+#   MYTHRIL: scanner-mythril:0.2.10
+```
+
+#### Cluster-verified production smoke test (2026-05-06)
+
+| Fix | Test fixture | Pre-fix | Post-fix |
+|---|---|---|---|
+| F1 | trident @ E2E-Rust-anchor-basic1-tree, rs_archive.tar, test-anchor-project.tar | `failed`, error_message: "Anchor build failed" | `failed`, error_message: actual `cargo build` / Anchor.toml error tail |
+| F2 | cargo-fuzz @ FIX3-Anchor-Escrow workspace | (control) | `completed` cleanly via workspace tree-walk |
+| F3 | medusa @ test-foundry-project (Foundry no-OZ) | `failed`, "Medusa produced no valid output" | `completed`, valid JSON output |
+| F4 | mythril @ TestA-VulnGood-0.8.20 (single-file) | `failed`, "exit_1" | `failed`, `exit_1_check_pod_logs` |
+| F5a | mythril @ hardhat-project-v2 (single-scanner) | `failed` after 5+ min OOMKill | `completed` 0 findings + actionable error_message |
+| F5b | mythril+slither+wake @ hardhat-project-v2 | scan stuck `failed` (slither/wake aggregation lost) | `completed` 17 findings (slither+wake) + gate error_message preserved |
+| F6 | `POST /contracts/from-github` blob with `import "./X.sol"` | downstream ParserError | HTTP 400 `blob_has_relative_imports` with tree-URL/archive guidance |
+
+**TaskDoc:** `TaskDocs-BlockSecOps/audit-2026-05-06-scanner-failure-fixes.md`.
+
+---
+
 ## Scanner Image Version Reference
 
 | Scanner | Image | Version | Base | UID |
@@ -491,14 +648,14 @@ kubectl get configmap scanner-versions -n tool-integration-prod \
 | soliditydefend | scanner-soliditydefend | 0.9.9 | debian:bookworm-slim (Rust builder) | 1000 |
 | echidna | scanner-echidna | 0.5.4 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
 | halmos | scanner-halmos | 0.4.3 | scanner-base-solidity:1.1.0-b49e3f10 | 1000 |
-| medusa | scanner-medusa | 0.4.4 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
-| mythril | scanner-mythril | 0.2.9 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
+| medusa | scanner-medusa | 0.4.5 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
+| mythril | scanner-mythril | 0.2.10 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
 | vyper | scanner-vyper | 0.3.5 | python:3.11-slim | 1000 |
 | moccasin | scanner-moccasin | 0.3.3 | python:3.11-slim | 1000 |
 | sol-azy | scanner-sol-azy | 0.5.1 | rust:1.88-bookworm | 1000 |
 | sec3-xray | scanner-sec3-xray | 0.4.1 | ghcr.io/sec3-product/x-ray:v0.0.6 | 1000 |
-| trident | scanner-trident | 0.4.2 | rust:1.88-bookworm | 1000 |
-| cargo-fuzz-solana | scanner-cargo-fuzz-solana | 0.4.2 | rust:1.85-bookworm + nightly | 1000 |
+| trident | scanner-trident | 0.4.3 | rust:1.88-bookworm | 1000 |
+| cargo-fuzz-solana | scanner-cargo-fuzz-solana | 0.4.3 | rust:1.85-bookworm + nightly | 1000 |
 | rustdefend | scanner-rustdefend | 0.4.6 | debian:bookworm-slim | 1000 |
 
 ---

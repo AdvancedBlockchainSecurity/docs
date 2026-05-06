@@ -107,6 +107,13 @@ curl -X POST https://app.0xapogee.com/api/v1/contracts/from-github \
 
 **Provenance benefit:** Anyone can independently verify which exact code was scanned by checking the repo at that commit.
 
+**Single-file blob constraint** (api-service 0.43.6+, audit follow-up F6 — 2026-05-06): blob URLs must point to a self-contained file. If the source contains relative imports (`./X.sol`, `../X.sol`, `./X.vy`, `../X.vy`), the upload is rejected with HTTP 400 `blob_has_relative_imports` and a message pointing to the correct ingest path:
+
+- Use the **tree URL of the parent directory** instead: `https://github.com/<owner>/<repo>/tree/<branch>/<dir>`
+- Or upload an **archive** containing the file and its siblings: `POST /api/v1/upload`
+
+Absolute imports (`@openzeppelin/contracts/...`, `@uniswap/...`) are unaffected — the validation only rejects path-relative imports the blob path cannot resolve.
+
 **Limits:** Same operational safety caps as archive upload (re-fetched per scan, not cached).
 
 ### 4. OAuth GitHub sync (private repos)
