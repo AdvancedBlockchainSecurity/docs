@@ -8,6 +8,100 @@ Each entry follows [Documentation Standards](../standards/documentation-standard
 
 ---
 
+## 2026-05-08 — wake P2-1 single-file perf fix
+
+**Scanner(s):** wake
+**Author:** Apogee
+**Services Affected:** blocksecops-tool-integration (scanner-wake image; ConfigMap; KJM default_images; regression test)
+**Image bump:** `scanner-wake:0.5.8 → 0.5.10` (0.5.9 was an intermediate buggy ordering — see note)
+**Pushed to:** `us-west1-docker.pkg.dev/project-8a2657b9-d96c-4c0a-a69/apogee/scanner-wake:0.5.10` digest `sha256:baf7667a...`
+
+### What changed
+
+In-cluster diagnostic (wake-debug-init Job, this date) showed `wake init --force` itself eagerly fetches solc-list metadata from `https://binaries.soliditylang.org/linux-amd64/list.json` AND `https://raw.githubusercontent.com/.../list.json` via wake's SVM module **before** producing `wake.toml`. Both requests are blocked by the scanner NetworkPolicy egress rule and time out after ~10s each with multiple retries — the dominant contributor to the ~480s single-file scan latency.
+
+The 0.5.8 fix (writing `wake.toml` with `target_version = $SOLC_VERSION`) was correct, but the write was gated on `grep -rqE @openzeppelin/contracts/` in two branches (Foundry+OZ at line ~199 and Hardhat-converted-Foundry at line ~268). Single-file scans, plain multi-file scans, and OZ-free Foundry/Hardhat projects fell through to the bare `wake init --force` path and triggered the network fetch in wake init itself.
+
+`scanner-images/wake/wake-scan` now writes a minimal `wake.toml` with `target_version` **before** the `wake init --force` invocation:
+
+```bash
+if [ ! -f wake.toml ]; then
+    cat > wake.toml <<EOF
+[compiler.solc]
+target_version = "${SOLC_VERSION:-0.8.20}"
+EOF
+elif ! grep -q "^target_version" wake.toml 2>/dev/null; then
+    if grep -q '^\[compiler\.solc\]' wake.toml 2>/dev/null; then
+        sed -i "/^\[compiler\.solc\]/a target_version = \"${SOLC_VERSION:-0.8.20}\"" wake.toml
+    else
+        cat >> wake.toml <<EOF
+
+[compiler.solc]
+target_version = "${SOLC_VERSION:-0.8.20}"
+EOF
+    fi
+fi
+
+# Initialize Wake project if not already initialized
+if [ ! -f "wake.toml" ]; then
+    echo "Initializing Wake project..."
+    wake init --force 2>/dev/null || true
+fi
+```
+
+`wake init --force`'s `[ ! -f wake.toml ]` gate now short-circuits because the unconditional block always leaves a wake.toml in place, eliminating the network fetch entirely.
+
+> **Note on 0.5.9:** an intermediate image was pushed where the unconditional block was placed *after* `wake init --force` rather than before — so the network fetch still fired. 0.5.9 was deployed and a verification scan ran for ~368s (still slow). 0.5.10 corrects the ordering. The 0.5.9 image remains in the registry (immutable tags) but is no longer referenced by any ConfigMap or KJM default.
+
+### Why
+
+Customer-facing impact: every single-file Solidity scan, plain multi-file scan, and OZ-free Foundry/Hardhat scan with wake was waiting ~484s while wake init's `aiohttp` calls timed out under the scanner NetworkPolicy. Findings still surfaced eventually, but the user-experienced delay was unacceptable for a single-file lint.
+
+### Verification
+
+**In-cluster wake-debug-init Job (image 0.5.9 — proves the network fetch fires inside wake init, before wake.toml is created):**
+
+```
+=== running wake init --force ===
+[23:01:37] Found 10 *.sol files in 0.00 s
+           Failed to load previous build artifacts
+WARNING ... wake.svm.svm: Failed to download solc list from
+         https://binaries.soliditylang.org/linux-amd64/list.json: <urlopen error timed out>
+WARNING ... wake.svm.svm: Failed to download solc list from
+         https://raw.githubusercontent.com/.../list.json: <urlopen error timed out>
+=== wake.toml after init === [empty]
+```
+
+**API end-to-end on Reentrancy.sol single-file (contract `7b72c90b`, image 0.5.10):**
+
+```
+[poll t=   0s] status=queued
+[poll t=  16s] status=completed crit=0 high=1 med=0 low=0
+final: completed   wall_seconds=20
+```
+
+20s wall-clock end-to-end (was ~484s) — >95% latency reduction. 1 high finding surfaced.
+
+**17-scanner regression smoke:** 16/17 completed; only the pre-existing P3-1 trident fixture failure remains (block 5 on the audit plan).
+
+### Files changed
+
+- `blocksecops-tool-integration/scanner-images/wake/wake-scan` — unconditional `wake.toml` + `target_version` write moved BEFORE `wake init --force`.
+- `blocksecops-tool-integration/scanner-images/wake/Dockerfile` — `ARG SCANNER_IMAGE_VERSION=0.5.10`.
+- `blocksecops-tool-integration/k8s/base/scanner-versions-configmap.yaml` — `SCANNER_IMAGE_WAKE: "scanner-wake:0.5.10"` + updated `_note`.
+- `blocksecops-tool-integration/src/scanners/kubernetes_job_manager.py` — `default_images['wake'] = "scanner-wake:0.5.10"`.
+- `blocksecops-tool-integration/tests/regression/test_wake_p2_1.py` — new `TestWakeP21UnconditionalTargetVersion` (4 tests asserting the unconditional block precedes `wake init --force`) + `TestWakeImageVersionSync` (3 tests). 7/7 unit tests pass.
+
+### Rollback plan
+
+Revert `SCANNER_IMAGE_WAKE` in the ConfigMap to `scanner-wake:0.5.8` and `kubectl apply -k k8s/overlays/gcp/`. The 0.5.8 image is still pushed and pullable. This restores the (slow) baseline behavior without affecting correctness — only perf regresses.
+
+### Plan reference
+
+Plan: `/home/pwner/.claude/plans/gentle-whistling-russell.md` — Block 3 (wake P2-1 single-file perf).
+
+---
+
 ## 2026-05-08 — mythril P0-2 corrective M2 (issues-found regression fix)
 
 **Scanner(s):** mythril
