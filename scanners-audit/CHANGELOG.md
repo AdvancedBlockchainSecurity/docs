@@ -8,6 +8,97 @@ Each entry follows [Documentation Standards](../standards/documentation-standard
 
 ---
 
+## 2026-05-08 — P0-3 per-scanner execution observability (`scanner_executions` table + endpoint)
+
+**Scanner(s):** all 17 (platform-level observability)
+**Author:** Apogee
+**Services Affected:** blocksecops-api-service (Migration 089; ScannerExecutionModel; ScanResults schema; new GET endpoint), blocksecops-tool-integration (callback payload enrichment)
+**Image bumps:** `api-service:0.43.6 → 0.43.8`, `tool-integration:0.6.28 → 0.6.30`
+**Pushed to:** `us-west1-docker.pkg.dev/.../api-service:0.43.8` digest `sha256:8d569e23...`, `us-west1-docker.pkg.dev/.../tool-integration:0.6.30` digest `sha256:6008793d...`
+
+### What changed
+
+The mythril 0.2.9 issues-found regression silently discarded findings for ~2 weeks (since approximately 2026-04-29) because the dashboard collapsed 17-scanner detail into one scan-level `status` + `error_message` field. Operators had no way to answer "for scan X, which scanner failed and why?" without pulling K8s pod logs (TTL'd at 1h by the Job controller).
+
+P0-3 adds a `scanner_executions` table with one row per scanner Job dispatched for a scan, plus a new endpoint `GET /api/v1/scans/{scan_id}/executions`. The columns:
+
+| Column | Notes |
+|---|---|
+| `id` | BIGINT PK |
+| `scan_id` | UUID FK → `scans.id` ON DELETE CASCADE |
+| `scanner_id` | matches `scanner_versions.scanner_name` |
+| `status` | CHECK queued/running/completed/failed/skipped/timeout |
+| `started_at` / `completed_at` | TIMESTAMPTZ; null while not yet started/completed |
+| `exit_code` | INT (0/124/137/etc.); v1 leaves null for wrapper-native callbacks |
+| `error_message` | per-scanner mirror of `scan.error_message` |
+| `duration_seconds` | INT (precomputed); v1 leaves null for wrapper-native callbacks |
+| `image_tag` | e.g., `scanner-mythril:0.2.12` (sourced from tool-integration env) |
+| `created_at` / `updated_at` | TIMESTAMPTZ |
+
+Constraints: `uq_scanner_executions_scan_scanner UNIQUE(scan_id, scanner_id)`, `valid_scanner_execution_status` CHECK on the 6-value status enum. Indexes on `scan_id` and `(scan_id, scanner_id)`.
+
+`store_scan_results` upserts a row in `scanner_executions` BEFORE the BSO-BUG-170 terminal-state-preservation gates. Wrapped in `db.begin_nested()` so an upsert failure (transient FK conflict, or the table-not-yet-migrated edge case during the 0.43.7→0.43.8 rollout) doesn't taint the outer session and break vulnerability persistence.
+
+`tool-integration` enriches the callback payload at two points: `forward_to_api()` (skip-gate synthetic callbacks) and 8 inline `scan_results = {...}` dict literals (wrapper-native callbacks). For v1 only `image_tag` (env lookup) and `completed_at` (server now-ish) are populated; `started_at`, `exit_code`, `duration_seconds` require a K8s Job status lookup deferred to a follow-up.
+
+### Why
+
+Customer-facing impact: per-scanner failures were rolling up into a generic scan-level status. The mythril 0.2.9 regression wasn't caught for ~2 weeks. The new endpoint gives operators a queryable "which scanner did what, and when" view.
+
+### Verification
+
+**Pre-migration backup** confirmed: `postgresql-backup-pre-089-1778282289` Job uploaded 9 files / 74.7 MiB to `gs://apogee-production-db-backups/postgresql/` including a fresh `postgresql-20260508-231821.sql.gz` snapshot.
+
+**Migration applied**: alembic at `089 (head)` in prod. The table was auto-created by api-service startup (`Base.metadata.create_all`) before alembic ran, so `alembic stamp 089` was used to align history with the actual schema. Schema verified via `\d scanner_executions` against prod DB: all 12 columns, all 4 indexes, FK ON DELETE CASCADE, status CHECK constraint present.
+
+**End-to-end** mythril scan against contract `eafe2b12` (scan `77826ec8-a121-414b-84f6-d54c1744e35a`):
+
+```
+GET /api/v1/scans/77826ec8-a121-414b-84f6-d54c1744e35a/executions
+HTTP 200
+{
+  "scan_id": "77826ec8-...",
+  "requested_scanners": ["mythril"],
+  "executions": [
+    {
+      "scanner_id": "mythril",
+      "status": "completed",
+      "completed_at": "2026-05-08T23:47:02.768878Z",
+      "image_tag": "scanner-mythril:0.2.12",
+      ...
+    }
+  ]
+}
+```
+
+**17-scanner regression smoke**: 16/17 pass; only the pre-existing P3-1 trident fixture failure (block 5 on the audit plan).
+
+**Source-level tests**: 24/24 unit tests pass in api-service (`tests/regression/test_scanner_executions_p0_3.py` — pinning migration shape, model definition, schema additions, upsert ordering, endpoint wiring).
+
+### Files changed
+
+**blocksecops-api-service** (PR #365):
+- `alembic/versions/20260508_2330-089_add_scanner_executions_table.py` — additive migration.
+- `src/infrastructure/database/models.py` — `ScannerExecutionModel` + `ScanModel.scanner_executions` relationship.
+- `src/presentation/schemas/scans.py` — `ScanResults` Optional fields; `ScannerExecution` + `ScanExecutionsResponse`.
+- `src/presentation/api/v1/endpoints/scans.py` — new GET endpoint; savepoint-protected upsert.
+- `tests/regression/test_scanner_executions_p0_3.py` — 24 tests.
+- `pyproject.toml` + `k8s/overlays/gcp/kustomization.yaml` — version 0.43.6 → 0.43.8.
+
+**blocksecops-tool-integration** (PR #174):
+- `src/main.py` — `_scanner_image_tag()` helper; enrichment in `forward_to_api()` + 8 inline `scan_results` dicts.
+- `pyproject.toml` + `k8s/overlays/gcp/kustomization.yaml` — version 0.6.28 → 0.6.30.
+
+### Rollback plan
+
+Migration 089 is additive (new table only). Rollback path: `alembic downgrade 088` drops the table. Service rollback: revert deployment image tags to api-service:0.43.6 and tool-integration:0.6.28; old code ignores the new fields.
+
+### Plan reference
+
+Plan: `/home/pwner/.claude/plans/gentle-whistling-russell.md` — Block 4 (P0-3 scanner_executions table + endpoint).
+
+---
+
 ## 2026-05-08 — wake P2-1 single-file perf fix
 
 **Scanner(s):** wake
