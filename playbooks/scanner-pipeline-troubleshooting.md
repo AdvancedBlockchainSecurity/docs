@@ -643,7 +643,7 @@ done
 | slither | scanner-slither | 0.4.7 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
 | aderyn | scanner-aderyn | 0.8.5 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
 | semgrep | scanner-semgrep | 0.3.12 | python:3.11-slim | 1000 |
-| solhint | scanner-solhint | 0.1.13 | node:20-alpine | 1000 (node) |
+| solhint | scanner-solhint | 0.1.14 | node:20-alpine | 1000 (node) |
 | wake | scanner-wake | 0.5.8 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
 | soliditydefend | scanner-soliditydefend | 0.9.9 | debian:bookworm-slim (Rust builder) | 1000 |
 | echidna | scanner-echidna | 0.5.4 | scanner-base-solidity:1.1.1-37dbe11e | 1000 |
