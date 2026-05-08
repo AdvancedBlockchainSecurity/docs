@@ -1,10 +1,85 @@
 # Scanner Audit Changelog
 
 **Status:** Active
-**Last Updated:** 2026-05-06
+**Last Updated:** 2026-05-08
 
 Reverse-chronological log of every scanner status change, fix attempt, regression, and verification.
 Each entry follows [Documentation Standards](../standards/documentation-standards.md) Change Summary format.
+
+---
+
+## 2026-05-08 — mythril P0-2 corrective M2 (issues-found regression fix)
+
+**Scanner(s):** mythril
+**Author:** Apogee
+**Services Affected:** blocksecops-tool-integration (scanner-mythril image; ConfigMap; KJM default_images; regression test)
+**Image bump:** `scanner-mythril:0.2.11 → 0.2.12`
+**Pushed to:** `us-west1-docker.pkg.dev/project-8a2657b9-d96c-4c0a-a69/apogee/scanner-mythril:0.2.12` digest `sha256:d02b1590...`
+
+### What changed
+
+Corrective fix on top of 0.2.11's M2 stderr-pattern refinement. The original M2 had been solving the wrong problem: an in-cluster diagnostic (mythril-debug-stderr Job, this date) showed mythril 0.24.8 exits code **1 on issues-found** per upstream CI convention, while still emitting valid JSON `{"error": null, "issues": [...]}` and **empty** stderr. The Task #182 bucketing introduced in image 0.2.9 (commit bc73fb4) treated all `MYTH_EXIT==1` as failure and discarded the JSON, so since approximately 2026-04-29 every successful issues-found scan was silently reported as `failed: 0 findings, exit_1_check_pod_logs` and the dashboard hid real findings.
+
+`scanner-images/mythril/run-mythril.sh` exit-1 branch now inspects `$MYTHRIL_RAW` first:
+
+```diff
+elif [ $MYTH_EXIT -eq 1 ]; then
++    if [ -s "$MYTHRIL_RAW" ] && jq -e '.error == null and (.issues | type == "array")' "$MYTHRIL_RAW" >/dev/null 2>&1; then
++        : # case (a) — exit-1-on-issues-found; fall through to JSON parsing
++        echo "  Note: Mythril exited 1 on $sol_file but produced valid issues-found JSON ..."
++    elif [ -s "$MYTHRIL_RAW" ] && jq -e '.success == false' "$MYTHRIL_RAW" >/dev/null 2>&1; then
++        FILE_FAIL_REASON=$(jq -r '"compile:" + (.error // "unknown" | gsub("\n"; " ") | .[:120])' "$MYTHRIL_RAW" 2>/dev/null || echo "compile:unknown")
++    elif grep -qE 'z3\.|Z3Exception|SMT' /tmp/mythril-stderr.log 2>/dev/null; then
+        FILE_FAIL_REASON="z3_solver_crash"
+    elif grep -qE 'Traceback|RuntimeError|...' /tmp/mythril-stderr.log 2>/dev/null; then
+        ...
+```
+
+The 0.2.11 stderr-pattern matching becomes a fallback only when the JSON is missing/invalid/error-shaped. The pre-existing `success == false` compile-error path (line 311 in 0.2.10/0.2.11) is folded into the new exit-1 ladder so compile errors are surfaced with their actual error text.
+
+### Why
+
+Customer-facing impact: every contract that mythril successfully analyzed and **found a vulnerability** since image 0.2.9 was being reported in the dashboard as `0 findings, status=failed, error_message="exit_1_check_pod_logs"`. Real reentrancy / TOD findings were being thrown away.
+
+### Verification
+
+**In-cluster Reentrancy debug Job (mythril-debug-stderr-v12):**
+
+```
+Analyzing: /contracts/contract.sol
+  Exit code: 1
+  Raw output size: 8194 bytes
+  Stderr:
+  Note: Mythril exited 1 on /contracts/contract.sol but produced valid issues-found JSON (upstream CI convention) — treating as success
+  Found 2 issues
+Status: completed
+Total issues: 2
+  Medium: 1  Low: 1
+```
+
+The 2 surfaced findings: External Call To User-Supplied Address (low, line 14) + Transaction Order Dependence (medium, line 14) — both legitimate reentrancy-related findings on the test contract.
+
+**Multi-file (M3) re-verification:** in-cluster Job with `Token.sol` + `utils_Context.sol` (flattened upload simulation) entered the multi-file block (`SOL_FILE_COUNT=2 > 1`), reconstructed `utils_Context.sol → utils/Context.sol`, synthesized the permissive foundry.toml, and analyzed both files at exit 0. M3 confirmed working in-cluster.
+
+**API end-to-end:** `POST /scans` against multi-file Foundry+OZ baseline `eafe2b12` returned `status=completed` (scan_id `81cb6b5d-9301-47b1-954a-f61df051afcb`).
+
+**17-scanner regression smoke:** 16 of 17 scanners completed normally against their baselines. The only failure was the pre-existing P3-1 trident fixture issue (`overflow-checks` not enabled in workspace `Cargo.toml` of `86096252`) — already on the plan as block 5; not caused by this rollout.
+
+### Files changed
+
+- `blocksecops-tool-integration/scanner-images/mythril/run-mythril.sh` — exit-1 branch now JSON-success-aware (lines ~286-313).
+- `blocksecops-tool-integration/scanner-images/mythril/Dockerfile` — `ARG SCANNER_IMAGE_VERSION=0.2.12`.
+- `blocksecops-tool-integration/k8s/base/scanner-versions-configmap.yaml` — `SCANNER_IMAGE_MYTHRIL: "scanner-mythril:0.2.12"` + updated `_note` describing the 0.2.9 regression and the corrective fix.
+- `blocksecops-tool-integration/src/scanners/kubernetes_job_manager.py` — `default_images['mythril'] = "scanner-mythril:0.2.12"`.
+- `blocksecops-tool-integration/tests/regression/test_mythril_m2_m3.py` — new `TestMythrilM2ExitOneIssuesFoundSuccess` class (2 tests) asserting the exit-1 branch inspects `$MYTHRIL_RAW` first and the JSON-success arm does not set `FILE_FAIL_REASON`. Image-version assertions bumped to `0.2.12`. 10 of 10 unit tests pass.
+
+### Rollback plan
+
+Revert `SCANNER_IMAGE_MYTHRIL` in the ConfigMap to `scanner-mythril:0.2.11` and `kubectl apply -k k8s/overlays/gcp/`. The 0.2.11 image is still pushed and pullable. This restores the (broken) issues-found behavior but unblocks if any unforeseen regression emerges.
+
+### Plan reference
+
+Plan: `/home/pwner/.claude/plans/gentle-whistling-russell.md` — Block 2 (mythril M2 corrective). M3 marked verified in-cluster; M2 corrective replaces the 0.2.11 stderr-pattern attempt.
 
 ---
 
