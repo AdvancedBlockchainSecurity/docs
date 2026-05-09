@@ -1,5 +1,7 @@
 # Scan Comparison & Export
 
+**Last Tested**: May 9, 2026 (dashboard 0.53.5 — contract-scoped baseline picker)
+
 ## Compare Two Scans
 **How to test**: Navigate to `/scans/compare` or click "Compare" button on scan results
 
@@ -11,9 +13,20 @@
 ## Scan Selection
 **How to test**: Use the scan dropdowns on comparison page
 
-- [ ] Dropdowns show only completed scans
+- [ ] Dropdowns show only completed scans of the **same contract** as the scan pinned in the URL — NOT all scans across all contracts
 - [ ] Scan entries show date and scanner used
-- [ ] Selecting one scan filters the other dropdown to same contract
+- [ ] Selecting one scan does NOT change the contract scope (both dropdowns are pre-scoped to the active contract)
+
+### Contract-scoped baseline picker (2026-05-09, dashboard 0.53.5)
+
+The page reads `?scanA=<id>` / `?scanB=<id>` from the URL, fetches each scan record by ID independently of any list query (`getScan` from `src/lib/api/scans.ts`), and derives the active contract from whichever scan is pinned. The candidate list is server-side filtered via `GET /api/v1/scans?contract_id=<UUID>` — scoping no longer depends on whether the pinned scans happen to be in the user's top-100-most-recent slice.
+
+- [ ] Open `/scans/compare?scanB=<some-old-scan-id>` where the user has more than 100 newer completed scans across other contracts. Baseline dropdown still scopes to the right contract (regression: pre-0.53.5 it would show ALL the user's scans because the pinned scan wasn't in the top-100 fetched).
+- [ ] Network tab: only ONE `GET /api/v1/scans?…&contract_id=<UUID>&status=completed&limit=100` fires per active contract.
+- [ ] Open `/scans/compare` with no query params: amber CTA banner reads "Open this page from a specific scan or contract to start a comparison — the baseline picker is scoped to one contract at a time. [Pick a contract →]"; both dropdowns disabled.
+- [ ] Open `/scans/compare?scanA=<id>` (only scanA, no scanB): scanA loads, contract_id is derived from scanA, scanB dropdown is scoped to the same contract.
+- [ ] When the contract has only one completed scan, the baseline dropdown shows the empty-state copy "No other scans available for this contract."
+- [ ] The picked scan IS NOT listed as its own counterpart option (current scan B is excluded from the scan A dropdown, and vice versa).
 
 ## Vulnerability Diff
 **How to test**: Compare two scans with different findings
