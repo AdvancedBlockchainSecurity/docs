@@ -8,6 +8,105 @@ Each entry follows [Documentation Standards](../standards/documentation-standard
 
 ---
 
+## 2026-05-08 — trident P3-1 fixture overflow-checks fix
+
+**Scanner(s):** trident (fixture-data fix; no scanner code change)
+**Author:** Apogee
+**Services Affected:** none (DB UPDATE on `contract_files` table only)
+
+### What changed
+
+The audit baseline fixture `86096252-b524-4ee1-beb6-4c3539627b3c` (E2E-Rust-anchor-basic1-tree) ships a workspace `Cargo.toml` that contains only:
+
+```toml
+[workspace]
+members = [
+  "programs/*"
+]
+```
+
+Trident's underlying `anchor build` requires `[profile.release] overflow-checks = true` for security-critical builds, so every smoke run produced `status: failed, error: "Anchor build failed (exit 1): Error: overflow-checks is not enabled in the release profile..."`. The F1 trident scanner fix from 2026-05-06 (image 0.4.3) was correct — it surfaced the build failure in `error_message` cleanly — but the fixture itself was the broken party.
+
+Per `docs/standards/database-management.md`, applied a SQL UPDATE inside `BEGIN; ... COMMIT;` against `contract_files`:
+
+```sql
+UPDATE contract_files
+SET file_content = '[workspace]
+members = [
+  "programs/*"
+]
+
+[profile.release]
+overflow-checks = true
+'
+WHERE contract_id = '86096252-b524-4ee1-beb6-4c3539627b3c'
+  AND file_path = 'Cargo.toml';
+```
+
+`file_size` was also updated to match the new content length (83 bytes).
+
+### Why
+
+Trident has been the only persistent failure on every 17-scanner regression smoke run since 2026-05-06. With the fixture fixed, smoke goes from 16/17 to a clean 17/17.
+
+### Verification
+
+**Pre-update backup** confirmed: `postgresql-backup-pre-p3-1-1778284750` Job uploaded 74.7 MiB to `gs://apogee-production-db-backups/postgresql/`.
+
+**Pre-fix state** (last smoke before this entry):
+
+```
+trident: status=failed err='Anchor build failed (exit 1): Error: `overflow-che...'
+```
+
+**Post-fix verification** scan `4f8cf80b-e42b-4c16-b87a-6f3459fef65f`:
+
+```
+[poll t=   0s] status=queued
+[poll t=   8s] status=completed crit=0 high=0 med=0 low=0
+final: completed
+```
+
+**P0-3 endpoint** corroboration:
+
+```json
+{
+  "scanner_id": "trident",
+  "status": "completed",
+  "image_tag": "scanner-trident:0.4.3",
+  "error_message": null,
+  ...
+}
+```
+
+(was `error_message: "Anchor build failed..."` before the fixture fix)
+
+### Files changed
+
+- DB-only: `contract_files` row for `(contract_id=86096252-..., file_path='Cargo.toml')` — `file_content` + `file_size` updated.
+- `docs/scanners-audit/scanner-status.md` — trident row promoted from `✅ working (scanner) / ⚠️ fixture` to `✅ working`.
+
+### Rollback plan
+
+```sql
+UPDATE contract_files
+SET file_content = '[workspace]
+members = [
+  "programs/*"
+]
+'
+WHERE contract_id = '86096252-b524-4ee1-beb6-4c3539627b3c'
+  AND file_path = 'Cargo.toml';
+```
+
+Or restore from `postgresql-backup-pre-p3-1-1778284750` if needed.
+
+### Plan reference
+
+Plan: `/home/pwner/.claude/plans/gentle-whistling-russell.md` — Block 5 (P3-1 trident fixture).
+
+---
+
 ## 2026-05-08 — P0-3 per-scanner execution observability (`scanner_executions` table + endpoint)
 
 **Scanner(s):** all 17 (platform-level observability)
