@@ -8,6 +8,100 @@ Each entry follows [Documentation Standards](../standards/documentation-standard
 
 ---
 
+## 2026-05-08 — Block 7 R1 RBAC cleanup + R2 stale `production/` overlay removal
+
+**Scanner(s):** none (infrastructure cleanup)
+**Author:** Apogee
+**Services Affected:** blocksecops-tool-integration (overlay removal + docs path fix); production GKE cluster (orphan RBAC deletion)
+
+### What changed
+
+**R1** — deleted two orphan cluster-scoped RBAC objects accidentally created during the audit on 2026-05-08 13:59 when `kubectl apply -k k8s/overlays/production/` was run against the prod cluster against my better judgment. Both were dangling — `ClusterRoleBinding` subject was a ServiceAccount in the non-existent-in-prod namespace `tool-integration-local`. No consumer pod referenced either object.
+
+```bash
+kubectl delete clusterrolebinding prod-tool-integration-cluster-reader
+kubectl delete clusterrole prod-tool-integration-cluster-reader
+```
+
+**R2** — removed the stale `blocksecops-tool-integration/k8s/overlays/production/` overlay entirely. It was a pre-GCP-migration relic pinned to image `0.5.42` (current `0.6.30`), and applying it created the R1 orphans. Production GKE is deployed via `k8s/overlays/gcp/`; `production/` had no current consumer. The single doc reference (`docs/SCANNER-VERSION-MANAGEMENT.md:166`) was updated from `production/` → `gcp/`. No CI/CD or deployment-script references existed.
+
+### Why
+
+Pre-customer launch hygiene — orphan cluster-scoped RBAC objects are a security-audit finding, and stale overlays are a foot-gun that caused this exact incident. The `staging/` overlay is preserved (active staging deployments). Only `production/` was stale.
+
+### Verification
+
+- `kubectl get clusterrole,clusterrolebinding | grep prod-tool-integration` returns nothing.
+- Org-wide grep for `overlays/production` shows the single doc reference was updated.
+- The 17-scanner regression smoke from earlier today (post-Block 4 deploy) confirmed all scanners still operating normally — no dependency on the removed RBAC objects existed.
+
+### Files changed
+
+- **In-cluster:** `ClusterRole/prod-tool-integration-cluster-reader` and `ClusterRoleBinding/prod-tool-integration-cluster-reader` deleted.
+- **blocksecops-tool-integration PR #176:**
+  - `k8s/overlays/production/` directory removed (5 files: `kustomization.yaml`, `scanner-versions-patch.yaml`, `patches/{replica,resource,security}-patch.yaml`).
+  - `docs/SCANNER-VERSION-MANAGEMENT.md:166` — prod path `production/` → `gcp/`.
+
+### Plan reference
+
+Plan: `/home/pwner/.claude/plans/gentle-whistling-russell.md` — Block 7 (R1 + R2 cleanup). **All 7 blocks of the plan are now shipped.**
+
+---
+
+## 2026-05-08 — Audit plan complete
+
+**Plan:** `/home/pwner/.claude/plans/gentle-whistling-russell.md`
+**Status:** ✅ All 7 blocks shipped
+**Author:** Apogee
+
+| Block | Subject | Status | Image bumps |
+|---|---|---|---|
+| 1 | solhint P0-2 severity mapping | ✅ shipped 2026-05-07 | `scanner-solhint:0.1.13 → 0.1.14` |
+| 2 | mythril M2 (corrective) + M3 (multi-file gate) | ✅ shipped | `scanner-mythril:0.2.10 → 0.2.12` |
+| 3 | wake P2-1 single-file perf | ✅ shipped (484s → 20s) | `scanner-wake:0.5.8 → 0.5.10` |
+| 4 | P0-3 `scanner_executions` table + endpoint | ✅ shipped | `api-service:0.43.6 → 0.43.9`, `tool-integration:0.6.28 → 0.6.30` |
+| 5 | P3-1 trident fixture `overflow-checks` | ✅ shipped (DB UPDATE) | none |
+| 6 | UX batch P2-3, P2-4, P3-2 | ✅ shipped (P2-4 image rebuilds deferred) | `api-service:0.43.8 → 0.43.9` |
+| 7 | R1 RBAC cleanup + R2 stale overlay removal | ✅ shipped | none |
+
+### Final audit state (post-plan)
+
+- `docs/scanners-audit/scanner-status.md` — all scanner rows reflect current production state. Mythril promoted from `⚠️ partial` to `✅ working`. Wake promoted from `✅ working (perf concern)` to `✅ working (perf fixed)`. Trident promoted from `✅ working (scanner) / ⚠️ fixture` to `✅ working`.
+- `/scans/{id}/result-types` returns only types with non-zero rows (no more empty dashboard tabs).
+- New `GET /api/v1/scans/{id}/executions` endpoint returns per-scanner observability rows.
+- Pragma-gate rejection text now action-oriented with `help_url` (image rebuilds deferred to next routine update).
+- New `blocksecops-docs/api/auth-jwt-refresh.md` page closes the JWT refresh-flow documentation gap.
+- Production cluster is clean of orphan RBAC objects; stale `production/` overlay removed from the repo.
+
+### Verification matrix
+
+| Check | Result |
+|---|---|
+| 17-scanner regression smoke | 17/17 (post-block-5 trident fixture fix) |
+| Mythril surfaces issues-found JSON correctly (Reentrancy.sol) | ✅ 2 findings (was 0 + `exit_1_check_pod_logs`) |
+| Wake single-file perf | ✅ 20s (was 484s) |
+| `GET /scans/{id}/executions` returns rows with `image_tag` | ✅ |
+| `GET /scans/{id}/result-types` filters empty types | ✅ |
+| Trident `overflow-checks` fixture | ✅ `status=completed` |
+| Orphan RBAC objects | ✅ deleted |
+
+### Memory rules pinned during the plan
+
+- `feedback_methodical_not_reactive` — fix one scanner at a time, baseline-test, no pre-emptive fixes.
+- `feedback_baseline_fixtures` — reuse same `contract_id`s as the last passing audit.
+- `feedback_verify_against_standards` — read source-of-truth files in Stage A; discard fix candidates that contradict architecture.
+- `feedback_autonomous_within_plan` — once a plan is approved, complete it autonomously without per-stage approval gates; only pause for scope-creep, unexpected state, judgment calls, or verification failures.
+
+### Out of scope (intentionally not shipped this audit)
+
+- Pre-emptive fixes for issues not surfaced in cluster verification.
+- Refactoring beyond the minimal change for each fix.
+- Detector-quality improvements (adding new detectors to scanners).
+- New scanner integrations.
+- Performance tuning beyond P2-1 (wake).
+
+---
+
 ## 2026-05-08 — Block 6 UX batch (P2-3, P2-4, P3-2)
 
 **Scanner(s):** all 17 (platform-level UX/observability)
