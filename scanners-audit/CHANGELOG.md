@@ -1,10 +1,84 @@
 # Scanner Audit Changelog
 
 **Status:** Active
-**Last Updated:** 2026-05-08
+**Last Updated:** 2026-05-09
 
 Reverse-chronological log of every scanner status change, fix attempt, regression, and verification.
 Each entry follows [Documentation Standards](../standards/documentation-standards.md) Change Summary format.
+
+---
+
+## 2026-05-09 — Pragma-gate UX: upstream gate + `failure_type` classification + dashboard rendering
+
+**Scanner(s):** all 8 Solidity scanners (wake, slither, aderyn, halmos, mythril, echidna, medusa, soliditydefend) — wrapper-side gate now demoted to defensive backstop
+**Author:** Apogee
+**Services Affected:** blocksecops-api-service (image 0.43.10 → 0.43.11), blocksecops-tool-integration (source-only — no rebuild), blocksecops-dashboard (image → 0.53.4), database (Migration 090)
+
+### What changed
+
+**Block A — Upstream pragma gate (api-service).** `POST /api/v1/scans` now short-circuits before scanner-Job dispatch when `contract.compiler_version` is parseable but unsupported (< 0.8.12). Implemented in `src/presentation/api/v1/endpoints/scans.py` (create handler) using a new domain helper `src/domain/entities/solidity_version.py` (`MIN_SUPPORTED = (0, 8, 12)`, `MIN_TEXT = "0.8.12"`, `MIN_RELEASE_DATE = "2022-01-17"`). The endpoint creates a scan record with `status='failed'`, `failure_type='unsupported_solidity_version'`, and the canonical pragma-gate `error_message`. **No scanner Jobs are dispatched.** Synchronous response in <1 s vs ~2 min wrapper-based path.
+
+**Migration 090.** New nullable `VARCHAR(50) failure_type` column on `scans` and `scanner_executions`. CHECK constraint enumerates `unsupported_solidity_version`, `compile_error`, `timeout`, `oom`, `internal_error`, `scanner_skipped`. Only `unsupported_solidity_version` is wired in v1; the rest are reserved for future blocks. Manual prod backup taken before alembic upgrade per `docs/standards/database-management.md`.
+
+**Block C — Tool-integration backstop payload (source-only).** Both `scanner-images/_base/check-pragma` and `scanner-images/soliditydefend/check-pragma` now include `"failure_type": "unsupported_solidity_version"` in their failure callbacks. Image rebuilds remain deferred (batched into next routine rebuild) — the api-service `store_scan_results` classifier pattern-matches the canonical `error_message` text as a backup for callbacks that arrive without the structured field.
+
+**Block D — Dashboard rendering.**
+- `Scan` and `Contract` TypeScript interfaces extended with `error_message`, `failure_type`, `compiler_version`, `compiler_version_supported`, `min_supported_solidity_version`.
+- New `ValidationNoticeBanner` component (`src/components/common/`) with dark-mode-aware amber palette (`bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100`).
+- `ScanResults.tsx` branches on `scan.failure_type === 'unsupported_solidity_version'` to render the yellow validation banner instead of the generic red "Scan Failed During Execution" panel.
+- `ContractDetail.tsx` adds a Solidity version chip near the language/framework labels and the inline notice when `compiler_version_supported === false`.
+- `ContractMetadataPanel.tsx` now reads from `contract.compiler_version` (was hardcoded mock `0.8.20`).
+- `ContractsList.tsx` adds a default-visible **Compiler** column. `STORAGE_KEY` bumped to `contracts-visible-columns-v2` so existing localStorage snapshots fall through to defaults and users see the new column without manual toggling.
+- Language filter dropdown trimmed from `LANGUAGES` to `TIER1_LANGUAGES` (Solidity, Vyper, Rust) — Tier 2/3 entries were aspirational placeholders that misled users.
+
+### Why
+
+User reported scan `88710862-db8e-4b51-817c-4748a238ee25` (contract `52fecf33-4d15-45f0-87b5-c228109d36f3`, `pragma solidity ^0.8.0`) rendering as a hard "Scan Failed During Execution" red banner. The scan was rejected by the wrapper-side `check-pragma` gate for an unsupported pragma — a user-actionable validation error, not a system failure. The platform had no structured signal to distinguish the two on the dashboard.
+
+Moving enforcement upstream to scan creation also saves Spot-VM compute: every unsupported-version scan previously dispatched N scanner Jobs (N = scanner count), each pulling its image and running for ~10–30 s before the wrapper exited. Post-Block-A, zero Jobs are created.
+
+### Verification (against the user-reported contract)
+
+- `POST /api/v1/scans` with `contract_id=52fecf33-…` now returns synchronously in <1 s with `status: 'failed'`, `failure_type: 'unsupported_solidity_version'`.
+- `kubectl get jobs -n tool-integration-prod` confirmed zero new scanner Jobs created.
+- `GET /scans/{id}/executions` returns empty `executions: []`.
+- `GET /contracts/{id}` returns `compiler_version: "0.8.0"`, `compiler_version_supported: false`, `min_supported_solidity_version: "0.8.12"`.
+- Dashboard `/scans/{id}` renders the yellow `ValidationNoticeBanner` (not the red panel) with the canonical message and link to language-support docs.
+- Dashboard `/contracts/{id}` shows the `Solidity v0.8.0` chip + the unsupported notice above the metadata panel.
+- Dashboard `/contracts` shows the new **Compiler** column populated for each row.
+- 17-scanner regression smoke against a supported contract confirmed no false-rejects.
+
+### Files changed
+
+**blocksecops-api-service (PR #367, image 0.43.11):**
+- `alembic/versions/20260509_1450-090_add_failure_type_to_scans_and_executions.py` — NEW migration
+- `src/domain/entities/solidity_version.py` — NEW domain helper (single source of truth)
+- `src/infrastructure/database/models.py` — `failure_type` column on `ScanModel` + `ScannerExecutionModel`
+- `src/presentation/schemas/scans.py` — `failure_type` on `ScanResults`, scan response, `ScannerExecution`
+- `src/presentation/schemas/contracts.py` — `compiler_version_supported`, `min_supported_solidity_version`
+- `src/presentation/api/v1/endpoints/scans.py` — upstream gate in create handler, backstop classifier in `store_scan_results`
+- `src/presentation/api/v1/endpoints/contracts.py` — populate derived fields on list and detail
+- `tests/regression/test_failure_type_classification.py` — NEW (28 tests)
+- `pyproject.toml`, `k8s/overlays/gcp/kustomization.yaml` — version bump
+
+**blocksecops-tool-integration (PR #177, source-only):**
+- `scanner-images/_base/check-pragma`
+- `scanner-images/soliditydefend/check-pragma`
+
+**blocksecops-dashboard (image 0.53.4):**
+- `src/lib/api/scans.ts`, `src/lib/api/contracts.ts` — type additions
+- `src/components/common/ValidationNoticeBanner.tsx` — NEW
+- `src/pages/ScanResults.tsx` — `failure_type` branching
+- `src/pages/ContractDetail.tsx` — chip + notice
+- `src/components/contract/ContractMetadataPanel.tsx` — wire real `compiler_version`
+- `src/pages/ContractsList.tsx` — Compiler column + Tier 1 language filter
+
+### Out of scope
+
+- Image rebuilds for the 9 Solidity scanner images carrying the Block C backstop payload (still batched into next routine rebuild).
+- Backfill of `compiler_version` for contracts uploaded before language detection populated the column — dashboard renders "detection pending" for those.
+- Wiring `failure_type` for non-pragma rejections (`compile_error`, `oom`, `timeout`, `internal_error`) — column + enum exist; classifier wiring deferred.
+- Backfilling `failure_type` to old failed scans — only new scans carry the structured field.
 
 ---
 
