@@ -87,19 +87,28 @@ One Debian-slim image that carries every solc version, Foundry toolchain, Hardha
 
 **Pre-requisites:** align with product on the new cutoff + a customer-migration plan.
 
-1. Edit `scanner-images/_base/check-pragma`:
+**As of 2026-05-09 (Migration 090, api-service 0.43.11)** the cutoff lives in TWO source-of-truth files. Both must be updated together or the upstream-gate and the wrapper-side backstop will disagree.
+
+1. Edit `blocksecops-api-service/src/domain/entities/solidity_version.py` (the **primary enforcement** at scan creation):
    ```python
    MIN_SUPPORTED: tuple[int, int, int] = (0, 8, NEW)   # adjust
    MIN_TEXT = "0.8.NEW"
    MIN_RELEASE_DATE = "YYYY-MM-DD"
    ```
-2. Remove any solc versions below the new cutoff from the install loop in `_base/Dockerfile` and `_base/solc-versions.txt`.
-3. Update test fixtures at `_base/test-fixtures/` if needed.
-4. Update `blocksecops-tool-integration/tests/unit/test_check_pragma.py` — the MIN constants are compared against literal versions in the tests.
-5. Update `docs/feature-tests/11-pragma-gate.md` with new version in the user-facing message.
-6. MINOR bump base image (e.g., `1.0.0` → `1.1.0`).
-7. Cascade: rebuild all 7 scanners + tool-integration. Standard release sequence.
-8. Announcement / customer docs — product's responsibility.
+2. Edit `scanner-images/_base/check-pragma` (the **wrapper-side backstop**):
+   ```python
+   MIN_SUPPORTED: tuple[int, int, int] = (0, 8, NEW)
+   MIN_TEXT = "0.8.NEW"
+   MIN_RELEASE_DATE = "YYYY-MM-DD"
+   ```
+3. Edit `scanner-images/soliditydefend/check-pragma` — same triple. The bespoke soliditydefend image carries its own copy.
+4. Remove any solc versions below the new cutoff from the install loop in `_base/Dockerfile` and `_base/solc-versions.txt`.
+5. Update test fixtures at `_base/test-fixtures/` if needed.
+6. Update `blocksecops-tool-integration/tests/unit/test_check_pragma.py` and `blocksecops-api-service/tests/regression/test_failure_type_classification.py` — the MIN constants are compared against literal versions in both test suites.
+7. Update `docs/feature-tests/11-pragma-gate.md` with the new version in the user-facing message.
+8. PATCH bump api-service. MINOR bump base image (e.g., `1.0.0` → `1.1.0`).
+9. Cascade: rebuild all 7 scanners + tool-integration + api-service. Standard release sequence.
+10. Announcement / customer docs — product's responsibility.
 
 ---
 

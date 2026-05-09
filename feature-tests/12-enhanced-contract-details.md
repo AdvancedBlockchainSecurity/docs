@@ -1,15 +1,24 @@
 # Enhanced Contract Details Tests (Phase 3.4)
 
 **Priority**: P2 - Medium
-**Last Tested**: _Not yet tested_
+**Last Tested**: May 9, 2026 (compiler version wired against `contract.compiler_version`)
 **Feature**: Contract Metadata, Security Score, Dependencies, Inheritance
+
+**Implementation note (2026-05-09):** The Compiler Version field in `ContractMetadataPanel.tsx` was previously hardcoded to mock `0.8.20`. As of dashboard 0.53.4 (paired with api-service 0.43.11), it now reads from `contract.compiler_version` populated at upload time by `language_detector.py`. Two new derived fields are also surfaced on `GET /contracts/{id}`:
+
+- `compiler_version_supported` — `true` / `false` / `null` (unparseable)
+- `min_supported_solidity_version` — `"0.8.12"` (sourced from the platform-wide policy file `src/domain/entities/solidity_version.py`)
+
+The contract detail page (`/contracts/{id}`) shows a **Solidity version chip** near the language/framework labels and an inline yellow `ValidationNoticeBanner` above the metadata panel when `compiler_version_supported === false`. The contracts list page (`/contracts`) has a new **Compiler** column (default-visible) showing the version per row.
 
 ---
 
 ## 1. Contract Metadata Panel
 
 ### 1.1 Compiler Settings Display
-- [ ] Solidity version displayed correctly (e.g., "v0.8.20")
+- [ ] Solidity version displayed correctly from `contract.compiler_version` (e.g., "v0.8.20") — no longer mock data
+- [ ] When `compiler_version` is null: "Solidity version: detection pending" rendered de-emphasized
+- [ ] When `compiler_version_supported === false`: amber unsupported badge rendered next to the version (dark-mode aware)
 - [ ] EVM version displayed (e.g., "paris")
 - [ ] Optimization status shown (Enabled/Disabled)
 - [ ] Optimization runs count shown when enabled
@@ -189,6 +198,15 @@
 
 ## 5. Integration in ContractDetail Page
 
+### 5.0 Solidity Version Header Chip & Unsupported Notice (2026-05-09)
+- [ ] Header chip near language/framework labels reads `Solidity vX.Y.Z` from `contract.compiler_version`
+- [ ] Chip is hidden when `contract.language !== 'solidity'`
+- [ ] When `contract.compiler_version_supported === false`, an inline yellow `ValidationNoticeBanner` renders above the metadata panel:
+  > "This contract uses Solidity {version}; Apogee scans Solidity ≥{min_supported_solidity_version}. Update the pragma to enable scanning. [Language support →]"
+- [ ] The notice uses the `bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100` palette (dark-mode aware)
+- [ ] Notice is hidden when `compiler_version_supported === true` or `null`
+- [ ] CTA links to `/language-support` docs page
+
 ### 5.1 Panel Order
 - [ ] Security Score Panel appears after Recent Scans
 - [ ] Contract Metadata Panel appears after Security Score
@@ -219,8 +237,27 @@
 - [ ] `SecurityScorePanel` exported from index.ts
 - [ ] `DependencyTreePanel` exported from index.ts
 - [ ] `InheritanceTreePanel` exported from index.ts
+- [ ] `ValidationNoticeBanner` exported from `src/components/common/` (added 2026-05-09)
 - [ ] No TypeScript compilation errors
 - [ ] No console errors on render
+
+---
+
+## 7. Contracts List — Compiler Column (2026-05-09)
+
+### 7.1 Default Visibility
+- [ ] `Compiler` column appears by default in `/contracts` (added to `DEFAULT_COLUMNS`)
+- [ ] Old localStorage `contracts-visible-columns` keys are orphaned after the storage key bumped to `contracts-visible-columns-v2`; users see the new default once
+
+### 7.2 Column Content
+- [ ] Cell renders `contract.compiler_version` for each row (e.g., `0.8.20`)
+- [ ] When `compiler_version` is null, cell shows muted dash placeholder
+- [ ] Toggle the column off via column-picker — column disappears
+- [ ] Toggle back on — column reappears
+
+### 7.3 Language Filter
+- [ ] Language filter dropdown only lists Tier 1 languages (Solidity, Vyper, Rust)
+- [ ] Tier 2/3 entries (e.g., Cairo, Move, Go) are hidden — they were aspirational placeholders that misled users into filtering for unscannable languages
 
 ---
 

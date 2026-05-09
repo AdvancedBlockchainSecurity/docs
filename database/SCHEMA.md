@@ -4,8 +4,8 @@
 **Database Name:** `solidity_security`
 **Schema:** `public`
 **Timezone:** UTC
-**Verified:** 2026-04-21 (contracts baseline columns + all tables from 082+ covered below; older tables reflect the 2026-03-15 snapshot)
-**Latest Migration:** 088 (add_baseline_scan_to_contracts)
+**Verified:** 2026-05-09 (scans + scanner_executions `failure_type` column reflected; 088 baseline columns + all tables from 082+ covered below; older tables reflect the 2026-03-15 snapshot)
+**Latest Migration:** 090 (add_failure_type_to_scans_and_executions)
 
 > **Naming Note:** The database is named `solidity_security`, not `blocksecops`. This name was established during initial development when the focus was solely on Solidity. Retained for backward compatibility.
 
@@ -21,6 +21,8 @@
 | 086 | 2026-04-15 | **NEW** `scanner_version_history` table | **Documented** — see Domain 12 |
 | 087 | 2026-04-17 | `integration_credentials` + 8 GitHub App BYO fields | Pending — column additions not yet reflected below |
 | 088 | 2026-04-21 | `contracts.baseline_scan_id` + `contracts.baseline_marked_at` + FK + index | **Documented** — see `contracts` in Domain 2 |
+| 089 | 2026-05-08 | **NEW** `scanner_executions` table (per-scanner row per scan) | **Documented** — see Domain 2 |
+| 090 | 2026-05-09 | `scans.failure_type` + `scanner_executions.failure_type` (VARCHAR(50), nullable, CHECK enum) | **Documented** — see `scans` and `scanner_executions` in Domain 2 |
 
 Migrations 083–085 and 087 predate this session and remain as documentation follow-up for the next full verification sweep.
 
@@ -398,6 +400,7 @@ Scan execution tracking with priority queue support.
 | started_at | TIMESTAMPTZ | nullable | |
 | completed_at | TIMESTAMPTZ | nullable | |
 | error_message | TEXT | nullable | |
+| failure_type | VARCHAR(50) | nullable, CHECK constraint | Migration 090. Enum: `unsupported_solidity_version`, `compile_error`, `timeout`, `oom`, `internal_error`, `scanner_skipped`. Set when `status='failed'` to let the dashboard branch the failure presentation (e.g., user-actionable validation rejection vs generic system error). |
 | critical_count | INTEGER | NOT NULL, default 0 | |
 | high_count | INTEGER | NOT NULL, default 0 | |
 | medium_count | INTEGER | NOT NULL, default 0 | |
@@ -431,6 +434,30 @@ Batch scan operations for multi-contract scans.
 | scanner_ids | VARCHAR(50)[] | nullable | |
 | created_at | TIMESTAMPTZ | NOT NULL, default now(), indexed | |
 | completed_at | TIMESTAMPTZ | nullable | |
+
+### `scanner_executions`
+
+Per-scanner execution row for each scan (Migration 089). One row per requested scanner per scan, regardless of outcome. Lets the dashboard display per-scanner status (queued / running / completed / failed / skipped / timeout) without packing the data into a JSON blob on `scans`.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK, default gen_random_uuid() | |
+| scan_id | UUID | FK scans(id) ON DELETE CASCADE, NOT NULL, indexed | |
+| scanner_id | VARCHAR(50) | NOT NULL | e.g. `slither`, `mythril`, `wake` |
+| status | VARCHAR(20) | NOT NULL, default 'queued' | queued/running/completed/failed/skipped/timeout |
+| started_at | TIMESTAMPTZ | nullable | |
+| completed_at | TIMESTAMPTZ | nullable | |
+| exit_code | INTEGER | nullable | Scanner process exit code |
+| error_message | TEXT | nullable | Per-scanner error text |
+| failure_type | VARCHAR(50) | nullable, CHECK constraint | Migration 090. Same enum as `scans.failure_type`. Lets a single failed scanner be classified independently of the overall scan. |
+| duration_seconds | INTEGER | nullable | |
+| image_tag | VARCHAR(255) | nullable | Scanner image tag the execution ran on (e.g., `0.4.1`) |
+| created_at | TIMESTAMPTZ | NOT NULL, default now() | |
+| updated_at | TIMESTAMPTZ | NOT NULL, default now(), on update | |
+
+**Indexes:** `(scan_id, scanner_id)` for per-scan lookups; `(scan_id)` alone for the GET `/scans/{id}/executions` endpoint.
+
+**Endpoint:** `GET /api/v1/scans/{scan_id}/executions` returns the rows for a scan.
 
 ### `vulnerabilities`
 
