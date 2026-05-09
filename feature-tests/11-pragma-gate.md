@@ -49,11 +49,18 @@ The wrapper-side gate at `scanner-base-solidity:1.0.0-30aad7ef`/`/usr/local/bin/
 - [ ] `pragma solidity >=0.8.13 <0.9.0;` → accepted
 - [ ] `pragma solidity 0.8.28;` → accepted (latest supported)
 
-### 1.3 Multi-file projects (foundry/hardhat archive)
+### 1.3 Loose ranges spanning the boundary
+The gate is **semver-correct, not lower-bound-conservative**: it accepts any pragma where at least one of the 17 pre-installed solc versions (0.8.12–0.8.28) satisfies ALL constraints across ALL files.
+
+- [ ] `pragma solidity >=0.7.0 <0.9.0;` → accepted (0.8.20 is in range)
+- [ ] `pragma solidity >=0.4.16;` → accepted (unbounded above; OZ-interface convention)
+- [ ] `pragma solidity ^0.7.0 || ^0.8.0;` → accepted (the `^0.8.0` group matches 0.8.x)
+
+### 1.4 Multi-file projects (foundry/hardhat archive)
 - [ ] All files have pragma ≥ 0.8.12 → scan completes
 - [ ] Mix of different compatible pragmas (0.8.13 + 0.8.20 + 0.8.28) → scan completes
 
-### 1.4 No pragma directive (uncommon)
+### 1.5 No pragma directive (uncommon)
 - [ ] File with only comments, no `pragma solidity` line → scan runs (scanner handles its own error if it can't compile)
 
 ---
@@ -74,15 +81,20 @@ The wrapper-side gate at `scanner-base-solidity:1.0.0-30aad7ef`/`/usr/local/bin/
 
 ### 2.2 Just-below-boundary `0.8.11`
 - [ ] `pragma solidity 0.8.11;` → rejected (cutoff is 0.8.12, released 1 month later)
-- [ ] `unsupported_version` field (if surfaced via API) = `0.8.11`
+- [ ] `unsupported_pragma` field (in the wrapper-side failure payload) = `0.8.11`
 
 ### 2.3 Mixed good + bad files
-- [ ] Project with `0.8.20` file AND `0.5.16` file → rejected (minimum drives the decision)
-- [ ] Error message names the offending file with the lowest version
+- [ ] Project with `0.8.20` file AND `0.5.16` file → rejected (any file with no satisfying solc drives the decision)
+- [ ] Error message names the offending file
 
-### 2.4 Loose constraint `>=0.7.0 <0.9.0`
-- [ ] Accepted pragma style in the Solidity world but conservatively rejected by the gate (lower bound is 0.7.0, below the cutoff)
-- [ ] Expected UX: customer tightens the constraint to `>=0.8.12 <0.9.0` and re-runs
+### 2.4 Old-only range `>=0.7.0 <0.8.0`
+- [ ] Range whose upper bound is below `0.8.12` → rejected (no pre-installed solc 0.8.12–0.8.28 satisfies)
+- [ ] `unsupported_pragma` field carries the verbatim constraint body (e.g., `>=0.7.0 <0.8.0`, including operators)
+- [ ] Expected UX: customer tightens the constraint to `>=0.8.12 <0.9.0` (or any range overlapping 0.8.12–0.8.28)
+
+### 2.5 Caret below boundary `^0.7.6`
+- [ ] `pragma solidity ^0.7.6;` resolves to `>=0.7.6 <0.8.0` → rejected
+- [ ] `unsupported_pragma` field = `^0.7.6` (caret prefix preserved — the field is the verbatim constraint body, not just the lower-bound version)
 
 ### 2.5 Per-scanner consistency
 - [ ] Same pre-2022 contract + scanner=`wake` → rejected with pragma-gate message
@@ -158,8 +170,14 @@ CHECK constraint: `failure_type IN (...) OR failure_type IS NULL`.
 ## Related Tests
 
 - **Unit coverage** (in `blocksecops-tool-integration`):
-  - `tests/unit/test_check_pragma.py` — 18 tests for the gate itself
+  - `tests/unit/test_check_pragma.py` — 21 tests for the gate itself, including the cross-script parametrized test that pins identical `failure_type` emission from both `_base/check-pragma` and `soliditydefend/check-pragma`
   - `tests/integration/test_callback_endpoint.py` — 16 parametrized tests confirming every scanner branch propagates `status=failed` + `error`
 - **Unit coverage** (in `blocksecops-api-service`):
   - `tests/unit/presentation/test_scan_failure_propagation.py` — 13 tests pinning the receiver-side contract
+  - `tests/regression/test_failure_type_classification.py` — 28 tests pinning Migration 090 + upstream pragma gate + backstop classifier
+  - `tests/regression/test_list_scans_contract_filter.py` — 8 tests pinning `GET /api/v1/scans?contract_id=` (load-bearing for the dashboard scan-compare baseline picker)
+  - `tests/regression/test_late_scanner_callback_accepted.py` — 10 tests pinning that callbacks arriving after `status='completed'` correctly add execution rows, bump `completed_at`, and append findings additively
+- **Component coverage** (in `blocksecops-dashboard`):
+  - `tests/components/common/ValidationNoticeBanner.test.tsx` — 4 tests pinning the yellow validation-rejection banner (palette + CTA + `target=_blank rel=noopener`)
+  - `tests/pages/ScanComparison.test.tsx` — 3 tests pinning the contract-scoped baseline picker behavior
 - **Related playbook**: `docs/playbooks/scanner-base-solidity-operations.md` — how to add a new solc version or change the minimum-supported cutoff.

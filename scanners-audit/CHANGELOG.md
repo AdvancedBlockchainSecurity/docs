@@ -8,6 +8,71 @@ Each entry follows [Documentation Standards](../standards/documentation-standard
 
 ---
 
+## 2026-05-09 — Test coverage: pragma-gate `failure_type`, late-callback acceptance, scan-compare contract scoping
+
+**Scanner(s):** all 8 Solidity scanners (indirect — pragma gate behavior pinned)
+**Author:** Apogee
+**Services Affected:** blocksecops-api-service (test-only), blocksecops-tool-integration (test-only), blocksecops-dashboard (test-only) — no image rebuilds, no version bumps
+
+### What changed
+
+Adds 43 net new tests across three repos to pin load-bearing invariants of today's earlier work. Plus fixes 5 pre-existing test failures in `tools-integration/tests/unit/test_check_pragma.py` that had silently broken since 2026-05-08 (PR #175 P2-4 renamed a payload field).
+
+**blocksecops-api-service (PR #368, source-inspection style — no DB):**
+- `tests/regression/test_list_scans_contract_filter.py` — 8 tests pinning `GET /api/v1/scans?contract_id=<UUID>`. The dashboard 0.53.5 scan-compare baseline picker depends on this filter; if it regresses the dashboard fix silently breaks again.
+- `tests/regression/test_late_scanner_callback_accepted.py` — 10 tests pinning the live behavior observed today on scan `1a536821-…` where mythril's late callback (after `status='completed'`) added the 7th `scanner_executions` row, bumped `completed_at`, and added 9 findings additively. Counts went 53 → 62. The opposite (reject) path is covered by the existing `test_terminal_state_symmetric_guard.py`.
+
+**blocksecops-tool-integration (PRs #178 + #179):**
+- 5 rejection-path tests in `tests/unit/test_check_pragma.py` extended with `assert data["failure_type"] == "unsupported_solidity_version"`.
+- `test_json_shape_matches_scanner_wrapper_expectations` extends `required_keys` to require `failure_type`.
+- NEW `test_failure_type_emitted_by_both_pragma_scripts` — parametrized over `_base/check-pragma` AND `soliditydefend/check-pragma` (separate copies, not symlinked) so the two stay in sync.
+- 5 tests had stale references to `data["unsupported_version"]`; renamed to `unsupported_pragma` to match the live script (PR #175 / P2-4 rename, 2026-05-08).
+- `test_loose_constraint_conservatively_rejected` was a stale assertion of the old "lower-bound conservative rejection" design. Renamed → `test_loose_constraint_spanning_boundary_accepted`; now asserts `>=0.7.0 <0.9.0` is ACCEPTED, matching the script's docstring example at line 25 of `_base/check-pragma`. Added companion `test_old_only_range_excluding_supported_rejected` (e.g., `>=0.7.0 <0.8.0`) so rejection coverage is preserved for ranges that exclude all supported solc.
+- `test_caret_constraint_below_boundary_rejected` — fixed assertion to expect `unsupported_pragma == "^0.7.6"` (with caret prefix) since the field carries the verbatim constraint body.
+
+Final tool-integration count: **21/21 pass** (was 18/20 with 2 failures, then +3 from new tests + alignment).
+
+**blocksecops-dashboard (PR #221):**
+- `tests/components/common/ValidationNoticeBanner.test.tsx` — 4 tests pinning the yellow validation-rejection banner: title + body + CTA link with `target="_blank" rel="noopener"`, dark-mode-aware amber palette (`bg-amber-50 dark:bg-amber-900/20`, etc).
+- `tests/pages/ScanComparison.test.tsx` — 3 tests pinning the contract-scoped baseline picker: `getScan(scanIdB)` is called, `listScans` is called with `contract_id` derived from scanB; same flow with `?scanA`; bare route disables both dropdowns and renders the amber CTA banner.
+
+### Why
+
+Today's three production fixes (api-service Migration 090, tool-integration `failure_type` payload, dashboard 0.53.5 scan-compare) all shipped without test coverage of their load-bearing behaviors. The two most recent UX bugs (1ae2f5d8 pragma-gate red-banner, 0.53.5 baseline picker showing all scans) were both *root cause: a behavior nobody pinned with a test*. Adding the tests now closes the loop on the same regression pattern.
+
+### Verification
+
+```bash
+# api-service
+cd /home/pwner/Git/blocksecops-api-service
+.venv/bin/python -m pytest tests/regression/test_list_scans_contract_filter.py tests/regression/test_late_scanner_callback_accepted.py
+# 18 passed
+
+# tool-integration
+cd /home/pwner/Git/blocksecops-tool-integration
+.venv/bin/python -m pytest tests/unit/test_check_pragma.py
+# 21 passed (was 18 passed + 2 pre-existing failures before today)
+
+# dashboard
+cd /home/pwner/Git/blocksecops-dashboard
+npx vitest run tests/components/common/ValidationNoticeBanner.test.tsx tests/pages/ScanComparison.test.tsx
+# 7 passed
+```
+
+### Files changed
+
+- **api-service:** `tests/regression/test_list_scans_contract_filter.py` (NEW), `tests/regression/test_late_scanner_callback_accepted.py` (NEW)
+- **tool-integration:** `tests/unit/test_check_pragma.py` (EXTEND — 5 existing tests + 1 new parametrized + 5 field-name fixes + 1 invert + 1 new old-only-range + 1 caret-prefix fix)
+- **dashboard:** `tests/components/common/ValidationNoticeBanner.test.tsx` (NEW), `tests/pages/ScanComparison.test.tsx` (NEW)
+
+### Out of scope
+
+- Dashboard tests for `ContractsList` Compiler column visibility, `ContractDetail` Solidity chip + unsupported notice, `ScanResults` failure_type branching (each adds 60–100 LOC; tracked as separate follow-up).
+- Real integration tests against live DB or HTTP client — source-inspection is the established pattern in `tests/regression/`.
+- Image rebuilds for the 9 Solidity scanner images carrying the `failure_type` payload field (still batched into next routine rebuild).
+
+---
+
 ## 2026-05-09 — Pragma-gate UX: upstream gate + `failure_type` classification + dashboard rendering
 
 **Scanner(s):** all 8 Solidity scanners (wake, slither, aderyn, halmos, mythril, echidna, medusa, soliditydefend) — wrapper-side gate now demoted to defensive backstop
