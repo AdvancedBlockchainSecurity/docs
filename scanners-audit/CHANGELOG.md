@@ -8,6 +8,62 @@ Each entry follows [Documentation Standards](../standards/documentation-standard
 
 ---
 
+## 2026-05-08 — Block 6 UX batch (P2-3, P2-4, P3-2)
+
+**Scanner(s):** all 17 (platform-level UX/observability)
+**Author:** Apogee
+**Services Affected:** blocksecops-api-service (P2-3 result-types filter), blocksecops-tool-integration (P2-4 pragma-gate text — source-only), blocksecops-docs (P3-2 JWT refresh-token doc)
+**Image bumps:** `api-service:0.43.8 → 0.43.9` (P2-3)
+
+### P2-3 — `/scans/{id}/result-types` filters to non-empty types
+
+`/scans/{id}/result-types` previously returned all types from the static `SCANNER_RESULT_TYPE_MAP` based on which scanners were *requested*, regardless of whether the corresponding finding tables actually had rows. The dashboard was showing empty tabs (e.g., halmos requested → "Formal Verification" tab → empty because no `prove_*` invariants).
+
+The fix runs a per-type EXISTS query against each finding table (`vulnerabilities`, `code_quality_findings`, `gas_analysis_findings`, `formal_verification_results`, `fuzzing_results`) and only returns types with at least one row. The static `SCANNER_RESULT_TYPE_MAP` lookup is dropped from `get_scan_result_types`.
+
+**Verification:**
+
+```
+GET /scans/4f8cf80b-e42b-4c16-b87a-6f3459fef65f/result-types
+→ ['fuzzing']  (trident scan with fuzzing rows)
+
+GET /scans/77826ec8-a121-414b-84f6-d54c1744e35a/result-types
+→ []           (mythril scan with 0 findings; was returning ['vulnerability'])
+```
+
+Source-level test: `tests/regression/test_result_types_p2_3.py` — 4/4 pass. Shipped via blocksecops-api-service PR #366 (image 0.43.9).
+
+### P2-4 — Friendlier pragma-gate rejection message + help link (source-only)
+
+User-flagged scan `1ae2f5d8-cba3-4f78-a570-1abb805be550` (scanners=[soliditydefend, slither] on a contract with `pragma solidity ^0.8.0;`) surfaced unfriendly rejection wording. Both check-pragma scripts (`scanner-images/_base/check-pragma` shared by 9 Solidity scanners + `scanner-images/soliditydefend/check-pragma` for soliditydefend's own variant) now emit a clearer, action-oriented message with an embedded link to `https://docs.0xapogee.com/language-support`. Both payloads gain a `help_url` field for clients that prefer structured links.
+
+Status remains `failed` (not `completed`) — the scan was rejected at dispatch, and treating that as `completed` would mislead the dashboard's success-counter aggregation. The friendlier `error_message` + `help_url` is the right shape.
+
+**Image rebuilds deferred** to the next routine scanner image rebuild — the change requires rebuilding `scanner-base-solidity` (used by 9 of 10 Solidity scanners) plus a fresh `scanner-soliditydefend` image. The current production message (since F1/2026-05-06) already mentions the actual version + min version + release date; the text-only sharpening + help link is a polish improvement, not a regression fix.
+
+Shipped via blocksecops-tool-integration PR #175.
+
+### P3-2 — JWT auth + refresh-token flow doc
+
+Closes the documentation gap flagged in the audit ("undocumented JWT refresh-token flow makes SDK consumers reverse-engineer the auth from the dashboard source"). New `blocksecops-docs/api/auth-jwt-refresh.md` covers:
+
+- Endpoint URLs + required headers (apikey + Content-Type)
+- Password-grant initial sign-in
+- Calling Apogee `/api/v1/*` endpoints with Bearer + apikey
+- Refresh-grant proactive renewal pattern (refresh when `expires_at - now < 60s`)
+- Refresh-token rotation behavior
+- Python + TypeScript auto-refresh wrappers (copy-paste ready)
+- Sign-out
+- Troubleshooting matrix
+
+Cross-linked to existing `api-key.md`, `rate-limits.md`, `sdk-overview.md`. Shipped via blocksecops-docs PR #185.
+
+### Plan reference
+
+Plan: `/home/pwner/.claude/plans/gentle-whistling-russell.md` — Block 6 (UX batch P2-3, P2-4, P3-2).
+
+---
+
 ## 2026-05-08 — trident P3-1 fixture overflow-checks fix
 
 **Scanner(s):** trident (fixture-data fix; no scanner code change)
