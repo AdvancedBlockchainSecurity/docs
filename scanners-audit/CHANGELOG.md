@@ -1,10 +1,41 @@
 # Scanner Audit Changelog
 
 **Status:** Active
-**Last Updated:** 2026-05-09
+**Last Updated:** 2026-05-22
 
 Reverse-chronological log of every scanner status change, fix attempt, regression, and verification.
 Each entry follows [Documentation Standards](../standards/documentation-standards.md) Change Summary format.
+
+---
+
+## 2026-05-22 — Full 17-scanner functionality verification (baseline + detector-firing)
+
+**Scanner(s):** all 17 production scanners
+**Author:** Apogee
+**Services Affected:** none — verification only, no code or image changes
+
+### What changed
+
+Two-phase verification of every scanner as end-user via `POST /api/v1/scans`:
+
+1. **Phase 1 — baseline matrix (17 scans).** 17/17 match the 2026-05-12 baseline `c/h/m/l` counts exactly. Wall-clock 217 s; per-scanner durations 83-224 s (well above the <5 s silent-crash floor).
+2. **Phase 2/3 — detector-firing on known/probable-bug fixtures (7 scans).** Decisive new detector firings observed on halmos (c=1), echidna (h=1), mythril (h=1 m=2 l=2), vyper (h=1 l=1 — first decisive Slither-Vyper firing on record), rustdefend (c=1 — first decisive rustdefend firing on record), plus halmos source-only negative control (0 ✅).
+
+**Tally: 17/17 scanners functional.** 13 decisively verified by detector firing; 4 confirmed via proof-of-life only (medusa, moccasin, trident, cargo-fuzz-solana — no seeded-bug fixture exists in the DB for these; gap recorded, not a scanner defect).
+
+See [`TaskDocs-BlockSecOps/audit-2026-05-22-scanner-matrix-reaudit.md`](/home/pwner/Git/TaskDocs-BlockSecOps/audit-2026-05-22-scanner-matrix-reaudit.md) for full evidence per scanner.
+
+### Why
+
+Owner requested verification of actual scanner functionality, not just baseline-match. The F1 notification bug fixed earlier today was the same class of silent-failure pattern: zero output looks identical whether the detector ran cleanly or silently crashed. This audit closes that risk by exercising detector logic against known-buggy fixtures wherever possible.
+
+### Verification
+
+- 24 total scans run; 23 completed cleanly (1 moccasin attempt returned HTTP 400 because no buggy multi-file Vyper project exists in the DB — fixture gap, not scanner failure).
+- 13 scanners decisively verified (detector fired on a real bug).
+- 4 scanners proof-of-life only (substantial wall-clock + clean baseline match; lack seeded-bug fixture for decisive test).
+- No regressions; no failed scanner Jobs; no errors in `tool-integration-prod` logs during the run window.
+- Two new firings on record (vyper, rustdefend) compared to the 2026-05-12 audit.
 
 ---
 

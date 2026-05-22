@@ -1,8 +1,10 @@
 # Scanner Status
 
 **Version:** 1.0.0
-**Last Updated:** 2026-05-09
+**Last Updated:** 2026-05-22
 **Status:** Active
+
+> **2026-05-22 verification update:** All 17 scanners re-verified end-to-end via the customer API. **13/17 decisively confirmed** by detector firing on a known-buggy fixture today (including **two new firings on record: vyper and rustdefend**). The remaining 4 (medusa, moccasin, trident, cargo-fuzz-solana) are proof-of-life-only because the DB lacks the seeded-bug fixture types they need — fixture-coverage gap, not a scanner defect. Full evidence in [`TaskDocs-BlockSecOps/audit-2026-05-22-scanner-matrix-reaudit.md`](/home/pwner/Git/TaskDocs-BlockSecOps/audit-2026-05-22-scanner-matrix-reaudit.md); summary in [CHANGELOG entry 2026-05-22](./CHANGELOG.md#2026-05-22--full-17-scanner-functionality-verification-baseline--detector-firing). Per-row "Last verified" cells below remain the 2026-05-09 deep-dive snapshot; today's audit confirms they have not regressed.
 
 ## Overview
 
