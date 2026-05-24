@@ -159,6 +159,8 @@ Validates data integrity after the upgrade. This is a **read-only** operation.
 | Delete old vulnerabilities | Manual clean-slate procedure (see below) |
 | Delete old scans | Manual clean-slate procedure (see below) |
 
+**API-service version sync:** The api-service `/api/v1/scanners` endpoint fetches version/developer metadata from tool-integration's `/scanners/health` at runtime with a 5-minute TTL cache. The pipeline does not need to update api-service — the UI picks up new versions automatically.
+
 ## Data Safety
 
 **The pipeline never deletes data.** Specifically:

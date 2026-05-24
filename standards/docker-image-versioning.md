@@ -653,6 +653,8 @@ Complete procedure when updating a scanner:
 
 See [Scanner Image Version Bump Workflow](../workflows/scanner-image-version-bump.md) for detailed steps.
 
+**API-service version sync is automatic.** The api-service `/api/v1/scanners` endpoint fetches version/developer metadata from tool-integration at runtime (5-minute TTL cache). No separate api-service update is needed.
+
 ### No pyproject.toml for Scanners
 
 Unlike services (which use `pyproject.toml` as source of truth), scanner images:

@@ -76,6 +76,8 @@ k8s/base/scanner-versions-configmap.yaml
 
 Any version mismatch between these three locations will cause problems.
 
+**API-service UI sync:** The api-service fetches version/developer metadata from tool-integration at runtime (5-minute TTL cache via `/scanners/health`). No separate api-service ConfigMap update or restart is needed — the "Configure Security Scan" UI picks up new versions automatically after tool-integration is updated.
+
 ### Immutable Tags
 
 All image tags in Harbor are immutable. **You cannot overwrite a tag.** Every version change requires a new, unique tag.

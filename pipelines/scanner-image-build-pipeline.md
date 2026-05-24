@@ -248,6 +248,10 @@ echo "All scanners built successfully"
 
 ---
 
+**API-service version sync:** The api-service fetches version/developer metadata from tool-integration at runtime (5-minute TTL cache). No separate api-service ConfigMap update or restart is needed after a scanner image build — the UI picks up new versions automatically.
+
+---
+
 ## Build Configuration Files
 
 ### ConfigMap (Source of Truth)
