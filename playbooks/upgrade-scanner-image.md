@@ -212,6 +212,8 @@ SCANNER_IMAGE_<SCANNER>: "scanner-<scanner>:<IMAGE_VERSION>"
 SCANNER_IMAGE_<SCANNER>: "harbor.blocksecops.local/blocksecops/scanner-<scanner>:<IMAGE_VERSION>"
 ```
 
+**API-service version sync:** The api-service fetches version/developer metadata from tool-integration at runtime (5-minute TTL cache via `/scanners/health`). No separate api-service ConfigMap update is needed — the "Configure Security Scan" UI picks up new versions automatically after tool-integration is restarted.
+
 ---
 
 ## Step 6: Deploy Updated Scanner

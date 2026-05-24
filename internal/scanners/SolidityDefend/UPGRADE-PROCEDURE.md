@@ -6,10 +6,11 @@
 
 1. **ConfigMap** (single source of truth):
    - `blocksecops-tool-integration/k8s/base/scanner-versions-configmap.yaml`
-   - `api-service-local` namespace ConfigMap
 
-2. **API Service** (if hardcoded version exists):
-   - `blocksecops-api-service/src/infrastructure/scanner_config/scanners.py`
+2. **Scanner image** (if Apogee wrapper image changed):
+   - `blocksecops-tool-integration/k8s/base/scanner-versions-configmap.yaml` — `SCANNER_IMAGE_SOLIDITYDEFEND` tag
+
+No api-service files need updating. The api-service fetches version/developer metadata from tool-integration at runtime (5-minute TTL cache via `/scanners/health`).
 
 ---
 
@@ -18,8 +19,7 @@
 ### 1. Update ConfigMap (Primary Source)
 
 ```bash
-# Edit the tool-integration ConfigMap
-vim /Users/pwner/Git/ABS/blocksecops-tool-integration/k8s/base/scanner-versions-configmap.yaml
+vim blocksecops-tool-integration/k8s/base/scanner-versions-configmap.yaml
 
 # Update in SCANNER_METADATA JSON:
 "soliditydefend": {
@@ -27,51 +27,36 @@ vim /Users/pwner/Git/ABS/blocksecops-tool-integration/k8s/base/scanner-versions-
   "developer": "Apogee",
   "_note": "Updated YYYY-MM-DD, description of changes"
 }
+
+# Update image tag if Apogee scanner image was rebuilt:
+SCANNER_IMAGE_SOLIDITYDEFEND: "...:0.X.0"
 ```
 
-### 2. Update api-service-local ConfigMap
+### 2. Apply and Restart tool-integration
 
 ```bash
-# Get current ConfigMap
-kubectl get configmap scanner-versions -n api-service-local -o yaml > /tmp/cm.yaml
-
-# Edit and update soliditydefend version in SCANNER_METADATA
-vim /tmp/cm.yaml
-
-# Apply updated ConfigMap
-kubectl apply -f /tmp/cm.yaml
+kubectl apply -k blocksecops-tool-integration/k8s/overlays/local
+kubectl rollout restart deployment/tool-integration -n tool-integration-local
+kubectl rollout status deployment/tool-integration -n tool-integration-local
 ```
 
-### 3. Apply tool-integration ConfigMap
+### 3. Verify
+
+The api-service picks up the new version automatically within 5 minutes (no restart needed):
 
 ```bash
-kubectl apply -k /Users/pwner/Git/ABS/blocksecops-tool-integration/k8s/overlays/local
-```
-
-### 4. Restart API Service
-
-```bash
-kubectl rollout restart deployment/api-service -n api-service-local
-kubectl rollout status deployment/api-service -n api-service-local
-```
-
-### 5. Verify
-
-```bash
-kubectl exec -n api-service-local deployment/api-service -- python -c "
-from infrastructure.scanner_config.scanners import SCANNERS
-print(f'SolidityDefend: {SCANNERS[\"soliditydefend\"].version}')
-"
+# Check tool-integration reports the new version
+curl -sk https://app.0xapogee.com/api/v1/scanners \
+  -H "Authorization: Bearer $TOKEN" | jq '.scanners[] | select(.id == "soliditydefend") | {id, version}'
 ```
 
 ---
 
 ## Notes
 
-- Version must be in ConfigMap `SCANNER_METADATA` JSON (single source of truth)
-- Do NOT hardcode version in `scanners.py` - it should load from ConfigMap
+- Version must be in tool-integration's ConfigMap `SCANNER_METADATA` JSON (single source of truth)
+- api-service reads version/developer from tool-integration `/scanners/health` at runtime — no manual ConfigMap sync needed
 - Use `:latest` tag for scanner images in local development
-- If `scanners.py` has hardcoded version, rebuild Docker image after removing it
 
 ---
 

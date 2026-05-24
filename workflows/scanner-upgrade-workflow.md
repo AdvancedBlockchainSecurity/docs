@@ -172,6 +172,8 @@ The tool-integration ServiceAccount needs:
 
 These are defined in `blocksecops-tool-integration/k8s/base/rbac.yaml`.
 
+**API-service version sync:** The api-service `/api/v1/scanners` endpoint (which feeds the "Configure Security Scan" UI) fetches version/developer metadata from tool-integration's `/scanners/health` at runtime with a 5-minute TTL cache. No manual ConfigMap sync or api-service restart is needed after a scanner upgrade — the UI picks up the new version automatically.
+
 ### Phase 2: Docker Image Build
 
 **Host-side operation** — pods don't have Docker socket access.

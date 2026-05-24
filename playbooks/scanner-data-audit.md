@@ -133,44 +133,34 @@ WHERE v.id IS NULL;
 
 ---
 
-## Phase 3: ConfigMap Version Consistency
+## Phase 3: Scanner Version Consistency
 
-### 3.1 Compare API Service vs Tool-Integration
+### 3.1 Verify API Response Shows Live Versions
 
-```bash
-echo "=== API Service ===" && \
-kubectl get cm scanner-versions -n api-service-local \
-  -o jsonpath='{.data.SCANNER_METADATA}' | jq 'to_entries[] | "\(.key): \(.value.version)"' -r
-
-echo "=== Tool Integration ===" && \
-kubectl get cm scanner-versions -n tool-integration-local \
-  -o jsonpath='{.data.SCANNER_METADATA}' | jq 'to_entries[] | "\(.key): \(.value.version)"' -r
-```
-
-**What to look for:** Versions must match between both ConfigMaps. The tool-integration ConfigMap is the source of truth (updated by admin dashboard upgrades).
-
-### 3.2 Compare API Response vs ConfigMap
+api-service fetches version/developer metadata from tool-integration at runtime (5-minute TTL cache). The API response should always reflect the current tool-integration state without requiring a pod restart or ConfigMap sync.
 
 ```bash
 curl -sk "https://app.0xapogee.com/api/v1/scanners" \
   -H "Authorization: Bearer $TOKEN" | jq '[.scanners[] | {id, version}]'
 ```
 
-**What to look for:** API response versions should match the API service ConfigMap.
-
-### 3.3 Fix: Sync Stale ConfigMap
-
-If versions are mismatched, copy `SCANNER_METADATA` from the tool-integration base ConfigMap to the API service ConfigMap:
-
-**Source:** `blocksecops-tool-integration/k8s/base/scanner-versions-configmap.yaml`
-**Target:** `blocksecops-api-service/k8s/overlays/local/api-service/scanner-versions-configmap.yaml`
+**Compare against tool-integration source of truth:**
 
 ```bash
-# After updating the file in Git:
-kubectl apply -k /home/pwner/Git/blocksecops-api-service/k8s/overlays/local/api-service/
-kubectl rollout restart deployment/api-service -n api-service-local
-kubectl rollout status deployment/api-service -n api-service-local --timeout=120s
+kubectl get cm scanner-versions -n tool-integration-prod \
+  -o jsonpath='{.data.SCANNER_METADATA}' | jq 'to_entries[] | "\(.key): \(.value.version)"' -r
 ```
+
+**What to look for:** API response versions should match tool-integration's ConfigMap. If they don't, wait 5 minutes (TTL cache) and retry. If still mismatched, check the fallback chain below.
+
+### 3.2 Diagnose Stale Versions
+
+If api-service returns stale versions after the cache TTL:
+
+1. **Check tool-integration is reachable:** `kubectl logs -n api-service-prod -l app.kubernetes.io/name=api-service --tail=50 | grep "tool-integration"`
+2. **Check fallback source:** api-service falls back to the `scanner_versions` DB table, then to the `SCANNER_METADATA` env var (startup ConfigMap bake), then to `"unknown"`.
+3. **Verify DB table:** `SELECT scanner_name, current_version FROM scanner_versions;` — updated during admin dashboard upgrades.
+4. **No manual ConfigMap sync is needed.** The api-service ConfigMap is a startup fallback only, not the UI source of truth.
 
 ---
 
