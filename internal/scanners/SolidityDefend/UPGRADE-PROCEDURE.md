@@ -62,10 +62,12 @@ curl -sk https://app.0xapogee.com/api/v1/scanners \
 
 ## Version History
 
-| Version | Date | Notes |
-|---------|------|-------|
-| 1.10.13 | 2026-02-03 | Project-aware scanning, cross-contract detection, 4 FP fixes (pool-donation, uups, proxy-storage, token-supply) |
-| 1.10.3 | 2026-01-17 | Major upgrade: 333 detectors (+118), EIP-7702/1153, proxy, L2, governance, noise reduction |
-| 1.4.0 | 2025-11-26 | Project mode support (Foundry/Hardhat) |
-| 1.3.7 | 2025-11-15 | Bug fixes |
-| 1.3.0 | 2025-11-03 | Initial platform integration |
+| Version | Date | Image | Notes |
+|---------|------|-------|-------|
+| 2.0.10 | 2026-05-23 | 0.10.0 | Restore TP recall regressions from v2.0.8-v2.0.9 FP work (reentrancy, access_control, unchecked_external_call). Rust 1.86. |
+| 2.0.9 | 2026-05-06 | 0.9.10 | Foundry+OZ remappings.txt sweep (Task #179) |
+| 2.0.1 | 2026-02-14 | 0.8.0 | Detectors reworked, FP reduction |
+| 1.10.13 | 2026-02-03 | 0.7.0 | Project-aware scanning, cross-contract detection, 4 FP fixes |
+| 1.10.3 | 2026-01-17 | 0.4.0 | Major upgrade: 333 detectors (+118), EIP-7702/1153, proxy, L2, governance |
+| 1.4.0 | 2025-11-26 | — | Project mode support (Foundry/Hardhat) |
+| 1.3.0 | 2025-11-03 | — | Initial platform integration |

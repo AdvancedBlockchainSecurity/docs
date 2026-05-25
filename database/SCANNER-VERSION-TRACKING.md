@@ -418,7 +418,7 @@ See `/home/pwner/Git/blocksecops-tool-integration/docs/SCANNER-UPDATE-PROCEDURE.
 - wake (eth-wake 4.22.0) - scanner-wake:0.3.6 ✅
 - semgrep (1.144.0) - scanner-semgrep:0.3.5 - 47 detectors - offline rules bundled as local YAML ✅
 - solhint (6.0.2) - scanner-solhint:0.1.6 - 20 detectors ✅
-- soliditydefend (2.0.1) - scanner-soliditydefend:0.8.0 - detectors reworked, FP reduction ✅
+- soliditydefend (2.0.10) - scanner-soliditydefend:0.10.0 - TP recall restored (reentrancy, access_control, unchecked_external_call) ✅
 - echidna (2.2.7, solc-select 1.1.0) - scanner-echidna:0.3.1 - fuzzer
 - medusa (1.5.0) - scanner-medusa:0.3.1 - fuzzer
 - halmos (0.3.3) - scanner-halmos:0.3.0 - formal verification

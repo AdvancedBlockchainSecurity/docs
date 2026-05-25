@@ -22,7 +22,7 @@ Apogee automatically detects your project framework based on configuration files
 |---------|-------------|---------|---------|-------|
 | **Slither** | Full | Full | Full | Hardhat projects converted to Foundry layout at scan time (offline-compatible). OZ 5.x bundled — see Hardhat Support Details. Foundry+OZ projects without a declared remapping resolved correctly (Task #179, scanner-slither:0.4.7). |
 | **Aderyn** | Full | Full | Full | Hardhat → Foundry conversion (Task #172 sweep). OZ 5.x bundled. Foundry+OZ projects without a declared remapping resolved correctly (Task #179, scanner-aderyn:0.8.5). |
-| **SolidityDefend** | Full | Full | Full | Apogee premier scanner. Foundry+OZ remappings.txt sweep applied (Task #179, scanner-soliditydefend:0.9.10). |
+| **SolidityDefend** | Full | Full | Full | Apogee premier scanner. v2.0.10 (scanner-soliditydefend:0.10.0). Foundry+OZ remappings.txt sweep applied. |
 | **Echidna** | Full | Full | Full | Hardhat → Foundry conversion. Foundry+OZ remappings.txt sweep applied (Task #179, scanner-echidna:0.5.4). Note: only finds issues on contracts with `echidna_*` invariant tests. |
 | **Halmos** | Full | Full | Full | Symbolic execution. Hardhat → Foundry conversion. OZ 5.x bundled. |
 | **Wake** | Full | Full | Full | Foundry+OZ projects: wake-scan writes `wake.toml` with `target_version` + OZ remapping when wake.toml is absent and OZ imports are detected (scanner-wake:0.5.8, Task #192). Without `target_version`, wake's compile pipeline triggers an outbound aiohttp call to `binaries.soliditylang.org` that the scanner NetworkPolicy egress block correctly denies. With `target_version` and the seeded `/opt/wake-compilers` cache, wake compiles fully offline. |
