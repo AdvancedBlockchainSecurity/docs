@@ -200,19 +200,26 @@ These standards ensure proper versioning and configuration management:
     - Pre-ship checklist
     - Cross-links to `new-cronjob-deployment.md` workflow
 
+24. **[Ingress and Networking](./ingress-networking.md)**
+    - GKE Gateway API (GCP production) vs Traefik (self-hosted)
+    - TLS certificate requirements: DNS-01 ACME authorization mandatory for all domains behind Cloudflare proxy
+    - Required `_acme-challenge` CNAME records and why they must be DNS-only (gray cloud)
+    - HTTPRoute and IngressRoute patterns
+    - Security layers: Cloudflare proxy + Cloud Armor + NetworkPolicy
+
 ### 🛠️ Operational Workflows (cross-link)
 
 - **[New CronJob Deployment](../workflows/new-cronjob-deployment.md)** — canonical pattern for adding a new production CronJob to GCP (kustomize layout, Workload Identity binding, RBAC scope, NetworkPolicy archetype, Prometheus alerting, deploy+verify). Followed by `postgresql-backup`, `gcp-secret-drift-check`, and `drift-audit`.
 
 ### ✅ Compliance & Verification
 
-23. **[Compliance Checklist](./compliance-checklist.md)**
+25. **[Compliance Checklist](./compliance-checklist.md)**
     - Daily development checklist
     - Making changes checklist
     - Database configuration changes checklist
     - Code review checklist
 
-24. **[Smoke Test](./smoke-test.md)**
+26. **[Smoke Test](./smoke-test.md)**
     - Platform smoke test after deployments
     - Pre-flight infrastructure checks
     - External and internal service health checks

@@ -14,6 +14,8 @@
 
 Per `stripe-security-audit-playbook.md` "Failure Handling" rules and the operator's standing instructions, the audit halted at Phase 4 immediately after filing the HIGH finding. **Phases 5–7 were NOT formally executed** in this run, although static evidence accidentally gathered during scope reconnaissance is included below as informational notes (clearly labelled "not-formally-executed"). A re-run from Phase 1 is required after the halt-triggering finding is remediated.
 
+> **BSO-SEC-021 RESOLVED — 2026-06-19.** Fixed in api-service v0.44.8. The private `_validate_redirect_url` helper was promoted to a public shared function in `src/infrastructure/security/url_validation.py` and applied to all three URL parameters in `billing.py` (`success_url`, `cancel_url`, `return_url`). See `docs/changelogs/API-SERVICE-V0.44.8-BSO-SEC-021-FIX-2026-06-19.md` for full details. BSO-SEC-022, BSO-SEC-023, and BSO-SEC-024 remain open. Audit re-run from Phase 1 is pending.
+
 Two additional Phase-4-adjacent findings (BSO-SEC-022, BSO-SEC-023) and one Phase-2 Medium finding (BSO-SEC-024) discovered before the halt are also filed, since they were already reproduced from source.
 
 ---
@@ -189,7 +191,7 @@ The Stripe surface has a strong primary trust boundary — webhook signature ver
 | 1 — Signature verification | PASS (static review) | `stripe_webhook.py:843–921`, `tier_audit.py:236–306,309–321` |
 | 2 — Webhook idempotency | **FAIL** — BSO-SEC-024 (Medium) — event-id idempotency missing for subscription events; pipeline references nonexistent `stripe_event_log` table | `stripe_webhook.py:597–803`; absence verified via `grep -rn "stripe_event_log\|StripeEventLog\|webhook_event"` returning no Python source matches |
 | 3 — Metadata whitelist | PASS — both ingestion (`parse_subscription_metadata`) and outgoing checkout-session creation (`_sanitize_metadata_value`) enforce whitelists; defense-in-depth note: `handle_checkout_session_completed` doesn't cross-check metadata.plan_tier against the actual price_id (Low, not filed — only exploitable post-`whsec_` compromise) | `stripe_webhook.py:204–245,295–331`; `stripe_service.py:43–61,224–245,547–600` |
-| 4 — Redirect whitelist | **FAIL — HALT** — BSO-SEC-021 (High); BSO-SEC-022 (Medium, tenant isolation, found in same review pass) | `billing.py:236–271,183–233` vs `payments.py:436–453,375–407`; `models.py:174` vs `models.py:1511` |
+| 4 — Redirect whitelist | **FAIL — HALT** — BSO-SEC-021 (High, **RESOLVED 2026-06-19 in v0.44.8**); BSO-SEC-022 (Medium, tenant isolation, found in same review pass, **still open**) | `billing.py:236–271,183–233` vs `payments.py:436–453,375–407`; `models.py:174` vs `models.py:1511` |
 | 5 — Secret hygiene | **NOT FORMALLY EXECUTED** (halted at Phase 4). Reconnaissance evidence: `sk_live_*` grep clean (only doc placeholders in `docs/playbooks/`); `whsec_*` matches all benign (test fixtures + a separate non-Stripe-scope leak in `docs/database/solidity_security_20260127_162115_pre_phase2_migrations.sql`, see Out-of-scope below); `STRIPE_API_KEY`/`STRIPE_WEBHOOK_SECRET` are externalized via Vault/GCP-SM ExternalSecrets; `VITE_STRIPE_PUBLISHABLE_KEY` is `pk_test_*` (publishable, intentionally per playbook prereq). To be re-run from Phase 1 after halt remediation. | n/a |
 | 6 — Tenant isolation | **NOT FORMALLY EXECUTED** (halted at Phase 4). One DB-layer issue (BSO-SEC-022) was found incidentally in Phase 4 model review. Live cross-tenant probes (6.1.1–6.1.5) require live cluster; deferred to re-run. | n/a |
 | 7 — Audit log review | **NOT FORMALLY EXECUTED** (halted at Phase 4). Requires `kubectl exec postgresql-0 -- psql` and Stripe-dashboard delivery-log read; owner is AFK so no live cluster access available in this run regardless. | n/a |
@@ -210,7 +212,7 @@ These were noticed during Stripe scope reconnaissance but belong to other featur
 
 ## Follow-ups
 
-- [ ] Owner: review BSO-SEC-021 (HIGH) and approve a fix branch — promote `_validate_redirect_url` to a shared helper and apply to all three URL params in `billing.py`. Per Rule 0, the audit does not propose code changes — only files the finding.
+- [x] **BSO-SEC-021 RESOLVED (2026-06-19)** — Fixed in api-service v0.44.8. See `docs/changelogs/API-SERVICE-V0.44.8-BSO-SEC-021-FIX-2026-06-19.md`.
 - [ ] Owner: review BSO-SEC-022 — schedule the partial-unique-index migration on `users.stripe_customer_id` after pre-migration duplicate-detection query.
 - [ ] Owner: review BSO-SEC-024 — schedule `stripe_event_log` table migration; once deployed, update `docs/audit-pipelines/stripe-security-audit-pipeline.md` Phase 2 SQL to match the actual table name (current pipeline references a table that doesn't exist).
 - [ ] Owner: review BSO-SEC-023 — decide between HTTP rate-limit vs Redis-backed log-write deduplication.
