@@ -4,12 +4,12 @@
 **Database Name:** `solidity_security`
 **Schema:** `public`
 **Timezone:** UTC
-**Verified:** 2026-05-09 (scans + scanner_executions `failure_type` column reflected; 088 baseline columns + all tables from 082+ covered below; older tables reflect the 2026-03-15 snapshot)
-**Latest Migration:** 090 (add_failure_type_to_scans_and_executions)
+**Verified:** 2026-06-20 (migrations 091/092/093 reflected; scans + scanner_executions `failure_type` column reflected; 088 baseline columns + all tables from 082+ covered below; older tables reflect the 2026-03-15 snapshot)
+**Latest Migration:** 093 (stripe_event_log)
 
 > **Naming Note:** The database is named `solidity_security`, not `blocksecops`. This name was established during initial development when the focus was solely on Solidity. Retained for backward compatibility.
 
-**Total Tables:** 84 ORM-managed tables (excluding `alembic_version`)
+**Total Tables:** 86 ORM-managed tables (excluding `alembic_version`) — adds `contract_artifacts` (091) and `stripe_event_log` (093)
 
 ### Migration history delta since last full verification
 
@@ -23,6 +23,9 @@
 | 088 | 2026-04-21 | `contracts.baseline_scan_id` + `contracts.baseline_marked_at` + FK + index | **Documented** — see `contracts` in Domain 2 |
 | 089 | 2026-05-08 | **NEW** `scanner_executions` table (per-scanner row per scan) | **Documented** — see Domain 2 |
 | 090 | 2026-05-09 | `scans.failure_type` + `scanner_executions.failure_type` (VARCHAR(50), nullable, CHECK enum) | **Documented** — see `scans` and `scanner_executions` in Domain 2 |
+| 091 | 2026-05-09 | `contracts.has_compiled_artifacts` + `contracts.artifact_layout` + **NEW** `contract_artifacts` table | **Documented** — see `contracts` and `contract_artifacts` in Domain 2 |
+| 092 | 2026-06-20 | Partial UNIQUE index `users_stripe_customer_id_uniq` on `users(stripe_customer_id) WHERE stripe_customer_id IS NOT NULL` (BSO-SEC-022) | **Documented** — see `users` in Domain 1 |
+| 093 | 2026-06-20 | **NEW** `stripe_event_log` table for webhook idempotency (BSO-SEC-024) | **Documented** — see Domain 1 (Stripe) |
 
 Migrations 083–085 and 087 predate this session and remain as documentation follow-up for the next full verification sweep.
 
@@ -69,7 +72,7 @@ Central user table with authentication, wallet, admin, and tier fields.
 | tier | VARCHAR(20) | NOT NULL, default 'developer', indexed | developer/starter/growth/enterprise |
 | tier_updated_at | TIMESTAMPTZ | nullable, default now() | |
 | supabase_user_id | UUID | UNIQUE, nullable, indexed | |
-| stripe_customer_id | VARCHAR(255) | nullable | |
+| stripe_customer_id | VARCHAR(255) | nullable, **partial UNIQUE** | Migration 092 (BSO-SEC-022). Index `users_stripe_customer_id_uniq` with `WHERE stripe_customer_id IS NOT NULL` preserves multi-NULL semantics |
 | stripe_subscription_id | VARCHAR(255) | nullable | |
 | wallet_address | VARCHAR(42) | UNIQUE, nullable, indexed | EVM MetaMask/WalletConnect |
 | wallet_nonce | VARCHAR(64) | nullable | |
@@ -890,6 +893,22 @@ Credit usage ledger (purchase, scan_usage, refund, gift).
 | scan_id | UUID | FK scans(id) ON DELETE SET NULL, nullable | |
 | description | VARCHAR(255) | nullable | |
 | created_at | TIMESTAMPTZ | NOT NULL, default now(), indexed | |
+
+### `stripe_event_log`
+
+Webhook idempotency log (Migration 093, BSO-SEC-024). The Stripe webhook dispatcher does an `INSERT … ON CONFLICT (event_id) DO NOTHING RETURNING event_id` after signature verification. If 0 rows are returned, the event is a Stripe retry of an already-processed event → the dispatcher short-circuits with `HTTP 200 {received: true, duplicate: true}` and skips the handler.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| event_id | VARCHAR(255) | PRIMARY KEY | Stripe `event.id` (e.g. `evt_1NCqJU...`) |
+| event_type | VARCHAR(100) | NOT NULL | Stripe `event.type` (e.g. `customer.subscription.updated`) |
+| received_at | TIMESTAMPTZ | NOT NULL, default now() | When the webhook was first received and validated |
+| processed_at | TIMESTAMPTZ | nullable | Stamped after the handler returns. NULL = in flight or crashed |
+
+**Indexes:**
+- `ix_stripe_event_log_type_received` on `(event_type, received_at)` — analytics + 30-day retention sweep
+
+**Retention:** 30 days. Stripe never retries beyond ~3 days; the retention window is comfortable. Cleanup is handled by a separate Celery beat task (see api-service release notes).
 
 ---
 
