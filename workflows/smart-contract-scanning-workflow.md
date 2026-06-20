@@ -1,7 +1,7 @@
 # Smart Contract Scanning Workflow
 
-**Version:** 1.2.0
-**Last Updated:** February 28, 2026
+**Version:** 1.3.0
+**Last Updated:** 2026-06-20
 **Status:** Active
 
 ---
@@ -344,65 +344,65 @@ spec:
 
 ---
 
-### Phase 4: Result Processing (Orchestration)
+### Phase 4: Scanner Dispatch (Tool Integration)
 
-**Technology:** Celery distributed task queue
+**Technology:** Kubernetes Jobs via tool-integration service
 
-#### Celery Tasks
+Scan dispatch is triggered synchronously at scan-creation time (Phase 2). The API service calls tool-integration for each selected scanner immediately after creating the scan record. There is no periodic polling loop.
+
+**Note:** `poll_scan_queue` was removed from blocksecops-orchestration in PR #111 (2026-06-20). The orchestration service no longer dispatches scans or runs scanner subprocesses in-pod. See `docs/internal/architecture/orchestration-rest-api.md` for the current orchestration architecture.
+
+#### Active Celery Beat Tasks
 
 | Task | Schedule | Description |
 |------|----------|-------------|
-| `poll_scan_queue` | Every 10s | Finds queued scans, dispatches execution |
-| `execute_scan_analysis` | On-demand | Main scan execution task |
+| `check_stale_scans` | Every 30s | Detects and marks stale `running` scans as `failed` or resets to `queued` |
+
+The `poll_scan_queue` task (formerly ran every 10s, dispatched queued scans) has been removed.
 
 #### Priority System
 
 | Tier | Priority Value | Description |
 |------|----------------|-------------|
-| Enterprise | 5 | Highest priority |
-| Growth | 25 | High priority |
-| Starter | 40 | Normal priority |
-| Developer | 50 | Base priority |
+| enterprise | 5 | Highest priority |
+| growth | 25 | High priority |
+| starter | 40 | Normal priority |
+| developer | 50 | Base priority |
 
-*Lower value = Higher priority*
+*Lower value = Higher priority. Priority is stored on the scan record and used for admin monitoring queries. Kubernetes Job scheduling is not currently weighted by priority value.*
 
-#### Orchestration Flow
+#### Dispatch Flow
 
 ```
-poll_scan_queue (every 10s)
+API service: POST /api/v1/scans
         │
         ▼
 ┌───────────────────┐
-│ Query scans where │ status='queued' ORDER BY priority
-│ status='queued'   │
+│ Create ScanModel  │ status='queued', priority by tier
 └─────────┬─────────┘
           │
           ▼
 ┌───────────────────┐
-│ Dispatch execute_ │ Celery task per scan
-│ scan_analysis     │
+│ HTTP POST to      │ One request per scanner
+│ tool-integration  │ POST /scans/{scan_id}/trigger?scanner={id}
 └─────────┬─────────┘
           │
           ▼
 ┌───────────────────┐
-│ Update status     │ 'queued' → 'running'
+│ KubernetesJobMgr  │ Creates K8s Job per scanner
+│ (KJM)             │ blocksecops-tool-integration/src/scanners/
+│                   │   kubernetes_job_manager.py
 └─────────┬─────────┘
           │
           ▼
 ┌───────────────────┐
-│ Fetch contract    │ Load source code
-│ and scan data     │
+│ Update status     │ 'queued' → 'running' (on Job creation)
 └─────────┬─────────┘
           │
           ▼
 ┌───────────────────┐
-│ ScannerOrchestrator│ Execute all requested scanners
-│ .execute_scanners()│
-└─────────┬─────────┘
-          │
-          ▼
-┌───────────────────┐
-│ Collect results   │ Wait for all scanners
+│ Scanner Job runs  │ Container executes analysis
+│                   │ POSTs results to CALLBACK_URL
 └─────────┬─────────┘
           │
           ▼
@@ -410,6 +410,8 @@ poll_scan_queue (every 10s)
 │ Update status     │ 'running' → 'completed' or 'failed'
 └───────────────────┘
 ```
+
+**Stale-scan re-dispatch gap (BSO-SEC-030):** If a scan is reset to `queued` by `check_stale_scans` after a timeout, no Kubernetes Job is automatically created. The admin retry endpoint resets status to `queued` but also does not dispatch. See [Scan Timeout and Retry Workflow](./scan-timeout-retry-workflow.md) for full details.
 
 ---
 
