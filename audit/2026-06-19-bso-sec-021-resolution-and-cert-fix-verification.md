@@ -224,3 +224,394 @@ If BSO-SEC-025 (control-char stripping) or BSO-SEC-026 (default-port normalizati
 ---
 
 **End of report.** No HALT triggered. Changesets A and B are approved for the deployed state. Three new findings (BSO-SEC-025/026/027) are filed for owner triage.
+
+---
+
+# Follow-Up Audit — 2026-06-20 — Five Uncommitted Changesets (A–E)
+
+**Auditor:** apogee-security-audit (Opus 4.7)
+**Scope (light pass, security only):**
+- **Changeset A:** `blocksecops-admin-portal/src/test/setup.ts` — Supabase `vi.stubEnv` for vitest
+- **Changeset B:** `blocksecops-contract-parser/.env.example` — Cairo env-key removal
+- **Changeset C:** `blocksecops-docs/` — 12 modified files (Cairo cleanup + scanner-count + occurrence-badge docs)
+- **Changeset D:** `blocksecops-orchestration/` — v0.13.0 → v0.13.1, `poll-scan-queue` Beat schedule entry removed
+- **Changeset E:** `blocksecops-dashboard/` — Migration 091 frontend (OccurrenceBadge + `with_artifacts` upload + ScannerSelector warning + 3 test files)
+**Severity scale:** Critical / High / Medium / Low / Info
+**Standards referenced:** `docs/standards/api-endpoint-auth.md`, `docs/standards/secure-coding.md`, memory `feedback_no_env_commits.md`, `feedback_no_cairo.md`, `feedback_no_auto_scan_on_sync.md`.
+
+## Follow-Up Status Table
+
+| Check | Outcome | Notes |
+|-------|---------|-------|
+| **A.1** Test setup file is test-only (not imported by app code) | PASS | `setupFiles: ['./src/test/setup.ts']` only referenced in `vite.config.ts` test block. Production build (`build:` block) does NOT include test directory. |
+| **A.2** Stub values are obviously-fake placeholders, not real secrets | PASS | URL is `https://test.supabase.co`; key is `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test-anon-key` (truncated JWT shape, no signature payload). No risk of accidental production credential commit. |
+| **A.3** No `.env` file accompanies the change | PASS | Only `src/test/setup.ts` is in the working tree. Memory `feedback_no_env_commits.md` upheld. |
+| **B.1** `.env.example` removed Cairo vars; no Rust code references them | PASS | `grep -rn "CAIRO_\|SUPPORTED_EXTENSIONS" src/` returns zero hits. Rust code does not load these env vars, so removal cannot crash the parser at runtime. |
+| **B.2** SUPPORTED_EXTENSIONS removal does not break runtime dispatcher | PASS | No Rust code reads `SUPPORTED_EXTENSIONS` from env. Variable was documentation-only in `.env.example`. |
+| **B.3** Memory `feedback_no_cairo.md` upheld | PASS | All active Cairo config keys removed from `.env.example`. Comment retained as deprecation marker. |
+| **C.1** Cairo removed from all user-facing public docs | PASS-with-WARN | 12 of 14 references removed cleanly. **Two historical references remain** in `resources/release-notes/2025/december.md:164,195` ("Cairo support in development" and "Move and Cairo language support"). These are December-2025 release notes that describe the platform state at that time; historically accurate. See follow-up note below. |
+| **C.2** New scanner count (13) is verifiable against deployed ConfigMap | **FAIL — BSO-SEC-028** | Docs claim **13 scanners** in `platform/admin/scanner-management.md:33`, but `blocksecops-tool-integration/k8s/base/scanner-versions-configmap.yaml` ships **17 distinct `SCANNER_IMAGE_*` entries**. Worse, the docs list and the ConfigMap list don't even overlap consistently. See finding below. |
+| **C.3** Docs match dashboard E (OccurrenceBadge) | PASS | `platform/findings/reading-findings.md` + `platform/findings/vulnerability-overview.md` + `platform/scanning/re-scanning.md` correctly document the badge labels and tooltip behavior that Changeset E implements. |
+| **D.1** Removing `poll-scan-queue` Beat task does not silently break the canonical scan path | PASS | api-service POST `/scans/batch` (`src/presentation/api/v1/endpoints/scans.py:1083-1170`) directly dispatches to tool-integration via `service_url_tool_integration` after the DB row is committed. Does not rely on Celery Beat. Production deployment is already running this image and working — confirmed by user. |
+| **D.2** `poll_scan_queue` callable still exists but is now dead code | INFO (cleanup) | `src/blocksecops_orchestration/tasks/scan_tasks_sync.py:33-111` is no longer scheduled and no other code path calls it. It remains a registered Celery task (importable, dispatchable by name) so external triggers theoretically still work, but no caller in this monorepo invokes it. Recommend removing in a follow-up patch or leaving with a `# DEPRECATED` comment. |
+| **D.3** Stale comment at api-service `scans.py:84` says "Celery Beat will pick this up" | **WARN — BSO-SEC-029** | Misleading comment in production code. Same stale-comment pattern at `blocksecops-orchestration/src/blocksecops_orchestration/api/routes/scans.py:59,84` (`Celery Beat will poll the database`). Not a security vulnerability but creates a debugging hazard. |
+| **D.4** Admin retry endpoint (`scan_monitoring.py:285-329`) re-dispatches retried scans | **WARN — BSO-SEC-030** | The admin retry endpoint only resets `scan.status = "queued"` and commits; it does **not** re-dispatch to tool-integration. Pre-changeset-D, the orchestration `poll_scan_queue` Celery beat would have picked these up. Post-changeset-D, **manually-retried scans will sit in "queued" until `check_stale_scans` marks them failed**. Functional bug, not a security issue, but the admin-retry feature is now silently broken. |
+| **D.5** Orchestration POST `/scans` endpoint orphaned | INFO | `blocksecops-orchestration/src/blocksecops_orchestration/api/routes/scans.py:46-105` is guarded by `verify_internal_service` and creates `status="queued"` rows. No caller in the monorepo invokes it (`grep` returns zero callers across api-service, dashboard, tool-integration, CLI). With `poll_scan_queue` removed, any new caller would create orphaned-then-failed scans. Safe today; latent risk if reintroduced. |
+| **D.6** Version bump is consistent across pyproject.toml and 5 kustomize overlays | PASS | `pyproject.toml` and all 5 kustomization.yaml files moved 0.13.0 → 0.13.1 in lockstep. `app.kubernetes.io/version` labels also synced per `docker-image-versioning.md`. |
+| **E.1** OccurrenceBadge.tsx has no XSS sinks | PASS | No `dangerouslySetInnerHTML`, no `eval`, no `innerHTML`. All user-controlled strings (`firstSeen`/`lastSeen`/`label`) interpolate as React text children or `title`/`aria-label` attributes — React auto-escapes. SVG icon is static literal markup. |
+| **E.2** API surface additions are read-only or write-with-existing-auth | PASS | `include_duplicates` is a GET query param on existing `listVulnerabilitiesByScan` — read-only and the server (`scans.py:2158,2264`) honors it. `with_artifacts` is a new form field on the EXISTING `POST /upload` endpoint, which already uses `require_auth_with_scope(["contracts:write"])` (`upload.py:189`) per `api-endpoint-auth.md`. No new endpoints created. |
+| **E.3** No new external network calls / new origins / new secrets | PASS | All new calls hit existing `apiClient` (api-service base URL). No new env vars, no new fetch destinations, no allowlist changes. |
+| **E.4** Scope/tier expansion check on contracts API client + ScannerSelector | PASS | `uploadContractFile` gained a 4th positional arg defaulting to `false` — existing callers unchanged. ScannerSelector gains a soft-warning UI only; no tier-check bypass, no scope expansion. The `FUZZER_LIKE_SCANNERS_REQUIRING_ARTIFACTS` set is purely cosmetic (it drives a warning, not enforcement — enforcement is server-side). |
+| **E.5** Three new test files do not commit secrets or hit real services | PASS | Tests are component-level (Vitest + Testing Library), mocked. No `fetch` to real URLs, no real Supabase keys, no `.env` reads. |
+| **E.6** Dashboard changeset scope matches description | PARTIAL — see note | **The user's description undercounted the change.** Described as "OccurrenceBadge + field additions", but actually delivers full Migration 091 dashboard frontend (artifact-aware upload modal + fuzzer warning + 3 test files). Server-side support already exists (`upload.py:176,238,402`, `scans.py:2158,2264`), so this is the dashboard side of a feature whose backend is already deployed. Scope mismatch worth flagging but not a security issue. |
+
+---
+
+## Follow-Up Findings
+
+### BSO-SEC-028 — Scanner count / inventory drift between docs and deployed ConfigMap
+
+- **Severity:** LOW (documentation/security-posture; not exploitable)
+- **CWE/OWASP:** CWE-1059 (Insufficient Technical Documentation), OWASP A05:2021 Security Misconfiguration (information mismatch class)
+- **Location:**
+  - `blocksecops-docs/platform/admin/scanner-management.md:33` ("13 security scanners")
+  - `blocksecops-docs/billing/pricing-tiers.md:42,73,115` ("All 25+ scanners")
+  - `blocksecops-docs/support/faq/README.md:28` ("Solidity (full support, 11+ scanners)")
+  - `blocksecops-docs/platform/intelligence/deduplication.md:13` ("Without deduplication, running 17 scanners")
+  - `blocksecops-docs/README.md:104-106` ("Solidity 12 scanners / Vyper 2 scanners / Rust 4 scanners" = 18)
+  - `blocksecops-tool-integration/k8s/base/scanner-versions-configmap.yaml` — **17 `SCANNER_IMAGE_*` entries** deployed
+- **Description:** The deployed ConfigMap ships 17 scanner images: slither, aderyn, semgrep, solhint, vyper, halmos, echidna, medusa, moccasin, wake, soliditydefend, mythril, sol-azy, sec3-xray, trident, cargo-fuzz-solana, rustdefend. The user-facing scanner-management doc lists only 13, omitting wake, moccasin, sol-azy, sec3-xray, trident, cargo-fuzz-solana, rustdefend AND including SolidityBOM, Rustle, Cargo Audit which are not in the ConfigMap. Marketing/billing copy says "25+ scanners" everywhere. **None of these four numbers (13, 17, 25+, sum-by-language=18) agree.**
+- **Impact:** Customer confusion about what they're paying for. More importantly: if a customer files a support ticket "Wake didn't run", support staff reading the published scanner list will say "Wake isn't supported" when in fact it's deployed. This is the bug that motivated `docs/standards/secure-coding.md` documentation-truthfulness rule.
+- **Proof / Evidence:**
+  ```
+  ConfigMap (deployed, 17): slither, aderyn, semgrep, solhint, vyper, halmos, echidna, medusa,
+                            moccasin, wake, soliditydefend, mythril, sol-azy, sec3-xray, trident,
+                            cargo-fuzz-solana, rustdefend
+  scanner-management.md (13): SolidityDefend, Slither, Aderyn, Mythril, Semgrep, Solhint,
+                               Echidna, Medusa, Halmos, SolidityBOM, Vyper Analyzer, Rustle,
+                               Cargo Audit
+  Mismatches:
+    - Docs claim but ConfigMap missing: SolidityBOM, Rustle, Cargo Audit
+    - ConfigMap has but docs omit: wake, moccasin, sol-azy, sec3-xray, trident,
+                                   cargo-fuzz-solana, rustdefend
+  ```
+- **Recommended Fix:**
+  1. Treat the ConfigMap as source-of-truth (it's what runs).
+  2. Reconcile `platform/admin/scanner-management.md` to list exactly the 17 deployed scanners with their languages and types.
+  3. Decide whether SolidityBOM/Rustle/Cargo Audit are: (a) production scanners that need deployment, (b) planned scanners that need a "Coming Soon" row, or (c) historical scanners that should be removed from docs.
+  4. Settle the headline number: pick one ("17 scanners" or "25+ when counting detector variants") and use it consistently across `README.md`, `pricing-tiers.md`, `x402-credits.md`, `support/faq/`.
+  5. The bumped 14→13 in this changeset is therefore **moving in the wrong direction** — Cairo was never in the ConfigMap to begin with, so removing it from the docs is correct, but the underlying number should be 17 not 13.
+- **References:** `docs/standards/secure-coding.md` (documentation truthfulness), feedback memory `feedback_verify_against_standards.md` (read source-of-truth files before proposing fixes), prior audit posture-drift observation in this same file.
+
+---
+
+### BSO-SEC-029 — Stale "Celery Beat will pick this up" comments at scan-creation sites
+
+- **Severity:** INFO (debugging hazard, not a vulnerability)
+- **CWE/OWASP:** CWE-1059 (Insufficient Technical Documentation)
+- **Location:**
+  - `blocksecops-api-service/src/presentation/api/v1/endpoints/scans.py:84` — "Celery Beat will pick this up via poll_scan_queue task"
+  - `blocksecops-orchestration/src/blocksecops_orchestration/api/routes/scans.py:59,84` — "Celery Beat will poll the database and dispatch to workers for execution"
+- **Description:** Three inline comments still describe the removed `poll_scan_queue` Beat-driven dispatch path. With Changeset D, scans are created with `status="queued"` and immediately dispatched via direct HTTP to tool-integration (api-service path) or are orphaned (orchestration path).
+- **Impact:** A future engineer debugging a "scan stuck in queued" issue will follow the comment trail to a Celery task that's no longer scheduled, wasting time. Higher risk: someone may "fix" the issue by re-enabling the Beat task without realizing the K8s Job path now handles dispatch — reintroducing the dual-path race that motivated Changeset D.
+- **Proof / Evidence:** see Location.
+- **Recommended Fix:** Update the three comments to describe the new dispatch path. Example for `blocksecops-api-service/src/presentation/api/v1/endpoints/scans.py:84`:
+  ```python
+  # Scan dispatch: this endpoint commits status="queued", then
+  # immediately POSTs to tool-integration which creates a K8s Job
+  # that transitions the scan to "running". The previous
+  # poll_scan_queue Celery Beat path was removed in orchestration
+  # v0.13.1 to eliminate dual-path racing.
+  ```
+- **References:** `docs/standards/core-development-rules.md` Rule 1 (codebase-first — code comments are part of the codebase).
+
+---
+
+### BSO-SEC-030 — Admin scan-retry endpoint silently broken by `poll_scan_queue` removal
+
+- **Severity:** MEDIUM (operational/functional regression, not a direct vulnerability — but blocks an admin recovery path that may be needed during incidents)
+- **CWE/OWASP:** CWE-440 (Expected Behavior Violation), OWASP A05:2021 Security Misconfiguration
+- **Location:** `blocksecops-api-service/src/presentation/api/v1/endpoints/admin/scan_monitoring.py:255-329` (`retry_scan` admin endpoint)
+- **Description:** The admin retry endpoint resets a stuck scan's status to `"queued"` and commits, returning HTTP 200 with message "Scan has been requeued for retry". Pre-changeset-D, the orchestration `poll_scan_queue` Celery Beat would pick up the requeued scan within `scan_poll_interval` seconds and dispatch it. Post-changeset-D, with `poll_scan_queue` removed from the Beat schedule:
+  1. The retried scan sits in `"queued"` state with no dispatcher.
+  2. After `scan_stale_timeout` seconds, `check_stale_scans` (still scheduled) finds the queued-too-long row.
+  3. Because `was_queued=True`, the scan is marked `"failed"` with reason `"Scan stuck in queued state — never picked up by worker"` (see `scan_tasks_sync.py:212-228`).
+  4. The admin gets no error feedback; they see "requeued" then later "failed" with a generic message.
+- **Impact:** An admin trying to recover a stuck scan during an incident (e.g., scanner Job evicted by Spot VM preemption) will retry, see success, then later find the scan dead-failed with no indication that the retry mechanism itself is broken. This delays incident response. Not a security boundary violation, but degrades incident-recovery capability. The user's note acknowledges the K8s Job dispatch path is the new canonical path; the admin retry endpoint was not updated to use it.
+- **Proof / Evidence:**
+  ```python
+  # scan_monitoring.py:291-300 — only resets status, no dispatch:
+  previous_status = scan.status
+  scan.status = "queued"
+  scan.retry_count = (scan.retry_count or 0) + 1
+  # ... other field resets ...
+  await db.commit()
+  # No call to tool-integration to actually re-dispatch.
+  ```
+  And in `scan_tasks_sync.py:212-228` (still scheduled every 30s):
+  ```python
+  else:  # was_queued = True
+      reason = "Scan stuck in queued state — never picked up by worker"
+      scan.status = "failed"
+      # ...
+  ```
+- **Recommended Fix:** Two viable approaches:
+  1. **Preferred:** Update `retry_scan` to additionally POST to `service_url_tool_integration` after the commit, mirroring the dispatch loop at `scans.py:1155-1170`. Refactor that dispatch loop into a helper (`_dispatch_scan_to_tool_integration(scan_id, contract, scanner_ids)`) and call it from both batch-create and admin-retry.
+  2. **Alternative:** Keep a thin "manual re-dispatch only" Celery task that the admin retry endpoint enqueues directly (not Beat-driven), so the dispatch path is owned by Celery but only fired on explicit admin action.
+  Add a regression test in `tests/unit/admin/test_scan_monitoring.py` that asserts the tool-integration mock receives a POST after `/scans/{id}/retry`.
+- **References:** Changeset-D removal context, feedback memory `feedback_no_unilateral_scope_exclusion.md` (changes to dispatch path should consider all callers).
+
+---
+
+## Follow-Up Positive Observations
+
+- **Changeset A** is a textbook test-only env stub: gated by `setupFiles` in vite.config.ts, uses obviously-fake values, mirrors the same pattern already used in `blocksecops-dashboard/src/test/setup.ts`. No risk of production credential leakage.
+- **Changeset B** correctly tied `SUPPORTED_EXTENSIONS` removal to verified absence of Rust callers — no runtime crash risk. The deprecation comment is retained as a tombstone.
+- **Changeset E's `OccurrenceBadge.tsx`** is well-written defensively: nullable inputs are typed and explicitly handled, the `formatTs` helper try/catches invalid dates, and the component renders nothing (returns `null`) when neither display condition applies. React's automatic escaping protects every dynamic string.
+- **Changeset E's API client additions** all flow through the existing `apiClient` (no bypass of auth/CSRF middleware), and the server-side `with_artifacts` and `include_duplicates` handlers were verified to exist and use `require_auth_with_scope(["contracts:write"])` (matches `api-endpoint-auth.md`).
+- **Changeset D's removed-comment block** is unusually detailed for the kind of change it is, capturing the root cause (`dual-path racing`, `missing solc in the orchestration pod`) inline so the next engineer to look here understands why the task was removed. This is the kind of in-code documentation that prevents BSO-SEC-029-style regressions.
+
+---
+
+## Out-of-Scope Issues Noted (filed under TaskDocs-BlockSecOps separately)
+
+1. **`resources/release-notes/2025/december.md:164,195` still mentions Cairo.** These are historical release notes describing the December 2025 state of the platform. Per memory `feedback_no_cairo.md` ("all Cairo references should be removed"), the strict reading is to remove them. Pragmatic reading: release notes are historical artifacts and rewriting them is revisionist. Recommend an editorial note ("Cairo support was discontinued in December 2025; see Q1 2026 release notes for details") rather than redacting history.
+2. **Orchestration POST `/scans` endpoint is dead code.** No caller in any of the 17 audited repos invokes it. Recommend either deleting the endpoint or annotating it as `@deprecated` with a sunset date.
+3. **Dashboard changeset description undercounted scope.** Future audit briefs should `git diff --stat` and `git status` first, rather than relying on the bullet description, to catch full scope of "small" changes.
+
+---
+
+## Follow-Up Section Conclusion
+
+**No HALT triggered.** All five changesets are safe to ship from a security standpoint. The three new findings are:
+
+- **BSO-SEC-028 (LOW)** — scanner inventory drift; documentation accuracy concern, not exploitable.
+- **BSO-SEC-029 (INFO)** — stale code comments; debugging hazard, not exploitable.
+- **BSO-SEC-030 (MEDIUM)** — admin retry endpoint functionally broken by Changeset D's Beat removal; operational regression, not a security boundary violation.
+
+**Recommended ordering:**
+1. Ship Changesets A, B, C, E as-is (each independent; no security blockers).
+2. Ship Changeset D as-is (the production cluster is already running this version per user's note — codebase-first reconciliation per Rule 1).
+3. Immediately follow Changeset D with a patch addressing BSO-SEC-030 (admin-retry dispatch). This is the only one with a real user-impact tail.
+4. Triage BSO-SEC-028 and BSO-SEC-029 as documentation/tech-debt for the next docs sprint.
+
+**No source files were modified during this audit.** All findings are advisory.
+
+---
+
+# Investigation: BSO-SEC-027 — 2026-06-20
+
+**Auditor:** apogee-security-audit (Opus 4.7)
+**Scope:** Reproduce BSO-SEC-027 (admin portal reachable via direct origin-IP bypass) and determine root cause via live runtime inspection. Read-only — no code or runtime mutation.
+**Method:** (1) Re-curl from non-Cloudflare IP with SNI manipulation. (2) `kubectl describe` GCPBackendPolicy + HTTPRoute. (3) `gcloud compute` describe Cloud Armor policy + backend services. (4) WAF rule semantics validation against vendor docs.
+
+## Reproduction Result: TRUE POSITIVE (confirmed and broader than originally filed)
+
+The finding is real, the WAF rules are misordered, and the issue is **NOT admin-portal-specific** — it affects every backend behind the gateway (`admin.0xapogee.com`, `app.0xapogee.com` dashboard, `/api/v1/*` API). The "Cloudflare-only" enforcement is functionally non-existent at the IP-allowlist layer, although the preconfigured OWASP rules (SQLi/XSS/scanner detection) still fire correctly.
+
+### Direct-Origin Probe Evidence (source IP `136.36.116.105`, NOT in any Cloudflare CIDR)
+
+```bash
+# Admin portal — should be 403 (default deny), got 200
+$ curl -sk --resolve admin.0xapogee.com:443:34.149.16.104 \
+    https://admin.0xapogee.com/ -D - -o /dev/null
+HTTP/2 200
+content-disposition: inline; filename="index.html"
+via: 1.1 google           ← proves request hit GCP LB front-end (not Cloudflare)
+
+# Dashboard — same story
+$ curl -sk --resolve app.0xapogee.com:443:34.149.16.104 \
+    https://app.0xapogee.com/ -o /dev/null -w "%{http_code}\n"
+200
+
+# API health — same story
+$ curl -sk --resolve app.0xapogee.com:443:34.149.16.104 \
+    https://app.0xapogee.com/api/v1/health/live -o /dev/null -w "%{http_code}\n"
+200
+
+# WAF preconfigured rules ARE evaluating (proves policy is attached and "working"):
+$ curl -sk --resolve admin.0xapogee.com:443:34.149.16.104 \
+    "https://admin.0xapogee.com/?id=1%20UNION%20SELECT%20password%20FROM%20users--" \
+    -o /dev/null -w "%{http_code}\n"
+403   ← sqli-v33-stable rule (priority 1001) fires
+
+$ curl -sk -H "User-Agent: nikto" --resolve admin.0xapogee.com:443:34.149.16.104 \
+    https://admin.0xapogee.com/ -o /dev/null -w "%{http_code}\n"
+403   ← scannerdetection-v33-stable rule (priority 1005) fires
+```
+
+So: WAF policy attached and evaluating, OWASP rules firing, but the Cloudflare IP allowlist is silently bypassed.
+
+## Runtime Evidence
+
+### 1. GCPBackendPolicy is properly attached at runtime
+
+```
+$ kubectl describe gcpbackendpolicy admin-portal-policy -n admin-portal-prod
+Spec:
+  Default:
+    Security Policy: apogee-production-waf-policy
+    Timeout Sec:     30
+  Target Ref:
+    Kind: Service
+    Name: admin-portal
+Status:
+  Conditions:
+    Reason: Attached
+    Status: True
+    Type:   Attached
+Events:
+  Normal  SYNC  3m57s (x941 over 23h)  sc-gateway-controller
+    Application of GCPBackendPolicy "admin-portal-prod/admin-portal-policy" was a success
+```
+
+All four backend policies (`admin-portal-policy`, `dashboard-policy`, `api-service-policy`, `notification-policy`) report `Status.Conditions[Attached]=True`.
+
+### 2. GCP backend services confirm attachment
+
+```
+$ gcloud compute backend-services describe \
+    gkegw1-crnq-admin-portal-prod-admin-portal-3000-xp2utdv9rk38 --global
+SecurityPolicy: .../securityPolicies/apogee-production-waf-policy
+EdgeSecurityPolicy: None
+LoadBalancingScheme: EXTERNAL_MANAGED
+LogConfig: { enable: false, sampleRate: 0.0 }   ← logging disabled (separate issue)
+```
+
+All four production backend services (admin-portal, api-service, dashboard, notification) have `SecurityPolicy: apogee-production-waf-policy` attached. `EdgeSecurityPolicy` is `None` for all (acceptable — backend-level enforcement is the design here).
+
+### 3. The actual WAF rule set (live, sorted by priority)
+
+```
+prio=100         action=allow            "Allow Cloudflare IPs (1/3)"          10 IPv4 CIDRs
+prio=101         action=allow            "Allow Cloudflare IPs (2/3)"          5 IPv4 CIDRs
+prio=102         action=allow            "Allow Cloudflare IPv6 (3/3)"         7 IPv6 CIDRs
+prio=900         action=rate_based_ban   "Rate limit scan creation"            match=request.path.matches('/api/v1/scans') && method=='POST'
+prio=1000        action=deny(403)        "XSS protection"                      preconfigured xss-v33-stable
+prio=1001        action=deny(403)        "SQL injection protection"            preconfigured sqli-v33-stable
+prio=1002..1006  action=deny(403)        LFI/RFI/RCE/scanner/protocolattack    preconfigured
+prio=2000        action=rate_based_ban   "Rate limiting: 30 req/min per IP"    srcIpRanges=["*"], conform_action=allow
+prio=2147483647  action=deny(403)        "Default deny - only Cloudflare IPs"  srcIpRanges=["*"]
+```
+
+(Pulled live via `gcloud compute security-policies describe apogee-production-waf-policy --format=json` and post-processed.)
+
+### 4. My source IP coverage
+
+`136.36.116.105` is NOT in any allow CIDR (verified by Python `ipaddress` check against all CIDRs in rules 100/101/102). So the request SHOULD fall to priority 2147483647 default deny → 403. Empirically it falls to 200.
+
+### 5. HTTPRoute is unambiguous — `admin.0xapogee.com` → `admin-portal` Service in `admin-portal-prod`, port 3000. No misrouting.
+
+## Root Cause: Rule-Ordering Bug — `rate_based_ban` at priority 2000 short-circuits the default-deny at 2147483647
+
+Cloud Armor evaluates rules in **priority order, lowest first**, and the **first matching rule wins** (per [cloud.google.com/armor/docs/security-policy-overview](https://cloud.google.com/armor/docs/security-policy-overview): "Typically, the highest priority rule that matches the request is applied").
+
+For a plain `GET /` request from `136.36.116.105`:
+
+| Priority | Match? | Action |
+|----------|--------|--------|
+| 100/101/102 (allow CF IPs) | No (IP not in CIDR) | skip |
+| 900 (rate-ban /api/v1/scans POST) | No (different path) | skip |
+| 1000–1006 (OWASP CRS) | No (clean payload) | skip |
+| **2000 (rate_based_ban, srcIpRanges=`*`)** | **Yes (matches any IP)** | **conform_action=allow** ← **STOPS HERE** |
+| 2147483647 (default deny) | (never evaluated) | (never applied) |
+
+The general rate-based ban rule at priority 2000 has `srcIpRanges = ["*"]` and `conform_action = "allow"`. Every request matches this rule. As long as the source IP is under 30 req/min, the conform action `allow` is applied and **the default-deny rule at priority 2147483647 is never reached**.
+
+Effectively, the platform's IP-allowlist enforcement has been silently disabled since the rate-limit rule was added. The OWASP CRS rules at 1000–1006 still fire because they have a lower priority (evaluated first), but the IP allowlist at 2147483647 is permanently shadowed by priority 2000.
+
+This is consistent with the original BSO-SEC-027 evidence and with the new burst-testing observation: 50 sequential requests at ~1 req/sec all returned 200 (well under 30/min in a single curl-then-sleep loop, so even the rate exceed_action never triggered).
+
+## Source-Code Location of the Bug
+
+**File:** `/home/pwner/Git/blocksecops-gcp-infrastructure/terraform/modules/load-balancer/main.tf`
+**Lines:** 277–298 — the "General rate limiting" rule at priority `2000` with `src_ip_ranges = ["*"]` and `conform_action = "allow"`.
+
+This rule was added as a defense-in-depth rate cap, but its priority is numerically lower than the default-deny (`2147483647`), so it wins.
+
+## Recommended Fix (do NOT apply yet)
+
+**Two clean options. I recommend Option A.**
+
+### Option A (preferred) — Scope the rate-based ban to Cloudflare IPs only, and accept it as ordering-compatible with default-deny
+
+The intent of the general rate cap is to throttle abusive Cloudflare-proxied clients. Non-Cloudflare clients should be denied by IP, not rate-limited. Restrict the rule's `src_ip_ranges` to the same Cloudflare CIDRs used in priorities 100/101/102.
+
+```diff
+--- a/terraform/modules/load-balancer/main.tf
++++ b/terraform/modules/load-balancer/main.tf
+@@ -277,11 +277,21 @@ resource "google_compute_security_policy" "waf" {
+   # General rate limiting
+   rule {
+     action   = "rate_based_ban"
+     priority = "2000"
+     match {
+       versioned_expr = "SRC_IPS_V1"
+       config {
+-        src_ip_ranges = ["*"]
++        # Only rate-limit Cloudflare-originated traffic; non-Cloudflare IPs
++        # are denied by the default-deny rule at priority 2147483647.
++        # Without this scoping, conform_action=allow shadows the default-deny.
++        src_ip_ranges = [
++          "173.245.48.0/20", "103.21.244.0/22", "103.22.200.0/22",
++          "103.31.4.0/22",   "141.101.64.0/18", "108.162.192.0/18",
++          "190.93.240.0/20", "188.114.96.0/20", "197.234.240.0/22",
++          "198.41.128.0/17", "162.158.0.0/15",  "104.16.0.0/13",
++          "104.24.0.0/14",   "172.64.0.0/13",   "131.0.72.0/22",
++        ]
+       }
+     }
+     rate_limit_options {
+       conform_action = "allow"
+       exceed_action  = "deny(429)"
+       enforce_on_key = "IP"
+       rate_limit_threshold {
+         count        = var.rate_limit_threshold
+         interval_sec = 60
+       }
+       ban_duration_sec = 300
+     }
+-    description = "Rate limiting: ${var.rate_limit_threshold} req/min per IP"
++    description = "Rate limiting (Cloudflare IPs only): ${var.rate_limit_threshold} req/min per IP"
+   }
+ }
+```
+
+Cloud Armor's 10-CIDRs-per-rule limit may bite here — the existing IPv4 list is 15 entries split into two rules (100/101). If `src_ip_ranges` on this single rule rejects >10 CIDRs, split this rule into two parallel rate-ban rules (priority 2000 / 2001) covering the same CIDR slices as priorities 100/101 respectively, and drop IPv6 (or add a third at 2002).
+
+After this change, the priority chain becomes:
+1. priorities 100/101/102 → allow Cloudflare IPs (terminal allow)
+2. priorities 900/1000–1006 → preconfigured OWASP / scan-endpoint rate ban
+3. priority 2000 (now scoped) → matches only Cloudflare IPs; for non-CF requests this is a non-match and evaluation falls through
+4. priority 2147483647 → default deny(403) for everything else (non-CF requests)
+
+### Option B (alternative) — Move the rate-ban rule below the default-deny
+
+Bump the rate-ban rule's priority to e.g. `2147483646` (one below default). This works but is fragile: if anyone ever adds another `["*"]` rule between 2147483646 and 2147483647, the same shadowing recurs. Option A is structurally robust.
+
+### Operational corollary (separate, recommended)
+
+`logConfig.enable = false` on all four backend services. Enable LB request logging so future WAF enforcement decisions show up in Cloud Logging with `jsonPayload.enforcedSecurityPolicy.{name,outcome,priority}` — this would have made the diagnosis instant. Not in the Terraform module today; add an `enableLogging = true` setting on the Gateway / backend services via the GKE Gateway annotations or update the LB module.
+
+## Severity Re-rating
+
+Original BSO-SEC-027 was filed MEDIUM (admin portal SPA exposure). With confirmed full-platform impact (`app.0xapogee.com` dashboard + `/api/v1/*` API also bypassable), **re-rate to HIGH**. The API surface is exposed to direct internet IPs without Cloudflare's rate-limiting, bot management, or WAF Phase-2 rules. Any authn/authz weakness in the api-service is now exploitable from any IP without Cloudflare telemetry.
+
+Note: the GCP-side OWASP CRS rules (priorities 1000–1006) DO fire and provide partial protection; this is not "no defense", just "Cloudflare layer entirely bypassable."
+
+## Verification Plan (post-fix)
+
+After Option A is applied:
+1. From a non-Cloudflare IP: `curl -k --resolve admin.0xapogee.com:443:34.149.16.104 https://admin.0xapogee.com/` → expect `HTTP 403`.
+2. From a Cloudflare-proxied client (DNS-resolved normally): `curl https://admin.0xapogee.com/` (when the A record is added) → expect `HTTP 200`.
+3. Verify rate cap still works for legitimate clients by sending >30 req/min from a Cloudflare-fronted client and confirming HTTP 429 after threshold.
+4. Inspect `gcloud logging read 'jsonPayload.enforcedSecurityPolicy.name="apogee-production-waf-policy"'` to confirm policy decisions are visible (after enabling backend-service logging).
+
+## Updated Follow-up Tasks
+
+- [ ] Owner: approve Option A fix to `blocksecops-gcp-infrastructure/terraform/modules/load-balancer/main.tf:277–298`, `terraform apply`, then re-test from non-Cloudflare IP.
+- [ ] Owner: enable backend-service request logging (sampleRate=1.0 in non-prod, ~0.1 in prod) for `apogee-production-waf-policy`-protected backends so WAF decisions are observable.
+- [ ] Owner: when the platform is opened to customers, schedule a quarterly Cloud Armor rule-ordering audit (Option A would prevent this regression, but the audit catches new ones).
+- [ ] Owner: independently re-evaluate the 7-CIDR IPv6 list and the 15-CIDR IPv4 list against the current published Cloudflare ranges at https://www.cloudflare.com/ips/ (not part of this fix; tracked separately).
+
+**No source files were modified during this investigation.** Read-only inspection only.

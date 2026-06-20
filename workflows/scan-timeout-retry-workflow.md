@@ -1,6 +1,6 @@
 # Scan Timeout & Auto-Retry Workflow
 
-**Last Updated**: 2026-02-06
+**Last Updated**: 2026-06-20
 **Status**: Active
 **API Version**: v1
 
@@ -14,8 +14,9 @@ This workflow handles detection and recovery of scans stuck in `running` state d
 │                                                        │
 │  queued ──▶ running ──▶ completed                      │
 │              │    ▲                                     │
-│              │    │ retry (if retry_count < limit)      │
-│              ▼    │                                     │
+│              │    │ reset to 'queued'                   │
+│              │    │ (retry_count < limit)               │
+│              ▼    │ [no auto re-dispatch — BSO-SEC-030] │
 │           stale ──┘                                     │
 │              │                                          │
 │              ▼ (if retry_count >= limit)                │
@@ -49,7 +50,7 @@ FOR UPDATE SKIP LOCKED
 ```
 
 `FOR UPDATE SKIP LOCKED` ensures:
-- No conflict with `poll_scan_queue` (which also uses `SKIP LOCKED`)
+- No conflict with concurrent `check_stale_scans` executions (Beat runs every 30s)
 - No conflict with manual admin retry (which uses `FOR UPDATE`)
 
 ### Phase 3: Recovery Decision
@@ -67,9 +68,18 @@ For each stale scan:
 - Set `status = 'failed'`
 - Set `error_message = 'Scan exceeded maximum retries after becoming unresponsive'`
 
-### Phase 4: Re-Dispatch
+### Phase 4: Re-Dispatch (Gap — BSO-SEC-030)
 
-Requeued scans are picked up by `poll_scan_queue` (runs every 10s), which dispatches them respecting priority ordering and batch limits.
+When `check_stale_scans` exceeds the retry limit, scans are marked `failed`. When under the limit, the scan is reset to `queued` with an incremented `retry_count`. However, **no automatic re-dispatch occurs at this point**.
+
+The `poll_scan_queue` Celery beat task that previously picked up re-queued scans and dispatched new Kubernetes Jobs has been removed (blocksecops-orchestration PR #111, 2026-06-20). The replacement dispatch path for retry scenarios is not yet implemented.
+
+Current behavior after a scan is reset to `queued` by `check_stale_scans`:
+- The scan remains in `queued` status indefinitely.
+- The admin manual retry endpoint (`POST /api/v1/admin/scan-monitoring/scans/{scan_id}/retry`) resets the scan to `queued` but does not trigger a new Kubernetes Job.
+- A human operator must track and re-submit scans via the API until BSO-SEC-030 is resolved.
+
+**BSO-SEC-030** tracks adding automatic re-dispatch from tool-integration when a scan is reset to `queued` after a stale-timeout retry.
 
 ## Manual Admin Recovery Flow
 
@@ -111,9 +121,9 @@ Body: {"reason": "Permanent infrastructure issue"}
 
 | Scenario | Protection |
 |----------|-----------|
-| `check_stale_scans` + `poll_scan_queue` | Both use `SKIP LOCKED` — one skips the other's locked rows |
+| Concurrent `check_stale_scans` runs | Uses `SKIP LOCKED` — concurrent Beat executions skip each other's locked rows |
 | Manual retry + auto-retry | Manual uses `FOR UPDATE` (blocking), auto uses `SKIP LOCKED` (skips) |
-| Double dispatch prevention | Scans reset to `queued`, not re-dispatched directly |
+| Double dispatch prevention | Not currently enforced at re-queue time (see BSO-SEC-030) — `poll_scan_queue` which enforced this via batch-locking has been removed |
 
 ## Monitoring
 

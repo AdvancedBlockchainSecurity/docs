@@ -1,15 +1,15 @@
 # Scan Priority Queue System
 
-**Repository:** blocksecops-api-service, blocksecops-orchestration
-**Version:** API 0.4.0+, Orchestration 0.3.0+
+**Repository:** blocksecops-api-service, blocksecops-tool-integration
+**Version:** API 0.4.0+
 **Status:** Production Ready
-**Last Updated:** November 25, 2025
+**Last Updated:** 2026-06-20
 
 ---
 
 ## Overview
 
-The priority queue system ensures that paid users (Pro, Enterprise) get their scans processed before free tier users, providing a better experience and incentive to upgrade.
+The priority queue system ensures that paid users (growth, enterprise) get their scans processed before lower-tier users, providing a better experience and incentive to upgrade.
 
 ---
 
@@ -23,7 +23,8 @@ The priority queue system ensures that paid users (Pro, Enterprise) get their sc
 │  POST /scans                                                 │
 │  1. Get user tier from current_user.tier                     │
 │  2. Calculate priority: _get_priority_for_tier(tier)         │
-│  3. Create scan with priority field                          │
+│  3. Create scan with priority field (status = 'queued')      │
+│  4. HTTP POST to tool-integration for each scanner           │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
@@ -37,14 +38,16 @@ The priority queue system ensures that paid users (Pro, Enterprise) get their sc
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                 Orchestration Service                        │
-│  poll_scan_queue task                                        │
-│  SELECT * FROM scans                                         │
-│  WHERE status = 'queued'                                     │
-│  ORDER BY priority ASC  <-- Lower number = Higher priority   │
-│  LIMIT batch_size                                            │
+│              Tool Integration Service                        │
+│  KubernetesJobManager (KJM)                                  │
+│  blocksecops-tool-integration/src/scanners/                  │
+│    kubernetes_job_manager.py                                 │
+│  Creates one Kubernetes Job per scanner per scan             │
+│  Scanner Jobs read priority from the scan record             │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+**Note — scan dispatch path (as of PR #111, 2026-06-20):** The `poll_scan_queue` Celery beat task was removed from `blocksecops-orchestration`. Scans are now dispatched synchronously at scan-creation time: the API service calls tool-integration directly, which creates Kubernetes Jobs via the KubernetesJobManager. The orchestration service no longer polls the database for queued scans or runs scanner subprocesses in-pod.
 
 ---
 
@@ -52,12 +55,12 @@ The priority queue system ensures that paid users (Pro, Enterprise) get their sc
 
 | Tier | Priority Value | Processing Order |
 |------|----------------|------------------|
-| Enterprise | 5 | First (highest priority) |
-| Enterprise Broker | 5 | First |
-| Pro | 25 | Second |
-| Free | 50 | Third (lowest priority) |
+| enterprise | 5 | First (highest priority) |
+| growth | 25 | Second |
+| starter | 40 | Third |
+| developer | 50 | Last (lowest priority) |
 
-**Note:** Lower number = Higher priority (processed first)
+**Note:** Lower number = Higher priority (dispatched first at scan-creation time)
 
 ---
 
@@ -92,26 +95,19 @@ scan = ScanModel(
 )
 ```
 
-### Orchestration Service: Queue Polling
+### Tool Integration Service: Kubernetes Job Dispatch
 
-**File:** `src/blocksecops_orchestration/tasks/scan_tasks_sync.py`
+**File:** `blocksecops-tool-integration/src/scanners/kubernetes_job_manager.py`
 
-```python
-@celery_app.task(name="blocksecops_orchestration.tasks.scan_tasks.poll_scan_queue")
-def poll_scan_queue() -> dict:
-    with get_db_session() as session:
-        from blocksecops_orchestration.models import ScanModel
+The KubernetesJobManager (KJM) receives dispatch requests from the API service and creates one Kubernetes Job per scanner per scan. Jobs are created immediately when the scan is initiated — there is no polling loop. The `priority` field is stored on the scan record for observability and ordering queries, but Kubernetes Job scheduling is not currently weighted by priority value.
 
-        # Query for queued scans, ordered by priority (lower = higher priority)
-        query = (
-            select(ScanModel)
-            .where(ScanModel.status == "queued")
-            .order_by(ScanModel.priority.asc())  # Lower number = higher priority
-            .limit(settings.scan_batch_size)
-            .with_for_update(skip_locked=True)
-        )
-        # ... process scans
-```
+**Known gap — stale-scan re-dispatch (BSO-SEC-030):** The removed `poll_scan_queue` task previously re-dispatched scans that had been reset to `queued` after a stale-scan timeout. The replacement path for this is not yet implemented:
+
+- `check_stale_scans` (Celery beat, still active) marks stale `running` scans as `failed` rather than re-queuing them.
+- The admin manual retry endpoint (`blocksecops-api-service/src/presentation/api/v1/endpoints/admin/scan_monitoring.py:285-329`) resets a scan's status to `queued` but does NOT trigger a new Kubernetes Job.
+- As a result, a scan manually retried via the admin endpoint will remain in `queued` state indefinitely until BSO-SEC-030 is resolved.
+
+Do not document a re-dispatch path here until BSO-SEC-030 is closed.
 
 ---
 
@@ -151,52 +147,45 @@ def downgrade() -> None:
 
 ## Query Performance
 
-The composite index `ix_scans_status_priority` is optimized for the common query pattern:
+The composite index `ix_scans_status_priority` is optimized for admin and monitoring queries over queued scans:
 
 ```sql
 SELECT * FROM scans
 WHERE status = 'queued'
 ORDER BY priority ASC
-LIMIT 10
-FOR UPDATE SKIP LOCKED;
+LIMIT 10;
 ```
 
 This allows PostgreSQL to efficiently:
-1. Filter by status using index
+1. Filter by status using the index
 2. Return results already sorted by priority
-3. Skip locked rows for concurrent processing
+
+The `FOR UPDATE SKIP LOCKED` clause was previously used by `poll_scan_queue` to prevent concurrent dispatch conflicts. It is no longer needed for normal scan dispatch now that Jobs are created at scan-creation time by the tool-integration service.
 
 ---
 
 ## Behavior Scenarios
 
-### Scenario 1: Mixed Queue
+### Scenario 1: Mixed Submissions
 ```
-Queue State:
-- Scan A: Free user (priority 50)
-- Scan B: Enterprise user (priority 5)
-- Scan C: Pro user (priority 25)
-- Scan D: Free user (priority 50)
+Submissions:
+- Scan A: developer user (priority 50) — submitted 10:00
+- Scan B: enterprise user (priority 5)  — submitted 10:01
+- Scan C: growth user (priority 25)     — submitted 10:02
 
-Processing Order: B → C → A → D
+Each scan triggers an immediate Kubernetes Job at submission time.
+Priority affects ordering in admin monitoring views, not Job scheduling order.
 ```
 
 ### Scenario 2: Same Tier
 ```
-Queue State:
-- Scan A: Free user (priority 50, created 10:00)
-- Scan B: Free user (priority 50, created 10:01)
-- Scan C: Free user (priority 50, created 10:02)
+Submissions:
+- Scan A: developer user (priority 50, submitted 10:00)
+- Scan B: developer user (priority 50, submitted 10:01)
+- Scan C: developer user (priority 50, submitted 10:02)
 
-Processing Order: A → B → C (FIFO within same priority)
-```
-
-### Scenario 3: Continuous Submissions
-```
-10:00 - Free user submits Scan A (priority 50)
-10:01 - Scan A starts processing
-10:02 - Enterprise user submits Scan B (priority 5)
-10:03 - Next poll picks up Scan B (higher priority than any pending Free scans)
+Jobs are created at submission time. Database index returns A → B → C
+(FIFO within same priority) for admin queue monitoring queries.
 ```
 
 ---
@@ -220,9 +209,9 @@ GROUP BY priority, status
 ORDER BY priority, status;
 ```
 
-### Celery Flower
+### Kubernetes Job Monitoring
 
-Monitor the `poll_scan_queue` task execution and scan processing throughput.
+Monitor scanner Job creation and completion via the tool-integration service logs and Kubernetes Job resources in the `scanner-jobs` namespace. The `poll_scan_queue` Celery task no longer exists; Celery Flower no longer shows scan dispatch activity.
 
 ---
 
@@ -243,6 +232,6 @@ The default priority (50) is set in:
 
 ## Related Documentation
 
-- [Monthly Quota Reset](/Users/pwner/Git/ABS/blocksecops-docs/backend/monthly-quota-reset.md)
-- [Quota Frontend](/Users/pwner/Git/ABS/blocksecops-docs/frontend/quota-frontend.md)
-- [Celery Configuration](/Users/pwner/Git/ABS/blocksecops-orchestration/README.md)
+- [Smart Contract Scanning Workflow](/home/pwner/Git/docs/workflows/smart-contract-scanning-workflow.md)
+- [Scan Timeout and Retry Workflow](/home/pwner/Git/docs/workflows/scan-timeout-retry-workflow.md)
+- [Tool Integration Service](../../../blocksecops-tool-integration/README.md)

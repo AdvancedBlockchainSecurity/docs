@@ -4,6 +4,7 @@
 **Component**: REST API Layer
 **Version**: 0.7.4 (Intelligence Layer Integration)
 **Date**: November 1, 2025
+**Last Updated**: 2026-06-20
 **Status**: Production Ready
 
 ## Recent Updates
@@ -103,12 +104,19 @@ The **Orchestration REST API** provides programmatic access to all 12 security s
 │                    (RedBeat with Redis)                               │
 ├──────────────────────────────────────────────────────────────────────┤
 │                                                                       │
-│  Periodic Task: poll_scan_queue (runs every 10s)                     │
-│    1. SELECT * FROM scans WHERE status='queued' LIMIT 10             │
-│    2. For each scan:                                                  │
-│       - UPDATE status='running'                                       │
-│       - Dispatch execute_scan_analysis.apply_async()                 │
-│    3. Log dispatched scan IDs                                        │
+│  Periodic Task: check_stale_scans (runs every 30s)                   │
+│    1. SELECT * FROM scans WHERE status='running'                     │
+│       AND started_at < NOW() - INTERVAL '600 seconds'                │
+│       FOR UPDATE SKIP LOCKED                                         │
+│    2. For each stale scan:                                           │
+│       - If retry_count < retry_limit: reset to 'queued', increment  │
+│         retry_count (NOTE: no re-dispatch — see BSO-SEC-030)        │
+│       - If retry_count >= retry_limit: UPDATE status='failed'        │
+│                                                                       │
+│  Removed (PR #111, 2026-06-20): poll_scan_queue                     │
+│    Previously ran every 10s to dispatch queued scans to workers.     │
+│    Scan dispatch now happens at scan-creation time via               │
+│    tool-integration (KubernetesJobManager).                          │
 │                                                                       │
 └───────────────────────────┬───────────────────────────────────────────┘
                             │
@@ -119,20 +127,11 @@ The **Orchestration REST API** provides programmatic access to all 12 security s
 │                (Gevent Pool, Concurrency=100)                         │
 ├──────────────────────────────────────────────────────────────────────┤
 │                                                                       │
-│  Task: execute_scan_analysis(scan_id)                                │
-│    1. Fetch scan from database                                       │
-│    2. Get scanner executor from registry                             │
-│    3. Execute scanner (subprocess)                                   │
-│    4. Parse output with parser registry                              │
-│    5. Store findings in database                                     │
-│    6. UPDATE status='completed'/'failed'                             │
+│  Handles tasks dispatched by Beat (e.g., check_stale_scans).        │
 │                                                                       │
-│  ┌───────────────────────┐     ┌────────────────────────────────┐  │
-│  │ Scanner Registry      │     │ Parser Registry                │  │
-│  │   • 11 executors      │     │   • 11 parsers                 │  │
-│  │   • Availability check│     │   • Type-based routing         │  │
-│  │   • Timeout config    │     │   • Finding classification     │  │
-│  └───────────────────────┘     └────────────────────────────────┘  │
+│  Scanner execution is no longer performed in-pod by Celery workers.  │
+│  The tool-integration service creates Kubernetes Jobs per scanner    │
+│  via KubernetesJobManager at scan-creation time.                     │
 │                                                                       │
 └──────────────────────────────────────────────────────────────────────┘
 
@@ -147,24 +146,30 @@ The **Orchestration REST API** provides programmatic access to all 12 security s
 │                       Data Flow Summary                               │
 ├──────────────────────────────────────────────────────────────────────┤
 │                                                                       │
-│  1. User → POST /api/v1/scans                                        │
+│  1. User → POST /api/v1/scans (blocksecops-api-service)              │
 │     FastAPI writes to database (status='queued')                     │
+│     Immediately calls tool-integration for each scanner              │
 │                                                                       │
-│  2. Celery Beat polls database every 10s                             │
-│     Finds queued scans, dispatches to workers                        │
+│  2. Tool Integration → KubernetesJobManager                          │
+│     Creates one K8s Job per scanner, updates status='running'        │
 │                                                                       │
-│  3. Celery Worker executes scanner                                   │
-│     Updates database with results (status='completed')               │
+│  3. Scanner Job executes, POSTs results to CALLBACK_URL              │
+│     Tool-integration forwards normalized results to API service      │
+│     API service updates status='completed'/'failed'                  │
 │                                                                       │
 │  4. User → GET /api/v1/scans/{scan_id}                               │
 │     FastAPI reads from database, returns findings                    │
 │                                                                       │
+│  Celery Beat (orchestration) role:                                   │
+│    • check_stale_scans every 30s — detects stuck 'running' scans    │
+│    • No scan dispatch — poll_scan_queue removed (PR #111, 2026-06-20)│
+│                                                                       │
 │  Benefits:                                                            │
 │    ✅ Database persistence (survives pod restarts)                   │
-│    ✅ Distributed execution (Celery workers)                         │
+│    ✅ Isolated scanner execution (K8s Jobs, one per scanner)         │
 │    ✅ HTTP REST interface (FastAPI)                                  │
-│    ✅ Automatic retries (Celery retry logic)                         │
-│    ✅ Real-time monitoring (Flower dashboard)                        │
+│    ✅ Stale-scan detection (check_stale_scans Beat task)             │
+│    ✅ Real-time monitoring (Flower dashboard for Celery tasks)       │
 │                                                                       │
 └──────────────────────────────────────────────────────────────────────┘
 ```
@@ -943,17 +948,9 @@ resources:
 **New Architecture** (v0.7.1):
 - 4 containers: Worker, Beat, Flower, **FastAPI** (new)
 - FastAPI writes scans to database with status='queued'
-- Celery Beat polls database and dispatches to workers
-- Celery workers execute scans and update database
-- FastAPI reads results from database
-
-**Benefits**:
-- ✅ HTTP REST interface (FastAPI)
-- ✅ Database persistence (survives pod restarts)
-- ✅ Distributed execution (Celery workers)
-- ✅ Automatic retries (Celery retry logic)
-- ✅ Real-time monitoring (Flower dashboard)
-- ✅ Queue polling (Celery Beat scheduler)
+- Celery Beat polled database every 10s via `poll_scan_queue` and dispatched to workers
+- Celery workers executed scanners as subprocesses and updated the database
+- FastAPI read results from database
 
 **Changes from v0.7.0**:
 1. Added `contract_id` and `user_id` to `ScanRequest` schema
@@ -961,6 +958,20 @@ resources:
 3. Removed FastAPI BackgroundTasks execution
 4. Added 4th container to Kubernetes deployment
 5. Added async database session dependency
+
+**Note:** This architecture was superseded when scanner execution moved to Kubernetes Jobs managed by the tool-integration service. See the removal note below.
+
+### v0.7.1 → current: poll_scan_queue Removed (PR #111, 2026-06-20)
+
+The `poll_scan_queue` Celery beat task has been removed from `blocksecops-orchestration`. This task was the mechanism by which the orchestration service discovered queued scans and dispatched in-pod scanner subprocesses.
+
+**Current dispatch path:**
+- The API service calls the tool-integration service directly at scan-creation time (HTTP POST per scanner).
+- The tool-integration KubernetesJobManager (`blocksecops-tool-integration/src/scanners/kubernetes_job_manager.py`) creates one Kubernetes Job per scanner per scan.
+- Scanner containers run in isolation and POST results back to tool-integration via `CALLBACK_URL`.
+- The orchestration Celery Beat retains only `check_stale_scans` (every 30s) for detecting stuck `running` scans.
+
+**Known gap (BSO-SEC-030):** Scans reset to `queued` by `check_stale_scans` (after a stale-timeout retry) are not automatically re-dispatched. The admin retry endpoint similarly resets status without triggering a new Job. This gap is tracked as BSO-SEC-030.
 
 ### v0.7.1 → v0.7.3: Bug Fixes and Stability
 
