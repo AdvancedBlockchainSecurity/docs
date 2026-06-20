@@ -411,6 +411,70 @@ spec:
           port: 3000
 ```
 
+### TLS Certificates — DNS-01 Authorization Required
+
+**CRITICAL:** Google-managed certificates for production domains MUST use DNS-01 ACME authorization. HTTP-01 authorization is incompatible with Cloudflare proxy and will cause cert provisioning and renewal failures.
+
+#### Why HTTP-01 fails with Cloudflare proxy
+
+HTTP-01 ACME challenge requires Google Trust Services to send an HTTP request to `http://<domain>/.well-known/acme-challenge/<token>`. When Cloudflare proxy (orange cloud) is active, this request hits Cloudflare's edge, not the GKE load balancer at `34.149.16.104`. If the origin cert is invalid or expired, Cloudflare returns a 526 error before the challenge can reach the origin. The cert cannot renew because Cloudflare blocks the challenge; Cloudflare continues returning 526 because the cert is expired — a deadlock.
+
+#### How DNS-01 is configured
+
+DNS-01 authorization works by placing `_acme-challenge.<domain>` CNAME records in the DNS zone. Google Trust Services validates ownership by querying DNS, which bypasses Cloudflare proxy entirely.
+
+Two `google_certificate_manager_dns_authorization` Terraform resources exist in `terraform/environments/gcp/main.tf`:
+
+| Resource | Domain |
+|----------|--------|
+| `apogee-dns-auth` | `app.0xapogee.com` |
+| `admin-dns-auth` | `admin.0xapogee.com` |
+
+Each certificate's `managed {}` block references its corresponding DNS authorization via `dns_authorizations`.
+
+#### Required Cloudflare DNS records
+
+The following CNAME records must exist in the `0xapogee.com` Cloudflare zone and must be **DNS-only (gray cloud) — never proxied**:
+
+| Name | Type | Proxy status | Notes |
+|------|------|-------------|-------|
+| `_acme-challenge.app.0xapogee.com` | CNAME | DNS-only | Value from `terraform output apogee_cert_dns_authorization_cname` |
+| `_acme-challenge.admin.0xapogee.com` | CNAME | DNS-only | Value from `terraform output admin_cert_dns_authorization_cname` |
+
+If these records are deleted or proxied, certificate auto-renewal will silently fail and the next expiry will cause another outage.
+
+#### Adding a new domain
+
+When adding a new production domain:
+
+1. Add a `google_certificate_manager_dns_authorization` resource in `terraform/environments/gcp/main.tf`.
+2. Reference it in the new certificate's `managed { dns_authorizations = [...] }` block.
+3. Run `terraform apply` and retrieve the CNAME value from the output.
+4. Create the `_acme-challenge.<domain>` CNAME at Cloudflare — DNS-only.
+5. Wait for the certificate to reach ACTIVE state before routing traffic.
+
+Never use HTTP-01 for any domain behind Cloudflare proxy.
+
+#### Verifying certificate status
+
+```bash
+# List all Certificate Manager certificates and their status
+gcloud certificate-manager certificates list \
+  --project=project-8a2657b9-d96c-4c0a-a69
+
+# Confirm platform is responding with valid TLS
+curl https://app.0xapogee.com/api/v1/health/live
+
+# Inspect TLS certificate expiry
+curl -vI https://app.0xapogee.com/api/v1/health/live 2>&1 | grep -E "expire|subject|issuer"
+```
+
+For troubleshooting 525/526 errors, see `docs/playbooks/cloudflare-proxy-gcp-cert-dns01.md`.
+
+**Incident reference:** 2026-06-08 to 2026-06-19 cert outage caused by HTTP-01 + Cloudflare proxy deadlock. See `docs/changelogs/INFRA-CERT-DNS01-CLOUDFLARE-FIX-2026-06-19.md`.
+
+---
+
 ### Security Layers
 
 | Layer | Technology | Protection |
@@ -418,7 +482,7 @@ spec:
 | Edge | Cloudflare Proxy | L3/L4/L7 DDoS, Bot protection |
 | WAF | Cloud Armor (`apogee-production-waf-policy`) | XSS, SQLi, LFI, RFI, RCE, scanner detection |
 | Rate Limiting | Cloud Armor | 300 req/min per IP, 5-min ban |
-| TLS | Google-managed certificate | Auto-renewal via Certificate Manager |
+| TLS | Google-managed certificate (DNS-01 via Certificate Manager) | Auto-renewal via DNS authorization — see above |
 | Network | NetworkPolicy (default-deny) | Pod-level isolation (14 namespaces) |
 | Firewall | VPC firewall rules (logged) | All rules logged, internal scoped to gke-node tags |
 | Resource Controls | ResourceQuota + LimitRange | Per-namespace CPU/memory/pod caps |
