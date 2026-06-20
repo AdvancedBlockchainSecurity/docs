@@ -1,11 +1,11 @@
 # Scanner Documentation
 
-**Last Updated**: March 3, 2026
+**Last Updated**: 2026-06-20
 **API Pipeline Tested**: February 13, 2026
 **Parser Tests Passing**: February 13, 2026 (335 tests — unit, integration, regression)
 **Fuzzer Filtering Tested**: December 29, 2025 (is_project filtering verified)
 **Fuzzer Results Display**: December 30, 2025 (end-to-end verified)
-**Active Scanners**: 18 available in orchestration (18 total registered)
+**Active Scanners**: 18 SAST/fuzzer/symbolic + 1 AI (ai-scanner v0.2.4, Phase 10)
 **Supported Languages**: Solidity (12 scanners), Vyper (2 scanners), Solana (4 scanners, 2 active)
 **Execution Mode**: Docker-based execution for Solana scanners
 **Project Mode**: Foundry/Hardhat support enabled (Phase 3.2)
@@ -212,6 +212,11 @@ Software Bill of Materials:
 ## Scanner-Specific Documentation
 
 ### Detailed Scanner Guides
+
+- **[AI Scanner](ai-scanner.md)** - LLM-powered semantic analysis (Phase 10, ai-scanner v0.2.4)
+  - Catches oracle staleness, vault inflation, MEV, and specification drift that SAST misses
+  - Managed-claude only in Phase 1; BYO providers in Phase 2
+  - Per-tier token budgets; findings enter standard FP triage pipeline
 
 - **[Slither](slither/README.md)** - Static analysis for Solidity and Vyper
   - 93 built-in detectors

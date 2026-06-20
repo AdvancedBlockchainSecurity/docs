@@ -1,10 +1,10 @@
 # Pipeline: ai-scanner Build & Deploy
 
 **Phase:** 10 — BYO AI Scanning
-**Status:** Planning (2026-06-20)
+**Status:** Production (shipped 2026-06-20) — ai-scanner v0.2.4, tier-config v1.4.0
 **Cross-reference:** `TaskDocs-BlockSecOps/phases/10-phase-10-byo-ai-scanning/PHASE-10-BYO-AI-SCANNING-PLAN.md`
 
-The new `blocksecops-ai-scanner` service follows the same build/deploy patterns as `blocksecops-api-service` per `docs/standards/docker-image-versioning.md`. This doc captures what's different — the egress NetworkPolicy and the ExternalSecret routing for managed Claude vs BYO keys.
+The `blocksecops-ai-scanner` service follows the same build/deploy patterns as `blocksecops-api-service` per `docs/standards/docker-image-versioning.md`. This doc captures what is different: the tier-config wheel bundling pattern, Workload Identity binding, ExternalSecret routing for managed Claude vs BYO keys, and the full NetworkPolicy archetype deployed in production.
 
 ## End-to-end build → deploy
 
@@ -45,45 +45,155 @@ flowchart LR
     AIPod -->|HTTPS| Gemini[generativelanguage.googleapis.com]
 ```
 
-## NetworkPolicy — egress allowlist
+## NetworkPolicy — full deployed archetype
 
-This is the **GDPR-relevant policy boundary**. Per `docs/standards/networkpolicy-templates.md` archetype "internal HTTP service with external API egress":
+Four NetworkPolicy objects are applied in `ai-scanner-prod`. All follow `docs/standards/networkpolicy-templates.md`.
+
+### 1. Default deny (ingress + egress baseline)
 
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: ai-scanner-to-llm-providers
+  name: default-deny-all
+  namespace: ai-scanner-prod
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+```
+
+### 2. Ingress — allow from api-service only
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-from-api-service
   namespace: ai-scanner-prod
 spec:
   podSelector:
     matchLabels:
       app: ai-scanner
-  policyTypes:
-    - Egress
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: api-service-prod
+          podSelector:
+            matchLabels:
+              app: api-service
+      ports:
+        - protocol: TCP
+          port: 8000
+```
+
+### 3. Egress — DNS (required for ExternalSecret + provider SDK hostname resolution)
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-dns
+  namespace: ai-scanner-prod
+spec:
+  podSelector:
+    matchLabels:
+      app: ai-scanner
+  policyTypes: [Egress]
   egress:
-    # Anthropic (managed Claude + BYO Anthropic)
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+```
+
+### 4. Egress — PostgreSQL
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-postgresql
+  namespace: ai-scanner-prod
+spec:
+  podSelector:
+    matchLabels:
+      app: ai-scanner
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: postgresql-prod
+      ports:
+        - protocol: TCP
+          port: 5432
+```
+
+### 5. Egress — LLM providers (GDPR-relevant boundary)
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-llm-providers
+  namespace: ai-scanner-prod
+spec:
+  podSelector:
+    matchLabels:
+      app: ai-scanner
+  policyTypes: [Egress]
+  egress:
     - to:
         - ipBlock:
             cidr: 0.0.0.0/0
-            # NOTE: Anthropic does not publish a fixed CIDR; we allow all
-            # public IPs but only on the standard HTTPS port. Combined
-            # with DNS validation in the adapter, this is acceptable.
-            # The audit log records the resolved host per call.
+            # Anthropic, OpenAI, and Google use cloud-front infrastructure
+            # with rotating IPs. CIDR pinning would break weekly.
+            # Defense: application layer only calls known SDK hostnames + audit log
       ports:
         - protocol: TCP
           port: 443
 ```
 
-**Why no per-provider CIDR pin:** Anthropic, OpenAI, and Google all use cloud-front infrastructure with rotating IPs. Pinning would break weekly. Defense is in the application layer (adapter explicitly only calls known SDKs hitting known hostnames) + audit logging.
+**Why no per-provider CIDR pin:** Anthropic, OpenAI, and Google all use cloud-front infrastructure with rotating IPs. Pinning would break weekly. Defense is in the application layer (adapters only call known SDK hostnames) combined with audit logging of the resolved host per call.
 
-Additional egress NetworkPolicies for PostgreSQL, DNS, Vault — follow the same patterns as api-service.
+## Tier-config wheel bundling
+
+`blocksecops-shared` publishes `blocksecops_tier_config-1.4.0-py3-none-any.whl` as a build artifact. The ai-scanner Dockerfile copies this wheel from the repo root and installs it in the builder stage, so the container carries the correct `aiScan` block at runtime without depending on a live PyPI or network fetch.
+
+```dockerfile
+# In the builder stage — copy wheel from repo root
+COPY blocksecops_tier_config-1.4.0-py3-none-any.whl /tmp/
+RUN pip install /tmp/blocksecops_tier_config-1.4.0-py3-none-any.whl
+```
+
+When tier-config is bumped, update both the wheel filename and the `COPY` instruction together, then rebuild and push a new image version.
+
+## Workload Identity
+
+The ai-scanner pod runs under Kubernetes Service Account `ai-scanner` in namespace `ai-scanner-prod`, which is annotated to bind to GCP Service Account `apogee-ai-scanner@<project>.iam.gserviceaccount.com` (the GSA):
+
+```yaml
+# k8s/base/ai-scanner/service-account.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ai-scanner
+  namespace: ai-scanner-prod
+  annotations:
+    iam.gke.io/gcp-service-account: apogee-ai-scanner@project-8a2657b9-d96c-4c0a-a69.iam.gserviceaccount.com
+```
+
+The GSA has `roles/secretmanager.secretAccessor` scoped to the ai-scanner secrets only. ExternalSecret Operator uses the pod's Workload Identity token to read from GCP Secret Manager — no long-lived key JSON in the cluster.
 
 ## Image layout
 
 ```
 blocksecops-ai-scanner/
 ├── Dockerfile                  # multi-stage: builder + runtime
+├── blocksecops_tier_config-1.4.0-py3-none-any.whl  # bundled at build time
 └── ...
 ```
 
@@ -151,7 +261,7 @@ spec:
 
 ## Versioning
 
-Standard semver per `docs/standards/docker-image-versioning.md`. Start at `0.1.0`. Each PR bumps the patch (`0.1.x`). Prompt-version (`solidity/v1`) is independent — bumps on prompt iteration so historical scans remain attributable to the exact prompt that ran.
+Standard semver per `docs/standards/docker-image-versioning.md`. Current production version: `0.2.4`. Each PR bumps the patch (`0.2.x`). Prompt-version (`solidity/v1`) is independent of the service version — it bumps on prompt iteration so historical scans in `ai_scan_metadata.prompt_version` remain attributable to the exact prompt that produced them.
 
 ## Deployment commands (operator)
 
