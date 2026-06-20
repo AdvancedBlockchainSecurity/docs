@@ -4,12 +4,12 @@
 **Database Name:** `solidity_security`
 **Schema:** `public`
 **Timezone:** UTC
-**Verified:** 2026-06-20 (migrations 091/092/093 reflected; scans + scanner_executions `failure_type` column reflected; 088 baseline columns + all tables from 082+ covered below; older tables reflect the 2026-03-15 snapshot)
-**Latest Migration:** 093 (stripe_event_log)
+**Verified:** 2026-06-20 (migrations 091/092/093/094/095 reflected; scans + scanner_executions `failure_type` column reflected; 088 baseline columns + all tables from 082+ covered below; older tables reflect the 2026-03-15 snapshot)
+**Latest Migration:** 095 (byo_llm_keys)
 
 > **Naming Note:** The database is named `solidity_security`, not `blocksecops`. This name was established during initial development when the focus was solely on Solidity. Retained for backward compatibility.
 
-**Total Tables:** 86 ORM-managed tables (excluding `alembic_version`) — adds `contract_artifacts` (091) and `stripe_event_log` (093)
+**Total Tables:** 88 ORM-managed tables (excluding `alembic_version`) — adds `contract_artifacts` (091), `stripe_event_log` (093), `ai_scan_metadata` (094), `byo_llm_keys` (095)
 
 ### Migration history delta since last full verification
 
@@ -26,6 +26,8 @@
 | 091 | 2026-05-09 | `contracts.has_compiled_artifacts` + `contracts.artifact_layout` + **NEW** `contract_artifacts` table | **Documented** — see `contracts` and `contract_artifacts` in Domain 2 |
 | 092 | 2026-06-20 | Partial UNIQUE index `users_stripe_customer_id_uniq` on `users(stripe_customer_id) WHERE stripe_customer_id IS NOT NULL` (BSO-SEC-022) | **Documented** — see `users` in Domain 1 |
 | 093 | 2026-06-20 | **NEW** `stripe_event_log` table for webhook idempotency (BSO-SEC-024) | **Documented** — see Domain 1 (Stripe) |
+| 094 | 2026-06-20 | **NEW** `ai_scan_metadata` table (Phase 10); `users.ai_consent_at`, `organizations.{ai_scanning_enabled,ai_input_tokens_used,ai_output_tokens_used,ai_quota_reset_at}`, `contracts.ai_processing_disabled` columns | **Documented** — see `users` / `organizations` / `contracts` rows + new AI Scanning section |
+| 095 | 2026-06-20 | **NEW** `byo_llm_keys` table (Phase 10, BYO LLM API key storage, AES-256-GCM at rest) + FK from `ai_scan_metadata.byo_key_id` | **Documented** — see AI Scanning section |
 
 Migrations 083–085 and 087 predate this session and remain as documentation follow-up for the next full verification sweep.
 
@@ -74,6 +76,7 @@ Central user table with authentication, wallet, admin, and tier fields.
 | supabase_user_id | UUID | UNIQUE, nullable, indexed | |
 | stripe_customer_id | VARCHAR(255) | nullable, **partial UNIQUE** | Migration 092 (BSO-SEC-022). Index `users_stripe_customer_id_uniq` with `WHERE stripe_customer_id IS NOT NULL` preserves multi-NULL semantics |
 | stripe_subscription_id | VARCHAR(255) | nullable | |
+| ai_consent_at | TIMESTAMPTZ | nullable | Migration 094 (Phase 10). NULL = user has not consented to AI sub-processor disclosure; AI scans rejected until set |
 | wallet_address | VARCHAR(42) | UNIQUE, nullable, indexed | EVM MetaMask/WalletConnect |
 | wallet_nonce | VARCHAR(64) | nullable | |
 | wallet_linked_at | TIMESTAMPTZ | nullable | |
@@ -108,6 +111,10 @@ Multi-tenant organization support with SSO and Stripe billing.
 | tier | VARCHAR(50) | NOT NULL, default 'developer' | |
 | stripe_customer_id | VARCHAR(255) | UNIQUE, nullable | |
 | stripe_subscription_id | VARCHAR(255) | nullable | |
+| ai_scanning_enabled | BOOLEAN | NOT NULL, default false | Migration 094 (Phase 10). Org-admin opt-in gate for AI scans; default OFF |
+| ai_input_tokens_used | INTEGER | NOT NULL, default 0 | Monthly token budget bookkeeping; reset by Celery beat |
+| ai_output_tokens_used | INTEGER | NOT NULL, default 0 | Monthly token budget bookkeeping; reset by Celery beat |
+| ai_quota_reset_at | TIMESTAMPTZ | nullable | Last quota reset timestamp |
 | sso_enabled | BOOLEAN | NOT NULL, default false | |
 | sso_provider | VARCHAR(50) | nullable | saml, oidc |
 | sso_config | JSONB | nullable | |
@@ -239,6 +246,7 @@ Smart contract source code and metadata.
 | archived_at | TIMESTAMPTZ | nullable | |
 | baseline_scan_id | UUID | FK scans(id) ON DELETE SET NULL, nullable, indexed | Scan marked as the canonical baseline for this contract. Set via `PUT /api/v1/contracts/{id}/baseline`. Migration 088. |
 | baseline_marked_at | TIMESTAMPTZ | nullable | When the current `baseline_scan_id` was set. Null when no baseline. Migration 088. |
+| ai_processing_disabled | BOOLEAN | NOT NULL, default false | Migration 094 (Phase 10). Per-contract sensitivity tag. When true, AI scans rejected with `failure_type=ai_contract_blocked` |
 | created_at | TIMESTAMPTZ | NOT NULL, default now() | |
 | updated_at | TIMESTAMPTZ | NOT NULL, default now() | |
 
@@ -909,6 +917,57 @@ Webhook idempotency log (Migration 093, BSO-SEC-024). The Stripe webhook dispatc
 - `ix_stripe_event_log_type_received` on `(event_type, received_at)` — analytics + 30-day retention sweep
 
 **Retention:** 30 days. Stripe never retries beyond ~3 days; the retention window is comfortable. Cleanup is handled by a separate Celery beat task (see api-service release notes).
+
+### `ai_scan_metadata`
+
+Per-AI-scan metadata (Migration 094, Phase 10 — BYO AI scanning). One row per scan whose `scanners_used = ['ai']`. The primary-key FK to `scans(id)` gives a 1:1 relationship; `ON DELETE CASCADE` handles right-to-deletion cleanly (delete the scan → metadata goes with it).
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| scan_id | UUID | PRIMARY KEY, FK scans(id) ON DELETE CASCADE | 1:1 with `scans` |
+| provider | VARCHAR(32) | NOT NULL, CHECK IN (anthropic, openai, gemini, bedrock-eu) | |
+| provider_route | VARCHAR(16) | NOT NULL, CHECK IN (managed, byo) | `managed` uses Apogee's Anthropic key; `byo` uses `byo_llm_keys` |
+| model_id | VARCHAR(64) | NOT NULL | e.g. `claude-sonnet-4-6`, `gpt-5`, `gemini-2.0-pro` |
+| mode | VARCHAR(16) | NOT NULL, CHECK IN (structured, freeform) | |
+| prompt_version | VARCHAR(32) | NOT NULL | e.g. `solidity/v1` — bumps when Apogee-owned prompts change |
+| input_tokens | INTEGER | NOT NULL, >= 0 | actual consumed |
+| output_tokens | INTEGER | NOT NULL, >= 0 | actual consumed |
+| cost_usd_micros | BIGINT | NOT NULL default 0, >= 0 | per-scan cost in micro-USD (1e-6 USD) for billing reconciliation |
+| sensitivity_acknowledged | BOOLEAN | NOT NULL default false | user acknowledged the contract sensitivity gate |
+| byo_key_id | UUID | nullable, FK byo_llm_keys(id) ON DELETE SET NULL | NULL when route=managed |
+| created_at | TIMESTAMPTZ | NOT NULL default now() | |
+
+**Indexes:**
+- `ix_ai_scan_metadata_created_at` on `(created_at)` — quota windowing + analytics
+- `ix_ai_scan_metadata_provider_route` on `(provider, provider_route)` — per-provider cost reports
+
+### `byo_llm_keys`
+
+Encrypted at-rest BYO LLM API key storage (Migration 095, Phase 10). AES-256-GCM per `docs/standards/encryption-standards.md`; KEK held in Vault. Plaintext is **NEVER** persisted or logged; only `key_fingerprint` (last 4 plaintext chars + provider) is surfaced in the UI.
+
+Scope is either organization-wide or user-personal — exactly one of `organization_id` / `user_id` is non-NULL, enforced by `ck_byo_llm_keys_exactly_one_scope`.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | UUID | PRIMARY KEY default gen_random_uuid() | |
+| organization_id | UUID | nullable, FK organizations(id) ON DELETE CASCADE | NULL when user_id is set |
+| user_id | UUID | nullable, FK users(id) ON DELETE CASCADE | NULL when organization_id is set |
+| provider | VARCHAR(32) | NOT NULL, CHECK IN (anthropic, openai, gemini) | |
+| key_label | VARCHAR(64) | NOT NULL | user-facing name e.g. "Engineering team OpenAI" |
+| encrypted_key | BYTEA | NOT NULL | AES-256-GCM ciphertext |
+| encryption_nonce | BYTEA | NOT NULL | 12 bytes, regenerated per encrypt |
+| key_fingerprint | VARCHAR(64) | NOT NULL | last 4 chars of plaintext + provider (UI display ONLY) |
+| validation_status | VARCHAR(16) | NOT NULL default 'unchecked', CHECK IN (valid, invalid, unchecked) | nightly cron re-validates active keys |
+| validation_last_checked_at | TIMESTAMPTZ | nullable | |
+| created_by | UUID | NOT NULL, FK users(id) ON DELETE RESTRICT | audit trail |
+| created_at | TIMESTAMPTZ | NOT NULL default now() | |
+| last_used_at | TIMESTAMPTZ | nullable | |
+| revoked_at | TIMESTAMPTZ | nullable | soft-delete; preserves audit trail |
+
+**Indexes (all partial, only on active keys):**
+- `ix_byo_llm_keys_org_provider_active` on `(organization_id, provider)` UNIQUE WHERE `revoked_at IS NULL AND organization_id IS NOT NULL` — one active org key per provider
+- `ix_byo_llm_keys_user_provider_active` on `(user_id, provider)` UNIQUE WHERE `revoked_at IS NULL AND user_id IS NOT NULL` — one active personal key per provider
+- `ix_byo_llm_keys_validation_status` on `(validation_status)` WHERE `revoked_at IS NULL` — nightly re-validation sweep
 
 ---
 
