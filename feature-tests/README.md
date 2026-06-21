@@ -83,6 +83,12 @@ Manual testing checklists for all user-facing features.
 | [88-referral-system.md](./88-referral-system.md) | **NEW** - Referral system: code generation, sharing, applying, reward threshold, admin settings, dashboard UI, Stripe integration (v0.29.49 API, v0.46.13 Dashboard) |
 | [89-gdpr-admin-data-requests.md](./89-gdpr-admin-data-requests.md) | **NEW** - GDPR admin data request processing: deletion (anonymization), export (0600 perms, 7-day expiry), ML-withdrawal (consent + provenance), path traversal protection, scan error_message fix (v0.29.55 API, v0.7.10 Admin Portal) |
 | [90-tier-upsell-cta.md](./90-tier-upsell-cta.md) | **NEW** - Tier upsell & CTA audit: sidebar lock icons, dashboard feature discovery, scan quota pre-checks, AI tier gates, CI/CD tier split, cross-tier smoke tests (v0.46.28-v0.46.29 Dashboard) |
+| [91-scanner-parsing-fixes-2026-04.md](./91-scanner-parsing-fixes-2026-04.md) | **NEW** - Scanner parsing fixes (April 2026): scanner-side output normalization, post-parse cleanup |
+| [92-solana-scanner-pipeline-2026-04.md](./92-solana-scanner-pipeline-2026-04.md) | **NEW** - Solana/Anchor scanner pipeline E2E: dispatch, parse, dedup, display |
+| [93-github-url-ingest-and-tier-limits-2026-04.md](./93-github-url-ingest-and-tier-limits-2026-04.md) | **NEW** - GitHub URL ingest path + tier safety-limit increases (April 2026) |
+| [94-precompiled-artifact-upload.md](./94-precompiled-artifact-upload.md) | **NEW** - Pre-compiled artifact upload path (Migration 091); P1 launch surface for prepared-artifact users |
+| [95-byo-ai-scanning.md](./95-byo-ai-scanning.md) | **NEW** - BYO AI Scanning Phase 10 (Migrations 094/095): managed-Claude provider, ai_scan_metadata, byo_llm_keys table |
+| [96-password-reset-and-change.md](./96-password-reset-and-change.md) | **NEW** - Password reset (email-link) + in-app change-password: OWASP ASVS 2.5/3.3.1/4.2.1, Supabase-direct flows, Section 0a built-in SMTP vs Section 0b custom SMTP (v0.55.5 Dashboard) — ADV-7, ADV-11, ADV-12 |
 
 ---
 
