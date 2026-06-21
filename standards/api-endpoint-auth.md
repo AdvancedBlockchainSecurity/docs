@@ -253,4 +253,23 @@ async def create_contract(
 
 ---
 
+## Supabase-direct auth flows (signup, login, password reset, password change)
+
+User credential lifecycle endpoints are **NOT proxied by api-service**. The dashboard talks to Supabase Auth directly using the project anon key:
+
+- `POST {SUPABASE_URL}/auth/v1/signup` — account creation
+- `POST {SUPABASE_URL}/auth/v1/token?grant_type=password` — login (and in-app password-change re-auth)
+- `POST {SUPABASE_URL}/auth/v1/recover` — request password-reset email
+- `PUT  {SUPABASE_URL}/auth/v1/user` — set new password (both reset flow and in-app change flow)
+- `POST {SUPABASE_URL}/auth/v1/logout?scope=others` — invalidate other sessions after a password change
+
+Implications for api-service auth standards:
+
+- `require_auth_with_scope()` and `get_current_user` continue to apply on every authenticated api-service endpoint that receives a JWT — those JWTs are issued by Supabase via the above flows, then presented to api-service in the `Authorization: Bearer` header. The validation path (`src/infrastructure/auth/supabase_client.py` with JWKS) is unchanged.
+- No `password_reset_tokens` table or `/api/v1/auth/*` endpoints in api-service. Do NOT introduce them — duplicating Supabase's token store would create drift and a second attack surface.
+- Email deliverability for the auth flows depends on Supabase SMTP configuration (Resend), NOT on `blocksecops-notification`'s SMTP creds. The two are independent.
+- See `docs/workflows/password-management-workflow.md` and `docs/playbooks/password-reset-customer-support.md` for the end-to-end sequence and customer support recipes.
+
+---
+
 **Maintained By:** Apogee Team
