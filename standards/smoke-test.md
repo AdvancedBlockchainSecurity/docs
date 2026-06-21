@@ -295,7 +295,9 @@ curl -s -o /dev/null -w "%{http_code}\n" -X POST -H "Content-Type: application/j
 ```bash
 ENV="${ENV:-prod}"
 
-# Table count (expect ~88)
+# Table count (expect 99)
+# Count verified 2026-06-21 against prod DB after migrations 083-096 applied.
+# Previous comment said ~88; updated after Phase 10 (094-096) and 083-086 landed.
 kubectl exec -n postgresql-${ENV} postgresql-0 -- \
   psql -U blocksecops -d solidity_security -t -c \
   "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='public';"
