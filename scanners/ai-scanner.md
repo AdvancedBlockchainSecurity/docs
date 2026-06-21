@@ -1,7 +1,7 @@
 # AI Scanner
 
 **Service:** `blocksecops-ai-scanner`
-**Version:** 0.2.6 (2026-06-21)
+**Version:** 0.2.7 (2026-06-21)
 **Tier availability:** `starter` (managed-claude, limited quota), `growth` (managed-claude, standard quota), `enterprise` (managed-claude, high quota + BYO providers in Phase 2)
 **scanner_id (catalog ID):** `ai-anthropic` — this is the ID used in `scanner_ids` dispatch payloads, returned by `GET /api/v1/scanners`, and stored on `vulnerabilities.scanner_id` for AI findings. Changed from `ai` to `ai-anthropic` in api-service v0.46.2 (PR #382) so the catalog ID matches what the orchestrator writes to the DB.
 **Display name:** "AI (Claude Sonnet)" — shown in the scanner picker and scanner catalog.
@@ -22,6 +22,26 @@ The scanner is not a replacement for SAST tools. It is a complement that catches
 | MEV front-running | Swap function with predictable slippage tolerance readable from pending-tx calldata | Requires understanding of mempool economics |
 | Unprotected initialization | `initialize()` callable by anyone after deployment | Access-control check present but on wrong function variant |
 | Specification drift | Contract behavior diverges from NatSpec invariants | Requires reading prose and code together |
+
+---
+
+## Multi-file contract support
+
+As of v0.2.7, the orchestrator handles Hardhat and Foundry projects that store source files individually rather than as a single concatenated `source_code` blob.
+
+When `contract.source_code` is empty and `contract.is_multi_file = true`, the orchestrator queries the `contract_files` table for all `.sol` files associated with that contract. It fences each file's content with its `file_path` header so the prompt context clearly attributes each code section. The output validator's `allowed_files` map is populated with every `file_path` returned, so per-file findings pass validation without requiring the file to appear in a single blob.
+
+Single-file contracts (non-empty `source_code`) are unaffected — the existing path continues to work identically.
+
+**Verification:** Scan `daee7c9d-6388-4cf2-8d2e-c7bcc72ee1c5` confirmed this path live against contract `0d0c1935` (hardhat-echidna project, 3 `.sol` files including `EchidnaBuggy.sol`). Completed in ~10 seconds with 1 finding. The gap that caused this fix was discovered via failed scan `369548e9-c019-45e7-931d-30ab71adefac` on the same contract.
+
+---
+
+## Consent model
+
+As of dashboard v0.55.4, consent to send contract source to the AI sub-processor is **implicit by use**: selecting the AI scanner and clicking Start Scan constitutes the consent action. The per-scan checkbox has been removed. A one-line disclosure in the scanner picker reads: "Note: starting an AI scan sends the contract source to the LLM sub-processor."
+
+The sub-processor relationship is covered in the Terms of Service. The backend gate (BSO-SEC-031) that rejects `ai_sensitivity_acknowledged=false` remains active as defense in depth. The dashboard always sends `ai_sensitivity_acknowledged: true` when AI is in `scanner_ids`. The `ai_scan_metadata.sensitivity_acknowledged` column continues to be recorded and is always `true` for scans initiated after v0.55.4.
 
 ---
 

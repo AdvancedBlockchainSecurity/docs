@@ -27,10 +27,10 @@ Phase 1 ships managed-claude only. BYO providers (anthropic, openai, gemini) are
 
 | Component | Version | Notes |
 |---|---|---|
-| blocksecops-ai-scanner | **0.2.6** | Internal service; namespace `ai-scanner-prod`; no public ingress |
+| blocksecops-ai-scanner | **0.2.7** | Multi-file Hardhat/Foundry support (PR #6); orchestrator queries `contract_files` when `source_code` empty + `is_multi_file=true` |
 | blocksecops-api-service | **0.46.2** | Scan request schema extended; fire-and-forget dispatch; permission gates; gap-closure endpoints (consent, sensitivity, org ai-scanning, quota); `cleanup_stuck_ai_scans` Celery beat task (BSO-SEC-040); scanner catalog ID renamed `ai` → `ai-anthropic`; search filter `scanner_ids` alias fixed |
 | blocksecops-shared (tier-config) | **1.4.0** | `aiScan` block added; `AIScanConfig`, `AIScanTier`, `AIScanOverage` models |
-| blocksecops-dashboard | **0.55.1** | `AIScanOptions`, `AIBadge` components; `selectedScanners.includes('ai-anthropic')` updated from `'ai'`; BYO options shown as disabled; `AIScanOptions.test.ts` + `AIBadge.test.ts` bundled |
+| blocksecops-dashboard | **0.55.4** | Independent AI Scanning section above SAST (PR #228); batch scan refactor with dynamic scanner list and amber AI-skip notice (PR #230); implicit consent model replacing per-scan checkbox (PR #231) |
 
 ---
 
@@ -61,12 +61,18 @@ TOKEN=$(curl -s -X POST "${SUPABASE_URL}/auth/v1/token?grant_type=password" \
 echo "TOKEN acquired: ${TOKEN:0:20}..."
 ```
 
-### Reference contract
+### Reference contracts
 
-The live e2e verification used contract `3cd9e3ac-082d-450c-a888-bd85009c63e8` (uploaded under `jasonbrailowbizop@mail.com`). Use this contract ID for re-runs unless a different contract is needed to exercise a specific failure path.
+Two contracts are used across the test matrix:
+
+| Variable | Contract ID | Description |
+|---|---|---|
+| `CONTRACT_ID` | `3cd9e3ac-082d-450c-a888-bd85009c63e8` | Single-file Solidity contract; Phase 10 baseline (8 findings) |
+| `MULTIFILE_CONTRACT_ID` | `0d0c1935` | Hardhat-echidna project with 3 `.sol` files including `EchidnaBuggy.sol`; used for multi-file happy path (test A4) |
 
 ```bash
 CONTRACT_ID="3cd9e3ac-082d-450c-a888-bd85009c63e8"
+MULTIFILE_CONTRACT_ID="0d0c1935"
 ```
 
 ---
@@ -159,6 +165,53 @@ kubectl exec postgresql-0 -n postgresql-prod -- psql -U blocksecops -d solidity_
 - `input_tokens > 0` and `output_tokens > 0`
 - `cost_usd_micros > 0`
 - `prompt_version` is non-null
+
+#### A4 — Multi-file Hardhat/Foundry project (ai-scanner v0.2.7)
+
+**Purpose:** Verify the orchestrator correctly assembles context from `contract_files` when `contract.source_code` is empty and `is_multi_file=true`.
+
+**Fixture:** Contract `0d0c1935` (hardhat-echidna project, 3 `.sol` files including `EchidnaBuggy.sol`). This is the contract that surfaced the multi-file gap via failed scan `369548e9-c019-45e7-931d-30ab71adefac` and was fixed in ai-scanner v0.2.7 (PR #6).
+
+**Setup:** All standard preconditions met. Use `MULTIFILE_CONTRACT_ID` from the reference contracts table.
+
+```bash
+# Dispatch AI scan against multi-file contract
+MFSCAN_RESP=$(curl -s -X POST "${PLATFORM_URL}/api/v1/scans" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"contract_id\": \"${MULTIFILE_CONTRACT_ID}\",
+    \"scanner_ids\": [\"ai-anthropic\"],
+    \"ai_provider\": \"managed-claude\",
+    \"ai_mode\": \"structured\",
+    \"ai_sensitivity_acknowledged\": true
+  }")
+echo "$MFSCAN_RESP" | python3 -m json.tool
+
+MFSCAN_ID=$(echo "$MFSCAN_RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('scan_id',''))")
+echo "MFSCAN_ID: $MFSCAN_ID"
+
+# Poll
+for i in $(seq 1 24); do
+  STATUS=$(curl -s -H "Authorization: Bearer $TOKEN" \
+    "${PLATFORM_URL}/api/v1/scans/${MFSCAN_ID}" | \
+    python3 -c "import sys,json; print(json.load(sys.stdin).get('status',''))")
+  echo "[$i] status: $STATUS"
+  [ "$STATUS" = "completed" ] && break
+  [ "$STATUS" = "failed" ] && echo "FAIL: scan failed" && break
+  sleep 5
+done
+```
+
+**Pass criteria:**
+- HTTP 202 with `scan_id`
+- Scan reaches `status = "completed"` (not `failed`)
+- Finding count >= 1 (baseline: scan `daee7c9d-6388-4cf2-8d2e-c7bcc72ee1c5` returned 1 finding in ~10 seconds)
+- Findings have `scanner_id = 'ai-anthropic'` and reference file paths from the project (e.g., `EchidnaBuggy.sol`)
+
+**Regression guard:** If this scan fails with `ai_output_invalid` or returns 0 findings while status is `completed`, the `contract_files` assembly path may have regressed. Check ai-scanner logs for "source_code empty, querying contract_files" to confirm the multi-file path was taken.
+
+**Live verification evidence:** Scan `daee7c9d-6388-4cf2-8d2e-c7bcc72ee1c5` confirmed live on 2026-06-21.
 
 ---
 
@@ -370,9 +423,9 @@ kubectl exec postgresql-0 -n postgresql-prod -- psql -U blocksecops -d solidity_
 
 ### C. Security gate verification
 
-#### C1 — BSO-SEC-029: ai_sensitivity_acknowledged=false must be rejected
+#### C1 — BSO-SEC-031: ai_sensitivity_acknowledged=false must be rejected at the API layer
 
-The api-service pre-dispatch gate must reject any AI scan request where `ai_sensitivity_acknowledged` is `false` or absent.
+As of dashboard v0.55.4, the frontend always sends `ai_sensitivity_acknowledged: true` when AI is in `scanner_ids` (implicit consent model). The backend gate (BSO-SEC-031) remains active as defense in depth and must reject requests where `ai_sensitivity_acknowledged` is `false` or absent at the API level. This test exercises the API directly, bypassing the dashboard.
 
 ```bash
 # Test: sensitivity_acknowledged explicitly false
@@ -507,11 +560,16 @@ These tests are owner-driven browser checks against the production dashboard. Ru
 |---|---|---|
 | F1 | `3cd9e3ac-082d-450c-a888-bd85009c63e8` (reference contract) | AI findings appear in the findings list. Each finding card or row shows the **AIBadge** pill (labeled "AI" or similar). |
 | F2 | Same contract, AI findings with varying confidence | Confidence sub-pill renders correctly: green or solid for `high`, amber for `medium`, outline/muted for `low`. |
-| F3 | Scanner picker for any contract | Selecting "AI" scanner shows `AIScanOptions` component with mode (structured) and provider (managed-claude) dropdowns. BYO provider options (anthropic, openai, gemini) are rendered but disabled with a "Phase 2" label. |
+| F3 | Scanner picker for any contract | The **AI Scanning** section (indigo accent, "Apogee AI" badge) renders **above** the Static Analysis section. Selecting "AI (Claude Sonnet)" shows `AIScanOptions` with mode and provider dropdowns. BYO options are disabled with "Phase 2" label. No AI scanners appear inside the Static Analysis section. |
 | F4 | Scanner picker — BYO providers | Clicking a disabled BYO option does not submit a scan. A tooltip or label explains Phase 2. |
 | F5 | Contract list or contract detail | No AI-specific UI elements appear on non-AI scans (badge must not bleed into SAST-only results). |
+| F6 | Scanner picker — consent disclosure | The per-scan consent checkbox is absent. A one-line italic disclosure reads "Note: starting an AI scan sends the contract source to the LLM sub-processor." The disclosure appears at the top of the `AIScanOptions` panel. |
+| F7 | Batch scan modal | The AI Scanning section renders above SAST scanners. An amber notice reads "Batch scanning skips AI scanners in Phase 1 — they only run on single-contract scans." (`data-testid="batch-ai-skip-notice"` present). The scan count display and Start button count use SAST-only selection (`selectedNonAiCount`). |
+| F8 | Batch scan modal — scanner list | Scanner list is loaded dynamically from `GET /api/v1/scanners` (`useQuery(['scanners'], listScanners)`) rather than a hardcoded list. |
 
 **Browser-side smoke check:** Navigate to `https://app.0xapogee.com/contracts/3cd9e3ac-082d-450c-a888-bd85009c63e8/scans` → locate the AI scan run (scan `eccb1121-f424-48fa-9798-4bc64c048f80` from the Phase 10 baseline) → confirm 8 findings with AIBadge pills.
+
+**Implicit consent live verification:** Scan `3622a074-9b56-4031-a314-a8f14ed648b4` was triggered via the v0.55.4 dashboard (no consent checkbox) and completed in ~30 seconds with 7 findings (2 high, 4 medium, 1 low), $0.047 cost. Confirmed `ai_scan_metadata.sensitivity_acknowledged = true`.
 
 ---
 
@@ -614,14 +672,15 @@ for v in vulns:
 
 | Contract ID | Name | Purpose |
 |---|---|---|
-| `3cd9e3ac-082d-450c-a888-bd85009c63e8` | (Phase 10 reference contract) | Baseline: 8 AI findings in Phase 10 e2e verification |
+| `3cd9e3ac-082d-450c-a888-bd85009c63e8` | (Phase 10 reference contract) | Baseline: 8 AI findings in Phase 10 e2e verification (scan `eccb1121`) |
+| `0d0c1935` | hardhat-echidna project | Multi-file test fixture: 3 `.sol` files including `EchidnaBuggy.sol`; used for A4 |
 
 ---
 
 ## Known limitations
 
 - **BYO provider E2E not verified** — anthropic/openai/gemini adapters return `ai_provider_error` in Phase 1. Verification deferred to Phase 2.
-- **Batch AI dispatch** — `scanner_ids=["ai-anthropic","slither"]` is not supported; the AI scanner_id is silently skipped. No UI warning yet.
+- **Batch AI dispatch** — `scanner_ids=["ai-anthropic","slither"]` is not supported; the AI scanner_id is silently skipped. Dashboard displays an amber notice in the batch modal (ships in v0.55.3).
 - **Org opt-in UI** — `organizations.ai_scanning_enabled` can now be toggled via `PATCH /api/v1/organizations/{id}/ai-scanning` (ships in v0.46.0); no dashboard settings-page toggle exists yet (Phase 2).
 - **Quota meter widget** — monthly token-usage indicator on the dashboard deferred to Phase 2. The `GET /api/v1/organizations/{id}/ai-quota` endpoint (v0.46.0) is available for programmatic checks.
 - **B4 (ai_token_cap_exceeded) E2E** — may require a contract larger than available test fixtures; verify via unit test if E2E is not feasible.

@@ -1,7 +1,7 @@
 # Pipeline: ai-scanner Build & Deploy
 
 **Phase:** 10 — BYO AI Scanning
-**Status:** Production (updated 2026-06-21) — ai-scanner v0.2.6, tier-config v1.4.0
+**Status:** Production (updated 2026-06-21) — ai-scanner v0.2.7, tier-config v1.4.0
 **Cross-reference:** `TaskDocs-BlockSecOps/phases/10-phase-10-byo-ai-scanning/PHASE-10-BYO-AI-SCANNING-PLAN.md`
 
 The `blocksecops-ai-scanner` service follows the same build/deploy patterns as `blocksecops-api-service` per `docs/standards/docker-image-versioning.md`. This doc captures what is different: the tier-config wheel bundling pattern, Workload Identity binding, ExternalSecret routing for managed Claude vs BYO keys, and the full NetworkPolicy archetype deployed in production.
@@ -266,7 +266,7 @@ spec:
 
 ## Versioning
 
-Standard semver per `docs/standards/docker-image-versioning.md`. Current production version: `0.2.6`. Each PR bumps the patch (`0.2.x`). Prompt-version (`solidity/v1`) is independent of the service version — it bumps on prompt iteration so historical scans in `ai_scan_metadata.prompt_version` remain attributable to the exact prompt that produced them.
+Standard semver per `docs/standards/docker-image-versioning.md`. Current production version: `0.2.7`. Each PR bumps the patch (`0.2.x`). Prompt-version (`solidity/v1`) is independent of the service version — it bumps on prompt iteration so historical scans in `ai_scan_metadata.prompt_version` remain attributable to the exact prompt that produced them.
 
 ## Deployment commands (operator)
 

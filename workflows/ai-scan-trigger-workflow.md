@@ -1,16 +1,17 @@
 # Workflow: AI Scan Trigger
 
 **Phase:** 10 — BYO AI Scanning
-**Status:** Production (updated 2026-06-21) — api-service v0.46.2, ai-scanner v0.2.6
+**Status:** Production (updated 2026-06-21) — api-service v0.46.2, ai-scanner v0.2.7, dashboard v0.55.4
 **Cross-reference:** `TaskDocs-BlockSecOps/phases/10-phase-10-byo-ai-scanning/PHASE-10-BYO-AI-SCANNING-PLAN.md`
 
 The end-to-end flow when a user triggers an AI scan. AI scanning is a scanner-type that slots into the existing scan dispatch pipeline alongside the 17 SAST scanners; this doc focuses on what is different from a standard SAST scanner trigger.
 
-**Phase 1 constraints (as of api-service v0.46.2):**
+**Phase 1 constraints (as of api-service v0.46.2, ai-scanner v0.2.7):**
 - Only `managed-claude` is live. BYO adapters (`anthropic`, `openai`, `gemini`) are wired but return `ai_provider_error` and are displayed as "Phase 2" in the dashboard.
-- `scanner_ids=["ai-anthropic"]` in a batch scan request is silently skipped with a server-side warning log; AI must be triggered as a standalone scan.
+- `scanner_ids=["ai-anthropic"]` in a batch scan request is silently skipped with a server-side warning log; AI must be triggered as a standalone scan. The dashboard displays an amber notice in the batch scan modal explaining this.
 - The per-org `ai_scanning_enabled` flag can now be toggled via `PATCH /api/v1/organizations/{id}/ai-scanning` (org-admin only) — no longer requires a direct DB UPDATE.
 - BYO_KEK is not yet mounted in the ai-scanner ExternalSecret (deferred to Phase 2); the `externalsecret.yaml` `BYO_KEK` entry has been removed until the BYO live-wiring ships.
+- Multi-file Hardhat/Foundry projects are supported: when `contract.source_code` is empty and `is_multi_file=true`, the orchestrator queries `contract_files` for all `.sol` files and fences each with its `file_path`. The output validator's `allowed_files` map accepts per-file findings.
 
 ## High-level sequence
 
@@ -79,7 +80,8 @@ sequenceDiagram
 3. **Org opt-in** — `organizations.ai_scanning_enabled = true`
 4. **Per-contract sensitivity** — `contracts.ai_processing_disabled = false`
 5. **User consent** — `users.ai_consent_at IS NOT NULL` (DPA acknowledged)
-6. **Token budget available** — atomic reservation per `quota_service.py`
+6. **Sub-processor acknowledgment** — `ai_sensitivity_acknowledged: true` must be present in the request body. As of dashboard v0.55.4, the client always sends `true` when AI is in `scanner_ids`; selecting the AI scanner and clicking Start Scan constitutes consent (implicit-by-use model). The backend gate (BSO-SEC-031) remains unchanged — it still rejects `false` or absent values as defense in depth. `ai_scan_metadata.sensitivity_acknowledged` is always recorded as `true` after this dashboard change.
+7. **Token budget available** — atomic reservation per `quota_service.py`
 
 Any gate failure short-circuits with a structured `failure_type` + readable `error_message` that surfaces in the scan list via the failure-label-renderer shipped in PR #225.
 
