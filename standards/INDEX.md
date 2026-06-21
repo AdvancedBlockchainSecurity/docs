@@ -209,6 +209,8 @@ These standards ensure proper versioning and configuration management:
 
 ### 🛠️ Operational Workflows (cross-link)
 
+- **[/ship Cycle Workflow](../workflows/ship-cycle-workflow.md)** — 8-phase ship cycle with Linear integration: ticket discovery/creation (Phase 0) → changelog → security audit → test coverage → documentation update → standards verification → commit/PR/merge → deploy/verify/close. Every phase posts a comment to the Linear ticket; tickets progress through `phase:in-progress` → `phase:in-review` → `phase:merged` → `phase:verified` before closing as Done. See also: `docs/playbooks/ship-with-linear-playbook.md` for operator how-to.
+
 - **[New CronJob Deployment](../workflows/new-cronjob-deployment.md)** — canonical pattern for adding a new production CronJob to GCP (kustomize layout, Workload Identity binding, RBAC scope, NetworkPolicy archetype, Prometheus alerting, deploy+verify). Followed by `postgresql-backup`, `gcp-secret-drift-check`, and `drift-audit`.
 
 ### ✅ Compliance & Verification
@@ -325,5 +327,5 @@ Contact the development team or create an issue in the `blocksecops-docs` reposi
 
 ---
 
-**Last Updated:** March 10, 2026
+**Last Updated:** 2026-06-21
 **Maintained By:** Apogee Team
