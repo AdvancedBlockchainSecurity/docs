@@ -29,7 +29,7 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 # API Configuration
-API_URL="http://app.0xapogee.com/api/v1"
+API_URL="https://app.0xapogee.com/api/v1"
 
 # Supabase Configuration (matches api-service configmap)
 SUPABASE_URL="https://huzjlpypdlelqnbjvxad.supabase.co"

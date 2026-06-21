@@ -4,22 +4,22 @@
 **Database Name:** `solidity_security`
 **Schema:** `public`
 **Timezone:** UTC
-**Verified:** 2026-06-21 (migrations 091–096 reflected; scans + scanner_executions `failure_type` constraint extended to include all `ai_*` values per migration 096; 088 baseline columns + all tables from 082+ covered below; older tables reflect the 2026-03-15 snapshot)
+**Verified:** 2026-06-21 (migrations 083–096 fully reflected; scans + scanner_executions `failure_type` constraint extended to include all `ai_*` values per migration 096; 088 baseline columns + all tables covered below)
 **Latest Migration:** 096 (extend failure_type CHECK constraint — ai_* values)
 
 > **Naming Note:** The database is named `solidity_security`, not `blocksecops`. This name was established during initial development when the focus was solely on Solidity. Retained for backward compatibility.
 
-**Total Tables:** 88 ORM-managed tables (excluding `alembic_version`) — adds `contract_artifacts` (091), `stripe_event_log` (093), `ai_scan_metadata` (094), `byo_llm_keys` (095); migration 096 is constraint-only (no new table)
+**Total Tables:** 99 ORM-managed tables (excluding `alembic_version`) — adds `scanner_versions` (085), `scanner_version_history` (086), `contract_artifacts` (091), `stripe_event_log` (093), `ai_scan_metadata` (094), `byo_llm_keys` (095); migrations 083–084, 087, 090, 092, 096 are column/constraint-only (no new tables). Count verified 2026-06-21 against prod DB.
 
 ### Migration history delta since last full verification
 
 | Migration | Date | Change | SCHEMA.md status |
 |-----------|------|--------|------------------|
-| 083 | 2026-03-16 | `support_tickets.ticket_number` column added | Pending — column not yet reflected below |
-| 084 | 2026-03-16 | `support_tickets.organization_id` column added | Pending — column not yet reflected below |
-| 085 | 2026-03-17 | **NEW** `scanner_versions` table | Pending — table not yet documented below |
+| 083 | 2026-03-16 | `support_tickets.ticket_number` column added | **Documented** — see Domain 14 |
+| 084 | 2026-03-16 | `support_tickets.organization_id` column added | **Documented** — see Domain 14 |
+| 085 | 2026-03-17 | **NEW** `scanner_versions` table | **Documented** — see Domain 12 |
 | 086 | 2026-04-15 | **NEW** `scanner_version_history` table | **Documented** — see Domain 12 |
-| 087 | 2026-04-17 | `integration_credentials` + 8 GitHub App BYO fields | Pending — column additions not yet reflected below |
+| 087 | 2026-04-17 | `integration_credentials` + 8 GitHub App BYO fields | **Documented** — see Domain 9 |
 | 088 | 2026-04-21 | `contracts.baseline_scan_id` + `contracts.baseline_marked_at` + FK + index | **Documented** — see `contracts` in Domain 2 |
 | 089 | 2026-05-08 | **NEW** `scanner_executions` table (per-scanner row per scan) | **Documented** — see Domain 2 |
 | 090 | 2026-05-09 | `scans.failure_type` + `scanner_executions.failure_type` (VARCHAR(50), nullable, CHECK enum) | **Documented** — see `scans` and `scanner_executions` in Domain 2 |
@@ -29,8 +29,6 @@
 | 094 | 2026-06-20 | **NEW** `ai_scan_metadata` table (Phase 10); `users.ai_consent_at`, `organizations.{ai_scanning_enabled,ai_input_tokens_used,ai_output_tokens_used,ai_quota_reset_at}`, `contracts.ai_processing_disabled` columns | **Documented** — see `users` / `organizations` / `contracts` rows + new AI Scanning section |
 | 095 | 2026-06-20 | **NEW** `byo_llm_keys` table (Phase 10, BYO LLM API key storage, AES-256-GCM at rest) + FK from `ai_scan_metadata.byo_key_id` | **Documented** — see AI Scanning section |
 | 096 | 2026-06-20 | Extends `failure_type` CHECK constraint on `scans` and `scanner_executions` to include all `ai_*` values: `ai_org_disabled`, `ai_contract_blocked`, `ai_token_cap_exceeded`, `ai_quota_exceeded`, `ai_safety_blocked`, `ai_output_invalid`, `ai_provider_error`, `ai_key_invalid`, `ai_system_error`, `ai_canceled` (BSO-SEC-040) | **Documented** — see `scans` and `scanner_executions` in Domain 2 |
-
-Migrations 083–085 and 087 predate this session and remain as documentation follow-up for the next full verification sweep.
 
 ---
 
@@ -1957,6 +1955,43 @@ Fuzzing test results.
 | seed | INTEGER | nullable | |
 | created_at | TIMESTAMPTZ | NOT NULL | |
 
+### `scanner_versions`
+
+Persistent snapshot of scanner metadata seeded from the `scanner-versions` ConfigMap on api-service startup. Added 2026-03-17 in migration 085. Used by `GET /api/v1/scanners` and the admin scanner management endpoints.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | SERIAL | PRIMARY KEY | |
+| scanner_name | VARCHAR(100) | NOT NULL, UNIQUE | Canonical scanner ID (e.g. `slither`, `mythril`). Constraint: `UNIQUE(scanner_name)`. |
+| scanner_type | VARCHAR(50) | NOT NULL, CHECK | One of `static-analysis`, `fuzzer`, `formal-verification`, `linting`, `symbolic-execution`. |
+| ecosystem | VARCHAR(50) | NOT NULL, CHECK | One of `evm`, `solana`, `move`, `multi`. |
+| language | VARCHAR(50) | NOT NULL | Target language (e.g. `solidity`, `vyper`, `move`). |
+| current_version | VARCHAR(50) | NOT NULL | Upstream tool version currently deployed (e.g. `0.11.5`). |
+| latest_version | VARCHAR(50) | nullable | Latest available upstream release; populated by version-check CronJob. |
+| version_status | VARCHAR(20) | NOT NULL, default `up-to-date`, CHECK | One of `up-to-date`, `outdated`, `unknown`, `deprecated`. |
+| image_tag | VARCHAR(50) | nullable | Apogee scanner image tag (e.g. `0.3.2`). |
+| image_name | VARCHAR(200) | nullable | Full image reference including registry path. |
+| developer | VARCHAR(200) | nullable | Third-party developer / maintainer name. |
+| repository_url | TEXT | nullable | Upstream source repository URL. |
+| detector_count | INTEGER | NOT NULL, default 0 | Total detectors available in the upstream tool. |
+| integrated_detector_count | INTEGER | NOT NULL, default 0 | Detectors actively wired into Apogee's pipeline. |
+| last_checked_at | TIMESTAMPTZ | nullable | When the version-check CronJob last ran for this scanner. |
+| last_updated_at | TIMESTAMPTZ | NOT NULL, default now() | When this row was last modified. |
+| created_at | TIMESTAMPTZ | NOT NULL, default now() | When the row was first seeded. |
+| notes | TEXT | nullable | Admin-visible changelog / notes from the ConfigMap `_note` field. |
+
+**Indexes:**
+- `idx_scanner_versions_ecosystem` — `(ecosystem)`
+- `idx_scanner_versions_type` — `(scanner_type)`
+- `idx_scanner_versions_status` — `(version_status)`
+
+**Check constraints:**
+- `valid_version_status` — closed-set CHECK on `version_status`
+- `valid_scanner_type` — closed-set CHECK on `scanner_type`
+- `valid_ecosystem` — closed-set CHECK on `ecosystem`
+
+---
+
 ### `scanner_version_history`
 
 Audit trail of every admin scanner upgrade + rollback + auto-revert. Added 2026-04-15 in migration 086 as fix #3 of the admin scanner upgrade pipeline review. Used by `POST /api/v1/admin/system/scanners/{name}/rollback` to resolve the immediately-prior version.
@@ -2129,6 +2164,8 @@ Support ticket submissions with JIRA integration.
 | jira_issue_url | VARCHAR(2048) | nullable | |
 | jira_sync_status | VARCHAR(20) | NOT NULL, default 'pending' | pending/synced/failed/disabled |
 | status | VARCHAR(20) | NOT NULL, default 'open', indexed | open/in_progress/resolved/closed |
+| ticket_number | INTEGER | nullable, UNIQUE indexed | Migration 083. Human-readable sequential reference (e.g. BSO-0001). Backfilled by created_at order. Index `ix_support_tickets_ticket_number` (unique). |
+| organization_id | UUID | FK organizations(id) ON DELETE SET NULL, nullable, indexed | Migration 084. Scopes ticket to an org. Index `ix_support_tickets_organization_id`. |
 | created_at | TIMESTAMPTZ | NOT NULL, default now(), indexed | |
 | updated_at | TIMESTAMPTZ | NOT NULL, default now() | |
 
@@ -2175,4 +2212,4 @@ Automatically creates a `user_quotas` row with tier-appropriate limits when a ne
 
 ---
 
-*Generated from ORM models at `/home/pwner/Git/blocksecops-api-service/src/infrastructure/database/models.py` and `/home/pwner/Git/blocksecops-api-service/src/infrastructure/database/specialized_models/`. Last migration applied: 082 (2026-03-15).*
+*Generated from ORM models at `/home/pwner/Git/blocksecops-api-service/src/infrastructure/database/models.py` and `/home/pwner/Git/blocksecops-api-service/src/infrastructure/database/specialized_models/`. Last migration applied: 096 (2026-06-20). Table count 99 verified against prod DB 2026-06-21.*
