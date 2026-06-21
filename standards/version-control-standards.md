@@ -1,7 +1,7 @@
 # Version Control Standards
 
-**Version:** 1.8.0
-**Last Updated:** October 20, 2025
+**Version:** 1.9.0
+**Last Updated:** 2026-06-21
 **Status:** Active
 
 ## Owner Approval Required
@@ -46,6 +46,47 @@ long-running scan operations.
 
 Refs: #123
 ```
+
+## Linear Ticket Reference
+
+When a change is shipped through the `/ship` cycle, the commit body must end with the Linear ticket ID on its own line as the last element of the footer. This is the bidirectional link between the Git commit and the Linear ticket in the `Advanced Blockchain Security` team (key `ADV`).
+
+**Reference (ticket remains open after this commit):**
+
+```
+Refs: ADV-NNN
+```
+
+**Close (this commit fully resolves the ticket):**
+
+```
+Closes: ADV-NNN
+```
+
+If a single commit addresses multiple tickets, list each reference on its own line:
+
+```
+Refs: ADV-12
+Refs: ADV-13
+```
+
+**Full example with Linear ticket reference:**
+
+```
+fix(api-service): reject AI scan trigger when org flag is disabled
+
+- Return 400 ai_org_disabled instead of silently queuing the scan
+- Added test_ai_scan_org_flag_disabled in test_scan_endpoints.py
+- Updated docs/workflows/ai-scan-trigger-workflow.md Phase 1 constraints
+
+Refs: ADV-42
+```
+
+**When is this required?** Any commit that goes through `/ship` Phase 6. Commits from hotfixes or pre-/ship changes use `Refs: #NNN` (GitHub issue number) as shown in the legacy example below. Do not mix `ADV-` and `#NNN` formats in the same footer.
+
+**See also:** `docs/workflows/ship-cycle-workflow.md` for the full Linear ticket lifecycle.
+
+---
 
 ## Branch Naming
 
