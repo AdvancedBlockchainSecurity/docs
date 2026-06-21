@@ -107,6 +107,58 @@ done
 | data-service | `"status":"healthy"` |
 | contract-parser | `"status":"OK"` |
 
+### AI Scanner Health (Phase 10 — internal service only)
+
+`ai-scanner` has no public ingress. Probe it from inside the cluster via the api-service pod.
+
+```bash
+ENV="${ENV:-prod}"
+
+# Liveness — always 200 when the process is up
+echo -n "ai-scanner /health/live: "
+kubectl exec -n api-service-${ENV} deployment/api-service -- \
+  curl -s -m 5 "http://ai-scanner.ai-scanner-${ENV}.svc.cluster.local:8000/health/live" 2>/dev/null
+echo ""
+
+# Readiness — 200 when operational, 503 when AI_SCANNING_DISABLED=true
+echo -n "ai-scanner /health/ready: "
+kubectl exec -n api-service-${ENV} deployment/api-service -- \
+  curl -s -o /dev/null -w "%{http_code}" -m 5 \
+  "http://ai-scanner.ai-scanner-${ENV}.svc.cluster.local:8000/health/ready" 2>/dev/null
+echo ""
+# Expected: 200 (normal operation)
+# Expected: 503 (kill-switch active — AI_SCANNING_DISABLED=true)
+```
+
+**Expected responses (normal operation):**
+
+| Endpoint | Expected HTTP | Response Contains |
+|----------|---------------|-------------------|
+| `/health/live` | 200 | `"status":"ok"` or similar process-up response |
+| `/health/ready` | 200 | `"status":"ready"` or similar |
+
+**Kill-switch smoke check.** Run this after any kill-switch toggle to confirm the switch took effect:
+
+```bash
+ENV="${ENV:-prod}"
+
+# Verify kill-switch is ACTIVE (AI_SCANNING_DISABLED=true):
+# Expected: 503
+kubectl exec -n api-service-${ENV} deployment/api-service -- \
+  curl -s -o /dev/null -w "%{http_code}" -m 5 \
+  "http://ai-scanner.ai-scanner-${ENV}.svc.cluster.local:8000/health/ready"
+# Expected output: 503
+
+# After re-enabling (AI_SCANNING_DISABLED=false + rollout restart):
+# Expected: 200
+kubectl exec -n api-service-${ENV} deployment/api-service -- \
+  curl -s -o /dev/null -w "%{http_code}" -m 5 \
+  "http://ai-scanner.ai-scanner-${ENV}.svc.cluster.local:8000/health/ready"
+# Expected output: 200
+```
+
+See `docs/playbooks/ai-cost-kill-switch.md` for the full kill-switch procedure.
+
 ## Authenticated Endpoint Tests
 
 ### Get Auth Token
@@ -278,6 +330,7 @@ for ns_svc in \
   "intelligence-engine-${ENV}/intelligence-engine" \
   "data-service-${ENV}/data-service" \
   "contract-parser-${ENV}/contract-parser" \
+  "ai-scanner-${ENV}/ai-scanner" \
 ; do
   NS=$(echo "$ns_svc" | cut -d/ -f1)
   SVC=$(echo "$ns_svc" | cut -d/ -f2)
@@ -427,6 +480,18 @@ for svc_url in \
     ((FAIL++))
   fi
 done
+
+echo ""
+echo "=== AI Scanner (Phase 10) ==="
+AI_LIVE=$(kubectl exec -n api-service-${ENV} deployment/api-service -- \
+  curl -s -o /dev/null -w '%{http_code}' -m 5 \
+  "http://ai-scanner.ai-scanner-${ENV}.svc.cluster.local:8000/health/live" 2>/dev/null)
+check "ai-scanner liveness" "200" "$AI_LIVE"
+
+AI_READY=$(kubectl exec -n api-service-${ENV} deployment/api-service -- \
+  curl -s -o /dev/null -w '%{http_code}' -m 5 \
+  "http://ai-scanner.ai-scanner-${ENV}.svc.cluster.local:8000/health/ready" 2>/dev/null)
+check "ai-scanner readiness (kill-switch off)" "200" "$AI_READY"
 
 echo ""
 echo "=== Database ==="
