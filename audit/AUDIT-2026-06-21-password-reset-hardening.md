@@ -106,3 +106,28 @@ The current session remains valid so the user sees the success screen without be
 2. **After the owner's own rotation test passes**, unblock and complete Task #64 (sanitize `apogee-platform-assistant.md` + sync `agents-skills` + write BSO-SEC-056 finding).
 3. **Future**: subscribe api-service to Supabase `auth.user.updated` webhook to log password changes server-side for audit compliance (low priority, not customer-blocking).
 4. **Future**: consider enabling Cloudflare Turnstile on the recovery request endpoint once customer volume justifies the extra UX friction (Track B step 0.6).
+
+---
+
+## Addendum — Supabase config codification (added during ship cycle)
+
+After the initial audit, the Track B Section 0a Supabase project configuration was codified into `blocksecops-dashboard/supabase/` (commit pending in this ship cycle). Verified:
+
+- `supabase/config.toml` — `[auth].site_url`, `additional_redirect_urls`, `password_min_length = 8`, `password_requirements = "lower_upper_letters_digits"`, `[auth.email.template.recovery]` pointing at the branded HTML
+- `supabase/templates/recovery.html` — branded body; uses `{{ .ConfirmationURL }}` (Supabase auto-escapes)
+- `supabase/README.md` — documents the CLI workflow + a known quirk (CLI v2.107.0 pushes `subject` but not `content_path` body — workaround uses the management API PATCH directly)
+- `supabase/.gitignore` — CLI default, excludes `.env.keys` + `.env.local` + `.env.*.local`
+
+**No secrets staged.** `[auth.email.smtp]` block remains commented out; the documented pattern uses `pass = "env(VAR_NAME)"` so the API key never lives in git when Section 0b is enabled.
+
+**Open-redirect posture (BSO-SEC-021 precedent)** verified via Supabase management API:
+
+```
+uri_allow_list: https://app.0xapogee.com/**,http://127.0.0.1:5173/**,http://localhost:5173/**
+```
+
+No wildcards or `*` patterns; all entries are scoped to known origins (production apex + local dev ports only). PASS.
+
+**Branded recovery body** verified live (1269 chars, Apogee-branded inline-CSS HTML). PASS.
+
+**Outstanding**: BSO-SEC-056 (`TestPass123` literal in public `dehvCurtis/agents-skills` since 2026-06-20 21:32 MDT) — remains the same gated cleanup; unblocks once owner completes the rotation test using the now-live Section 0a flow.

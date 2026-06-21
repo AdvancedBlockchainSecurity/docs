@@ -19,6 +19,11 @@ There are two valid setups depending on where you are in the launch:
 
 This is the minimum config so a single user (the owner) can complete a working end-to-end reset.
 
+**Two ways to apply Section 0a** — pick one:
+
+- **Recommended (codebase-first)**: edit `blocksecops-dashboard/supabase/config.toml` then `supabase config push`. The config lives in git, every change goes through PR review. See `blocksecops-dashboard/supabase/README.md` for the full workflow and the known CLI v2.107.0 quirk (template body needs a follow-up management-API PATCH; one-liner included in the README).
+- **Dashboard clicks** (subsections below): same end state, but the changes aren't versioned. Use only if the CLI is unavailable.
+
 #### 0a.1 — Configure Supabase URL Configuration
 
 Supabase Dashboard → Authentication → URL Configuration:
