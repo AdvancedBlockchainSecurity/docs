@@ -34,7 +34,27 @@ flowchart TB
 
 ## Commands
 
-### Check an org's AI usage vs cap
+### Check an org's AI usage vs cap (API — preferred)
+
+As of api-service v0.46.0 the canonical quota-state inspection command is the API endpoint. This is the same data the dashboard will show the org admin:
+
+```bash
+# Requires a JWT with org-member scope (or platform admin token).
+curl -s "https://app.0xapogee.com/api/v1/organizations/<org-uuid>/ai-quota" \
+  -H "Authorization: Bearer $TOKEN" | jq .
+# Returns:
+# {
+#   "tier": "enterprise",
+#   "ai_scanning_enabled": true,
+#   "input_tokens_used": 18544,
+#   "input_tokens_cap": 10000000,
+#   "output_tokens_used": 9654,
+#   "output_tokens_cap": <from tiers.json>,
+#   "quota_reset_at": "2026-07-01T00:00:00Z"
+# }
+```
+
+### Check an org's AI usage vs cap (DB — fallback / deeper audit)
 
 ```bash
 kubectl exec postgresql-0 -n postgresql-prod -- psql -U blocksecops -d solidity_security <<EOF

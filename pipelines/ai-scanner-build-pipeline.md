@@ -1,7 +1,7 @@
 # Pipeline: ai-scanner Build & Deploy
 
 **Phase:** 10 — BYO AI Scanning
-**Status:** Production (shipped 2026-06-20) — ai-scanner v0.2.4, tier-config v1.4.0
+**Status:** Production (updated 2026-06-21) — ai-scanner v0.2.6, tier-config v1.4.0
 **Cross-reference:** `TaskDocs-BlockSecOps/phases/10-phase-10-byo-ai-scanning/PHASE-10-BYO-AI-SCANNING-PLAN.md`
 
 The `blocksecops-ai-scanner` service follows the same build/deploy patterns as `blocksecops-api-service` per `docs/standards/docker-image-versioning.md`. This doc captures what is different: the tier-config wheel bundling pattern, Workload Identity binding, ExternalSecret routing for managed Claude vs BYO keys, and the full NetworkPolicy archetype deployed in production.
@@ -252,16 +252,21 @@ spec:
     - secretKey: APOGEE_ANTHROPIC_KEY  # managed Claude only
       remoteRef:
         key: apogee-gcp-anthropic-key
-    - secretKey: BYO_KEK  # KEK for encrypting BYO keys at rest
-      remoteRef:
-        key: apogee-gcp-byo-kek
 ```
 
-`APOGEE_ANTHROPIC_KEY` is the only LLM API key the service holds in env. All BYO keys are loaded on-demand from the `byo_llm_keys` table and decrypted with `BYO_KEK` per use (never cached in memory beyond the request's lifetime).
+> **Phase 2 note — BYO_KEK not yet mounted:** The `BYO_KEK` entry has been removed from `externalsecret.yaml` for the Phase 1 ship (api-service v0.46.2, ai-scanner v0.2.6). The `byo_llm_keys` table and decryption code exist, but the key-encryption key is not injected until the BYO live-wiring ships in Phase 2. Add the following block back to `data:` when Phase 2 deploys:
+>
+> ```yaml
+>     - secretKey: BYO_KEK
+>       remoteRef:
+>         key: apogee-gcp-byo-kek
+> ```
+
+`APOGEE_ANTHROPIC_KEY` is the only LLM API key the service holds in env for Phase 1. In Phase 2, BYO keys will be loaded on-demand from the `byo_llm_keys` table and decrypted with `BYO_KEK` per use (never cached in memory beyond the request's lifetime).
 
 ## Versioning
 
-Standard semver per `docs/standards/docker-image-versioning.md`. Current production version: `0.2.4`. Each PR bumps the patch (`0.2.x`). Prompt-version (`solidity/v1`) is independent of the service version — it bumps on prompt iteration so historical scans in `ai_scan_metadata.prompt_version` remain attributable to the exact prompt that produced them.
+Standard semver per `docs/standards/docker-image-versioning.md`. Current production version: `0.2.6`. Each PR bumps the patch (`0.2.x`). Prompt-version (`solidity/v1`) is independent of the service version — it bumps on prompt iteration so historical scans in `ai_scan_metadata.prompt_version` remain attributable to the exact prompt that produced them.
 
 ## Deployment commands (operator)
 

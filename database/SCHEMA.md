@@ -4,12 +4,12 @@
 **Database Name:** `solidity_security`
 **Schema:** `public`
 **Timezone:** UTC
-**Verified:** 2026-06-20 (migrations 091/092/093/094/095 reflected; scans + scanner_executions `failure_type` column reflected; 088 baseline columns + all tables from 082+ covered below; older tables reflect the 2026-03-15 snapshot)
-**Latest Migration:** 095 (byo_llm_keys)
+**Verified:** 2026-06-21 (migrations 091–096 reflected; scans + scanner_executions `failure_type` constraint extended to include all `ai_*` values per migration 096; 088 baseline columns + all tables from 082+ covered below; older tables reflect the 2026-03-15 snapshot)
+**Latest Migration:** 096 (extend failure_type CHECK constraint — ai_* values)
 
 > **Naming Note:** The database is named `solidity_security`, not `blocksecops`. This name was established during initial development when the focus was solely on Solidity. Retained for backward compatibility.
 
-**Total Tables:** 88 ORM-managed tables (excluding `alembic_version`) — adds `contract_artifacts` (091), `stripe_event_log` (093), `ai_scan_metadata` (094), `byo_llm_keys` (095)
+**Total Tables:** 88 ORM-managed tables (excluding `alembic_version`) — adds `contract_artifacts` (091), `stripe_event_log` (093), `ai_scan_metadata` (094), `byo_llm_keys` (095); migration 096 is constraint-only (no new table)
 
 ### Migration history delta since last full verification
 
@@ -28,6 +28,7 @@
 | 093 | 2026-06-20 | **NEW** `stripe_event_log` table for webhook idempotency (BSO-SEC-024) | **Documented** — see Domain 1 (Stripe) |
 | 094 | 2026-06-20 | **NEW** `ai_scan_metadata` table (Phase 10); `users.ai_consent_at`, `organizations.{ai_scanning_enabled,ai_input_tokens_used,ai_output_tokens_used,ai_quota_reset_at}`, `contracts.ai_processing_disabled` columns | **Documented** — see `users` / `organizations` / `contracts` rows + new AI Scanning section |
 | 095 | 2026-06-20 | **NEW** `byo_llm_keys` table (Phase 10, BYO LLM API key storage, AES-256-GCM at rest) + FK from `ai_scan_metadata.byo_key_id` | **Documented** — see AI Scanning section |
+| 096 | 2026-06-20 | Extends `failure_type` CHECK constraint on `scans` and `scanner_executions` to include all `ai_*` values: `ai_org_disabled`, `ai_contract_blocked`, `ai_token_cap_exceeded`, `ai_quota_exceeded`, `ai_safety_blocked`, `ai_output_invalid`, `ai_provider_error`, `ai_key_invalid`, `ai_system_error`, `ai_canceled` (BSO-SEC-040) | **Documented** — see `scans` and `scanner_executions` in Domain 2 |
 
 Migrations 083–085 and 087 predate this session and remain as documentation follow-up for the next full verification sweep.
 
@@ -411,7 +412,7 @@ Scan execution tracking with priority queue support.
 | started_at | TIMESTAMPTZ | nullable | |
 | completed_at | TIMESTAMPTZ | nullable | |
 | error_message | TEXT | nullable | |
-| failure_type | VARCHAR(50) | nullable, CHECK constraint | Migration 090. Enum: `unsupported_solidity_version`, `compile_error`, `timeout`, `oom`, `internal_error`, `scanner_skipped`. Set when `status='failed'` to let the dashboard branch the failure presentation (e.g., user-actionable validation rejection vs generic system error). |
+| failure_type | VARCHAR(50) | nullable, CHECK constraint | Migration 090 (initial). Migration 096 extended CHECK to include all `ai_*` values (BSO-SEC-040). Full enum: `unsupported_solidity_version`, `compile_error`, `timeout`, `oom`, `internal_error`, `scanner_skipped`, `ai_org_disabled`, `ai_contract_blocked`, `ai_token_cap_exceeded`, `ai_quota_exceeded`, `ai_safety_blocked`, `ai_output_invalid`, `ai_provider_error`, `ai_key_invalid`, `ai_system_error`, `ai_canceled`. Set when `status='failed'` to let the dashboard branch the failure presentation. |
 | critical_count | INTEGER | NOT NULL, default 0 | |
 | high_count | INTEGER | NOT NULL, default 0 | |
 | medium_count | INTEGER | NOT NULL, default 0 | |
@@ -460,7 +461,7 @@ Per-scanner execution row for each scan (Migration 089). One row per requested s
 | completed_at | TIMESTAMPTZ | nullable | |
 | exit_code | INTEGER | nullable | Scanner process exit code |
 | error_message | TEXT | nullable | Per-scanner error text |
-| failure_type | VARCHAR(50) | nullable, CHECK constraint | Migration 090. Same enum as `scans.failure_type`. Lets a single failed scanner be classified independently of the overall scan. |
+| failure_type | VARCHAR(50) | nullable, CHECK constraint | Migration 090 (initial); constraint extended by migration 096 to include all `ai_*` values — same full enum as `scans.failure_type`. Lets a single failed scanner be classified independently of the overall scan. |
 | duration_seconds | INTEGER | nullable | |
 | image_tag | VARCHAR(255) | nullable | Scanner image tag the execution ran on (e.g., `0.4.1`) |
 | created_at | TIMESTAMPTZ | NOT NULL, default now() | |
@@ -920,7 +921,7 @@ Webhook idempotency log (Migration 093, BSO-SEC-024). The Stripe webhook dispatc
 
 ### `ai_scan_metadata`
 
-Per-AI-scan metadata (Migration 094, Phase 10 — BYO AI scanning). One row per scan whose `scanners_used = ['ai']`. The primary-key FK to `scans(id)` gives a 1:1 relationship; `ON DELETE CASCADE` handles right-to-deletion cleanly (delete the scan → metadata goes with it).
+Per-AI-scan metadata (Migration 094, Phase 10 — BYO AI scanning). One row per scan whose `scanners_used` includes `'ai-anthropic'` (the catalog ID as of api-service v0.46.2; previously `'ai'` in Phase 1 initial ship). The primary-key FK to `scans(id)` gives a 1:1 relationship; `ON DELETE CASCADE` handles right-to-deletion cleanly (delete the scan → metadata goes with it).
 
 | Column | Type | Constraints | Notes |
 |--------|------|-------------|-------|

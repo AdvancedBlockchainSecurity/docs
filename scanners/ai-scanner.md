@@ -1,9 +1,10 @@
 # AI Scanner
 
 **Service:** `blocksecops-ai-scanner`
-**Version:** 0.2.4 (2026-06-20)
+**Version:** 0.2.6 (2026-06-21)
 **Tier availability:** `starter` (managed-claude, limited quota), `growth` (managed-claude, standard quota), `enterprise` (managed-claude, high quota + BYO providers in Phase 2)
-**scanner_id:** `ai` (prefix used in dispatch; findings tagged `ai-<provider>-<model>` e.g. `ai-managed-claude-sonnet-4-6`)
+**scanner_id (catalog ID):** `ai-anthropic` — this is the ID used in `scanner_ids` dispatch payloads, returned by `GET /api/v1/scanners`, and stored on `vulnerabilities.scanner_id` for AI findings. Changed from `ai` to `ai-anthropic` in api-service v0.46.2 (PR #382) so the catalog ID matches what the orchestrator writes to the DB.
+**Display name:** "AI (Claude Sonnet)" — shown in the scanner picker and scanner catalog.
 **Phase 1 status:** Managed-claude path live. BYO providers (anthropic, openai, gemini) return `ai_provider_error` and are marked Phase 2 in the dashboard.
 
 ---
@@ -42,9 +43,9 @@ Confidence does not map directly to severity. A `low`-confidence `critical` find
 
 AI findings enter the FP pipeline identically to SAST findings:
 
-1. `vulnerabilities` row inserted with `scanner_id` prefix `ai-`.
+1. `vulnerabilities` row inserted with `scanner_id = 'ai-anthropic'` (the catalog ID).
 2. The FP classifier scores the finding using its existing 30+ features. AI findings tend to have higher lexical novelty (lower n-gram match with training data) — the classifier currently treats this as a mild signal toward "review needed" rather than FP.
-3. The finding appears in the dashboard's finding list with an **AI badge** (rendered by `AIBadge` component when `scanner_id.startsWith('ai-')`).
+3. The finding appears in the dashboard's finding list with an **AI badge** (rendered by `AIBadge` component when `scanner_id.startsWith('ai-')`, which matches `ai-anthropic`).
 4. Reviewers can triage, suppress, or accept exactly as with SAST findings.
 
 The ML review queue (`docs/pipelines/ml-review-queue-pipeline.md`) handles AI findings without special casing. Flagging a finding as a confirmed FP or TP adds it to the next FP-model training batch.

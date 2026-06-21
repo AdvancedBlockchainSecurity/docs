@@ -73,7 +73,14 @@ async def show():
 asyncio.run(show())
 "
 
-# 2. Disable AI scanning for the org (sets the same flag UI org-admin uses)
+# 2a. Preferred: disable via the API (org-admin route, ships as of api-service v0.46.0)
+#     Requires a valid JWT with org-admin scope for the target org.
+curl -s -X PATCH "https://app.0xapogee.com/api/v1/organizations/<org-uuid>/ai-scanning" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"ai_scanning_enabled": false}' | jq .
+
+# 2b. Fallback: disable directly in DB (use if API access is unavailable)
 kubectl exec postgresql-0 -n postgresql-prod -- psql -U blocksecops -d solidity_security -c \
   "UPDATE organizations SET ai_scanning_enabled = false WHERE id = '<org-uuid>';"
 
