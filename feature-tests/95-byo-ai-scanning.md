@@ -1,9 +1,9 @@
 # BYO AI Scanning (Phase 10, Migration 094/095) — feature tests
 
 **Priority**: P1 — High
-**Last tested**: 2026-06-20
-**Endpoints**: `POST /api/v1/scans`, `GET /api/v1/scans/{id}`, `GET /api/v1/vulnerabilities`
-**Scope**: AI-scanner dispatch, quota enforcement, failure-mode gating, dashboard rendering
+**Last tested**: 2026-06-21
+**Endpoints**: `POST /api/v1/scans`, `GET /api/v1/scans/{id}`, `GET /api/v1/vulnerabilities`, `POST /api/v1/users/me/ai-consent`, `PATCH /api/v1/contracts/{id}/ai-sensitivity`, `PATCH /api/v1/organizations/{id}/ai-scanning`, `GET /api/v1/organizations/{id}/ai-quota`
+**Scope**: AI-scanner dispatch, quota enforcement, failure-mode gating, dashboard rendering, gap-closure endpoints (v0.46.x)
 **Cross-links:**
 - Workflow: [`docs/workflows/ai-scan-trigger-workflow.md`](../workflows/ai-scan-trigger-workflow.md)
 - Pipeline: [`docs/pipelines/ai-scanner-build-pipeline.md`](../pipelines/ai-scanner-build-pipeline.md)
@@ -17,7 +17,7 @@
 
 ## What this feature does
 
-Adds a managed-claude AI scanning path to the platform. Users with consent set and sufficient tier quota can submit a contract for AI analysis (`scanner_ids=["ai"]`). The api-service dispatches asynchronously via fire-and-forget to `blocksecops-ai-scanner`, which calls Claude via the Apogee-managed key, validates the JSON output, and persists findings into the `vulnerabilities` table with `scanner_id` prefixed `ai-`. The dashboard renders AI findings with an **AIBadge** component and confidence sub-pill.
+Adds a managed-claude AI scanning path to the platform. Users with consent set and sufficient tier quota can submit a contract for AI analysis (`scanner_ids=["ai-anthropic"]`). The api-service dispatches asynchronously via fire-and-forget to `blocksecops-ai-scanner`, which calls Claude via the Apogee-managed key, validates the JSON output, and persists findings into the `vulnerabilities` table with `scanner_id = 'ai-anthropic'`. The dashboard renders AI findings with an **AIBadge** component (keyed on `scanner_id.startsWith('ai-')`) and confidence sub-pill.
 
 Phase 1 ships managed-claude only. BYO providers (anthropic, openai, gemini) are wired but gated as Phase 2.
 
@@ -27,10 +27,10 @@ Phase 1 ships managed-claude only. BYO providers (anthropic, openai, gemini) are
 
 | Component | Version | Notes |
 |---|---|---|
-| blocksecops-ai-scanner | **0.2.5** | Internal service; namespace `ai-scanner-prod`; no public ingress |
-| blocksecops-api-service | **0.45.2** | Scan request schema extended; fire-and-forget dispatch; permission gates |
+| blocksecops-ai-scanner | **0.2.6** | Internal service; namespace `ai-scanner-prod`; no public ingress |
+| blocksecops-api-service | **0.46.2** | Scan request schema extended; fire-and-forget dispatch; permission gates; gap-closure endpoints (consent, sensitivity, org ai-scanning, quota); `cleanup_stuck_ai_scans` Celery beat task (BSO-SEC-040); scanner catalog ID renamed `ai` → `ai-anthropic`; search filter `scanner_ids` alias fixed |
 | blocksecops-shared (tier-config) | **1.4.0** | `aiScan` block added; `AIScanConfig`, `AIScanTier`, `AIScanOverage` models |
-| blocksecops-dashboard | **0.55.0** | `AIScanOptions`, `AIBadge` components; BYO options shown as disabled |
+| blocksecops-dashboard | **0.55.1** | `AIScanOptions`, `AIBadge` components; `selectedScanners.includes('ai-anthropic')` updated from `'ai'`; BYO options shown as disabled; `AIScanOptions.test.ts` + `AIBadge.test.ts` bundled |
 
 ---
 
@@ -117,7 +117,7 @@ done
 
 **Pass criteria (after completion):**
 - `status` reaches `"completed"`
-- `scanner_ids` in the scan record contains `"ai"` or the resolved `scanner_id` (`"ai-managed-claude-sonnet-4-6"` or similar)
+- `scanner_ids` in the scan record contains `"ai-anthropic"` (the catalog ID as of v0.46.2)
 - Finding count > 0 for the reference contract (8 findings observed in baseline e2e run)
 
 #### A2 — Findings have correct scanner_id and metadata
@@ -132,7 +132,7 @@ vulns=d.get('vulnerabilities', d) if isinstance(d,dict) else d
 for v in vulns:
     sid=v.get('scanner_id','')
     conf=v.get('confidence','')
-    assert sid.startswith('ai-'), f'scanner_id must start with ai-: {sid}'
+    assert sid == 'ai-anthropic' or sid.startswith('ai-anthropic-'), f'scanner_id must be ai-anthropic or ai-anthropic-* prefix: {sid}'
     assert conf in ('high','medium','low',''), f'unexpected confidence: {conf}'
     print(f'  OK: {sid} | severity={v.get(\"severity\")} | confidence={conf}')
 print('PASS: all findings have ai- scanner_id')
@@ -140,7 +140,7 @@ print('PASS: all findings have ai- scanner_id')
 ```
 
 **Pass criteria:**
-- All findings have `scanner_id` starting with `ai-`
+- All findings have `scanner_id = 'ai-anthropic'` (or an `ai-anthropic-` prefixed variant)
 - `confidence` is one of `high`, `medium`, `low`
 - `severity` is one of `critical`, `high`, `medium`, `low`, `informational`
 
@@ -181,7 +181,7 @@ kubectl exec postgresql-0 -n postgresql-prod -- psql -U blocksecops -d solidity_
 curl -s -X POST "${PLATFORM_URL}/api/v1/scans" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"ai\"],\"ai_provider\":\"managed-claude\",\"ai_mode\":\"structured\",\"ai_sensitivity_acknowledged\":true}" | \
+  -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"ai-anthropic\"],\"ai_provider\":\"managed-claude\",\"ai_mode\":\"structured\",\"ai_sensitivity_acknowledged\":true}" | \
   python3 -c "import sys,json; d=json.load(sys.stdin); ft=d.get('detail',{}).get('failure_type') or d.get('failure_type'); print('PASS: ai_org_disabled' if ft=='ai_org_disabled' else f'FAIL: got {d}')"
 ```
 
@@ -204,7 +204,7 @@ kubectl exec postgresql-0 -n postgresql-prod -- psql -U blocksecops -d solidity_
 curl -s -X POST "${PLATFORM_URL}/api/v1/scans" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"ai\"],\"ai_provider\":\"managed-claude\",\"ai_mode\":\"structured\",\"ai_sensitivity_acknowledged\":true}" | \
+  -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"ai-anthropic\"],\"ai_provider\":\"managed-claude\",\"ai_mode\":\"structured\",\"ai_sensitivity_acknowledged\":true}" | \
   python3 -c "import sys,json; d=json.load(sys.stdin); ft=d.get('detail',{}).get('failure_type') or d.get('failure_type'); print('PASS: ai_contract_blocked' if ft=='ai_contract_blocked' else f'FAIL: got {d}')"
 ```
 
@@ -228,7 +228,7 @@ kubectl exec postgresql-0 -n postgresql-prod -- psql -U blocksecops -d solidity_
 RESP=$(curl -s -X POST "${PLATFORM_URL}/api/v1/scans" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"ai\"],\"ai_provider\":\"managed-claude\",\"ai_mode\":\"structured\",\"ai_sensitivity_acknowledged\":true}")
+  -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"ai-anthropic\"],\"ai_provider\":\"managed-claude\",\"ai_mode\":\"structured\",\"ai_sensitivity_acknowledged\":true}")
 
 echo "$RESP" | python3 -c "
 import sys,json; d=json.load(sys.stdin)
@@ -261,7 +261,7 @@ kubectl exec postgresql-0 -n postgresql-prod -- psql -U blocksecops -d solidity_
 curl -s -X POST "${PLATFORM_URL}/api/v1/scans" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"ai\"],\"ai_provider\":\"managed-claude\",\"ai_mode\":\"structured\",\"ai_sensitivity_acknowledged\":true}" | \
+  -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"ai-anthropic\"],\"ai_provider\":\"managed-claude\",\"ai_mode\":\"structured\",\"ai_sensitivity_acknowledged\":true}" | \
   python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('scan_id','(no scan_id — gate fired pre-dispatch)'))"
 ```
 
@@ -298,7 +298,7 @@ kubectl rollout status deployment/ai-scanner -n ai-scanner-prod --timeout=60s
 RESP=$(curl -s -X POST "${PLATFORM_URL}/api/v1/scans" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"ai\"],\"ai_provider\":\"managed-claude\",\"ai_mode\":\"structured\",\"ai_sensitivity_acknowledged\":true}")
+  -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"ai-anthropic\"],\"ai_provider\":\"managed-claude\",\"ai_mode\":\"structured\",\"ai_sensitivity_acknowledged\":true}")
 echo "$RESP" | python3 -m json.tool
 
 SCAN_ID=$(echo "$RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('scan_id',''))")
@@ -344,9 +344,9 @@ Three sub-cases, all produce `failure_type: "ai_system_error"`:
 
 **B9a — DB connection lost mid-scan:** Inject a transient DB failure via `kubectl exec postgresql-0 -- psql ... -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE application_name='ai-scanner';"` during an in-flight scan. The ai-scanner's retry logic should attempt once and then write the failure record.
 
-**B9b — ai-scanner pod crash mid-scan:** `kubectl delete pod -n ai-scanner-prod -l app.kubernetes.io/name=ai-scanner --grace-period=0` during an in-flight scan. The fire-and-forget design means api-service does not retry; the scan stays in `running` until the BSO-SEC-040 stale-scan cleanup task transitions it to `failed`.
+**B9b — ai-scanner pod crash mid-scan:** `kubectl delete pod -n ai-scanner-prod -l app.kubernetes.io/name=ai-scanner --grace-period=0` during an in-flight scan. The fire-and-forget design means api-service does not retry; the scan stays in `running` until the `cleanup_stuck_ai_scans` Celery beat task (BSO-SEC-040, ships in api-service v0.46.0) transitions it to `failed`.
 
-**B9c — Fire-and-forget hung past 10 minutes (BSO-SEC-040):** Verify the cleanup CronJob or background task exists and transitions scans stuck in `running` for `> 10 minutes` to `failed` with `failure_type: "ai_system_error"`.
+**B9c — Fire-and-forget hung past 10 minutes (BSO-SEC-040):** The `cleanup_stuck_ai_scans` Celery beat task (5-minute interval) and companion `ai-scan-cleanup` CronJob in `api-service-prod` are deployed as of api-service v0.46.0. Both transition scans stuck in `running` for `> 10 minutes` to `failed` with `failure_type: "ai_system_error"`.
 
 ```bash
 # Check for BSO-SEC-040 cleanup mechanism
@@ -421,7 +421,7 @@ No scan record should be created, OR if a scan record is created it must immedia
 ```bash
 curl -s -o /dev/null -w "%{http_code}" -X POST "${PLATFORM_URL}/api/v1/scans" \
   -H "Content-Type: application/json" \
-  -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"ai\"],\"ai_sensitivity_acknowledged\":true}"
+  -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"ai-anthropic\"],\"ai_sensitivity_acknowledged\":true}"
 # Expected: 401
 ```
 
@@ -526,7 +526,7 @@ for PROVIDER in "anthropic" "openai" "gemini"; do
   RESP=$(curl -s -X POST "${PLATFORM_URL}/api/v1/scans" \
     -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json" \
-    -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"ai\"],\"ai_provider\":\"${PROVIDER}\",\"ai_mode\":\"structured\",\"ai_sensitivity_acknowledged\":true}")
+    -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"ai-anthropic\"],\"ai_provider\":\"${PROVIDER}\",\"ai_mode\":\"structured\",\"ai_sensitivity_acknowledged\":true}")
   FT=$(echo "$RESP" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('failure_type') or d.get('detail',{}).get('failure_type','?'))" 2>/dev/null || echo "check scan record")
   echo "Provider $PROVIDER: failure_type=$FT"
 done
@@ -536,7 +536,7 @@ done
 
 #### G2 — Vyper/Move contracts are skipped by AI scanner
 
-**Pass criteria:** Submitting `scanner_ids=["ai"]` against a non-Solidity contract (language=vyper or language=move in the contracts table) results in either:
+**Pass criteria:** Submitting `scanner_ids=["ai-anthropic"]` against a non-Solidity contract (language=vyper or language=move in the contracts table) results in either:
 - Dispatch rejected with a meaningful failure_type (e.g. `ai_unsupported_language`)
 - OR scan completed with 0 findings and a note in `ai_scan_metadata` indicating the contract was skipped
 
@@ -549,7 +549,7 @@ Verify by uploading a Vyper file and running an AI-only scan.
 RESP=$(curl -s -X POST "${PLATFORM_URL}/api/v1/scans" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"slither\",\"ai\"],\"ai_provider\":\"managed-claude\",\"ai_mode\":\"structured\",\"ai_sensitivity_acknowledged\":true}")
+  -d "{\"contract_id\":\"${CONTRACT_ID}\",\"scanner_ids\":[\"slither\",\"ai-anthropic\"],\"ai_provider\":\"managed-claude\",\"ai_mode\":\"structured\",\"ai_sensitivity_acknowledged\":true}")
 echo "$RESP" | python3 -m json.tool
 ```
 
@@ -575,7 +575,7 @@ RESP=$(curl -s -X POST "https://app.0xapogee.com/api/v1/scans" \
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{
     "contract_id": "3cd9e3ac-082d-450c-a888-bd85009c63e8",
-    "scanner_ids": ["ai"],
+    "scanner_ids": ["ai-anthropic"],
     "ai_provider": "managed-claude",
     "ai_mode": "structured",
     "ai_sensitivity_acknowledged": true
@@ -621,9 +621,9 @@ for v in vulns:
 ## Known limitations
 
 - **BYO provider E2E not verified** — anthropic/openai/gemini adapters return `ai_provider_error` in Phase 1. Verification deferred to Phase 2.
-- **Batch AI dispatch** — `scanner_ids=["ai","slither"]` is not supported; the AI scanner_id is silently skipped. No UI warning yet.
-- **Org opt-in UI** — `organizations.ai_scanning_enabled` must be flipped via DB UPDATE; no dashboard toggle exists yet.
-- **Quota meter widget** — monthly token-usage indicator on the dashboard deferred to Phase 2.
+- **Batch AI dispatch** — `scanner_ids=["ai-anthropic","slither"]` is not supported; the AI scanner_id is silently skipped. No UI warning yet.
+- **Org opt-in UI** — `organizations.ai_scanning_enabled` can now be toggled via `PATCH /api/v1/organizations/{id}/ai-scanning` (ships in v0.46.0); no dashboard settings-page toggle exists yet (Phase 2).
+- **Quota meter widget** — monthly token-usage indicator on the dashboard deferred to Phase 2. The `GET /api/v1/organizations/{id}/ai-quota` endpoint (v0.46.0) is available for programmatic checks.
 - **B4 (ai_token_cap_exceeded) E2E** — may require a contract larger than available test fixtures; verify via unit test if E2E is not feasible.
 - **B5 (ai_safety_blocked) E2E** — cannot be deterministically triggered against managed-claude without a specially crafted fixture; verify via unit test.
-- **BSO-SEC-040 cleanup task** — if the stale-scan cleaner is not yet deployed as a CronJob, B9c cannot be verified E2E. Track as a follow-up.
+- **BYO_KEK not mounted** — `BYO_KEK` removed from ai-scanner ExternalSecret for Phase 1; BYO key decryption is not functional until Phase 2.

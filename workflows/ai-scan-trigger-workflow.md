@@ -1,15 +1,16 @@
 # Workflow: AI Scan Trigger
 
 **Phase:** 10 — BYO AI Scanning
-**Status:** Production (shipped 2026-06-20) — api-service v0.45.1, ai-scanner v0.2.4
+**Status:** Production (updated 2026-06-21) — api-service v0.46.2, ai-scanner v0.2.6
 **Cross-reference:** `TaskDocs-BlockSecOps/phases/10-phase-10-byo-ai-scanning/PHASE-10-BYO-AI-SCANNING-PLAN.md`
 
 The end-to-end flow when a user triggers an AI scan. AI scanning is a scanner-type that slots into the existing scan dispatch pipeline alongside the 17 SAST scanners; this doc focuses on what is different from a standard SAST scanner trigger.
 
-**Phase 1 constraints (as shipped):**
+**Phase 1 constraints (as of api-service v0.46.2):**
 - Only `managed-claude` is live. BYO adapters (`anthropic`, `openai`, `gemini`) are wired but return `ai_provider_error` and are displayed as "Phase 2" in the dashboard.
-- `scanner_ids=["ai"]` in a batch scan request is silently skipped with a server-side warning log; AI must be triggered as a standalone scan.
-- The per-org `ai_scanning_enabled` flag must be set via direct DB UPDATE until the org-admin UI toggle ships in Phase 2.
+- `scanner_ids=["ai-anthropic"]` in a batch scan request is silently skipped with a server-side warning log; AI must be triggered as a standalone scan.
+- The per-org `ai_scanning_enabled` flag can now be toggled via `PATCH /api/v1/organizations/{id}/ai-scanning` (org-admin only) — no longer requires a direct DB UPDATE.
+- BYO_KEK is not yet mounted in the ai-scanner ExternalSecret (deferred to Phase 2); the `externalsecret.yaml` `BYO_KEK` entry has been removed until the BYO live-wiring ships.
 
 ## High-level sequence
 
@@ -23,7 +24,7 @@ sequenceDiagram
     participant V as Vault
     participant LLM as LLM Provider<br/>(Anthropic / OpenAI / Gemini)
 
-    U->>API: POST /api/v1/scans<br/>{scanner_ids: ["ai"], ai_mode: "structured",<br/>ai_provider: "managed-claude",<br/>ai_sensitivity_acknowledged: true}
+    U->>API: POST /api/v1/scans<br/>{scanner_ids: ["ai-anthropic"], ai_mode: "structured",<br/>ai_provider: "managed-claude",<br/>ai_sensitivity_acknowledged: true}
     API->>DB: SELECT organizations.ai_scanning_enabled
     alt Org has not opted in
         API-->>U: 400 ai_org_disabled<br/>"Org admin must enable AI scanning"
@@ -59,7 +60,8 @@ sequenceDiagram
         AI->>DB: UPDATE scans SET status=failed, failure_type=ai_output_invalid
         AI->>DB: Refund unused output tokens
     end
-    AI->>DB: INSERT vulnerabilities (one row per finding)
+    AI->>DB: INSERT vulnerabilities (one row per finding)<br/>scanner_id="ai-anthropic"
+    AI->>DB: UPDATE scans SET {critical,high,medium,low}_count (GAP 1)
     AI->>DB: INSERT ai_scan_metadata (tokens, cost, provider, model, prompt_version)
     AI->>DB: UPDATE scans SET status=completed
 
@@ -94,7 +96,7 @@ Any gate failure short-circuits with a structured `failure_type` + readable `err
 | `ai_provider_error` | Provider returned 5xx, network error, or BYO adapter returned error (Phase 2 adapters) | "AI provider returned an error" | Refunded |
 | `ai_key_invalid` | BYO key rejected by provider on initial validation or at call time | "Your BYO API key was rejected by the provider" | No |
 | `ai_system_error` | ai-scanner internal unhandled exception, or `AI_SCANNING_DISABLED=true` kill-switch active | "AI scan service is temporarily unavailable" | Refunded |
-| `ai_canceled` | User canceled mid-scan via `POST /scans/{id}/cancel` | "Scan canceled" | Charged for tokens streamed up to abort |
+| `ai_canceled` | User canceled mid-scan via `POST /scans/{id}/cancel`, OR the `cleanup_stuck_ai_scans` task (BSO-SEC-040) transitions a stuck scan; see cleanup task note below | "Scan canceled" | Charged for tokens streamed up to abort |
 
 ## Cancel-mid-scan flow
 
@@ -118,13 +120,39 @@ sequenceDiagram
 
 Cancel = abort, prioritising budget over completeness. Partial findings already persisted (if any) remain.
 
+## New AI management endpoints (api-service v0.46.x)
+
+The following endpoints were added as part of the Phase 1 gap-closure pass (PRs #379–#382, api-service v0.46.0–v0.46.2):
+
+| Endpoint | Auth | Purpose |
+|---|---|---|
+| `POST /api/v1/users/me/ai-consent` | JWT (self) | Set `users.ai_consent_at = NOW()` — records DPA acknowledgment; required before first AI scan |
+| `PATCH /api/v1/contracts/{id}/ai-sensitivity` | JWT (contract owner or org-admin) | Toggle `contracts.ai_processing_disabled`; `true` causes all subsequent AI scans for that contract to fail with `ai_contract_blocked` |
+| `PATCH /api/v1/organizations/{id}/ai-scanning` | JWT (org-admin role only) | Toggle `organizations.ai_scanning_enabled`; replaces the prior DB-UPDATE-only workflow for org opt-in |
+| `GET /api/v1/organizations/{id}/ai-quota` | JWT (org member) | Returns `{tier, ai_scanning_enabled, input_tokens_used, input_tokens_cap, output_tokens_used, output_tokens_cap, quota_reset_at}` from `blocksecops_tier_config` |
+
+`UserResponse` now includes `ai_consent_at` (nullable ISO timestamp). `ContractResponse` now includes `ai_processing_disabled` (boolean).
+
+## BSO-SEC-040: Stale AI scan cleanup
+
+The `cleanup_stuck_ai_scans` Celery beat task (api-service v0.46.x) runs every 5 minutes and transitions any scan that:
+- Has `status = 'running'`
+- Has `scanners_used` containing `'ai-anthropic'`
+- Has `updated_at < NOW() - INTERVAL '10 minutes'`
+
+to `status = 'failed'`, `failure_type = 'ai_system_error'` with `error_message = 'AI scan timed out — no response received within 10 minutes'`.
+
+A corresponding CronJob (`ai-scan-cleanup`) is deployed in `api-service-prod` as a belt-and-suspenders companion in case the Celery worker is down.
+
+This closes the gap where a pod crash mid-scan left scans permanently in `running` state (previously documented as sub-case B9b/B9c in the feature test).
+
 ## Idempotency
 
 The `POST /scans/{scan_id}/ai-trigger` endpoint is idempotent on `scan_id`: a repeated call against an already-in-flight or terminal scan returns the current state, never starts a second LLM call.
 
 ## CI/CD parity
 
-CI clients trigger AI scans via the same `POST /api/v1/scans` endpoint with `scanner_ids: ["ai"]` — no new API surface. Returns the same scan object; the client polls `GET /api/v1/scans/{id}` to completion.
+CI clients trigger AI scans via the same `POST /api/v1/scans` endpoint with `scanner_ids: ["ai-anthropic"]` — no new API surface. Returns the same scan object; the client polls `GET /api/v1/scans/{id}` to completion.
 
 ## Cross-references
 
