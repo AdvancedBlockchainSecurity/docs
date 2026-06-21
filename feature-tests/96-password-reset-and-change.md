@@ -36,7 +36,7 @@ Both flows share the same password complexity rule: 8+ chars, at least one upper
 | Component | Version | Notes |
 |---|---|---|
 | `blocksecops-dashboard` | 0.55.5 | Hardened reset pages + ChangePasswordCard + new unit tests |
-| Supabase project | (config) | Resend SMTP, Site URL + redirect allow-list, branded email template |
+| Supabase project | (config) | **Section 0a (today)**: Site URL + redirect allow-list + branded body template, built-in SMTP (Supabase-controlled sender, 2 emails/hour cap). **Section 0b (before first customer)**: custom SMTP via Resend, sender `noreply@0xapogee.com`, no rate cap. |
 | api-service | 0.46.5 | Unchanged — no backend coupling |
 | ai-scanner | 0.2.8 | Unchanged |
 
@@ -46,11 +46,11 @@ Both flows share the same password complexity rule: 8+ chars, at least one upper
 
 | Check | How to verify | Expected |
 |---|---|---|
-| Resend domain verified | Resend dashboard → Domains → `app.0xapogee.com` (or chosen sender domain) | `Verified` status, DKIM/SPF/DMARC green |
+| Resend domain verified (Section 0b only) | Resend dashboard → Domains → `0xapogee.com` (apex) | `Verified` status, DKIM/SPF/DMARC green. Skip if still on Section 0a abbreviated path — Supabase built-in SMTP doesn't use Resend. |
 | Supabase SMTP wired to Resend | Supabase Dashboard → Authentication → SMTP Settings | Custom SMTP enabled, host `smtp.resend.com`, sender on the verified domain |
 | Site URL set | Supabase Dashboard → Authentication → URL Configuration | `https://app.0xapogee.com` |
 | Redirect URLs allow-listed | Same panel | `https://app.0xapogee.com/**` + the local dev origin |
-| Email template customized | Supabase Dashboard → Authentication → Email Templates → Reset Password | Apogee branding, `{{ .ConfirmationURL }}` CTA, "1 hour" copy matches dashboard |
+| Email template customized | Supabase Dashboard → Authentication → Email Templates → Reset Password | Apogee branding, `{{ .ConfirmationURL }}` CTA, "1 hour" copy matches dashboard. Note: template controls the BODY, not the `From:` — the sender is Supabase-controlled on the abbreviated path and `noreply@0xapogee.com` on the full path. |
 | Token expiry matches UI | Supabase Dashboard → Authentication → Email Settings → OTP expiry | 3600s (1h) — matches the "1 hour" copy in `ForgotPassword.tsx` |
 
 If any precondition fails, fix it before running the matrix below — otherwise tests will fail for the wrong reason.
@@ -61,7 +61,7 @@ If any precondition fails, fix it before running the matrix below — otherwise 
 
 | # | Test | Steps | Expected |
 |---|---|---|---|
-| FP-01 | Happy path | `/forgot-password` → enter registered email → "Send Reset Link" | Success screen "Check your email"; reset email arrives in inbox within 60s from `noreply@app.0xapogee.com` (or chosen sender); subject "Reset your Apogee password" |
+| FP-01 | Happy path | `/forgot-password` → enter registered email → "Send Reset Link" | Success screen "Check your email"; reset email arrives in inbox within 60s. **Section 0a**: sender is Supabase-controlled (e.g. `noreply@mail.app.supabase.io`). **Section 0b**: sender is `noreply@0xapogee.com`. Subject either way: "Reset your Apogee password" |
 | FP-02 | Click link → form unlocks | Open reset email → click CTA | Lands on `/reset-password`; "Verifying link" shows briefly then transitions to "Set new password" form |
 | FP-03 | New password set | Enter strong password (8+, upper, lower, digit) + matching confirm → submit | Success screen "Password updated"; redirected to `/login` within 3s |
 | FP-04 | Login with new password | `/login` with the new password | Sign-in succeeds |

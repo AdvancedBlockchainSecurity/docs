@@ -8,51 +8,18 @@ For ops + customer support when a user reports a password issue. Also doubles as
 
 ---
 
-## Section 0 — One-time setup (owner, before any customer can use the feature)
+## Section 0 — Setup paths
 
-These are dashboard clicks + DNS — no code. Do them in this order; do NOT skip any.
+There are two valid setups depending on where you are in the launch:
 
-### 0.1 Provision Resend (free tier, ~5 min)
+- **Section 0a — Abbreviated path (Supabase built-in SMTP)**: use this for single-user testing (owner rotating their own password) and demos. **Hard cap: 2 emails per hour, project-wide.** Generic sender (e.g. `noreply@mail.app.supabase.io`). Acceptable today; **must be upgraded to Section 0b before any real customer signs up.**
+- **Section 0b — Full path (custom SMTP, branded sender)**: required for real customer traffic. Currently deferred — see Section 0b for the steps when you're ready (Resend, AWS SES, or your existing transactional provider).
 
-1. Sign up at <https://resend.com> with your owner email
-2. Settings → **API Keys** → Create API Key
-   - Name: `apogee-supabase-smtp`
-   - Permission: **Sending access** only (NOT full access)
-   - Copy the `re_xxxxx` key — you'll paste it into Supabase in step 0.3
-3. Settings → **Domains** → Add Domain
-   - Use the production sender domain (e.g. `app.0xapogee.com` — match the dashboard's Site URL)
-4. Resend will display 3 DNS records:
-   - 1× `MX` (Resend mail handler)
-   - 1× `TXT` for SPF
-   - 1× `TXT` for DKIM
-   - (DMARC is optional but recommended — Resend will offer the value)
+### 0a — Abbreviated path (today, ~5 min)
 
-### 0.2 Add DNS records (Cloudflare, ~5 min + propagation)
+This is the minimum config so a single user (the owner) can complete a working end-to-end reset.
 
-In the Cloudflare dashboard for `0xapogee.com`:
-
-1. DNS → Records → Add each of the 3 (or 4 with DMARC) values from Resend verbatim
-2. Set proxy status to **DNS only** (gray cloud) for the MX record — proxying would break mail
-3. Wait 5–10 min for propagation, then click **Verify** in Resend → status should turn `Verified`
-
-### 0.3 Configure Supabase SMTP
-
-Supabase Dashboard → Authentication → SMTP Settings:
-
-| Field | Value |
-|---|---|
-| Enable Custom SMTP | ✓ |
-| Sender email | `noreply@app.0xapogee.com` (must be on verified domain) |
-| Sender name | `Apogee Security` |
-| Host | `smtp.resend.com` |
-| Port | `465` |
-| Username | `resend` (literal string — Resend's SMTP uses this as username) |
-| Password | the `re_xxxxx` API key from step 0.1 |
-| Minimum interval between emails | `60` (seconds) |
-
-Save → click "Send Test Email" → confirm it arrives in your inbox from the Apogee sender.
-
-### 0.4 Configure URL Configuration
+#### 0a.1 — Configure Supabase URL Configuration
 
 Supabase Dashboard → Authentication → URL Configuration:
 
@@ -61,7 +28,79 @@ Supabase Dashboard → Authentication → URL Configuration:
 | Site URL | `https://app.0xapogee.com` |
 | Redirect URLs | One per line:<br>`https://app.0xapogee.com/**`<br>`http://127.0.0.1:5173/**`<br>`http://localhost:5173/**` |
 
-### 0.5 Customize the "Reset Password" email template
+#### 0a.2 — (Optional) Customize the "Reset Password" email template
+
+Even with the built-in SMTP, you can override the Supabase default copy. Supabase Dashboard → Authentication → Email Templates → **Reset Password**:
+
+- **Subject**: `Reset your Apogee password`
+- **Body**: paste the HTML in Section 0b.5 below — works regardless of which SMTP you use later.
+
+#### 0a.3 — Expect a Supabase-branded sender
+
+On the built-in SMTP, the `From:` is fixed to a Supabase-controlled domain such as `noreply@mail.app.supabase.io`. **You cannot change the sender domain without configuring custom SMTP (Section 0b).** The email body can be customized via the template above, but the `From:` cannot. Be ready for users to see this sender and possibly route it to spam.
+
+#### 0a.4 — Smoke test
+
+Run FP-01 through FP-04 from [`docs/feature-tests/96-password-reset-and-change.md`](../feature-tests/96-password-reset-and-change.md) against your owner account. **Be aware**: the 2-emails/hour cap is project-wide, so if you trigger more than 2 sends in an hour (across signup, recovery, magic links), subsequent ones silently 429.
+
+#### 0a.5 — When to upgrade
+
+Move to Section 0b BEFORE either of these:
+- Any non-owner user signs up (they need recovery emails too)
+- You start sending welcome / verification / digest emails (they also draw from the same 2/hour budget)
+- You go to production for a real launch
+
+---
+
+### 0b — Full path (before first real customer)
+
+Skip this section if you're still in Section 0a abbreviated mode.
+
+#### 0b.1 Provision Resend (free tier, ~5 min)
+
+1. Sign up at <https://resend.com> with your owner email
+2. Settings → **API Keys** → Create API Key
+   - Name: `apogee-supabase-smtp`
+   - Permission: **Sending access** only (NOT full access)
+   - Copy the `re_xxxxx` key — you'll paste it into Supabase in step 0.3
+3. Settings → **Domains** → Add Domain
+   - Use the apex sender domain `0xapogee.com` (NOT `app.0xapogee.com` — that's the dashboard URL, a different concern)
+4. Resend will display 3 DNS records:
+   - 1× `MX` (Resend mail handler)
+   - 1× `TXT` for SPF
+   - 1× `TXT` for DKIM
+   - (DMARC is optional but recommended — Resend will offer the value)
+
+#### 0b.2 Add DNS records (Cloudflare, ~5 min + propagation)
+
+In the Cloudflare dashboard for `0xapogee.com`:
+
+1. DNS → Records → Add each of the 3 (or 4 with DMARC) values from Resend verbatim
+2. Set proxy status to **DNS only** (gray cloud) for the MX record — proxying would break mail
+3. Wait 5–10 min for propagation, then click **Verify** in Resend → status should turn `Verified`
+
+#### 0b.3 Configure Supabase SMTP
+
+Supabase Dashboard → Authentication → SMTP Settings:
+
+| Field | Value |
+|---|---|
+| Enable Custom SMTP | ✓ |
+| Sender email | `noreply@0xapogee.com` (must be on the verified apex domain) |
+| Sender name | `Apogee Security` |
+| Host | `smtp.resend.com` |
+| Port | `465` |
+| Username | `resend` (literal string — Resend's SMTP uses this as username) |
+| Password | the `re_xxxxx` API key from step 0b.1 |
+| Minimum interval between emails | `60` (seconds) |
+
+Save → click "Send Test Email" → confirm it arrives in your inbox from the `noreply@0xapogee.com` Apogee Security sender (no longer from a Supabase domain).
+
+#### 0b.4 (URL Configuration was set in Section 0a.1 — no change needed here)
+
+If you skipped Section 0a and came straight to 0b, set the URL Configuration now per Section 0a.1.
+
+#### 0b.5 Customize the "Reset Password" email template
 
 Supabase Dashboard → Authentication → Email Templates → **Reset Password**:
 
@@ -93,13 +132,13 @@ Supabase Dashboard → Authentication → Email Templates → **Reset Password**
 </table>
 ```
 
-### 0.6 (Optional) Enable Turnstile captcha on recovery
+#### 0b.6 (Optional) Enable Turnstile captcha on recovery
 
 Supabase Dashboard → Authentication → Captcha → enable Turnstile with the existing Apogee Turnstile sitekey. If enabled, also add the `<Turnstile />` widget to `ForgotPassword.tsx` and pass the resolved token via `captchaToken`. Skip if you'd rather not add the extra UX step now — Supabase rate-limiting alone is acceptable for pre-customer launch.
 
-### 0.7 Smoke-test before customer use
+#### 0b.7 Smoke-test the full path
 
-Run the FP-01 through FP-04 scenarios from [`docs/feature-tests/96-password-reset-and-change.md`](../feature-tests/96-password-reset-and-change.md) against your own owner account. If they pass, the feature is live.
+Run the FP-01 through FP-04 scenarios from [`docs/feature-tests/96-password-reset-and-change.md`](../feature-tests/96-password-reset-and-change.md) against your own owner account. Reset email should now arrive from `noreply@0xapogee.com` (not Supabase's domain).
 
 ---
 
@@ -133,7 +172,7 @@ If permanently bounced (`5xx`), the email account no longer exists or is mistype
 Walk customer through:
 
 1. Check spam / promotions folder
-2. Search inbox for `noreply@app.0xapogee.com` or subject `Reset your Apogee password`
+2. Search inbox for `noreply@0xapogee.com` (or Supabase's `noreply@mail.app.supabase.io` if you're still on the abbreviated path) or subject `Reset your Apogee password`
 3. Add the sender to safe-senders / whitelist
 4. Confirm they're checking the SAME email that's on file (typos, corporate vs personal address, etc.)
 5. If still nothing, re-trigger from the dashboard (they may need to wait out the per-address rate limit — default 4/hour)
