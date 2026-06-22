@@ -1,8 +1,10 @@
 # Scanner Status
 
-**Version:** 1.0.0
-**Last Updated:** 2026-05-22
+**Version:** 1.1.0
+**Last Updated:** 2026-06-21
 **Status:** Active
+
+> **2026-06-21 verification update:** All 17 SAST scanners re-verified end-to-end via the customer API; **17/17 match the 2026-05-22 baseline exactly — zero drift**. All 5 detector-firing fixtures reproduced their results (halmos c=1, echidna h=1, mythril h=1 m=2 l=2, vyper h=1 l=1, rustdefend c=1). **ai-anthropic (Phase 10, shipped 2026-06-20) is NOT yet baselined** — dispatch fails with a misleading "tool-integration unavailable" error (tracked as **ADV-16**, suspected tier-gate failure). Two additional bugs surfaced: `/scans/{id}/vulnerabilities` returns empty when counts > 0 (**ADV-17**) and explicit user-facing error messages need hardening (**ADV-18**). Full evidence in [`TaskDocs-BlockSecOps/audit-2026-06-21-scanner-matrix-reaudit.md`](/home/pwner/Git/TaskDocs-BlockSecOps/audit-2026-06-21-scanner-matrix-reaudit.md); see [CHANGELOG entry 2026-06-21](./CHANGELOG.md).
 
 > **2026-05-22 verification update:** All 17 scanners re-verified end-to-end via the customer API. **13/17 decisively confirmed** by detector firing on a known-buggy fixture today (including **two new firings on record: vyper and rustdefend**). The remaining 4 (medusa, moccasin, trident, cargo-fuzz-solana) are proof-of-life-only because the DB lacks the seeded-bug fixture types they need — fixture-coverage gap, not a scanner defect. Full evidence in [`TaskDocs-BlockSecOps/audit-2026-05-22-scanner-matrix-reaudit.md`](/home/pwner/Git/TaskDocs-BlockSecOps/audit-2026-05-22-scanner-matrix-reaudit.md); summary in [CHANGELOG entry 2026-05-22](./CHANGELOG.md#2026-05-22--full-17-scanner-functionality-verification-baseline--detector-firing). Per-row "Last verified" cells below remain the 2026-05-09 deep-dive snapshot; today's audit confirms they have not regressed.
 

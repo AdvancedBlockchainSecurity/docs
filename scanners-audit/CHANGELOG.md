@@ -8,6 +8,44 @@ Each entry follows [Documentation Standards](../standards/documentation-standard
 
 ---
 
+## 2026-06-21 — Full 17-scanner functionality verification + ai-anthropic dispatch blocked (ADV-16)
+
+**Scanner(s):** all 17 production SAST scanners + ai-anthropic (Phase 10)
+**Author:** Apogee
+**Services Affected:** none — verification only, no code or image changes
+**Tickets:** ADV-16, ADV-17, ADV-18 (all surfaced by this audit)
+
+### What changed
+
+Two-phase API-driven verification of every SAST scanner + first attempted ai-anthropic baseline:
+
+1. **Phase 1 — baseline matrix (17 SAST scans).** 17/17 match the 2026-05-22 baseline counts exactly. Wall-clock 274 s for the full batch; per-scanner durations 33-284 s.
+2. **Phase 2 — detector-firing on known-buggy fixtures (5 scans).** All 5 detectors fired with identical counts to 2026-05-22: halmos c=1, echidna h=1, mythril h=1 m=2 l=2, vyper h=1 l=1, rustdefend c=1.
+3. **Phase 3 — ai-anthropic first baseline FAILED to dispatch.** `{"detail":"Failed to trigger any scanners. Tool-integration service may be unavailable."}` reproduced 3x. Tool-integration is healthy; suspected tier-gate failure with misleading error text. Filed **ADV-16** (P2 High).
+
+**Tally: 17/17 SAST scanners functional, zero drift. ai-anthropic dispatch broken — separately tracked.**
+
+See [`TaskDocs-BlockSecOps/audit-2026-06-21-scanner-matrix-reaudit.md`](/home/pwner/Git/TaskDocs-BlockSecOps/audit-2026-06-21-scanner-matrix-reaudit.md) for full evidence per scanner.
+
+### Why
+
+Owner requested comprehensive scanner testing including AI. Last full reaudit was 2026-05-22; ai-anthropic shipped 2026-06-20 (Phase 10) and had never been audit-baselined.
+
+### Side findings filed as their own tickets
+
+- **ADV-17** — `/scans/{id}/vulnerabilities` returns empty even when scan record `critical/high/medium/low_count` fields are non-zero. Caught during triage of what initially appeared to be 22/22 zero-finding drift; the scan-record aggregates exposed the real source of truth.
+- **ADV-18** — explicit user-facing status/error messages (owner-driven UX hardening) — the misleading ai-anthropic error text was the trigger.
+
+### Verification
+
+- 22 SAST scans completed in 274 s; 1 AI scan dispatch failed 3x (deterministic)
+- 17/17 SAST scanners decisively verified (13 by detector firing, 4 by proof-of-life)
+- No scanner Job failures; no errors in tool-integration logs during the run window
+- Initial 22/22 "drift" was an artifact of querying the broken /vulnerabilities endpoint; aggregates on the scan record are correct (ADV-17 captures the endpoint bug)
+
+
+---
+
 ## 2026-05-22 — Full 17-scanner functionality verification (baseline + detector-firing)
 
 **Scanner(s):** all 17 production scanners
