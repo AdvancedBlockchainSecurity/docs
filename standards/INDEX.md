@@ -176,6 +176,13 @@ These standards ensure proper versioning and configuration management:
     - Tier requirements for org creation (starter+) and service accounts (growth+)
     - Invite workflow, data scoping rules, enterprise features (SSO/SAML)
 
+20a. **[Customer-Facing Error Message Style Guide](./error-message-style-guide.md)** *(added 2026-06-22, ADV-18)*
+    - Name what went wrong specifically; tell the caller what to do next
+    - 4xx for caller-fixable, 503 only when infra is actually down
+    - Avoid silent-empty-results — `{"total": 0}` when there are rows is the worst case
+    - Authorization 403 messages: differentiate org vs personal without info-disclosure
+    - `failure_type` + structured log discipline; concrete patterns from scans.py
+
 ### ☸️ Kubernetes Standards
 
 21. **[Kubernetes Pod Lifecycle](./kubernetes-pod-lifecycle.md)**
