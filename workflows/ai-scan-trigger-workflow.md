@@ -1,12 +1,12 @@
 # Workflow: AI Scan Trigger
 
 **Phase:** 10 — BYO AI Scanning
-**Status:** Production (updated 2026-06-21) — api-service v0.46.2, ai-scanner v0.2.7, dashboard v0.55.4
+**Status:** Production (updated 2026-06-22) — api-service v0.46.8, ai-scanner v0.2.7, dashboard v0.55.5
 **Cross-reference:** `TaskDocs-BlockSecOps/phases/10-phase-10-byo-ai-scanning/PHASE-10-BYO-AI-SCANNING-PLAN.md`
 
 The end-to-end flow when a user triggers an AI scan. AI scanning is a scanner-type that slots into the existing scan dispatch pipeline alongside the 17 SAST scanners; this doc focuses on what is different from a standard SAST scanner trigger.
 
-**Phase 1 constraints (as of api-service v0.46.2, ai-scanner v0.2.7):**
+**Phase 1 constraints (as of api-service v0.46.8, ai-scanner v0.2.7):**
 - Only `managed-claude` is live. BYO adapters (`anthropic`, `openai`, `gemini`) are wired but return `ai_provider_error` and are displayed as "Phase 2" in the dashboard.
 - `scanner_ids=["ai-anthropic"]` in a batch scan request is silently skipped with a server-side warning log; AI must be triggered as a standalone scan. The dashboard displays an amber notice in the batch scan modal explaining this.
 - The per-org `ai_scanning_enabled` flag can now be toggled via `PATCH /api/v1/organizations/{id}/ai-scanning` (org-admin only) — no longer requires a direct DB UPDATE.
@@ -77,13 +77,14 @@ sequenceDiagram
 
 1. **JWT auth** — standard for all `/scans` POSTs
 2. **Tier check** — `tiers.json` `aiScan.{tier}.managedClaudeAllowed` or `byoAllowed`
-3. **Org opt-in** — `organizations.ai_scanning_enabled = true`
-4. **Per-contract sensitivity** — `contracts.ai_processing_disabled = false`
-5. **User consent** — `users.ai_consent_at IS NOT NULL` (DPA acknowledged)
-6. **Sub-processor acknowledgment** — `ai_sensitivity_acknowledged: true` must be present in the request body. As of dashboard v0.55.4, the client always sends `true` when AI is in `scanner_ids`; selecting the AI scanner and clicking Start Scan constitutes consent (implicit-by-use model). The backend gate (BSO-SEC-031) remains unchanged — it still rejects `false` or absent values as defense in depth. `ai_scan_metadata.sensitivity_acknowledged` is always recorded as `true` after this dashboard change.
-7. **Token budget available** — atomic reservation per `quota_service.py`
+3. **AI tier gate (api-service v0.46.6+, ADV-16 defense-in-depth)** — `get_ai_scan_tier(current_user.tier)` must return a non-None tier. This is the 5th gate in the dispatch loop and rejects with `failure_type=ai_tier_gated` + message *"AI scanning requires Starter tier or higher. Upgrade your plan to enable ai-anthropic."* Belt-and-suspenders alongside gate #2 to ensure no AI scan dispatches without tier-config evaluation in scope.
+4. **Org opt-in** — `organizations.ai_scanning_enabled = true`
+5. **Per-contract sensitivity** — `contracts.ai_processing_disabled = false`
+6. **User consent** — `users.ai_consent_at IS NOT NULL` (DPA acknowledged)
+7. **Sub-processor acknowledgment** — `ai_sensitivity_acknowledged: true` must be present in the request body. As of dashboard v0.55.4, the client always sends `true` when AI is in `scanner_ids`; selecting the AI scanner and clicking Start Scan constitutes consent (implicit-by-use model). The backend gate (BSO-SEC-031) remains unchanged — it still rejects `false` or absent values as defense in depth. `ai_scan_metadata.sensitivity_acknowledged` is always recorded as `true` after this dashboard change.
+8. **Token budget available** — atomic reservation per `quota_service.py`
 
-Any gate failure short-circuits with a structured `failure_type` + readable `error_message` that surfaces in the scan list via the failure-label-renderer shipped in PR #225.
+Any gate failure short-circuits with a structured `failure_type` + readable `error_message` that surfaces in the scan list via the failure-label-renderer shipped in PR #225. Per-scanner failures are now also collected in a `failure_details` map (ADV-16, api-service v0.46.6) so the dashboard can render a precise reason per scanner instead of a single aggregate string.
 
 ## Failure-mode summary
 
@@ -98,6 +99,8 @@ Any gate failure short-circuits with a structured `failure_type` + readable `err
 | `ai_provider_error` | Provider returned 5xx, network error, or BYO adapter returned error (Phase 2 adapters) | "AI provider returned an error" | Refunded |
 | `ai_key_invalid` | BYO key rejected by provider on initial validation or at call time | "Your BYO API key was rejected by the provider" | No |
 | `ai_system_error` | ai-scanner internal unhandled exception, or `AI_SCANNING_DISABLED=true` kill-switch active | "AI scan service is temporarily unavailable" | Refunded |
+| `ai_tier_gated` | (v0.46.6+, ADV-16) Caller's tier resolves to `None` via `get_ai_scan_tier` — typically Trial or unauthenticated | "AI scanning requires Starter tier or higher. Upgrade your plan to enable ai-anthropic." | No |
+| `ai_consent_missing` | (v0.46.6+, ADV-16) `ai_sensitivity_acknowledged` was absent or false on the request body | "AI scans require explicit sub-processor consent. Set ai_sensitivity_acknowledged=true on the scan request." | No |
 | `ai_canceled` | User canceled mid-scan via `POST /scans/{id}/cancel`, OR the `cleanup_stuck_ai_scans` task (BSO-SEC-040) transitions a stuck scan; see cleanup task note below | "Scan canceled" | Charged for tokens streamed up to abort |
 
 ## Cancel-mid-scan flow
@@ -156,8 +159,25 @@ The `POST /scans/{scan_id}/ai-trigger` endpoint is idempotent on `scan_id`: a re
 
 CI clients trigger AI scans via the same `POST /api/v1/scans` endpoint with `scanner_ids: ["ai-anthropic"]` — no new API surface. Returns the same scan object; the client polls `GET /api/v1/scans/{id}` to completion.
 
+## Recent fixes (2026-06-22)
+
+### ADV-16 — `failure_details` map (api-service v0.46.6)
+
+The dispatch loop in `src/presentation/api/v1/endpoints/scans.py:create_scan` previously surfaced one aggregate error string for an entire batch. When AI dispatch was blocked by a specific gate (e.g. consent), the response read *"Failed to trigger any scanners. Tool-integration service may be unavailable"* — both misleading (tool-integration was fine) and unactionable.
+
+Fix: each per-scanner reject now writes into a `failure_details: Dict[scanner_id, {failure_type, message, status_code}]` map. The final HTTP status is chosen based on whether every failure is caller-fixable (4xx) or any are infra (503). Includes the new tier gate (`ai_tier_gated`) and a dedicated consent failure type (`ai_consent_missing`). Source-inspection regression tests in `tests/regression/test_scan_dispatch_error_messages.py` pin the load-bearing strings.
+
+### ADV-17 — `/scans/{id}/vulnerabilities` empty-result fix (api-service v0.46.7)
+
+Per-scan vulnerability endpoint defaulted `include_duplicates=False`, which combined with cross-scan dedup (every row flipped to `is_primary=False` after a re-scan) returned `{"total": 0, "items": []}` even when `scans.critical_count + high_count + ...` were non-zero. Fix: flipped `Query(True)` as the default for both `get_scan_vulnerabilities` and `get_scan_vulnerabilities_breakdown` — the per-scan endpoint now returns all of that scan's findings by default; callers wanting dedup-filtered behavior pass `include_duplicates=False` explicitly. Regression covered by `tests/unit/infrastructure/test_scan_vulnerabilities_include_duplicates.py`.
+
+### ADV-18 — error-message sweep (api-service v0.46.8)
+
+Seven HTTPException sites in `scans.py` were upgraded to follow the new [Customer-Facing Error Message Style Guide](../standards/error-message-style-guide.md): quota-not-found, batch-scan-unauth, contract-scan-unauth (org vs personal split), contract-access-unauth, store-results contract-not-found, bulk-delete-unauth. Each carries a `# ADV-18:` annotation for future-refactor visibility. Regression covered by `tests/regression/test_scan_endpoint_error_messages.py`.
+
 ## Cross-references
 
+- `docs/standards/error-message-style-guide.md` (new 2026-06-22)
 - `docs/pipelines/ai-scanner-build-pipeline.md`
 - `docs/playbooks/ai-cost-kill-switch.md`
 - `docs/playbooks/ai-quota-exhausted-runbook.md`
