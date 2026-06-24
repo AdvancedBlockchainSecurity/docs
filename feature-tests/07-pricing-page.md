@@ -41,7 +41,7 @@
   - [ ] Unlimited files per scan
   - [ ] Unlimited LoC per scan
   - [ ] 15 projects
-  - [ ] All 25+ scanners
+  - [ ] All 18 scanners
   - [ ] No API access
   - [ ] Export enabled (PDF, JSON, SARIF)
   - [ ] 90-day retention

@@ -59,7 +59,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | **AI Invariant Generations/Month** | 0 |
 | **CI/CD Integration** | CLI only (GitHub Actions, GitLab CI templates) |
 | **Integrations Hub** | No (requires Starter) |
-| **Scanners** | All 25+ |
+| **Scanners** | All 18 |
 | **Support** | Community |
 
 **Best For**: Platform trials, evaluating the product, open-source developers
@@ -96,7 +96,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | **Export Reports** | Yes (PDF, JSON, SARIF) |
 | **AI Explanations/Month** | 75 |
 | **AI Invariant Generations/Month** | 15 |
-| **Scanners** | All 25+ |
+| **Scanners** | All 18 |
 | **Support** | Email (24h response) |
 
 **Best For**: Small development teams, freelance auditors, early-stage startups
@@ -119,7 +119,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | **Scan Priority** | 25 |
 | **API Access** | Yes |
 | **Private Repos** | Unlimited |
-| **Multi-Chain** | Yes (Solidity, Vyper, Rust/Solana, Cairo, Move) |
+| **Multi-Chain** | Yes (Solidity, Vyper, Rust/Solana) |
 | **Continuous Monitoring** | Yes |
 | **95% FP Reduction** | Yes |
 | **Webhooks** | Yes |
@@ -127,7 +127,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | **Export Reports** | Yes (PDF, JSON, SARIF) |
 | **AI Explanations/Month** | 300 |
 | **AI Invariant Generations/Month** | 75 |
-| **Scanners** | All 25+ |
+| **Scanners** | All 18 |
 | **Support** | Priority (4h response) |
 
 **Best For**: Growing protocols, multi-chain projects, companies preparing for audits
@@ -164,7 +164,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 | **AI Invariant Generations/Month** | Unlimited (-1) |
 | **AI Priority Queue** | Yes |
 | **Custom AI Prompts** | Available |
-| **Scanners** | All 25+ |
+| **Scanners** | All 18 |
 | **Support** | Dedicated (named contact) |
 
 **Best For**: Large organizations, major DeFi protocols, companies requiring compliance
@@ -196,7 +196,7 @@ developer (0) < starter (1) < growth (2) < enterprise (3)
 
 | Feature | Developer | Starter | Growth | Enterprise |
 |---------|-----------|------|--------|------------|
-| All 25+ Scanners | Yes | Yes | Yes | Yes |
+| All 18 Scanners | Yes | Yes | Yes | Yes |
 | Export Reports | No | Yes | Yes | Yes |
 | 95% FP Reduction | No | Yes | Yes | Yes |
 | Private Repos | No | 5 | Unlimited | Unlimited |
@@ -436,11 +436,11 @@ Pay-per-scan credit packages via x402 (USDC on Base) for users who prefer flexib
 
 | Platform | Model | Per-Scan Cost | Scanners |
 |----------|-------|---------------|----------|
-| Apogee x402 | Credit packages | $1.25-$2.50 | 25+ |
+| Apogee x402 | Credit packages | $1.25-$2.50 | 18 |
 | MythX On-Demand | Per-scan | $3.33 | 1 |
 | SolidityScan On-Demand | LoC-based | $15-30 | 1 |
 
-**Value Proposition**: "Same price as MythX, get 25x the scanners"
+**Value Proposition**: "Same price as MythX, get 18x the scanners"
 
 ### Subscription Break-Even
 

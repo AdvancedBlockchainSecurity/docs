@@ -41,7 +41,7 @@
 - [ ] Projects limit increased to 15
 - [ ] API access NOT enabled (Starter has no API access)
 - [ ] Priority queue level updated (40)
-- [ ] All 25+ scanners now accessible
+- [ ] All 18 scanners now accessible
 - [ ] Team members limit increased to 5
 
 ### 1.4 Quota Preservation

@@ -3758,7 +3758,7 @@ Get available subscription plans with pricing (public endpoint).
       "scans_per_month": 3,
       "price_monthly": 0,
       "price_annual": 0,
-      "features": ["3 contracts per month", "All 25+ scanners", "7-day retention"]
+      "features": ["3 contracts per month", "All 18 scanners", "7-day retention"]
     },
     {
       "tier": "starter",

@@ -1,7 +1,7 @@
 # AI Scanner
 
 **Service:** `blocksecops-ai-scanner`
-**Version:** 0.2.7 (2026-06-21)
+**Version:** 0.2.7 (2026-06-21) — orchestrator. Latest api-service callsite: v0.46.8 (2026-06-22).
 **Tier availability:** `starter` (managed-claude, limited quota), `growth` (managed-claude, standard quota), `enterprise` (managed-claude, high quota + BYO providers in Phase 2)
 **scanner_id (catalog ID):** `ai-anthropic` — this is the ID used in `scanner_ids` dispatch payloads, returned by `GET /api/v1/scanners`, and stored on `vulnerabilities.scanner_id` for AI findings. Changed from `ai` to `ai-anthropic` in api-service v0.46.2 (PR #382) so the catalog ID matches what the orchestrator writes to the DB.
 **Display name:** "AI (Claude Sonnet)" — shown in the scanner picker and scanner catalog.
@@ -102,9 +102,30 @@ Costs vary with contract size. The per-tier `perScanInputTokenCap` in `tiers.jso
 
 ---
 
+## Verification log
+
+### 2026-06-22 — first ai-anthropic baseline established (ADV-16 fix verification)
+
+After api-service v0.46.6 shipped the `failure_details` map + tier gate fix (see [ADV-16](https://linear.app/advanced-blockchain-security/issue/ADV-16)), an end-to-end scan was run against the foundry-oz baseline (contract fingerprint `eafe2b12`) as `jasonbrailowbizop@mail.com` (Enterprise tier, org opted in, contract not flagged sensitive). Result:
+
+| Metric | Value |
+|---|---|
+| Scan ID | `e764da1d` (8-char prefix) |
+| Scanner | `ai-anthropic` (managed-claude path) |
+| Outcome | `status=completed` |
+| Findings | `critical=1, medium=1` (`c=1 m=1`) |
+| Failure type | None |
+
+This is the **first recorded passing ai-anthropic baseline** for the audit matrix. Prior audit (2026-06-21) recorded the scanner as blocked at dispatch by the misleading 503; with that fixed, the AI scanner joins the 17 SAST scanners in the verified-passing column.
+
+Audit trail: `docs/scanners-audit/CHANGELOG.md` 2026-06-22 entry; `TaskDocs-BlockSecOps/audit-2026-06-21-scanner-matrix-reaudit.md` for prior baseline state.
+
+---
+
 ## Cross-references
 
 - `docs/workflows/ai-scan-trigger-workflow.md` — end-to-end trigger flow and failure modes
+- `docs/standards/error-message-style-guide.md` — error-message conventions (ADV-16 reference incident)
 - `docs/pipelines/ai-scanner-build-pipeline.md` — build, deploy, NetworkPolicy
 - `docs/playbooks/ai-cost-kill-switch.md` — emergency cost control
 - `docs/playbooks/ai-quota-exhausted-runbook.md` — quota triage
