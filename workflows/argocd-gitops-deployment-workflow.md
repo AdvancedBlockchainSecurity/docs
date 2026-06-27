@@ -296,6 +296,11 @@ If the bare-metal ArgoCD (argocd-local) needs to manage GKE workloads:
 
 #### Step 1: Authorize the Bare-Metal Server
 
+> For a fixed-IP bare-metal ArgoCD server, allowlisting its public IP (below) is
+> the appropriate path. For roaming operators (a laptop on changing networks),
+> prefer **Connect Gateway** instead — it grants kubectl access with no IP
+> allowlist entry. See `blocksecops-gcp-infrastructure/docs/gcp/connect-gateway.md`.
+
 ```bash
 # In gcp-infrastructure Terraform, add to master_authorized_networks:
 master_authorized_networks = [
