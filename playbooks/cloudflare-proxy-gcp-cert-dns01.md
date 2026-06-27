@@ -15,7 +15,7 @@ This playbook covers diagnosing and resolving TLS certificate errors (Cloudflare
 ## Prerequisites
 
 - `gcloud` CLI authenticated: `gcloud auth application-default login`
-- `kubectl` access to GKE cluster: `gcloud container clusters get-credentials apogee-production-gke --region us-west1 --project project-8a2657b9-d96c-4c0a-a69`
+- `kubectl` access to GKE cluster. From the operator laptop / any roaming network, use Connect Gateway (no IP allowlist): `gcloud container fleet memberships get-credentials apogee-production-gke --location us-west1 --project project-8a2657b9-d96c-4c0a-a69`. The direct `gcloud container clusters get-credentials apogee-production-gke --region us-west1 --project project-8a2657b9-d96c-4c0a-a69` path only works from an IP in `master_authorized_networks`. See `blocksecops-gcp-infrastructure/docs/gcp/connect-gateway.md`.
 - Terraform working directory: `blocksecops-gcp-infrastructure/terraform/environments/gcp`
 - Cloudflare API access (via Cloudflare API MCP or `curl` with Zone API token)
 
